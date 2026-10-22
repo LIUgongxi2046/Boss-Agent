@@ -14,6 +14,7 @@ from aiohttp import web
 
 from business import now
 from boss_workspace_api import BossWorkspaceAPI
+from boss_sector_api import BossSectorAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -33,6 +34,7 @@ class BossPageAPI:
         self.store = store
         self.namespace = namespace
         self.workspace = BossWorkspaceAPI(store, namespace)
+        self.sectors = BossSectorAPI(store, namespace)
 
     @staticmethod
     def _items(db, namespace, kind):
@@ -308,6 +310,8 @@ class BossPageAPI:
         try:
             if path.startswith("/api/boss/ui/workspace/"):
                 return self.workspace.serve(role, path, query_string)
+            if path == "/api/boss/ui/sector":
+                return self.sectors.serve(role, query_string)
             if path == "/api/boss/ui/maintenance":
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}
