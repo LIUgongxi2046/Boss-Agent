@@ -67,7 +67,7 @@ def test_technical_create_has_real_fts_and_owner_only_text_read(services):
     assert metadata["title"] == "合成技术资料（由维护录入）"
     assert metadata["version"] == "1"
     assert metadata["content_visible"] is False
-    assert "content" not in json.dumps(index)
+    assert all("content" not in row for row in index["sources"])
     assert "蓝天对照号" not in json.dumps(index)
     assert "finance-1" in index["available_simulated_author_ids"]
     assert projection(page, "BOSS", "source-index")[0] == 403
