@@ -65,3 +65,40 @@ def test_reviewed_desktop_v6_hero_sidebar_and_card_geometry():
     assert "--v6-secondary:#5CA63B" in design_css
     assert "--boss-blue: #005BAC" in css
     assert "--boss-green: #5CA63B" in css
+
+
+
+def test_f05_confirmed_minute_draft_has_separate_authorized_create_and_f06_link():
+    editor = (ROOT / "app/webui/BossMinutesAssignmentActions.tsx").read_text()
+    shell = (ROOT / "app/webui/BossDesktop.tsx").read_text()
+    f06 = (ROOT / "app/webui/BossAssignmentFlow.tsx").read_text()
+    backend = (ROOT / "validation/boss_meeting_approval.py").read_text()
+    for marker in (
+        "boss.minutes.assignment.create", "ASSIGNMENT_DRAFT",
+        "CONFIRMED", "sourceCurrent", "editingUnsaved",
+        "entry_id", "minute_version", "due_at", "evidence_requirements",
+        "onTaskCreated", "独立", "client.requestMutation",
+        "/api/boss/ui/operation-status",
+    ):
+        assert marker in editor
+    assert "BossMinutesAssignmentActions" in (
+        ROOT / "app/webui/BossMeetingApproval.tsx"
+    ).read_text()
+    assert "onTaskCreated={id=>{setSelectedTaskId(id);refresh();}}" in shell
+    assert "origin_minute_id" in f06
+    assert "origin_entry_id" in f06
+    assert "minutes_assignment_link" in backend
+    assert "message_sent_at_link" in backend
+    assert 'task["status"]' not in editor  # no fake local task success
+    assert "dangerouslySetInnerHTML" not in editor
+    assert "iframe" not in editor
+
+
+def test_f05_transaction_and_replay_are_represented_in_real_contract():
+    source = (ROOT / "validation/boss_command_api.py").read_text()
+    projection = (ROOT / "validation/boss_workspace_api.py").read_text()
+    assert '"boss.minutes.assignment.create": "BOSS"' in source
+    assert "minutes_assignment_create(self, db, data, payload, key)" in source
+    assert '"task_created_by_minutes": bool(linked)' in projection
+    assert '"message_sent_by_minutes": any(' in projection
+    assert '"linked_assignments": linked' in projection
