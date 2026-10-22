@@ -8,8 +8,8 @@ import { useClient } from "@/providers/ClientProvider";
 // from this map still show the original transparent "not implemented" panel.
 export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
   F02: "notifications", F04: "organization",
-  F08: "outbox", F09: "knowledge",
-  F10: "organization", F11: "calendar", F12: "calendar",
+  F09: "knowledge",
+  F10: "organization", F11: "calendar",
   F13: "memory", F25: "dataset", F26: "plans",
   F28: "authorizations", F29: "decisions",
   F32: "system", N06: "notifications", N07: "memory",
