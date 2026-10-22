@@ -605,13 +605,37 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   </div>
                 </div> :
                 page === "F06" ? <BossAssignmentFlow
-                  tasks={tasks}
-                  selectedTaskId={selectedTaskId}
-                  onSelectTask={setSelectedTaskId}
-                  onReload={refresh}
-                  onViewSource={() => goSource("finance-note")}
-                  context={dashboard}
+                  tasks={tasks} selectedTaskId={selectedTaskId}
+                  onSelectTask={setSelectedTaskId} onReload={refresh}
+                  onViewSource={() => goSource("finance-note")} context={dashboard}
+                  draft={assignmentDraft} onDraftChange={updateAssignmentDraft}
+                  onDraftSaved={()=>setAssignmentDirty(false)}
+                  onOpenCoordinatorPicker={()=>navigate("D04")}
+                  onOpenDuePicker={()=>navigate("D05")}
                 /> :
+                (page==="D04"||page==="D05") ? <BossAssignmentPicker
+                  key={page} pageId={page} contacts={dashboard?.contacts||[]}
+                  timezone={dashboard?.profile.timezone||"Asia/Shanghai"}
+                  businessClock={dashboard?.business_clock} draft={assignmentDraft}
+                  onChange={updateAssignmentDraft} onReturn={()=>navigate("F06")}
+                /> :
+                page==="D06" ? <div className="boss-columns">
+                  <div className="boss-column">
+                    <Panel title="未保存修改提醒" note="D06 · 草稿保护">
+                      <StatusLine text="当前草稿不自动保存或发送；离开F06前会显示真实确认弹窗。"/>
+                      <GlassButton onClick={()=>navigate("F06")}>返回交办草稿</GlassButton>
+                    </Panel>
+                  </div>
+                </div> :
+                page==="D07" ? <div className="boss-columns">
+                  <div className="boss-column">
+                    <Panel title="访问权限限制" note="D07 · 服务端权限制约">
+                      <StatusLine variant="warn" text="角色权限由Gateway与业务服务同时核查，前端页面不能提升或绕过授权。"/>
+                      <Value label="当前身份" value={role}/>
+                      <GlassButton onClick={()=>navigate("F01")}>返回本人工作台</GlassButton>
+                    </Panel>
+                  </div>
+                </div> :
                 page === "N05" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="任务与承诺" note="从 SQLite 正式业务对象读取，不根据设计图生成任务">
