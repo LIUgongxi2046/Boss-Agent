@@ -111,7 +111,10 @@ const MAINT_NAV = [
   ["A15", "运行记录", Activity],
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
-const PRODUCT_PAGES = new Set(["F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "A04", "A08", "A15", "N12"]);
+const PRODUCT_PAGES = new Set<string>([
+  "F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "A04", "A08", "A15", "N12",
+  ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
+]);
 const ANIMATIONS: Record<Animation, string> = {
   idle: "/boss-brand/01-待机悬浮.webp",
   thinking: "/boss-brand/03-思考分析.webp",
