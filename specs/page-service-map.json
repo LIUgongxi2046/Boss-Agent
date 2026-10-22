@@ -5,8 +5,8 @@
   "source_locked": "Boss-Agent Desktop v6.0",
   "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
   "original_v6_status": "DESIGN_ONLY",
-  "implemented_page_count": 13,
-  "placeholder_page_count": 59,
+  "implemented_page_count": 61,
+  "placeholder_page_count": 11,
   "page_count": 72,
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
@@ -20,7 +20,10 @@
     "Task completion requires result submitted with currently valid evidence and a separate authenticated BOSS decision. Simulated feedback never marks completed.",
     "Real Mac visual snapshots, actual DeepSeek+UI complete walkthrough and end-to-end E01-E06 remain not verified in this development slice.",
     "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance.",
-    "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration."
+    "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration.",
+    "2026-10-22 implementation slice: 36 modular workplace routes and 13 agriculture coverage routes added; existing A04 counts once. 61/72 pages have at least partial real code/role-scoped read data; none of these 61 is thereby accepted as functionally complete.",
+    "Agriculture pages only render verified source coverage and unknown KPIs: the selected water-feed sales note is not evidence for raw-material prices and does not support other sector metrics. All sector numeric KPIs are NULL and require new approved datasets.",
+    "Remaining action gaps, 561 visual states, end-to-end Mac/DeepSeek/voice/installation, source/metric completeness and pixel-accurate visual comparison are not accepted. Metadata-only page content does not satisfy PRD write or approval actions."
   ],
   "pages": [
     {
@@ -87,11 +90,17 @@
       "logical_architecture_route": "/app/boss/F02",
       "actual_webui_navigation": "?bossPage=F02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/notifications"
+      ],
+      "code_wired_write_actions": [
+        "boss.reminder.ack",
+        "boss.reminder.snooze",
+        "boss.reminder.close"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -102,7 +111,9 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -163,10 +174,12 @@
       "logical_architecture_route": "/app/boss/F04",
       "actual_webui_navigation": "?bossPage=F04",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/organization"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -176,7 +189,9 @@
         "message_draft.save"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -204,10 +219,12 @@
       "logical_architecture_route": "/app/boss/F05",
       "actual_webui_navigation": "?bossPage=F05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/organization"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -217,7 +234,9 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -293,10 +312,12 @@
       "logical_architecture_route": "/app/boss/F07",
       "actual_webui_navigation": "?bossPage=F07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/sources"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -305,7 +326,9 @@
         "approval.decide"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -330,10 +353,12 @@
       "logical_architecture_route": "/app/boss/F08",
       "actual_webui_navigation": "?bossPage=F08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/outbox"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -343,7 +368,9 @@
         "messages.send"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -365,10 +392,12 @@
       "logical_architecture_route": "/app/boss/F09",
       "actual_webui_navigation": "?bossPage=F09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/knowledge"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -378,7 +407,9 @@
         "message_drafts.save"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -400,10 +431,12 @@
       "logical_architecture_route": "/app/boss/F10",
       "actual_webui_navigation": "?bossPage=F10",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/organization"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -413,7 +446,9 @@
         "meeting_schedule.propose"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -438,10 +473,12 @@
       "logical_architecture_route": "/app/boss/F11",
       "actual_webui_navigation": "?bossPage=F11",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/calendar"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -451,7 +488,9 @@
         "travel.confirm"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -476,10 +515,12 @@
       "logical_architecture_route": "/app/boss/F12",
       "actual_webui_navigation": "?bossPage=F12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/calendar"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -490,7 +531,9 @@
         "private_calendar.revoke"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -515,11 +558,16 @@
       "logical_architecture_route": "/app/boss/F13",
       "actual_webui_navigation": "?bossPage=F13",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_OWNER_MEMORY_WRITE_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/memory"
+      ],
+      "code_wired_write_actions": [
+        "boss.memory.confirm",
+        "boss.memory.delete"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -529,7 +577,9 @@
         "owner_memory.delete"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -551,24 +601,31 @@
       "logical_architecture_route": "/app/boss/F14",
       "actual_webui_navigation": "?bossPage=F14",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F14"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F15",
@@ -585,12 +642,16 @@
       "logical_architecture_route": "/app/boss/F15",
       "actual_webui_navigation": "?bossPage=F15",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F15"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -598,12 +659,15 @@
         "review.schedule"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F16",
@@ -620,24 +684,31 @@
       "logical_architecture_route": "/app/boss/F16",
       "actual_webui_navigation": "?bossPage=F16",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F16"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F17",
@@ -654,12 +725,16 @@
       "logical_architecture_route": "/app/boss/F17",
       "actual_webui_navigation": "?bossPage=F17",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F17"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -667,12 +742,15 @@
         "review.schedule"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F18",
@@ -689,12 +767,16 @@
       "logical_architecture_route": "/app/boss/F18",
       "actual_webui_navigation": "?bossPage=F18",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F18"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -702,12 +784,15 @@
         "review.schedule"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F19",
@@ -724,12 +809,16 @@
       "logical_architecture_route": "/app/boss/F19",
       "actual_webui_navigation": "?bossPage=F19",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F19"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -737,12 +826,15 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F20",
@@ -759,24 +851,31 @@
       "logical_architecture_route": "/app/boss/F20",
       "actual_webui_navigation": "?bossPage=F20",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F20"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F21",
@@ -793,24 +892,31 @@
       "logical_architecture_route": "/app/boss/F21",
       "actual_webui_navigation": "?bossPage=F21",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F21"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F22",
@@ -827,12 +933,16 @@
       "logical_architecture_route": "/app/boss/F22",
       "actual_webui_navigation": "?bossPage=F22",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F22"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -840,12 +950,15 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F23",
@@ -862,12 +975,16 @@
       "logical_architecture_route": "/app/boss/F23",
       "actual_webui_navigation": "?bossPage=F23",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=F23"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -875,12 +992,15 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "F24",
@@ -940,11 +1060,15 @@
       "logical_architecture_route": "/app/maintain/F25",
       "actual_webui_navigation": "?bossPage=F25",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_SIMULATION_DATASET_EVENT_SEED",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/dataset"
+      ],
+      "code_wired_write_actions": [
+        "boss.simulation.event.seed"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -954,7 +1078,9 @@
         "simulation.inject"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -979,10 +1105,12 @@
       "logical_architecture_route": "/app/boss/F26",
       "actual_webui_navigation": "?bossPage=F26",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/plans"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -992,7 +1120,9 @@
         "auth.logout"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1059,10 +1189,12 @@
       "logical_architecture_route": "/app/boss/F28",
       "actual_webui_navigation": "?bossPage=F28",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/authorizations"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1072,7 +1204,9 @@
         "owner_authorizations.revoke"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1097,10 +1231,12 @@
       "logical_architecture_route": "/app/boss/F29",
       "actual_webui_navigation": "?bossPage=F29",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/decisions"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1110,7 +1246,9 @@
         "runs.cancel_pending"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1210,10 +1348,12 @@
       "logical_architecture_route": "/app/maintain/F32",
       "actual_webui_navigation": "?bossPage=F32",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/system"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1222,7 +1362,9 @@
         "maintenance.check_health"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -1496,11 +1638,17 @@
       "logical_architecture_route": "/app/boss/N06",
       "actual_webui_navigation": "?bossPage=N06",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/notifications"
+      ],
+      "code_wired_write_actions": [
+        "boss.reminder.ack",
+        "boss.reminder.snooze",
+        "boss.reminder.close"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1510,7 +1658,9 @@
         "notifications.close"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1538,11 +1688,16 @@
       "logical_architecture_route": "/app/boss/N07",
       "actual_webui_navigation": "?bossPage=N07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/memory"
+      ],
+      "code_wired_write_actions": [
+        "boss.memory.confirm",
+        "boss.memory.delete"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1550,7 +1705,9 @@
         "owner_goals.save"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1578,11 +1735,17 @@
       "logical_architecture_route": "/app/boss/N08",
       "actual_webui_navigation": "?bossPage=N08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/notifications"
+      ],
+      "code_wired_write_actions": [
+        "boss.reminder.ack",
+        "boss.reminder.snooze",
+        "boss.reminder.close"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1590,7 +1753,9 @@
         "notification_preferences.save"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1621,10 +1786,12 @@
       "logical_architecture_route": "/app/boss/N09",
       "actual_webui_navigation": "?bossPage=N09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/plans"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1635,7 +1802,9 @@
         "owner_plans.cancel"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1657,10 +1826,12 @@
       "logical_architecture_route": "/app/boss/N10",
       "actual_webui_navigation": "?bossPage=N10",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/authorizations"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1669,7 +1840,9 @@
         "owner_authorizations.revoke"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1694,17 +1867,21 @@
       "logical_architecture_route": "/app/boss/N11",
       "actual_webui_navigation": "?bossPage=N11",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/decisions"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1800,10 +1977,12 @@
       "logical_architecture_route": "/app/boss/D02",
       "actual_webui_navigation": "?bossPage=D02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/authorizations"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1812,7 +1991,9 @@
         "owner_decision.submit"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -2062,17 +2243,25 @@
       "logical_architecture_route": "/app/boss/D09",
       "actual_webui_navigation": "?bossPage=D09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/notifications"
+      ],
+      "code_wired_write_actions": [
+        "boss.reminder.ack",
+        "boss.reminder.snooze",
+        "boss.reminder.close"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T18",
@@ -2097,10 +2286,12 @@
       "logical_architecture_route": "/app/maintain/A01",
       "actual_webui_navigation": "?bossPage=A01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/system"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2111,7 +2302,9 @@
         "maintenance.access.activate"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2136,10 +2329,12 @@
       "logical_architecture_route": "/app/maintain/A02",
       "actual_webui_navigation": "?bossPage=A02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/tool-catalog"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2149,7 +2344,9 @@
         "simulation.test"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2174,10 +2371,12 @@
       "logical_architecture_route": "/app/maintain/A03",
       "actual_webui_navigation": "?bossPage=A03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/dataset"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2187,7 +2386,9 @@
         "simulation.reset"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2212,14 +2413,17 @@
       "logical_architecture_route": "/app/maintain/A04",
       "actual_webui_navigation": "?bossPage=A04",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
-      "component_file": "app/webui/BossAssignmentFlow.tsx",
-      "component_name": "MaintainerFeedback (nested in BossDesktop)",
+      "render_status": "PARTIAL_MAINTAINER_SIMULATION_WRITES_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/maintenance"
+        "GET /api/boss/ui/maintenance",
+        "GET /api/boss/ui/workspace/relationships"
       ],
       "code_wired_write_actions": [
-        "boss.simulation.feedback"
+        "boss.simulation.feedback",
+        "boss.simulation.event.seed",
+        "boss.simulation.clock.advance"
       ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2230,7 +2434,9 @@
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_command_api.py"
+        "app/tests/test_boss_command_api.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2258,10 +2464,12 @@
       "logical_architecture_route": "/app/maintain/A05",
       "actual_webui_navigation": "?bossPage=A05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/system"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2272,7 +2480,9 @@
         "prompt_versions.activate"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2336,10 +2546,12 @@
       "logical_architecture_route": "/app/maintain/A07",
       "actual_webui_navigation": "?bossPage=A07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/source-index"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2350,7 +2562,9 @@
         "knowledge.withdraw"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2424,10 +2638,12 @@
       "logical_architecture_route": "/app/maintain/A09",
       "actual_webui_navigation": "?bossPage=A09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/tool-catalog"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2438,7 +2654,9 @@
         "tools.activate"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2466,10 +2684,12 @@
       "logical_architecture_route": "/app/maintain/A10",
       "actual_webui_navigation": "?bossPage=A10",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/metric-definitions"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2480,7 +2700,9 @@
         "configuration.activate"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2508,11 +2730,16 @@
       "logical_architecture_route": "/app/maintain/A11",
       "actual_webui_navigation": "?bossPage=A11",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_MAINTAINER_SIMULATION_WRITES_AND_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/relationships"
+      ],
+      "code_wired_write_actions": [
+        "boss.simulation.event.seed",
+        "boss.simulation.clock.advance"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -2521,7 +2748,9 @@
         "simulation.feedback.inject"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2546,10 +2775,12 @@
       "logical_architecture_route": "/app/maintain/A12",
       "actual_webui_navigation": "?bossPage=A12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/source-index"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2559,7 +2790,9 @@
         "memory_index.repair"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2587,10 +2820,12 @@
       "logical_architecture_route": "/app/maintain/A13",
       "actual_webui_navigation": "?bossPage=A13",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/scheduler"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2601,7 +2836,9 @@
         "scheduler.jobs.cancel"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2626,17 +2863,21 @@
       "logical_architecture_route": "/app/maintain/A14",
       "actual_webui_navigation": "?bossPage=A14",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/audit"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2698,10 +2939,12 @@
       "logical_architecture_route": "/app/maintain/A16",
       "actual_webui_navigation": "?bossPage=A16",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/system"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2711,7 +2954,9 @@
         "evaluation.reset"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py",
+        "app/tests/test_boss_memory_notifications.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2733,12 +2978,16 @@
       "logical_architecture_route": "/app/boss/V19-BEEF",
       "actual_webui_navigation": "?bossPage=V19-BEEF",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=V19-BEEF"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -2746,12 +2995,15 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "V19-EGG",
@@ -2768,12 +3020,16 @@
       "logical_architecture_route": "/app/boss/V19-EGG",
       "actual_webui_navigation": "?bossPage=V19-EGG",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=V19-EGG"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -2781,12 +3037,15 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     },
     {
       "page_id": "V19-MILK",
@@ -2803,12 +3062,16 @@
       "logical_architecture_route": "/app/boss/V19-MILK",
       "actual_webui_navigation": "?bossPage=V19-MILK",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
+      "component_file": "app/webui/BossSectorView.tsx",
+      "component_name": "BossSectorView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/sector?page=V19-MILK"
+      ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "authenticated native Agent conversation for identifying missing evidence"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -2816,12 +3079,30 @@
         "assignment.prepare"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_sector_api.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "data_coverage": "NO_VERIFIED_SECTOR_KPI_SOURCE",
+      "metrics_are_real": false
     }
+  ],
+  "business_mutation_end_to_end_accepted": false,
+  "visual_all_pages_accepted": false,
+  "not_yet_built_page_ids": [
+    "F27",
+    "F30",
+    "F31",
+    "N01",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "A06"
   ]
 }
