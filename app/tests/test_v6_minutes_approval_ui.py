@@ -17,6 +17,7 @@ def test_real_minute_approval_routes_not_shell_placeholders():
         assert not by_id[id]["visual_pixel_verified"]
     assert set(by_id["F05"]["code_wired_write_actions"]) == {
         "boss.minutes.save", "boss.minutes.confirm",
+        "boss.minutes.assignment.create",
     }
     assert "boss.approval.decide" in by_id["F07"]["code_wired_write_actions"]
     assert {"boss.simulation.application.seed", "boss.simulation.application.revise"} <= set(
@@ -39,6 +40,8 @@ def test_workflow_component_respects_source_and_owner_boundaries():
     assert "funds_transferred" in domain
     assert "document_revision" in domain
     assert "BossMeetingApproval.tsx" in overlay
+    assert "BossMinutesAssignmentActions.tsx" in overlay
+    assert "BossMinutesAssignmentActions" in view
     assert "dangerouslySetInnerHTML" not in view
     assert "<iframe" not in view
 
