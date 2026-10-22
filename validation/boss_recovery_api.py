@@ -22,7 +22,7 @@ NS = "ui-check"
 SAFE_RECEIPT_FIELDS = {
     "source_type", "draft_id", "draft_version", "message_id",
     "recipient_id", "send_state", "delivery_state", "reply_state",
-    "external_channel_invoked", "status", "version", "calendar_id",
+    "external_channel_invoked", "status", "state", "decision", "version", "calendar_id",
     "share_id", "share_status", "fields", "active_shares_invalidated",
     "external_delivery_created", "external_recall_verified",
     "future_visibility_stopped", "task_id", "task_status_after_reply",
