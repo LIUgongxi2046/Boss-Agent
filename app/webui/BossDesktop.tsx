@@ -15,6 +15,7 @@ import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
+import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -760,6 +761,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   key={page} pageId={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
                 /> :
+                (page === "F05" || page === "F07") ? <BossMeetingApprovalView
+                  key={page} pageId={page}
+                  onViewSource={goSource}
+                  onNavigate={id=>navigate(id)}
+                /> :
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
                   onNavigate={id=>navigate(id)} onViewSource={goSource}
@@ -848,6 +854,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 <BossWorkspaceView key="A04" role={role} pageId="A04"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
               </div>
+              </> : page === "A03" ? <>
+                <BossWorkspaceView key="A03" role={role} pageId="A03"
+                  onNavigate={id=>navigate(id)} onViewSource={goSource}/>
+                <div className="boss-workspace-extra">
+                  <MaintainerApplicationSeed/>
+                </div>
               </> : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                 key={page} role={role} pageId={page}
                 onNavigate={id=>navigate(id)} onViewSource={goSource}
