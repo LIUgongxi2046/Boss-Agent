@@ -26,6 +26,7 @@ from boss_message_calendar import (
     calendar_share, calendar_revoke, calendar_delete,
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
+from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_meeting_approval import (
     minutes_save, minutes_confirm, minutes_assignment_create,
     application_seed, application_revise, approval_decide,
@@ -322,7 +323,12 @@ class BossCommandAPI:
         validate("send_input", tool_input)
         result = self.store.send_assignment(db, NAMESPACE, data, tool_input)
         validate("send_output", result)
-        return {**result, "authorization_id": auth_id}
+        updated = self.store.get(db, NAMESPACE, "task", payload["task_id"])
+        reminder = synchronize_task_due(
+            self.store, db, updated, reason="AUTHORIZED_SEND",
+        )
+        return {**result, "authorization_id": auth_id,
+                "task_due_event": reminder}
 
     def _feedback(self, db, payload):
         required = {
@@ -395,9 +401,15 @@ class BossCommandAPI:
         result = self.store.control_decide(
             db, NAMESPACE, {"authorization_id": auth_id, **bound}
         )
+        prior_event = task_due_event(db, result["task_id"])
+        reminder = synchronize_task_due(
+            self.store, db, result,
+            reason="OWNER_COMPLETE" if action.endswith(".complete") else "AUTHORIZED_EXTEND",
+        ) if prior_event else None
         return {"source_type": "SIMULATED", "task_id": result["task_id"],
                 "version": result["version"], "status": result["status"],
-                "due_at": result.get("due_at"), "authorization_id": auth_id}
+                "due_at": result.get("due_at"), "authorization_id": auth_id,
+                "task_due_event": reminder}
 
     def _cancel(self, db, payload):
         self._exact(payload, {"client_request_id", "task_id", "task_version", "reason"})
@@ -417,9 +429,14 @@ class BossCommandAPI:
         task["cancellation_reason"] = payload["reason"]
         task["canceled_at"] = now()
         self.store.put(db, NAMESPACE, "task", task["task_id"], task)
+        prior_event = task_due_event(db, task["task_id"])
+        reminder = synchronize_task_due(
+            self.store, db, task, reason="OWNER_CANCEL",
+        ) if prior_event else None
         return {"source_type": "SIMULATED", "task_id": task["task_id"],
                 "status": "CANCELED", "version": task["version"],
                 "authorization_id": auth_id,
+                "task_due_event": reminder,
                 "previous_message_ids": task.get("message_ids", [])}
 
 
