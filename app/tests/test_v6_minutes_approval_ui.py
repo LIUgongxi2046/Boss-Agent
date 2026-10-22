@@ -122,3 +122,18 @@ def test_f06_task_message_timeline_is_genuine_cross_page_readback():
     assert "message.send_state" in task_view  # backend supplies actual simulated send state
     assert "message.delivery_state" in task_view
     assert "message.reply_state" in task_view
+
+
+
+def test_f06_followup_draft_requires_existing_sent_task_and_separate_f08_send():
+    flow=(ROOT/"app/webui/BossAssignmentFlow.tsx").read_text(encoding="utf-8")
+    assert '"boss.message.draft.save"' in flow
+    assert 'related_task_id:current.task_id' in flow
+    assert 'recipient_id:current.coordinator_id' in flow
+    assert '["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status)' in flow
+    assert 'current.source_reference_state!=="CURRENT"' in flow
+    assert 'visibility:"RECIPIENT_ONLY"' in flow
+    assert 'draft_id:null,expected_version:"0"' in flow
+    assert '只保存 F08 DRAFT，不会自动发送' in flow
+    assert '保存关联催办草稿（F08）' in flow
+    assert "onViewMessages" in flow
