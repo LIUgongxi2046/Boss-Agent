@@ -738,3 +738,25 @@
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* FR-08 + FR-12: v6 message editor and personal schedule */
+.boss-v6 .boss-msg-reply{
+  margin:12px 0 0;padding:12px 14px;
+  border-left:3px solid #5CA63B;background:#f1f9f5;
+  border-radius:0 9px 9px 0;
+}
+.boss-v6 .boss-msg-reply span{font-size:11px;font-weight:760;color:#26774c}
+.boss-v6 .boss-msg-reply p{
+  margin:7px 0 0;line-height:1.7;color:#2a5f49;
+  font-size:12.5px;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.boss-v6 .boss-form-grid select{
+  min-height:44px;background:#fbfdff;border:1px solid #d6e4f2;
+  color:#234869;border-radius:9px;width:100%;min-width:0;
+}
+.boss-v6 .boss-private-scope-warning{
+  background:#fff9ed;border:1px solid #f2dcae;
+  color:#905b14;border-radius:10px;padding:12px;
+  font-size:12px;line-height:1.65;
+}
