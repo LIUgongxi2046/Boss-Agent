@@ -83,3 +83,25 @@ def test_electron_and_runtime_product_log_paths_stay_untracked():
     assert "path.join(work, 'diagnostics')" in main
     assert "validation/.work/" in gitignore
     assert ".work/" in gitignore
+
+
+def test_preexisting_unsanitized_tool_history_is_scrubbed_on_load():
+    old = [{
+        "type": "tool", "name": "read_evidence",
+        "input": {"private_instruction": PRIVATE},
+        "output": {"content": PRIVATE, "source_id": "finance-note"},
+    }]
+    cleaned = mod.RedactedEventList(old)
+    assert len(cleaned) == 1
+    assert "input" not in cleaned[0] and "output" not in cleaned[0]
+    assert PRIVATE not in json.dumps(cleaned)
+
+
+def test_model_health_scripts_never_output_credential_or_prompt():
+    for name in ("check_local_deepseek.py", "check_local_boss_agent.py"):
+        script = (ROOT / "scripts" / name).read_text()
+        assert "print(secret)" not in script
+        assert "print(api_token)" not in script
+        assert "Authorization" not in script or "Bearer " in script
+        assert "validation" in script
+        assert ".work" in script
