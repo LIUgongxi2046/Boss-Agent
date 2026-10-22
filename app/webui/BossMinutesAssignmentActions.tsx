@@ -20,6 +20,9 @@ type TaskLink = {
 type Props = {
   minute: Minute | null;
   participants: string[];
+  contacts: {contact_id:string;name:string;organization:string;
+    responsibility:string;allowed_for_fixture_assignment:boolean}[];
+  businessClock:string;
   links: TaskLink[];
   sourceCurrent: boolean;
   editingUnsaved: boolean;
@@ -44,7 +47,7 @@ function dateShanghai(value: string) {
 }
 
 export function BossMinutesAssignmentActions({
-  minute, participants, links, sourceCurrent, editingUnsaved,
+  minute, participants, contacts, businessClock, links, sourceCurrent, editingUnsaved,
   onReload, onTaskCreated, onNavigate,
 }: Props) {
   const {client, getToken} = useClient();
@@ -107,11 +110,14 @@ export function BossMinutesAssignmentActions({
       if(!sourceCurrent)throw Error("原始会议来源已失效，不能创建关联交办");
       if(editingUnsaved)throw Error("存在未保存的纪要修改，先保存并重读确认版本");
       if(alreadyLinked)throw Error("本条纪要已有关联交办，请直接打开原任务");
-      if(!coordinator||!participants.includes(coordinator)||coordinator!=="coordinator-1")
-        throw Error("当前固定模拟交办仅支持已核验的统筹负责人 coordinator-1");
+      const eligible = contacts.find(c=>c.contact_id===coordinator);
+      if(!coordinator||!participants.includes(coordinator)||!eligible?.allowed_for_fixture_assignment)
+        throw Error("须选择当前模拟业务时钟下获准的唯一负责人");
       if(!purpose.trim()||purpose.length>1600)throw Error("交办目的须为1—1600字");
       if(!evidence.trim()||evidence.length>160)throw Error("交付证据须为1—160字");
       const until=dateShanghai(due);
+      if (businessClock && new Date(until).getTime() <= new Date(businessClock).getTime())
+        throw Error("交办期限必须晚于当前模拟业务时钟");
       const fields:Record<string,unknown>={
         meeting_id:minute.meeting_id,minute_version:minute.version,
         entry_id:entry.entry_id,purpose:purpose.trim(),
@@ -222,9 +228,12 @@ export function BossMinutesAssignmentActions({
           <label>唯一负责人
             <select value={coordinator} onChange={e=>setCoordinator(e.target.value)}>
               <option value="">请选择当前联系人 ID</option>
-              {participants.map(id=><option key={id} value={id} disabled={id!=="coordinator-1"}>
-                {id}{id!=="coordinator-1"?" · 未核验交办权限":""}
-              </option>)}
+              {contacts.filter(c=>participants.includes(c.contact_id)).map(c=>
+                <option key={c.contact_id} value={c.contact_id}
+                  disabled={!c.allowed_for_fixture_assignment}>
+                  {c.name} · {c.organization} · {c.responsibility} [{c.contact_id}]
+                  {!c.allowed_for_fixture_assignment?" · 当前无有效交办权限":""}
+                </option>)}
             </select>
           </label>
           <label>期限（Asia/Shanghai）
