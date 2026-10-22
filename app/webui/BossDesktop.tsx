@@ -12,6 +12,7 @@ import {
 import pageMeta from "./page-meta.json";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
+import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -421,7 +422,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
                   <Tag tone={PRODUCT_PAGES.has(page) ? "green" : "muted"}>
-                    {PRODUCT_PAGES.has(page) ? "第一批开发范围" : "已映射 · 未实现"}
+                    {PRODUCT_PAGES.has(page) ? "部分功能已接入 · 待验收" : "已映射 · 未实现"}
                   </Tag>
                   <span>{metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
@@ -700,6 +701,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
+                (SECTOR_PAGE_IDS as readonly string[]).includes(page) ? <BossSectorView
+                  key={page} pageId={page} onNavigate={id=>navigate(id)}
+                  onViewSource={goSource} onStartChat={onStartChat}
+                /> :
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
                   onNavigate={id=>navigate(id)} onViewSource={goSource}
@@ -814,7 +819,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           {searchablePages.map(([id,p])=>
             <button type="button" key={id} onClick={() => navigate(id)} className={page===id?"selected":""}>
               <span>{id} · {p.title}</span>
-              <Tag tone={PRODUCT_PAGES.has(id)?"green":"muted"}>{PRODUCT_PAGES.has(id)?"首批":"待实现"}</Tag>
+              <Tag tone={PRODUCT_PAGES.has(id)?"green":"muted"}>{PRODUCT_PAGES.has(id)?"部分开发":"待实现"}</Tag>
             </button>)}
           {searchablePages.length === 0 && <Quiet message="当前身份下无匹配页面。"/>}
         </div>
