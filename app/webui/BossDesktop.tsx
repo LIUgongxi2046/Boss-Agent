@@ -117,7 +117,7 @@ const MAINT_NAV = [
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
 const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F05", "F06", "F07", "D01", "F24", "D03", "A04", "A06", "A08", "A15", "F30", "N12",
+  "F01", "N02", "N03", "F03", "N04", "N05", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 const ANIMATIONS: Record<Animation, string> = {
