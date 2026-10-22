@@ -200,3 +200,55 @@ def test_owner_completion_revokes_due_event_after_valid_evidence(context):
     assert due(api, task["task_id"])["state"] == "CANCELED"
     assert due(api, task["task_id"])["version"] == "2"
     assert pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]["status"] == "COMPLETED_CONFIRMED"
+
+
+
+def test_f06_detail_reads_task_due_state_from_same_sqlite_source(context):
+    api, pages = context
+    created = create(api)[1]
+    tasks_before = pages.serve("BOSS", "/api/boss/ui/tasks")[1]
+    assert tasks_before["task_due_events"] == []
+
+    sent = send(api, created["task_id"])
+    assert sent[0] == 200
+    status, tasks_after = pages.serve("BOSS", "/api/boss/ui/tasks")
+    assert status == 200
+    task_due = tasks_after["task_due_events"]
+    assert len(task_due) == 1
+    assert task_due[0]["task_id"] == created["task_id"]
+    assert task_due[0]["event_id"] == "task-due:" + created["task_id"]
+    assert task_due[0]["event_state"] == "OPEN"
+    assert task_due[0]["dispatch_state"] == "NOT_DISPATCHED"
+    assert task_due[0]["external_delivery_verified"] is False
+    assert pages.serve("MAINTAINER", "/api/boss/ui/tasks")[0] == 403
+
+    ended = act(
+        api, "BOSS", "boss.assignment.cancel", "cancel-task-for-readback",
+        task_id=created["task_id"], task_version="2",
+        reason="已终止此交办任务，不再催办",
+    )
+    assert ended[0] == 200
+    _, post = pages.serve("BOSS", "/api/boss/ui/tasks")
+    assert post["task_due_events"][0]["event_state"] == "CANCELED"
+    assert post["task_due_events"][0]["event_version"] == "2"
+    assert post["tasks"][0]["status"] == "CANCELED"
+
+
+def test_task_due_events_are_metadata_only_not_owner_message_bodies(context):
+    api, pages = context
+    created = create(api)[1]
+    status, send_result = act(
+        api, "BOSS", "boss.assignment.send", "send-private-text-task",
+        task_id=created["task_id"], task_version="1",
+        recipient_id="coordinator-1",
+        body="ONLY_OWNER_PRIVATE_MESSAGE_MUST_NOT_BE_IN_EVENT",
+        content_version="1",
+    )
+    assert status == 200, send_result
+    _, response = pages.serve("BOSS", "/api/boss/ui/tasks")
+    assert "ONLY_OWNER_PRIVATE_MESSAGE_MUST_NOT_BE_IN_EVENT" not in json.dumps(
+        response["task_due_events"]
+    )
+    with api.store.connect() as db:
+        event = current(db, created["task_id"])
+        assert "ONLY_OWNER_PRIVATE_MESSAGE_MUST_NOT_BE_IN_EVENT" not in json.dumps(event)
