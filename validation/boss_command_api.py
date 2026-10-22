@@ -268,6 +268,11 @@ class BossCommandAPI:
             format_checker=FormatChecker(),
         )
         require(not list(validator.iter_errors(body)), "反馈 Schema 无效", web.HTTPBadRequest)
+        # Feedback is a response to a *sent* assignment, never a way for
+        # the maintainer to forge a task state before the owner authorizes send.
+        task = self.store.get(db, NAMESPACE, "task", body["task_id"])
+        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS"),
+                "当前交办不接受新的模拟反馈")
         # Feedback may cite only currently available, scope-checked simulated
         # sources. The maintainer has no capability to forge a source ID.
         data = self.store.get(db, NAMESPACE, "initial", "snapshot")
