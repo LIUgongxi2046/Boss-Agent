@@ -777,6 +777,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   key={page} pageId={page}
                   onViewSource={goSource}
                   onNavigate={id=>navigate(id)}
+                  onTaskCreated={id=>{setSelectedTaskId(id);refresh();}}
                 /> :
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
