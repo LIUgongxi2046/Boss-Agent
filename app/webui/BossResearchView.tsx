@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AlertCircle, ArrowRight, BookOpen, CheckCircle2,
-  Clock3, FileSearch, FolderOpen, Loader2, RefreshCw,
+  FileSearch, FolderOpen, Loader2, RefreshCw,
   Search, ShieldCheck, Send } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 
@@ -49,10 +49,12 @@ function Block({title,note,children}:{
     {children}
   </section>;
 }
-function Fact({label,value}:{
+function Fact({label,value,children}:{
   label:string;value?:string|number|boolean|null;
+  children?:string|number|boolean|null;
 }) {
-  return <div className="boss-kv"><span>{label}</span><strong>{value??"未核查"}</strong></div>;
+  const shown=value??children;
+  return <div className="boss-kv"><span>{label}</span><strong>{shown??"未核查"}</strong></div>;
 }
 export function BossResearchView({onNavigate,onViewSource,onStartChat}:Props){
   const {client,getToken}=useClient();
