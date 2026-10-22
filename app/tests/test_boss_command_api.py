@@ -215,7 +215,8 @@ def test_progress_and_extension_request_do_not_change_due_automatically(demo):
     created = create(demo)
     sent = demo.execute("BOSS", "boss.assignment.send", send_input(created))[1]
     fb = feedback_input({"task_id": created["task_id"], "version": sent["task_version"]},
-                        "EXTENSION_REQUEST", "feedback-extension-001", evidence=[])
+                        "EXTENSION_REQUEST", "feedback-extension-001", evidence=["finance-note"])
+    fb["proposed_due_at"] = "2026-10-26T17:00:00+08:00"
     status, response = demo.execute("MAINTAINER", "boss.simulation.feedback", fb)
     assert status == 200, response
     with demo.store.connect() as db:
