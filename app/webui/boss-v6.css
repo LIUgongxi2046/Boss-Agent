@@ -712,3 +712,29 @@
   .boss-v6 .boss-hero-copy{max-width:78%}
   .boss-v6 .boss-approval-decisions{grid-template-columns:1fr}
 }
+
+
+/* v6 source: the 1024px desktop viewport is already icon-rail mode. */
+.boss-v6 .boss-brand img{width:32px;height:32px}
+@media(max-width:1050px){
+  .boss-v6 .boss-layout,
+  .boss-v6 .boss-layout-slim{grid-template-columns:60px minmax(0,1fr)}
+  .boss-v6 .boss-sidebar{align-items:center;padding:14px 6px 8px}
+  .boss-v6 .boss-sidebar .boss-brand{padding:2px}
+  .boss-v6 .boss-sidebar .boss-brand img{width:35px;height:35px}
+  .boss-v6 .boss-sidebar .boss-brand strong,
+  .boss-v6 .boss-sidebar .boss-brand-caption,
+  .boss-v6 .boss-sidebar .boss-sidebar-label,
+  .boss-v6 .boss-sidebar .boss-nav-item span{display:none}
+  .boss-v6 .boss-sidebar .boss-nav-item{
+    width:46px;min-height:47px;justify-content:center;padding:7px 0;
+  }
+  .boss-v6 .boss-sidebar-bottom{width:100%}
+  .boss-v6 .boss-sidebar-bottom button{justify-content:center}
+  .boss-v6 .boss-hero h1{font-size:24px}
+}
+@media(max-width:690px){
+  .boss-v6 .boss-layout,.boss-v6 .boss-layout-slim{
+    grid-template-columns:minmax(0,1fr);
+  }
+}
