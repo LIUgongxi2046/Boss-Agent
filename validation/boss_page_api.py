@@ -147,10 +147,16 @@ class BossPageAPI:
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
             data = self.store.get(db, self.namespace, "initial", "snapshot")
-            known = {doc["source_id"] for doc in data.get("documents", [])}
-            if source_id not in known:
+            # Current documented records are the source of truth, including
+            # applications created later by the authorized simulation editor.
+            # Never trust an arbitrary client locator or path.
+            row = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='document' AND id=?",
+                (self.namespace, source_id),
+            ).fetchone()
+            if row is None:
                 return 404, {"error": "SOURCE_NOT_FOUND"}
-            doc = self.store.get(db, self.namespace, "document", source_id)
+            doc = json.loads(row[0])
             if doc.get("access_scope") != data["owner_id"]:
                 return 403, {"error": "SOURCE_FORBIDDEN"}
             if doc.get("withdrawn"):
