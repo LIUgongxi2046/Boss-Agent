@@ -28,7 +28,7 @@ jobs:
       - name: Python syntax verification
         run: python -m compileall -q validation/boss_page_api.py validation/business.py validation/controls.py validation/role_channel.py validation/application.py scripts/prepare_boss_webui.py
       - name: Scoped role/business tests
-        run: python -m pytest -q app/tests/test_boss_page_api.py
+        run: python -m pytest -q app/tests/test_boss_page_api.py app/tests/test_v6_contract.py
 
   react-webui-build:
     runs-on: ubuntu-latest
