@@ -20,10 +20,11 @@ NS = "ui-check"
 BOSS_PAGES = {
     "memory", "calendar", "notifications", "authorizations", "decisions",
     "outbox", "sources", "knowledge", "organization", "plans", "voice",
+    "minutes", "approvals",
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
-    "relationships", "scheduler", "audit", "system", "evaluation",
+    "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin",
 }
 
 
@@ -103,6 +104,83 @@ class BossWorkspaceAPI:
                 "recording_is_local_until_explicit_send": True,
                 "transcription_result_status": "NOT_EXECUTED",
                 "transcription_input_mime": "audio/webm",
+            }
+        if key == "minutes":
+            meeting = data["meeting"]
+            item = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='minutes' AND id=?",
+                (self.namespace, meeting["meeting_id"]),
+            ).fetchone()
+            minute = json.loads(item[0]) if item else None
+            current_sources = {
+                d["source_id"]: d for d in _object_list(db, self.namespace, "document")
+            }
+            associated = [
+                _safe_source(current_sources[source_id])
+                for source_id in meeting["material_ids"]
+                if source_id in current_sources
+            ]
+            revisions = _object_list(db, self.namespace, "minutes_revision")
+            history = [
+                {"version": row["version"], "state": row["state"],
+                 "source_version": row["source_version"],
+                 "updated_at": row.get("updated_at")}
+                for row in revisions if row["meeting_id"] == meeting["meeting_id"]
+            ]
+            return {
+                "meeting": {
+                    "meeting_id": meeting["meeting_id"], "version": meeting["version"],
+                    "starts_at": meeting["starts_at"], "timezone": meeting["timezone"],
+                    "participant_ids": meeting["participant_ids"],
+                },
+                "minute": minute,
+                "source_index": associated, "revisions": history,
+                "task_created_by_minutes": False,
+                "message_sent_by_minutes": False,
+            }
+        if key == "approvals" or key == "approval-admin":
+            apps = _object_list(db, self.namespace, "application")
+            documents = {d["source_id"]: d for d in _object_list(
+                db, self.namespace, "document"
+            )}
+            output = []
+            for app in apps:
+                doc = documents.get(app["source_id"])
+                summary = {
+                    k: app[k] for k in (
+                        "application_id", "title", "amount", "currency", "version",
+                        "source_id", "source_version", "state", "created_at",
+                        "applicant_contact_id", "decision_id", "source_type",
+                    ) if k in app
+                }
+                summary["attachment_status"] = (
+                    "WITHDRAWN" if doc and doc.get("withdrawn") else
+                    "CURRENT" if doc and doc.get("version") == app["source_version"]
+                    else "MISSING_OR_CHANGED"
+                )
+                if key == "approvals":
+                    summary["description"] = app["description"]
+                    summary["funds_transferred"] = bool(app.get("funds_transferred", False))
+                    summary["professional_release_issued"] = bool(app.get("professional_release_issued", False))
+                output.append(summary)
+            if key == "approval-admin":
+                return {
+                    "applications": output,
+                    "can_seed_simulation": True,
+                    "can_approve_on_behalf_of_owner": False,
+                    "private_decision_comments_returned": False,
+                }
+            decisions = _object_list(db, self.namespace, "application_decision")
+            return {
+                "applications": output,
+                "decisions": [{
+                    k: row[k] for k in (
+                        "decision_id", "application_id", "application_version",
+                        "source_id", "source_version", "amount", "currency",
+                        "action", "comment", "recorded_at", "authorization_id",
+                    ) if k in row
+                } for row in decisions],
+                "actual_funds_transfer_supported": False,
             }
         if key == "memory":
             current = self.store.get(db, self.namespace, "memory", "current")
