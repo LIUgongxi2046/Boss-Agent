@@ -7,8 +7,8 @@ import { useClient } from "@/providers/ClientProvider";
 // Only these routes have real, role-scoped read projections. Routes absent
 // from this map still show the original transparent "not implemented" panel.
 export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
-  F02: "notifications", F04: "organization", F05: "organization",
-  F07: "sources", F08: "outbox", F09: "knowledge",
+  F02: "notifications", F04: "organization",
+  F08: "outbox", F09: "knowledge",
   F10: "organization", F11: "calendar", F12: "calendar",
   F13: "memory", F25: "dataset", F26: "plans",
   F28: "authorizations", F29: "decisions",
