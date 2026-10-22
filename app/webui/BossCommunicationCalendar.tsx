@@ -38,6 +38,12 @@ type BusyShare = {
   share_id:string;calendar_version:string;recipient_id:string;
   busy:boolean;starts_at:string;ends_at:string;timezone:string;
   expires_at:string;revoked:boolean;
+  effective_state:"ACTIVE_SIMULATED"|"EXPIRED"|"REVOKED"|"OUTDATED"|"INVALID";
+};
+type BusyPreview = {
+  share_id:string;share_status:"ACTIVE_SIMULATED";recipient_id:string;
+  busy:true;starts_at:string;ends_at:string;timezone:string;
+  fields:string[];preview_only_not_external_access:true;
 };
 type CalendarData = {
   source_type:"SIMULATED";projection:"calendar";data_version:string;
@@ -204,6 +210,10 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
   const [title,setTitle]=useState("");
   const [privateBody,setPrivateBody]=useState("");
   const [location,setLocation]=useState("");
+  const [privateAttachmentId,setPrivateAttachmentId]=useState("");
+  const [privateAttachmentVersion,setPrivateAttachmentVersion]=useState("1");
+  const [busyPreview,setBusyPreview]=useState<BusyPreview|null>(null);
+  const [previewBusy,setPreviewBusy]=useState(false);
   const [conflictAcknowledged,setConflictAcknowledged]=useState(false);
   const [shareRecipient,setShareRecipient]=useState("");
   const [sharePurpose,setSharePurpose]=useState("");
@@ -218,7 +228,7 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
     const abort=new AbortController();
     const token=getToken();
     if(!token){setError("当前登录已失效");return;}
-    setLoading(true);setError("");setState(null);
+    setLoading(true);setError("");setState(null);setBusyPreview(null);
     const key=isMessage?"outbox":"calendar";
     void fetch("/api/boss/ui/workspace/"+key,{
       headers:{"Authorization":"Bearer "+token},cache:"no-store",signal:abort.signal,
@@ -236,6 +246,8 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
         setStart(splitDate(c.starts_at));setEnd(splitDate(c.ends_at));
         setTitle(c.title||"");setPrivateBody(c.private_body||"");
         setLocation(c.location||"");
+        setPrivateAttachmentId(c.attachment_refs?.[0]?.source_id||"");
+        setPrivateAttachmentVersion(c.attachment_refs?.[0]?.version||"1");
       }
     }).catch(e=>{
       if(abort.signal.aborted)return;
@@ -307,11 +319,14 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
       propose("boss.calendar.save",{
         expected_version:c.version,starts_at:isoShanghai(start),ends_at:isoShanghai(end),
         timezone:"Asia/Shanghai",title,private_body:validate(privateBody,"私人日程正文",2000),
-        location,attachment_refs:[],acknowledge_conflict:conflictAcknowledged,
+        location,attachment_refs:privateAttachmentId.trim()?[{
+          source_id:privateAttachmentId.trim(),version:validate(privateAttachmentVersion,"附件来源版本",40),
+        }]:[],acknowledge_conflict:conflictAcknowledged,
       },"保存本人私人安排",[
         "私人安排："+start+" — "+end,
         "标题和地点将仅由老板读取："+(title||"未填写")+" / "+(location||"未填写"),
         "私人正文："+privateBody,
+        "获准附件："+(privateAttachmentId.trim()?privateAttachmentId+" v"+privateAttachmentVersion:"无"),
         "与工作会议的结束时间无法完全核实；邻近时段须由本人确认。",
         "原有效 busy 分享会因版本变化全部失效。",
       ]);
@@ -335,6 +350,34 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
         "禁止分享标题、地点、私人正文及附件。无外部实际送达。",
       ]);
     }catch(e){setError(e instanceof Error?e.message:String(e));}
+  }
+  async function inspectShare(item:BusyShare){
+    if(item.effective_state!=="ACTIVE_SIMULATED"){
+      setError("当前分享已失效，不能继续展示获准时段");return;
+    }
+    const token=getToken();
+    if(!token){setError("身份已过期，请重新认证");return;}
+    setPreviewBusy(true);setError("");setBusyPreview(null);
+    try{
+      const response=await fetch(
+        "/api/boss/ui/calendar-share-preview?share_id="+encodeURIComponent(item.share_id),{
+          headers:{Authorization:"Bearer "+token},cache:"no-store",
+        }
+      );
+      if(response.status===410){
+        setError("该 busy 分享已经过期、撤销或版本失效；已重新读取正式状态。");
+        reload();return;
+      }
+      if(!response.ok)throw Error("读取分享范围失败（HTTP "+response.status+"）");
+      const result=await response.json() as BusyPreview;
+      const allowed=["busy","starts_at","ends_at","timezone"];
+      if(result.share_id!==item.share_id || result.share_status!=="ACTIVE_SIMULATED" ||
+         JSON.stringify(result.fields)!==JSON.stringify(allowed) ||
+         result.preview_only_not_external_access!==true)
+        throw Error("预览字段超出允许范围或分享身份不匹配");
+      setBusyPreview(result);
+    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    finally{setPreviewBusy(false);}
   }
   function revokeShare(item:BusyShare){
     propose("boss.calendar.share.revoke",{
@@ -449,6 +492,15 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
               <label>地点<input value={location} disabled={!calendars.can_edit}
                 onChange={e=>{setLocation(e.target.value);setDirty(true);}}/></label>
             </div>:<Empty>正在等待本人私有日程。</Empty>}
+            <div className="boss-form-grid">
+              <label>私人附件来源 ID<input value={privateAttachmentId}
+                disabled={!calendars?.can_edit}
+                onChange={e=>{setPrivateAttachmentId(e.target.value);setDirty(true);}}
+                placeholder="无附件可留空"/></label>
+              <label>附件当前版本<input value={privateAttachmentVersion}
+                disabled={!calendars?.can_edit}
+                onChange={e=>{setPrivateAttachmentVersion(e.target.value);setDirty(true);}}/></label>
+            </div>
             <label className="boss-label" htmlFor="boss-private-body">私人正文（禁止向维护者显示）</label>
             <textarea id="boss-private-body" rows={4} value={privateBody}
               disabled={!calendars?.can_edit}
@@ -501,11 +553,25 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
                 <LabelValue name="接收人 ID">{share.recipient_id}</LabelValue>
                 <LabelValue name="时段">{share.starts_at.replace("T"," ")+" — "+share.ends_at.replace("T"," ")}</LabelValue>
                 <LabelValue name="授权版本">{share.calendar_version}</LabelValue>
-                <LabelValue name="状态">{share.revoked?"已撤销":"有效模拟分享"}</LabelValue>
-                {!share.revoked&&<div className="boss-actions">
-                  <button type="button" className="boss-btn" disabled={busy} onClick={()=>revokeShare(share)}>
-                    <X size={15}/> 明确撤销分享</button>
-                </div>}
+                <LabelValue name="状态">{share.effective_state}</LabelValue>
+                <div className="boss-actions">
+                  {share.effective_state==="ACTIVE_SIMULATED"&&
+                    <button type="button" className="boss-btn" disabled={previewBusy}
+                      onClick={()=>void inspectShare(share)}>
+                      <ShieldCheck size={15}/> 模拟接收方允许字段预览</button>}
+                  {!share.revoked&&<button type="button" className="boss-btn" disabled={busy}
+                    onClick={()=>revokeShare(share)}>
+                    <X size={15}/> 明确撤销分享</button>}
+                </div>
+                {busyPreview?.share_id===share.share_id&&
+                  <div className="boss-workspace-item" role="status">
+                    <strong>模拟接收范围（仅预览，不是对外访问）</strong>
+                    <LabelValue name="接收方">{busyPreview.recipient_id}</LabelValue>
+                    <LabelValue name="busy">{busyPreview.busy}</LabelValue>
+                    <LabelValue name="开始">{busyPreview.starts_at}</LabelValue>
+                    <LabelValue name="结束">{busyPreview.ends_at}</LabelValue>
+                    <LabelValue name="时区">{busyPreview.timezone}</LabelValue>
+                  </div>}
               </div>):<Empty>没有已生效的忙碌分享记录。</Empty>}
           </Block>
         </>}
@@ -528,7 +594,7 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
           </>:<>
             <LabelValue name="日程版本">{calendars?.calendar.version}</LabelValue>
             <LabelValue name="私人正文可见性">BOSS ONLY</LabelValue>
-            <LabelValue name="当前生效分享数">{calendars?.shares.filter(x=>!x.revoked).length}</LabelValue>
+            <LabelValue name="当前生效分享数">{calendars?.shares.filter(x=>x.effective_state==="ACTIVE_SIMULATED").length}</LabelValue>
             <LabelValue name="私人资料物理擦除">未独立验证</LabelValue>
             <LabelValue name="会议原定开始">{calendars?.meeting.starts_at.replace("T"," ")}</LabelValue>
             <LabelValue name="会议结束时间">未知</LabelValue>
