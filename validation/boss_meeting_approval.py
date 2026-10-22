@@ -76,11 +76,14 @@ def minutes_save(api, db, data, payload):
         require(isinstance(row, dict) and set(row) == {"kind", "text", "source_anchor"},
                 "每条纪要必须保留分类、正文与原文位置", web.HTTPBadRequest)
         require(row["kind"] in ENTRY_KINDS, "纪要分类无效", web.HTTPBadRequest)
+        anchor = validate_text(row["source_anchor"], 200)
+        require(anchor in doc.get("content", ""),
+                "原文位置无法在当前版本资料中核查", web.HTTPBadRequest)
         cleaned.append({
             "entry_id": f"entry-{i+1:02d}",
             "kind": row["kind"],
             "text": validate_text(row["text"]),
-            "source_anchor": validate_text(row["source_anchor"], 200),
+            "source_anchor": anchor,
             "source_id": doc["source_id"],
             "source_version": doc["version"],
             "task_created": False,
