@@ -72,6 +72,13 @@ class BossPageAPI:
                 "tasks": [self._public_task(task) for task in tasks],
                 "historical_commitment": data.get("historical_task"),
                 "meeting": data.get("meeting"),
+                "event": {"event_id": data["event"]["event_id"],
+                          "status": data["event"]["status"]},
+                "assignment_source_ids": [
+                    item["source_id"] for item in data["documents"]
+                    if item["source_id"] == "finance-note"
+                    and not self.store.get(db, self.namespace, "document", item["source_id"]).get("withdrawn")
+                ],
                 "contacts": [
                     {"contact_id": item["contact_id"], "name": item["name"],
                      "organization": item["organization"], "responsibility": item["responsibility"]}
