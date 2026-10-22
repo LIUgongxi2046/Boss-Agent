@@ -770,7 +770,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine text="未连接写入动作，不会显示模拟保存/发送成功。" />
                   </Panel></div>
                 </div>
-              ) : page === "A06" ? <div className="boss-columns">
+              ) : page === "D07" ? <div className="boss-columns">
+                <div className="boss-column">
+                  <Panel title="当前角色访问限制" note="D07 · 无敏感信息">
+                    <StatusLine variant="warn" text="老板业务信息仅BOSS角色可访问；维护者不能代替老板批准、读取个人记忆或私人日历。"/>
+                    <Value label="当前身份" value={role}/>
+                    <GlassButton onClick={()=>navigate("A08")}>返回技术工作台</GlassButton>
+                  </Panel>
+                </div>
+              </div> : page === "A06" ? <div className="boss-columns">
                 <div className="boss-column">
                   <Panel title="SOP 与 Skills" note="A06 · 复用 nanobot 原生目录及工具注册表">
                     <StatusLine text="SOP 与 Skills 的安装、校验和正式采用由已有 nanobot Settings/Skills 承载；本页不再造一个未经验证的配置引擎。" />
@@ -875,6 +883,22 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         </main>
       </div>
     </div>
+    {pendingNavigation && <div className="boss-confirm-backdrop">
+      <section className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-unsaved-title">
+        <h3 id="boss-unsaved-title"><AlertCircle size={19}/> 未保存修改（D06）</h3>
+        <p>当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。</p>
+        <div className="boss-actions">
+          <button type="button" className="boss-btn" onClick={()=>setPendingNavigation(null)}>返回继续编辑</button>
+          <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
+            const destination=pendingNavigation;
+            setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
+            setAssignmentDirty(false);
+            setPendingNavigation(null);
+            navigate(destination.id,destination.focus,true);
+          }}>放弃草稿并离开</button>
+        </div>
+      </section>
+    </div>}
     {directoryOpen && <div className="boss-directory-backdrop" role="presentation" onMouseDown={(e) => {
       if(e.target === e.currentTarget) setDirectoryOpen(false);
     }}>
