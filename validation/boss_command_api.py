@@ -202,6 +202,16 @@ class BossCommandAPI:
         )
         return doc
 
+    def _require_current_task_sources(self, db, data, task):
+        """Task contents are not safe to send/close on withdrawn provenance."""
+        for source_id in task.get("source_refs", []):
+            self._require_current_source(db, data, source_id)
+        origin_source = task.get("origin_source_id")
+        if origin_source:
+            source = self._require_current_source(db, data, origin_source)
+            require(source.get("version") == task.get("origin_source_version"),
+                    "纪要创建任务所引用的原始资料版本已变化，必须重新核查")
+
     def _transaction(self, action, payload):
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -314,8 +324,7 @@ class BossCommandAPI:
                 "任务版本变化或已经发送")
         require(task["coordinator_id"] == payload["recipient_id"],
                 "收件人不是当前唯一负责人", web.HTTPForbidden)
-        for source_id in task.get("source_refs", []):
-            self._require_current_source(db, data, source_id)
+        self._require_current_task_sources(db, data, task)
         bound = {k: v for k, v in payload.items() if k != "client_request_id"}
         auth_id = self._authorize(db, "send_assignment", bound, payload["task_id"], "1")
         tool_input = {**bound, "authorization_id": auth_id,
@@ -383,6 +392,7 @@ class BossCommandAPI:
                     feedback.get("evidence_refs"),
                     "缺少已提交的完成证据", web.HTTPBadRequest)
             data = self.store.get(db, NAMESPACE, "initial", "snapshot")
+            self._require_current_task_sources(db, data, task)
             for source_id in feedback["evidence_refs"]:
                 self._require_current_source(db, data, source_id)
             action_name = "complete_assignment"
