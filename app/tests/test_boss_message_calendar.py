@@ -263,3 +263,67 @@ def test_calendar_delete_revokes_shares_and_stops_future_private_read(services):
     assert owner["shares"][0]["revoked"]
     assert cmd(api,"BOSS","boss.calendar.save","restore-not-allowed",
                **calendar_input(expected_version="3"))[0]==409
+
+
+
+def test_maintainer_message_index_contains_no_boss_body_or_draft(services):
+    api,pages=services
+    body="OWNER_PRIVATE_MESSAGE_CONTENT_FOR_TEST"
+    cmd(api,"BOSS","boss.message.draft.save","admin-index-draft",
+        **msg_input(body=body))
+    d=read(pages,"BOSS","outbox")[1]["drafts"][0]
+    sent=cmd(api,"BOSS","boss.message.send","admin-index-send",
+        draft_id=d["draft_id"],expected_version="1",recipient_id="coordinator-1",
+        expected_content_sha256=d["content_sha256"])[1]
+    code,admin=read(pages,"MAINTAINER","message-admin")
+    assert code==200
+    assert admin["raw_message_text_returned"] is False
+    assert admin["pending_reply_refs"][0]["message_id"]==sent["message_id"]
+    assert admin["pending_reply_refs"][0]["recipient_id"]=="coordinator-1"
+    assert body not in json.dumps(admin)
+    assert d["content_sha256"] not in json.dumps(admin)
+    assert read(pages,"BOSS","message-admin")[0]==403
+
+
+def test_named_simulated_reply_can_update_sent_assignment_progress_once(services):
+    api,pages=services
+    created=cmd(api,"BOSS","boss.assignment.create","assignment-for-msg-reply",
+        purpose="核查经营回款",coordinator_id="coordinator-1",
+        due_at="2026-10-24T17:00:00+08:00",timezone="Asia/Shanghai",
+        evidence_requirements=["经营原始明细"],related_meeting_id="meeting-1",
+        related_event_ids=["event-1"],source_refs=["finance-note"],content_version="1")
+    assert created[0]==200,created
+    task=created[1]
+    sent_task=cmd(api,"BOSS","boss.assignment.send","assignment-send-reply",
+        task_id=task["task_id"],task_version=task["version"],
+        recipient_id="coordinator-1",
+        body="请准备反馈",content_version="1")
+    assert sent_task[0]==200,sent_task
+    saved=cmd(api,"BOSS","boss.message.draft.save","draft-with-task",
+        **msg_input(related_task_id=task["task_id"],attachment_refs=[]))
+    assert saved[0]==200,saved
+    draft=read(pages,"BOSS","outbox")[1]["drafts"][0]
+    msg=cmd(api,"BOSS","boss.message.send","send-with-task",
+        draft_id=draft["draft_id"],expected_version=draft["version"],
+        recipient_id="coordinator-1",
+        expected_content_sha256=draft["content_sha256"])
+    assert msg[0]==200,msg
+    reply=cmd(api,"MAINTAINER","boss.simulation.message.reply",
+        "reply-with-progress",message_id=msg[1]["message_id"],
+        author_contact_id="coordinator-1",
+        text="已开始整理经营回款明细，尚未提交结果")
+    assert reply[0]==200,reply
+    assert reply[1]["task_status_after_reply"]=="IN_PROGRESS"
+    assert reply[1]["task_feedback_id"]
+    assert reply[1]["task_completion_confirmed"] is False
+    with api.store.connect() as db:
+        current=api.store.get(db,"ui-check","task",task["task_id"])
+        assert current["status"]=="IN_PROGRESS"
+        evidence=api.store.get(db,"ui-check","feedback",reply[1]["task_feedback_id"])
+        assert evidence["kind"]=="PROGRESS"
+        assert evidence["author_contact_id"]=="coordinator-1"
+        assert evidence["content"]=="已开始整理经营回款明细，尚未提交结果"
+    assert cmd(api,"MAINTAINER","boss.simulation.message.reply",
+        "reply-with-progress",message_id=msg[1]["message_id"],
+        author_contact_id="coordinator-1",
+        text="已开始整理经营回款明细，尚未提交结果")==reply
