@@ -27,7 +27,8 @@ from boss_message_calendar import (
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
 from boss_meeting_approval import (
-    minutes_save, minutes_confirm, application_seed, application_revise, approval_decide,
+    minutes_save, minutes_confirm, minutes_assignment_create,
+    application_seed, application_revise, approval_decide,
 )
 
 NAMESPACE = "ui-check"
@@ -92,6 +93,7 @@ class BossCommandAPI:
         "boss.meeting.brief.prepare": "BOSS",
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
+        "boss.minutes.assignment.create": "BOSS",
         "boss.approval.decide": "BOSS",
         "boss.simulation.application.seed": "MAINTAINER",
         "boss.simulation.application.revise": "MAINTAINER",
@@ -233,6 +235,8 @@ class BossCommandAPI:
                 result = minutes_save(self, db, data, payload)
             elif action == "boss.minutes.confirm":
                 result = minutes_confirm(self, db, data, payload)
+            elif action == "boss.minutes.assignment.create":
+                result = minutes_assignment_create(self, db, data, payload, key)
             elif action == "boss.simulation.application.seed":
                 result = application_seed(self, db, data, payload)
             elif action == "boss.simulation.application.revise":
