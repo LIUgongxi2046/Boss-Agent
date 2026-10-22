@@ -21,6 +21,9 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from business import checksum, encode, now, require, validate
 from controls import FIELDS
+from boss_meeting_approval import (
+    minutes_save, minutes_confirm, application_seed, approval_decide,
+)
 
 NAMESPACE = "ui-check"
 MAX_PURPOSE = 1600
@@ -81,6 +84,10 @@ class BossCommandAPI:
         "boss.reminder.ack": "BOSS",
         "boss.reminder.snooze": "BOSS",
         "boss.reminder.close": "BOSS",
+        "boss.minutes.save": "BOSS",
+        "boss.minutes.confirm": "BOSS",
+        "boss.approval.decide": "BOSS",
+        "boss.simulation.application.seed": "MAINTAINER",
     }
 
     def __init__(self, store):
@@ -200,6 +207,14 @@ class BossCommandAPI:
                 result = self._memory_delete(db, payload)
             elif action.startswith("boss.reminder."):
                 result = self._reminder(db, payload, action)
+            elif action == "boss.minutes.save":
+                result = minutes_save(self, db, data, payload)
+            elif action == "boss.minutes.confirm":
+                result = minutes_confirm(self, db, data, payload)
+            elif action == "boss.simulation.application.seed":
+                result = application_seed(self, db, data, payload)
+            elif action == "boss.approval.decide":
+                result = approval_decide(self, db, data, payload)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)
