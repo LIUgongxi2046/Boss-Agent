@@ -265,3 +265,70 @@ def test_link_provenance_does_not_write_raw_minute_text_to_link_or_audit(app):
         assert "候选交办" not in str(audit)
         assert result["authorization_id"]
     assert page.serve("MAINTAINER", "/api/boss/ui/workspace/minutes")[0] == 403
+
+
+
+def test_reconfirmed_new_minute_version_can_create_new_link_without_rewriting_old_task(app):
+    cmd, page = app
+    assert save_minutes(cmd)[0] == 200
+    assert confirm_minutes(cmd)[0] == 200
+    first = create_linked_task(cmd)[1]
+    revised_entries = [
+        {"kind": "OPINION", "text": "原讨论继续保留",
+         "source_anchor": "历史会议纪要"},
+        {"kind": "ASSIGNMENT_DRAFT",
+         "text": "新版本明确需要独立查证另一批资料",
+         "source_anchor": "coordinator-1"},
+    ]
+    revised = call(
+        cmd, "BOSS", "boss.minutes.save", "new-minutes-version-001",
+        meeting_id="meeting-1", meeting_version="1",
+        source_id="meeting-minutes", source_version="1",
+        expected_version="2", entries=revised_entries,
+    )
+    assert revised[0] == 200 and revised[1]["version"] == "3"
+    assert create_linked_task(cmd, "cannot-create-unconfirmed-new-version",
+                              minute_version="3")[0] == 409
+    confirmed = call(
+        cmd, "BOSS", "boss.minutes.confirm", "new-minutes-version-confirm",
+        meeting_id="meeting-1", expected_version="3",
+        source_id="meeting-minutes", source_version="1",
+    )
+    assert confirmed[0] == 200 and confirmed[1]["version"] == "4"
+    newer = create_linked_task(
+        cmd, "new-confirmed-version-task-001", minute_version="4",
+        purpose="重新核查当前已确认纪要版本的独立任务",
+    )
+    assert newer[0] == 200, newer
+    assert newer[1]["task_id"] != first["task_id"]
+    code, view = minutes(page)
+    assert code == 200
+    assert len(view["linked_assignments"]) == 2
+    versions = {
+        x["task_id"]: x["minute_version"] for x in view["linked_assignments"]
+    }
+    assert versions[first["task_id"]] == "2"
+    assert versions[newer[1]["task_id"]] == "4"
+    assert view["minute"]["version"] == "4"
+    with cmd.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='task'"
+        ).fetchone()[0] == 2
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='minutes_assignment_link'"
+        ).fetchone()[0] == 2
+
+
+def test_wrong_meeting_or_explicit_source_version_cannot_reuse_old_approval(app):
+    cmd, page = app
+    save_minutes(cmd)
+    confirm_minutes(cmd)
+    assert create_linked_task(
+        cmd, "wrong-meeting-link", meeting_id="unknown-meeting",
+    )[0] == 400
+    assert create_linked_task(
+        cmd, "wrong-minutes-version-link", minute_version="1",
+    )[0] == 409
+    status, page_body = minutes(page)
+    assert status == 200
+    assert page_body["linked_assignments"] == []
