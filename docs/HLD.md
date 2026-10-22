@@ -267,7 +267,7 @@ sequenceDiagram
 - A：16 个维护能力，不以组件存在代替配置实际采用证据。
 - V19：3 个 FR-19 用途变体 V19-BEEF/EGG/MILK；F19 基准为肉禽 BROILER，四种用途**共用 AgriScenarioPage 模板**并采用独立查询口径与数据范围。
 
-**状态设计**：F32 + A16 + V3 共 51 页 × S00—S10 = 561 条设计入口；N12 + D9 共 21 页无单页状态索引，继承通用加载、缺少资料、错误、访问受限、并发冲突和 E01—E06；全站另遵循 SYS-STARTUP/CLOSE/EXIT/RESTORE/NETWORK/NOTIFICATION/MICROPHONE/FILE。页面的设计态 S00—S10 是 UI 表达要求；真实业务状态必须来自领域服务，不能模拟状态切换得出已执行结论。
+**状态设计**：F 组 32 页 + A 组 16 页 + V 组 3 页，共 51 页 × S00—S10 = 561 条设计入口；N 组 12 页 + D 组 9 页，共 21 页无单页状态索引，继承通用加载、缺少资料、错误、访问受限、并发冲突和 E01—E06；全站另遵循 SYS-STARTUP/CLOSE/EXIT/RESTORE/NETWORK/NOTIFICATION/MICROPHONE/FILE。页面的设计态 S00—S10 是 UI 表达要求；真实业务状态必须来自领域服务，不能模拟状态切换得出已执行结论。
 
 **视觉基线（不可降级）**：以 v6 design-tokens.json 为权威：brandBlue #005BAC、deepBlue #073B70、brandGreen #5CA63B、actionBlue #0968EA，正文 16/24、说明 14/22、8px 节奏、卡片 14px 圆角、输入 9px 圆角、2px 焦点和至少 44px 主控件。设计素材复用 boss-logo-from-reference.png、dapeng-front/side/think/execute.png 与 animation 的待机/倾听/思考/执行/确认/提醒六组 WebP/MP4。动画状态只映射真实 UI 事件、尊重 prefers-reduced-motion，不因动效完成擅自改变业务状态。素材知识产权/正式品牌许可仍需核查。
 
@@ -277,7 +277,7 @@ sequenceDiagram
 
 本阶段把页面映射的 semantic_read_contracts/semantic_command_contracts 固定为**业务接口意图**，不是可直接调用的真实 HTTP 路径。只有 T02 明确实证的上游 API/WebSocket 和验证程序操作可以标注为“已有验证”：原生 GET /api/sessions、GET /api/sessions/{key}/webui-thread、WebSocket 消息/工具事件、Provider/Settings 配置事件、Cron 接口，以及验证业务工具 query_metrics / read_evidence / create_assignment / send_assignment / read_assignment 等。验证工程操作也不代表完整产品 API 已上线。
 
-T06 必须为每类语义契约提供 operationId、身份/资源范围、请求/响应与错误 Schema、版本及幂等；T08 才可生成 page-service-map.json，把真实路由、组件、动作、服务操作和事件一对一绑定。浏览器业务读写建议通过同源 WebUI/RoleChannel Gate 暴露，不直接把 8871 模拟服务凭据交给 renderer。
+D04/D05 的本地选择、D06 的未保存编辑提醒及 N12 的筛选作为 client_only_intents 留在前端，不生成伪业务接口；若原页面明确支持“保存草稿”，也需走该页经授权的保存 API。T06 必须为每类**服务端**语义契约提供 operationId、身份/资源范围、请求/响应与错误 Schema、版本及幂等；T08 才可生成 page-service-map.json，把真实路由、组件、动作、服务操作和事件一对一绑定。浏览器业务读写建议通过同源 WebUI/RoleChannel Gate 暴露，不直接把 8871 模拟服务凭据交给 renderer。
 
 | 类别 | 规范意图 | 请求/结果与恢复 |
 |---|---|---|
