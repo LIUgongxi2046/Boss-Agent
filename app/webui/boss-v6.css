@@ -412,3 +412,62 @@
   .boss-confirm *, .boss-confirm *:before,
   .boss-confirm *:after {animation:none!important;transition:none!important}
 }
+
+
+/* Desktop v6 modular business workspaces (real read and mutation APIs). */
+.boss-workspace-toolbar {
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:14px;padding:10px 15px;
+  background:#fff;border:1px solid #dce9f6;border-radius:12px;
+  box-shadow:var(--boss-shadow);
+}
+.boss-workspace-note{display:flex;align-items:center;gap:11px;min-width:0;color:#6d85a1;font-size:12px}
+.boss-workspace-toolbar .boss-btn{min-height:36px;flex-shrink:0}
+.boss-workspace-item {
+  padding:14px 14px;margin:10px 0;border-radius:12px;
+  background:linear-gradient(115deg,#fcfeff,#f7fbff);
+  border:1px solid #e1ebf6;color:#294b6c;overflow-wrap:anywhere;
+}
+.boss-workspace-item-top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:9px;
+}
+.boss-workspace-item strong{font-size:13.5px;color:#1d4267;font-weight:750}
+.boss-workspace-item .boss-kv{padding:6px 0;font-size:12px}
+.boss-workspace-item small{
+  display:block;font-size:11.7px;line-height:1.6;color:#758da3;margin-top:4px;
+}
+.boss-workspace-item p{
+  font-size:12.7px;line-height:1.75;color:#506b85;
+  margin:9px 0;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.boss-workspace-search{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
+.boss-workspace-search .boss-label{grid-column:1/-1;margin-bottom:-3px}
+.boss-workspace-search input,
+.boss-field input {
+  min-height:44px;background:#fbfdff;border:1px solid #d6e4f2;
+  border-radius:9px;padding:9px 12px;font-size:13px;color:#294a6d;
+  min-width:0;width:100%;
+}
+.boss-workspace-search button{min-height:44px}
+.boss-field{display:flex;flex-direction:column;gap:7px;margin:14px 0;color:#44617e;font-size:12.5px;font-weight:650}
+.boss-field input{font-weight:500}
+.boss-workspace-extra{margin-top:15px}
+.boss-private-source{
+  margin:12px 0 14px;padding:16px;border-radius:12px;
+  background:linear-gradient(110deg,#ecf5ff,#f6fbff);
+  border:1px solid #d2e6fa;
+}
+.boss-private-source strong{
+  display:flex;align-items:center;gap:9px;color:#24578c;font-size:13px;
+}
+.boss-private-source p{
+  color:#335876;font-size:13px;line-height:1.8;
+  margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.boss-workspace-next{display:flex;align-items:stretch;flex-wrap:wrap;gap:10px}
+@media(max-width:690px){
+  .boss-workspace-toolbar{flex-wrap:wrap;padding:10px}
+  .boss-workspace-item-top{align-items:flex-start;flex-wrap:wrap}
+  .boss-workspace-search{grid-template-columns:1fr}
+}
