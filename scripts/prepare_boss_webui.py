@@ -101,6 +101,7 @@ def copy_overlay() -> None:
         ("BossResearchView.tsx", "BossResearchView.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
+        ("MaintainerKnowledgeEditor.tsx", "MaintainerKnowledgeEditor.tsx"),
         ("boss-v6.css", "boss-v6.css"),
     ]:
         shutil.copy2(ROOT / "app" / "webui" / source_name, BOSS_DIR / target_name)
