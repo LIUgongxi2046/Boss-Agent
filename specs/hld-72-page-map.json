@@ -141,7 +141,8 @@
     "F19 is the default BROILER animal-use scenario; V19-BEEF/EGG/MILK are independent designed views sharing a component, not three new functional requirements.",
     "N and D page designs carry common states; S00-S10 individual prompt index exists only for 51 F/A/V pages.",
     "All business state changes are verified server-side against role, owner, namespace, object version, current authorization, idempotency and source validity.",
-    "All page paths and component files are proposed architectural targets, not files currently present in repository; authorization D19 remains architecture only."
+    "All page paths and component files are proposed architectural targets, not files currently present in repository; authorization D19 remains architecture only.",
+    "D04/D05/N12 and D06 local UI actions are client_only_intents, not backend command endpoints. A D06 explicit save-draft action, if offered by the originating page, must invoke that page's authorized save API and show a durable result."
   ],
   "pages": [
     {
@@ -688,9 +689,7 @@
         "messages.send"
       ],
       "semantic_contracts_are_real_api": false,
-      "t02_verified_runtime_operations": [
-        "send_assignment"
-      ],
+      "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
       "owner_tasks": [
         "T18",
@@ -2925,9 +2924,7 @@
         "owner_decisions.list",
         "decision_evidence.read"
       ],
-      "semantic_command_contracts": [
-        "owner_decisions.annotate"
-      ],
+      "semantic_command_contracts": [],
       "semantic_contracts_are_real_api": false,
       "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
@@ -2977,9 +2974,7 @@
         "run_telemetry.overview",
         "service_health.read"
       ],
-      "semantic_command_contracts": [
-        "runs.filter"
-      ],
+      "semantic_command_contracts": [],
       "semantic_contracts_are_real_api": false,
       "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_MAINTAINER_META_ONLY",
@@ -2988,7 +2983,10 @@
         "T24"
       ],
       "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
-      "additional_context": null
+      "additional_context": null,
+      "client_only_intents": [
+        "runs.filter"
+      ]
     },
     {
       "page_id": "D01",
@@ -3181,9 +3179,7 @@
         "contacts.resolve",
         "contact_roles.read"
       ],
-      "semantic_command_contracts": [
-        "selection.owner.choose"
-      ],
+      "semantic_command_contracts": [],
       "semantic_contracts_are_real_api": false,
       "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
@@ -3192,7 +3188,10 @@
         "T24"
       ],
       "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
-      "additional_context": null
+      "additional_context": null,
+      "client_only_intents": [
+        "selection.owner.choose"
+      ]
     },
     {
       "page_id": "D05",
@@ -3237,9 +3236,7 @@
         "timezone_rules.read",
         "conflicts.read"
       ],
-      "semantic_command_contracts": [
-        "selection.datetime.choose"
-      ],
+      "semantic_command_contracts": [],
       "semantic_contracts_are_real_api": false,
       "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
@@ -3248,7 +3245,10 @@
         "T24"
       ],
       "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
-      "additional_context": null
+      "additional_context": null,
+      "client_only_intents": [
+        "selection.datetime.choose"
+      ]
     },
     {
       "page_id": "D06",
@@ -3292,11 +3292,7 @@
       "semantic_read_contracts": [
         "draft_state.local"
       ],
-      "semantic_command_contracts": [
-        "draft.discard",
-        "draft.keep_editing",
-        "draft.persist_if_supported"
-      ],
+      "semantic_command_contracts": [],
       "semantic_contracts_are_real_api": false,
       "t02_verified_runtime_operations": [],
       "guard_policy": "SERVER_RECHECK_AND_HIDE_PRIVATE_DATA",
@@ -3305,7 +3301,12 @@
         "T19"
       ],
       "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
-      "additional_context": null
+      "additional_context": null,
+      "client_only_intents": [
+        "draft.discard",
+        "draft.keep_editing",
+        "draft.navigation_intent"
+      ]
     },
     {
       "page_id": "D07",
