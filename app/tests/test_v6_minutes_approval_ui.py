@@ -119,4 +119,6 @@ def test_f06_task_message_timeline_is_genuine_cross_page_readback():
     assert "关联发件与回复状态" in task_view
     assert "onViewMessages()" not in task_view or "onViewMessages" in task_view
     assert 'onViewMessages={()=>navigate("F08")}' in shell
-    assert "SENT_SIMULATED" in task_view
+    assert "row.send_state" in task_view  # backend supplies actual simulated send state
+    assert "row.delivery_state" in task_view
+    assert "row.reply_state" in task_view
