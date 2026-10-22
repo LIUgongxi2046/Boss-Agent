@@ -159,3 +159,45 @@ def active_runtime_prompts(store,namespace=NS):
                                "instruction_text":draft["instruction_text"],
                                "source_refs":draft["source_refs"]})
     return output
+
+
+
+def record_runtime_context_load(store, runtime_prompts, namespace=NS):
+    """Record metadata after a *real RuntimeContextBlock provider* selects a version.
+
+    This does not claim the DeepSeek API accepted a prompt, produced a reply,
+    or passed safety/quality evaluation. Re-check the pointer under SQLite
+    BEGIN IMMEDIATE: an activation may have changed between read and use.
+    No prompt body, owner memory, model text, or API credential is logged.
+    """
+    if not runtime_prompts:
+        return
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        store.active(db, namespace)
+        for entry in runtime_prompts:
+            kind=entry.get("kind")
+            if kind not in KINDS:
+                continue
+            active=obj(db,"prompt_active",kind)
+            if not active or not active.get("enabled"):
+                continue
+            if active["prompt_id"]!=entry.get("prompt_id") or (
+                active["prompt_version"]!=entry.get("prompt_version")
+            ) or active["active_version"]!=entry.get("active_version"):
+                continue
+            identifier=active["prompt_id"]+":"+active["prompt_version"]
+            previous=obj(db,"prompt_context_use",identifier)
+            entry_record={
+                "kind":kind,
+                "prompt_id":active["prompt_id"],
+                "prompt_version":active["prompt_version"],
+                "active_version":active["active_version"],
+                "content_sha256":active["content_sha256"],
+                "at":now(),
+                "context_load_count":(previous["context_load_count"]+1) if previous else 1,
+                "observation":"RUNTIME_CONTEXT_PROVIDER_INVOKED",
+                "model_completion_verified":False,
+                "technical_configuration_grants_business_authority":False,
+            }
+            store.put(db,namespace,"prompt_context_use",identifier,entry_record)
