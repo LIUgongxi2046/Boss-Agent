@@ -5,8 +5,8 @@
   "source_locked": "Boss-Agent Desktop v6.0",
   "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
   "original_v6_status": "DESIGN_ONLY",
-  "implemented_page_count": 61,
-  "placeholder_page_count": 11,
+  "implemented_page_count": 65,
+  "placeholder_page_count": 7,
   "page_count": 72,
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
@@ -23,7 +23,8 @@
     "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration.",
     "2026-10-22 implementation slice: 36 modular workplace routes and 13 agriculture coverage routes added; existing A04 counts once. 61/72 pages have at least partial real code/role-scoped read data; none of these 61 is thereby accepted as functionally complete.",
     "Agriculture pages only render verified source coverage and unknown KPIs: the selected water-feed sales note is not evidence for raw-material prices and does not support other sector metrics. All sector numeric KPIs are NULL and require new approved datasets.",
-    "Remaining action gaps, 561 visual states, end-to-end Mac/DeepSeek/voice/installation, source/metric completeness and pixel-accurate visual comparison are not accepted. Metadata-only page content does not satisfy PRD write or approval actions."
+    "Remaining action gaps, 561 visual states, end-to-end Mac/DeepSeek/voice/installation, source/metric completeness and pixel-accurate visual comparison are not accepted. Metadata-only page content does not satisfy PRD write or approval actions.",
+    "D03 and F30 are read-only runtime diagnostic views; A06 delegates to upstream Skills catalog; F31 renders the real evaluation definition but no actual score. None is accepted as an end-to-end PRD feature."
   ],
   "pages": [
     {
@@ -1273,10 +1274,12 @@
       "logical_architecture_route": "/app/maintain/F30",
       "actual_webui_navigation": "?bossPage=F30",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_REAL_MODEL_USAGE_READ",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/model-usage"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1310,10 +1313,12 @@
       "logical_architecture_route": "/app/maintain/F31",
       "actual_webui_navigation": "?bossPage=F31",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_INDEPENDENT_EVALUATION_DEFINITION",
+      "component_file": "app/webui/BossWorkspaceView.tsx",
+      "component_name": "BossWorkspaceView",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/workspace/evaluation"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -1323,7 +1328,8 @@
         "evaluation.reset"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_workspace_api.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2018,10 +2024,12 @@
       "logical_architecture_route": "/app/boss/D03",
       "actual_webui_navigation": "?bossPage=D03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_REAL_MODEL_RESPONSE_READ",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/model-health"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2507,12 +2515,14 @@
       "logical_architecture_route": "/app/maintain/A06",
       "actual_webui_navigation": "?bossPage=A06",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
+      "render_status": "PARTIAL_NATIVE_SKILLS_HANDOFF",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop + native nanobot Skills",
       "verified_http_read_routes": [],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "native nanobot Skills catalog (#/skills) inside the authenticated Shell"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -3094,15 +3104,11 @@
   "visual_all_pages_accepted": false,
   "not_yet_built_page_ids": [
     "F27",
-    "F30",
-    "F31",
     "N01",
-    "D03",
     "D04",
     "D05",
     "D06",
     "D07",
-    "D08",
-    "A06"
+    "D08"
   ]
 }
