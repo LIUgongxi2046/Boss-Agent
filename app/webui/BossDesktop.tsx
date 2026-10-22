@@ -17,6 +17,7 @@ import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } 
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
+import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -847,6 +848,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>
+                  <MaintainerMessageReply/>
                 </div>
                 <div className="boss-column">
                   <Panel title="当前模拟资料与角色">
