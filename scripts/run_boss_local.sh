@@ -3,6 +3,17 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DIST="$ROOT/.work/product/nanobot/nanobot/web/dist/index.html"
 PYTHON="$ROOT/validation/.venv/bin/python"
+# Credentials stay on this Mac. The user-provided Markdown is Git-ignored,
+# and the generated connection.json stores only a file reference.
+if [[ ! -f "$ROOT/boss agent.md" ]]; then
+  echo "缺少本机凭据文件 boss agent.md。请先将用户提供的附件保存于项目根目录。" >&2
+  exit 2
+fi
+python3 "$ROOT/scripts/configure_local_deepseek.py" >/dev/null
+if [[ ! -f "$ROOT/validation/connection.json" ]]; then
+  echo "本机服务端 DeepSeek 连接配置未生成，拒绝启动。" >&2
+  exit 2
+fi
 if [[ ! -f "$DIST" ]]; then
   echo "缺少产品构建。请先运行：python3 scripts/prepare_boss_webui.py --build" >&2
   exit 2
