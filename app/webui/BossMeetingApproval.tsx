@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3,
   ClipboardCheck, FileSearch, FolderOpen, Loader2, Plus, RefreshCw,
@@ -7,7 +7,6 @@ import {
 import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
 
-type Role = "BOSS" | "MAINTAINER";
 type Kind = "OPINION" | "SUGGESTION" | "DECISION" | "ASSIGNMENT_DRAFT";
 type Entry = { kind: Kind; text: string; source_anchor: string };
 type MinutesResponse = {
@@ -64,19 +63,19 @@ function ifText(value: string, max: number, label: string) {
   if (!value.trim() || value.length > max) throw Error(label+"须填写，且最多"+max+"字");
   return value.trim();
 }
-function Tip({children, warning=false}: {children: React.ReactNode;warning?:boolean}) {
+function Tip({children, warning=false}: {children: ReactNode;warning?:boolean}) {
   return <div className={"boss-status "+(warning?"boss-status-warn":"")}>
     {warning?<AlertCircle size={16}/>:<Clock3 size={16}/>}
     <span>{children}</span>
   </div>;
 }
-function Panel({title,note,children}:{title:string;note?:string;children:React.ReactNode}) {
+function Panel({title,note,children}:{title:string;note?:string;children:ReactNode}) {
   return <section className="boss-panel">
     <div className="boss-panel-head"><h2>{title}</h2>{note&&<small>{note}</small>}</div>
     {children}
   </section>;
 }
-function Empty({children}: {children:React.ReactNode}) {
+function Empty({children}: {children:ReactNode}) {
   return <div className="boss-empty"><FolderOpen size={20}/><div><strong>没有符合当前范围的记录</strong><p>{children}</p></div></div>;
 }
 function EntryRow({entry}: {entry:Entry}) {
