@@ -247,8 +247,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     return () => abort.abort();
   }, [getToken, authAttempt]);
 
-  const navigate = useCallback((id: string, focus = "") => {
+  const navigate = useCallback((id: string, focus = "", bypassDirty = false) => {
     if (!role || !allowed(id, role)) return;
+    if (!bypassDirty && page === "F06" && assignmentDirty &&
+        id !== page && !["D04","D05","D01"].includes(id)) {
+      setPendingNavigation({id,focus});
+      return;
+    }
     if (id !== page) setPreviousPage(page);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
@@ -257,7 +262,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role]);
+  }, [page, role, assignmentDirty]);
+
+  useEffect(() => {
+    if (!pendingNavigation) return;
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPendingNavigation(null);
+    };
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [pendingNavigation]);
 
   useEffect(() => {
     const onBack = () => {
@@ -280,7 +294,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       }));
     };
     if (role === "BOSS") {
-      if (["F01", "F06", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
+      if (["F01", "F06", "D04", "D05", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
       if (["F24", "D03"].includes(page)) read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
