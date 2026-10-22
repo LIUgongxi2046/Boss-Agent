@@ -200,10 +200,34 @@ class BossWorkspaceAPI:
                 "physical_secure_erasure_verified": False,
             }
         if key == "calendar":
-            calendar = dict(data["private_calendar"])
-            # Only BOSS sees private_body. No public/maintainer counterpart.
-            return {"calendar": calendar, "visibility": "BOSS_PRIVATE",
-                    "external_share_created": False, "can_edit": False}
+            row = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id='private-1'",
+                (self.namespace,),
+            ).fetchone()
+            calendar = json.loads(row[0]) if row else {
+                **data["private_calendar"], "version": "1", "status": "ACTIVE",
+                "title": "", "location": "", "attachment_refs": [],
+            }
+            shares = _object_list(db, self.namespace, "calendar_share")
+            return {
+                "calendar": calendar,
+                "shares": [{
+                    k: share[k] for k in (
+                        "share_id", "calendar_version", "recipient_id",
+                        "busy", "starts_at", "ends_at", "timezone", "expires_at",
+                        "revoked", "revoked_at", "external_delivery_created",
+                    ) if k in share
+                } for share in shares],
+                "meeting": {
+                    "meeting_id": data["meeting"]["meeting_id"],
+                    "starts_at": data["meeting"]["starts_at"],
+                    "ends_at": None, "end_is_known": False,
+                },
+                "visibility": "BOSS_PRIVATE",
+                "external_share_created": False,
+                "can_edit": calendar["status"] != "DELETED",
+                "physical_secure_erasure_verified": False,
+            }
         if key == "sources" or key == "source-index":
             docs = _object_list(db, self.namespace, "document")
             records = [_safe_source(d) for d in docs]
@@ -312,10 +336,43 @@ class BossWorkspaceAPI:
             return {"history": entries, "raw_action_payload_returned": False}
         if key == "outbox":
             rows = _object_list(db, self.namespace, "outbox")
-            return {"messages": [{k: r[k] for k in (
-                "message_id", "task_id", "message_status", "task_status",
-                "task_version", "recipient_id", "sent_at", "source_type"
-            ) if k in r} for r in rows], "body_exposed": False}
+            drafts = _object_list(db, self.namespace, "message_draft")
+            sent = _object_list(db, self.namespace, "message_outbox")
+            replies = _object_list(db, self.namespace, "message_reply")
+            return {
+                "messages": [{k: r[k] for k in (
+                    "message_id", "task_id", "message_status", "task_status",
+                    "task_version", "recipient_id", "sent_at", "source_type",
+                ) if k in r} for r in rows],
+                "drafts": [dict(row) for row in drafts],
+                "sent_messages": [{
+                    k: row[k] for k in (
+                        "message_id", "draft_id", "draft_version", "recipient_id",
+                        "related_task_id", "body", "attachment_refs", "send_state",
+                        "delivery_state", "reply_state", "sent_at", "source_type",
+                        "external_channel_invoked",
+                    ) if k in row
+                } for row in sent],
+                "replies": [{
+                    k: row[k] for k in (
+                        "reply_id", "reply_to", "author_contact_id",
+                        "text", "source_type", "received_at",
+                        "related_task_id", "task_completion_confirmed",
+                    ) if k in row
+                } for row in replies],
+                "contacts": [{
+                    k: row[k] for k in (
+                        "contact_id", "name", "organization",
+                        "responsibility", "valid_from", "valid_until",
+                    ) if k in row
+                } for row in data["contacts"]],
+                "task_ids": [row["task_id"] for row in _object_list(
+                    db, self.namespace, "task") if row.get("status") not in
+                    ("CANCELED", "COMPLETED_CONFIRMED")],
+                "body_exposed": True,
+                "visibility": "BOSS_ONLY",
+                "external_channel_invoked": False,
+            }
         if key == "dataset":
             c = db.execute(
                 "SELECT kind, COUNT(*) FROM objects WHERE namespace=? "
