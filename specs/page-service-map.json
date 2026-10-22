@@ -28,7 +28,9 @@
     "F27 records locally and requests the native authenticated transcribeAudio operation only after user action. Transcription remains disabled by default until a real STT provider is configured and tested; no success/e2e assertions are made.",
     "F05 meeting minutes are versioned and grouped OPINION/SUGGESTION/DECISION/ASSIGNMENT_DRAFT; owner confirmed only after original source check. No assignment is auto-created or sent.",
     "F07 application approvals must originate from explicit MAINTAINER simulated data in A03, with exact amount/currency and source version. REJECT/APPROVE/REQUEST_MORE are distinct. Revision after REQUEST_MORE invalidates old approvals; no financial transaction.",
-    "The redesigned Desktop v6 shell now follows source desktop layout geometry (64px topbar, 146/122px Hero, 204px sidebar, 278px right information column); macOS screenshot pixel diff remains NOT_RUN."
+    "The redesigned Desktop v6 shell now follows source desktop layout geometry (64px topbar, 146/122px Hero, 204px sidebar, 278px right information column); macOS screenshot pixel diff remains NOT_RUN.",
+    "F08 now has versioned draft/save/simulated send/reply with actual SQLite records and owner consent; SENT_SIMULATED is distinct from external delivery and reply. Reply injection is a separate MAINTAINER action; it does not confirm task completion.",
+    "F12 owner-only private calendar edit/delete and busy-only scope sharing/revocation: title/location/body cannot enter the share object; private content is not readable through maintenance API. No actual external invite is sent."
   ],
   "pages": [
     {
@@ -369,13 +371,16 @@
       "logical_architecture_route": "/app/boss/F08",
       "actual_webui_navigation": "?bossPage=F08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_SIMULATED_MESSAGE_DRAFT_SEND_REPLY",
+      "component_file": "app/webui/BossCommunicationCalendar.tsx",
+      "component_name": "BossCommunicationCalendar",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/outbox"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.message.draft.save",
+        "boss.message.send"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -386,12 +391,14 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_message_calendar.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "external_delivery_verified": false
     },
     {
       "page_id": "F09",
@@ -531,13 +538,18 @@
       "logical_architecture_route": "/app/boss/F12",
       "actual_webui_navigation": "?bossPage=F12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_OWNER_PRIVATE_CALENDAR_BUSY_SHARING",
+      "component_file": "app/webui/BossCommunicationCalendar.tsx",
+      "component_name": "BossCommunicationCalendar",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/calendar"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.calendar.save",
+        "boss.calendar.share",
+        "boss.calendar.share.revoke",
+        "boss.calendar.delete"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -549,12 +561,14 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_message_calendar.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "external_delivery_verified": false
     },
     {
       "page_id": "F13",
@@ -2455,7 +2469,8 @@
       "code_wired_write_actions": [
         "boss.simulation.feedback",
         "boss.simulation.event.seed",
-        "boss.simulation.clock.advance"
+        "boss.simulation.clock.advance",
+        "boss.simulation.message.reply"
       ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
