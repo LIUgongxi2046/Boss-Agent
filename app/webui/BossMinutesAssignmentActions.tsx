@@ -65,7 +65,7 @@ export function BossMinutesAssignmentActions({
   busyRef.current = busy || lookupBusy;
 
   const entry = candidates.find(x=>x.entry_id===entryId);
-  const alreadyLinked = links.find(x=>x.entry_id===entryId);
+  const alreadyLinked = links.find(x=>x.entry_id===entryId && x.minute_version===minute?.version);
   useEffect(()=>{
     if(!entryId || !candidates.some(x=>x.entry_id===entryId)){
       setEntryId(candidates[0]?.entry_id||"");
@@ -191,6 +191,10 @@ export function BossMinutesAssignmentActions({
       <ShieldCheck size={16}/>
       已确认纪要 {minute.minute_id} · v{minute.version}。创建与发送仍是两次独立本人决定。
     </div>}
+    {links.some(x=>x.minute_version!==minute?.version)&&
+      <div className="boss-status boss-status-warn">
+        <Clock3 size={16}/> 这份会议存在旧版本纪要关联的历史交办。当前只允许按最新已确认版本逐项授权，旧任务仍在 F06 保留。
+      </div>}
     {candidates.length ? <>
       <label className="boss-label" htmlFor="boss-minute-entry">选择已确认交办草稿</label>
       <select id="boss-minute-entry" className="boss-single-input" value={entryId}
