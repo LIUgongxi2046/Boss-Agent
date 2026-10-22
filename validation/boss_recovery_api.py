@@ -14,7 +14,8 @@ from urllib.parse import parse_qs
 
 from aiohttp import web
 
-from boss_command_api import BossCommandAPI, _client_key
+from boss_command_api import BossCommandAPI, _client_key, _aware_due
+from boss_message_calendar import work_meeting_conflict
 from business import now
 
 NS = "ui-check"
@@ -62,6 +63,33 @@ class BossRecoveryAPI:
     def serve(self, role, path, query_string=""):
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
+        if path == "/api/boss/ui/calendar-conflict":
+            if role != "BOSS":
+                return 403, {"error": "FORBIDDEN"}
+            params = _query(query_string, ("starts_at", "ends_at", "timezone"))
+            start = _aware_due(params["starts_at"], params["timezone"])
+            end = _aware_due(params["ends_at"], params["timezone"])
+            if not start < end or (end - start).total_seconds() > 31 * 86400:
+                return 400, {"error": "INVALID_TIME_WINDOW"}
+            with self.store.connect() as db:
+                self.store.active(db, self.namespace)
+                data = self.store.get(db, self.namespace, "initial", "snapshot")
+                meeting = data["meeting"]
+                observed = work_meeting_conflict(
+                    start, end, datetime.fromisoformat(meeting["starts_at"]),
+                )
+                return 200, {
+                    "source_type": "SIMULATED",
+                    "calendar_id": "private-1",
+                    "meeting_id": meeting["meeting_id"],
+                    "meeting_version": meeting["version"],
+                    "timezone": params["timezone"],
+                    "proposed_starts_at": params["starts_at"],
+                    "proposed_ends_at": params["ends_at"],
+                    **observed,
+                    "read_only": True,
+                    "read_at": now(),
+                }
         if path == "/api/boss/ui/operation-status":
             params = _query(query_string, ("action", "client_request_id"))
             action = params["action"]
