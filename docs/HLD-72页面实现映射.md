@@ -2,17 +2,19 @@
 
 > 版本：1.0.1 · 日期：2026-10-22 · 状态：**架构映射固定，开发状态另见当前 page-service-map**
 
-**当前真实实施与未完成状态**：[`specs/page-service-map.json`](../specs/page-service-map.json)（已部分接入 11 页，其他仍待开发）。以下是 T04 固定时的逻辑路由和目标组件契约，不等于全部已经开发。\n\n**权威结构化映射**：[`specs/hld-72-page-map.json`](../specs/hld-72-page-map.json)。架构约束见 [`docs/HLD.md`](HLD.md)，验收规则见 PRD V1.2.0 与《交互与页面规范》V1.2.0。本表由设计包 `meta/页面配置.json` 与 `v6-状态关联.json` 一一核对生成。
+**当前真实实施与未完成状态**：[`specs/page-service-map.json`](../specs/page-service-map.json)（已部分接入 11 页，其他仍待开发）。以下是 T04 固定时的逻辑路由和目标组件契约，不等于全部已经开发。
+
+**权威结构化映射**：[`specs/hld-72-page-map.json`](../specs/hld-72-page-map.json)。架构约束见 [`docs/HLD.md`](HLD.md)，验收规则见 PRD V1.2.0 与《交互与页面规范》V1.2.0。本表由设计包 `meta/页面配置.json` 与 `v6-状态关联.json` 一一核对生成。
 
 ## 1. 范围及解释
 
 - 72 个 HTML：F 32 / N 12 / D 9 / A 16 / V19 3。每一行都绑定真实设计文件、逻辑路由、拟实现 React 组件、上游复用锚点、语义读写、服务端角色、需求标识及实施验收任务。
 - 561 个独立状态关联 = 51（F/A/V）× 11（S00—S10）；N/D 共 21 页无逐页 S00—S10 提示词，继承 `COMMON_STATE_INHERITANCE`、桌面 SYS 和 E01—E06 异常状态。
 - 路由 `/app/...` 是 T04 **拟定逻辑路由契约**，不是已存在的 nanobot 路由。T08 在不改变原生 WebUI API 约定的前提下确定 SPA/desktop 的实际承载方式。
-- 组件路径为 T10/T08 后续开发建议目标，**仓库当前不存在该 React 产品源码**；每页的 `semantic_read_contracts` / `semantic_command_contracts` 也**不是已经可调用的 HTTP endpoint**；`client_only_intents` 是前端本地选择、草稿提醒及筛选，不生成后端接口。
+- 组件路径为 T10/T08 后续开发建议目标，**这些 T04 原拟定路径尚不等于真实 React 源码位置**；每页的 `semantic_read_contracts` / `semantic_command_contracts` 也**不是已经可调用的 HTTP endpoint**；`client_only_intents` 是前端本地选择、草稿提醒及筛选，不生成后端接口。
 - `SHELL/THREAD/SETTINGS/...` 是可核验的上游源码锚点（见 JSON `upstream_reuse_anchors` 和 T02 source-map）；共享 UI、React 与 SDK 本身不代表农业、会议、BI、审批已经开发。
 - 老板写入必须服务端进行当前授权、版本和幂等校验；维护后台不能代老板决定；示例模拟业务不产生真实外部发送或生产业务影响。
-- 页面未开发状态固定为 `ARCHITECTURE_MAPPED_NOT_BUILT`。测试责任：老板 T18，维护 T19，语音 T20，集成/安全 T24，安装交接 T25。
+- 本表的 `ARCHITECTURE_MAPPED_NOT_BUILT` 是 T04 冻结时的基线状态，不覆盖 D21 后实际开发进度。测试责任：老板 T18，维护 T19，语音 T20，集成/安全 T24，安装交接 T25。
 
 ## 2. 全量页面映射
 
