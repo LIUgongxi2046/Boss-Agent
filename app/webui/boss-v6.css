@@ -829,3 +829,13 @@
  .boss-v6 .boss-research-filters{grid-template-columns:minmax(0,1fr)}
  .boss-v6 .boss-research-filters label:first-child{grid-column:span 1}
 }
+
+
+/* D01 inspectable quote locator; preserves the approved v6 document viewer. */
+.boss-v6 .boss-source-highlight{
+  color:#194b80;background:#fff0b8;
+  box-shadow:0 0 0 2px rgba(248,205,84,.18);
+  border-radius:3px;padding:0 2px;
+  text-decoration:underline;text-decoration-color:#d6a23d;
+  text-underline-offset:3px;
+}
