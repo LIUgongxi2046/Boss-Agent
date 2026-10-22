@@ -218,6 +218,11 @@ class BossWorkspaceAPI:
                         "revoked", "revoked_at", "external_delivery_created",
                     ) if k in share
                 } for share in shares],
+                "contacts": [{
+                    "contact_id": c["contact_id"], "name": c["name"],
+                    "organization": c["organization"],
+                    "responsibility": c["responsibility"],
+                } for c in data["contacts"]],
                 "meeting": {
                     "meeting_id": data["meeting"]["meeting_id"],
                     "starts_at": data["meeting"]["starts_at"],
