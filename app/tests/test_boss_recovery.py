@@ -344,3 +344,59 @@ def test_contact_validity_uses_current_simulated_time_not_old_meeting_date(conte
     with commands.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='message_draft'").fetchone()[0] == 0
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='calendar_share'").fetchone()[0] == 0
+
+
+
+@pytest.mark.parametrize(("starts","ends","expected","requires_ack"), [
+    ("2026-10-23T08:30:00+08:00","2026-10-23T09:30:00+08:00",
+     "KNOWN_MEETING_START_OVERLAP", True),
+    ("2026-10-23T12:00:00+08:00","2026-10-23T13:00:00+08:00",
+     "POSSIBLE_CONFLICT_MEETING_END_UNKNOWN", True),
+    ("2026-10-23T07:00:00+08:00","2026-10-23T08:00:00+08:00",
+     "ENDS_BEFORE_KNOWN_MEETING_START", True),
+    ("2026-10-24T18:00:00+08:00","2026-10-24T19:00:00+08:00",
+     "NO_OVERLAP_IDENTIFIED_WITH_KNOWN_START", False),
+])
+def test_calendar_conflict_endpoint_matches_actual_save_policy(
+        context, starts, ends, expected, requires_ack):
+    commands, pages = context
+    path = "/api/boss/ui/calendar-conflict"
+    query = urlencode({"starts_at": starts, "ends_at": ends, "timezone": "Asia/Shanghai"})
+    status, result = pages.serve("BOSS", path, query)
+    assert status == 200, result
+    assert result["status"] == expected
+    assert result["requires_owner_acknowledgement"] is requires_ack
+    assert result["meeting_end_known"] is False
+    assert result["meeting_ends_at"] is None
+    assert result["conflict_proven_absent"] is False
+    assert result["read_only"] is True
+    assert result["source_type"] == "SIMULATED"
+    assert pages.serve("MAINTAINER", path, query)[0] == 403
+    with commands.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='private_calendar'").fetchone()[0] == 0
+    args = {
+        "expected_version": "1", "starts_at": starts, "ends_at": ends,
+        "timezone": "Asia/Shanghai", "title": "工作冲突核验",
+        "private_body": "OWNER_PRIVATE_CONFLICT_CHECK_TEXT",
+        "location": "", "attachment_refs": [],
+        "acknowledge_conflict": False,
+    }
+    status, _ = act(commands, "BOSS", "boss.calendar.save",
+                    "conflict-save-attempt-001", **args)
+    assert status == (409 if requires_ack else 200)
+
+
+def test_calendar_conflict_invalid_time_or_unauthorized_params_rejected(context):
+    _, pages = context
+    path = "/api/boss/ui/calendar-conflict"
+    assert pages.serve("BOSS", path, urlencode({
+        "starts_at": "2026-10-23T10:00:00+08:00",
+        "ends_at": "2026-10-23T09:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+    }))[0] == 400
+    assert pages.serve("BOSS", path, urlencode({
+        "starts_at": "2026-10-23T10:00:00+08:00",
+        "ends_at": "2026-10-23T11:00:00+08:00",
+        "timezone": "Europe/Paris",
+    }))[0] == 400
+    assert pages.serve("BOSS", path, "starts_at=foo&ends_at=bar&timezone=UTC&owner_id=other")[0] == 400
