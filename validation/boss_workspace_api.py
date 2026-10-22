@@ -24,7 +24,7 @@ BOSS_PAGES = {
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
-    "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin",
+    "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin", "message-admin",
 }
 
 
@@ -334,6 +334,21 @@ class BossWorkspaceAPI:
                     and isinstance(result[k], (int, str))},
                 })
             return {"history": entries, "raw_action_payload_returned": False}
+        if key == "message-admin":
+            # MAINTAINER gets technical identifiers only, never draft/body,
+            # personal messages, attachment text or reply content.
+            sent = _object_list(db, self.namespace, "message_outbox")
+            return {
+                "pending_reply_refs": [{
+                    "message_id": row["message_id"],
+                    "recipient_id": row["recipient_id"],
+                    "send_state": row["send_state"],
+                    "reply_state": row["reply_state"],
+                    "related_task_id": row.get("related_task_id"),
+                } for row in sent],
+                "raw_message_text_returned": False,
+                "contact_accounts_exist": False,
+            }
         if key == "outbox":
             rows = _object_list(db, self.namespace, "outbox")
             drafts = _object_list(db, self.namespace, "message_draft")
