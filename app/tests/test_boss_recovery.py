@@ -400,3 +400,62 @@ def test_calendar_conflict_invalid_time_or_unauthorized_params_rejected(context)
         "timezone": "Europe/Paris",
     }))[0] == 400
     assert pages.serve("BOSS", path, "starts_at=foo&ends_at=bar&timezone=UTC&owner_id=other")[0] == 400
+
+
+
+def test_minutes_recovery_reports_real_version_without_private_text(context):
+    commands, pages = context
+    hidden = "SENSITIVE_OWNER_MINUTES_TEXT_NEVER_IN_RECEIPT"
+    status, saved = act(
+        commands, "BOSS", "boss.minutes.save", "minutes-reconcile-owner-001",
+        meeting_id="meeting-1", meeting_version="1",
+        source_id="meeting-minutes", source_version="1",
+        expected_version="0",
+        entries=[{
+            "kind": "OPINION", "text": hidden,
+            "source_anchor": "合成历史会议纪要",
+        }],
+    )
+    assert status == 200, saved
+    code, record = receipt(
+        pages, "BOSS", "boss.minutes.save", "minutes-reconcile-owner-001"
+    )
+    assert code == 200
+    assert record["outcome"] == "RECORDED"
+    assert record["result"]["state"] == "DRAFT_REVIEW"
+    assert record["result"]["version"] == "1"
+    assert hidden not in json.dumps(record)
+    assert receipt(
+        pages, "MAINTAINER", "boss.minutes.save", "minutes-reconcile-owner-001"
+    )[0] == 403
+
+
+def test_approval_recovery_does_not_echo_decision_comment(context):
+    commands, pages = context
+    seeded = act(
+        commands, "MAINTAINER", "boss.simulation.application.seed",
+        "simulated-application-receipt-001",
+        application_id="application-1", applicant_contact_id="finance-1",
+        amount_cny="750.00", title="模拟审批申请",
+        description="仅用于模拟老板审批", 
+        attachment_text="模拟申请附件：2026-10-22报价记录和申请来源证明明细。",
+    )
+    assert seeded[0] == 200, seeded
+    hidden = "SENSITIVE_APPROVAL_COMMENT_NEVER_IN_RECEIPT"
+    status, result = act(
+        commands, "BOSS", "boss.approval.decide", "decision-reconcile-owner-001",
+        application_id="application-1", expected_version="1",
+        source_id="application-1-attachment", source_version="1",
+        amount="750.00", currency="CNY",
+        decision="APPROVE", comment=hidden,
+    )
+    assert status == 200, result
+    code, record = receipt(
+        pages, "BOSS", "boss.approval.decide", "decision-reconcile-owner-001"
+    )
+    assert code == 200
+    assert record["outcome"] == "RECORDED"
+    assert record["result"]["state"] == "APPROVED_RECORDED"
+    assert record["result"]["decision"] == "APPROVE"
+    assert record["result"]["version"] == "2"
+    assert hidden not in json.dumps(record)
