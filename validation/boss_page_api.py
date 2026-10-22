@@ -143,11 +143,39 @@ class BossPageAPI:
                 [*task_messages, *followup_messages],
                 key=lambda row: (row["sent_at"], row["message_id"]),
             )
+            # Task-specific due notifications are owned by the same SQLite
+            # business lifecycle as F06, not inferred from displayed deadlines.
+            dispatch_index = {
+                row["event_id"]: row for row in
+                self._items(db, self.namespace, "dispatch")
+                if row.get("event_id")
+            }
+            task_due_events = [
+                {
+                    "task_id": row["task_id"],
+                    "event_id": row["event_id"],
+                    "event_version": row["version"],
+                    "event_state": row["state"],
+                    "due_at": row["due_at"],
+                    "task_version_at_sync": row["task_version"],
+                    "dispatch_state": dispatch_index.get(
+                        row["event_id"], {}
+                    ).get("state", "NOT_DISPATCHED"),
+                    "dispatch_reason": dispatch_index.get(
+                        row["event_id"], {}
+                    ).get("reason"),
+                    "external_delivery_verified": False,
+                }
+                for row in self._items(db, self.namespace, "event")
+                if row.get("generated_by") == "BOSS_AUTHORIZED_TASK"
+                and row.get("task_id")
+            ]
             return {
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
                 "tasks": [self._public_task(v) for v in self._items(db, self.namespace, "task")],
                 "linked_messages": linked_messages,
+                "task_due_events": task_due_events,
                 "feedback": [
                     {key: item[key] for key in (
                         "feedback_id", "task_id", "kind", "content",
