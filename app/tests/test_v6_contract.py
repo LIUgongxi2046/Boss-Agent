@@ -89,8 +89,8 @@ def test_page_service_map_is_explicit_about_partial_runtime():
     service_map = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
     assert service_map["page_count"] == 72
     assert len(service_map["pages"]) == 72
-    assert service_map["implemented_page_count"] == 11
-    assert service_map["placeholder_page_count"] == 61
+    assert service_map["implemented_page_count"] == 13
+    assert service_map["placeholder_page_count"] == 59
     assert all(page["actual_e2e_verified"] is False for page in service_map["pages"])
     assert all(page["visual_pixel_verified"] is False for page in service_map["pages"])
     by_id = {item["page_id"]: item for item in service_map["pages"]}
@@ -100,6 +100,8 @@ def test_page_service_map_is_explicit_about_partial_runtime():
         "boss.assignment.complete", "boss.assignment.extend", "boss.assignment.cancel",
     }
     assert by_id["A04"]["code_wired_write_actions"] == ["boss.simulation.feedback"]
+    assert by_id["F24"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-health"]
+    assert by_id["A15"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-usage"]
     for item in service_map["pages"]:
         assert item["component_file"]
         assert item["role_gate"] == next(p["role_gate"] for p in BASELINE["pages"] if p["page_id"] == item["page_id"])
