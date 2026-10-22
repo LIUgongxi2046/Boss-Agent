@@ -10,6 +10,7 @@
 | DOC-VALUE | G01—G04、H01—H37、M01—M17、协议、未知阈值与桌面资源条件 | [价值验证定义](../specs/value-validation.json) | S001；S009 采集结果 | CURRENT | 2026-10-22 |
 | DOC-PRD | 32 项 FR/BR/AC、48 个功能与管理线框、六类 Agent 组件、两端开源复用；第 10.5 节桌面窗口、权限与生命周期 | [PRD](PRD.md) | S002 | IN_REVIEW | 2026-10-22 |
 | DOC-PROBE | T02 的 15 步骤、37 断言；DeepSeek、记忆、调度、权限、两端复用及桌面安装恢复 | [共同验证定义](../specs/selection-probe.json) | S002；T02 执行 | DEFINITION_ONLY | 2026-10-22 |
+| DOC-DEV-FIRST | 固定开源 v0.3.5、Desktop v6 React 首批实现、可复现构建、权限测试、剩余阻塞 | [首批开发记录](development/T11.md)、[运行脚本](../scripts/run_boss_local.sh) | S008 / T11，后续 T18 接收 | IN_PROGRESS（不等于 T11/T18 验收通过） | 2026-10-22 |
 | DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
 | DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[机器可读契约](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
 | DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |
@@ -21,4 +22,4 @@
 
 S008 实施每项工单时保存 `docs/development/Txx.md` 与 `docs/development/index.md`，记录输入、实际修改、运行命令、结果和关联资料。跨模块知识按实际产生的内容维护，本索引提供检索入口。
 
-T04 固定的 HLD 与 72 页架构映射可交接 T05—T08：前者固定系统边界和唯一维护来源，后者固定每页到设计源/上游组件/语义操作/角色/任务的追踪。当前 D19 只允许架构文档工作；尚未进行 T18/T19/T20 页面代码开发或产品验收。
+T04 固定的 HLD 与 72 页架构映射可交接 T05—T08：前者固定系统边界和唯一维护来源，后者固定每页到设计源/上游组件/语义操作/角色/任务的追踪。用户新指令 D21 已批准开始代码开发。首批 React 工作台、RoleChannel 真实模拟业务读取、开源构建脚本已入库；T11 为 IN_PROGRESS，T18/T19/T20 完整页面及最终验收未通过。

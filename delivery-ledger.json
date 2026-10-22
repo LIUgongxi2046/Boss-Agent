@@ -1281,7 +1281,7 @@
       "depends_on": [
         "T10"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "src/",
         "tests/",
@@ -1292,9 +1292,19 @@
         "docs/README.md",
         "evidence/",
         ".gitignore",
-        "delivery-ledger.json"
+        "delivery-ledger.json",
+        "app/",
+        "validation/boss_page_api.py",
+        ".github/workflows/boss-agent-desktop.yml",
+        "scripts/prepare_boss_webui.py",
+        "scripts/run_boss_local.sh",
+        "docs/development/T11.md"
       ],
-      "blockers": []
+      "blockers": [
+        "T05—T10 专业 LLD、OpenAPI、前端服务映射与设计评审尚未 ACCEPTED；本批为用户已授权、可回滚的研发实施切片，不得将 T11 完整验收标为通过。",
+        "开发者目标 macOS Intel 的真实 Electron 启动、DeepSeek 端到端、系统权限与截图像素对照未在本次云工具环境执行；T11/A11 运行证据尚不完整。",
+        "上游 npm 锁定版本依赖存在审计告警，需在正式分发前分类评估影响、修复方案与回归验证，不能仅因编译成功视为安全通过。"
+      ]
     },
     {
       "id": "T12",
@@ -1716,7 +1726,7 @@
       "T25",
       "T26"
     ],
-    "next_task_id": "T03",
+    "next_task_id": "T05",
     "constraints": [
       "用户确定当前交付为电脑桌面应用；D17、PRD 第 10.5 节及项目计划第 8 节适用于全部后续工单及验收。保留 R01—R32、两端开源复用、48 个线框、最终高保真及素材。T02 已实际验证 Electron、原生两端、IPC、尺寸缩放、重复启动与退出重启；P15 完整系统过程未验证，T25 交付完整产品安装包。",
       "T03 按 D17 交付全部 48 个 WF-1.1 区域及适用状态。T02 已在 docs/选型验证.md 提供两端矩阵、真实模型业务和桌面证据；T03 可引用固定源码和正式 API 完成绑定，全部待办继续保留。A03 必须有当前文字、视觉与素材检查；T08 接收完整设计，正式功能由 T18—T20 验证。",
@@ -1729,7 +1739,7 @@
       "allowed_paths 为规划中的逻辑目录；T10 根据批准设计更新为实际工程路径后，才能开始对应实现。",
       "T02/A02 按用户 D18 确认完成本轮选型可行性，固定 nanobot 0.3.5 commit 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9 与 Electron 45.0.0；D16 的 Runtime 和两端复用均有实际证据。T03/T04/T07/T16 引用同版本和扩展责任；完整人工审查、异常及系统权限/恢复继续由 T09/T12/T15/T16/T24/T25 验证，原单项状态不改为通过。",
       "每项 S008 工作保存独立开发记录，更新索引，依据真实业务断言维护验收。",
-      "D19 当前授权只允许架构文档及必要只读核查。T04/A04 为静态架构设计通过；T03 和 T05—T26 的 UI/开发/测试/模型/构建/部署工作不得因任务台账变化自动启动，必须待用户新的明确授权。"
+      "D21 最新用户明确授权在固定开源架构与 Desktop v6 高保真基础上开始产品开发，已覆盖 D19 旧的暂停开发状态；权限、数据、模型与目标系统范围仍受 D03/D04/D11/D16/D17 约束。T11 已开始首批研发切片，但 T05—T10 前置设计和完整 T11/A11 验收仍待完成。"
     ],
     "authorization_refs": [
       "用户要求根据最新需求制定项目计划",
