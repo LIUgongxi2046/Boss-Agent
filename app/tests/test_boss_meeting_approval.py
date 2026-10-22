@@ -354,3 +354,166 @@ def test_revise_rejects_missing_owner_request_and_bad_contact(services):
     assert run(api, "MAINTAINER", "boss.simulation.application.revise",
                {**payload,"client_request_id":"bad-version-revision",
                 "expected_version":"1"})[0]==409
+
+
+def minute_assignment_input(key="from-minutes-task-001", **overrides):
+    return {
+        "client_request_id": key,
+        "meeting_id": "meeting-1",
+        "minute_version": "2",
+        "entry_id": "entry-04",
+        "purpose": "根据已确认纪要核对经营材料与差异",
+        "coordinator_id": "coordinator-1",
+        "due_at": "2026-10-24T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": ["经营原始明细与结论依据"],
+        **overrides,
+    }
+
+
+def confirmed_minute(services):
+    api, _ = services
+    assert run(api, "BOSS", "boss.minutes.save", minutes_input())[0] == 200
+    confirmed = {
+        "client_request_id": "minute-confirm-link",
+        "meeting_id": "meeting-1", "expected_version": "1",
+        "source_id": "meeting-minutes", "source_version": "1",
+    }
+    assert run(api, "BOSS", "boss.minutes.confirm", confirmed)[0] == 200
+    return api
+
+
+def test_confirmed_minute_entry_creates_one_traceable_open_task_without_send(services):
+    api, reads = services
+    confirmed_minute(services)
+    result = run(api, "BOSS", "boss.minutes.assignment.create",
+                 minute_assignment_input())
+    assert result[0] == 200, result
+    created = result[1]
+    assert created["status"] == "OPEN"
+    assert created["minute_version"] == "2"
+    assert created["entry_id"] == "entry-04"
+    assert not created["message_sent"]
+    assert created["independent_send_required"]
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input()) == result
+    with api.store.connect() as db:
+        task = api.store.get(db, "ui-check", "task", created["task_id"])
+        assert task["origin_minute_id"] == "minutes:meeting-1"
+        assert task["origin_minute_version"] == "2"
+        assert task["origin_entry_id"] == "entry-04"
+        assert task["origin_source_id"] == "meeting-minutes"
+        assert task["origin_source_version"] == "1"
+        assert task["message_ids"] == []
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='minutes_assignment_link'"
+        ).fetchone()[0] == 1
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='outbox'"
+        ).fetchone()[0] == 0
+    _, minutes = view(reads, "BOSS", "minutes")
+    linked = minutes["linked_assignments"]
+    assert len(linked) == 1 and linked[0]["task_id"] == created["task_id"]
+    assert linked[0]["task_status"] == "OPEN"
+    assert linked[0]["send_status"] == "NOT_SENT"
+    assert linked[0]["sent_message_count"] == 0
+    assert minutes["task_created_by_minutes"] is True
+    assert minutes["message_sent_by_minutes"] is False
+    _, tasks = reads.serve("BOSS", "/api/boss/ui/tasks")
+    task_read = next(t for t in tasks["tasks"] if t["task_id"] == created["task_id"])
+    assert task_read["origin_minute_id"] == "minutes:meeting-1"
+    assert task_read["origin_entry_id"] == "entry-04"
+
+
+def test_linked_minute_requires_separate_boss_send_and_reads_consistent_state(services):
+    api, reads = services
+    confirmed_minute(services)
+    created = run(api, "BOSS", "boss.minutes.assignment.create",
+                  minute_assignment_input())[1]
+    message = run(api, "BOSS", "boss.assignment.send", {
+        "client_request_id": "send-minute-assignment-001",
+        "task_id": created["task_id"], "task_version": created["version"],
+        "recipient_id": "coordinator-1",
+        "body": "请核对已确认纪要提及的业务资料", "content_version": "1",
+    })
+    assert message[0] == 200, message
+    _, minutes = view(reads, "BOSS", "minutes")
+    link = minutes["linked_assignments"][0]
+    assert link["task_status"] == "WAITING_FEEDBACK"
+    assert link["send_status"] == "SENT_SIMULATED"
+    assert link["sent_message_count"] == 1
+    assert minutes["message_sent_by_minutes"] is True
+    _, tasks = reads.serve("BOSS", "/api/boss/ui/tasks")
+    task = next(t for t in tasks["tasks"] if t["task_id"] == created["task_id"])
+    assert task["status"] == "WAITING_FEEDBACK"
+    assert len(task["message_ids"]) == 1
+
+
+@pytest.mark.parametrize(("corrupt", "expected"), [
+    ({"entry_id": "entry-01"}, 400),
+    ({"entry_id": "entry-99"}, 400),
+    ({"minute_version": "1"}, 409),
+    ({"meeting_id": "another-meeting"}, 400),
+    ({"coordinator_id": "finance-1"}, 400),
+])
+def test_minute_assignment_rejects_wrong_entry_role_version_and_contact(
+        services, corrupt, expected):
+    api, _ = services
+    confirmed_minute(services)
+    result = run(api, "BOSS", "boss.minutes.assignment.create",
+                 minute_assignment_input(key="bad-link-" + str(corrupt), **corrupt))
+    assert result[0] == expected, result
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='task'"
+        ).fetchone()[0] == 0
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='minutes_assignment_link'"
+        ).fetchone()[0] == 0
+
+
+def test_minute_assignment_requires_owner_confirmation_and_is_not_maintainer_action(services):
+    api, _ = services
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input())[0] == 404
+    assert run(api, "BOSS", "boss.minutes.save", minutes_input())[0] == 200
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input())[0] == 409
+    confirmed_minute_after_save = {
+        "client_request_id": "confirm-existing-minute",
+        "meeting_id": "meeting-1", "expected_version": "1",
+        "source_id": "meeting-minutes", "source_version": "1",
+    }
+    assert run(api, "BOSS", "boss.minutes.confirm", confirmed_minute_after_save)[0] == 200
+    assert run(api, "MAINTAINER", "boss.minutes.assignment.create",
+               minute_assignment_input())[0] == 403
+
+
+def test_duplicate_minute_entry_with_new_request_key_cannot_create_second_task(services):
+    api, _ = services
+    confirmed_minute(services)
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input())[0] == 200
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input(key="second-request-for-same-entry"))[0] == 409
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='task'"
+        ).fetchone()[0] == 1
+
+
+def test_withdrawn_minutes_source_blocks_new_linked_task(services):
+    api, reads = services
+    confirmed_minute(services)
+    api.store.control("ui-check", "withdraw", {
+        "source_id": "meeting-minutes", "version": "1",
+    })
+    assert run(api, "BOSS", "boss.minutes.assignment.create",
+               minute_assignment_input())[0] == 403
+    _, minutes = view(reads, "BOSS", "minutes")
+    assert minutes["minute"]["source_reference_state"] == "NEEDS_REVIEW"
+    assert not minutes["linked_assignments"]
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='task'"
+        ).fetchone()[0] == 0
