@@ -14,6 +14,7 @@ import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type Mai
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
+import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -604,6 +605,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
+                page === "F27" ? <BossVoiceAssignment
+                  getToken={getToken}
+                  onSubmit={onStartChat}
+                  onOpenConversation={() => navigate("NATIVE")}
+                /> :
                 page === "F06" ? <BossAssignmentFlow
                   tasks={tasks} selectedTaskId={selectedTaskId}
                   onSelectTask={setSelectedTaskId} onReload={refresh}
