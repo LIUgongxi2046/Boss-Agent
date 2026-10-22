@@ -316,7 +316,7 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
-            if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview"):
+            if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview", "/api/boss/ui/calendar-conflict"):
                 return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
                 return self.workspace.serve(role, path, query_string)
