@@ -15,6 +15,7 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import OPERATIONS, ROOT, now
+from boss_recovery_api import calendar_share_state
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -209,14 +210,16 @@ class BossWorkspaceAPI:
                 "title": "", "location": "", "attachment_refs": [],
             }
             shares = _object_list(db, self.namespace, "calendar_share")
+            clock = self.store.get(db, self.namespace, "clock", "current")
             return {
                 "calendar": calendar,
                 "shares": [{
-                    k: share[k] for k in (
+                    **{k: share[k] for k in (
                         "share_id", "calendar_version", "recipient_id",
                         "busy", "starts_at", "ends_at", "timezone", "expires_at",
                         "revoked", "revoked_at", "external_delivery_created",
-                    ) if k in share
+                    ) if k in share},
+                    "effective_state": calendar_share_state(share, calendar, clock),
                 } for share in shares],
                 "contacts": [{
                     "contact_id": c["contact_id"], "name": c["name"],
