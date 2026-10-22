@@ -287,17 +287,29 @@ class BossWorkspaceAPI:
             } for row in rows], "secrets_or_payloads_returned": False}
         if key == "decisions":
             audit = db.execute(
-                "SELECT id,operation,created_at FROM audit WHERE namespace=? "
+                "SELECT id,operation,created_at,output FROM audit WHERE namespace=? "
                 "AND operation IN ('boss.assignment.complete','boss.assignment.extend',"
                 "'boss.assignment.cancel','boss.memory.confirm','boss.memory.delete',"
-                "'boss.reminder.ack','boss.reminder.snooze','boss.reminder.close') "
+                "'boss.reminder.ack','boss.reminder.snooze','boss.reminder.close',"
+                "'boss.minutes.confirm','boss.approval.decide') "
                 "ORDER BY id DESC LIMIT 80",
                 (self.namespace,),
             ).fetchall()
-            return {"history": [
-                {"sequence": row[0], "action": row[1], "at": row[2]}
-                for row in audit
-            ], "raw_action_payload_returned": False}
+            entries = []
+            for row in audit:
+                try:
+                    result = json.loads(row[3])
+                except (TypeError, ValueError):
+                    result = {}
+                entries.append({
+                    "sequence": row[0], "action": row[1], "at": row[2],
+                    **{k: result[k] for k in (
+                        "task_id", "meeting_id", "application_id", "decision_id",
+                        "status", "version", "authorization_id",
+                    ) if isinstance(result, dict) and k in result
+                    and isinstance(result[k], (int, str))},
+                })
+            return {"history": entries, "raw_action_payload_returned": False}
         if key == "outbox":
             rows = _object_list(db, self.namespace, "outbox")
             return {"messages": [{k: r[k] for k in (
