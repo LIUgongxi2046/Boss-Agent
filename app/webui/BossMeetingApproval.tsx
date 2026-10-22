@@ -14,7 +14,7 @@ type MinutesResponse = {
   meeting: { meeting_id: string; version: string; starts_at: string;
     timezone: string; participant_ids: string[] };
   minute: {
-    minute_id: string; version: string; state: "DRAFT_REVIEW" | "CONFIRMED";
+    minute_id: string; meeting_id: string; version: string; state: "DRAFT_REVIEW" | "CONFIRMED";
     source_id: string; source_version: string; updated_at: string;
     confirmed_at: string | null; entries: (Entry & {entry_id: string})[];
     task_count_created: number; message_count_sent: number;
