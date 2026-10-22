@@ -4,6 +4,7 @@ import {
   Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import type { AssignmentDraft } from "./BossAssignmentPicker";
 
 export interface AssignmentTask {
   task_id: string; status: string; version?: string; purpose?: string;
@@ -136,19 +137,20 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
   return { propose, dialog, notice, busy };
 }
 
-export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context }: {
+export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
+  draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string) => void; onReload: () => void;
   onViewSource: () => void; context: AssignmentContext | null;
+  draft: AssignmentDraft;
+  onDraftChange: (key: keyof AssignmentDraft, value: string) => void;
+  onDraftSaved: () => void;
+  onOpenCoordinatorPicker: () => void; onOpenDuePicker: () => void;
 }) {
-  const { propose, dialog, notice, busy } = useTransaction(onReload, onSelectTask);
-  const [purpose,setPurpose]=useState("");
-  const [coordinator,setCoordinator]=useState("");
-  const [due,setDue]=useState("");
-  const [evidence,setEvidence]=useState("经营原始明细");
-  const [body,setBody]=useState("");
-  const [newDue,setNewDue]=useState("");
-  const [reason,setReason]=useState("");
+  const { propose, dialog, notice, busy } = useTransaction(onReload, id => {
+    onSelectTask(id); onDraftSaved();
+  });
+  const {purpose,coordinator,due,evidence,body,newDue,reason}=draft;
   const [error,setError]=useState("");
   const rows=tasks?.tasks||[];
   const current=rows.find(t=>t.task_id===selectedTaskId)||rows[0];
@@ -227,19 +229,23 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>创建交办</h2><small>F06 · 当前老板授权</small></div>
           <div className="boss-form-grid">
-            <label>唯一负责人<select value={coordinator} onChange={e=>setCoordinator(e.target.value)}>
+            <label>唯一负责人<select value={coordinator} onChange={e=>onDraftChange("coordinator",e.target.value)}>
               <option value="">请选择</option>
               {(context?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
                 {c.name} · {c.organization} · {c.responsibility}
               </option>)}
             </select></label>
-            <label>期限（Asia/Shanghai）<input type="datetime-local" value={due} onChange={e=>setDue(e.target.value)}/></label>
+            <label>期限（Asia/Shanghai）<input type="datetime-local" value={due} onChange={e=>onDraftChange("due",e.target.value)}/></label>
+          </div>
+          <div className="boss-actions">
+            <button type="button" className="boss-btn" onClick={onOpenCoordinatorPicker}>选择负责人（D04）</button>
+            <button type="button" className="boss-btn" onClick={onOpenDuePicker}>选择时间与时区（D05）</button>
           </div>
           <label className="boss-label">交办目的</label>
-          <textarea rows={3} value={purpose} onChange={e=>setPurpose(e.target.value)}
+          <textarea rows={3} value={purpose} onChange={e=>onDraftChange("purpose",e.target.value)}
             placeholder="说明目的、范围、要求与应交付的产物"/>
           <label className="boss-label">证据要求</label>
-          <input className="boss-single-input" value={evidence} onChange={e=>setEvidence(e.target.value)}/>
+          <input className="boss-single-input" value={evidence} onChange={e=>onDraftChange("evidence",e.target.value)}/>
           <p className="boss-helper">会议：{context?.meeting?.meeting_id||"待读取"} ·
             关联事件：{context?.event?.event_id||"待读取"} · 资料：{context?.assignment_source_ids?.join("、")||"待读取"}</p>
           <div className="boss-actions">
@@ -272,7 +278,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
             <div className="boss-kv"><span>截止时间</span><strong>{displayTime(current.due_at)}</strong></div>
             <div className="boss-kv"><span>证据要求</span><strong>{current.evidence_requirements?.join("、")||"缺少"}</strong></div>
             <label className="boss-label">模拟发件内容</label>
-            <textarea rows={3} value={body} onChange={e=>setBody(e.target.value)} placeholder="输入准备发给唯一负责人的正文"/>
+            <textarea rows={3} value={body} onChange={e=>onDraftChange("body",e.target.value)} placeholder="输入准备发给唯一负责人的正文"/>
             <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button"
               disabled={current.status!=="OPEN"||busy} onClick={prepareSend}>
               <MessageSquareText size={15}/> 核对并模拟发送</button></div>
@@ -293,12 +299,12 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
               <CheckCircle2 size={15}/> 核查证据并确认完成</button>
           </div>
           <div className="boss-form-grid boss-form-below">
-            <label>新期限（北京时间）<input type="datetime-local" value={newDue} onChange={e=>setNewDue(e.target.value)}/></label>
+            <label>新期限（北京时间）<input type="datetime-local" value={newDue} onChange={e=>onDraftChange("newDue",e.target.value)}/></label>
           </div>
           <div className="boss-actions"><button type="button" className="boss-btn" disabled={!extension||busy}
             onClick={prepareExtend}><Clock3 size={15}/> 审阅延期申请</button></div>
           <label className="boss-label">取消原因</label>
-          <input className="boss-single-input" value={reason} onChange={e=>setReason(e.target.value)} placeholder="说明本次取消的原因"/>
+          <input className="boss-single-input" value={reason} onChange={e=>onDraftChange("reason",e.target.value)} placeholder="说明本次取消的原因"/>
           <div className="boss-actions"><button type="button" className="boss-btn" onClick={prepareCancel}
             disabled={!current||busy||["CANCELED","COMPLETED_CONFIRMED"].includes(current.status)}>
             <XCircle size={15}/> 核对并取消交办</button></div>
