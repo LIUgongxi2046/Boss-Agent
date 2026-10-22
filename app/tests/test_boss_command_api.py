@@ -287,3 +287,29 @@ def test_completed_evidence_withdrawn_before_owner_confirmation_is_blocked(demo)
     assert code == 403
     with demo.store.connect() as db:
         assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
+
+
+def test_maintainer_cannot_claim_feedback_before_boss_authorized_send(demo):
+    created = create(demo)
+    code, _ = demo.execute(
+        "MAINTAINER", "boss.simulation.feedback",
+        feedback_input(created, "PROGRESS", "feedback-before-send-001"),
+    )
+    assert code == 409
+    with demo.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='feedback'").fetchone()[0] == 0
+        assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "OPEN"
+
+
+def test_result_submitted_cannot_be_demoted_by_late_progress(demo):
+    created = create(demo)
+    sent = demo.execute("BOSS", "boss.assignment.send", send_input(created))[1]
+    result = demo.execute("MAINTAINER", "boss.simulation.feedback",
+        feedback_input({"task_id": created["task_id"], "version": sent["task_version"]}))[1]
+    late = feedback_input(
+        {"task_id": created["task_id"], "version": result["task"]["version"]},
+        "PROGRESS", "late-progress-001",
+    )
+    assert demo.execute("MAINTAINER", "boss.simulation.feedback", late)[0] == 409
+    with demo.store.connect() as db:
+        assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
