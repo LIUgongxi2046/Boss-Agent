@@ -102,3 +102,21 @@ def test_f05_transaction_and_replay_are_represented_in_real_contract():
     assert '"task_created_by_minutes": bool(linked)' in projection
     assert '"message_sent_by_minutes": any(' in projection
     assert '"linked_assignments": linked' in projection
+
+
+
+def test_f06_task_message_timeline_is_genuine_cross_page_readback():
+    domain = (ROOT / "validation/boss_page_api.py").read_text()
+    task_view = (ROOT / "app/webui/BossAssignmentFlow.tsx").read_text()
+    shell = (ROOT / "app/webui/BossDesktop.tsx").read_text()
+    assert '"linked_messages": linked_messages' in domain
+    assert '"type": "ASSIGNMENT_SEND"' in domain
+    assert '"type": "FOLLOWUP_MESSAGE"' in domain
+    assert '"delivery_state": "NOT_VERIFIED"' in domain
+    assert "external_channel_invoked" in domain
+    assert "TaskLinkedMessage" in task_view
+    assert "tasks?.linked_messages" in task_view
+    assert "关联发件与回复状态" in task_view
+    assert "onViewMessages()" not in task_view or "onViewMessages" in task_view
+    assert 'onViewMessages={()=>navigate("F08")}' in shell
+    assert "SENT_SIMULATED" in task_view
