@@ -139,6 +139,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
   const [pending,setPending] = useState<Pending|null>(null);
   const [approved,setApproved] = useState(false);
   const [busy,setBusy] = useState(false);
+  const [lookupBusy,setLookupBusy] = useState(false);
   const modalRef = useRef<HTMLElement|null>(null);
   const [draft,setDraft] = useState("");
   const [search,setSearch] = useState("");
@@ -215,6 +216,34 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
       setError((e instanceof Error?e.message:String(e))+
         "。执行结果可能未同步；请先重读正式业务状态，再用同一个确认框重试。");
     }finally{setBusy(false);}
+  }
+  async function reconcile(){
+    if(!pending||busy||lookupBusy)return;
+    const token=getToken();
+    if(!token){setError("身份已过期，无法查找该请求回执");return;}
+    setLookupBusy(true);setError("");
+    try{
+      const qs=new URLSearchParams({
+        action:pending.action,client_request_id:pending.id,
+      });
+      const response=await fetch("/api/boss/ui/operation-status?"+qs.toString(),{
+        headers:{Authorization:"Bearer "+token},cache:"no-store",
+      });
+      if(!response.ok)throw Error("幂等回执核查失败（HTTP "+response.status+"）");
+      const data=await response.json() as {
+        action:string;client_request_id:string;outcome:string;
+      };
+      if(data.action!==pending.action||data.client_request_id!==pending.id)
+        throw Error("幂等回执与当前动作不匹配");
+      if(data.outcome==="RECORDED"){
+        setNotice("服务端确认当前动作已持久化，已重新读取正式状态。");
+        setPending(null);setApproved(false);setDirty(false);reload();
+      }else if(data.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
+        setError("当前未查到原请求回执，这不是未执行的证明。请先重读状态，必要时复用同一编号重试。");
+        reload();
+      }else throw Error("无效回执，不能认定已执行");
+    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    finally{setLookupBusy(false);}
   }
   function confirmMemory(){
     const current=data?.memory;
@@ -583,9 +612,13 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         </label>
         {error&&<Notice error message={error}/>}
         <footer className="boss-actions">
-          <button type="button" className="boss-btn" onClick={()=>{setPending(null);setApproved(false);}} disabled={busy}>取消</button>
+          <button type="button" className="boss-btn" onClick={()=>{setPending(null);setApproved(false);}} disabled={busy||lookupBusy}>取消</button>
+          <button type="button" className="boss-btn" onClick={()=>void reconcile()}
+            disabled={busy||lookupBusy}>
+            {lookupBusy&&<Loader2 size={15} className="boss-spin"/>} 核查原请求回执
+          </button>
           <button type="button" className="boss-btn boss-btn-primary"
-            disabled={!approved||busy} onClick={()=>void commit()}>
+            disabled={!approved||busy||lookupBusy} onClick={()=>void commit()}>
             {busy&&<Loader2 size={15} className="boss-spin"/>} 确认并提交
           </button>
         </footer>
