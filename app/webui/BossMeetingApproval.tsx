@@ -22,6 +22,11 @@ type MinutesResponse = {
     task_count_created: number; message_count_sent: number;
   } | null;
   source_index: {source_id: string; version: string; withdrawn: boolean}[];
+  eligible_assignment_contacts: {
+    contact_id:string;name:string;organization:string;responsibility:string;
+    allowed_for_fixture_assignment:boolean;
+  }[];
+  business_clock:string;
   linked_assignments: {
     minute_id: string;minute_version: string;entry_id: string;
     task_id: string;task_status: string;task_version: string;
@@ -58,6 +63,7 @@ type Pending = {
 };
 type MutationResult = {
   version?: string; state?: string; minute_id?: string; application_id?: string;
+  task_id?: string; status?: string; entry_id?: string;
   tasks_created?: number; messages_sent?: number;
   funds_transferred?: boolean; authorization_id?: string;
 };
@@ -98,7 +104,7 @@ function VersionValue({label,value}:{label:string;value?:string|number|null}) {
   return <div className="boss-kv"><span>{label}</span><strong>{value??"未知"}</strong></div>;
 }
 
-function useConfirmedMutation(onSuccess: ()=>void) {
+function useConfirmedMutation(onSuccess: (result?: MutationResult)=>void) {
   const {client,getToken}=useClient();
   const [lookupBusy,setLookupBusy]=useState(false);
   const [pending,setPending]=useState<Pending|null>(null);
@@ -146,7 +152,7 @@ function useConfirmedMutation(onSuccess: ()=>void) {
         " · 版本 "+(result.version||"待核查")+
         "。纪要、审批、交办和消息会分别回读，不会推定发生资金交易或实际发送。");
       setPending(null);setChecked(false);
-      onSuccess();
+      onSuccess(result);
     }catch(e){
       setError((e instanceof Error?e.message:String(e))+
         "。该操作可能已经保存；请先重新读取，必要时使用本弹窗原请求编号重试。");
@@ -172,7 +178,7 @@ function useConfirmedMutation(onSuccess: ()=>void) {
         throw Error("服务端回执与本次操作标识不匹配");
       if(result.outcome==="RECORDED"&&result.result){
         setNotice("已通过实际 SQLite 回执确认本次纪要/审批操作完成，现重新读取版本与决定。");
-        setPending(null);setChecked(false);onSuccess();
+        setPending(null);setChecked(false);onSuccess(result.result);
       }else if(result.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
         setError("当前没有发现原请求回执，不能因此断定没有执行。先重读正式状态，必要时使用本确认框同一请求编号重试。");
         onSuccess();
