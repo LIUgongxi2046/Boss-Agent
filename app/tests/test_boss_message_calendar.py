@@ -213,7 +213,7 @@ def test_busy_share_returns_no_title_location_body_and_can_revoke(services):
     assert "title" not in record and "private_body" not in record
     assert "location" not in record and "attachment_refs" not in record
     assert cmd(api,"BOSS","boss.calendar.share","share-private-body",
-               **{**params,"client_request_id":"share-private-body", "fields":["private_body"]})[0]==400
+               **{**params,"fields":["private_body"]})[0]==403
     code,revoked=cmd(api,"BOSS","boss.calendar.share.revoke","revoke-share-1",
                      share_id=shared["share_id"],expected_version=saved["version"])
     assert code==200,revoked
