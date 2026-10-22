@@ -60,14 +60,55 @@ fs.mkdirSync(output,{recursive:true,mode:0o700});
        const page=await context.newPage();
        const filename=pageId+"-"+vp.width+"x"+vp.height+".png";
        const screenshot=path.join(output,filename);
-       let state="SUCCESS",message="";
+       let state="SUCCESS",message="",geometry=null,geometryViolations=[];
        try{
          await page.goto(address+"/?bossPage="+encodeURIComponent(pageId),{waitUntil:"domcontentloaded",timeout:15000});
          await page.locator('.boss-v6[data-role="'+role+'"]').waitFor({state:"visible",timeout:30000});
          await page.locator(".boss-meta-strip").waitFor({state:"visible",timeout:12000});
          // Allow first non-blocking render; live business values remain in frame.
          await page.waitForTimeout(450);
+         geometry = await page.evaluate(() => {
+           const rect = selector => {
+             const element = document.querySelector(selector);
+             if (!element) return null;
+             const bounds = element.getBoundingClientRect();
+             return {width: bounds.width, height: bounds.height};
+           };
+           const hero = document.querySelector(".boss-hero");
+           const mascot = document.querySelector(".boss-hero-mascot");
+           const logo = document.querySelector(".boss-brand img");
+           return {
+             sidebar: rect(".boss-sidebar"),
+             topbar: rect(".boss-topbar"),
+             hero: rect(".boss-hero"),
+             heroRadiusPx: hero ? Number.parseFloat(getComputedStyle(hero).borderTopLeftRadius) : null,
+             mascotAssetLoaded: !!mascot && mascot instanceof HTMLImageElement && mascot.naturalWidth > 0,
+             brandAssetLoaded: !!logo && logo instanceof HTMLImageElement && logo.naturalWidth > 0,
+             pageTitle: hero?.querySelector("h1")?.textContent || "",
+           };
+         });
+         const expectedSidebar = vp.width <= 1050 ? 60 : 204;
+         const expectedHero = pageId === "F01" ? (vp.width <= 1250 ? 124 : 146) : 122;
+         const close = (actual, expected) => Math.abs(actual - expected) <= 2.5;
+         if (!geometry?.sidebar || !close(geometry.sidebar.width, expectedSidebar)) {
+           geometryViolations.push("sidebar_width");
+         }
+         if (!geometry?.topbar || !close(geometry.topbar.height, 64)) {
+           geometryViolations.push("topbar_height");
+         }
+         if (!geometry?.hero || !close(geometry.hero.height, expectedHero)) {
+           geometryViolations.push("hero_height");
+         }
+         if (geometry?.heroRadiusPx == null || !close(geometry.heroRadiusPx, 20)) {
+           geometryViolations.push("hero_radius");
+         }
+         if (!geometry?.brandAssetLoaded) geometryViolations.push("logo_not_loaded");
+         if (!geometry?.mascotAssetLoaded) geometryViolations.push("mascot_not_loaded");
          await page.screenshot({path:screenshot,animations:"disabled",fullPage:false});
+         if (geometryViolations.length) {
+           state="GEOMETRY_MISMATCH";
+           message="Desktop v6 source geometry or branded media differs from reference";
+         }
        } catch(e){
          state="CAPTURE_FAILED";message=String(e instanceof Error?e.message:e).slice(0,300);
        }
@@ -76,7 +117,7 @@ fs.mkdirSync(output,{recursive:true,mode:0o700});
          page_title:catalogue[pageId].title,
          role,viewport:vp,screenshot:state==="SUCCESS"?path.relative(ROOT,screenshot):null,
          design_reference:path.join("Boss-Agent-Desktop-Complete-v6","images-1x",pageId+"-"+catalogue[pageId].title+".png"),
-         state,message,
+         state,message,geometry,geometry_violations:geometryViolations,
        });
        console.log(pageId+" "+vp.width+"x"+vp.height+": "+state);
        await context.close();
@@ -88,7 +129,7 @@ fs.mkdirSync(output,{recursive:true,mode:0o700});
    fs.writeFileSync(path.join(output,"capture-report.json"),JSON.stringify({
      platform:process.platform,architecture:process.arch,role,
      generated_at:new Date().toISOString(),
-     notes:"Rendered code screenshots, not pixel-comparison or product acceptance.",
+     notes:"Source-v6 shell geometry and branded-media diagnostic. Screenshots are NOT pixel comparison or complete product acceptance.",
      captures:records,
    },null,2)+"\n",{mode:0o600});
  }
