@@ -416,6 +416,8 @@ export function BossMeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCr
           </Panel>
           <BossMinutesAssignmentActions
             minute={minute||null} participants={minutes?.meeting.participant_ids||[]}
+            contacts={minutes?.eligible_assignment_contacts||[]}
+            businessClock={minutes?.business_clock||""}
             links={minutes?.linked_assignments||[]}
             sourceCurrent={Boolean(source&&minute&&source.source_id===minute.source_id&&source.version===minute.source_version)}
             editingUnsaved={dirty} onReload={reload}
