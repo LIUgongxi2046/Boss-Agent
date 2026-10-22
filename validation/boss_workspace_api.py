@@ -487,9 +487,23 @@ class BossWorkspaceAPI:
                         "enabled": item["enabled"],
                         "adoption_policy": item["adoption_policy"],
                         "actual_model_evaluation_passed": False,
+                        "runtime_context_adoption": context_index.get(
+                            (item["prompt_id"],item["prompt_version"]),{}
+                        ).get("observation","NOT_OBSERVED"),
+                        "context_load_count": context_index.get(
+                            (item["prompt_id"],item["prompt_version"]),{}
+                        ).get("context_load_count",0),
+                        "last_context_at": context_index.get(
+                            (item["prompt_id"],item["prompt_version"]),{}
+                        ).get("at"),
                     })
             valid_runtime_ids = {
                 p["prompt_id"] for p in active_runtime_prompts(self.store, self.namespace)
+            }
+            context_records = _object_list(db, self.namespace, "prompt_context_use")
+            context_index = {
+                (item["prompt_id"],item["prompt_version"]):item
+                for item in context_records
             }
             return {
                 "kinds": list(KINDS),
