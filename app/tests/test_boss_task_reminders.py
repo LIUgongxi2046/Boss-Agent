@@ -369,3 +369,47 @@ def test_revoked_original_task_source_blocks_completion_without_fake_success(con
     )
     assert canceled[0] == 200
     assert due(api, task["task_id"])["state"] == "CANCELED"
+
+
+
+def test_task_source_version_is_pinned_and_changed_document_blocks_send(context):
+    api, pages = context
+    created = create(api)[1]
+    task_id = created["task_id"]
+    with api.store.connect() as db:
+        persisted = api.store.get(db, "ui-check", "task", task_id)
+        assert persisted["source_versions"] == {"finance-note": "1"}
+        source = api.store.get(db, "ui-check", "document", "finance-note")
+        source["version"] = "2"
+        api.store.put(db, "ui-check", "document", "finance-note", source)
+    read = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
+    assert read["source_reference_state"] == "NEEDS_REVIEW"
+    assert "SOURCE_VERSION_CHANGED" in read["source_reference_reasons"]
+    attempted = send(api, task_id, key="cannot-send-with-new-source-version")
+    assert attempted[0] == 409
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='outbox'"
+        ).fetchone()[0] == 0
+        assert current(db, task_id) is None
+    canceled = act(
+        api, "BOSS", "boss.assignment.cancel", "cancel-old-source-task",
+        task_id=task_id, task_version="1",
+        reason="任务原附件版本已变化，本人取消未发送交办",
+    )
+    assert canceled[0] == 200
+
+
+def test_legacy_task_without_pinned_versions_is_not_sent_as_verified(context):
+    api, pages = context
+    created = create(api)[1]
+    with api.store.connect() as db:
+        original = api.store.get(db, "ui-check", "task", created["task_id"])
+        del original["source_versions"]
+        api.store.put(db, "ui-check", "task", created["task_id"], original)
+    task = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
+    assert task["source_reference_state"] == "NEEDS_REVIEW"
+    assert "UNPINNED_SOURCE_VERSION" in task["source_reference_reasons"]
+    assert send(
+        api, created["task_id"], key="legacy-unpinned-cannot-send"
+    )[0] == 409
