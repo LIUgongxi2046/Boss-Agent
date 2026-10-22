@@ -6,6 +6,7 @@ Runtime, domain and Mac visual acceptance stay separate.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -89,8 +90,8 @@ def test_page_service_map_is_explicit_about_partial_runtime():
     service_map = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
     assert service_map["page_count"] == 72
     assert len(service_map["pages"]) == 72
-    assert service_map["implemented_page_count"] == 13
-    assert service_map["placeholder_page_count"] == 59
+    assert service_map["implemented_page_count"] == 61
+    assert service_map["placeholder_page_count"] == 11
     assert all(page["actual_e2e_verified"] is False for page in service_map["pages"])
     assert all(page["visual_pixel_verified"] is False for page in service_map["pages"])
     by_id = {item["page_id"]: item for item in service_map["pages"]}
@@ -99,7 +100,7 @@ def test_page_service_map_is_explicit_about_partial_runtime():
         "boss.assignment.create", "boss.assignment.send",
         "boss.assignment.complete", "boss.assignment.extend", "boss.assignment.cancel",
     }
-    assert by_id["A04"]["code_wired_write_actions"] == ["boss.simulation.feedback"]
+    assert set(by_id["A04"]["code_wired_write_actions"]) == {"boss.simulation.feedback", "boss.simulation.event.seed", "boss.simulation.clock.advance"}
     assert by_id["F24"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-health"]
     assert by_id["A15"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-usage"]
     for item in service_map["pages"]:
@@ -122,3 +123,44 @@ def test_boss_websocket_writes_are_never_literal_http_or_client_storage():
     assert "idempotency" in command_api
     assert "localStorage.setItem" not in flow
     assert "dangerouslySetInnerHTML" not in flow
+
+
+def test_real_workspace_and_sector_routing_coverage_is_not_faked():
+    mapping = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
+    by_id = {row["page_id"]: row for row in mapping["pages"]}
+    workspace_source = (ROOT / "app/webui/BossWorkspaceView.tsx").read_text(encoding="utf-8")
+    part = workspace_source.split("export const WORKSPACE_PAGE_ROUTES", 1)[1].split("type Role", 1)[0]
+    workplace_ids = re.findall(r"\b([FAND]\d{2}(?:-[A-Z]+)?):\s*\"", part)
+    assert len(workplace_ids) == 36
+    for page_id in workplace_ids:
+        assert by_id[page_id]["component_file"] == "app/webui/BossWorkspaceView.tsx"
+        assert by_id[page_id]["render_status"] != "DESIGN_PLACEHOLDER_ONLY"
+        assert any("/api/boss/ui/workspace/" in endpoint
+                   for endpoint in by_id[page_id]["verified_http_read_routes"])
+    sector_source = (ROOT / "app/webui/BossSectorView.tsx").read_text(encoding="utf-8")
+    sector_part = sector_source.split("export const SECTOR_PAGE_IDS", 1)[1].split("] as const;", 1)[0]
+    sector_ids = re.findall(r'\"(F\d{2}|V19-[A-Z]+)\"', sector_part)
+    assert len(sector_ids) == 13
+    for page_id in sector_ids:
+        assert by_id[page_id]["component_file"] == "app/webui/BossSectorView.tsx"
+        assert by_id[page_id]["render_status"] == "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA"
+        assert by_id[page_id]["metrics_are_real"] is False
+        assert by_id[page_id]["actual_e2e_verified"] is False
+    assert len(mapping["not_yet_built_page_ids"]) == 11
+    assert set(mapping["not_yet_built_page_ids"]) == {
+        id for id, row in by_id.items() if row["render_status"] == "DESIGN_PLACEHOLDER_ONLY"
+    }
+
+
+def test_memory_and_notification_commands_are_owner_bound():
+    mapping = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
+    by_id = {row["page_id"]: row for row in mapping["pages"]}
+    assert set(by_id["F13"]["code_wired_write_actions"]) == {
+        "boss.memory.confirm", "boss.memory.delete",
+    }
+    assert {"boss.reminder.ack", "boss.reminder.close", "boss.reminder.snooze"} <= set(
+        by_id["N06"]["code_wired_write_actions"]
+    )
+    assert by_id["F14"]["metrics_are_real"] is False
+    assert by_id["N01"]["render_status"] == "DESIGN_PLACEHOLDER_ONLY"  # original native AuthForm
+    assert by_id["D08"]["render_status"] == "DESIGN_PLACEHOLDER_ONLY"  # original native expired session
