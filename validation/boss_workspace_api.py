@@ -15,13 +15,14 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import OPERATIONS, ROOT, now
+from boss_meeting_brief import briefing_projection
 from boss_recovery_api import calendar_share_state
 
 NS = "ui-check"
 BOSS_PAGES = {
     "memory", "calendar", "notifications", "authorizations", "decisions",
     "outbox", "sources", "knowledge", "organization", "plans", "voice",
-    "minutes", "approvals",
+    "minutes", "approvals", "briefing",
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
@@ -106,6 +107,8 @@ class BossWorkspaceAPI:
                 "transcription_result_status": "NOT_EXECUTED",
                 "transcription_input_mime": "audio/webm",
             }
+        if key == "briefing":
+            return briefing_projection(db,data)
         if key == "minutes":
             meeting = data["meeting"]
             item = db.execute(
