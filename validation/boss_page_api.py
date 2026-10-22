@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from pathlib import Path
 from urllib.parse import parse_qs
 from aiohttp import web
 
@@ -197,6 +198,82 @@ class BossPageAPI:
             "read_at": now(),
         }
 
+    def _model_runtime(self, role: str):
+        """Project metadata-only model/probe log; never return prompts or API keys."""
+        local = Path(self.store.path).parent / "diagnostics"
+        transports = local / "http-requests.json"
+        events_file = local / "events.json"
+
+        def read_local(file):
+            if not file.is_file():
+                return []
+            if file.stat().st_size > 8 * 1024 * 1024:
+                return []  # bounded read; never a remote URL or supplied path
+            result = json.loads(file.read_text(encoding="utf-8"))
+            return result if isinstance(result, list) else []
+
+        requests = read_local(transports)
+        events = read_local(events_file)
+        calls = [v for v in requests
+                 if isinstance(v, dict) and v.get("type") == "request"]
+        responses = {}
+        for record in requests:
+            if not isinstance(record, dict):
+                continue
+            if record.get("type") not in ("stream_metadata", "response"):
+                continue
+            rid = record.get("response_id")
+            if not isinstance(rid, str) or not rid:
+                continue
+            # The final usage chunk can follow the initial response chunk.
+            original = responses.get(rid, {})
+            responses[rid] = {
+                "response_id": rid[:128],
+                "at": record.get("at", original.get("at")),
+                "model": record.get("model") or original.get("model"),
+                "usage": record.get("usage") if isinstance(record.get("usage"), dict)
+                         else original.get("usage"),
+                "finish_reasons": record.get("finish_reasons")
+                         if isinstance(record.get("finish_reasons"), list)
+                         else original.get("finish_reasons", []),
+            }
+        latest = list(responses.values())[-1] if responses else None
+        usage = latest.get("usage") if latest else None
+        # Refuse arbitrary provider usage fields: only numeric token counts.
+        summary = {
+            k: usage.get(k) if isinstance(usage, dict) and
+                  isinstance(usage.get(k), (int, float)) else None
+            for k in ("prompt_tokens", "completion_tokens", "total_tokens")
+        }
+        result = {
+            "source_type": "ACTUAL_PROVIDER_DIAGNOSTICS",
+            "provider": "deepseek" if calls else "NOT_OBSERVED",
+            "data_source": "LOCAL_PRIVATE_REDACTED_LOG",
+            "observed_request_count": len(calls),
+            "observed_response_count": len(responses),
+            "runtime_response_observed": bool(latest),
+            "latest_response": {
+                "response_id": latest["response_id"],
+                "at": latest.get("at"),
+                "model": latest.get("model"),
+                "finish_reasons": latest.get("finish_reasons", []),
+            } if latest else None,
+            "reported_usage": summary if latest else None,
+            "cost_total": None,
+            "business_task_completed": False,
+            "read_at": now(),
+        }
+        if role == "MAINTAINER":
+            result["tool_event_count"] = sum(
+                1 for row in events
+                if isinstance(row, dict) and row.get("type") == "tool"
+            )
+            result["observed_error_count"] = sum(
+                1 for row in events
+                if isinstance(row, dict) and row.get("error_present")
+            )
+        return result
+
     def _maintenance(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
@@ -231,10 +308,16 @@ class BossPageAPI:
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}
                 return 200, self._maintenance()
+            if path == "/api/boss/ui/model-usage":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                return 200, self._model_runtime(role)
             if role != "BOSS":
                 return 403, {"error": "FORBIDDEN"}
             if path == "/api/boss/ui/dashboard":
                 return 200, self._dashboard()
+            if path == "/api/boss/ui/model-health":
+                return 200, self._model_runtime(role)
             if path == "/api/boss/ui/tasks":
                 return 200, self._tasks()
             if path == "/api/boss/ui/meetings":
