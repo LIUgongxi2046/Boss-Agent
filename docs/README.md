@@ -10,8 +10,8 @@
 | DOC-VALUE | G01—G04、H01—H37、M01—M17、协议、未知阈值与桌面资源条件 | [价值验证定义](../specs/value-validation.json) | S001；S009 采集结果 | CURRENT | 2026-10-22 |
 | DOC-PRD | 32 项 FR/BR/AC、48 个功能与管理线框、六类 Agent 组件、两端开源复用；第 10.5 节桌面窗口、权限与生命周期 | [PRD](PRD.md) | S002 | IN_REVIEW | 2026-10-22 |
 | DOC-PROBE | T02 的 15 步骤、37 断言；DeepSeek、记忆、调度、权限、两端复用及桌面安装恢复 | [共同验证定义](../specs/selection-probe.json) | S002；T02 执行 | DEFINITION_ONLY | 2026-10-22 |
-| DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | ARCHITECTURE_BASELINE_FIXED（非产品验收） | 2026-10-22 |
-| DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[机器可读契约](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | ARCHITECTURE_BASELINE_FIXED（待 T08 绑定） | 2026-10-22 |
+| DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
+| DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[机器可读契约](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
 | DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |
 | DOC-SELECTION-ENV | 本机依赖、独立验证程序、服务端配置及运行命令 | [选型环境](选型环境.md)、[验证工程](../validation/README.md) | S004 | CURRENT | 2026-10-22 |
 | DOC-UI | 桌面六类老板入口、16 类管理能力、48 个线框映射与系统权限；第 13 节规定最终高保真和素材，等待 T02 完成制作与绑定 | [交互与页面规范](交互与页面规范.md) | S003-1/S003-2；T08 接收 | PARTIAL_HANDOFF | 2026-10-22 |
