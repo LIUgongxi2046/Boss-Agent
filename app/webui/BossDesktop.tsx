@@ -13,6 +13,7 @@ import pageMeta from "./page-meta.json";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
+import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -204,6 +205,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [pageFilter, setPageFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [question, setQuestion] = useState("");
+  const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
+  const [assignmentDirty, setAssignmentDirty] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string}|null>(null);
+  const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
+    setAssignmentDraft(old=>({...old,[field]:value}));
+    setAssignmentDirty(true);
+  }, []);
   const [productScope, setProductScope] = useState("product-1,product-2");
   const [selectedTaskId, setSelectedTaskId] = useState("");
   const [sourceId, setSourceId] = useState("finance-note");
