@@ -78,7 +78,8 @@ function validate(text:string,label:string,max=2400) {
 }
 
 function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
-  const {client}=useClient();
+  const {client,getToken}=useClient();
+  const [lookupBusy,setLookupBusy]=useState(false);
   const [pending,setPending]=useState<Pending|null>(null);
   const [checked,setChecked]=useState(false);
   const [busy,setBusy]=useState(false);
@@ -125,6 +126,37 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
         "。请求结果可能尚未同步；请先重新核查，重试会复用原请求编号。");
     }finally{setBusy(false);}
   };
+  const reconcile=async()=>{
+    if(!pending||busy||lookupBusy)return;
+    const token=getToken();
+    if(!token){setError("身份已过期，不能核对原请求回执");return;}
+    setLookupBusy(true);setError("");
+    try{
+      const params=new URLSearchParams({
+        action:pending.action,client_request_id:pending.key,
+      });
+      const response=await fetch("/api/boss/ui/operation-status?"+params.toString(),{
+        headers:{Authorization:"Bearer "+token},cache:"no-store",
+      });
+      if(!response.ok)throw new Error("原请求回执读取失败（HTTP "+response.status+"）");
+      const data=await response.json() as {
+        action:string;client_request_id:string;outcome:string;
+        result?:MutationResult;
+      };
+      if(data.action!==pending.action||data.client_request_id!==pending.key)
+        throw new Error("回执请求标识或动作不一致");
+      if(data.outcome==="RECORDED"&&data.result){
+        success?.(data.result);
+        setStatus("已从服务端 SQLite 幂等回执证实本次动作已保存，已重新读取正式状态。");
+        setPending(null);setChecked(false);refresh();
+      }else if(data.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
+        setError("当前数据库没有找到本次幂等回执，但这不能证明原请求未执行。请先核对正式业务对象，必要时保持本请求编号重试。");
+        refresh();
+      }else throw new Error("未识别的回执状态，不进行再次提交");
+    }catch(e){
+      setError(e instanceof Error?e.message:String(e));
+    }finally{setLookupBusy(false);}
+  };
   const dialog=pending?<div className="boss-confirm-backdrop">
     <section ref={modal} tabIndex={-1} className="boss-confirm" role="dialog"
       aria-modal="true" aria-labelledby="boss-private-action-title">
@@ -138,9 +170,13 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
       </label>
       {error&&<p className="boss-validation-error" role="alert">{error}</p>}
       <footer className="boss-actions">
-        <button className="boss-btn" type="button" disabled={busy} onClick={()=>setPending(null)}>取消</button>
+        <button className="boss-btn" type="button" disabled={busy||lookupBusy} onClick={()=>setPending(null)}>取消</button>
+        <button className="boss-btn" type="button" disabled={busy||lookupBusy}
+          onClick={()=>void reconcile()}>
+          {lookupBusy&&<Loader2 size={16} className="boss-spin"/>} 查询本次回执
+        </button>
         <button className="boss-btn boss-btn-primary" type="button"
-          disabled={!checked||busy} onClick={()=>void submit()}>
+          disabled={!checked||busy||lookupBusy} onClick={()=>void submit()}>
           {busy&&<Loader2 size={16} className="boss-spin"/>} 确认并提交
         </button>
       </footer>
