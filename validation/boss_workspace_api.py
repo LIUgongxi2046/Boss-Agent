@@ -185,6 +185,14 @@ class BossWorkspaceAPI:
                 "minute": minute,
                 "source_index": associated, "revisions": history,
                 "linked_assignments": linked,
+                "eligible_assignment_contacts": [{
+                    "contact_id": c["contact_id"],
+                    "name": c["name"],
+                    "organization": c["organization"],
+                    "responsibility": c["responsibility"],
+                    "allowed_for_fixture_assignment": c["contact_id"] == "coordinator-1",
+                } for c in data["contacts"]],
+                "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
                 "task_created_by_minutes": bool(linked),
                 "message_sent_by_minutes": any(
                     item["sent_message_count"] > 0 for item in linked
