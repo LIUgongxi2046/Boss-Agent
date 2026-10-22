@@ -29,6 +29,7 @@ from connection import RecordedProvider, settings
 from controls import ControlStore
 from model_probe import Audit, BusinessTool
 from role_channel import RoleChannel
+from safe_diagnostics import RedactedEventList
 from service import application as business_application
 
 WORK = ROOT / ".work/application"
@@ -44,6 +45,8 @@ class ApplicationTool(BusinessTool):
 
 def prepare():
     WORK.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("BOSS_PRODUCT_UI") == "1":
+        WORK.chmod(0o700)
     access = WORK / "access.json"
     if not access.exists():
         access.write_text(encode({"BOSS": secrets.token_urlsafe(32), "MAINTAINER": secrets.token_urlsafe(32)}))
@@ -74,13 +77,18 @@ async def serve():
         baseline = store.initialize("ui-check")
     else:
         baseline = {"namespace": "ui-check", "snapshot_sha256": existing[0]}
-    output = ROOT.parent / "evidence/T02/application"
-    output.mkdir(parents=True, exist_ok=True)
-    provider = RecordedProvider(connection, output / "http-requests.json")
+    product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
+    output = WORK / "diagnostics" if product_mode else ROOT.parent / "evidence/T02/application"
+    output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
+    if product_mode:
+        output.chmod(0o700)
+    provider = RecordedProvider(connection, output / "http-requests.json", redact_payload=product_mode)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = ToolRegistry()
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
+    if product_mode:
+        records = RedactedEventList(records)
     audit = Audit(output / "events.json", records)
     audit.registry = registry
     bus = MessageBus()
