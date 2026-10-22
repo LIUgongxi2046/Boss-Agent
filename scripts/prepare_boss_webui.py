@@ -96,6 +96,7 @@ def copy_overlay() -> None:
         ("BossAssignmentPicker.tsx", "BossAssignmentPicker.tsx"),
         ("BossVoiceAssignment.tsx", "BossVoiceAssignment.tsx"),
         ("BossMeetingApproval.tsx", "BossMeetingApproval.tsx"),
+        ("BossMeetingBrief.tsx", "BossMeetingBrief.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
         ("boss-v6.css", "boss-v6.css"),
