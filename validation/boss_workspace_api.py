@@ -166,6 +166,10 @@ class BossWorkspaceAPI:
             if key == "approval-admin":
                 return {
                     "applications": output,
+                    "eligible_applicant_contact_ids": [
+                        c["contact_id"] for c in data["contacts"]
+                        if c["contact_id"] != "contact-2"
+                    ],
                     "can_seed_simulation": True,
                     "can_approve_on_behalf_of_owner": False,
                     "private_decision_comments_returned": False,
