@@ -165,6 +165,108 @@ def minutes_confirm(api, db, data, payload):
     }
 
 
+
+def minutes_assignment_create(api, db, data, payload, key):
+    """Create ONE explicitly authorized task from a CONFIRMED minute entry.
+
+    Both task and minute-entry link commit inside BossCommandAPI's original
+    BEGIN IMMEDIATE transaction. This action never sends messages. Confirming
+    the minutes alone cannot create a task.
+    """
+    api._exact(payload, {
+        "client_request_id", "meeting_id", "minute_version",
+        "entry_id", "purpose", "coordinator_id", "due_at",
+        "timezone", "evidence_requirements",
+    })
+    meeting = data["meeting"]
+    require(payload["meeting_id"] == meeting["meeting_id"],
+            "交办草稿所属会议不符", web.HTTPBadRequest)
+    minute = api.store.get(db, NS, "minutes", meeting["meeting_id"])
+    require(minute["state"] == "CONFIRMED"
+            and minute["meeting_version"] == meeting["version"],
+            "纪要尚未确认，或者关联会议版本已变化")
+    require(minute["version"] == payload["minute_version"],
+            "纪要确认版本已变化，必须重新核查")
+    require(isinstance(payload["entry_id"], str)
+            and payload["entry_id"].startswith("entry-"),
+            "纪要交办条目 ID 无效", web.HTTPBadRequest)
+    entry = next(
+        (item for item in minute["entries"]
+         if item["entry_id"] == payload["entry_id"]), None,
+    )
+    require(entry is not None and entry["kind"] == "ASSIGNMENT_DRAFT",
+            "仅已确认纪要中的交办草稿能够逐项创建", web.HTTPBadRequest)
+    doc = valid_source(
+        api, db, data["owner_id"], minute["source_id"], minute["source_version"]
+    )
+    require(entry["source_id"] == doc["source_id"]
+            and entry["source_version"] == doc["version"]
+            and entry["source_anchor"] in doc.get("content", ""),
+            "交办草稿原文已更改或无法验证", web.HTTPForbidden)
+    link_id = meeting["meeting_id"] + ":" + entry["entry_id"]
+    require(existing(db, "minutes_assignment_link", link_id) is None,
+            "该纪要条目已经创建关联任务，请读取任务状态；不可重复创建")
+
+    # The existing verified FR-06 creation path owns assignment semantics,
+    # contact/date checks, source authorization and task construction.
+    # FR-05 cannot relax it or invent a different simulation data scope.
+    original = {
+        "client_request_id": key,
+        "purpose": payload["purpose"],
+        "coordinator_id": payload["coordinator_id"],
+        "due_at": payload["due_at"],
+        "timezone": payload["timezone"],
+        "evidence_requirements": payload["evidence_requirements"],
+        "related_meeting_id": meeting["meeting_id"],
+        "related_event_ids": [data["event"]["event_id"]],
+        "source_refs": ["finance-note"],
+        "content_version": "1",
+    }
+    created = api._create(db, data, original, key)
+    task_id = created["task_id"]
+    origin = {
+        "origin_minute_id": minute["minute_id"],
+        "origin_minute_version": minute["version"],
+        "origin_entry_id": entry["entry_id"],
+        "origin_source_id": doc["source_id"],
+        "origin_source_version": doc["version"],
+    }
+    task = api.store.get(db, NS, "task", task_id)
+    task.update(origin)
+    api.store.put(db, NS, "task", task_id, task)
+    link = {
+        "link_id": link_id,
+        "meeting_id": meeting["meeting_id"],
+        "minute_id": minute["minute_id"],
+        "minute_version": minute["version"],
+        "entry_id": entry["entry_id"],
+        "entry_kind": "ASSIGNMENT_DRAFT",
+        "entry_text_sha256": checksum(entry["text"]),
+        "source_id": doc["source_id"],
+        "source_version": doc["version"],
+        "task_id": task_id,
+        "authorization_id": created["authorization_id"],
+        "linked_at": now(),
+        "task_status_at_link": "OPEN",
+        "message_sent_at_link": False,
+        "source_type": "SIMULATED",
+    }
+    api.store.put(db, NS, "minutes_assignment_link", link_id, link)
+    return {
+        "source_type": "SIMULATED",
+        "meeting_id": meeting["meeting_id"],
+        "minute_id": minute["minute_id"],
+        "minute_version": minute["version"],
+        "entry_id": entry["entry_id"],
+        "task_id": task_id,
+        "status": "OPEN",
+        "version": created["version"],
+        "authorization_id": created["authorization_id"],
+        "message_sent": False,
+        "independent_send_required": True,
+    }
+
+
 def application_seed(api, db, data, payload):
     """MAINTAINER provides a new synthetic application and attachment.
 
