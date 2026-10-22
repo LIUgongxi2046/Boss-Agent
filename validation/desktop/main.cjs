@@ -12,7 +12,11 @@ app.setPath('userData', path.join(work, 'profile'));
 app.setPath('temp', path.join(root, '.work', 'tmp'));
 app.setPath('logs', path.join(work, 'logs'));
 app.setPath('crashDumps', path.join(work, 'crash-dumps'));
-const lifecycle = path.join(root, '..', 'evidence', 'T02', 'desktop-lifecycle.jsonl');
+const productMode = process.env.BOSS_PRODUCT_UI === '1';
+const diagnostics = productMode ? path.join(work, 'diagnostics') : path.join(root, '..', 'evidence', 'T02');
+fs.mkdirSync(diagnostics, { recursive: true, mode: productMode ? 0o700 : 0o755 });
+if (productMode) fs.chmodSync(diagnostics, 0o700);
+const lifecycle = path.join(diagnostics, 'desktop-lifecycle.jsonl');
 function record(event, details = {}) {
   fs.appendFileSync(lifecycle, JSON.stringify({ at: new Date().toISOString(), pid: process.pid, event, ...details }) + '\n');
 }
@@ -83,7 +87,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
-    const log = fs.openSync(path.join(root, '..', 'evidence', 'T02', 'desktop-service.log'), 'a');
+    const log = fs.openSync(path.join(diagnostics, 'desktop-service.log'), 'a', productMode ? 0o600 : 0o644);
     child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(root, '.work', 'tmp') }, stdio: ['ignore', log, log] });
     child.on('error', error => { throw error; });
     const deadline = Date.now() + 20000;
