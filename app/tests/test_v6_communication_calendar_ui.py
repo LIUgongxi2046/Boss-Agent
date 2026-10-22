@@ -65,3 +65,36 @@ def test_private_contents_cannot_enter_authorization_or_technical_projection():
     assert 'if key == "message-admin"' in api
     assert '"visibility": "BOSS_ONLY"' in api
     assert "physical_secure_erasure_verified" in api
+
+
+
+def test_failed_owner_mutations_can_reconcile_original_receipt_without_reissuing():
+    client=(ROOT/"app/webui/BossCommunicationCalendar.tsx").read_text(encoding="utf-8")
+    task=(ROOT/"app/webui/BossAssignmentFlow.tsx").read_text(encoding="utf-8")
+    service=(ROOT/"validation/boss_recovery_api.py").read_text(encoding="utf-8")
+    for text in (client,task):
+        assert "/api/boss/ui/operation-status?" in text
+        assert "client_request_id" in text
+        assert "NOT_FOUND_IN_CURRENT_STORE" in text
+        assert "RECORDED" in text
+        assert "Authorization" in text
+        assert "重新" in text or "重读" in text
+    assert "SELECT result FROM idempotency" in service
+    assert '"not_proof_of_failed_delivery": True' in service
+    assert '"write_performed_by_lookup": False' in service
+
+
+def test_private_schedule_share_preview_is_live_and_strictly_busy_only():
+    view=(ROOT/"app/webui/BossCommunicationCalendar.tsx").read_text(encoding="utf-8")
+    api=(ROOT/"validation/boss_recovery_api.py").read_text(encoding="utf-8")
+    for token in ("privateAttachmentId","privateAttachmentVersion","effective_state",
+                  "calendar-share-preview","ACTIVE_SIMULATED","preview_only_not_external_access"):
+        assert token in view or token in api
+    assert "setBusyPreview(null)" in view
+    assert "busyPreview?.share_id===share.share_id" in view
+    assert '"share_status": status' in api
+    assert '"preview_only_not_external_access": True' in api
+    assert '"busy": True' in api
+    assert '"private_body"' not in api
+    shell=(ROOT/"app/webui/BossDesktop.tsx").read_text(encoding="utf-8")
+    assert '"F08", "F12"' in shell
