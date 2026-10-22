@@ -234,3 +234,91 @@ def test_calendar_share_requires_future_and_bounded_expiry(context, expiry):
     assert status == 400
     with commands.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='calendar_share'").fetchone()[0] == 0
+
+
+
+def test_owner_cannot_use_message_reply_to_bypass_assignment_send(context):
+    commands, pages = context
+    status, task = act(
+        commands, "BOSS", "boss.assignment.create", "guard-task-create-001",
+        purpose="核查经营原始凭证", coordinator_id="coordinator-1",
+        due_at="2026-10-24T17:00:00+08:00", timezone="Asia/Shanghai",
+        evidence_requirements=["经营原始明细"],
+        related_meeting_id="meeting-1", related_event_ids=["event-1"],
+        source_refs=["finance-note"], content_version="1",
+    )
+    assert status == 200, task
+    created = act(
+        commands, "BOSS", "boss.message.draft.save", "guard-msg-draft-001",
+        draft_id=None, expected_version="0", recipient_id="coordinator-1",
+        related_task_id=task["task_id"], body="请确认交办已经到达",
+        attachment_refs=[], visibility="RECIPIENT_ONLY",
+    )
+    assert created[0] == 200, created
+    message = pages.serve("BOSS", "/api/boss/ui/workspace/outbox")[1]["drafts"][0]
+    status, _ = act(
+        commands, "BOSS", "boss.message.send", "guard-msg-send-001",
+        draft_id=message["draft_id"], expected_version="1",
+        recipient_id="coordinator-1",
+        expected_content_sha256=message["content_sha256"],
+    )
+    assert status == 409
+    with commands.store.connect() as db:
+        task_after = commands.store.get(db, "ui-check", "task", task["task_id"])
+        assert task_after["status"] == "OPEN"
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='message_outbox'"
+        ).fetchone()[0] == 0
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='feedback'"
+        ).fetchone()[0] == 0
+
+
+def test_f06_owner_can_reconcile_actual_saved_assignment(context):
+    commands, pages = context
+    created = act(
+        commands, "BOSS", "boss.assignment.create", "recover-assignment-owner",
+        purpose="核实业务情况", coordinator_id="coordinator-1",
+        due_at="2026-10-24T17:00:00+08:00", timezone="Asia/Shanghai",
+        evidence_requirements=["经营原始明细"],
+        related_meeting_id="meeting-1", related_event_ids=["event-1"],
+        source_refs=["finance-note"], content_version="1",
+    )
+    assert created[0] == 200
+    status, result = receipt(
+        pages, "BOSS", "boss.assignment.create", "recover-assignment-owner"
+    )
+    assert status == 200
+    assert result["result"]["task_id"] == created[1]["task_id"]
+    assert result["outcome"] == "RECORDED"
+    assert "purpose" not in json.dumps(result)
+    assert receipt(
+        pages, "MAINTAINER", "boss.assignment.create", "recover-assignment-owner"
+    )[0] == 403
+
+
+def test_parallel_same_request_id_does_not_create_two_simulated_messages(context):
+    from concurrent.futures import ThreadPoolExecutor
+    commands, pages = context
+    assert draft(commands, "parallel-draft-owner")[0] == 200
+    entry = pages.serve("BOSS", "/api/boss/ui/workspace/outbox")[1]["drafts"][0]
+    params = {
+        "draft_id": entry["draft_id"], "expected_version": entry["version"],
+        "recipient_id": "coordinator-1",
+        "expected_content_sha256": entry["content_sha256"],
+    }
+    def submit():
+        return act(
+            commands, "BOSS", "boss.message.send", "parallel-message-owner", **params
+        )
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _: submit(), range(2)))
+    assert all(status == 200 for status, _ in results), results
+    assert results[0][1]["message_id"] == results[1][1]["message_id"]
+    with commands.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='message_outbox'"
+        ).fetchone()[0] == 1
+        assert db.execute(
+            "SELECT COUNT(*) FROM audit WHERE operation='boss.message.send'"
+        ).fetchone()[0] == 1
