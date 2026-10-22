@@ -21,6 +21,10 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from business import checksum, encode, now, require, validate
 from controls import FIELDS
+from boss_message_calendar import (
+    message_save, message_send, message_reply, calendar_save,
+    calendar_share, calendar_revoke, calendar_delete,
+)
 from boss_meeting_approval import (
     minutes_save, minutes_confirm, application_seed, application_revise, approval_decide,
 )
@@ -89,6 +93,13 @@ class BossCommandAPI:
         "boss.approval.decide": "BOSS",
         "boss.simulation.application.seed": "MAINTAINER",
         "boss.simulation.application.revise": "MAINTAINER",
+        "boss.message.draft.save": "BOSS",
+        "boss.message.send": "BOSS",
+        "boss.simulation.message.reply": "MAINTAINER",
+        "boss.calendar.save": "BOSS",
+        "boss.calendar.share": "BOSS",
+        "boss.calendar.share.revoke": "BOSS",
+        "boss.calendar.delete": "BOSS",
     }
 
     def __init__(self, store):
@@ -224,6 +235,20 @@ class BossCommandAPI:
                 result = application_revise(self, db, data, payload)
             elif action == "boss.approval.decide":
                 result = approval_decide(self, db, data, payload)
+            elif action == "boss.message.draft.save":
+                result = message_save(self, db, data, payload)
+            elif action == "boss.message.send":
+                result = message_send(self, db, data, payload)
+            elif action == "boss.simulation.message.reply":
+                result = message_reply(self, db, data, payload)
+            elif action == "boss.calendar.save":
+                result = calendar_save(self, db, data, payload)
+            elif action == "boss.calendar.share":
+                result = calendar_share(self, db, data, payload)
+            elif action == "boss.calendar.share.revoke":
+                result = calendar_revoke(self, db, data, payload)
+            elif action == "boss.calendar.delete":
+                result = calendar_delete(self, db, data, payload)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)
