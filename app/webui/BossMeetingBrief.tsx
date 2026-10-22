@@ -214,18 +214,19 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
         </button>
       </div>
     </section>
-    <nav className="boss-minutes-tabs" aria-label="F04会前材料分类">
-      {(["议题","历史承诺","待决定","材料缺口"] as const).map(item=>
-        <button type="button" key={item} aria-current={tab===item?"page":undefined}
-          className={tab===item?"selected":""} onClick={()=>setTab(item)}>
-          {item}
-          <span>{item==="历史承诺"?b?.commitments.length??0:
-            item==="材料缺口"?b?.missing_items.length??0:
-            item==="议题"?b?.sources.length??0:"—"}</span>
-        </button>)}
-    </nav>
     <div className="boss-columns">
       <div className="boss-column">
+        <nav className="boss-minutes-tabs" aria-label="F04会前材料分类">
+          {(["议题","历史承诺","待决定","材料缺口"] as const).map(item=>
+            <button type="button" key={item} aria-current={tab===item?"page":undefined}
+              className={tab===item?"selected":""} onClick={()=>setTab(item)}>
+              {item}
+              <span>{item==="历史承诺"?b?.commitments.length??0:
+                item==="材料缺口"?b?.missing_items.length??0:
+                item==="议题"?b?.sources.length??0:"—"}</span>
+            </button>)}
+        </nav>
+    
         <div className="boss-tab-view" hidden={tab!=="议题"}>
         <Panel title="会议资料与准备状态" note="会议标识、时间、参会联系人">
           <Fact label="会议 ID" value={b?.meeting.meeting_id}/>
