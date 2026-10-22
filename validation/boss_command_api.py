@@ -26,6 +26,7 @@ from boss_message_calendar import (
     calendar_share, calendar_revoke, calendar_delete,
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
+from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
 from boss_research import prepare as research_prepare
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_meeting_approval import (
@@ -97,6 +98,9 @@ class BossCommandAPI:
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
         "boss.minutes.assignment.create": "BOSS",
+        "boss.knowledge.source.create": "MAINTAINER",
+        "boss.knowledge.source.revise": "MAINTAINER",
+        "boss.knowledge.source.withdraw": "MAINTAINER",
         "boss.approval.decide": "BOSS",
         "boss.simulation.application.seed": "MAINTAINER",
         "boss.simulation.application.revise": "MAINTAINER",
@@ -258,6 +262,12 @@ class BossCommandAPI:
                 result = minutes_confirm(self, db, data, payload)
             elif action == "boss.minutes.assignment.create":
                 result = minutes_assignment_create(self, db, data, payload, key)
+            elif action == "boss.knowledge.source.create":
+                result = source_create(self, db, data, payload)
+            elif action == "boss.knowledge.source.revise":
+                result = source_revise(self, db, data, payload)
+            elif action == "boss.knowledge.source.withdraw":
+                result = source_withdraw(self, db, data, payload)
             elif action == "boss.simulation.application.seed":
                 result = application_seed(self, db, data, payload)
             elif action == "boss.simulation.application.revise":
