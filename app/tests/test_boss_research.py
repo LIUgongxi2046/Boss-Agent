@@ -94,7 +94,7 @@ def test_research_source_withdrawal_redacts_saved_excerpt_but_keeps_metadata(run
     assert after["current_reference_state"]=="NEEDS_REVIEW"
     assert after["report"]["state"]=="NEEDS_REVIEW"
     assert after["report"]["matched_sources"]==[]
-    assert after["report"]["current_source_count"] if "current_source_count" in after["report"] else True
+    assert after["current_source_count"] == 0
     assert old["quote"] not in json.dumps(after)
     assert after["revisions"]==[]
 
@@ -165,3 +165,52 @@ def test_source_text_is_not_executable_instruction(runtime):
     with ops.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0]==0
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0]==0
+
+
+
+def test_same_version_mutated_content_forces_review_instead_of_silent_acceptance(runtime):
+    ops,api=runtime
+    assert request(ops)[0]==200
+    with ops.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        doc=ops.store.get(db,"ui-check","document","finance-note")
+        doc["content"]+=" 这是在上游未递增版本的条件下新增的信息。"
+        ops.store.put(db,"ui-check","document","finance-note",doc)
+    _,view=query(api)
+    assert view["current_reference_state"]=="NEEDS_REVIEW"
+    assert view["source_changed"]
+    assert view["report"]["historical_source_text_reused"] is False
+
+
+def test_research_owner_can_prepare_f08_missing_materials_request_draft(runtime):
+    ops,api=runtime
+    assert request(ops,question="不存在的跨国业务来源")[0]==200
+    _,current=query(api)
+    report=current["report"]
+    assert report["missing_items"]
+    valid=current["contacts"]
+    assert any(p["contact_id"]=="coordinator-1" for p in valid)
+    body="请补充专题研究的有效来源和统计口径。问题："+report["scope"]["question"]+\
+       "；待补事项："+"、".join(report["missing_items"])+\
+       "。请返回原始材料、日期和版本供本人核对。"
+    result=ops.execute("BOSS","boss.message.draft.save",{
+        "client_request_id":"research-related-material-draft-001",
+        "draft_id":None,"expected_version":"0",
+        "recipient_id":"coordinator-1","related_task_id":None,
+        "body":body,"attachment_refs":[],"visibility":"RECIPIENT_ONLY",
+    })
+    assert result[0]==200,result
+    assert result[1]["message_sent"] is False
+    status,inbox=api.serve("BOSS","/api/boss/ui/workspace/outbox")
+    assert status==200
+    assert inbox["drafts"][0]["body"]==body
+    assert inbox["sent_messages"]==[]
+
+
+def test_research_rejects_secondary_roles_and_never_creates_external_messages(runtime):
+    ops,api=runtime
+    assert request(ops)[0]==200
+    with ops.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0]==0
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='message_outbox'").fetchone()[0]==0
+    assert api.serve("MAINTAINER","/api/boss/ui/workspace/research")[0]==403
