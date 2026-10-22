@@ -133,3 +133,59 @@ def test_authorized_source_and_contact_expiration_do_not_fabricate_readiness(ser
     assert "participant:coordinator-1" in current["current"]["missing_items"]
     assert prepare(cmd)[1]["state"]=="NEEDS_REVIEW"
     assert all(row["status"]=="EXPIRED" for row in current["current"]["participants"])
+
+
+
+def test_f04_missing_material_request_becomes_f08_draft_not_sent(service):
+    cmd,pages=service
+    assert prepare(cmd)[0]==200
+    cmd.store.control("ui-check","withdraw",{
+        "source_id":"meeting-minutes","version":"1",
+    })
+    _,brief=briefing(pages)
+    missing=brief["current"]["missing_items"]
+    assert "meeting-minutes" in missing
+    body=("关于会议 meeting-1，请补充以下待核查资料："+ "；".join(missing)
+          +"。请说明有效来源版本和预计提供时间。")
+    status,draft=cmd.execute("BOSS","boss.message.draft.save",{
+        "client_request_id":"brief-request-draft-001",
+        "draft_id":None,"expected_version":"0",
+        "recipient_id":"coordinator-1","related_task_id":None,
+        "body":body,"attachment_refs":[],
+        "visibility":"RECIPIENT_ONLY",
+    })
+    assert status==200,draft
+    assert draft["status"]=="DRAFT"
+    assert draft["message_sent"] is False
+    _,outbox=pages.serve("BOSS","/api/boss/ui/workspace/outbox")
+    assert len(outbox["drafts"])==1
+    assert outbox["drafts"][0]["recipient_id"]=="coordinator-1"
+    assert outbox["drafts"][0]["body"]==body
+    assert outbox["sent_messages"]==[]
+    with cmd.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='message_outbox'"
+        ).fetchone()[0]==0
+
+
+def test_f04_preparation_receipt_recovery_does_not_leak_source_excerpt(service):
+    cmd,pages=service
+    status,result=prepare(cmd)
+    assert status==200,result
+    from urllib.parse import urlencode
+    status,receipt=pages.serve("BOSS","/api/boss/ui/operation-status",
+        urlencode({
+            "action":"boss.meeting.brief.prepare",
+            "client_request_id":"brief-prep-001",
+        }))
+    assert status==200,receipt
+    assert receipt["outcome"]=="RECORDED"
+    assert receipt["result"]["state"]=="READY_FOR_REVIEW"
+    assert receipt["result"]["version"]=="1"
+    assert "source_id" not in receipt["result"]
+    assert "合成水产饲料外销" not in json.dumps(receipt)
+    assert pages.serve("MAINTAINER","/api/boss/ui/operation-status",
+        urlencode({
+            "action":"boss.meeting.brief.prepare",
+            "client_request_id":"brief-prep-001",
+        }))[0]==403
