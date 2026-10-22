@@ -26,6 +26,7 @@ from boss_message_calendar import (
     calendar_share, calendar_revoke, calendar_delete,
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
+from boss_research import prepare as research_prepare
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_meeting_approval import (
     minutes_save, minutes_confirm, minutes_assignment_create,
@@ -92,6 +93,7 @@ class BossCommandAPI:
         "boss.reminder.snooze": "BOSS",
         "boss.reminder.close": "BOSS",
         "boss.meeting.brief.prepare": "BOSS",
+        "boss.research.prepare": "BOSS",
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
         "boss.minutes.assignment.create": "BOSS",
@@ -248,6 +250,8 @@ class BossCommandAPI:
                 result = self._reminder(db, payload, action)
             elif action == "boss.meeting.brief.prepare":
                 result = meeting_brief_prepare(self, db, data, payload)
+            elif action == "boss.research.prepare":
+                result = research_prepare(self, db, data, payload)
             elif action == "boss.minutes.save":
                 result = minutes_save(self, db, data, payload)
             elif action == "boss.minutes.confirm":
