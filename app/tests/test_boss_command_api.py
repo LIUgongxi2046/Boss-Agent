@@ -248,3 +248,42 @@ def test_unknown_action_and_bad_content_return_safe_error(demo):
         create_input("bad-timezone-001", due_at="not-a-date"))
     assert code == 400
     assert "Traceback" not in str(result)
+
+
+def test_source_withdrawn_after_create_prevents_send(demo):
+    created = create(demo)
+    demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    status, _ = demo.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 403
+    with demo.store.connect() as db:
+        task = demo.store.get(db, "ui-check", "task", created["task_id"])
+        assert task["status"] == "OPEN"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+
+
+def test_maintainer_cannot_forge_evidence_reference(demo):
+    created = create(demo)
+    sent = demo.execute("BOSS", "boss.assignment.send", send_input(created))[1]
+    bad = feedback_input({"task_id": created["task_id"], "version": sent["task_version"]})
+    bad["evidence_refs"] = ["made-up-evidence"]
+    code, _ = demo.execute("MAINTAINER", "boss.simulation.feedback", bad)
+    assert code == 404
+    with demo.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='feedback'").fetchone()[0] == 0
+
+
+def test_completed_evidence_withdrawn_before_owner_confirmation_is_blocked(demo):
+    created = create(demo)
+    sent = demo.execute("BOSS", "boss.assignment.send", send_input(created))[1]
+    response = demo.execute("MAINTAINER", "boss.simulation.feedback",
+        feedback_input({"task_id": created["task_id"], "version": sent["task_version"]}))[1]
+    demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    code, _ = demo.execute("BOSS", "boss.assignment.complete", {
+        "client_request_id": "owner-commit-after-source-withdrawn",
+        "task_id": created["task_id"],
+        "task_version": response["task"]["version"],
+        "feedback_id": response["feedback_id"],
+    })
+    assert code == 403
+    with demo.store.connect() as db:
+        assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
