@@ -104,7 +104,11 @@ async def serve():
     cron.on_job = scheduled
     channels = ChannelManager(config, loop.bus, session_manager=loop.sessions, cron_service=cron, webui_runtime_model_name=lambda: loop.model, webui_refresh_runtime_config=loop.refresh_runtime_config, webui_recovery_action=recovery.handle_action, config_path=config_path)
     original = channels.channels["websocket"]
-    frontend = ROOT / ".work/upstream/nanobot-0.3.5/nanobot/web/dist"
+    # Product v6 frontend only when explicitly requested; preserve T02 baseline.
+    if os.environ.get("BOSS_PRODUCT_UI") == "1":
+        frontend = ROOT.parent / ".work/product/nanobot/nanobot/web/dist"
+    else:
+        frontend = ROOT / ".work/upstream/nanobot-0.3.5/nanobot/web/dist"
     if not (frontend / "index.html").is_file():
         raise FileNotFoundError("固定上游 WebUI 必须完成构建")
     original.gateway.http.static_dist_path = frontend
