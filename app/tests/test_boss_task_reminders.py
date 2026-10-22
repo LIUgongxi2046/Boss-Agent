@@ -252,3 +252,40 @@ def test_task_due_events_are_metadata_only_not_owner_message_bodies(context):
     with api.store.connect() as db:
         event = current(db, created["task_id"])
         assert "ONLY_OWNER_PRIVATE_MESSAGE_MUST_NOT_BE_IN_EVENT" not in json.dumps(event)
+
+
+
+def test_approved_extension_feedback_cannot_be_reused_for_another_deadline(context):
+    api, pages = context
+    task = create(api)[1]
+    assert send(api, task["task_id"])[0] == 200
+    request = act(
+        api, "MAINTAINER", "boss.simulation.feedback",
+        "one-extension-feedback", task_id=task["task_id"], task_version="2",
+        author_contact_id="coordinator-1", kind="EXTENSION_REQUEST",
+        content="请允许调整交办截止时间", evidence_refs=[],
+        proposed_due_at="2026-10-26T17:00:00+08:00",
+    )
+    assert request[0] == 200, request
+    grant = act(
+        api, "BOSS", "boss.assignment.extend", "grant-once-task-extension",
+        task_id=task["task_id"], task_version=request[1]["task"]["version"],
+        feedback_id=request[1]["feedback_id"], due_at="2026-10-26T17:00:00+08:00",
+    )
+    assert grant[0] == 200, grant
+    event = due(api, task["task_id"])
+    repeated = act(
+        api, "BOSS", "boss.assignment.extend",
+        "bad-repeat-approval-with-new-request-id",
+        task_id=task["task_id"], task_version=grant[1]["version"],
+        feedback_id=request[1]["feedback_id"], due_at="2026-10-28T17:00:00+08:00",
+    )
+    assert repeated[0] == 409
+    assert due(api, task["task_id"]) == event
+    with api.store.connect() as db:
+        current_task = api.store.get(db, "ui-check", "task", task["task_id"])
+        assert current_task["accepted_extension_feedback_ids"] == [request[1]["feedback_id"]]
+        assert current_task["due_at"] == "2026-10-26T17:00:00+08:00"
+        assert db.execute(
+            "SELECT COUNT(*) FROM audit WHERE operation='boss.assignment.extend'"
+        ).fetchone()[0] == 1
