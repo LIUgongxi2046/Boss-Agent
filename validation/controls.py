@@ -12,7 +12,7 @@ from business import Store, checksum, encode, initial_materials, now, require
 TEXT = {"type": "string", "minLength": 1}
 TIME = {"type": "string", "format": "date-time"}
 FIELDS = {
-    "feedback": ({"task_id": TEXT, "task_version": TEXT, "author_contact_id": TEXT, "kind": {"enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": TEXT, "proposed_due_at": TIME, "evidence_refs": {"type": "array", "minItems": 1, "items": TEXT}}, ["task_id", "task_version", "author_contact_id", "kind", "content"]),
+    "feedback": ({"task_id": TEXT, "task_version": TEXT, "author_contact_id": TEXT, "kind": {"enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": TEXT, "proposed_due_at": TIME, "evidence_refs": {"type": "array", "minItems": 0, "maxItems": 16, "items": TEXT}}, ["task_id", "task_version", "author_contact_id", "kind", "content"]),
     "decide": ({"authorization_id": TEXT, "task_id": TEXT, "task_version": TEXT, "feedback_id": TEXT, "due_at": TIME}, ["authorization_id", "task_id", "task_version", "feedback_id"]),
     "revoke": ({"authorization_id": TEXT}, ["authorization_id"]),
     "withdraw": ({"source_id": TEXT, "version": TEXT}, ["source_id", "version"]),
