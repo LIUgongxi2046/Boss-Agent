@@ -390,6 +390,9 @@ class BossCommandAPI:
             require(feedback["kind"] == "EXTENSION_REQUEST" and
                     task["status"] not in ("CANCELED", "COMPLETED_CONFIRMED"),
                     "延期申请或任务状态无效", web.HTTPBadRequest)
+            require(feedback["feedback_id"] not in
+                    task.get("accepted_extension_feedback_ids", []),
+                    "该延期申请此前已被老板批准，必须有新的模拟申请才能再次延期")
             require(_is_text(payload["due_at"], 100), "新期限缺少", web.HTTPBadRequest)
             requested = _aware_due(payload["due_at"], task["timezone"])
             require(requested > datetime.fromisoformat(task["due_at"]),
@@ -401,6 +404,12 @@ class BossCommandAPI:
         result = self.store.control_decide(
             db, NAMESPACE, {"authorization_id": auth_id, **bound}
         )
+        if action.endswith(".extend"):
+            result["accepted_extension_feedback_ids"] = [
+                *result.get("accepted_extension_feedback_ids", []),
+                feedback["feedback_id"],
+            ]
+            self.store.put(db, NAMESPACE, "task", result["task_id"], result)
         prior_event = task_due_event(db, result["task_id"])
         reminder = synchronize_task_due(
             self.store, db, result,
