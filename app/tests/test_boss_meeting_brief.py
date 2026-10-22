@@ -86,6 +86,12 @@ def test_source_withdrawn_keeps_history_but_invalidates_ready(service):
     cmd.store.control("ui-check","withdraw",{"source_id":"finance-note","version":"1"})
     _,state=briefing(pages)
     assert state["saved_brief"]["state"]=="READY_FOR_REVIEW" # immutable historical snapshot
+    prior=next(x for x in state["saved_brief"]["compiled"]["sources"]
+               if x["source_id"]=="finance-note")
+    assert prior["excerpt"] is None
+    assert prior["display_redacted_due_to_source_change"] is True
+    assert state["saved_brief"]["compiled"]["metrics"]["available"] is False
+    assert state["saved_brief"]["compiled"]["metrics"]["values"]==[]
     assert state["current_status"]=="NEEDS_REVIEW"
     assert state["source_changed"]
     assert state["current"]["metrics"]["available"] is False
