@@ -322,3 +322,25 @@ def test_parallel_same_request_id_does_not_create_two_simulated_messages(context
         assert db.execute(
             "SELECT COUNT(*) FROM audit WHERE operation='boss.message.send'"
         ).fetchone()[0] == 1
+
+
+
+def test_contact_validity_uses_current_simulated_time_not_old_meeting_date(context):
+    commands, pages = context
+    assert save_private(commands)[0] == 200
+    code, clock = act(
+        commands, "MAINTAINER", "boss.simulation.clock.advance",
+        "advance-beyond-contact-001", at="2027-02-01T09:00:00+08:00",
+    )
+    assert code == 200, clock
+    expired_draft = draft(commands, "draft-contact-expired-001")
+    assert expired_draft[0] == 403
+    assert act(
+        commands, "BOSS", "boss.calendar.share", "calendar-contact-expired",
+        expected_version="2", recipient_id="coordinator-1",
+        purpose="现在联系人资料已过期", expires_at="2027-02-05T08:00:00+08:00",
+        fields=["busy", "starts_at", "ends_at", "timezone"],
+    )[0] == 403
+    with commands.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='message_draft'").fetchone()[0] == 0
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='calendar_share'").fetchone()[0] == 0
