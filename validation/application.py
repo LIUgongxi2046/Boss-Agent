@@ -108,7 +108,7 @@ async def serve():
     if not (frontend / "index.html").is_file():
         raise FileNotFoundError("固定上游 WebUI 必须完成构建")
     original.gateway.http.static_dist_path = frontend
-    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl")
+    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store)
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", 8871).start()

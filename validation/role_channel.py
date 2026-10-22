@@ -9,15 +9,17 @@ from websockets.datastructures import Headers
 from websockets.http11 import Request
 
 from business import now
+from boss_page_api import BossPageAPI
 
 
 class RoleChannel(WebSocketChannel):
-    def __init__(self, original, secrets, audit):
+    def __init__(self, original, secrets, audit, business_store=None):
         super().__init__(original.config, original.bus, gateway=original.gateway)
         self.secrets = secrets
         self.audit = audit
         self.token_roles = {}
         self.connection_roles = {}
+        self.boss_pages = BossPageAPI(business_store) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
@@ -60,8 +62,17 @@ class RoleChannel(WebSocketChannel):
                 self.record(None, address.path, 401)
                 return connection.respond(401, "未认证")
             if address.path == "/api/boss/identity":
+                if role not in ("BOSS", "MAINTAINER"):
+                    self.record(role, address.path, 403)
+                    return connection.respond(403, "身份权限不足")
                 self.record(role, address.path, 200)
                 return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None}))
+            if address.path.startswith("/api/boss/ui/"):
+                if self.boss_pages is None:
+                    return connection.respond(503, json.dumps({"error": "BOSS_SERVICE_NOT_READY"}))
+                status, body = self.boss_pages.serve(role, address.path, address.query)
+                self.record(role, address.path, status)
+                return connection.respond(status, json.dumps(body, ensure_ascii=False))
             allowed = role == "BOSS" or role == "MAINTAINER" and address.path in {"/api/settings", "/api/settings/usage", "/api/settings/provider-models", "/api/webui/automations", "/api/webui/skills", "/api/settings/mcp-presets"}
             if not allowed:
                 self.record(role, address.path, 403)
