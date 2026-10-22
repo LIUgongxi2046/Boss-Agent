@@ -472,6 +472,11 @@ class BossWorkspaceAPI:
             }
         if key == "prompt-versions":
             drafts = _object_list(db, self.namespace, "prompt_draft")
+            context_records = _object_list(db, self.namespace, "prompt_context_use")
+            context_index = {
+                (item["prompt_id"],item["prompt_version"]):item
+                for item in context_records
+            }
             active = []
             for kind in KINDS:
                 record = db.execute(
@@ -499,11 +504,6 @@ class BossWorkspaceAPI:
                     })
             valid_runtime_ids = {
                 p["prompt_id"] for p in active_runtime_prompts(self.store, self.namespace)
-            }
-            context_records = _object_list(db, self.namespace, "prompt_context_use")
-            context_index = {
-                (item["prompt_id"],item["prompt_version"]):item
-                for item in context_records
             }
             return {
                 "kinds": list(KINDS),
