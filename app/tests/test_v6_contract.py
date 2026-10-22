@@ -100,7 +100,7 @@ def test_page_service_map_is_explicit_about_partial_runtime():
         "boss.assignment.create", "boss.assignment.send",
         "boss.assignment.complete", "boss.assignment.extend", "boss.assignment.cancel",
     }
-    assert set(by_id["A04"]["code_wired_write_actions"]) == {"boss.simulation.feedback", "boss.simulation.event.seed", "boss.simulation.clock.advance"}
+    assert set(by_id["A04"]["code_wired_write_actions"]) == {"boss.simulation.feedback", "boss.simulation.event.seed", "boss.simulation.clock.advance", "boss.simulation.message.reply"}
     assert by_id["F24"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-health"]
     assert by_id["A15"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-usage"]
     for item in service_map["pages"]:
