@@ -92,7 +92,10 @@ def copy_overlay() -> None:
         shutil.copy2(DESIGN / "animation" / filename, ASSET_DIR / filename)
 
     # Read the pristine pinned source from Git every time for idempotence.
-    original = run("git", "show", "HEAD:webui/src/App.tsx", cwd=SOURCE)
+    original = subprocess.run(
+        ["git", "show", "HEAD:webui/src/App.tsx"], cwd=SOURCE,
+        check=True, capture_output=True, text=True,
+    ).stdout
     patched = one_replace(
         original,
         'import { ThemeProvider, useTheme } from "@/hooks/useTheme";',
