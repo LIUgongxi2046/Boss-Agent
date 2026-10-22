@@ -53,6 +53,9 @@ def _safe_source(entry):
         "withdrawn": bool(entry.get("withdrawn")),
         "access_scope": "BOSS_ONLY" if entry.get("access_scope") == "boss-1" else "NOT_AUTHORIZED",
         "content_visible": False,
+        "index_state": entry.get("index_state", "LEGACY_INDEX_STATE_UNVERIFIED"),
+        "created_by_role": entry.get("created_by_role"),
+        "title": entry.get("title") if entry.get("created_by_role") == "MAINTAINER" else None,
     }
 
 
@@ -304,8 +307,14 @@ class BossWorkspaceAPI:
             if role == "MAINTAINER":
                 records = [{k: v for k, v in d.items() if k not in
                             ("author_contact_id",)} for d in records]
-            return {"sources": records, "count": len(records),
-                    "original_body_available_here": False}
+            return {
+                "sources": records, "count": len(records),
+                "original_body_available_here": False,
+                "available_simulated_author_ids": [
+                    c["contact_id"] for c in data["contacts"]
+                ] if key == "source-index" else [],
+                "external_ingestion_performed": False,
+            }
         if key == "knowledge":
             params = parse_qs(query_string, keep_blank_values=True)
             phrase = params.get("q", [""])[0].strip()[:100]
@@ -313,7 +322,9 @@ class BossWorkspaceAPI:
             documents = _object_list(db, self.namespace, "document")
             matches = []
             for document in documents:
-                if document.get("withdrawn") or document.get("access_scope") != data["owner_id"]:
+                if (document.get("withdrawn")
+                        or document.get("access_scope") != data["owner_id"]
+                        or document.get("source_type") != "SIMULATED"):
                     continue
                 if phrase and phrase.casefold() not in document.get("content", "").casefold():
                     continue
