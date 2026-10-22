@@ -19,7 +19,7 @@ export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
   A05: "system", A07: "source-index", A09: "tool-catalog",
   A10: "metric-definitions", A11: "relationships",
   A12: "source-index", A13: "scheduler", A14: "audit",
-  A16: "system", A04: "relationships",
+  A16: "system", A04: "relationships", F31: "evaluation",
 };
 
 type Role = "BOSS" | "MAINTAINER";
@@ -67,6 +67,10 @@ type Workspace = {
   operations?: RecordItem[]; metric_definitions?: RecordItem[];
   entity_counts?: Record<string, number>; technical_links?: Record<string, string>;
   notification_draft_only?: boolean; can_edit?: boolean;
+  definition_id?: string;definition_version?:string;
+  defined_step_count?:number;defined_assertion_count?:number;
+  independent_product_evaluation_completed?:boolean;actual_score?:number|null;
+  steps?:{step_id:string;actor:string;action:string}[];coverage?:string;
   simulated_business_time?: string;
   installed_mac_app_verified?: boolean;
   model_connection_verified_here?: boolean;
@@ -117,7 +121,7 @@ const ROLES: Record<string,Role> = {
   organization:"BOSS",plans:"BOSS",dataset:"MAINTAINER",
   "source-index":"MAINTAINER","tool-catalog":"MAINTAINER",
   "metric-definitions":"MAINTAINER",relationships:"MAINTAINER",
-  scheduler:"MAINTAINER",audit:"MAINTAINER",system:"MAINTAINER",
+  scheduler:"MAINTAINER",audit:"MAINTAINER",system:"MAINTAINER",evaluation:"MAINTAINER",
 };
 
 export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
@@ -490,6 +494,19 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
             <strong>{v(x.operation)}</strong><small>序号 {v(x.sequence)} · {date(x.created_at)}</small>
           </div>)}
           {!(w.operations||[]).length&&<Empty message="没有已持久化的审计事件。"/>}
+        </Layer>}
+        {role==="MAINTAINER"&&route==="evaluation"&&<Layer title="独立演示评测规范" description="F31 · 尚未运行正式产品评测">
+          <Fact label="定义版本">{v(w.definition_version)}</Fact>
+          <Fact label="已定义测试步骤">{v(w.defined_step_count)}</Fact>
+          <Fact label="已定义检查断言">{v(w.defined_assertion_count)}</Fact>
+          <Fact label="实际产品评测结论">尚未执行</Fact>
+          <Fact label="有效评分">未知（不得填写零）</Fact>
+          {(w.steps||[]).map(item=><div key={item.step_id} className="boss-workspace-item">
+            <div className="boss-workspace-item-top"><strong>{item.step_id}</strong>
+              <span className="boss-tag boss-tag-blue">{item.actor}</span></div>
+            <p>{item.action}</p>
+          </div>)}
+          <Notice message="这只是已固定的检查定义，不是执行结果。最终验收需独立准备数据、逐条运行、输出证据和失败用例。"/>
         </Layer>}
         {role==="MAINTAINER"&&route==="system"&&<Layer title="本地系统部署状态" description="安装与系统能力需实测">
           <Fact label="执行空间">{v(w.namespace)}</Fact>
