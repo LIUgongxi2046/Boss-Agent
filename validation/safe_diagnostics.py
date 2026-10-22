@@ -12,6 +12,12 @@ from __future__ import annotations
 class RedactedEventList(list):
     """Accept existing AgentHook/BusinessTool .append calls without raw bodies."""
 
+    def __init__(self, records=()):
+        super().__init__()
+        # list.__init__(iterable) bypasses the overridden append method.
+        # Resanitize any on-disk records loaded from older app versions.
+        self.extend(records)
+
     @staticmethod
     def redact(raw: object) -> dict:
         if not isinstance(raw, dict):
