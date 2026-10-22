@@ -102,6 +102,14 @@ class BossPageAPI:
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
                 "tasks": [self._public_task(v) for v in self._items(db, self.namespace, "task")],
+                "feedback": [
+                    {key: item[key] for key in (
+                        "feedback_id", "task_id", "kind", "content",
+                        "evidence_refs", "author_contact_id", "submitted_at",
+                        "source_type", "proposed_due_at",
+                    ) if key in item}
+                    for item in self._items(db, self.namespace, "feedback")
+                ],
                 "historical_commitment": data.get("historical_task"),
                 "read_at": now(),
             }
@@ -195,6 +203,11 @@ class BossPageAPI:
                 "scope": "MAINTAINER_METADATA_ONLY",
                 "source_type": "SIMULATED",
                 "status": "VALIDATION_SERVICE_NOT_PRODUCT_INSTALL",
+                "task_refs": [
+                    {key: item[key] for key in ("task_id", "status", "version", "coordinator_id")
+                     if key in item}
+                    for item in self._items(db, self.namespace, "task")
+                ],
                 "configured_provider": configuration["provider"],
                 "configured_model": configuration["model_id"],
                 "configuration_version": configuration["version"],
