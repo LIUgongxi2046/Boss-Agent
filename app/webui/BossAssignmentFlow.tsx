@@ -21,9 +21,17 @@ export interface TaskFeedback {
   author_contact_id?: string; content?: string; evidence_refs?: string[];
   proposed_due_at?: string; submitted_at?: string;
 }
+export interface TaskLinkedMessage {
+  message_id: string; task_id: string;
+  type: "ASSIGNMENT_SEND" | "FOLLOWUP_MESSAGE";
+  recipient_id: string; sent_at: string; send_state: string;
+  delivery_state: string; reply_state: string;
+  external_channel_invoked: false;
+}
 export interface TaskListResponse {
   tasks: AssignmentTask[];
   feedback?: TaskFeedback[];
+  linked_messages?: TaskLinkedMessage[];
 }
 export interface AssignmentContext {
   meeting: { meeting_id: string; starts_at: string } | null;
@@ -176,7 +184,8 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
 }
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
-  draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker }: {
+  draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker,
+  onViewMessages }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string) => void; onReload: () => void;
   onViewSource: () => void; context: AssignmentContext | null;
@@ -184,6 +193,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   onDraftChange: (key: keyof AssignmentDraft, value: string) => void;
   onDraftSaved: () => void;
   onOpenCoordinatorPicker: () => void; onOpenDuePicker: () => void;
+  onViewMessages: () => void;
 }) {
   const { propose, dialog, notice, busy } = useTransaction(onReload, id => {
     onSelectTask(id); onDraftSaved();
@@ -193,6 +203,9 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const rows=tasks?.tasks||[];
   const current=rows.find(t=>t.task_id===selectedTaskId)||rows[0];
   const feedback=useMemo(()=>(tasks?.feedback||[]).filter(f=>current&&f.task_id===current.task_id),[current,tasks]);
+  const linkedMessages=useMemo(()=>(tasks?.linked_messages||[]).filter(
+    row=>current&&row.task_id===current.task_id
+  ),[current,tasks]);
   const completed=feedback.find(f=>f.kind==="RESULT_SUBMITTED"&&Boolean(f.evidence_refs?.length));
   const extension=[...feedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST");
   const safe=(fn:()=>void)=>{setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
@@ -336,6 +349,29 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
               <MessageSquareText size={15}/> 核对并模拟发送</button></div>
           </>:<p className="boss-helper">请先选择或创建交办。</p>}
           <p className="boss-helper">模拟 SENT 只代表本地发件箱已记录；任务仍需反馈。</p>
+        </section>
+        <section className="boss-panel">
+          <div className="boss-panel-head"><h2>关联发件与回复状态</h2><small>F06 / F08 同一任务 ID · 真实 SQLite</small></div>
+          {linkedMessages.length ? linkedMessages.map(message=>
+            <div key={message.message_id} className="boss-feedback">
+              <div><span className="boss-tag boss-tag-blue">{message.type}</span>
+                <small>{displayTime(message.sent_at)}</small></div>
+              <div className="boss-kv"><span>消息编号</span><strong>{message.message_id}</strong></div>
+              <div className="boss-kv"><span>收件人</span><strong>{message.recipient_id}</strong></div>
+              <div className="boss-kv"><span>模拟发送</span><strong>{message.send_state}</strong></div>
+              <div className="boss-kv"><span>真实送达</span><strong>{message.delivery_state}</strong></div>
+              <div className="boss-kv"><span>回复</span><strong>{message.reply_state}</strong></div>
+            </div>
+          ) : <p className="boss-helper">当前交办尚无已保存的模拟发件；任务创建并不等于发送。</p>}
+          <p className="boss-helper">
+            两类消息分别来自 F06 交办发件箱和 F08 后续发件箱；
+            NOT_VERIFIED 表示没有真实外部送达证明，不可解释为已经送达。
+          </p>
+          <div className="boss-actions">
+            <button type="button" className="boss-btn" onClick={onViewMessages}>
+              <MessageSquareText size={15}/> 查看 F08 消息与回复
+            </button>
+          </div>
         </section>
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>反馈与本人决定</h2><small>进展、结果提交、确认完成分别记录</small></div>
