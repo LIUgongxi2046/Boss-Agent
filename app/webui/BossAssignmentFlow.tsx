@@ -28,10 +28,17 @@ export interface TaskLinkedMessage {
   delivery_state: string; reply_state: string;
   external_channel_invoked: false;
 }
+export interface TaskDueEvent {
+  task_id: string; event_id: string; event_version: string;
+  event_state: string; due_at: string; task_version_at_sync: string;
+  dispatch_state: string; dispatch_reason: string | null;
+  external_delivery_verified: false;
+}
 export interface TaskListResponse {
   tasks: AssignmentTask[];
   feedback?: TaskFeedback[];
   linked_messages?: TaskLinkedMessage[];
+  task_due_events?: TaskDueEvent[];
 }
 export interface AssignmentContext {
   meeting: { meeting_id: string; starts_at: string } | null;
@@ -206,6 +213,9 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const linkedMessages=useMemo(()=>(tasks?.linked_messages||[]).filter(
     row=>current&&row.task_id===current.task_id
   ),[current,tasks]);
+  const taskDue=useMemo(()=>(tasks?.task_due_events||[]).find(
+    row=>current&&row.task_id===current.task_id
+  ),[current,tasks]);
   const completed=feedback.find(f=>f.kind==="RESULT_SUBMITTED"&&Boolean(f.evidence_refs?.length));
   const extension=[...feedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST");
   const safe=(fn:()=>void)=>{setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
@@ -349,6 +359,25 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
               <MessageSquareText size={15}/> 核对并模拟发送</button></div>
           </>:<p className="boss-helper">请先选择或创建交办。</p>}
           <p className="boss-helper">模拟 SENT 只代表本地发件箱已记录；任务仍需反馈。</p>
+        </section>
+        <section className="boss-panel">
+          <div className="boss-panel-head">
+            <h2>到期提醒与调度结果</h2><small>FR06 · 服务端模拟时钟</small>
+          </div>
+          {taskDue ? <>
+            <div className="boss-kv"><span>到期事件 ID</span><strong>{taskDue.event_id}</strong></div>
+            <div className="boss-kv"><span>事件版本</span><strong>{taskDue.event_version}</strong></div>
+            <div className="boss-kv"><span>到期时刻</span><strong>{displayTime(taskDue.due_at)}</strong></div>
+            <div className="boss-kv"><span>事件状态</span><strong>{taskDue.event_state}</strong></div>
+            <div className="boss-kv"><span>实际派发检查</span><strong>{taskDue.dispatch_state}</strong></div>
+            <div className="boss-kv"><span>抑制原因</span><strong>{taskDue.dispatch_reason||"无记录"}</strong></div>
+          </> : <p className="boss-helper">
+            尚未经老板独立授权发送的任务不会启动到期催办；当前没有已登记的任务到期事件。
+          </p>}
+          <p className="boss-helper">
+            仅注册本机模拟到期事件。取消或确认完成后终止后续催办，延期须由老板批准；
+            当前不具备真实外部通知送达证明。
+          </p>
         </section>
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>关联发件与回复状态</h2><small>F06 / F08 同一任务 ID · 真实 SQLite</small></div>
