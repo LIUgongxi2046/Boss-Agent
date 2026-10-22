@@ -37,7 +37,9 @@
     "FR04 owner-authenticated meeting briefing preparation is versioned in real SQLite with deterministic metric aggregation and source state; any document/participant/task/event change can yield NEEDS_REVIEW without rewriting old snapshots. Missing-material requests become F08 DRAFT only, never SENT.",
     "FR05 confirmed minute ASSIGNMENT_DRAFT can be separately authorized into ONE OPEN FR06 task with original minute version, entry ID and document version, using existing Store.create_assignment inside BEGIN IMMEDIATE. F05 and F06 read live link/task status; send remains a distinct owner action. Not a production external delivery.",
     "F06 task page now reads a unified actual SQLite link timeline for independently approved F06 assignment outbox messages and F08 follow-up messages, with separate send/delivery/reply statuses; no external delivery success is assumed.",
-    "F09 is an owner-scoped versioned research draft with exact quote/source-id/offset and publication cutoff. Missing causality/model inference/country relation remains explicitly unknown. No simulated source converted into verified factual claim. No public-web/semantic ingestion and no Mac pixel acceptance."
+    "F09 is an owner-scoped versioned research draft with exact quote/source-id/offset and publication cutoff. Missing causality/model inference/country relation remains explicitly unknown. No simulated source converted into verified factual claim. No public-web/semantic ingestion and no Mac pixel acceptance.",
+    "A07 technical knowledge lifecycle: explicit SIMULATED source create/revise/withdraw with CAS and SQLite FTS indexing. MAINTAINER only sees metadata; BOSS F09 sees approved, current text. External crawling and multi-format ingestion remain pending.",
+    "FR05->FR06 confirmed minute entry link is independently authorized and creates exactly one OPEN task per entry/version; sending still requires separate BOSS action. Latest creation/sending validates coordinator validity against actual simulation clock."
   ],
   "pages": [
     {
@@ -489,7 +491,8 @@
       "other_integration_points": [
         "Source citation opens D01 with exact character offset and live document version check",
         "F09 confirmed missing-source request saves owner-only F08 DRAFT; separate send approval",
-        "Native nanobot chat continuation can ask about source IDs without claiming model research succeeded"
+        "Native nanobot chat continuation can ask about source IDs without claiming model research succeeded",
+        "Technically ingested, role-scoped SIMULATED sources are immediately available to BOSS-only current source search; withdrawn or replaced versions cannot be served as current"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -2717,25 +2720,33 @@
       "logical_architecture_route": "/app/maintain/A07",
       "actual_webui_navigation": "?bossPage=A07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_VERSIONED_SIMULATED_KNOWLEDGE_CAS_FTS",
+      "component_file": "app/webui/MaintainerKnowledgeEditor.tsx",
+      "component_name": "MaintainerKnowledgeEditor",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/source-index"
+        "GET /api/boss/ui/workspace/source-index",
+        "GET /api/boss/ui/operation-status"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.knowledge.source.create",
+        "boss.knowledge.source.revise",
+        "boss.knowledge.source.withdraw"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "knowledge.ingest",
-        "knowledge.verify",
-        "knowledge.withdraw"
+        "knowledge.real_file_ingest",
+        "knowledge.public_source_fetch_with_verification",
+        "knowledge.cross_source_deduplication",
+        "knowledge.multi_format_parse",
+        "knowledge.search_quality_evaluation"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_knowledge_ingestion.py"
       ],
       "source_task_ids": [
         "T19",
