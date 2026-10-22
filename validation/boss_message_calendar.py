@@ -195,6 +195,24 @@ def message_reply(api, db, data, payload):
             "当前消息已有回复，不能重复注入")
     _contact(data, payload["author_contact_id"])
     text = _text(payload["text"], "模拟反馈")
+    # Only a previously *separately sent* assignment may receive
+    # task PROGRESS. Arbitrary message replies never create/complete tasks.
+    task_feedback_id = None
+    task_status = None
+    if message["related_task_id"]:
+        task = api.store.get(db, NS, "task", message["related_task_id"])
+        require(task["coordinator_id"] == payload["author_contact_id"],
+                "关联交办负责人已变化", web.HTTPForbidden)
+        if task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS"):
+            updated = api.store.control_feedback(db, NS, {
+                "task_id": task["task_id"],
+                "task_version": task["version"],
+                "author_contact_id": payload["author_contact_id"],
+                "kind": "PROGRESS", "content": text,
+                "evidence_refs": [],
+            })
+            task_feedback_id = updated["feedback"]["feedback_id"]
+            task_status = updated["task"]["status"]
     reply_id = "sim-reply-" + str(uuid.uuid4())
     reply = {
         "reply_id": reply_id, "reply_to": message["message_id"],
@@ -202,6 +220,8 @@ def message_reply(api, db, data, payload):
         "text": text, "source_type": "SIMULATED",
         "received_at": now(), "related_task_id": message["related_task_id"],
         "task_completion_confirmed": False,
+        "task_feedback_id": task_feedback_id,
+        "task_status_after_reply": task_status,
     }
     api.store.put(db, NS, "message_reply", reply_id, reply)
     message["reply_state"] = "RECEIVED_SIMULATED"
@@ -211,6 +231,8 @@ def message_reply(api, db, data, payload):
         "source_type": "SIMULATED", "reply_id": reply_id,
         "reply_to": message["message_id"], "reply_state": "RECEIVED_SIMULATED",
         "task_completion_confirmed": False,
+        "task_feedback_id": task_feedback_id,
+        "task_status_after_reply": task_status,
     }
 
 
