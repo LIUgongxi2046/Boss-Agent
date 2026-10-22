@@ -31,3 +31,18 @@ python -m pytest -q app/tests/test_boss_page_api.py
 ## 文档
 
 [产品 PRD](docs/PRD.md) · [最终 HLD](docs/HLD.md) · [72 页实施映射](docs/HLD-72页面实现映射.md) · [高保真 v6 预览](Boss-Agent-Desktop-Complete-v6/index.html)
+
+
+## 第二批交办闭环（开发中）
+
+F06 采用服务端事务完成“创建交办→模拟发送→维护端模拟反馈→老板确认完成/批准延期/取消”链路；由 nanobot 已认证 WebSocket `requestMutation` 转到 `RoleChannel`，在同一个 SQLite 事务写授权、对象状态、幂等回执及最小审计。MAINTAINER 只有模拟反馈能力，无法代老板决定。T18/T19 整体功能仍未完成，详见 [老板端开发记录](docs/development/T18.md)、[维护端开发记录](docs/development/T19.md) 和 [72 页当前实现状态](specs/page-service-map.json)。
+
+本机 Desktop v6 UI 截图与原图差异核查：
+
+```bash
+cd validation/desktop && npx playwright install chromium && cd ../..
+node scripts/visual_qa.cjs --role BOSS --pages F01,F06,N02,N05
+python3 scripts/visual_diff.py --role boss
+```
+
+这些命令要求本地研发版服务已运行；Pillow 仅在差异分析阶段额外安装。截图存于忽略的 `.work/visual-qa/`，绝不表示目前已经完成 72 页像素验收。
