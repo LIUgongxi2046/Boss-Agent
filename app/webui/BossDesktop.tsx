@@ -6,7 +6,7 @@ import {
   Activity, AlertCircle, ArrowLeft, ArrowRight, Bell, CalendarDays,
   ChartNoAxesCombined, CheckCircle2, ChevronRight, ClipboardCheck,
   Clock3, Database, FileSearch, FolderOpen, LayoutDashboard, Loader2,
-  Menu, MessageCircle, Mic, RefreshCw, Search, Send, Settings,
+  Menu, MessageCircle, RefreshCw, Search, Send, Settings,
   ShieldCheck, X,
 } from "lucide-react";
 import pageMeta from "./page-meta.json";
@@ -467,7 +467,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                       <Value label="执行空间" value={dashboard?.namespace}/>
                       <Value label="数据集版本" value={dashboard?.dataset_version}/>
                       <Value label="业务时钟" value={localTime(dashboard?.business_clock)}/>
-                      <Value label="当前资料覆盖" value={dashboard?.source_coverage.region + " / " + dashboard?.source_coverage.trade_scope}/>
+                      <Value label="当前资料覆盖" value={dashboard ? (dashboard.source_coverage.region + " / " + dashboard.source_coverage.trade_scope) : undefined}/>
                       <div className="boss-actions"><GlassButton onClick={() => goSource("finance-note")}>查看原始依据</GlassButton></div>
                     </Panel>
                     <Panel title="大鹏的工作状态">
