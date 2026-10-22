@@ -39,14 +39,14 @@ def _exists(db, kind, identifier):
     return json.loads(row[0]) if row else None
 
 
-def _contact(data, contact_id):
+def _contact(api, db, data, contact_id):
     require(isinstance(contact_id, str), "联系人 ID 缺少", web.HTTPBadRequest)
     matches = [c for c in data["contacts"] if c["contact_id"] == contact_id]
     require(len(matches) == 1, "无法唯一识别当前联系人 ID", web.HTTPBadRequest)
     person = matches[0]
-    today = datetime.fromisoformat(
-        data["meeting"]["starts_at"]
-    ).date().isoformat()
+    # Current simulation business time, never a frozen historical meeting.
+    business_clock = api.store.get(db, NS, "clock", "current")
+    today = datetime.fromisoformat(business_clock["at"]).date().isoformat()
     require(person["valid_from"] <= today <= person["valid_until"],
             "当前资料未确认联系人仍然有效", web.HTTPForbidden)
     return person
@@ -86,7 +86,7 @@ def message_save(api, db, data, payload):
     require(ident is None or (isinstance(ident, str)
             and ident.startswith("draft-") and len(ident) <= 80),
             "草稿标识无效", web.HTTPBadRequest)
-    recipient = _contact(data, payload["recipient_id"])
+    recipient = _contact(api, db, data, payload["recipient_id"])
     body = _text(payload["body"], "消息草稿")
     require(payload["visibility"] == "RECIPIENT_ONLY",
             "不能向未经核验的范围广播", web.HTTPForbidden)
@@ -144,7 +144,7 @@ def message_send(api, db, data, payload):
             "收件人不符合已保存草稿", web.HTTPForbidden)
     require(payload["expected_content_sha256"] == draft["content_sha256"],
             "草稿内容已变化，必须重新核查", web.HTTPForbidden)
-    _contact(data, draft["recipient_id"])
+    _contact(api, db, data, draft["recipient_id"])
     _source_refs(api, db, data, draft["attachment_refs"])
     if draft["related_task_id"]:
         task = api.store.get(db, NS, "task", draft["related_task_id"])
@@ -197,7 +197,7 @@ def message_reply(api, db, data, payload):
             "回复者不是原模拟收件人", web.HTTPForbidden)
     require(message["reply_state"] == "NOT_RECEIVED",
             "当前消息已有回复，不能重复注入")
-    _contact(data, payload["author_contact_id"])
+    _contact(api, db, data, payload["author_contact_id"])
     text = _text(payload["text"], "模拟反馈")
     # Only a previously *separately sent* assignment may receive
     # task PROGRESS. Arbitrary message replies never create/complete tasks.
@@ -334,7 +334,7 @@ def calendar_share(api, db, data, payload):
     require(current["status"] == "ACTIVE"
             and current["version"] == payload["expected_version"],
             "私人日程版本已变化，须重新确认")
-    recipient = _contact(data, payload["recipient_id"])
+    recipient = _contact(api, db, data, payload["recipient_id"])
     purpose = _text(payload["purpose"], "分享用途", 240)
     end = _time(api, payload["expires_at"], current["timezone"])
     start = datetime.fromisoformat(current["starts_at"])
