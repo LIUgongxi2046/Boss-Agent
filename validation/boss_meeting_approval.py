@@ -203,7 +203,13 @@ def minutes_assignment_create(api, db, data, payload, key):
             and entry["source_version"] == doc["version"]
             and entry["source_anchor"] in doc.get("content", ""),
             "交办草稿原文已更改或无法验证", web.HTTPForbidden)
-    link_id = meeting["meeting_id"] + ":" + entry["entry_id"]
+    # Each *confirmed minute version* has its own immutable entry identity.
+    # A newer, independently reconfirmed revision may define new work without
+    # rewriting or silently resending the old task.
+    link_id = (
+        meeting["meeting_id"] + ":v" + minute["version"]
+        + ":" + entry["entry_id"]
+    )
     require(existing(db, "minutes_assignment_link", link_id) is None,
             "该纪要条目已经创建关联任务，请读取任务状态；不可重复创建")
 
