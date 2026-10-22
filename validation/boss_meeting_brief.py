@@ -212,8 +212,26 @@ def briefing_projection(db,data):
                 (NS,)).fetchall()
         ) if row["meeting_id"]==stored["meeting_id"]
     ]
+    # Preserve the historical snapshot *in SQLite*, but never serve a
+    # previously cached excerpt or numeric aggregate from a source that has
+    # since been revoked or superseded. Historic references stay visible.
+    display_snapshot=json.loads(json.dumps(stored))
+    latest={doc["source_id"]:doc for doc in current["sources"]}
+    for old_doc in display_snapshot["compiled"]["sources"]:
+        live=latest.get(old_doc["source_id"])
+        if not live or live["status"]!="CURRENT" or live["version"]!=old_doc["version"]:
+            old_doc["excerpt"]=None
+            old_doc["display_redacted_due_to_source_change"]=True
+    old_finance=next((doc for doc in display_snapshot["compiled"]["sources"]
+                      if doc["source_id"]=="finance-note"),None)
+    if not old_finance or old_finance.get("display_redacted_due_to_source_change"):
+        display_snapshot["compiled"]["metrics"]={
+            "available":False,"values":[],
+            "reason":"HISTORICAL_METRICS_SOURCE_NOT_CURRENT",
+            "unexplained_causes":["来源版本撤销或已变化，旧指标不作为当前依据"],
+        }
     return {
-        "saved":True,"saved_brief":stored,
+        "saved":True,"saved_brief":display_snapshot,
         "current":current,"current_status":status,
         "needs_review":status=="NEEDS_REVIEW",
         "source_changed":source_changed,
