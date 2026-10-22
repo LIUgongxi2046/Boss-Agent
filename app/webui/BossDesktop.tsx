@@ -17,6 +17,7 @@ import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } 
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
+import { BossResearchView } from "./BossResearchView";
 import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import "./boss-v6.css";
@@ -770,6 +771,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 (page === "F08" || page === "F12") ? <BossCommunicationCalendar
                   key={page} pageId={page} onViewSource={goSource}
                   onNavigate={id=>navigate(id)}
+                /> :
+                page === "F09" ? <BossResearchView
+                  key={page} onNavigate={id=>navigate(id)}
+                  onViewSource={goSource} onStartChat={onStartChat}
                 /> :
                 page === "F04" ? <BossMeetingBrief
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
