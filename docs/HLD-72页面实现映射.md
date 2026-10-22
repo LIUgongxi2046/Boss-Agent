@@ -9,7 +9,7 @@
 - 72 个 HTML：F 32 / N 12 / D 9 / A 16 / V19 3。每一行都绑定真实设计文件、逻辑路由、拟实现 React 组件、上游复用锚点、语义读写、服务端角色、需求标识及实施验收任务。
 - 561 个独立状态关联 = 51（F/A/V）× 11（S00—S10）；N/D 共 21 页无逐页 S00—S10 提示词，继承 `COMMON_STATE_INHERITANCE`、桌面 SYS 和 E01—E06 异常状态。
 - 路由 `/app/...` 是 T04 **拟定逻辑路由契约**，不是已存在的 nanobot 路由。T08 在不改变原生 WebUI API 约定的前提下确定 SPA/desktop 的实际承载方式。
-- 组件路径为 T10/T08 后续开发建议目标，**仓库当前不存在该 React 产品源码**；每页的 `semantic_read_contracts` / `semantic_command_contracts` 也**不是已经可调用的 HTTP endpoint**。
+- 组件路径为 T10/T08 后续开发建议目标，**仓库当前不存在该 React 产品源码**；每页的 `semantic_read_contracts` / `semantic_command_contracts` 也**不是已经可调用的 HTTP endpoint**；`client_only_intents` 是前端本地选择、草稿提醒及筛选，不生成后端接口。
 - `SHELL/THREAD/SETTINGS/...` 是可核验的上游源码锚点（见 JSON `upstream_reuse_anchors` 和 T02 source-map）；共享 UI、React 与 SDK 本身不代表农业、会议、BI、审批已经开发。
 - 老板写入必须服务端进行当前授权、版本和幂等校验；维护后台不能代老板决定；示例模拟业务不产生真实外部发送或生产业务影响。
 - 页面未开发状态固定为 `ARCHITECTURE_MAPPED_NOT_BUILT`。测试责任：老板 T18，维护 T19，语音 T20，集成/安全 T24，安装交接 T25。
@@ -69,8 +69,8 @@
 | [N08 通知要求与可见范围](../Boss-Agent-Desktop-Complete-v6/pages/N08-通知要求与可见范围.html) | `/app/boss/N08` | `NotificationAndVisibilityPage` | `SHELL`、`AUTOMATION`、`SETTINGS` | notification_preferences.read<br>sharing_scope.read → notification_preferences.save | B | WF-FR-02、WF-FR-12、WF-FR-26 | T18/T24 | 0 |
 | [N09 本人计划](../Boss-Agent-Desktop-Complete-v6/pages/N09-本人计划.html) | `/app/boss/N09` | `OwnerPlansPage` | `SHELL`、`AUTOMATION` | owner_plans.read<br>calendar.read<br>scheduled_events.read → owner_plans.save<br>owner_plans.pause<br>owner_plans.cancel | B | WF-FR-01、WF-FR-02、WF-FR-11、WF-FR-26 | T18/T24 | 0 |
 | [N10 本人授权](../Boss-Agent-Desktop-Complete-v6/pages/N10-本人授权.html) | `/app/boss/N10` | `OwnerAuthorizationsPage` | `SHELL`、`SECURITY` | owner_authorizations.list<br>authorization_history.read → owner_authorizations.revoke | B | WF-FR-28 | T18/T24 | 0 |
-| [N11 历史决定](../Boss-Agent-Desktop-Complete-v6/pages/N11-历史决定.html) | `/app/boss/N11` | `OwnerDecisionHistoryPage` | `SHELL`、`SOURCE` | owner_decisions.list<br>decision_evidence.read → owner_decisions.annotate | B | WF-FR-13、WF-FR-28 | T18/T24 | 0 |
-| [N12 运行概况](../Boss-Agent-Desktop-Complete-v6/pages/N12-运行概况.html) | `/app/maintain/N12` | `MaintainerRunOverviewPage` | `SETTINGS`、`USAGE` | run_telemetry.overview<br>service_health.read → runs.filter | M | WF-FR-26、WF-FR-30 | T19/T24 | 0 |
+| [N11 历史决定](../Boss-Agent-Desktop-Complete-v6/pages/N11-历史决定.html) | `/app/boss/N11` | `OwnerDecisionHistoryPage` | `SHELL`、`SOURCE` | owner_decisions.list<br>decision_evidence.read → — | B | WF-FR-13、WF-FR-28 | T18/T24 | 0 |
+| [N12 运行概况](../Boss-Agent-Desktop-Complete-v6/pages/N12-运行概况.html) | `/app/maintain/N12` | `MaintainerRunOverviewPage` | `SETTINGS`、`USAGE` | run_telemetry.overview<br>service_health.read → —（本地筛选） | M | WF-FR-26、WF-FR-30 | T19/T24 | 0 |
 
 ### D 组（9 页）
 
@@ -79,9 +79,9 @@
 | [D01 来源原文与支持关系](../Boss-Agent-Desktop-Complete-v6/pages/D01-来源原文与支持关系.html) | `/app/boss/D01` | `EvidenceSourceDrawer` | `SHELL`、`SOURCE` | evidence.source.read<br>evidence.support_relations.read → — | B | WF-FR-03、WF-FR-09 | T18/T24 | 0 |
 | [D02 当前动作必要决定](../Boss-Agent-Desktop-Complete-v6/pages/D02-当前动作必要决定.html) | `/app/boss/D02` | `RequiredDecisionDialog` | `SHELL`、`SECURITY` | owner_authorizations.read<br>action_proposal.read → owner_decision.submit | B | WF-FR-28 | T18/T24 | 0 |
 | [D03 执行结果核查](../Boss-Agent-Desktop-Complete-v6/pages/D03-执行结果核查.html) | `/app/boss/D03` | `ExecutionOutcomeDrawer` | `SHELL`、`TOOLRUN` | operation_outcome.read<br>run_business_outcomes.read → runs.reconcile | B | WF-FR-24、WF-FR-29 | T18/T24 | 0 |
-| [D04 选择负责人](../Boss-Agent-Desktop-Complete-v6/pages/D04-选择负责人.html) | `/app/boss/D04` | `OwnerSelectorDialog` | `SHELL`、`CHATLIST` | contacts.resolve<br>contact_roles.read → selection.owner.choose | B | WF-FR-06、WF-FR-08 | T18/T24 | 0 |
-| [D05 选择时间与时区](../Boss-Agent-Desktop-Complete-v6/pages/D05-选择时间与时区.html) | `/app/boss/D05` | `DateTimezoneDialog` | `SHELL`、`AUTOMATION` | timezone_rules.read<br>conflicts.read → selection.datetime.choose | B | WF-FR-02、WF-FR-06、WF-FR-11 | T18/T24 | 0 |
-| [D06 未保存修改提醒](../Boss-Agent-Desktop-Complete-v6/pages/D06-未保存修改提醒.html) | `/app/shared/D06` | `UnsavedChangesDialog` | `SHELL`、`SETTINGS` | draft_state.local → draft.discard<br>draft.keep_editing<br>draft.persist_if_supported | S | WF-FR-05、WF-FR-08、WF-FR-26 | T18/T19 | 0 |
+| [D04 选择负责人](../Boss-Agent-Desktop-Complete-v6/pages/D04-选择负责人.html) | `/app/boss/D04` | `OwnerSelectorDialog` | `SHELL`、`CHATLIST` | contacts.resolve<br>contact_roles.read → —（本地选人） | B | WF-FR-06、WF-FR-08 | T18/T24 | 0 |
+| [D05 选择时间与时区](../Boss-Agent-Desktop-Complete-v6/pages/D05-选择时间与时区.html) | `/app/boss/D05` | `DateTimezoneDialog` | `SHELL`、`AUTOMATION` | timezone_rules.read<br>conflicts.read → —（本地选时区） | B | WF-FR-02、WF-FR-06、WF-FR-11 | T18/T24 | 0 |
+| [D06 未保存修改提醒](../Boss-Agent-Desktop-Complete-v6/pages/D06-未保存修改提醒.html) | `/app/shared/D06` | `UnsavedChangesDialog` | `SHELL`、`SETTINGS` | draft_state.local → —（本地未保存提醒） | S | WF-FR-05、WF-FR-08、WF-FR-26 | T18/T19 | 0 |
 | [D07 访问权限限制](../Boss-Agent-Desktop-Complete-v6/pages/D07-访问权限限制.html) | `/app/shared/D07` | `AccessDeniedPage` | `SETTINGS`、`SECURITY` | access_denial.safe_context → — | S | WF-FR-26、WF-FR-28 | T18/T19/T24 | 0 |
 | [D08 登录状态已过期](../Boss-Agent-Desktop-Complete-v6/pages/D08-登录状态已过期.html) | `/app/auth/D08` | `SessionExpiredPage` | `AUTH_CLIENT` | auth.session.read → auth.reauthenticate | A | WF-FR-26、WF-FR-28 | T18/T19/T24 | 0 |
 | [D09 历史通知只读详情](../Boss-Agent-Desktop-Complete-v6/pages/D09-历史通知只读详情.html) | `/app/boss/D09` | `HistoricalNotificationDetailPage` | `SHELL`、`AUTOMATION` | notifications.history.read<br>source_version.read → — | B | WF-FR-02、WF-FR-25、WF-FR-26 | T18/T24 | 0 |
