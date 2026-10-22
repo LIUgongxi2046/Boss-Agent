@@ -461,7 +461,7 @@ def test_minute_assignment_rejects_wrong_entry_role_version_and_contact(
     api, _ = services
     confirmed_minute(services)
     result = run(api, "BOSS", "boss.minutes.assignment.create",
-                 minute_assignment_input(key="bad-link-" + str(corrupt), **corrupt))
+                 minute_assignment_input(key="bad-link-" + next(iter(corrupt)), **corrupt))
     assert result[0] == expected, result
     with api.store.connect() as db:
         assert db.execute(
