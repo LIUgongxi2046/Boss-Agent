@@ -11,6 +11,10 @@ on:
       - "specs/hld-72-page-map.json"
   workflow_dispatch:
 
+concurrency:
+  group: boss-agent-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
