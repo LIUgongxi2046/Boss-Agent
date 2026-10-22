@@ -112,7 +112,7 @@ const MAINT_NAV = [
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
 const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "A04", "A08", "A15", "N12",
+  "F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "D03", "A04", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 const ANIMATIONS: Record<Animation, string> = {
@@ -275,11 +275,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       if (["F01", "F06", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
-      if (page === "F24") read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
+      if (["F24", "D03"].includes(page)) read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
       if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
-    } else if (["A04", "A08", "N12", "A01", "A15"].includes(page)) {
+    } else if (["A04", "A08", "N12", "A01", "A15", "F30"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
-      if (page === "A15") read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
+      if (["A15", "F30"].includes(page)) read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
     }
     if (tasksToRead.length === 0) { setLoading(false); return () => abort.abort(); }
     setLoading(true);
@@ -656,9 +656,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
-                page === "F24" ? <div className="boss-columns">
+                ["F24","D03"].includes(page) ? <div className="boss-columns">
                   <div className="boss-column">
-                    <Panel title="DeepSeek 实际运行详情" note="F24 · 源自本机脱敏 Provider 回执">
+                    <Panel title="DeepSeek 实际运行详情" note={page+" · 源自本机脱敏 Provider 回执"}>
                       {modelHealth?.runtime_response_observed ?
                         <StatusLine variant="ok" text="本机服务收到过实际 DeepSeek 模型响应。此状态不代表当前业务已完成。" /> :
                         <StatusLine variant="warn" text="本次本机运行尚无真实模型响应回执。仅有配置不等于服务已验证可用。" />}
@@ -724,9 +724,29 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine text="未连接写入动作，不会显示模拟保存/发送成功。" />
                   </Panel></div>
                 </div>
-              ) : page === "A15" ? <div className="boss-columns">
+              ) : page === "A06" ? <div className="boss-columns">
                 <div className="boss-column">
-                  <Panel title="模型及工具实际运行记录" note="A15 · 只读技术元信息">
+                  <Panel title="SOP 与 Skills" note="A06 · 复用 nanobot 原生目录及工具注册表">
+                    <StatusLine text="SOP 与 Skills 的安装、校验和正式采用由已有 nanobot Settings/Skills 承载；本页不再造一个未经验证的配置引擎。" />
+                    <Value label="已固定的 Agent 核心" value="nanobot v0.3.5"/>
+                    <Value label="业务角色" value="技术维护，不具备老板业务授权"/>
+                    <Value label="本页状态" value="原生设置承接 · 自定义流程版本管理待开发"/>
+                    <div className="boss-actions">
+                      <GlassButton primary onClick={() => {
+                        window.location.hash="#/skills";
+                        navigate("NATIVE");
+                      }}>打开原生 Skills 目录 <ArrowRight size={15}/></GlassButton>
+                    </div>
+                  </Panel>
+                </div>
+                <div className="boss-column">
+                  <Panel title="启用和验证边界">
+                    <StatusLine variant="warn" text="可以进入已认证的开源原生目录；这不表示 PRD 规定的业务 SOP 版本、校验、启用和下一任务采用全部实现。" />
+                  </Panel>
+                </div>
+              </div> : ["A15","F30"].includes(page) ? <div className="boss-columns">
+                <div className="boss-column">
+                  <Panel title="模型及工具实际运行记录" note={page+" · 只读技术元信息"}>
                     {modelHealth?.runtime_response_observed ?
                       <StatusLine variant="ok" text="已观察到本机实际 Provider 响应；请求内容已脱敏。" /> :
                       <StatusLine variant="warn" text="当前还没有实际模型响应记录；不能将已配置视为运行成功。" />}
