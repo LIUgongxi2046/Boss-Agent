@@ -173,6 +173,16 @@ def test_draft_entry_and_finance_source_revocation_block_no_partial_writes(app):
         "ui-check", "withdraw", {"source_id": "meeting-minutes", "version": "1"},
     )
     assert create_linked_task(cmd, "withdrawn-minute-entry")[0] == 403
+    code, redacted = minutes(page)
+    assert code == 200
+    assert redacted["minute"]["state"] == "CONFIRMED"
+    assert redacted["minute"]["source_reference_state"] == "NEEDS_REVIEW"
+    assert [row["kind"] for row in redacted["minute"]["entries"]] == [
+        "OPINION", "ASSIGNMENT_DRAFT",
+    ]
+    assert all(not row["text"] and not row["source_anchor"]
+               for row in redacted["minute"]["entries"])
+    assert "候选交办：核查未完成经营材料" not in json.dumps(redacted)
     with cmd.store.connect() as db:
         assert db.execute(
             "SELECT COUNT(*) FROM objects WHERE kind='task'"
