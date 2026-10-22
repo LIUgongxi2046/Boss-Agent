@@ -227,6 +227,69 @@ def application_seed(api, db, data, payload):
     }
 
 
+
+def application_revise(api, db, data, payload):
+    """MAINTAINER replaces missing/withdrawn synthetic material after request-more.
+
+    Old application & source versions are archived for traceability; they can
+    no longer authorize approval. The new file is an *explicit* simulation.
+    """
+    api._exact(payload, {
+        "client_request_id", "application_id", "expected_version",
+        "applicant_contact_id", "amount_cny", "title", "description",
+        "attachment_text",
+    })
+    app = api.store.get(db, NS, "application", payload["application_id"])
+    require(app["state"] == "WAITING_MATERIAL",
+            "仅收到本人请求补充材料的申请可以由维护端更新")
+    require(app["version"] == payload["expected_version"],
+            "申请版本已变化，禁止使用旧材料覆盖")
+    require(app["applicant_contact_id"] == payload["applicant_contact_id"],
+            "模拟申请对象改变必须作为新申请审查", web.HTTPBadRequest)
+    amount = currency_amount(payload["amount_cny"])
+    title = validate_text(payload["title"], 100)
+    description = validate_text(payload["description"], 1500)
+    attachment = validate_text(payload["attachment_text"], 2500)
+    require(len(attachment) >= 12, "模拟补充附件内容不足", web.HTTPBadRequest)
+    doc = api.store.get(db, NS, "document", app["source_id"])
+    require(doc["version"] == app["source_version"] and
+            doc.get("access_scope") == data["owner_id"] and
+            doc.get("source_type") == "SIMULATED",
+            "申请附件身份或版本变化", web.HTTPForbidden)
+    old_version = doc["version"]
+    api.store.put(db, NS, "document_revision",
+                  f'{doc["source_id"]}:v{old_version}', doc)
+    api.store.put(db, NS, "application_revision",
+                  f'{app["application_id"]}:v{app["version"]}', app)
+    doc["version"] = str(int(doc["version"]) + 1)
+    doc["content"] = attachment
+    doc["published_at"] = now()
+    doc["withdrawn"] = False
+    doc["withdrawn_at"] = None
+    doc["replaced_source_version"] = old_version
+    api.store.put(db, NS, "document", doc["source_id"], doc)
+    db.execute("DELETE FROM knowledge WHERE namespace=? AND source_id=?",
+               (NS, doc["source_id"]))
+    db.execute("INSERT INTO knowledge(namespace,source_id,content) VALUES(?,?,?)",
+               (NS, doc["source_id"], attachment))
+    app["version"] = str(int(app["version"]) + 1)
+    app["source_version"] = doc["version"]
+    app["title"], app["description"], app["amount"] = title, description, amount
+    app["state"] = "PENDING_DECISION"
+    app["decision_id"] = None
+    app["updated_at"] = now()
+    app["funds_transferred"] = False
+    app["professional_release_issued"] = False
+    api.store.put(db, NS, "application", app["application_id"], app)
+    return {
+        "application_id": app["application_id"],
+        "version": app["version"], "source_version": app["source_version"],
+        "source_id": app["source_id"], "state": app["state"],
+        "source_type": "SIMULATED",
+        "owner_authorization_created": False,
+        "funds_transferred": False,
+    }
+
 def approval_decide(api, db, data, payload):
     api._exact(payload, {
         "client_request_id", "application_id", "expected_version",
