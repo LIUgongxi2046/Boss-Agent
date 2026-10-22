@@ -518,3 +518,197 @@
 .boss-sector-next button{width:100%;white-space:normal}
 @media(max-width:1350px){.boss-sector-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:690px){.boss-sector-filter-row label{flex:1 1 40%}.boss-sector-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/*
+ * Faithful Desktop v6.0 1440×1024/1280×800 desktop geometry.
+ * These values come from the reviewed design CSS, not a generic admin shell.
+ * It is still subject to a screenshot-by-screenshot pixel acceptance on Mac.
+ */
+.boss-v6 .boss-topbar{
+  min-height:64px;height:64px;padding:8px 22px 8px 28px;
+}
+.boss-v6 .boss-stage{
+  padding:4px 23px 21px 28px;
+  gap:14px;
+  background:#fff;
+}
+.boss-v6 .boss-hero{
+  min-height:146px;height:146px;
+  flex:0 0 146px;
+  padding:22px;
+  border-radius:20px;
+  border:0;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 85% 5%,rgba(97,238,196,.26),transparent 43%),
+    radial-gradient(ellipse at 68% 58%,rgba(81,172,255,.2),transparent 41%),
+    linear-gradient(107deg,rgba(249,252,255,.78),rgba(232,245,255,.56));
+}
+.boss-v6 .boss-hero:after{display:none}
+.boss-v6 .boss-hero-compact{
+  min-height:122px;height:122px;
+  flex-basis:122px;
+}
+.boss-v6 .boss-hero h1{
+  font-size:29px;
+  line-height:1.28;font-weight:850;letter-spacing:-.65px;
+  color:#172B4D;margin-bottom:7px;
+}
+.boss-v6 .boss-hero-compact h1{font-size:27px}
+.boss-v6 .boss-hero p{font-size:14px;color:#526987;line-height:1.6}
+.boss-v6 .boss-hero-mascot{
+  position:absolute;right:27px;top:-6px;
+  width:200px;height:160px;margin:0;
+  object-fit:contain;
+  filter:drop-shadow(0 8px 15px rgba(13,113,235,.11));
+}
+.boss-v6 .boss-hero-compact .boss-hero-mascot{
+  width:145px;height:130px;right:38px;top:-11px;
+}
+.boss-v6 .boss-content{
+  min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:0 0 12px;
+  scrollbar-width:thin;scrollbar-color:#bfd7ee transparent;
+}
+.boss-v6 .boss-meta-strip{min-height:48px;margin-bottom:13px}
+.boss-v6 .boss-columns{
+  grid-template-columns:minmax(0,1fr) 278px;
+  gap:14px;align-items:start;
+}
+.boss-v6 .boss-column{gap:13px}
+.boss-v6 .boss-panel{
+  padding:17px 18px;
+  border:1px solid #e0ebf7;border-radius:15px;
+  background:#fff;
+}
+.boss-v6 .boss-search{max-width:450px}
+.boss-v6 .boss-sidebar{
+  background:linear-gradient(155deg,#fff,#f8fbff 68%,#f0f8ff);
+}
+.boss-v6 .boss-sidebar .boss-brand strong{font-weight:820;font-size:17px}
+.boss-v6 .boss-nav-item.active{
+  color:#0866ea;background:#e5f1ff;border-color:transparent;
+}
+.boss-v6 .boss-panel-head h2{font-size:16px;line-height:24px}
+.boss-v6 .boss-btn{min-height:44px}
+.boss-v6 .boss-status{line-height:1.6}
+
+/* F05, F07 and A03 use the actual v6 editor/control grammar. */
+.boss-v6 .boss-minutes-tabs{
+  display:flex;align-items:center;gap:4px;flex-wrap:wrap;
+  padding:5px;margin:0 0 12px;
+  background:#f4f8fc;border-radius:10px;
+}
+.boss-v6 .boss-minutes-tabs button{
+  border:0;border-radius:8px;min-height:39px;
+  flex:1 1 105px;background:transparent;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:8px 10px;color:#627a94;font-size:12.5px;font-weight:650;
+}
+.boss-v6 .boss-minutes-tabs button.selected{
+  background:#fff;color:#0563c9;
+  box-shadow:0 1px 5px #dae8f4;
+}
+.boss-v6 .boss-minutes-tabs span{
+  min-width:18px;height:18px;padding:0 4px;
+  border-radius:12px;background:#e9f0f7;
+  color:#557c9e;font-size:11px;
+  display:inline-flex;justify-content:center;align-items:center;
+}
+.boss-v6 .boss-minutes-editor{
+  padding:14px 15px;background:#f9fcff;
+  border:1px solid #e1ebf7;border-radius:12px;
+  margin-bottom:12px;
+}
+.boss-v6 .boss-minutes-editor select{
+  min-height:44px;width:100%;
+}
+.boss-v6 .boss-minutes-edit-row{
+  display:flex;align-items:start;gap:8px;
+}
+.boss-v6 .boss-minutes-edit-row>.boss-minutes-row{flex:1}
+.boss-v6 .boss-minutes-edit-row>button{
+  min-height:44px;width:44px;
+  display:grid;place-items:center;
+  flex-shrink:0;
+  border:1px solid #e7d7d7;
+  border-radius:10px;color:#a35a57;background:#fffafa;
+}
+.boss-v6 .boss-minutes-row{
+  padding:13px 14px;border:1px solid #e1eaf5;
+  border-radius:11px;background:linear-gradient(135deg,#fcfeff,#f7fbff);
+  margin-bottom:10px;min-width:0;
+}
+.boss-v6 .boss-minutes-row p{
+  margin:8px 0;color:#315172;font-size:13px;
+  line-height:1.72;white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.boss-v6 .boss-minutes-row small{
+  display:block;color:#7b91a9;
+  font-size:11.5px;line-height:1.6;
+}
+.boss-v6 .boss-minutes-history{
+  margin-top:14px;border-top:1px solid #e7eef6;
+  padding-top:12px;
+}
+.boss-v6 .boss-minutes-history h3{
+  font-size:12px;font-weight:720;color:#446781;
+  margin-bottom:7px;
+}
+.boss-v6 .boss-minutes-history p{
+  margin:4px 0;color:#7289a3;font-size:11.7px;
+}
+.boss-v6 .boss-approval-description{
+  background:#f7fbff;padding:14px;
+  border:1px solid #dfecf8;
+  border-radius:10px;
+  font-size:13px;color:#416580;
+  line-height:1.7;margin:13px 0;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.boss-v6 .boss-approval-decisions{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;margin:15px 0;
+}
+.boss-v6 .boss-approval-decisions label{
+  display:flex;align-items:center;gap:7px;
+  min-height:48px;padding:10px;
+  border:1px solid #dce9f5;border-radius:10px;
+  background:#f9fcff;font-size:12px;
+  color:#53718d;cursor:pointer;
+}
+.boss-v6 .boss-approval-decisions label.selected{
+  color:#1358a4;background:#edf6ff;border-color:#93c5f4;
+}
+.boss-v6 .boss-approval-decisions input{
+  width:18px;height:18px;accent-color:#0968EA;flex:0 0 auto;
+}
+@media(max-width:1250px){
+  .boss-v6 .boss-stage{padding:4px 14px 12px;gap:12px}
+  .boss-v6 .boss-topbar{padding:8px 12px}
+  .boss-v6 .boss-hero{min-height:124px;height:124px;flex-basis:124px}
+  .boss-v6 .boss-hero-compact{min-height:114px;height:114px;flex-basis:114px}
+  .boss-v6 .boss-hero h1{font-size:25px}
+  .boss-v6 .boss-hero-mascot{right:4px;opacity:.85}
+  .boss-v6 .boss-hero-compact .boss-hero-mascot{right:10px}
+  .boss-v6 .boss-columns{grid-template-columns:minmax(0,1fr) 260px}
+}
+@media(max-width:1050px){
+  .boss-v6 .boss-hero-mascot{opacity:.74}
+  .boss-v6 .boss-columns{grid-template-columns:minmax(0,1fr)}
+  .boss-v6 .boss-content{padding-bottom:16px}
+}
+@media(max-width:690px){
+  .boss-v6 .boss-stage{padding:4px 9px 12px;gap:10px}
+  .boss-v6 .boss-topbar{height:60px;min-height:60px;padding:7px 10px}
+  .boss-v6 .boss-hero{min-height:128px;height:auto;flex-basis:128px;padding:16px}
+  .boss-v6 .boss-hero-compact{min-height:115px;flex-basis:115px}
+  .boss-v6 .boss-hero h1{font-size:21px}
+  .boss-v6 .boss-hero p{font-size:12px}
+  .boss-v6 .boss-hero-mascot{width:93px;height:100px;right:4px;top:5px}
+  .boss-v6 .boss-hero-compact .boss-hero-mascot{width:78px;height:91px;right:4px;top:6px}
+  .boss-v6 .boss-hero-copy{max-width:78%}
+  .boss-v6 .boss-approval-decisions{grid-template-columns:1fr}
+}
