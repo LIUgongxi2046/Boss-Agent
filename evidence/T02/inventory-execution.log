@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-22T06:01:00.526875+00:00",
+  "repository": "https://github.com/HKUDS/nanobot",
+  "tag": "v0.3.5",
+  "commit": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+  "archive_sha256": "907d179f428ca321236058efef721f942eb11917d3874887d37b33fd0e208525",
+  "python": "3.12.7 (v3.12.7:0b05ead877f, Sep 30 2024, 23:18:00) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "machine": "x86_64",
+  "macos": "13.7.8",
+  "installed_distribution_count": 111,
+  "locked_distribution_count": 116,
+  "upstream_files": 1471,
+  "source_changes": [],
+  "python_source_comparison_count": 329,
+  "python_source_mismatches": [],
+  "bundled_webui_files": 438,
+  "rebuilt_webui_files": 438,
+  "frontend_rebuilt": true,
+  "rebuilt_matches_release_bundle": false,
+  "frontend_reproducible_build": "一次源码构建成功；跨环境字节复现尚未执行",
+  "dependency_license_review": "声明及安装分发包内可定位许可原文已收集；全部条款的人工审查未完成"
+}

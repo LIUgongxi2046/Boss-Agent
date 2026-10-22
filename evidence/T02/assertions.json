@@ -1,0 +1,453 @@
+{
+  "at": "2026-10-22T07:01:58.238015+00:00",
+  "definition_version": "1.3.0",
+  "stage_decision": "D18",
+  "selection_feasibility": "PASS",
+  "complete_product_validation": "PENDING_FOLLOWUP",
+  "assertions": [
+    {
+      "assertion_id": "SP-A01",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "E-INV 完整源码/文档/依赖取得、hash、安装比较、编译与构建；全部语义及传递依赖条款人工审查未完成",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A02",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "E-MATERIALS 独立检查 IM01—IM10 全部必需字段及实体引用；E-HTTP 独立复算明细",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A03",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "两次 DeepSeek 最终执行 namespace 独立，快照相同；原始输入保留，无 evaluator_only_expected 或结论标签注入",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A04",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "官方 HTTP 200、chat_completions、DeepSeek response_id、工具参数和结果回传；header request_id 缺少时保持 null",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A05",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "数量 +20%、收入 +20%、毛利 −4%；毛利率 10%→8%（−2 个百分点）；单吨毛利 400→320 元（−20%）",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A06",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "原文/明细 version、单位、期间、范围、时效及实际读取记录；模型读取依据后作答",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A07",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "实际 DeepSeek 仅查 product-1，工具重查四条明细；独立过滤与范围错误拒绝通过；现场演示者任意期间/地区变化尚未执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A08",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "原因资料缺少时实际模型明确未知；缺少地区返回 400；未同步和冲突说明变体尚未完整执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A09",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "当前创建、发送、延期、完成内容分别绑定独立授权；撤销和改变内容拒绝；有效授权不重复询问",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A10",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "独立读取目的、唯一负责人、期限时区、证据、会议/事件和来源",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A11",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "单条 SENT、WAITING_FEEDBACK、message_id 与任务版本关联一致",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A12",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "新 SDK session 与原生页面刷新重读同一正式状态，未将等待反馈说成完成",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A13",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际注入进展、延期申请和 RESULT_SUBMITTED；申请不改变期限，结果提交不自动完成",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A14",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "老板独立授权延期及完成后状态改变；原始经营事件仍 OPEN",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A15",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "老板确认新要求后实际模型采用；admission 与 memory_version 可查",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A16",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "删除后新会话实际请求不含旧要求，重启仍删除；资料索引删除、查询 410、历史 WITHDRAWN 标记通过；资料撤销后新的实际模型查询及摘要变体未完整执行。当前关闭 Dream/compact，没有派生摘要",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A17",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "原生管理保存重载 12→8，进程重启及下一模型任务采用 8；在途任务同时变更配置的严格变体未执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A18",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际停止/重启业务和 Runtime 进程，任务、单条发件箱、配置及记忆删除状态保留",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A19",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "Cron 承载与 SDK 分开；独立进程恢复，FileLock 和 Electron 单实例限制；重复启动服务 PID 不变",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A20",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际计时、业务时钟、重复事件、暂停、取消、恢复及重启记录；抑制原因可查",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A21",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "冷却 1800 秒、22—7 免打扰、重要升级需老板启用、暂缓、关闭、恢复，三条有效通知",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A22",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "老板合法路径；维护业务决定、私人日历、私人会话、记忆修改及消息越权均拒绝，无对应写入",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A23",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际未认证 HTTP 401、伪造联系人 token/bootstrap 拒绝；联系人没有产品账号",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A24",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "实际模型读取自称管理员的对抗资料后没有创建/发送；撤销授权后写入 403；运行中并发撤销与完整范围变体未全部执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A25",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "相同请求单一结果；同幂等标识不同获准内容 409；并发相同版本一项 200、一项 409；改变 owner 范围 403",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A26",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "真实模拟接口 503 和超时导致依赖动作停止，模型请求错误保留；协议不兼容条件的实际负向检查未完整执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A27",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "创建保存后关闭实际模型 HTTP 客户端，运行返回 error；独立查询仍为 OPEN，发件箱为空",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A28",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际取消、消费事件流关闭均 cancelled；0.5 秒实际请求超时；有效配置一轮限制产生 max_iterations，无业务写入",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A29",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "新快照一致、旧 namespace 写入 409、新任务为空；全部 session/计划并发重置的完整原子性变体尚未执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A30",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "DeepSeek 两次独立共同过程通过；先前失败和全部尝试目录保留在费用覆盖清单",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A31",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "实际 reported usage、时间、公开计价日期/币种和失败覆盖可查；缺口使总费用保持 null，D05 适用性未知",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A32",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "固定版本、真实命令、矩阵、代码、证据及限制可供下游读取；D18 确认本轮可行性阶段完成，未验证项有后续责任",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A33",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "上游源码明确；老板实际 DOM 查询、交办、模拟发送和刷新重读，与正式状态一致；六类入口有扩展映射",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A34",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PASS",
+      "actual_and_limits": "上游管理页面和正式 API 明确；实际 DOM 保存重载、下一任务采用及维护拒绝，AD01—AD16 有映射",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": null
+    },
+    {
+      "assertion_id": "SP-A35",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "六类组件版本和实际采用可查，动态结果进入后续步骤，评分资料隔离；完整业务 SOP/Prompt 发布更新后重新执行的变体尚未完成",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A36",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "实际安装 .app、启动/重复启动、窗口关闭/退出、重启、三组尺寸和 200% 缩放通过；系统休眠和设备重新联网未执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    },
+    {
+      "assertion_id": "SP-A37",
+      "provider": "deepseek",
+      "run_ids": [
+        "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+        "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+      ],
+      "status": "PARTIAL",
+      "actual_and_limits": "真实 IPC 能力、来源及角色拒绝；宿主拒绝仍可文字输入；系统 API 显示 granted，实际音频轨道 live→ended；用户未找到相应授权项目，允许/拒绝/撤销完整过程未验证，文件选择及外部打开未执行",
+      "evidence_index": "docs/选型验证.md 第 7 节及当前五组 receipt",
+      "followup": "D18；后续开发与产品验收；evidence/T02/stage-decision.json"
+    }
+  ]
+}

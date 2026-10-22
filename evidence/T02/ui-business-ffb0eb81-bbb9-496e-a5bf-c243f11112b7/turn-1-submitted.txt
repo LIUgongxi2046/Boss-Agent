@@ -1,0 +1,60 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "New topic"
+          - button "Topic actions for New topic":
+            - img
+        - listitem:
+          - button "@kevu 查询 region-1 产品对比与原始依据"
+          - button "Topic actions for 查询 region-1 产品对比与原始依据":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "New topic":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 01:39 PM
+      - status: Sending…
+      - button "Copy"
+      - status "Working for 1s"
+    - textbox "Message New topic"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Voice input":
+      - img
+    - button "Stop response":
+      - img

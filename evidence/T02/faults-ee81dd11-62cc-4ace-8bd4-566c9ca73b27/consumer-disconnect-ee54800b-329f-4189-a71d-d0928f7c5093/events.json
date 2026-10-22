@@ -1,0 +1,14 @@
+[
+  {
+    "at": "2026-10-22T06:32:19.457770+00:00",
+    "type": "stream_event",
+    "event": "run.started",
+    "delta": ""
+  },
+  {
+    "at": "2026-10-22T06:32:20.236398+00:00",
+    "type": "stream_event",
+    "event": "text.delta",
+    "delta": "以下"
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "direction": "sent",
+    "at": "2026-10-22T04:48:41.802471+00:00",
+    "request": {
+      "type": "webui_request",
+      "request_id": "0f4ca74e-ba9f-4e13-825e-695a6060fb6f",
+      "action": "settings.runtime_config.update",
+      "payload": {
+        "values": {
+          "agents.defaults.max_tool_iterations": 9
+        }
+      }
+    }
+  },
+  {
+    "direction": "received",
+    "at": "2026-10-22T04:48:42.053256+00:00",
+    "request_id": "0f4ca74e-ba9f-4e13-825e-695a6060fb6f",
+    "ok": true,
+    "error": null,
+    "runtime_config": {
+      "agents.defaults.timezone": "Asia/Shanghai",
+      "agents.defaults.timezone_mode": "manual",
+      "agents.defaults.unified_session": false,
+      "agents.defaults.max_tool_iterations": 9,
+      "agents.defaults.max_concurrent_subagents": 4,
+      "agents.defaults.max_tool_result_chars": 16000,
+      "agents.defaults.provider_retry_mode": "standard",
+      "agents.defaults.tool_hint_max_length": 40,
+      "agents.defaults.dream.enabled": false,
+      "gateway.host": "127.0.0.1",
+      "gateway.port": 18791,
+      "gateway.restart_mode": "auto",
+      "tools.exec.enable": true,
+      "tools.exec.timeout": 60,
+      "tools.exec.path_prepend": "",
+      "tools.exec.path_append": "",
+      "tools.exec.sandbox": "",
+      "tools.exec.sandbox_ro_binds": [],
+      "tools.exec.sandbox_rw_binds": [],
+      "tools.exec.allowed_env_keys": [],
+      "tools.exec.allow_patterns": [],
+      "tools.exec.deny_patterns": [],
+      "tools.file.enable": true,
+      "tools.my.enable": true,
+      "tools.my.allow_set": false,
+      "tools.cli_apps.enable": true,
+      "tools.cli_apps.install_timeout": 300,
+      "tools.cli_apps.run_timeout": 60,
+      "tools.cli_apps.catalog_ttl_seconds": 3600,
+      "tools.restrict_to_workspace": true,
+      "tools.ssrf_whitelist": [],
+      "tools.max_session_messages_per_minute": 6,
+      "tools.webui_allow_remote_package_install": false,
+      "tools.web.enable": true,
+      "tools.web.proxy": null,
+      "tools.web.user_agent": null,
+      "tools.image_generation.save_dir": "generated",
+      "api.host": "127.0.0.1",
+      "api.timeout": 120.0
+    },
+    "requires_restart": true
+  }
+]

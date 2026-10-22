@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T06:12:23.367133+00:00",
+  "requests": 38,
+  "scope": "反馈、老板延期与完成、授权撤销、私人正文权限、联系人拒绝、资料摄取检索撤销、并发版本及上游实际调度采用业务时钟和提醒规则",
+  "baseline": {
+    "namespace": "controls-check",
+    "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+  },
+  "concurrent_statuses": [
+    200,
+    409
+  ],
+  "completed_task": {
+    "authorization_id": "0b8f29ca-0063-490a-b18d-7f685d950443",
+    "completion_authorization_id": "025deece-ce6b-4e19-a612-30c01882b73a",
+    "coordinator_id": "coordinator-1",
+    "due_at": "2026-10-26T17:00:00+08:00",
+    "evidence_requirements": [
+      "原因明细",
+      "措施及证据"
+    ],
+    "execution_namespace": "controls-check",
+    "feedback_ids": [
+      "cb2192f5-f71b-4535-8fee-feeec24c1169",
+      "645f19bb-332b-4543-867d-e4d8bef65691",
+      "215b75d0-5aba-4b8e-8b96-94b74efcde6c"
+    ],
+    "message_ids": [
+      "1258709a-607f-4b17-9900-4851f35453b5"
+    ],
+    "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+    "related_event_ids": [
+      "event-1"
+    ],
+    "related_meeting_id": "meeting-1",
+    "source_refs": [
+      "finance-note"
+    ],
+    "status": "COMPLETED_CONFIRMED",
+    "task_id": "16939e3e-8e10-4dc8-9c3f-e1288c71bad6",
+    "timezone": "Asia/Shanghai",
+    "version": "7"
+  }
+}

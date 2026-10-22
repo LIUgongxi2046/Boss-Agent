@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K02-models",
+  "kind": "EXTERNAL",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "validation/.venv/bin/python",
+    "validation/model_probe.py"
+  ],
+  "started_at": "2026-10-22T04:51:56.538120+00:00",
+  "ended_at": "2026-10-22T04:51:58.531059+00:00",
+  "exit_code": 1,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py",
+      "sha256": "5e3f122e3fe0320649998d3988560bd74b9f507210b421eca4bd718bb50a3ea0"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/business.py",
+      "sha256": "5ffb1c8d509400542a785d193c245de859c53b49bf260d859444f259d8a9d68e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/uv.lock",
+      "sha256": "4a9a5b7a3d34863c90504521ccb5f0635828f9bb561e1f1f37fdc604a3ec17d2"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/selection-probe.json",
+      "sha256": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/选型环境.md",
+      "sha256": "61e50238362e609a88256329aabc59807c1d78e83ac7d7abd1c8b248b1b42d7b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/model-current/output.log",
+      "sha256": "ceb74e7460c775a02a776218df4c12ac782f393af3b9f1d824656e3aa86fcfe8"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/model-preflight.json",
+      "sha256": "4f057535cd44bce3c939e9c4f5f3e66f44f1320f5311c7c6e46c01a78b90ab35"
+    }
+  ]
+}

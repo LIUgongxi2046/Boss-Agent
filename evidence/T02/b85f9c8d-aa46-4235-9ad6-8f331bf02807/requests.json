@@ -1,0 +1,1545 @@
+[
+  {
+    "at": "2026-10-22T06:18:39.000778+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/datasets",
+    "input": {
+      "namespace": "local-a"
+    },
+    "status": 200,
+    "response": {
+      "namespace": "local-a",
+      "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.006661+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/datasets",
+    "input": {
+      "namespace": "local-b"
+    },
+    "status": 200,
+    "response": {
+      "namespace": "local-b",
+      "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.078465+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/query_metrics",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "question": "查询当前与基准期间经营指标",
+      "metric_ids": [
+        "sales_quantity",
+        "revenue",
+        "cost",
+        "gross_profit",
+        "gross_margin",
+        "gross_profit_per_tonne"
+      ],
+      "region_id": "region-1",
+      "product_ids": [
+        "product-1",
+        "product-2"
+      ],
+      "period_start": "2026-10-01",
+      "period_end": "2026-10-10",
+      "comparison_start": "2026-09-01",
+      "comparison_end": "2026-09-10",
+      "currency": "CNY",
+      "trade_scope": "EXTERNAL_SALES",
+      "definition_version": "1"
+    },
+    "status": 200,
+    "response": {
+      "query_id": "1c8d9b84-8719-4f3e-ac02-1fc67a551afd",
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "values": [
+        {
+          "metric_id": "sales_quantity",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "10000",
+          "unit": "吨",
+          "formula": "SUM(quantity_tonnes)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "revenue",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "40000000",
+          "unit": "CNY",
+          "formula": "SUM(revenue_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "cost",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "36000000",
+          "unit": "CNY",
+          "formula": "SUM(cost_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "4000000",
+          "unit": "CNY",
+          "formula": "revenue-cost",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_margin",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "10.0",
+          "unit": "%",
+          "formula": "gross_profit/revenue*100",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit_per_tonne",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "400",
+          "unit": "CNY/吨",
+          "formula": "gross_profit/quantity",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "sales_quantity",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "12000",
+          "unit": "吨",
+          "formula": "SUM(quantity_tonnes)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "revenue",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "48000000",
+          "unit": "CNY",
+          "formula": "SUM(revenue_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "cost",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "44160000",
+          "unit": "CNY",
+          "formula": "SUM(cost_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "3840000",
+          "unit": "CNY",
+          "formula": "revenue-cost",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_margin",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "8.00",
+          "unit": "%",
+          "formula": "gross_profit/revenue*100",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit_per_tonne",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1', 'product-2']",
+          "value": "320",
+          "unit": "CNY/吨",
+          "formula": "gross_profit/quantity",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        }
+      ],
+      "detail_refs": [
+        "BASE-0",
+        "BASE-1",
+        "BASE-2",
+        "BASE-3",
+        "CURRENT-0",
+        "CURRENT-1",
+        "CURRENT-2",
+        "CURRENT-3"
+      ],
+      "sources": [
+        {
+          "source_id": "finance-note",
+          "source_type": "SIMULATED",
+          "version": "1",
+          "locator": "sqlite:documents/finance-note",
+          "business_as_of": "2026-10-10T23:59:59+08:00",
+          "source_updated_at": "2026-10-11T08:00:00+08:00",
+          "read_at": "2026-10-22T06:18:39.067877+00:00",
+          "coverage": "region-1 水产饲料外销，两个十日期间",
+          "quality_state": "COMPLETE"
+        }
+      ],
+      "missing_fields": [],
+      "unexplained_causes": [
+        "原因贡献明细尚未提供"
+      ]
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.106284+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/read_evidence",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "query_id": "1c8d9b84-8719-4f3e-ac02-1fc67a551afd",
+      "source_ids": [
+        "finance-note"
+      ],
+      "detail_refs": [
+        "BASE-0",
+        "BASE-1",
+        "BASE-2",
+        "BASE-3",
+        "CURRENT-0",
+        "CURRENT-1",
+        "CURRENT-2",
+        "CURRENT-3"
+      ]
+    },
+    "status": 200,
+    "response": {
+      "sources": [
+        {
+          "source_id": "finance-note",
+          "source_type": "SIMULATED",
+          "version": "1",
+          "locator": "sqlite:documents/finance-note",
+          "business_as_of": "2026-10-10T23:59:59+08:00",
+          "source_updated_at": "2026-10-11T08:00:00+08:00",
+          "read_at": "2026-10-22T06:18:39.101079+00:00",
+          "coverage": "region-1 水产饲料外销，两个十日期间",
+          "quality_state": "COMPLETE"
+        }
+      ],
+      "original_records": [
+        {
+          "record_id": "BASE-0",
+          "version": "1",
+          "content": {
+            "cost_cny": "9000000",
+            "customer_id": "customer-1",
+            "factory_id": "factory-1",
+            "legal_entity_id": "entity-1",
+            "period": "BASE",
+            "product_id": "product-1",
+            "quantity_tonnes": "2500",
+            "record_id": "BASE-0",
+            "region_id": "region-1",
+            "revenue_cny": "10000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "BASE-1",
+          "version": "1",
+          "content": {
+            "cost_cny": "9000000",
+            "customer_id": "customer-2",
+            "factory_id": "factory-2",
+            "legal_entity_id": "entity-1",
+            "period": "BASE",
+            "product_id": "product-2",
+            "quantity_tonnes": "2500",
+            "record_id": "BASE-1",
+            "region_id": "region-1",
+            "revenue_cny": "10000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "BASE-2",
+          "version": "1",
+          "content": {
+            "cost_cny": "9000000",
+            "customer_id": "customer-3",
+            "factory_id": "factory-1",
+            "legal_entity_id": "entity-1",
+            "period": "BASE",
+            "product_id": "product-1",
+            "quantity_tonnes": "2500",
+            "record_id": "BASE-2",
+            "region_id": "region-1",
+            "revenue_cny": "10000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "BASE-3",
+          "version": "1",
+          "content": {
+            "cost_cny": "9000000",
+            "customer_id": "customer-4",
+            "factory_id": "factory-2",
+            "legal_entity_id": "entity-1",
+            "period": "BASE",
+            "product_id": "product-2",
+            "quantity_tonnes": "2500",
+            "record_id": "BASE-3",
+            "region_id": "region-1",
+            "revenue_cny": "10000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "CURRENT-0",
+          "version": "1",
+          "content": {
+            "cost_cny": "11040000",
+            "customer_id": "customer-1",
+            "factory_id": "factory-1",
+            "legal_entity_id": "entity-1",
+            "period": "CURRENT",
+            "product_id": "product-1",
+            "quantity_tonnes": "3000",
+            "record_id": "CURRENT-0",
+            "region_id": "region-1",
+            "revenue_cny": "12000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "CURRENT-1",
+          "version": "1",
+          "content": {
+            "cost_cny": "11040000",
+            "customer_id": "customer-2",
+            "factory_id": "factory-2",
+            "legal_entity_id": "entity-1",
+            "period": "CURRENT",
+            "product_id": "product-2",
+            "quantity_tonnes": "3000",
+            "record_id": "CURRENT-1",
+            "region_id": "region-1",
+            "revenue_cny": "12000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "CURRENT-2",
+          "version": "1",
+          "content": {
+            "cost_cny": "11040000",
+            "customer_id": "customer-3",
+            "factory_id": "factory-1",
+            "legal_entity_id": "entity-1",
+            "period": "CURRENT",
+            "product_id": "product-1",
+            "quantity_tonnes": "3000",
+            "record_id": "CURRENT-2",
+            "region_id": "region-1",
+            "revenue_cny": "12000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "CURRENT-3",
+          "version": "1",
+          "content": {
+            "cost_cny": "11040000",
+            "customer_id": "customer-4",
+            "factory_id": "factory-2",
+            "legal_entity_id": "entity-1",
+            "period": "CURRENT",
+            "product_id": "product-2",
+            "quantity_tonnes": "3000",
+            "record_id": "CURRENT-3",
+            "region_id": "region-1",
+            "revenue_cny": "12000000",
+            "trade_type": "EXTERNAL_SALES",
+            "version": "1"
+          }
+        },
+        {
+          "record_id": "finance-note",
+          "version": "1",
+          "content": {
+            "access_scope": "boss-1",
+            "author_contact_id": "finance-1",
+            "content": "合成水产饲料外销明细；毛利=收入减成本，毛利率=毛利除收入，单吨毛利=毛利除吨数。原因贡献明细尚未提供。",
+            "original_locator": "sqlite:documents/finance-note",
+            "published_at": "2026-10-11T08:00:00+08:00",
+            "source_id": "finance-note",
+            "source_type": "SIMULATED",
+            "valid_from": "2026-10-11T08:00:00+08:00",
+            "version": "1"
+          }
+        }
+      ],
+      "definition_version": "1",
+      "conflicts": [],
+      "missing_fields": [
+        "原因贡献明细"
+      ]
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.120352+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/query_metrics",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "question": "查询当前与基准期间经营指标",
+      "metric_ids": [
+        "sales_quantity",
+        "revenue",
+        "cost",
+        "gross_profit",
+        "gross_margin",
+        "gross_profit_per_tonne"
+      ],
+      "region_id": "region-1",
+      "product_ids": [
+        "product-1"
+      ],
+      "period_start": "2026-10-01",
+      "period_end": "2026-10-10",
+      "comparison_start": "2026-09-01",
+      "comparison_end": "2026-09-10",
+      "currency": "CNY",
+      "trade_scope": "EXTERNAL_SALES",
+      "definition_version": "1"
+    },
+    "status": 200,
+    "response": {
+      "query_id": "2c36aa18-1e67-433d-9c65-e779c4638893",
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "values": [
+        {
+          "metric_id": "sales_quantity",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "5000",
+          "unit": "吨",
+          "formula": "SUM(quantity_tonnes)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "revenue",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "20000000",
+          "unit": "CNY",
+          "formula": "SUM(revenue_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "cost",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "18000000",
+          "unit": "CNY",
+          "formula": "SUM(cost_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "2000000",
+          "unit": "CNY",
+          "formula": "revenue-cost",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_margin",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "10.0",
+          "unit": "%",
+          "formula": "gross_profit/revenue*100",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit_per_tonne",
+          "period_scope": "BASE",
+          "scope_description": "region-1 ['product-1']",
+          "value": "400",
+          "unit": "CNY/吨",
+          "formula": "gross_profit/quantity",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "sales_quantity",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "6000",
+          "unit": "吨",
+          "formula": "SUM(quantity_tonnes)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "revenue",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "24000000",
+          "unit": "CNY",
+          "formula": "SUM(revenue_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "cost",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "22080000",
+          "unit": "CNY",
+          "formula": "SUM(cost_cny)",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "1920000",
+          "unit": "CNY",
+          "formula": "revenue-cost",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_margin",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "8.00",
+          "unit": "%",
+          "formula": "gross_profit/revenue*100",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        },
+        {
+          "metric_id": "gross_profit_per_tonne",
+          "period_scope": "CURRENT",
+          "scope_description": "region-1 ['product-1']",
+          "value": "320",
+          "unit": "CNY/吨",
+          "formula": "gross_profit/quantity",
+          "definition_version": "1",
+          "display_rounding": "原始 Decimal 精度"
+        }
+      ],
+      "detail_refs": [
+        "BASE-0",
+        "BASE-2",
+        "CURRENT-0",
+        "CURRENT-2"
+      ],
+      "sources": [
+        {
+          "source_id": "finance-note",
+          "source_type": "SIMULATED",
+          "version": "1",
+          "locator": "sqlite:documents/finance-note",
+          "business_as_of": "2026-10-10T23:59:59+08:00",
+          "source_updated_at": "2026-10-11T08:00:00+08:00",
+          "read_at": "2026-10-22T06:18:39.112885+00:00",
+          "coverage": "region-1 水产饲料外销，两个十日期间",
+          "quality_state": "COMPLETE"
+        }
+      ],
+      "missing_fields": [],
+      "unexplained_causes": [
+        "原因贡献明细尚未提供"
+      ]
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.129959+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/query_metrics",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "question": "查询当前与基准期间经营指标",
+      "metric_ids": [
+        "sales_quantity",
+        "revenue",
+        "cost",
+        "gross_profit",
+        "gross_margin",
+        "gross_profit_per_tonne"
+      ],
+      "region_id": "unavailable",
+      "product_ids": [
+        "product-1",
+        "product-2"
+      ],
+      "period_start": "2026-10-01",
+      "period_end": "2026-10-10",
+      "comparison_start": "2026-09-01",
+      "comparison_end": "2026-09-10",
+      "currency": "CNY",
+      "trade_scope": "EXTERNAL_SALES",
+      "definition_version": "1"
+    },
+    "status": 400,
+    "response": "范围或口径不可用"
+  },
+  {
+    "at": "2026-10-22T06:18:39.137072+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "local-a",
+      "action": "create_assignment",
+      "payload": {
+        "content_version": "1",
+        "coordinator_id": "coordinator-1",
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "related_meeting_id": "meeting-1",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "source_refs": [
+          "finance-note"
+        ]
+      }
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.145605+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "idempotency_key": "create-1"
+    },
+    "status": 200,
+    "response": {
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "status": "OPEN",
+      "version": "1",
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "execution_namespace": "local-a",
+      "persisted_at": "2026-10-22T06:18:39.142998+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.152464+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "idempotency_key": "create-1"
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "execution_namespace": "local-a",
+      "persisted_at": "2026-10-22T06:18:39.142998+00:00",
+      "status": "OPEN",
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "version": "1"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.158412+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "未经授权的内容",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "idempotency_key": "create-1"
+    },
+    "status": 403,
+    "response": "授权对象或内容版本不符"
+  },
+  {
+    "at": "2026-10-22T06:18:39.164016+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "local-a",
+      "action": "create_assignment",
+      "payload": {
+        "content_version": "1",
+        "coordinator_id": "coordinator-1",
+        "purpose": "另一个获准模拟任务",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "related_meeting_id": "meeting-1",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "source_refs": [
+          "finance-note"
+        ]
+      }
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "8304c183-fb79-4fa7-b1f6-5cca1d7ee090"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.170187+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "另一个获准模拟任务",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "8304c183-fb79-4fa7-b1f6-5cca1d7ee090",
+      "idempotency_key": "create-1"
+    },
+    "status": 409,
+    "response": "幂等内容冲突"
+  },
+  {
+    "at": "2026-10-22T06:18:39.175365+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/query_metrics",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "coordinator-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "question": "查询当前与基准期间经营指标",
+      "metric_ids": [
+        "sales_quantity",
+        "revenue",
+        "cost",
+        "gross_profit",
+        "gross_margin",
+        "gross_profit_per_tonne"
+      ],
+      "region_id": "region-1",
+      "product_ids": [
+        "product-1",
+        "product-2"
+      ],
+      "period_start": "2026-10-01",
+      "period_end": "2026-10-10",
+      "comparison_start": "2026-09-01",
+      "comparison_end": "2026-09-10",
+      "currency": "CNY",
+      "trade_scope": "EXTERNAL_SALES",
+      "definition_version": "1"
+    },
+    "status": 403,
+    "response": "本人或数据版本不符"
+  },
+  {
+    "at": "2026-10-22T06:18:39.180825+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "local-a",
+      "action": "send_assignment",
+      "payload": {
+        "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+        "task_version": "1",
+        "recipient_id": "coordinator-1",
+        "body": "提交当前会议关联的毛利变化解释、措施和证据",
+        "content_version": "1"
+      }
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "a73c708e-7287-47f1-ae4d-dece7dbe174d"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.189972+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/send_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "task_version": "1",
+      "recipient_id": "coordinator-1",
+      "body": "提交当前会议关联的毛利变化解释、措施和证据",
+      "content_version": "1",
+      "authorization_id": "a73c708e-7287-47f1-ae4d-dece7dbe174d",
+      "idempotency_key": "send-1"
+    },
+    "status": 200,
+    "response": {
+      "message_id": "1185f69a-0757-4091-8df6-7f756478cf55",
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "message_status": "SENT",
+      "task_status": "WAITING_FEEDBACK",
+      "task_version": "2",
+      "source_type": "SIMULATED",
+      "sent_at": "2026-10-22T06:18:39.187616+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.197168+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/send_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "task_version": "1",
+      "recipient_id": "coordinator-1",
+      "body": "提交当前会议关联的毛利变化解释、措施和证据",
+      "content_version": "1",
+      "authorization_id": "a73c708e-7287-47f1-ae4d-dece7dbe174d",
+      "idempotency_key": "send-1"
+    },
+    "status": 200,
+    "response": {
+      "message_id": "1185f69a-0757-4091-8df6-7f756478cf55",
+      "message_status": "SENT",
+      "sent_at": "2026-10-22T06:18:39.187616+00:00",
+      "source_type": "SIMULATED",
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "task_status": "WAITING_FEEDBACK",
+      "task_version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.210362+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/read_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-2"
+      },
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469"
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "completion_authorization_id": null,
+      "coordinator_id": "coordinator-1",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "execution_namespace": "local-a",
+      "feedback_ids": [],
+      "message_ids": [
+        "1185f69a-0757-4091-8df6-7f756478cf55"
+      ],
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "related_meeting_id": "meeting-1",
+      "source_refs": [
+        "finance-note"
+      ],
+      "status": "WAITING_FEEDBACK",
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "timezone": "Asia/Shanghai",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.215152+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "idempotency_key": "create-1"
+    },
+    "status": 403,
+    "response": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T06:18:39.222320+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "local-a",
+      "action": "send_assignment",
+      "payload": {
+        "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+        "task_version": "1",
+        "recipient_id": "coordinator-1",
+        "body": "提交当前会议关联的毛利变化解释、措施和证据",
+        "content_version": "1"
+      }
+    },
+    "status": 403,
+    "response": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T06:18:39.241853+00:00",
+    "role": "MAINTAINER",
+    "method": "GET",
+    "route": "/spaces/local-a/context",
+    "input": null,
+    "status": 403,
+    "response": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T06:18:39.245880+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/local-a/memory",
+    "input": {
+      "version": "1",
+      "text": "无权修改"
+    },
+    "status": 403,
+    "response": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T06:18:39.250451+00:00",
+    "role": null,
+    "method": "POST",
+    "route": "/operations/read_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-2"
+      },
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469"
+    },
+    "status": 401,
+    "response": "未认证"
+  },
+  {
+    "at": "2026-10-22T06:18:39.255568+00:00",
+    "role": null,
+    "method": "GET",
+    "route": "/spaces/local-a/context",
+    "input": null,
+    "status": 401,
+    "response": "未认证"
+  },
+  {
+    "at": "2026-10-22T06:18:39.261590+00:00",
+    "role": "BOSS",
+    "method": "PUT",
+    "route": "/spaces/local-a/memory",
+    "input": {
+      "version": "1",
+      "text": "简报优先显示待决定事项",
+      "confirmation_state": "CONFIRMED"
+    },
+    "status": 200,
+    "response": {
+      "confirmation_state": "CONFIRMED",
+      "memory_id": "memory-1",
+      "memory_version": "2",
+      "text": "简报优先显示待决定事项",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.268144+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/local-a/configuration",
+    "input": {
+      "version": "1",
+      "max_tool_rounds": 8
+    },
+    "status": 200,
+    "response": {
+      "api_type": "chat_completions",
+      "config_id": "runtime-1",
+      "credential_ref": "connection.json:credential_file",
+      "enabled": true,
+      "max_tool_rounds": 8,
+      "model_id": "deepseek-flash",
+      "provider": "deepseek",
+      "timeout": 120,
+      "tool_scope": [
+        "query_metrics",
+        "read_evidence",
+        "create_assignment",
+        "send_assignment",
+        "read_assignment"
+      ],
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.273454+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/local-a/context",
+    "input": null,
+    "status": 200,
+    "response": {
+      "memory": {
+        "confirmation_state": "CONFIRMED",
+        "memory_id": "memory-1",
+        "memory_version": "2",
+        "text": "简报优先显示待决定事项",
+        "version": "2"
+      },
+      "memory_version": "2",
+      "configuration": {
+        "api_type": "chat_completions",
+        "config_id": "runtime-1",
+        "credential_ref": "connection.json:credential_file",
+        "enabled": true,
+        "max_tool_rounds": 8,
+        "model_id": "deepseek-flash",
+        "provider": "deepseek",
+        "timeout": 120,
+        "tool_scope": [
+          "query_metrics",
+          "read_evidence",
+          "create_assignment",
+          "send_assignment",
+          "read_assignment"
+        ],
+        "version": "2"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.279205+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/local-a/configuration",
+    "input": {
+      "version": "1",
+      "max_tool_rounds": 4
+    },
+    "status": 409,
+    "response": "版本冲突"
+  },
+  {
+    "at": "2026-10-22T06:18:39.288233+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/local-a/events",
+    "input": {
+      "event_id": "event-1"
+    },
+    "status": 200,
+    "response": {
+      "state": "DELIVERED",
+      "event_id": "event-1",
+      "schedule_version": "1",
+      "source_type": "SIMULATED",
+      "created_at": "2026-10-22T06:18:39.286837+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.294139+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/local-a/events",
+    "input": {
+      "event_id": "event-1"
+    },
+    "status": 200,
+    "response": {
+      "state": "SUPPRESSED",
+      "reason": "重复事件"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.300171+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/local-a/schedule",
+    "input": {
+      "version": "1",
+      "enabled": false
+    },
+    "status": 200,
+    "response": {
+      "canceled": false,
+      "enabled": false,
+      "schedule_id": "schedule-1",
+      "schedule_version": "2",
+      "timezone": "Asia/Shanghai",
+      "trigger": "EVENT_OR_TIME",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.306152+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/local-a/events",
+    "input": {
+      "event_id": "event-2"
+    },
+    "status": 200,
+    "response": {
+      "state": "SUPPRESSED",
+      "reason": "计划暂停或取消"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:39.312862+00:00",
+    "role": "BOSS",
+    "method": "PUT",
+    "route": "/spaces/local-a/memory",
+    "input": {
+      "version": "2",
+      "confirmation_state": "DELETED"
+    },
+    "status": 200,
+    "response": {
+      "confirmation_state": "DELETED",
+      "memory_id": "memory-1",
+      "memory_version": "3",
+      "text": "",
+      "version": "3"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:41.044364+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/read_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-2"
+      },
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469"
+    },
+    "status": 200,
+    "response": {
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "completion_authorization_id": null,
+      "coordinator_id": "coordinator-1",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "execution_namespace": "local-a",
+      "feedback_ids": [],
+      "message_ids": [
+        "1185f69a-0757-4091-8df6-7f756478cf55"
+      ],
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "related_meeting_id": "meeting-1",
+      "source_refs": [
+        "finance-note"
+      ],
+      "status": "WAITING_FEEDBACK",
+      "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+      "timezone": "Asia/Shanghai",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:41.050577+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/local-a/objects/outbox",
+    "input": null,
+    "status": 200,
+    "response": [
+      {
+        "authorization_id": "a73c708e-7287-47f1-ae4d-dece7dbe174d",
+        "body": "提交当前会议关联的毛利变化解释、措施和证据",
+        "content_version": "1",
+        "envelope": {
+          "dataset_id": "selection",
+          "dataset_version": "1",
+          "execution_namespace": "local-a",
+          "owner_id": "boss-1",
+          "request_id": "query-1",
+          "session_id": "session-1"
+        },
+        "idempotency_key": "send-1",
+        "message_id": "1185f69a-0757-4091-8df6-7f756478cf55",
+        "message_status": "SENT",
+        "recipient_id": "coordinator-1",
+        "sent_at": "2026-10-22T06:18:39.187616+00:00",
+        "source_type": "SIMULATED",
+        "task_id": "3b8fcf8f-2fb4-47cb-ab7c-2594a2c29469",
+        "task_status": "WAITING_FEEDBACK",
+        "task_version": "2"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:18:41.056481+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/local-a/objects/notification",
+    "input": null,
+    "status": 200,
+    "response": [
+      {
+        "created_at": "2026-10-22T06:18:39.286837+00:00",
+        "event_id": "event-1",
+        "schedule_version": "1",
+        "source_type": "SIMULATED",
+        "state": "DELIVERED"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:18:41.063720+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/local-a/context",
+    "input": null,
+    "status": 200,
+    "response": {
+      "memory": null,
+      "memory_version": "3",
+      "configuration": {
+        "api_type": "chat_completions",
+        "config_id": "runtime-1",
+        "credential_ref": "connection.json:credential_file",
+        "enabled": true,
+        "max_tool_rounds": 8,
+        "model_id": "deepseek-flash",
+        "provider": "deepseek",
+        "timeout": 120,
+        "tool_scope": [
+          "query_metrics",
+          "read_evidence",
+          "create_assignment",
+          "send_assignment",
+          "read_assignment"
+        ],
+        "version": "2"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:41.069388+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/local-a/events",
+    "input": {
+      "event_id": "event-3"
+    },
+    "status": 200,
+    "response": {
+      "state": "SUPPRESSED",
+      "reason": "计划暂停或取消"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:41.079388+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/local-a/reset",
+    "input": {
+      "namespace": "local-c"
+    },
+    "status": 200,
+    "response": {
+      "namespace": "local-c",
+      "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:41.089985+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "query-1",
+        "owner_id": "boss-1",
+        "execution_namespace": "local-a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "session-1"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "5b61fdb0-6901-4654-87a4-ccd41ffa5e08",
+      "idempotency_key": "create-1"
+    },
+    "status": 409,
+    "response": "执行空间已失效"
+  },
+  {
+    "at": "2026-10-22T06:18:41.096519+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/local-c/objects/task",
+    "input": null,
+    "status": 200,
+    "response": []
+  }
+]

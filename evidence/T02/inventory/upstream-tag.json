@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDORF9GhNoAKGI5ODU3ZDc0NTVlNzViZWE1Y2E1ZDEyNGZlZGM3YWIwMGFhMzFjNzA",
+  "sha": "b9857d7455e75bea5ca5d124fedc7ab00aa31c70",
+  "url": "https://api.github.com/repos/HKUDS/nanobot/git/tags/b9857d7455e75bea5ca5d124fedc7ab00aa31c70",
+  "tagger": {
+    "name": "Xubin Ren",
+    "email": "52506698+Re-bin@users.noreply.github.com",
+    "date": "2026-09-15T19:02:02Z"
+  },
+  "object": {
+    "sha": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+    "type": "commit",
+    "url": "https://api.github.com/repos/HKUDS/nanobot/git/commits/1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
+  },
+  "tag": "v0.3.5",
+  "message": "nanobot v0.3.5\n",
+  "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+  }
+}

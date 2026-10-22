@@ -1,0 +1,157 @@
+{
+  "capability": "DESIGN",
+  "kind": "STATIC",
+  "source_screens": 48,
+  "mapped_screens": 48,
+  "missing_screens": [],
+  "fr_count": 32,
+  "ac_count": 64,
+  "admin_count": 16,
+  "boss_entries": 6,
+  "operation_count": 35,
+  "state_count": 11,
+  "pending_t02_bindings": 23,
+  "full_acceptance": "BLOCKED",
+  "field_label_review": [
+    {
+      "source_id": "WF-FR-01",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-02",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-03",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-04",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-05",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-06",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-07",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-08",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-09",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-10",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-11",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-12",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-13",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-14",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-15",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-16",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-17",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-18",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-19",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-20",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-21",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-22",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-23",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-24",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-25",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-26",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-27",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-28",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-29",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-30",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-31",
+      "missing_element_labels": []
+    },
+    {
+      "source_id": "WF-FR-32",
+      "missing_element_labels": []
+    }
+  ],
+  "ui_structure_audit": {
+    "valid": true,
+    "evidence_kind": "STRUCTURE",
+    "mode": "audit",
+    "screens": 48,
+    "assets": 0,
+    "generated_assets": 0,
+    "interaction_verified": false,
+    "visual_verified": false
+  },
+  "interaction": "NOT_RUN",
+  "visual": "NOT_RUN"
+}

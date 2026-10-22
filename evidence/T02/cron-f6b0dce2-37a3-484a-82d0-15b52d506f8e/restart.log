@@ -1,0 +1,4 @@
+2026-10-22 14:12:16.038 | INFO     | nanobot.cron.service:start:492 - Cron service started with 1 jobs
+2026-10-22 14:12:17.802 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'T02 实际调度' (9f519bdd)
+2026-10-22 14:12:17.806 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'T02 实际调度' completed
+2026-10-22 14:12:17.808 | INFO     | nanobot.cron.service:remove_job:789 - Cron: removed job 9f519bdd

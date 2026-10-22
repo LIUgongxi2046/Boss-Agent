@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-22T07:01:58.242035+00:00",
+  "status": "PASS",
+  "scope": "本轮选型交接：当前 receipt 与源码 hash、两次实际模型证据、37 项真实状态完整性、固定两端组件路径；未替代未执行的产品检查",
+  "receipts": [
+    {
+      "id": "E02-MODELS",
+      "check_id": "K02-models",
+      "receipt": "evidence/T02/feasibility-bound-models/receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "E02-RUNTIME",
+      "check_id": "K02-runtime",
+      "receipt": "evidence/T02/feasibility-bound-runtime/receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "E02-FAULTS",
+      "check_id": "K02-runtime",
+      "receipt": "evidence/T02/feasibility-bound-faults/receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "E02-UI",
+      "check_id": "K02-ui-reuse",
+      "receipt": "evidence/T02/feasibility-bound-reuse/receipt.json",
+      "status": "PASS"
+    },
+    {
+      "id": "E02-DESKTOP",
+      "check_id": "K02-desktop",
+      "receipt": "evidence/T02/feasibility-bound-desktop/receipt.json",
+      "status": "PASS"
+    }
+  ],
+  "model_runs": [
+    "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+    "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e"
+  ],
+  "baseline_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+  "assertion_status_counts": {
+    "PARTIAL": 11,
+    "PASS": 26
+  },
+  "source_locations": 32
+}

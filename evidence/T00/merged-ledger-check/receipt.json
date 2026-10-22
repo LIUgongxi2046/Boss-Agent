@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "T00-ledger",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    ".planning-checks/venv/bin/python",
+    "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py",
+    "delivery-ledger.json"
+  ],
+  "started_at": "2026-10-21T07:19:36.220400+00:00",
+  "ended_at": "2026-10-21T07:19:40.027599+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/delivery-ledger.json",
+      "sha256": "d2d3d4e1bbe5efe111dd667b732f2ce6e48bfc0516f391627bcecee501b204a7"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "ec8657bd63359c340b996ec944eafe4dd805e4c981f203e752a9c2d02496010e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/merged-design-check/receipt.json",
+      "sha256": "c411cb0e680656936a919f9d754619bd8ea94abac089879383a3d1c90c59853c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/merged-ledger-check/output.log",
+      "sha256": "34a91c8e2b80bb1a9b36937b104a0eadea7c0b16dcd09bb9fd5d95795bfc21fc"
+    }
+  ]
+}

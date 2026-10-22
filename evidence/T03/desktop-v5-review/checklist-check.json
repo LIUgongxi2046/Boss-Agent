@@ -1,0 +1,29 @@
+{
+  "checklist": "docs/桌面设计修改清单-v5.md",
+  "page_sections": [
+    "F01",
+    "F06",
+    "N05",
+    "F05",
+    "F11",
+    "F13",
+    "F27",
+    "N02",
+    "N03",
+    "A03",
+    "A04",
+    "A08",
+    "A09",
+    "A10",
+    "A13",
+    "F32",
+    "D04",
+    "D05",
+    "D06",
+    "F26",
+    "N08"
+  ],
+  "checklist_items": 96,
+  "links_checked": 22,
+  "design_files_modified": false
+}

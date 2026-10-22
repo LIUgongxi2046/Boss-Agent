@@ -1,0 +1,14 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.goto: Navigation to "http://127.0.0.1:8872/" is interrupted by another navigation to "http://127.0.0.1:8872/"
+Call log:
+[2m  - navigating to "http://127.0.0.1:8872/", waiting until "networkidle"[22m
+
+    at start (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:22:14)
+    at async main (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:27:29) {
+  name: 'Error'
+}
+
+Node.js v24.13.0

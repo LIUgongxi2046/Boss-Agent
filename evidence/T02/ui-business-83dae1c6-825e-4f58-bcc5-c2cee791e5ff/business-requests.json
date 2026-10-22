@@ -1,0 +1,51 @@
+[
+  {
+    "at": "2026-10-22T06:41:19.203536+00:00",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "ui-check",
+      "action": "create_assignment",
+      "payload": {
+        "content_version": "1",
+        "coordinator_id": "coordinator-1",
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "related_meeting_id": "meeting-1",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "source_refs": [
+          "finance-note"
+        ]
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "22f565fd-67fd-488e-9539-5c7d28ec34a0"
+    }
+  },
+  {
+    "at": "2026-10-22T06:41:26.475110+00:00",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "ui-check",
+      "action": "send_assignment",
+      "payload": {
+        "task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef",
+        "task_version": "1",
+        "recipient_id": "coordinator-1",
+        "body": "提交当前会议关联的毛利变化解释、措施和证据",
+        "content_version": "1"
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "5af51141-c0e8-4a9f-9f99-1406b1cb01e9"
+    }
+  }
+]

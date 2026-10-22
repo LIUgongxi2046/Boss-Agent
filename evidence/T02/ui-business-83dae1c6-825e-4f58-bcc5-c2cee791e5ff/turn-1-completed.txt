@@ -1,0 +1,141 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "@dova 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+        - listitem:
+          - button "@royi 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@lolu 生成简报并查询region-1经营指标"
+          - button "Topic actions for 生成简报并查询region-1经营指标":
+            - img
+        - listitem:
+          - button "@gane 当前会话无已确认阅读要求"
+          - button "Topic actions for 当前会话无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@soro 生成简报并查询区域销售指标"
+          - button "Topic actions for 生成简报并查询区域销售指标":
+            - img
+        - listitem:
+          - button "@mita 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@havi 生成简报并查询 region-1 指标"
+          - button "Topic actions for 生成简报并查询 region-1 指标":
+            - img
+        - listitem:
+          - button "@tiyu 生成简报并查询 region-1 经营指标"
+          - button "Topic actions for 生成简报并查询 region-1 经营指标":
+            - img
+      - button "8 hidden topics"
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 02:41 PM
+      - button "Copy"
+      - paragraph: 已查询并读取原始依据。口径：region-1、product-1 + product-2、CNY、EXTERNAL_SALES、definition_version=1；本期 2026-10-01~10-10，对比期 2026-09-01~09-10。
+      - heading "指标汇总" [level=2]
+      - region "Data table":
+        - table:
+          - rowgroup:
+            - row "指标 对比期（9/1–9/10） 本期（10/1–10/10） 变化":
+              - cell "指标"
+              - cell "对比期（9/1–9/10）"
+              - cell "本期（10/1–10/10）"
+              - cell "变化"
+          - rowgroup:
+            - row "销量（吨） 10,000 12,000 +2,000（+20.0%）":
+              - cell "销量（吨）"
+              - cell "10,000"
+              - cell "12,000"
+              - cell "+2,000（+20.0%）"
+            - row "收入（CNY） 40,000,000 48,000,000 +8,000,000（+20.0%）":
+              - cell "收入（CNY）"
+              - cell "40,000,000"
+              - cell "48,000,000"
+              - cell "+8,000,000（+20.0%）"
+            - row "成本（CNY） 36,000,000 44,160,000 +8,160,000（+22.7%）":
+              - cell "成本（CNY）"
+              - cell "36,000,000"
+              - cell "44,160,000"
+              - cell "+8,160,000（+22.7%）"
+            - row "毛利（CNY） 4,000,000 3,840,000 −160,000（−4.0%）":
+              - cell "毛利（CNY）"
+              - cell "4,000,000"
+              - cell "3,840,000"
+              - cell "−160,000（−4.0%）"
+            - row "毛利率 10.00% 8.00% −2.00 个百分点":
+              - cell "毛利率"
+              - cell "10.00%"
+              - cell "8.00%"
+              - cell "−2.00 个百分点"
+            - row "单吨毛利（CNY/吨） 400 320 −80（−20.0%）":
+              - cell "单吨毛利（CNY/吨）"
+              - cell "400"
+              - cell "320"
+              - cell "−80（−20.0%）"
+      - heading "原始依据（finance-note，version 1，业务时点 2026-10-10 23:59:59 +08:00，质量状态 COMPLETE）" [level=2]
+      - paragraph: 对比期 4 条明细（每条 2,500 吨 / 收入 10,000,000 / 成本 9,000,000）：
+      - list:
+        - listitem: BASE-0：product-1，customer-1，factory-1
+        - listitem: BASE-1：product-2，customer-2，factory-2
+        - listitem: BASE-2：product-1，customer-3，factory-1
+        - listitem: BASE-3：product-2，customer-4，factory-2
+      - paragraph: 本期 4 条明细（每条 3,000 吨 / 收入 12,000,000 / 成本 11,040,000）：
+      - list:
+        - listitem: CURRENT-0：product-1，customer-1，factory-1
+        - listitem: CURRENT-1：product-2，customer-2，factory-2
+        - listitem: CURRENT-2：product-1，customer-3，factory-1
+        - listitem: CURRENT-3：product-2，customer-4，factory-2
+      - paragraph: 全部记录 legal_entity_id=entity-1、trade_type=EXTERNAL_SALES、version=1；明细加总与上表完全一致，无冲突记录。
+      - heading "要点与缺口" [level=2]
+      - list:
+        - listitem: 量价齐升但盈利下滑：收入与销量同步 +20%，成本 +22.7%，导致毛利 −4.0%、毛利率 −2.0pp、单吨毛利 −80 元/吨。按明细推算，单吨收入由 4,000 元升至 4,000 元（持平），单吨成本由 3,600 元升至 3,680 元（+80 元/吨），即毛利下滑完全来自单位成本上升。
+        - listitem:
+          - text: 数据缺口：
+          - code: missing_fields
+          - text: 与
+          - code: unexplained_causes
+          - text: 均标注“原因贡献明细尚未提供”，因此成本上升的构成原因（原料、工厂、客户结构等）目前无原始依据支撑，不能下结论。
+        - listitem: 另需注意：明细中 product-1 与 product-2 的数值完全相同，且每个期间仅 4 条记录，粒度较粗；如需按产品拆分对比，现有依据无法区分两者差异。
+      - paragraph: 如需，我可以基于此创建交办，要求财务/业务补充成本上升的原因贡献明细。
+      - button "Copy"
+      - button "Fork"
+      - time: 02:41 PM
+    - textbox "Message 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Context 3%. Open context usage"
+    - button "Voice input":
+      - img
+    - button "Send message" [disabled]:
+      - img

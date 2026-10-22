@@ -1,0 +1,101 @@
+2026-10-22 14:17:50.860 | INFO     | nanobot.agent.loop:_register_default_tools:641 - Registered 22 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 14:17:50.861 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from cli:boss-1: 查询合成 region-1 的 product-1 和 product-2 水产饲料外销经营情况，比较 2026-10-01 至 2026-10-10 与 20...
+2026-10-22 14:17:50.861 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage restore completed in 0.7ms
+2026-10-22 14:17:50.861 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage compact completed in 0.0ms
+2026-10-22 14:17:50.861 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage command completed in 0.1ms
+2026-10-22 14:17:50.907 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage build completed in 45.2ms
+2026-10-22 14:17:51.047 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:17:53.803 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: query_metrics({"question": "合成 region-1 的 product-1 和 product-2 水产饲料外销经营情况，比较 2026-10-01 至 2026-10-10 与 2026-09-01 至 2026-09-10", "metric_ids": ["sales_quantity", "revenue", "cost", "gross_profit", "gross_margin", )
+2026-10-22 14:17:53.822 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=3402 output=335 cache_read=3200 cache_write=None source=reported
+2026-10-22 14:17:53.824 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:17:54.837 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_evidence({"query_id": "7d6d5916-9964-4d8b-9225-57a6d1f3e6e1", "source_ids": ["finance-note"], "detail_refs": ["BASE-0", "BASE-1", "BASE-2", "BASE-3", "CURRENT-0", "CURRENT-1", "CURRENT-2", "CURRENT-3"]})
+2026-10-22 14:17:54.843 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=4904 output=149 cache_read=3712 cache_write=None source=reported
+2026-10-22 14:17:54.844 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 2 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:17:58.490 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=6178 output=823 cache_read=4992 cache_write=None source=reported
+2026-10-22 14:17:58.491 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage run completed in 7584.3ms
+2026-10-22 14:17:58.493 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage save completed in 1.9ms
+2026-10-22 14:17:58.493 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to cli:boss-1: 查询完成（query_id 7d6d5916-9964-4d8b-9225-57a6d1f3e6e1，definition_version=1，CNY，EXTERNAL_SALES，region-1，product-1 和 product-...
+2026-10-22 14:17:58.493 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649870860919000] Stage respond completed in 0.1ms
+2026-10-22 14:17:58.497 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from cli:boss-1: 本人授权按以下内容创建交办：{"content_version":"1","coordinator_id":"coordinator-1","due_at":"...
+2026-10-22 14:17:58.497 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage restore completed in 0.4ms
+2026-10-22 14:17:58.498 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage compact completed in 0.0ms
+2026-10-22 14:17:58.498 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage command completed in 0.0ms
+2026-10-22 14:17:58.528 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage build completed in 30.6ms
+2026-10-22 14:17:58.663 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:00.036 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: create_assignment({"content_version": "1", "coordinator_id": "coordinator-1", "purpose": "提交当前会议关联的毛利变化解释、措施和证据", "due_at": "2026-10-25T17:00:00+08:00", "timezone": "Asia/Shanghai", "evidence_requirements": ["原因明细", "措)
+2026-10-22 14:18:00.043 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=7253 output=233 cache_read=6912 cache_write=None source=reported
+2026-10-22 14:18:00.044 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:00.929 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "a9901c45-66da-40b5-a431-1e4a7cbf86df"})
+2026-10-22 14:18:00.937 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=7618 output=62 cache_read=7424 cache_write=None source=reported
+2026-10-22 14:18:00.938 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 2 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:02.574 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=7904 output=191 cache_read=7680 cache_write=None source=reported
+2026-10-22 14:18:02.576 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage run completed in 4047.1ms
+2026-10-22 14:18:02.578 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage save completed in 2.3ms
+2026-10-22 14:18:02.578 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to cli:boss-1: 交办已按授权创建，并已回读确认。
+
+  任务号        a9901c45-66da-40b5-a431-1e4a7cbf86df
+  版本          1
+  状态          OPEN（尚未发送）
+  协调人      ...
+2026-10-22 14:18:02.578 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649878497508000] Stage respond completed in 0.2ms
+2026-10-22 14:18:02.583 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from cli:boss-1: 本人授权按以下内容模拟发送交办：{"body":"提交当前会议关联的毛利变化解释、措施和证据","content_version":"1","recipient...
+2026-10-22 14:18:02.583 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage restore completed in 0.2ms
+2026-10-22 14:18:02.583 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage compact completed in 0.0ms
+2026-10-22 14:18:02.583 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage command completed in 0.0ms
+2026-10-22 14:18:02.614 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage build completed in 30.4ms
+2026-10-22 14:18:02.734 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:04.042 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: send_assignment({"task_id": "a9901c45-66da-40b5-a431-1e4a7cbf86df", "task_version": "1", "recipient_id": "coordinator-1", "body": "提交当前会议关联的毛利变化解释、措施和证据", "content_version": "1"})
+2026-10-22 14:18:04.051 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=8308 output=144 cache_read=8064 cache_write=None source=reported
+2026-10-22 14:18:04.052 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:04.797 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "a9901c45-66da-40b5-a431-1e4a7cbf86df"})
+2026-10-22 14:18:04.803 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=8571 output=62 cache_read=8320 cache_write=None source=reported
+2026-10-22 14:18:04.804 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 2 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4
+2026-10-22 14:18:06.493 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=8886 output=215 cache_read=8576 cache_write=None source=reported
+2026-10-22 14:18:06.495 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage run completed in 3881.4ms
+2026-10-22 14:18:06.497 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage save completed in 2.1ms
+2026-10-22 14:18:06.498 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to cli:boss-1: 模拟发送已完成，并已回读确认。
+
+  任务号      a9901c45-66da-40b5-a431-1e4a7cbf86df
+  任务版本    2（发送后递增）
+  任务状态    WAITING_FEEDBACK
+  消息号    ...
+2026-10-22 14:18:06.498 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4:1792649882582979000] Stage respond completed in 0.1ms
+2026-10-22 14:18:06.500 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from cli:boss-1: 重新查询交办 a9901c45-66da-40b5-a431-1e4a7cbf86df 的正式状态与消息关联。
+2026-10-22 14:18:06.501 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage restore completed in 0.9ms
+2026-10-22 14:18:06.501 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage compact completed in 0.0ms
+2026-10-22 14:18:06.501 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage command completed in 0.0ms
+2026-10-22 14:18:06.530 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage build completed in 28.7ms
+2026-10-22 14:18:06.650 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback
+2026-10-22 14:18:07.759 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "a9901c45-66da-40b5-a431-1e4a7cbf86df"})
+2026-10-22 14:18:07.771 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=3324 output=62 cache_read=2944 cache_write=None source=reported
+2026-10-22 14:18:07.773 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback
+2026-10-22 14:18:09.684 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=3639 output=245 cache_read=3328 cache_write=None source=reported
+2026-10-22 14:18:09.686 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage run completed in 3156.6ms
+2026-10-22 14:18:09.688 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage save completed in 1.7ms
+2026-10-22 14:18:09.688 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to cli:boss-1: 交办 a9901c45-66da-40b5-a431-1e4a7cbf86df 的正式状态如下：
+
+状态：WAITING_FEEDBACK（等待反馈）
+版本：2
+授权 ID：578047b1-40aa-4deb-a578-f9a0be17c...
+2026-10-22 14:18:09.689 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4-readback:1792649886500144000] Stage respond completed in 0.2ms
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py", line 163, in <module>
+    asyncio.run(main())
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py", line 159, in main
+    await run_once(os.environ["DEEPSEEK_MODEL"], iteration)
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py", line 139, in run_once
+    assert provider.requests and all(record["url"].endswith("/chat/completions") for record in provider.requests)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py", line 139, in <genexpr>
+    assert provider.requests and all(record["url"].endswith("/chat/completions") for record in provider.requests)
+                                     ~~~~~~^^^^^^^
+KeyError: 'url'

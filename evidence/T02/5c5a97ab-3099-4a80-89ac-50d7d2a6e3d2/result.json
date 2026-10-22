@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "scope": "真实 HTTP 与 SQLite 模拟业务服务检查；不代表模型、上游页面或桌面验收",
+  "run_id": "5c5a97ab-3099-4a80-89ac-50d7d2a6e3d2",
+  "requests": 37,
+  "snapshot_sha256": "8e4b87f946494174f14fb350667364ebce3b517efbba230982d975860560a401",
+  "numeric_changes": {
+    "sales_quantity": "20.0",
+    "revenue": "20.0",
+    "gross_profit": "-4.00",
+    "gross_profit_per_tonne": "-20.0"
+  },
+  "checks": [
+    "相同初始快照",
+    "明细复算",
+    "产品维度查询",
+    "原始依据",
+    "授权创建与发送",
+    "独立重读",
+    "重复写入",
+    "内容越权拒绝",
+    "维护越权拒绝",
+    "未认证拒绝",
+    "记忆版本与删除",
+    "配置版本与冲突",
+    "事件重复抑制",
+    "暂停",
+    "实际进程重启",
+    "重置隔离"
+  ],
+  "finished_at": "2026-10-22T04:50:47.180726+00:00",
+  "code_sha256": {
+    "business.py": "5ffb1c8d509400542a785d193c245de859c53b49bf260d859444f259d8a9d68e",
+    "service.py": "4ecbd1d9c493aafa7fd1159fbb58e0bb1bf28135af001299a31db16c87ed76ab",
+    "check_local.py": "1a3b5c5cc3f4be34db0c2fd5dd4763de7c4b7e14c867f66ad95ca737451e6e60"
+  }
+}

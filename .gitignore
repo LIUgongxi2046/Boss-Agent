@@ -1,0 +1,18 @@
+.research-cache/
+.planning-checks/
+validation/.work/
+validation/.venv/
+validation/.env
+validation/__pycache__/
+boss agent.md
+validation/desktop/node_modules/
+.DS_Store
+__pycache__/
+*.py[cod]
+node_modules/
+.env
+.env.*
+!.env.example
+.venv/
+*.pem
+*.key

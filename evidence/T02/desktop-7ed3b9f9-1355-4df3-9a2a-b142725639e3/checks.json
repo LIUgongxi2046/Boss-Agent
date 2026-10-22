@@ -1,0 +1,61 @@
+[
+  {
+    "at": "2026-10-22T05:59:21.599Z",
+    "check": "desktop_start",
+    "result": {
+      "versions": {
+        "node": "24.22.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "150",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.11",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.6.75.19-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "45.0.0",
+        "chrome": "156.0.8078.48"
+      },
+      "service_pid": 14851,
+      "platform": "darwin",
+      "architecture": "x64",
+      "microphone": "granted",
+      "notifications_supported": true
+    }
+  },
+  {
+    "at": "2026-10-22T05:59:21.605Z",
+    "check": "admin_configuration_reloaded",
+    "result": {
+      "at": "2026-10-22T05:59:14.641137+00:00",
+      "baseline": {
+        "namespace": "ui-check",
+        "snapshot_sha256": "8e4b87f946494174f14fb350667364ebce3b517efbba230982d975860560a401"
+      },
+      "max_output_tokens": 4096,
+      "max_tool_rounds": 8,
+      "model": "deepseek-flash",
+      "pid": 14851
+    }
+  }
+]

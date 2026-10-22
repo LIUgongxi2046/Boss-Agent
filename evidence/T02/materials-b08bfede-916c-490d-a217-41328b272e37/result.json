@@ -1,0 +1,162 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T06:10:42.112274+00:00",
+  "baseline": {
+    "namespace": "materials-b08bfede-916c-490d-a217-41328b272e37",
+    "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+  },
+  "generator_version": "T02-3",
+  "fields": [
+    {
+      "object_id": "IM01",
+      "rows": 1,
+      "required_fields": [
+        "owner_id",
+        "goals",
+        "timezone",
+        "confirmed_reading_requirement",
+        "version"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM02",
+      "rows": 3,
+      "required_fields": [
+        "contact_id",
+        "name",
+        "organization",
+        "responsibility",
+        "valid_from",
+        "valid_until"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM03",
+      "rows": 8,
+      "required_fields": [
+        "record_id",
+        "region_id",
+        "product_id",
+        "legal_entity_id",
+        "customer_id",
+        "factory_id",
+        "period",
+        "quantity_tonnes",
+        "revenue_cny",
+        "cost_cny",
+        "trade_type",
+        "version"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM04",
+      "rows": 6,
+      "required_fields": [
+        "metric_id",
+        "formula",
+        "unit",
+        "precision",
+        "definition_version",
+        "scope",
+        "settlement_state"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM05",
+      "rows": 1,
+      "required_fields": [
+        "meeting_id",
+        "owner_id",
+        "participant_ids",
+        "starts_at",
+        "timezone",
+        "material_ids",
+        "historical_commitment_ids",
+        "version"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM06",
+      "rows": 2,
+      "required_fields": [
+        "source_id",
+        "author_contact_id",
+        "version",
+        "source_type",
+        "published_at",
+        "valid_from",
+        "access_scope",
+        "original_locator"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM07",
+      "rows": 1,
+      "required_fields": [
+        "event_id",
+        "coordinator_id",
+        "meeting_id",
+        "task_id",
+        "owner_id",
+        "status",
+        "due_at",
+        "evidence_requirements",
+        "version"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM08",
+      "rows": 1,
+      "required_fields": [
+        "calendar_id",
+        "owner_id",
+        "starts_at",
+        "ends_at",
+        "timezone",
+        "private_body",
+        "visibility"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM09",
+      "rows": 1,
+      "required_fields": [
+        "config_id",
+        "version",
+        "provider",
+        "api_type",
+        "model_id",
+        "credential_ref",
+        "tool_scope",
+        "timeout",
+        "max_tool_rounds"
+      ],
+      "status": "PASS"
+    },
+    {
+      "object_id": "IM10",
+      "rows": 1,
+      "required_fields": [
+        "schedule_id",
+        "schedule_version",
+        "trigger",
+        "timezone",
+        "enabled",
+        "memory_id",
+        "memory_version",
+        "confirmation_state"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "relations": "老板归属、同名人员独立标识、作者、参会人、事件、会议和历史任务关联均已独立检查",
+  "credential_ref": "connection.json:credential_file"
+}

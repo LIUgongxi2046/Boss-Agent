@@ -1,0 +1,170 @@
+Using config: 
+/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream-ins
+tance/config.json
+Provider/model setup is incomplete: No API key configured for provider 
+'deepseek'.
+Gateway will start so you can configure a provider and model in WebUI Settings →
+Models.
+WebUI: http://127.0.0.1:8872
+If prompted, enter the WebUI password from channels.websocket.tokenIssueSecret 
+in 
+/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream-ins
+tance/config.json.
+🐈 Starting nanobot gateway version 0.3.5 on port 18791...
+  Created HEARTBEAT.md
+  Created USER.md
+  Created SOUL.md
+  Created AGENTS.md
+  Created memory/MEMORY.md
+  Created prompts/README.md
+  Created memory/history.jsonl
+2026-10-22 12:10:37 | INFO  | - | Git store initialized at /Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream-instance/workspace
+2026-10-22 12:10:37 | INFO  | - | Registered 23 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'cron', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 12:10:37 | INFO  | - | WebSocket channel enabled as websocket
+✓ Channels enabled: websocket
+✗ Heartbeat: disabled
+○ Dream: disabled
+2026-10-22 12:10:37 | INFO  | - | Cron service started with 0 jobs
+2026-10-22 12:10:37 | INFO  | - | Agent loop started
+2026-10-22 12:10:37 | INFO  | - | Starting websocket channel...
+2026-10-22 12:10:37 | INFO  | - | Local trigger queue started
+2026-10-22 12:10:37 | INFO  | - | Outbound dispatcher started
+✓ Health endpoint: http://127.0.0.1:18791/health
+2026-10-22 12:10:37 | INFO  | websocket | WebSocket server listening on ws://127.0.0.1:8872/
+2026-10-22 12:12:25 | ERROR | - | [websockets] unexpected internal error
+Traceback (most recent call last):
+
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/bin/nanobot", line 10, in <module>
+    sys.exit(main())
+    │   │    └ <function main at 0x10f5a8d60>
+    │   └ <built-in function exit>
+    └ <module 'sys' (built-in)>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/nanobot/cli/entry.py", line 100, in main
+    app()
+    └ <typer.main.Typer object at 0x118270f50>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/main.py", line 1137, in __call__
+    return get_command(self)(*args, **kwargs)
+           │           │      │       └ {}
+           │           │      └ ()
+           │           └ <typer.main.Typer object at 0x118270f50>
+           └ <function get_command at 0x1124e0ea0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/_click/core.py", line 802, in __call__
+    return self.main(*args, **kwargs)
+           │    │     │       └ {}
+           │    │     └ ()
+           │    └ <function TyperGroup.main at 0x1124e0900>
+           └ <_DesktopAwareGroup nanobot>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/core.py", line 1197, in main
+    return _main(
+           └ <function _main at 0x1124caa20>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/core.py", line 187, in _main
+    rv = self.invoke(ctx)
+         │    │      └ <typer._click.core.Context object at 0x117768290>
+         │    └ <function TyperGroup.invoke at 0x1124e04a0>
+         └ <_DesktopAwareGroup nanobot>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/core.py", line 1119, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <typer._click.core.Context object at 0x11823e8a0>
+           │               │       │       └ <function TyperGroup.invoke at 0x1124e04a0>
+           │               │       └ <TyperGroup gateway>
+           │               └ <typer._click.core.Context object at 0x11823e8a0>
+           └ <function TyperGroup.invoke.<locals>._process_result at 0x118336b60>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/core.py", line 1100, in invoke
+    rv = super().invoke(ctx)
+                        └ <typer._click.core.Context object at 0x11823e8a0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/_click/core.py", line 741, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'config': '/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream-instance/config.json', 'foreground': Tru...
+           │   │      │    │           └ <typer._click.core.Context object at 0x11823e8a0>
+           │   │      │    └ <function create_gateway_app.<locals>.gateway at 0x118335ee0>
+           │   │      └ <TyperGroup gateway>
+           │   └ <function Context.invoke at 0x11233ac00>
+           └ <typer._click.core.Context object at 0x11823e8a0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/_click/core.py", line 483, in invoke
+    return callback(*args, **kwargs)
+           │         │       └ {'config': '/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream-instance/config.json', 'foreground': Tru...
+           │         └ ()
+           └ <function create_gateway_app.<locals>.gateway at 0x118335ee0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/typer/main.py", line 1524, in wrapper
+    return callback(**use_params)
+           │          └ {'ctx': <typer._click.core.Context object at 0x11823e8a0>, 'port': None, 'workspace': None, 'verbose': False, 'config': '/Use...
+           └ <function create_gateway_app.<locals>.gateway at 0x118334c20>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/nanobot/cli/gateway.py", line 245, in gateway
+    run_gateway(
+    └ <function _run_gateway at 0x118306de0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/nanobot/cli/gateway_runtime.py", line 1034, in _run_gateway
+    asyncio.run(run())
+    │       │   └ <function _run_gateway.<locals>.run at 0x119b1de40>
+    │       └ <function run at 0x10f602c00>
+    └ <module 'asyncio' from '/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/__init__.py'>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object _run_gateway.<locals>.run at 0x119ad5e40>
+           │      └ <function Runner.run at 0x1122805e0>
+           └ <asyncio.runners.Runner object at 0x1197be120>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<_run_gateway.<locals>.run() running at /Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/valid...
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x11227e0c0>
+           │    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x1197be120>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x11227e020>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x11227fe20>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x10fc039c0>
+    └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+          │          └ <function ServerConnection.handshake at 0x11840d1c0>
+          └ <websockets.asyncio.server.ServerConnection object at 0x1197f0530>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 142, in handshake
+    async with self.send_context(expected_state=CONNECTING):
+               │    │                           └ <State.CONNECTING: 0>
+               │    └ <function Connection.send_context at 0x11840cae0>
+               └ <websockets.asyncio.server.ServerConnection object at 0x1197f0530>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+          │    │   │      └ AssertionError()
+          │    │   └ <method 'athrow' of 'async_generator' objects>
+          │    └ <async_generator object Connection.send_context at 0x119c8b670>
+          └ <contextlib._AsyncGeneratorContextManager object at 0x1197de600>
+> File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/connection.py", line 896, in send_context
+    yield
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 196, in handshake
+    self.protocol.send_response(self.response)
+    │    │        │             │    └ Response(status_code=200, reason_phrase='OK', headers=Headers([('Date', 'Thu, 22 Oct 2026 04:12:25 GMT'), ('Connection', 'clo...
+    │    │        │             └ <websockets.asyncio.server.ServerConnection object at 0x1197f0530>
+    │    │        └ <function ServerProtocol.send_response at 0x1184b9e40>
+    │    └ <websockets.server.ServerProtocol object at 0x1197f0620>
+    └ <websockets.asyncio.server.ServerConnection object at 0x1197f0530>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/server.py", line 540, in send_response
+    self.send_eof()
+    │    └ <function Protocol.send_eof at 0x1184b94e0>
+    └ <websockets.server.ServerProtocol object at 0x1197f0620>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/protocol.py", line 764, in send_eof
+    assert not self.eof_sent
+               │    └ True
+               └ <websockets.server.ServerProtocol object at 0x1197f0620>
+
+AssertionError: assert not self.eof_sent
+2026-10-22 12:52:36 | INFO  | - | Gateway shutdown requested by SIGTERM
+
+Shutting down... Press Ctrl+C again to force.
+2026-10-22 12:52:36 | INFO  | - | Agent loop stopping
+2026-10-22 12:52:36 | INFO  | - | Stopping all channels...
+2026-10-22 12:52:36 | INFO  | - | Stopped websocket channel

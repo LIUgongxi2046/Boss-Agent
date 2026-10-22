@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-22T04:21:52.728034+00:00",
+  "status": "PASS",
+  "scope": "上游登录、管理配置保存与刷新重读、用户聊天入口 DOM；业务模型任务未执行",
+  "url": "http://127.0.0.1:8872",
+  "before": 8,
+  "saved": 9,
+  "file_reloaded": 9,
+  "model_request_sent": false,
+  "next_model_task_adoption": "NOT_RUN",
+  "desktop": "NOT_RUN"
+}

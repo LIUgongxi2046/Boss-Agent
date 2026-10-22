@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K03",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/venv/bin/python",
+    "evidence/T03/check_interaction.py"
+  ],
+  "started_at": "2026-10-21T12:10:55.003853+00:00",
+  "ended_at": "2026-10-21T12:10:55.718633+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/交互与页面规范.md",
+      "sha256": "e5a4af8e71258e8a9db145fd513feeeb8403816e584015248e6cec934d353635"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/PRD.md",
+      "sha256": "da8e4a76767fb64ea47ad7625bd52cd04c442a89edf858f33939a4133c6727a8"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent需求输入.md",
+      "sha256": "3d923f1a81d1629a56c7127e94396e6377b4c85967370005834d7be9caf6aff0"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/项目决策记录.md",
+      "sha256": "97604161e5b9955f170cc2810f16a8550c645a85f7683b39dec35bf045967948"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent项目计划.md",
+      "sha256": "86d3473903a6da8d6e845eeb5c05c506d4205ed0dcefcf3dd728e358354f050e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/README.md",
+      "sha256": "c27d3ee262650b916453c7cbdf968dab6505c9f1571ffb671eba79af24ebba9d"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "ec8657bd63359c340b996ec944eafe4dd805e4c981f203e752a9c2d02496010e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T03/check_interaction.py",
+      "sha256": "b9ae0b90d2cfd4197e2e5811b95c9efe0dc1f52710a4d4efb5b127f310713c05"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T03/run_design_checks.py",
+      "sha256": "91c7d874945b379de5bd1485b30257369a4ca62d91be79b2770b4dab737ce48c"
+    },
+    {
+      "path": "/Users/liuhaoxian/.agents/skills/haonan-s003-2-ui/scripts/audit_ui_delivery.py",
+      "sha256": "2ff99c7d0082372bf978e61c52c2d355b0d4293b3ebb180ea25d0cff28c272fe"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T03/hifi-delivery-scope/output.log",
+      "sha256": "cead9ab4d97de38ccfa5d2915a33434589307c06ae1564aa24410cb2d291ad35"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/t03-ui-audit/ui-audit.md",
+      "sha256": "32ac4d23b55df21f66409cc5406cf7bbe9ce879aa73cb0f526ad50d0fd166bd4"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/t03-ui-audit/screen-design-map.csv",
+      "sha256": "a01e959808c22e20f6eb293852b400e03e9f29e60733177ba72c201fbc9e6242"
+    }
+  ]
+}

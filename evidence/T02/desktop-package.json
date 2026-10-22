@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-22T06:07:57.408Z",
+  "status": "PASS",
+  "electron": "45.0.0",
+  "packager": "20.3.0",
+  "architecture": "x64",
+  "electron_archive_sha256": "7877c282e74a52f8d87949536a25735cf9982de1265b544c9cd258dd14eff4de",
+  "bundles": [
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/installed/Boss-Agent-Validation-darwin-x64"
+  ],
+  "code_signing": "未配置开发者证书及公证",
+  "dependency_scope": "桌面验证宿主引用本机 validation Python 环境，最终产品安装由 T25 完成"
+}

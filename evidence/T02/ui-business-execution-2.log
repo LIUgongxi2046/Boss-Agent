@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_ui_business.py", line 83, in <module>
+    main()
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_ui_business.py", line 56, in main
+    turn("查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。")
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_ui_business.py", line 50, in turn
+    page.wait_for_function("() => document.querySelector('[aria-label=\"Message input\"]')?.value === ''", timeout=10000)
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 11559, in wait_for_function
+    self._sync(
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/_impl/_page.py", line 1113, in wait_for_function
+    return await self._main_frame.wait_for_function(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 860, in wait_for_function
+    await self._channel.send("waitForFunction", self._timeout, params)
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 10000ms exceeded.

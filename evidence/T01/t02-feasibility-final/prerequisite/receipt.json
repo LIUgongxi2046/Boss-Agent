@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K00",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/bin/python",
+    "evidence/T00/check_strategy.py"
+  ],
+  "started_at": "2026-10-22T06:55:33.542395+00:00",
+  "ended_at": "2026-10-22T06:55:37.363854+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent需求输入.md",
+      "sha256": "854e6e6d49397874d6ed22583b249d753a3caa84135ad20922fab970af1e11e4"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent项目计划.md",
+      "sha256": "d1290389e5aee3792b2c76931b18e0c65993fa80642ccb4dc671c61018b5630e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/项目决策记录.md",
+      "sha256": "b186c9d0e3e5ea6caa04f5d090cf14ff9d4a73729dda5d1e966a15c7c882d0d6"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/value-validation.json",
+      "sha256": "6970d39b8512bac35e7b7a61399da8f3777a539644167c07d20119ee3113f678"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/README.md",
+      "sha256": "bd661e17671487da8b62cb198b2979e4f394e860576e550722538d7806b9b36f"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/run_design_checks.py",
+      "sha256": "ebf4c5e4715074404d98ee3f440537ad0613f3c32578ae7802dc2ceea18c754f"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/run_design_check.py",
+      "sha256": "83168509d6a8c9a73ea15e549b4bc932b6f09b8b49391498fbfb6bf6059397f0"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/check_strategy.py",
+      "sha256": "6b41e873b291b4ec6323c6a3dee8c64bdb7c9ba9075710b3c65dc5ddbc3ac2e5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/t02-feasibility-final/prerequisite/output.log",
+      "sha256": "40d9420a3435fef71e406a7767895ca3273a31f0ef4b7070020246e4af458c23"
+    }
+  ]
+}

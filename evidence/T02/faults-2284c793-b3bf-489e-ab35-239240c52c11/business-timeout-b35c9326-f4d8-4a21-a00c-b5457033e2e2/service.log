@@ -1,0 +1,31 @@
+Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_protocol.py", line 577, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_app.py", line 563, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/service.py", line 26, in authenticate
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/service.py", line 51, in invoke
+    return web.json_response(store.invoke(request.match_info["operation"], await request.json()))
+                                                                           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_request.py", line 773, in json
+    body = await self.text()
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_request.py", line 767, in text
+    bytes_body = await self.read()
+                 ^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_request.py", line 754, in read
+    chunk = await self._payload.readany()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/streams.py", line 465, in readany
+    raise self._exception
+ConnectionResetError: Connection lost
+======== Running on http://127.0.0.1:8874 ========
+(Press CTRL+C to quit)

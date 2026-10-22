@@ -1,0 +1,30 @@
+[
+  {
+    "page": "F05",
+    "action": "create-selected",
+    "expected": "请先勾选",
+    "visible": true,
+    "js_errors": []
+  },
+  {
+    "page": "A08",
+    "action": "enable-model",
+    "expected": "未通过真实验证",
+    "visible": true,
+    "js_errors": []
+  },
+  {
+    "page": "F01",
+    "action": "reorder",
+    "expected": "排序更改",
+    "visible": true,
+    "js_errors": []
+  },
+  {
+    "page": "D06",
+    "action": "full-exit",
+    "expected": "影响范围核查",
+    "visible": true,
+    "js_errors": []
+  }
+]

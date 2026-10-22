@@ -1,0 +1,10 @@
+{
+  "report": "docs/桌面设计审查-v5.md",
+  "report_links_checked": 46,
+  "issues": {
+    "P1": 7,
+    "P2": 4
+  },
+  "design_files_unchanged": 259,
+  "browser_runtime_checks": "NOT_RUN"
+}

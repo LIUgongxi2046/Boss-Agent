@@ -1,0 +1,11 @@
+2026-10-22 13:42:04.915 | INFO     | nanobot.agent.loop:_register_default_tools:641 - Registered 22 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 13:42:05.071 | INFO     | nanobot.channels.manager:_init_channels:303 - WebSocket channel enabled as websocket
+2026-10-22 13:42:05.079 | INFO     | nanobot.cron.service:start:492 - Cron service started with 0 jobs
+应用验证服务已启动
+2026-10-22 13:42:05.081 | INFO     | nanobot.channels.manager:_start_channel_task:392 - Starting websocket channel...
+2026-10-22 13:42:05.081 | INFO     | nanobot.agent.loop:run:1265 - Agent loop started
+2026-10-22 13:42:05.081 | INFO     | nanobot.channels.manager:_dispatch_outbound_loop:769 - Outbound dispatcher started
+2026-10-22 13:42:05.083 | INFO     | nanobot.channels.websocket.runtime:_log_listener_ready:656 - WebSocket server listening on ws://127.0.0.1:8872/
+2026-10-22 13:51:47.649 | INFO     | nanobot.agent.loop:stop:1592 - Agent loop stopping
+2026-10-22 13:51:47.661 | INFO     | nanobot.channels.manager:stop_all:670 - Stopping all channels...
+2026-10-22 13:51:47.682 | INFO     | nanobot.channels.manager:_stop_channel_runtime:414 - Stopped websocket channel

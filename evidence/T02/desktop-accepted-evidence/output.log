@@ -1,0 +1,1 @@
+{"status":"PASS","at":"2026-10-22T06:33:04.732Z","scope":"Electron 实际启动、两端状态采用、IPC 拒绝、窗口关闭与进程重启；系统休眠及 OS 权限完整过程尚未执行","checks":15,"system_sleep":"NOT_RUN","os_permissions":"PARTIAL","evidence":"/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/desktop-1be6c579-3cce-44d0-a855-943980e8e5ff"}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K01",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/venv/bin/python",
+    "evidence/T01/check_prd.py"
+  ],
+  "started_at": "2026-10-21T09:23:36.729917+00:00",
+  "ended_at": "2026-10-21T09:23:39.652991+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent需求输入.md",
+      "sha256": "3d923f1a81d1629a56c7127e94396e6377b4c85967370005834d7be9caf6aff0"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/Boss-Agent项目计划.md",
+      "sha256": "4fd2c3ee55a22fcbf866069f94bf3cc7412ee67c49a19de080cce9c58a64cead"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/项目决策记录.md",
+      "sha256": "368a847cbf48c8e1fb6cf0a3dc24f8eb19ba6c6ee77c76eb4afd3afc30d75d12"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/value-validation.json",
+      "sha256": "1bdba82cf8f1b5f4743342fe7d6651f0ebe728870d2e8e85a8788e76064294b9"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/README.md",
+      "sha256": "d0b86ac002adeaf4bfca962c5ea741f07319200d2289262c0248e248edc8e636"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "ec8657bd63359c340b996ec944eafe4dd805e4c981f203e752a9c2d02496010e"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/run_design_checks.py",
+      "sha256": "ebf4c5e4715074404d98ee3f440537ad0613f3c32578ae7802dc2ceea18c754f"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/PRD.md",
+      "sha256": "9d3991349bb6409628063dba16412988c433751565fb43018b5dcaca320e84a5"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/selection-probe.json",
+      "sha256": "14e171127505362de209a53c4993253d40c9f9b3c3f9fd32994e0f4685e654e8"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/check_mermaid.mjs",
+      "sha256": "8f8349366647da9a6fabfc41a2017d7f5330c572238db756bac08d1543fa82dd"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/package.json",
+      "sha256": "8c19de240cc6689dc1cedbcaed5dcfed87711b875829c8905b0f6d5d31fbfdbf"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/.planning-checks/package-lock.json",
+      "sha256": "9247eee8ecc449a1a279f6de45b4aadc0bc470a539e28948b536e29d79282b0f"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/check_prd.py",
+      "sha256": "643d8754caee4b4472c3771030f4625143254eb74e2359639a4edd42f21fa9b8"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/review-wireframes/prd/output.log",
+      "sha256": "fd00b1f2bf23d890f8db9f70ca0e4f29ef65ebd97b6bf499860054ca1d8b708d"
+    }
+  ]
+}

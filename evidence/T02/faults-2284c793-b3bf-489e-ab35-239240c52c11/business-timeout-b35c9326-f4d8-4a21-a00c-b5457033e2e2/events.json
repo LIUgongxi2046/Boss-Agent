@@ -1,0 +1,16 @@
+[
+  {
+    "at": "2026-10-22T06:37:53.482641+00:00",
+    "type": "tool_error",
+    "name": "query_metrics",
+    "error_type": "ReadTimeout",
+    "error": ""
+  },
+  {
+    "at": "2026-10-22T06:37:53.483789+00:00",
+    "type": "run_error",
+    "stop_reason": "error",
+    "exception_type": "RuntimeError",
+    "error": "业务接口实际请求失败"
+  }
+]

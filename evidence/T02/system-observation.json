@@ -1,0 +1,12 @@
+{
+  "recorded_date": "2026-10-22",
+  "source": "当前用户会话与实际系统检查记录",
+  "user_observation": "没有看到这个授权，不过没关系，继续推进选型吧",
+  "application_evidence": "system-91d8bb33-e590-4954-988e-cdb4ddbce40d/checks.json",
+  "observed_api_state": "granted",
+  "observed_audio_track": "live 后经明确停止操作变为 ended；没有保存音频",
+  "os_allow_deny_revoke_sequence": "NOT_VERIFIED",
+  "sleep_resume": "NOT_RUN",
+  "device_network_reconnect": "NOT_RUN",
+  "decision": "继续独立技术选型工作，保留系统检查限制，不登记完整 P15 通过"
+}

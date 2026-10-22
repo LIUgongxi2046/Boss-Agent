@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/check_strategy.py", line 220, in <module>
+    assert source_hash == "4aa0e0f646749aece70329766b83c816cf906563e4cbe042cf14bdf9375e25bf"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,23 @@
+[
+  {
+    "at": "2026-10-22T06:18:46.677190+00:00",
+    "pid": 16316,
+    "job_id": "9e7ea53c",
+    "result": {
+      "state": "DELIVERED",
+      "event_id": "fixed-event",
+      "schedule_version": "1",
+      "source_type": "SIMULATED",
+      "created_at": "2026-10-22T06:18:46.676600+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T06:18:46.683082+00:00",
+    "pid": 16316,
+    "job_id": "9e7ea53c",
+    "result": {
+      "state": "SUPPRESSED",
+      "reason": "重复事件"
+    }
+  }
+]

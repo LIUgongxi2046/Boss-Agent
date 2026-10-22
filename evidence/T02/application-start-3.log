@@ -1,0 +1,258 @@
+2026-10-22 13:33:44.477 | INFO     | nanobot.agent.loop:_register_default_tools:641 - Registered 22 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 13:33:44.592 | INFO     | nanobot.channels.manager:_init_channels:303 - WebSocket channel enabled as websocket
+2026-10-22 13:33:44.598 | INFO     | nanobot.cron.service:start:492 - Cron service started with 0 jobs
+应用验证服务已启动
+2026-10-22 13:33:44.600 | INFO     | nanobot.channels.manager:_start_channel_task:392 - Starting websocket channel...
+2026-10-22 13:33:44.600 | INFO     | nanobot.agent.loop:run:1265 - Agent loop started
+2026-10-22 13:33:44.600 | INFO     | nanobot.channels.manager:_dispatch_outbound_loop:769 - Outbound dispatcher started
+2026-10-22 13:33:44.602 | INFO     | nanobot.channels.websocket.runtime:_log_listener_ready:656 - WebSocket server listening on ws://127.0.0.1:8872/
+2026-10-22 13:34:42.488 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026...
+2026-10-22 13:34:42.489 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage restore completed in 1.2ms
+2026-10-22 13:34:42.489 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage compact completed in 0.0ms
+2026-10-22 13:34:42.490 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage command completed in 0.4ms
+2026-10-22 13:34:43.461 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage build completed in 971.1ms
+2026-10-22 13:34:46.123 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690
+2026-10-22 13:34:52.110 | WARNING  | nanobot.webui.ws_http:_log_webui_thread_diagnostics:931 - webui thread replay session_hash=122967f00cd6 status=200 limit=40 source_bytes=395 parsed_records=1 selected_bytes=395 selected_records=1 compacted_deltas=0 manifest_rebuilt=False manifest_rebuild_ms=0 capped_bytes=False capped_records=False truncated_turn=False replay_ms=0 build_ms=10.2 json_ms=0.0 gzip_ms=0.0 gzip=False response_bytes=1275 event_loop_lag_ms=9570.1 total_ms=9683.0
+2026-10-22 13:34:54.410 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: query_metrics({"question": "region-1 的 product-1 与 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的销量、收入、成本、毛利、毛利率、吨毛利", "metric_ids": ["sales_quantity", "revenue", "cost", "gross_profit", "gross_ma)
+2026-10-22 13:34:54.450 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=18660 output=352 cache_read=18432 cache_write=None source=reported
+2026-10-22 13:34:54.457 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690
+2026-10-22 13:34:56.439 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_evidence({"query_id": "9d4d80a9-02d0-4d39-80c2-927ca4f2a1cf", "source_ids": ["finance-note"], "detail_refs": ["BASE-0", "BASE-1", "BASE-2", "BASE-3", "CURRENT-0", "CURRENT-1", "CURRENT-2", "CURRENT-3"]})
+2026-10-22 13:34:56.470 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=20100 output=148 cache_read=18944 cache_write=None source=reported
+2026-10-22 13:34:56.495 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 2 for session websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690
+2026-10-22 13:35:01.508 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=21373 output=770 cache_read=20224 cache_write=None source=reported
+2026-10-22 13:35:01.528 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage run completed in 18066.9ms
+2026-10-22 13:35:01.538 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage save completed in 8.0ms
+2026-10-22 13:35:01.538 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: ## region-1 · product-1 + product-2 · 外销（EXTERNAL_SALES）· CNY · 定义版本 1
+
+**本期** 2026-10-01 至 2026-10-10 对比 **基期** 2026-09...
+2026-10-22 13:35:01.539 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:ec4fdc04-6173-4eeb-b0e9-bd43d1b24690:1792647282488109000] Stage respond completed in 0.2ms
+2026-10-22 13:35:49.776 | ERROR    | logging:callHandlers:1762 - [websockets] unexpected internal error
+Traceback (most recent call last):
+
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/application.py", line 118, in <module>
+    asyncio.run(serve())
+    │       │   └ <function serve at 0x10617d300>
+    │       └ <function run at 0x10093bba0>
+    └ <module 'asyncio' from '/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/__init__.py'>
+
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object serve at 0x7f8f409eaeb0>
+           │      └ <function Runner.run at 0x100ad1c60>
+           └ <asyncio.runners.Runner object at 0x10615dc40>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<serve() running at /Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/application.py...
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x100acb7e0>
+           │    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x10615dc40>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x100acb740>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x100ad1580>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x100922fc0>
+    └ <Handle Task.task_wakeup(<Future finis..._ve…', ...}]}>)>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle Task.task_wakeup(<Future finis..._ve…', ...}]}>)>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle Task.task_wakeup(<Future finis..._ve…', ...}]}>)>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle Task.task_wakeup(<Future finis..._ve…', ...}]}>)>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+          │          └ <function ServerConnection.handshake at 0x105785760>
+          └ <websockets.asyncio.server.ServerConnection object at 0x106bb38c0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 142, in handshake
+    async with self.send_context(expected_state=CONNECTING):
+               │    │                           └ <State.CONNECTING: 0>
+               │    └ <function Connection.send_context at 0x105785120>
+               └ <websockets.asyncio.server.ServerConnection object at 0x106bb38c0>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+          │    │   │      └ AssertionError()
+          │    │   └ <method 'athrow' of 'async_generator' objects>
+          │    └ <async_generator object Connection.send_context at 0x106cc2ce0>
+          └ <contextlib._AsyncGeneratorContextManager object at 0x1067ac380>
+> File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/connection.py", line 896, in send_context
+    yield
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 196, in handshake
+    self.protocol.send_response(self.response)
+    │    │        │             │    └ Response(status_code=200, reason_phrase='OK', headers=Headers([('Date', 'Thu, 22 Oct 2026 05:35:49 GMT'), ('Connection', 'clo...
+    │    │        │             └ <websockets.asyncio.server.ServerConnection object at 0x106bb38c0>
+    │    │        └ <function ServerProtocol.send_response at 0x10576a700>
+    │    └ <websockets.server.ServerProtocol object at 0x106bb3710>
+    └ <websockets.asyncio.server.ServerConnection object at 0x106bb38c0>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/server.py", line 540, in send_response
+    self.send_eof()
+    │    └ <function Protocol.send_eof at 0x105769da0>
+    └ <websockets.server.ServerProtocol object at 0x106bb3710>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/protocol.py", line 764, in send_eof
+    assert not self.eof_sent
+               │    └ True
+               └ <websockets.server.ServerProtocol object at 0x106bb3710>
+
+AssertionError: assert not self.eof_sent
+2026-10-22 13:35:49.816 | ERROR    | logging:callHandlers:1762 - [websockets] unexpected internal error
+Traceback (most recent call last):
+
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/application.py", line 118, in <module>
+    asyncio.run(serve())
+    │       │   └ <function serve at 0x10617d300>
+    │       └ <function run at 0x10093bba0>
+    └ <module 'asyncio' from '/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/__init__.py'>
+
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object serve at 0x7f8f409eaeb0>
+           │      └ <function Runner.run at 0x100ad1c60>
+           └ <asyncio.runners.Runner object at 0x10615dc40>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<serve() running at /Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/application.py...
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x100acb7e0>
+           │    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x10615dc40>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x100acb740>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x100ad1580>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x100922fc0>
+    └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle Task.task_wakeup(<Future finis...ception=None)>)>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+          │          └ <function ServerConnection.handshake at 0x105785760>
+          └ <websockets.asyncio.server.ServerConnection object at 0x106bb2d50>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 142, in handshake
+    async with self.send_context(expected_state=CONNECTING):
+               │    │                           └ <State.CONNECTING: 0>
+               │    └ <function Connection.send_context at 0x105785120>
+               └ <websockets.asyncio.server.ServerConnection object at 0x106bb2d50>
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+          │    │   │      └ AssertionError()
+          │    │   └ <method 'athrow' of 'async_generator' objects>
+          │    └ <async_generator object Connection.send_context at 0x106cc2240>
+          └ <contextlib._AsyncGeneratorContextManager object at 0x106ba9610>
+> File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/connection.py", line 896, in send_context
+    yield
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 196, in handshake
+    self.protocol.send_response(self.response)
+    │    │        │             │    └ Response(status_code=200, reason_phrase='OK', headers=Headers([('Date', 'Thu, 22 Oct 2026 05:35:49 GMT'), ('Connection', 'clo...
+    │    │        │             └ <websockets.asyncio.server.ServerConnection object at 0x106bb2d50>
+    │    │        └ <function ServerProtocol.send_response at 0x10576a700>
+    │    └ <websockets.server.ServerProtocol object at 0x106bb2f30>
+    └ <websockets.asyncio.server.ServerConnection object at 0x106bb2d50>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/server.py", line 540, in send_response
+    self.send_eof()
+    │    └ <function Protocol.send_eof at 0x105769da0>
+    └ <websockets.server.ServerProtocol object at 0x106bb2f30>
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/websockets/protocol.py", line 764, in send_eof
+    assert not self.eof_sent
+               │    └ True
+               └ <websockets.server.ServerProtocol object at 0x106bb2f30>
+
+AssertionError: assert not self.eof_sent
+2026-10-22 13:39:51.786 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026...
+2026-10-22 13:39:51.788 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage restore completed in 2.2ms
+2026-10-22 13:39:51.788 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage compact completed in 0.0ms
+2026-10-22 13:39:51.789 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage command completed in 0.8ms
+2026-10-22 13:39:51.897 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage build completed in 107.9ms
+2026-10-22 13:39:52.169 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:39:54.571 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: query_metrics({"question": "region-1 的 product-1 和 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的销量、收入、成本、毛利、毛利率、吨毛利", "metric_ids": ["sales_quantity", "revenue", "cost", "gross_profit", "gross_ma)
+2026-10-22 13:39:54.589 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=18660 output=352 cache_read=18432 cache_write=None source=reported
+2026-10-22 13:39:54.598 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:39:55.951 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_evidence({"query_id": "f38a7560-e4fe-4056-b97d-59ad875fe557", "source_ids": ["finance-note"], "detail_refs": ["BASE-0", "BASE-1", "BASE-2", "BASE-3", "CURRENT-0", "CURRENT-1", "CURRENT-2", "CURRENT-3"]})
+2026-10-22 13:39:55.958 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=20092 output=140 cache_read=18944 cache_write=None source=reported
+2026-10-22 13:39:55.961 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 2 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:39:58.999 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=21357 output=569 cache_read=20224 cache_write=None source=reported
+2026-10-22 13:39:59.005 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage run completed in 7107.7ms
+2026-10-22 13:39:59.007 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage save completed in 2.0ms
+2026-10-22 13:39:59.008 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: ## region-1 · product-1 + product-2 · 外销（CNY，definition_version=1）
+
+| 指标 | 基期 9/1–9/10 | 本期 10/1–10/10 | 变化 |
+|---|---|-...
+2026-10-22 13:39:59.008 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647591782228000] Stage respond completed in 0.2ms
+2026-10-22 13:39:59.558 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权创建以下交办：{"content_version": "1", "coordinator_id": "coordinator-1", "purpose"...
+2026-10-22 13:39:59.558 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage restore completed in 0.5ms
+2026-10-22 13:39:59.558 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage compact completed in 0.0ms
+2026-10-22 13:39:59.558 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage command completed in 0.0ms
+2026-10-22 13:39:59.661 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage build completed in 102.4ms
+2026-10-22 13:39:59.846 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:01.548 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: create_assignment({"content_version": "1", "coordinator_id": "coordinator-1", "purpose": "提交当前会议关联的毛利变化解释、措施和证据", "due_at": "2026-10-25T17:00:00+08:00", "timezone": "Asia/Shanghai", "evidence_requirements": ["原因明细", "措)
+2026-10-22 13:40:01.577 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=22113 output=233 cache_read=21888 cache_write=None source=reported
+2026-10-22 13:40:01.583 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:03.783 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=22458 output=219 cache_read=22272 cache_write=None source=reported
+2026-10-22 13:40:03.792 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage run completed in 4130.8ms
+2026-10-22 13:40:03.798 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage save completed in 5.8ms
+2026-10-22 13:40:03.798 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 交办已创建，当前状态为 OPEN，尚未发送。
+
+| 字段 | 值 |
+|---|---|
+| 任务 ID | `f51a21e1-6639-49f9-9c19-89deeed6b8ef` |
+| 版本 | 1 |
+| 状态 | OPEN |...
+2026-10-22 13:40:03.798 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647599557982000] Stage respond completed in 0.1ms
+2026-10-22 13:40:04.192 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权按以下内容模拟发送：{"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version"...
+2026-10-22 13:40:04.192 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage restore completed in 0.2ms
+2026-10-22 13:40:04.192 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage compact completed in 0.0ms
+2026-10-22 13:40:04.192 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage command completed in 0.0ms
+2026-10-22 13:40:04.252 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage build completed in 59.8ms
+2026-10-22 13:40:04.483 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:06.209 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: send_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version": "1", "recipient_id": "coordinator-1", "body": "提交当前会议关联的毛利变化解释、措施和证据", "content_version": "1"})
+2026-10-22 13:40:06.223 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=22823 output=145 cache_read=22656 cache_write=None source=reported
+2026-10-22 13:40:06.235 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:09.666 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=23090 output=187 cache_read=22912 cache_write=None source=reported
+2026-10-22 13:40:09.686 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage run completed in 5433.2ms
+2026-10-22 13:40:09.689 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage save completed in 3.3ms
+2026-10-22 13:40:09.690 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 模拟发送已完成。
+
+| 字段 | 值 |
+|---|---|
+| 消息 ID | `5111243e-1be3-4b7d-bb52-ecba3bd9a91a` |
+| 消息状态 | SENT（SIMULATED） |
+| 任务 ID | `...
+2026-10-22 13:40:09.690 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647604192095000] Stage respond completed in 0.2ms
+2026-10-22 13:40:11.079 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。
+2026-10-22 13:40:11.079 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage restore completed in 0.6ms
+2026-10-22 13:40:11.079 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage compact completed in 0.0ms
+2026-10-22 13:40:11.080 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage command completed in 0.0ms
+2026-10-22 13:40:11.444 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage build completed in 364.2ms
+2026-10-22 13:40:13.037 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 0 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:14.592 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 13:40:14.609 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=23378 output=63 cache_read=23168 cache_write=None source=reported
+2026-10-22 13:40:14.622 | DEBUG    | nanobot.agent.progress_hook:before_iteration:80 - Starting agent loop iteration 1 for session websocket:56c0d256-510c-4f04-bc1b-dda869322f46
+2026-10-22 13:40:17.512 | DEBUG    | nanobot.agent.progress_hook:after_iteration:171 - LLM usage: input=23676 output=360 cache_read=23424 cache_write=None source=reported
+2026-10-22 13:40:17.521 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage run completed in 6063.6ms
+2026-10-22 13:40:17.526 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage save completed in 5.0ms
+2026-10-22 13:40:17.526 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: ## 任务正式状态（重新读取）
+
+| 字段 | 值 |
+|---|---|
+| 任务 ID | `f51a21e1-6639-49f9-9c19-89deeed6b8ef` |
+| 状态 | **WAITING_FEEDBACK**（等待反...
+2026-10-22 13:40:17.527 | DEBUG    | nanobot.agent.loop:_run_turn_stage:1708 - [turn websocket:56c0d256-510c-4f04-bc1b-dda869322f46:1792647611078942000] Stage respond completed in 0.3ms
+2026-10-22 13:41:30.109 | INFO     | nanobot.agent.loop:stop:1592 - Agent loop stopping
+2026-10-22 13:41:30.110 | INFO     | nanobot.channels.manager:stop_all:670 - Stopping all channels...
+2026-10-22 13:41:30.117 | INFO     | nanobot.channels.manager:_stop_channel_runtime:414 - Stopped websocket channel

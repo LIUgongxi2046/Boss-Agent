@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T00/check_strategy.py", line 9, in <module>
+    from jsonschema import Draft202012Validator
+ModuleNotFoundError: No module named 'jsonschema'

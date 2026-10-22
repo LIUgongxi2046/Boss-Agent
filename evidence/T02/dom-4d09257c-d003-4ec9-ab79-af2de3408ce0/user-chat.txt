@@ -1,0 +1,33 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - text: No sessions yet.
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - region "nanobot":
+      - button "Temporary chat"
+      - button "Toggle theme from header":
+        - img
+      - heading "What should we work on?" [level=1]
+      - textbox "Message input"
+      - button "Attach files":
+        - img
+      - 'button "Workspace access mode: Default Permission"':
+        - img
+        - img
+      - button "Choose your AI"
+      - button "Voice input":
+        - img
+      - button "Configure model":
+        - img
+      - button "Choose project":
+        - img
+        - text: Select project

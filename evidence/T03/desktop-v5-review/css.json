@@ -1,0 +1,150 @@
+[
+  {
+    "selector": "html,body",
+    "declarations": "padding: 0; margin: 0; width: 100%; height: 100%;"
+  },
+  {
+    "selector": "body",
+    "declarations": "font-family: \"Noto Sans CJK SC\",\"PingFang SC\",\"Microsoft YaHei\",sans-serif; font-size: 13px; font-weight: 400; line-height: 1.55; letter-spacing: 0; color: var(--ink); -webkit-font-smoothing: antialiased; background: #eff7ff;"
+  },
+  {
+    "selector": "button,input",
+    "declarations": "font: inherit; outline: 0;"
+  },
+  {
+    "selector": "button",
+    "declarations": "cursor: default;"
+  },
+  {
+    "selector": ".btn",
+    "declarations": "height: 36px; border-radius: 10px; padding: 0 14px; border: 1px solid #dfe9f5; color: #506889; background: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; font-weight: 650; white-space: nowrap;"
+  },
+  {
+    "selector": ".btn.primary",
+    "declarations": "background: linear-gradient(105deg,#176cfa,#075fdc); color: #fff; border: 1px solid #126efa; box-shadow: 0 6px 14px rgba(22,105,244,.19);"
+  },
+  {
+    "selector": ".btn.mint",
+    "declarations": "border-color: #cdeede; background: #edfbf5; color: #149d70;"
+  },
+  {
+    "selector": ".btn.negative",
+    "declarations": "border-color: #fad6d8; color: #cd5560; background: #fff6f6;"
+  },
+  {
+    "selector": ".caption",
+    "declarations": "color: #8298b4; font-size: 10.5px;"
+  },
+  {
+    "selector": ".screen",
+    "declarations": "height: 1024px; width: 1440px; padding: 17px; overflow: hidden; background: radial-gradient(circle at 80% 8%,rgba(173,242,222,.5),transparent 31%),radial-gradient(circle at 28% 79%,rgba(200,229,255,.7),transparent 44%),linear-gradient(115deg,#ecf7ff 0%,#f8fcff 55%,#eaf9f4 100%);"
+  },
+  {
+    "selector": ".shell",
+    "declarations": "height: 990px; width: 1406px; border: 1px solid #fff; border-radius: 24px; display: grid; grid-template-columns: 204px minmax(0,1fr); overflow: hidden; background: rgba(255,255,255,.48); box-shadow: 0 19px 55px rgba(33,92,164,.085);"
+  },
+  {
+    "selector": ".app",
+    "declarations": "min-width: 0; display: flex; flex-direction: column;"
+  },
+  {
+    "selector": ".stage",
+    "declarations": "flex: 1; min-height: 0; padding: 4px 23px 22px 28px; overflow: hidden; display: flex; flex-direction: column; gap: 14px;"
+  },
+  {
+    "selector": ".stage-body",
+    "declarations": "flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 12px;"
+  },
+  {
+    "selector": ".scrollinner",
+    "declarations": "overflow: hidden; min-height: 0;"
+  },
+  {
+    "selector": ".smallstat .caption",
+    "declarations": "line-height: 1.5;"
+  },
+  {
+    "selector": ".filterbar .btn",
+    "declarations": "height: 35px;"
+  },
+  {
+    "selector": ".form-value",
+    "declarations": "height: 38px; border: 1px solid #e1ebf7; background: #f9fcff; border-radius: 9px; padding: 0 12px; color: #8499b3; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 7px;"
+  },
+  {
+    "selector": ".form-value .ico",
+    "declarations": "color: #94acc6; width: 13px; height: 13px;"
+  },
+  {
+    "selector": ".form-value.wrap",
+    "declarations": "height: auto; min-height: 55px; padding-top: 9px; padding-bottom: 9px; line-height: 1.6;"
+  },
+  {
+    "selector": ".smallstep .caption",
+    "declarations": "margin-top: 3px;"
+  },
+  {
+    "selector": ".modal-screen",
+    "declarations": "position: relative; flex: 1; min-height: 0;"
+  },
+  {
+    "selector": ".modal-screen .behind",
+    "declarations": "filter: blur(1.6px); opacity: .54; pointer-events: none;"
+  },
+  {
+    "selector": ".modal-cover",
+    "declarations": "position: absolute; inset: 0; background: rgba(223,235,248,.42); z-index: 5; display: flex; align-items: center; justify-content: center;"
+  },
+  {
+    "selector": ".modal",
+    "declarations": "width: 610px; max-height: 590px; border: 1px solid #e5eff9; border-radius: 21px; background: #fff; box-shadow: 0 24px 100px rgba(21,65,133,.18); padding: 23px 25px; overflow: hidden;"
+  },
+  {
+    "selector": ".modal .modalicon",
+    "declarations": "width: 44px; height: 44px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #0e74e8; background: #e9f3ff;"
+  },
+  {
+    "selector": ".modal-title",
+    "declarations": "font-size: 22px; font-weight: 820;"
+  },
+  {
+    "selector": ".modal .form-grid",
+    "declarations": "margin-top: 18px;"
+  },
+  {
+    "selector": ".modal .btnrow",
+    "declarations": "justify-content: flex-end; margin-top: 20px;"
+  },
+  {
+    "selector": ".modal .softnote",
+    "declarations": "margin-top: 14px;"
+  },
+  {
+    "selector": ".authcard .btn",
+    "declarations": "width: 100%; margin-top: 16px; height: 45px;"
+  },
+  {
+    "selector": ".footer-actions .hint",
+    "declarations": "font-size: 11px; color: #8fa2b9;"
+  },
+  {
+    "selector": ".stage",
+    "declarations": "gap: 11px;"
+  },
+  {
+    "selector": ".stage-body",
+    "declarations": "gap: 9px;"
+  },
+  {
+    "selector": ".app",
+    "declarations": "min-height: 0; overflow: hidden;"
+  },
+  {
+    "selector": ".stage",
+    "declarations": "min-height: 0; overflow: hidden;"
+  },
+  {
+    "selector": ".stage-body",
+    "declarations": "min-height: 0; overflow: hidden;"
+  }
+]

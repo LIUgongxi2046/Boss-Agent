@@ -1,0 +1,13 @@
+{
+  "status": "BLOCKED",
+  "provider": "deepseek",
+  "request_sent": false,
+  "missing_configuration": [
+    "DEEPSEEK_API_KEY",
+    "DEEPSEEK_MODEL",
+    "DEEPSEEK_BASE_URL"
+  ],
+  "usage": null,
+  "cost": null,
+  "at": "2026-10-22T04:51:58.374283+00:00"
+}

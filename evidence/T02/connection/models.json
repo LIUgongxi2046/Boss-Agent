@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-22T05:21:30.251336+00:00",
+  "status": 200,
+  "method": "GET",
+  "url": "https://api.deepseek.com/models",
+  "request_id": null,
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "selected_model": "deepseek-flash",
+  "credential_ref": "../boss agent.md"
+}

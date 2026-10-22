@@ -1,0 +1,1976 @@
+[
+  {
+    "path": "__init__.py",
+    "source_sha256": "a718407d196a7bfad97f02451d5c7a35bb09bbac34adb46b58a6ec91641c7fda",
+    "installed_sha256": "a718407d196a7bfad97f02451d5c7a35bb09bbac34adb46b58a6ec91641c7fda",
+    "matches": true
+  },
+  {
+    "path": "__main__.py",
+    "source_sha256": "c8e8dce8576f9ea153b5cd2ec5eec8235a1b697cc0c20b58e4ef6e104467946a",
+    "installed_sha256": "c8e8dce8576f9ea153b5cd2ec5eec8235a1b697cc0c20b58e4ef6e104467946a",
+    "matches": true
+  },
+  {
+    "path": "agent/__init__.py",
+    "source_sha256": "39ea6fbc5e1bf92c73739f04bd984d27cf25255ceca461def194fc758d318af8",
+    "installed_sha256": "39ea6fbc5e1bf92c73739f04bd984d27cf25255ceca461def194fc758d318af8",
+    "matches": true
+  },
+  {
+    "path": "agent/autocompact.py",
+    "source_sha256": "941cb6afd01ba851417845ca784d5a78d555e6acf736502a7bb7c1b52b2d7e19",
+    "installed_sha256": "941cb6afd01ba851417845ca784d5a78d555e6acf736502a7bb7c1b52b2d7e19",
+    "matches": true
+  },
+  {
+    "path": "agent/automation_turns.py",
+    "source_sha256": "6dcc6b941a65c43ea656dc7301d24ac4815333fd5cfb1deb8dd5a51206c6a10d",
+    "installed_sha256": "6dcc6b941a65c43ea656dc7301d24ac4815333fd5cfb1deb8dd5a51206c6a10d",
+    "matches": true
+  },
+  {
+    "path": "agent/context.py",
+    "source_sha256": "a868f85bc37f17e954cbf1579538282e3e19b0008db949fba2af463ea618dbed",
+    "installed_sha256": "a868f85bc37f17e954cbf1579538282e3e19b0008db949fba2af463ea618dbed",
+    "matches": true
+  },
+  {
+    "path": "agent/context_governance.py",
+    "source_sha256": "a3583af740e0d1642fd9427e59a897caeb9aa2788ef6e682e1f678be2b1db44d",
+    "installed_sha256": "a3583af740e0d1642fd9427e59a897caeb9aa2788ef6e682e1f678be2b1db44d",
+    "matches": true
+  },
+  {
+    "path": "agent/cron_turns.py",
+    "source_sha256": "c0800073059a3fb8f09fca389f18821814e4ebad061c2e38b165a6e3a60334b2",
+    "installed_sha256": "c0800073059a3fb8f09fca389f18821814e4ebad061c2e38b165a6e3a60334b2",
+    "matches": true
+  },
+  {
+    "path": "agent/goal_permission.py",
+    "source_sha256": "67e208c2aa9e53416bda38f839f3c956caf6e3b2ae84994f2a6ad80ec6be2313",
+    "installed_sha256": "67e208c2aa9e53416bda38f839f3c956caf6e3b2ae84994f2a6ad80ec6be2313",
+    "matches": true
+  },
+  {
+    "path": "agent/hook.py",
+    "source_sha256": "6ab7fc6dbd53f3366083d014a89c773d9a554e3b78a12128d48262264794bdfa",
+    "installed_sha256": "6ab7fc6dbd53f3366083d014a89c773d9a554e3b78a12128d48262264794bdfa",
+    "matches": true
+  },
+  {
+    "path": "agent/hooks/__init__.py",
+    "source_sha256": "976f2f05267ae3d5e461aab7fd6aa2b3107b96af28fb14e18b1448d78cd58332",
+    "installed_sha256": "976f2f05267ae3d5e461aab7fd6aa2b3107b96af28fb14e18b1448d78cd58332",
+    "matches": true
+  },
+  {
+    "path": "agent/hooks/file_edit_activity.py",
+    "source_sha256": "09c288d18b24e5e9498ff5db9d53a1ff7440f395a16b37e70e1a7076ee53b273",
+    "installed_sha256": "09c288d18b24e5e9498ff5db9d53a1ff7440f395a16b37e70e1a7076ee53b273",
+    "matches": true
+  },
+  {
+    "path": "agent/loop.py",
+    "source_sha256": "658468c8ae5eb4111e2227b8c5ab69b97f13828996966bcc9834050d9036a307",
+    "installed_sha256": "658468c8ae5eb4111e2227b8c5ab69b97f13828996966bcc9834050d9036a307",
+    "matches": true
+  },
+  {
+    "path": "agent/memory.py",
+    "source_sha256": "569db6fdc64e366f3ce55e5535229703b60d3a7cf015b9389a474a4b14968aaa",
+    "installed_sha256": "569db6fdc64e366f3ce55e5535229703b60d3a7cf015b9389a474a4b14968aaa",
+    "matches": true
+  },
+  {
+    "path": "agent/model_presets.py",
+    "source_sha256": "ceba310a6b6c4f4ffa3451f2e5efe21eb614312bf3de4a62da76487d21d39a3c",
+    "installed_sha256": "ceba310a6b6c4f4ffa3451f2e5efe21eb614312bf3de4a62da76487d21d39a3c",
+    "matches": true
+  },
+  {
+    "path": "agent/model_runtime.py",
+    "source_sha256": "8b190ce2f80ec13e8bcd5260d6e8d180a21ab1c1977c77bacc3df815fba1328c",
+    "installed_sha256": "8b190ce2f80ec13e8bcd5260d6e8d180a21ab1c1977c77bacc3df815fba1328c",
+    "matches": true
+  },
+  {
+    "path": "agent/plugins.py",
+    "source_sha256": "1d0a4b45cc33f14f723207fac4d8518aecdf758ff56eb360d2b2914cadeded2e",
+    "installed_sha256": "1d0a4b45cc33f14f723207fac4d8518aecdf758ff56eb360d2b2914cadeded2e",
+    "matches": true
+  },
+  {
+    "path": "agent/progress_hook.py",
+    "source_sha256": "516bd45999b105680d64cb9d1ea040014b021763e2913bbd9e51f402b5f52f27",
+    "installed_sha256": "516bd45999b105680d64cb9d1ea040014b021763e2913bbd9e51f402b5f52f27",
+    "matches": true
+  },
+  {
+    "path": "agent/runner.py",
+    "source_sha256": "72ecdd211827762f098da376b85f79f5722d6b506bf7935ce6b418c814864662",
+    "installed_sha256": "72ecdd211827762f098da376b85f79f5722d6b506bf7935ce6b418c814864662",
+    "matches": true
+  },
+  {
+    "path": "agent/skills.py",
+    "source_sha256": "26c1dd94e75b30da7e813043d2664e3f53d75cbc8835f3d027f028c92b374d96",
+    "installed_sha256": "26c1dd94e75b30da7e813043d2664e3f53d75cbc8835f3d027f028c92b374d96",
+    "matches": true
+  },
+  {
+    "path": "agent/subagent.py",
+    "source_sha256": "032650e8bf71d77a0fcd366719f08b84fe3fcb793b7067c07cafb1ca06ac22d6",
+    "installed_sha256": "032650e8bf71d77a0fcd366719f08b84fe3fcb793b7067c07cafb1ca06ac22d6",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/__init__.py",
+    "source_sha256": "d099c218edfcdfb2d05267231e1fd8578a036cd12e717a95dcc90f8a8d273a4e",
+    "installed_sha256": "d099c218edfcdfb2d05267231e1fd8578a036cd12e717a95dcc90f8a8d273a4e",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/_windows_job.py",
+    "source_sha256": "1965c9fcbe7d6fe1626ebbc582c67459598b45af3458e28952ead207e414b990",
+    "installed_sha256": "1965c9fcbe7d6fe1626ebbc582c67459598b45af3458e28952ead207e414b990",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/apply_patch.py",
+    "source_sha256": "bb37381ffd39889cd6d7f757203bfce383925f20b6cb32cbe8f863eac53e08a8",
+    "installed_sha256": "bb37381ffd39889cd6d7f757203bfce383925f20b6cb32cbe8f863eac53e08a8",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/base.py",
+    "source_sha256": "69ea21868d3bbda324a5e2c245998b5cc16bbd5819f680aea038370ed08b7488",
+    "installed_sha256": "69ea21868d3bbda324a5e2c245998b5cc16bbd5819f680aea038370ed08b7488",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/cli_apps.py",
+    "source_sha256": "fd15b3d759f3cae358c88976b3a7d27d8b1834d3fc00f977ee28ddd34b0eae86",
+    "installed_sha256": "fd15b3d759f3cae358c88976b3a7d27d8b1834d3fc00f977ee28ddd34b0eae86",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/context.py",
+    "source_sha256": "413f848d025b04d9a751f5da9a4bc64e936510ea62df313fb4dc470acea24046",
+    "installed_sha256": "413f848d025b04d9a751f5da9a4bc64e936510ea62df313fb4dc470acea24046",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/cron.py",
+    "source_sha256": "be3d43a61c55b01c047fce05d219f3767621f8e7aaf4d10f87b89ca37cc5f1b1",
+    "installed_sha256": "be3d43a61c55b01c047fce05d219f3767621f8e7aaf4d10f87b89ca37cc5f1b1",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/exec_session.py",
+    "source_sha256": "3edf8b4f7455f36b494150ef1f75a333279e931da08c0a17fdc879be3a1aeaeb",
+    "installed_sha256": "3edf8b4f7455f36b494150ef1f75a333279e931da08c0a17fdc879be3a1aeaeb",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/execution.py",
+    "source_sha256": "1f64b8cf51e67f9f5acdaa4053487d378ae72637323255821b1b70d9019bd077",
+    "installed_sha256": "1f64b8cf51e67f9f5acdaa4053487d378ae72637323255821b1b70d9019bd077",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/file_state.py",
+    "source_sha256": "e5d859e8d5c32348af3e52aced3905935f46f913534c7da4ffd48d72d223efb4",
+    "installed_sha256": "e5d859e8d5c32348af3e52aced3905935f46f913534c7da4ffd48d72d223efb4",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/filesystem.py",
+    "source_sha256": "c4dacaae64d8b3eafe72a48d37ef3ab90773f4c324260e2019486b179bce1435",
+    "installed_sha256": "c4dacaae64d8b3eafe72a48d37ef3ab90773f4c324260e2019486b179bce1435",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/image_generation.py",
+    "source_sha256": "0a806a085b77f07de65f11cd8689fd55bde5eb3107ffdfb0970aa11781417de3",
+    "installed_sha256": "0a806a085b77f07de65f11cd8689fd55bde5eb3107ffdfb0970aa11781417de3",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/loader.py",
+    "source_sha256": "049b80e70fe8b5c860b90641ca997ac6dcf5de885c0023a3becb5ec7bf8a26bc",
+    "installed_sha256": "049b80e70fe8b5c860b90641ca997ac6dcf5de885c0023a3becb5ec7bf8a26bc",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/long_task.py",
+    "source_sha256": "3c589e12f41a20b3cb1f14b6f8e512dbfd7699c929ff921f932aa657ebfeecb2",
+    "installed_sha256": "3c589e12f41a20b3cb1f14b6f8e512dbfd7699c929ff921f932aa657ebfeecb2",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/mcp.py",
+    "source_sha256": "1b7804ac2b294a7c78fe37cd6a06b0c88c18fc1faeeaf49ef5bf91c9b5b61f67",
+    "installed_sha256": "1b7804ac2b294a7c78fe37cd6a06b0c88c18fc1faeeaf49ef5bf91c9b5b61f67",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/mcp_oauth.py",
+    "source_sha256": "b4470695321ac9a9415c5666768042e2600eee542d1179361a841f5982da4c86",
+    "installed_sha256": "b4470695321ac9a9415c5666768042e2600eee542d1179361a841f5982da4c86",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/message.py",
+    "source_sha256": "7c9521729b8517691213b1b9fc3a86fc867b7ef0d59f0d47bffd60f51b06fbf8",
+    "installed_sha256": "7c9521729b8517691213b1b9fc3a86fc867b7ef0d59f0d47bffd60f51b06fbf8",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/path_utils.py",
+    "source_sha256": "e723d040ab4326dd588b6cf7f9d7660e104765ec584ebf1d240cecd02901beb1",
+    "installed_sha256": "e723d040ab4326dd588b6cf7f9d7660e104765ec584ebf1d240cecd02901beb1",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/registry.py",
+    "source_sha256": "257b8cc7f80d0538d281495f88cdd45c221fad11c618f1124a4adbf972e5da4f",
+    "installed_sha256": "257b8cc7f80d0538d281495f88cdd45c221fad11c618f1124a4adbf972e5da4f",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/runtime_control.py",
+    "source_sha256": "42af2d0a0c965f8bc86398e36e15fce2a8d595ddd8ebfca391de41fd547093f1",
+    "installed_sha256": "42af2d0a0c965f8bc86398e36e15fce2a8d595ddd8ebfca391de41fd547093f1",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/sandbox.py",
+    "source_sha256": "4c9e4b51ccfabbc0eba232ef2e4f87db7f741cae9ec50c252e5e9016eee77aec",
+    "installed_sha256": "4c9e4b51ccfabbc0eba232ef2e4f87db7f741cae9ec50c252e5e9016eee77aec",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/schema.py",
+    "source_sha256": "904d8be55932d01b681681fd21ac2918492391e56c1501de17fa1b5eaa0bd7d7",
+    "installed_sha256": "904d8be55932d01b681681fd21ac2918492391e56c1501de17fa1b5eaa0bd7d7",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/search.py",
+    "source_sha256": "c12f126a71605806c5477753b147f60311dd8af1dd4a9e4e90b5548727d62b67",
+    "installed_sha256": "c12f126a71605806c5477753b147f60311dd8af1dd4a9e4e90b5548727d62b67",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/self.py",
+    "source_sha256": "8ae111b094c3f203e0dcdffd3191e831f002c285d9881f2ec87e0df45f5f3bd0",
+    "installed_sha256": "8ae111b094c3f203e0dcdffd3191e831f002c285d9881f2ec87e0df45f5f3bd0",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/session_messages.py",
+    "source_sha256": "a974bd7ec210459c8276f0799afa8891ef7dbb503f82a987260eab57fb6370f1",
+    "installed_sha256": "a974bd7ec210459c8276f0799afa8891ef7dbb503f82a987260eab57fb6370f1",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/sessions.py",
+    "source_sha256": "6bc621fec0fa0bd07424f65d7ae485c652db3a8eb552c69020b1280db86c0efa",
+    "installed_sha256": "6bc621fec0fa0bd07424f65d7ae485c652db3a8eb552c69020b1280db86c0efa",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/shell.py",
+    "source_sha256": "695b54ec3b60ba6e6285207374cc47f5f7b01e72c0d7298f506a97c5a5fb3314",
+    "installed_sha256": "695b54ec3b60ba6e6285207374cc47f5f7b01e72c0d7298f506a97c5a5fb3314",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/spawn.py",
+    "source_sha256": "8d02fba9049f6c3a03985a6ef5b2ef2f5e197573fd3b85dfca29724eb511b8a0",
+    "installed_sha256": "8d02fba9049f6c3a03985a6ef5b2ef2f5e197573fd3b85dfca29724eb511b8a0",
+    "matches": true
+  },
+  {
+    "path": "agent/tools/web.py",
+    "source_sha256": "c078aeb0ad85f983c91bd0db194b247e70a1d2f45562d52f6312692c1bc78a93",
+    "installed_sha256": "c078aeb0ad85f983c91bd0db194b247e70a1d2f45562d52f6312692c1bc78a93",
+    "matches": true
+  },
+  {
+    "path": "agent/turn_delivery.py",
+    "source_sha256": "c59e3c9efd0bcb4896bedea3f0985b34f9b4e73c9f867763c0ca9c71bbbaf576",
+    "installed_sha256": "c59e3c9efd0bcb4896bedea3f0985b34f9b4e73c9f867763c0ca9c71bbbaf576",
+    "matches": true
+  },
+  {
+    "path": "agent/turn_hooks.py",
+    "source_sha256": "11eedc95b4385bc52b7112c5f8bdff3ffb55f11297caf19c831fd00ef6204d04",
+    "installed_sha256": "11eedc95b4385bc52b7112c5f8bdff3ffb55f11297caf19c831fd00ef6204d04",
+    "matches": true
+  },
+  {
+    "path": "api/__init__.py",
+    "source_sha256": "4bdbea818e02669828bb0ef5f1c9196d690880f937e05894eb79371ffdf4d5f2",
+    "installed_sha256": "4bdbea818e02669828bb0ef5f1c9196d690880f937e05894eb79371ffdf4d5f2",
+    "matches": true
+  },
+  {
+    "path": "api/runtime.py",
+    "source_sha256": "ca04f18a9ac8b2c36b78fe93fc5196a742a879082a863a322fe0c49b46de754a",
+    "installed_sha256": "ca04f18a9ac8b2c36b78fe93fc5196a742a879082a863a322fe0c49b46de754a",
+    "matches": true
+  },
+  {
+    "path": "api/server.py",
+    "source_sha256": "cfb2dd4c3e5d60eb33f843dd6ef127339c6658c8997b46db659f60cfcf176eb5",
+    "installed_sha256": "cfb2dd4c3e5d60eb33f843dd6ef127339c6658c8997b46db659f60cfcf176eb5",
+    "matches": true
+  },
+  {
+    "path": "apps/__init__.py",
+    "source_sha256": "5d502483d7b5d53c6c597f063aa69c1938efbe65296100c4af041cfe1bf0706f",
+    "installed_sha256": "5d502483d7b5d53c6c597f063aa69c1938efbe65296100c4af041cfe1bf0706f",
+    "matches": true
+  },
+  {
+    "path": "apps/cli/__init__.py",
+    "source_sha256": "e0d9d377a872e97734a036dee2f7cb43b14f7c10942157bbe7a43f8be20ced1a",
+    "installed_sha256": "e0d9d377a872e97734a036dee2f7cb43b14f7c10942157bbe7a43f8be20ced1a",
+    "matches": true
+  },
+  {
+    "path": "apps/cli/service.py",
+    "source_sha256": "4e111439e2b0464fb6d4b285f9e0d98bcb2bb93b66b5c5c483d1bcac8ad81066",
+    "installed_sha256": "4e111439e2b0464fb6d4b285f9e0d98bcb2bb93b66b5c5c483d1bcac8ad81066",
+    "matches": true
+  },
+  {
+    "path": "apps/cli/utils.py",
+    "source_sha256": "57032aa9a5ba6a31d533519744df1e0677ab278e316c11635c6b061d347dcfb0",
+    "installed_sha256": "57032aa9a5ba6a31d533519744df1e0677ab278e316c11635c6b061d347dcfb0",
+    "matches": true
+  },
+  {
+    "path": "apps/protocol.py",
+    "source_sha256": "4b68a739092d40bc8b21e0b6ab943c4cf7466be8d198459955d513c414ef2194",
+    "installed_sha256": "4b68a739092d40bc8b21e0b6ab943c4cf7466be8d198459955d513c414ef2194",
+    "matches": true
+  },
+  {
+    "path": "audio/__init__.py",
+    "source_sha256": "9028e46d0989931b6ec17731ebf17feb09f4ff85e0b5e805cae5888c2651540d",
+    "installed_sha256": "9028e46d0989931b6ec17731ebf17feb09f4ff85e0b5e805cae5888c2651540d",
+    "matches": true
+  },
+  {
+    "path": "audio/transcription.py",
+    "source_sha256": "72f1562090af59fa0cb949e36a18f818a9a064c91a79d7f0a3cc6b2faa50769d",
+    "installed_sha256": "72f1562090af59fa0cb949e36a18f818a9a064c91a79d7f0a3cc6b2faa50769d",
+    "matches": true
+  },
+  {
+    "path": "audio/transcription_registry.py",
+    "source_sha256": "26a3b7170b3fe76082bef87d8ee757a725e49a1d75170ec5e740389122793a68",
+    "installed_sha256": "26a3b7170b3fe76082bef87d8ee757a725e49a1d75170ec5e740389122793a68",
+    "matches": true
+  },
+  {
+    "path": "bus/__init__.py",
+    "source_sha256": "68d0ca509c7becdcc7895b7395b4ae64d2b840ed5d67550684cec16a4406dbd3",
+    "installed_sha256": "68d0ca509c7becdcc7895b7395b4ae64d2b840ed5d67550684cec16a4406dbd3",
+    "matches": true
+  },
+  {
+    "path": "bus/events.py",
+    "source_sha256": "11c1c54d2fc8eb64c723bd77a7c4dbcededaf80c4dcfa9f6b8560809327f5aeb",
+    "installed_sha256": "11c1c54d2fc8eb64c723bd77a7c4dbcededaf80c4dcfa9f6b8560809327f5aeb",
+    "matches": true
+  },
+  {
+    "path": "bus/notification_delivery.py",
+    "source_sha256": "043763d27c2a9fee0af29f1d892445c9941932ba7b32290b7df7331017b86681",
+    "installed_sha256": "043763d27c2a9fee0af29f1d892445c9941932ba7b32290b7df7331017b86681",
+    "matches": true
+  },
+  {
+    "path": "bus/outbound_events.py",
+    "source_sha256": "af4c32ecec852de983ee056d6ba7b0e14bcb7ec1d03f4413aaa8bbaf796a7760",
+    "installed_sha256": "af4c32ecec852de983ee056d6ba7b0e14bcb7ec1d03f4413aaa8bbaf796a7760",
+    "matches": true
+  },
+  {
+    "path": "bus/queue.py",
+    "source_sha256": "7bd1d878cec259725f1c246e05622ed72ed6a53ed7c6160516c86ad97f4b8127",
+    "installed_sha256": "7bd1d878cec259725f1c246e05622ed72ed6a53ed7c6160516c86ad97f4b8127",
+    "matches": true
+  },
+  {
+    "path": "bus/runtime_events.py",
+    "source_sha256": "dbbda1ce34c3709e6b0625bf1c72ade4adf2e196e929b3e95475552c2e64224a",
+    "installed_sha256": "dbbda1ce34c3709e6b0625bf1c72ade4adf2e196e929b3e95475552c2e64224a",
+    "matches": true
+  },
+  {
+    "path": "channels/__init__.py",
+    "source_sha256": "675314ddea0871a34919d793549b9e15bfae455443e67750c02964b613f34503",
+    "installed_sha256": "675314ddea0871a34919d793549b9e15bfae455443e67750c02964b613f34503",
+    "matches": true
+  },
+  {
+    "path": "channels/_manifest.py",
+    "source_sha256": "a8b79e8dbd83824b8c2f0546f58248aef7321347c0ce9df945f1be82959bb267",
+    "installed_sha256": "a8b79e8dbd83824b8c2f0546f58248aef7321347c0ce9df945f1be82959bb267",
+    "matches": true
+  },
+  {
+    "path": "channels/_setup.py",
+    "source_sha256": "78e71246a928a094abcb93db21971e78e0ec5fd802513a97f19f516337474e9a",
+    "installed_sha256": "78e71246a928a094abcb93db21971e78e0ec5fd802513a97f19f516337474e9a",
+    "matches": true
+  },
+  {
+    "path": "channels/base.py",
+    "source_sha256": "f1335fddc4144fb09f6613ac79063958aca6fdfb992007a8f2fee12cec732eb3",
+    "installed_sha256": "f1335fddc4144fb09f6613ac79063958aca6fdfb992007a8f2fee12cec732eb3",
+    "matches": true
+  },
+  {
+    "path": "channels/connect.py",
+    "source_sha256": "35a45402bba9d6c9a0a3b41ea1095d6fa83be3e5d317c587aa70d65319090d10",
+    "installed_sha256": "35a45402bba9d6c9a0a3b41ea1095d6fa83be3e5d317c587aa70d65319090d10",
+    "matches": true
+  },
+  {
+    "path": "channels/contracts.py",
+    "source_sha256": "99cc4accee60154d0634449a7609bb78364eb62516685307725b291980b662c9",
+    "installed_sha256": "99cc4accee60154d0634449a7609bb78364eb62516685307725b291980b662c9",
+    "matches": true
+  },
+  {
+    "path": "channels/dingtalk/__init__.py",
+    "source_sha256": "d777d977130ceba1813155e55a49cf595d412ea0ea4fb03b66c4e1873b4e5893",
+    "installed_sha256": "d777d977130ceba1813155e55a49cf595d412ea0ea4fb03b66c4e1873b4e5893",
+    "matches": true
+  },
+  {
+    "path": "channels/dingtalk/manifest.py",
+    "source_sha256": "6b4c671974b5be89124f0d173c35e29ae452fbd828696139355b6b7fa93df4aa",
+    "installed_sha256": "6b4c671974b5be89124f0d173c35e29ae452fbd828696139355b6b7fa93df4aa",
+    "matches": true
+  },
+  {
+    "path": "channels/dingtalk/runtime.py",
+    "source_sha256": "3056febe813cb4293da7810b4006202a1a936c487998deffc6a3f131cca33fbf",
+    "installed_sha256": "3056febe813cb4293da7810b4006202a1a936c487998deffc6a3f131cca33fbf",
+    "matches": true
+  },
+  {
+    "path": "channels/discord/__init__.py",
+    "source_sha256": "19bf5db981d54160d998f8cf6d5865d42b4a1bfdd902f7949990af32118ce41e",
+    "installed_sha256": "19bf5db981d54160d998f8cf6d5865d42b4a1bfdd902f7949990af32118ce41e",
+    "matches": true
+  },
+  {
+    "path": "channels/discord/manifest.py",
+    "source_sha256": "7818088d182eefe3c18748aa079d1a540ccd79e0318ef4a8b3d45195b9f93c8b",
+    "installed_sha256": "7818088d182eefe3c18748aa079d1a540ccd79e0318ef4a8b3d45195b9f93c8b",
+    "matches": true
+  },
+  {
+    "path": "channels/discord/runtime.py",
+    "source_sha256": "c52f42b182cde6055503441570bf41166c47f588ec48a642b31ac93f1a0cdfbb",
+    "installed_sha256": "c52f42b182cde6055503441570bf41166c47f588ec48a642b31ac93f1a0cdfbb",
+    "matches": true
+  },
+  {
+    "path": "channels/discord/validation.py",
+    "source_sha256": "048192fe0d215055faf72db5344cbb04813cd798ec64e4e75dde7dc57e9ad3e9",
+    "installed_sha256": "048192fe0d215055faf72db5344cbb04813cd798ec64e4e75dde7dc57e9ad3e9",
+    "matches": true
+  },
+  {
+    "path": "channels/email/__init__.py",
+    "source_sha256": "e7b7ab78927f430f8f7fba2176ad089d8bb4c769ccef64865e7d01503850f98a",
+    "installed_sha256": "e7b7ab78927f430f8f7fba2176ad089d8bb4c769ccef64865e7d01503850f98a",
+    "matches": true
+  },
+  {
+    "path": "channels/email/manifest.py",
+    "source_sha256": "efaacaae2b94d864bc4167eb56efae0251aafff152667cc2c2205d7766df554a",
+    "installed_sha256": "efaacaae2b94d864bc4167eb56efae0251aafff152667cc2c2205d7766df554a",
+    "matches": true
+  },
+  {
+    "path": "channels/email/runtime.py",
+    "source_sha256": "59e3612fbec1fa51e109e20b9d899dc863fdf8e8b5ab19416bd8080caa00ff99",
+    "installed_sha256": "59e3612fbec1fa51e109e20b9d899dc863fdf8e8b5ab19416bd8080caa00ff99",
+    "matches": true
+  },
+  {
+    "path": "channels/email/validation.py",
+    "source_sha256": "5fe508c51ce9cc7521eb93425a84ce3e0bd9a70b7bc7debafc5d5bd282a11538",
+    "installed_sha256": "5fe508c51ce9cc7521eb93425a84ce3e0bd9a70b7bc7debafc5d5bd282a11538",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/__init__.py",
+    "source_sha256": "04d9ee0b3a441f799223c0f9d15a0670bf23c8f6ec659ee3047b7e8947eb526f",
+    "installed_sha256": "04d9ee0b3a441f799223c0f9d15a0670bf23c8f6ec659ee3047b7e8947eb526f",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/config.py",
+    "source_sha256": "e679a010b41125a4d9a7b431db77eb03e475ca1faeebca4ddaafa54d7987961f",
+    "installed_sha256": "e679a010b41125a4d9a7b431db77eb03e475ca1faeebca4ddaafa54d7987961f",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/connect.py",
+    "source_sha256": "409e530f67e13ee402c944ffd0ecd1626964f74071cbdc2d1ea0c7c5278b6d64",
+    "installed_sha256": "409e530f67e13ee402c944ffd0ecd1626964f74071cbdc2d1ea0c7c5278b6d64",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/instances.py",
+    "source_sha256": "246e1c3f38b77d8db441ec9d6c309f6196ebb752e3b3d0c826fdae2453ce3dd0",
+    "installed_sha256": "246e1c3f38b77d8db441ec9d6c309f6196ebb752e3b3d0c826fdae2453ce3dd0",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/manifest.py",
+    "source_sha256": "bf9e3a1b186d7bea021f805b144fd2e5236f6f6dba40fb6f43d1f107c02ddc84",
+    "installed_sha256": "bf9e3a1b186d7bea021f805b144fd2e5236f6f6dba40fb6f43d1f107c02ddc84",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/runtime.py",
+    "source_sha256": "8ea443d4a33c94b992377151d0374c03fafda27f7ba7907b779abb1d63bc8f2c",
+    "installed_sha256": "8ea443d4a33c94b992377151d0374c03fafda27f7ba7907b779abb1d63bc8f2c",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/validation.py",
+    "source_sha256": "69ddbb09cf52f5c7e36e83a6911c755f8ae1733de24ac6ff85a8ebc5430b7c86",
+    "installed_sha256": "69ddbb09cf52f5c7e36e83a6911c755f8ae1733de24ac6ff85a8ebc5430b7c86",
+    "matches": true
+  },
+  {
+    "path": "channels/feishu/websocket.py",
+    "source_sha256": "f1f350106282f23c58f7a4fe1caf302dd1775aa3c2178a8d77004dac990d5586",
+    "installed_sha256": "f1f350106282f23c58f7a4fe1caf302dd1775aa3c2178a8d77004dac990d5586",
+    "matches": true
+  },
+  {
+    "path": "channels/manager.py",
+    "source_sha256": "54d25f02ff4369995585130f703a2c2816a122fef52134a1f5824b8359ef846b",
+    "installed_sha256": "54d25f02ff4369995585130f703a2c2816a122fef52134a1f5824b8359ef846b",
+    "matches": true
+  },
+  {
+    "path": "channels/matrix/__init__.py",
+    "source_sha256": "9fd0365c6e45a5123a4565cd75803b25a956989b43b809595e98e53bf62deb32",
+    "installed_sha256": "9fd0365c6e45a5123a4565cd75803b25a956989b43b809595e98e53bf62deb32",
+    "matches": true
+  },
+  {
+    "path": "channels/matrix/manifest.py",
+    "source_sha256": "4be96729b156e71a29df8ebfb2d9a4f26b1f8f3879d671f35f4037094b2773e2",
+    "installed_sha256": "4be96729b156e71a29df8ebfb2d9a4f26b1f8f3879d671f35f4037094b2773e2",
+    "matches": true
+  },
+  {
+    "path": "channels/matrix/runtime.py",
+    "source_sha256": "891e12188090aeed0c67f942d8bd1b93a2f20599f67cec9990648f85deab5803",
+    "installed_sha256": "891e12188090aeed0c67f942d8bd1b93a2f20599f67cec9990648f85deab5803",
+    "matches": true
+  },
+  {
+    "path": "channels/matrix/validation.py",
+    "source_sha256": "8a9a81deee3e90773edff1d2ae1e9e33cbfd3060a0e04b7fa51be0394bb1469d",
+    "installed_sha256": "8a9a81deee3e90773edff1d2ae1e9e33cbfd3060a0e04b7fa51be0394bb1469d",
+    "matches": true
+  },
+  {
+    "path": "channels/mattermost/__init__.py",
+    "source_sha256": "f2bc12ef0fba3ce1d1483b6e089e3613d1469e43e5b4d5bf46556837008ce407",
+    "installed_sha256": "f2bc12ef0fba3ce1d1483b6e089e3613d1469e43e5b4d5bf46556837008ce407",
+    "matches": true
+  },
+  {
+    "path": "channels/mattermost/manifest.py",
+    "source_sha256": "f54cf02f413cd779a262bcb6943dbb2c5ddb2defdf52471ae0cb42269941f1c0",
+    "installed_sha256": "f54cf02f413cd779a262bcb6943dbb2c5ddb2defdf52471ae0cb42269941f1c0",
+    "matches": true
+  },
+  {
+    "path": "channels/mattermost/runtime.py",
+    "source_sha256": "222bf434673e7d0b7c3fe406ee17fb3b06a4db6d067395537315feb74b12f5a8",
+    "installed_sha256": "222bf434673e7d0b7c3fe406ee17fb3b06a4db6d067395537315feb74b12f5a8",
+    "matches": true
+  },
+  {
+    "path": "channels/mochat/__init__.py",
+    "source_sha256": "45142e7b58cd1b020b8c3ff5d1ba1fe7f7b56115a0edbe308fe2e29f8099dcac",
+    "installed_sha256": "45142e7b58cd1b020b8c3ff5d1ba1fe7f7b56115a0edbe308fe2e29f8099dcac",
+    "matches": true
+  },
+  {
+    "path": "channels/mochat/manifest.py",
+    "source_sha256": "cabaa894998fba3580c70f976ee3bf998b33aea77b1b247b32e2b1928c959940",
+    "installed_sha256": "cabaa894998fba3580c70f976ee3bf998b33aea77b1b247b32e2b1928c959940",
+    "matches": true
+  },
+  {
+    "path": "channels/mochat/runtime.py",
+    "source_sha256": "961c380790033f834f810b895e2e9b2c96794ccc343860839e5549d857b9698d",
+    "installed_sha256": "961c380790033f834f810b895e2e9b2c96794ccc343860839e5549d857b9698d",
+    "matches": true
+  },
+  {
+    "path": "channels/msteams/__init__.py",
+    "source_sha256": "80476d75391ae6037e744da11e05cf21597f9249235c1ab0d33c4e065229402d",
+    "installed_sha256": "80476d75391ae6037e744da11e05cf21597f9249235c1ab0d33c4e065229402d",
+    "matches": true
+  },
+  {
+    "path": "channels/msteams/manifest.py",
+    "source_sha256": "75cb188a74464cbcf0ab420c447269dc53330f4b443f9e05702ecc2590a0cf5e",
+    "installed_sha256": "75cb188a74464cbcf0ab420c447269dc53330f4b443f9e05702ecc2590a0cf5e",
+    "matches": true
+  },
+  {
+    "path": "channels/msteams/runtime.py",
+    "source_sha256": "c7b74ff2b892c0f324eff6113e20deef26c1fb61ff7b92a13e65b5bca2fd9806",
+    "installed_sha256": "c7b74ff2b892c0f324eff6113e20deef26c1fb61ff7b92a13e65b5bca2fd9806",
+    "matches": true
+  },
+  {
+    "path": "channels/napcat/__init__.py",
+    "source_sha256": "7d51d75b85cefabeae6410b8087e8a07d7ce5ad3e4cf471c0f4d71799ab8e52f",
+    "installed_sha256": "7d51d75b85cefabeae6410b8087e8a07d7ce5ad3e4cf471c0f4d71799ab8e52f",
+    "matches": true
+  },
+  {
+    "path": "channels/napcat/manifest.py",
+    "source_sha256": "203ecb6f7ab169e368fdd6dc55ef38655b04a809db728afb27611b3edc29e1c4",
+    "installed_sha256": "203ecb6f7ab169e368fdd6dc55ef38655b04a809db728afb27611b3edc29e1c4",
+    "matches": true
+  },
+  {
+    "path": "channels/napcat/runtime.py",
+    "source_sha256": "49dbe787565acf542911417bc715a6797cbfc30d34327a2e6d6ccf0d3ea4470d",
+    "installed_sha256": "49dbe787565acf542911417bc715a6797cbfc30d34327a2e6d6ccf0d3ea4470d",
+    "matches": true
+  },
+  {
+    "path": "channels/notification_routes.py",
+    "source_sha256": "c3573277ce9ec7f4efbfed5af1547abc4944df3f0f660f76bdc16c7db1dce80e",
+    "installed_sha256": "c3573277ce9ec7f4efbfed5af1547abc4944df3f0f660f76bdc16c7db1dce80e",
+    "matches": true
+  },
+  {
+    "path": "channels/plugin.py",
+    "source_sha256": "bd92ed7c406ab75e9d441fd22d6ae92d2d6df0ccd405c8414c12140f3e81a200",
+    "installed_sha256": "bd92ed7c406ab75e9d441fd22d6ae92d2d6df0ccd405c8414c12140f3e81a200",
+    "matches": true
+  },
+  {
+    "path": "channels/qq/__init__.py",
+    "source_sha256": "d4a19cb059ce3c53885a09354f30d36a48ab7fdf5c7e3f6d800f55052787a24a",
+    "installed_sha256": "d4a19cb059ce3c53885a09354f30d36a48ab7fdf5c7e3f6d800f55052787a24a",
+    "matches": true
+  },
+  {
+    "path": "channels/qq/manifest.py",
+    "source_sha256": "6d6fbaa9626177e320ff990245a4f22102809d5ce9f210be99dfaa2952f29ecd",
+    "installed_sha256": "6d6fbaa9626177e320ff990245a4f22102809d5ce9f210be99dfaa2952f29ecd",
+    "matches": true
+  },
+  {
+    "path": "channels/qq/runtime.py",
+    "source_sha256": "29314f19d97f1002ec05fcfa29f623142c41ce73950a716466b3c2deaadad45b",
+    "installed_sha256": "29314f19d97f1002ec05fcfa29f623142c41ce73950a716466b3c2deaadad45b",
+    "matches": true
+  },
+  {
+    "path": "channels/registry.py",
+    "source_sha256": "11c252800818d52788a362998afa6974ea4048586bbac43a4b874180f9eb08b9",
+    "installed_sha256": "11c252800818d52788a362998afa6974ea4048586bbac43a4b874180f9eb08b9",
+    "matches": true
+  },
+  {
+    "path": "channels/signal/__init__.py",
+    "source_sha256": "b579056dec2cfe54ba84dd0127a92f2767a29c0049af5eb661edf7e2345e6b3e",
+    "installed_sha256": "b579056dec2cfe54ba84dd0127a92f2767a29c0049af5eb661edf7e2345e6b3e",
+    "matches": true
+  },
+  {
+    "path": "channels/signal/manifest.py",
+    "source_sha256": "0d21ad804d7b316d1adf8378dcfdec357b36ce76ce7b744914a7834aae170c59",
+    "installed_sha256": "0d21ad804d7b316d1adf8378dcfdec357b36ce76ce7b744914a7834aae170c59",
+    "matches": true
+  },
+  {
+    "path": "channels/signal/runtime.py",
+    "source_sha256": "8a58538236c25f02af4d403771a29f4e3e8f12e442395a090d84eba22285084e",
+    "installed_sha256": "8a58538236c25f02af4d403771a29f4e3e8f12e442395a090d84eba22285084e",
+    "matches": true
+  },
+  {
+    "path": "channels/slack/__init__.py",
+    "source_sha256": "2f8a8159a84f65059e5a8eb13d6fe07ce885a2e16e41106aa8d99392259253c7",
+    "installed_sha256": "2f8a8159a84f65059e5a8eb13d6fe07ce885a2e16e41106aa8d99392259253c7",
+    "matches": true
+  },
+  {
+    "path": "channels/slack/manifest.py",
+    "source_sha256": "ab597ca58b0556dc54115c7850ead05d42ae9e64e6f20ed89bd050491a089087",
+    "installed_sha256": "ab597ca58b0556dc54115c7850ead05d42ae9e64e6f20ed89bd050491a089087",
+    "matches": true
+  },
+  {
+    "path": "channels/slack/runtime.py",
+    "source_sha256": "01e6f566405609c7b22f88ca4b0df452411fd512011ed018c5bf77a45fef4cc1",
+    "installed_sha256": "01e6f566405609c7b22f88ca4b0df452411fd512011ed018c5bf77a45fef4cc1",
+    "matches": true
+  },
+  {
+    "path": "channels/slack/validation.py",
+    "source_sha256": "2b81ac12aa054539e9d37c86c2b9d2ca8bd06861d8ba7140b959420039f537d0",
+    "installed_sha256": "2b81ac12aa054539e9d37c86c2b9d2ca8bd06861d8ba7140b959420039f537d0",
+    "matches": true
+  },
+  {
+    "path": "channels/telegram/__init__.py",
+    "source_sha256": "f2f60dfed980d5cdf20982857bf6fa2f9aa34f3223140c7558e44a9bf0ee678c",
+    "installed_sha256": "f2f60dfed980d5cdf20982857bf6fa2f9aa34f3223140c7558e44a9bf0ee678c",
+    "matches": true
+  },
+  {
+    "path": "channels/telegram/manifest.py",
+    "source_sha256": "cfb7ac2fa250cd57eaf34f08a55edb23cec0d791ab4ebdbac797be3bd612cf52",
+    "installed_sha256": "cfb7ac2fa250cd57eaf34f08a55edb23cec0d791ab4ebdbac797be3bd612cf52",
+    "matches": true
+  },
+  {
+    "path": "channels/telegram/runtime.py",
+    "source_sha256": "793e374682bf88cd9ab892c6b1f1eb612011d2df8cacc9aa7364f1e4e82de4fc",
+    "installed_sha256": "793e374682bf88cd9ab892c6b1f1eb612011d2df8cacc9aa7364f1e4e82de4fc",
+    "matches": true
+  },
+  {
+    "path": "channels/telegram/validation.py",
+    "source_sha256": "9535ee4783962712a41959df71cac09dd7c2bd90195dedadf7be58706355605c",
+    "installed_sha256": "9535ee4783962712a41959df71cac09dd7c2bd90195dedadf7be58706355605c",
+    "matches": true
+  },
+  {
+    "path": "channels/validation.py",
+    "source_sha256": "ed716116aa06c6b5384283b206ecbe53ad00ad6ceadaef9c74502257cb41651a",
+    "installed_sha256": "ed716116aa06c6b5384283b206ecbe53ad00ad6ceadaef9c74502257cb41651a",
+    "matches": true
+  },
+  {
+    "path": "channels/websocket/__init__.py",
+    "source_sha256": "440037ddc480fb2771aaa04dda0eebd8c6cb436d32fc91c73fb82bf1fd39225d",
+    "installed_sha256": "440037ddc480fb2771aaa04dda0eebd8c6cb436d32fc91c73fb82bf1fd39225d",
+    "matches": true
+  },
+  {
+    "path": "channels/websocket/manifest.py",
+    "source_sha256": "1006579664b0dd3095a159ecb31c49ab6d1de93acd5e0559d82c8c30d9dcae14",
+    "installed_sha256": "1006579664b0dd3095a159ecb31c49ab6d1de93acd5e0559d82c8c30d9dcae14",
+    "matches": true
+  },
+  {
+    "path": "channels/websocket/runtime.py",
+    "source_sha256": "753f2d3c58f30948df509fab899c7a1fc745cf43c20879b95e1b654540688456",
+    "installed_sha256": "753f2d3c58f30948df509fab899c7a1fc745cf43c20879b95e1b654540688456",
+    "matches": true
+  },
+  {
+    "path": "channels/websocket/validation.py",
+    "source_sha256": "2f07490954b05b0ef358d4b480d4de0153ab98b26c4b9df0fafa1a7fe17aaa81",
+    "installed_sha256": "2f07490954b05b0ef358d4b480d4de0153ab98b26c4b9df0fafa1a7fe17aaa81",
+    "matches": true
+  },
+  {
+    "path": "channels/wecom/__init__.py",
+    "source_sha256": "4b63d2c2af7414a5c72028b9d21706215d5c28cb37183712b46863df33e93e21",
+    "installed_sha256": "4b63d2c2af7414a5c72028b9d21706215d5c28cb37183712b46863df33e93e21",
+    "matches": true
+  },
+  {
+    "path": "channels/wecom/manifest.py",
+    "source_sha256": "1fcf5c5979de4ba206c833bde4aecd46c47e4fb3d869fbd754094b3274821256",
+    "installed_sha256": "1fcf5c5979de4ba206c833bde4aecd46c47e4fb3d869fbd754094b3274821256",
+    "matches": true
+  },
+  {
+    "path": "channels/wecom/runtime.py",
+    "source_sha256": "b0b37c7347e863f7d28bdbdab79152a395c84439ccee4cb7a824a4e8554e72a0",
+    "installed_sha256": "b0b37c7347e863f7d28bdbdab79152a395c84439ccee4cb7a824a4e8554e72a0",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/__init__.py",
+    "source_sha256": "21ef44c4007ca87f4cedc46f732d7c756f22569e7d86dd4ec0efeea43be93e2e",
+    "installed_sha256": "21ef44c4007ca87f4cedc46f732d7c756f22569e7d86dd4ec0efeea43be93e2e",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/connect.py",
+    "source_sha256": "682bb763535babec85bb23f9c3362b69af4f7aec1d4f4ce1fa7f8fc54d949b7c",
+    "installed_sha256": "682bb763535babec85bb23f9c3362b69af4f7aec1d4f4ce1fa7f8fc54d949b7c",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/manifest.py",
+    "source_sha256": "997d69c408ee717b8c2612b2da4233498e26a6fecc6a710cb7c2be1b22c2ce1d",
+    "installed_sha256": "997d69c408ee717b8c2612b2da4233498e26a6fecc6a710cb7c2be1b22c2ce1d",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/runtime.py",
+    "source_sha256": "821eb1c3b6fb5b56aeeb9f5a58fbde6f81e7de58440bc6d38f378a2695996528",
+    "installed_sha256": "821eb1c3b6fb5b56aeeb9f5a58fbde6f81e7de58440bc6d38f378a2695996528",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/state.py",
+    "source_sha256": "ebdad051167c302ef1f426e2e2131ea6ecc036749e76cb2fd294493296d99c7c",
+    "installed_sha256": "ebdad051167c302ef1f426e2e2131ea6ecc036749e76cb2fd294493296d99c7c",
+    "matches": true
+  },
+  {
+    "path": "channels/weixin/validation.py",
+    "source_sha256": "eb5811d164f20079c2083d3f897ae8a9fea95f97cfbe3b7dc9875080418874c9",
+    "installed_sha256": "eb5811d164f20079c2083d3f897ae8a9fea95f97cfbe3b7dc9875080418874c9",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/__init__.py",
+    "source_sha256": "29f7383afde2cb714828b7103c941c0c9574948b3bd2b9f5a3b77d7514fda8a1",
+    "installed_sha256": "29f7383afde2cb714828b7103c941c0c9574948b3bd2b9f5a3b77d7514fda8a1",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/connect.py",
+    "source_sha256": "dcf08ea8597f28e4b22c0fe69678fa4f673e9071d511c944390334e6eea964cc",
+    "installed_sha256": "dcf08ea8597f28e4b22c0fe69678fa4f673e9071d511c944390334e6eea964cc",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/manifest.py",
+    "source_sha256": "2c1255698c901cd67ff5ac4854b588f458eeaa644436dc747caaf2e9ddf49b39",
+    "installed_sha256": "2c1255698c901cd67ff5ac4854b588f458eeaa644436dc747caaf2e9ddf49b39",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/runtime.py",
+    "source_sha256": "763145fbb2f3099bdb36b79249271f9c202ac42b16ac233623eacec8e54943c5",
+    "installed_sha256": "763145fbb2f3099bdb36b79249271f9c202ac42b16ac233623eacec8e54943c5",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/state.py",
+    "source_sha256": "5f2cb95531209c567ee4464c4122f7f07f133eede3e8f6a4c4181bc3ab5c3e17",
+    "installed_sha256": "5f2cb95531209c567ee4464c4122f7f07f133eede3e8f6a4c4181bc3ab5c3e17",
+    "matches": true
+  },
+  {
+    "path": "channels/whatsapp/validation.py",
+    "source_sha256": "be83012ebbe3f6a93b8f0a652ed2364b3b75ed60b52691a8721f1c41d94b2e82",
+    "installed_sha256": "be83012ebbe3f6a93b8f0a652ed2364b3b75ed60b52691a8721f1c41d94b2e82",
+    "matches": true
+  },
+  {
+    "path": "cli/__init__.py",
+    "source_sha256": "133769600c445467bfb772be9f988686fc4dbd880e9a2999094a4648a70641cf",
+    "installed_sha256": "133769600c445467bfb772be9f988686fc4dbd880e9a2999094a4648a70641cf",
+    "matches": true
+  },
+  {
+    "path": "cli/agent.py",
+    "source_sha256": "324848f4058d9283b392572dd6cbe1a76108ae670aa1bc3fd178becb2e245872",
+    "installed_sha256": "324848f4058d9283b392572dd6cbe1a76108ae670aa1bc3fd178becb2e245872",
+    "matches": true
+  },
+  {
+    "path": "cli/commands.py",
+    "source_sha256": "e04accf9f36f6bea7f8d2cf0cfce8fec0f4cf086054d8a148af5059528fc9f3c",
+    "installed_sha256": "e04accf9f36f6bea7f8d2cf0cfce8fec0f4cf086054d8a148af5059528fc9f3c",
+    "matches": true
+  },
+  {
+    "path": "cli/desktop_target.py",
+    "source_sha256": "3ee313e46ff127a81a34cde883a35fa4d30f68d2b731663bc060e2a51c7bcdb6",
+    "installed_sha256": "3ee313e46ff127a81a34cde883a35fa4d30f68d2b731663bc060e2a51c7bcdb6",
+    "matches": true
+  },
+  {
+    "path": "cli/desktop_tui.py",
+    "source_sha256": "dee691b67fb70cfba81ccc64139f169b5d9eb91cd12f83ea9d58e50f09630ca4",
+    "installed_sha256": "dee691b67fb70cfba81ccc64139f169b5d9eb91cd12f83ea9d58e50f09630ca4",
+    "matches": true
+  },
+  {
+    "path": "cli/entry.py",
+    "source_sha256": "e29c8b87fd5cca4c40c5ff11d9eaa6413672b7b7d8bb7cf4b02c042434af0a9b",
+    "installed_sha256": "e29c8b87fd5cca4c40c5ff11d9eaa6413672b7b7d8bb7cf4b02c042434af0a9b",
+    "matches": true
+  },
+  {
+    "path": "cli/gateway.py",
+    "source_sha256": "104df95708f92938cd988618a4835d74629fdcfdeec4948b6f2abc9551a71170",
+    "installed_sha256": "104df95708f92938cd988618a4835d74629fdcfdeec4948b6f2abc9551a71170",
+    "matches": true
+  },
+  {
+    "path": "cli/gateway_runtime.py",
+    "source_sha256": "5dda5bfb083580ec9858c2914225c367ea868505a74572aa9b24c66b6503c99d",
+    "installed_sha256": "5dda5bfb083580ec9858c2914225c367ea868505a74572aa9b24c66b6503c99d",
+    "matches": true
+  },
+  {
+    "path": "cli/log_control.py",
+    "source_sha256": "ed9e318b9c2f338dba96c2bafb0ff35d44cd1bbdeaaa5659f94a2c3fb903e98b",
+    "installed_sha256": "ed9e318b9c2f338dba96c2bafb0ff35d44cd1bbdeaaa5659f94a2c3fb903e98b",
+    "matches": true
+  },
+  {
+    "path": "cli/models.py",
+    "source_sha256": "5cd68173729861e7a2b322f15cc426193ef86e496fe5f45273618da2e615e392",
+    "installed_sha256": "5cd68173729861e7a2b322f15cc426193ef86e496fe5f45273618da2e615e392",
+    "matches": true
+  },
+  {
+    "path": "cli/onboard.py",
+    "source_sha256": "3988fd0a662a380ced15f0eb5683056d0bbead11d60e95136e4648961176fc64",
+    "installed_sha256": "3988fd0a662a380ced15f0eb5683056d0bbead11d60e95136e4648961176fc64",
+    "matches": true
+  },
+  {
+    "path": "cli/process_identity.py",
+    "source_sha256": "004987e2498443660c160ab83b09e019d194df956a0cbab9d5de4ede67366dda",
+    "installed_sha256": "004987e2498443660c160ab83b09e019d194df956a0cbab9d5de4ede67366dda",
+    "matches": true
+  },
+  {
+    "path": "cli/provider.py",
+    "source_sha256": "a713e5493b8ed883ff860904c3d957e6758b87a8a43a6e9d2a7a9824a8d6862e",
+    "installed_sha256": "a713e5493b8ed883ff860904c3d957e6758b87a8a43a6e9d2a7a9824a8d6862e",
+    "matches": true
+  },
+  {
+    "path": "cli/runtime_config.py",
+    "source_sha256": "98125a1ac3cac416c1b5eaaa7ef49f4aad474ae603c4f5ebdb17ce42cc024935",
+    "installed_sha256": "98125a1ac3cac416c1b5eaaa7ef49f4aad474ae603c4f5ebdb17ce42cc024935",
+    "matches": true
+  },
+  {
+    "path": "cli/stream.py",
+    "source_sha256": "62f4842e4484dcaeb9d8595ff41983f099ba7068cecb06cbe82297ce738d5c72",
+    "installed_sha256": "62f4842e4484dcaeb9d8595ff41983f099ba7068cecb06cbe82297ce738d5c72",
+    "matches": true
+  },
+  {
+    "path": "cli/terminal.py",
+    "source_sha256": "ce9f9a670a175f6276b6a7551318088814d267b8dfae58d5a157e1d4a03a0712",
+    "installed_sha256": "ce9f9a670a175f6276b6a7551318088814d267b8dfae58d5a157e1d4a03a0712",
+    "matches": true
+  },
+  {
+    "path": "cli/tui_launcher.py",
+    "source_sha256": "c4df4514e21c862ce3e59d9ed04e6e40cdc75d99301ecbd4fce20e4ff27465fc",
+    "installed_sha256": "c4df4514e21c862ce3e59d9ed04e6e40cdc75d99301ecbd4fce20e4ff27465fc",
+    "matches": true
+  },
+  {
+    "path": "cli/webui.py",
+    "source_sha256": "bf9e2ccfef97c61046eb6becab818ac9180d41801cec93295f624d0b5a1852c6",
+    "installed_sha256": "bf9e2ccfef97c61046eb6becab818ac9180d41801cec93295f624d0b5a1852c6",
+    "matches": true
+  },
+  {
+    "path": "cli/webui_support.py",
+    "source_sha256": "9ad90ed0177e19a621468802371acdc853db770cc3ab1d4f19f5925c174a7676",
+    "installed_sha256": "9ad90ed0177e19a621468802371acdc853db770cc3ab1d4f19f5925c174a7676",
+    "matches": true
+  },
+  {
+    "path": "cli/windows_browser.py",
+    "source_sha256": "29f3873473449a1797f2a50176a8b7c86a1f1538c962654127bf61bc42abf1b0",
+    "installed_sha256": "29f3873473449a1797f2a50176a8b7c86a1f1538c962654127bf61bc42abf1b0",
+    "matches": true
+  },
+  {
+    "path": "command/__init__.py",
+    "source_sha256": "1ad0670b918e7999ce60a1752a142fccf4c104eab8c4b11124febd5a1886b9de",
+    "installed_sha256": "1ad0670b918e7999ce60a1752a142fccf4c104eab8c4b11124febd5a1886b9de",
+    "matches": true
+  },
+  {
+    "path": "command/builtin.py",
+    "source_sha256": "228a32d669f6df97d410bab6b9f2a70d4b67abdedadbbd9b95df648974cf2e38",
+    "installed_sha256": "228a32d669f6df97d410bab6b9f2a70d4b67abdedadbbd9b95df648974cf2e38",
+    "matches": true
+  },
+  {
+    "path": "command/router.py",
+    "source_sha256": "6cb069b77d80afc9cc2691363ff396210adf8b8391a537bb669d53bd06653737",
+    "installed_sha256": "6cb069b77d80afc9cc2691363ff396210adf8b8391a537bb669d53bd06653737",
+    "matches": true
+  },
+  {
+    "path": "config/__init__.py",
+    "source_sha256": "34610408d0bc418f70834c2673a9543bc01dc58eb7fb650b178f80944eedf1e2",
+    "installed_sha256": "34610408d0bc418f70834c2673a9543bc01dc58eb7fb650b178f80944eedf1e2",
+    "matches": true
+  },
+  {
+    "path": "config/errors.py",
+    "source_sha256": "fd2292ef18708d6e30cfc64f0df7d808986cfe605fd5ff9d27e87f7f55f66c3f",
+    "installed_sha256": "fd2292ef18708d6e30cfc64f0df7d808986cfe605fd5ff9d27e87f7f55f66c3f",
+    "matches": true
+  },
+  {
+    "path": "config/loader.py",
+    "source_sha256": "b7a8470acc521685535a9b49702e266c0a3f18fa236b2684e7e0d1a1c5682cbd",
+    "installed_sha256": "b7a8470acc521685535a9b49702e266c0a3f18fa236b2684e7e0d1a1c5682cbd",
+    "matches": true
+  },
+  {
+    "path": "config/paths.py",
+    "source_sha256": "a6432705d9d34496fef5c53d8fca558632718046b377e462b36d9dae811d6a3d",
+    "installed_sha256": "a6432705d9d34496fef5c53d8fca558632718046b377e462b36d9dae811d6a3d",
+    "matches": true
+  },
+  {
+    "path": "config/schema.py",
+    "source_sha256": "e852767667b741494888321adfc719e9f2913748a92680dce93256f1b35ec544",
+    "installed_sha256": "e852767667b741494888321adfc719e9f2913748a92680dce93256f1b35ec544",
+    "matches": true
+  },
+  {
+    "path": "config/timezone.py",
+    "source_sha256": "db84bfd2dbce2ed3a1ac2db9f4cd5fff4ef4652b2dd4aecf32b35fdbe107f5f6",
+    "installed_sha256": "db84bfd2dbce2ed3a1ac2db9f4cd5fff4ef4652b2dd4aecf32b35fdbe107f5f6",
+    "matches": true
+  },
+  {
+    "path": "config/watcher.py",
+    "source_sha256": "54324ad522518f8d007a67a64cd58eee4ba31d319319be36c6329b95b0751f7f",
+    "installed_sha256": "54324ad522518f8d007a67a64cd58eee4ba31d319319be36c6329b95b0751f7f",
+    "matches": true
+  },
+  {
+    "path": "config_base.py",
+    "source_sha256": "5579be5ae3020e339a6ad49776912fb41cc32ef6e05134feaf64160aecb56285",
+    "installed_sha256": "5579be5ae3020e339a6ad49776912fb41cc32ef6e05134feaf64160aecb56285",
+    "matches": true
+  },
+  {
+    "path": "cron/__init__.py",
+    "source_sha256": "95348a9488a47a2c35a15b2de6153852c6b6d6a547b5a4c4ea9d20adc3ca7483",
+    "installed_sha256": "95348a9488a47a2c35a15b2de6153852c6b6d6a547b5a4c4ea9d20adc3ca7483",
+    "matches": true
+  },
+  {
+    "path": "cron/bound_runner.py",
+    "source_sha256": "c61599e9c87cb38c692b5243cd0156919b2c41af4567f71e9adf4d428cabdc08",
+    "installed_sha256": "c61599e9c87cb38c692b5243cd0156919b2c41af4567f71e9adf4d428cabdc08",
+    "matches": true
+  },
+  {
+    "path": "cron/service.py",
+    "source_sha256": "889e8689903596b9e8b19d6755c89495cfd9b32f381bfe28584abcda69085b91",
+    "installed_sha256": "889e8689903596b9e8b19d6755c89495cfd9b32f381bfe28584abcda69085b91",
+    "matches": true
+  },
+  {
+    "path": "cron/session_delivery.py",
+    "source_sha256": "7af15c85378af211b054f4fb0e1f2ff796df5e3b8dc657ae167b15f0cd2a6d1d",
+    "installed_sha256": "7af15c85378af211b054f4fb0e1f2ff796df5e3b8dc657ae167b15f0cd2a6d1d",
+    "matches": true
+  },
+  {
+    "path": "cron/session_turns.py",
+    "source_sha256": "b9ff2bd292a1930b16d3d23433a53ade9dc5e39c7360948dbb95247a8ce32664",
+    "installed_sha256": "b9ff2bd292a1930b16d3d23433a53ade9dc5e39c7360948dbb95247a8ce32664",
+    "matches": true
+  },
+  {
+    "path": "cron/types.py",
+    "source_sha256": "066f98e421db2127dd5a3357b71a15084526afb493509edf95fba2e5a9289ca7",
+    "installed_sha256": "066f98e421db2127dd5a3357b71a15084526afb493509edf95fba2e5a9289ca7",
+    "matches": true
+  },
+  {
+    "path": "cron/webui_metadata.py",
+    "source_sha256": "e2c9c7cc62cddf7bc2bba93c3f239689847b562c42bacb16f8c1f8ca404a2ea8",
+    "installed_sha256": "e2c9c7cc62cddf7bc2bba93c3f239689847b562c42bacb16f8c1f8ca404a2ea8",
+    "matches": true
+  },
+  {
+    "path": "events.py",
+    "source_sha256": "9c8eae518b1e1089fab8a4e35149a5943734ed5ec2a84a453f0f47785278cc70",
+    "installed_sha256": "9c8eae518b1e1089fab8a4e35149a5943734ed5ec2a84a453f0f47785278cc70",
+    "matches": true
+  },
+  {
+    "path": "gateway/__init__.py",
+    "source_sha256": "7a5d23d9ba512f68c32b819d5b421e03155fd0d24df08df026354c9cc988bb7e",
+    "installed_sha256": "7a5d23d9ba512f68c32b819d5b421e03155fd0d24df08df026354c9cc988bb7e",
+    "matches": true
+  },
+  {
+    "path": "gateway/runtime.py",
+    "source_sha256": "c3efe45083797658b1324b9d2bf349e03716a4149eef3515e2f0190c4c4ce399",
+    "installed_sha256": "c3efe45083797658b1324b9d2bf349e03716a4149eef3515e2f0190c4c4ce399",
+    "matches": true
+  },
+  {
+    "path": "gateway/service.py",
+    "source_sha256": "50c9a22c5d6608d3ae2c27c5e00e4288b5005726803e1aec75626e2fedb154a4",
+    "installed_sha256": "50c9a22c5d6608d3ae2c27c5e00e4288b5005726803e1aec75626e2fedb154a4",
+    "matches": true
+  },
+  {
+    "path": "llm_usage/__init__.py",
+    "source_sha256": "fbd347b240b187ec2eb74247da63c532ab8ad9e5f96a8d3bd59ab49fbdabfee3",
+    "installed_sha256": "fbd347b240b187ec2eb74247da63c532ab8ad9e5f96a8d3bd59ab49fbdabfee3",
+    "matches": true
+  },
+  {
+    "path": "llm_usage/context.py",
+    "source_sha256": "87f8845f03d08e8fc412ae2d8c14c4170fb4bd972f4997cd6065cb7a0fe5f060",
+    "installed_sha256": "87f8845f03d08e8fc412ae2d8c14c4170fb4bd972f4997cd6065cb7a0fe5f060",
+    "matches": true
+  },
+  {
+    "path": "llm_usage/models.py",
+    "source_sha256": "170e4c95fe468e9c7dc0c55503dcc9645a39d2d6d3d1d6812f061203f2648370",
+    "installed_sha256": "170e4c95fe468e9c7dc0c55503dcc9645a39d2d6d3d1d6812f061203f2648370",
+    "matches": true
+  },
+  {
+    "path": "llm_usage/store.py",
+    "source_sha256": "b1d080b30c017784d1762984821c9d3769db4f63ad2020437208d81743d99f41",
+    "installed_sha256": "b1d080b30c017784d1762984821c9d3769db4f63ad2020437208d81743d99f41",
+    "matches": true
+  },
+  {
+    "path": "nanobot.py",
+    "source_sha256": "ebc9323d8df1a66082947e853dae9096c3f6ed2ad69cc06b4777c4c893e6a8cc",
+    "installed_sha256": "ebc9323d8df1a66082947e853dae9096c3f6ed2ad69cc06b4777c4c893e6a8cc",
+    "matches": true
+  },
+  {
+    "path": "optional_features.py",
+    "source_sha256": "7721fab69536409a51fbf6cb3494404fcb725640e068176299fcc337e768c7ff",
+    "installed_sha256": "7721fab69536409a51fbf6cb3494404fcb725640e068176299fcc337e768c7ff",
+    "matches": true
+  },
+  {
+    "path": "pairing/__init__.py",
+    "source_sha256": "d08cdf2e9ed497db390298f8cef254320b6795a2415cdc9766ed5285f06ca707",
+    "installed_sha256": "d08cdf2e9ed497db390298f8cef254320b6795a2415cdc9766ed5285f06ca707",
+    "matches": true
+  },
+  {
+    "path": "pairing/store.py",
+    "source_sha256": "bf5d0b67ef11a6d3fd8c023ff13340c4f44f48e5e520517013a6a7a37e611f30",
+    "installed_sha256": "bf5d0b67ef11a6d3fd8c023ff13340c4f44f48e5e520517013a6a7a37e611f30",
+    "matches": true
+  },
+  {
+    "path": "process_runtime.py",
+    "source_sha256": "180d066ba9f29e4d93e59ee9e3902deef2ed04ac354d10e8acba1c5b131c2694",
+    "installed_sha256": "180d066ba9f29e4d93e59ee9e3902deef2ed04ac354d10e8acba1c5b131c2694",
+    "matches": true
+  },
+  {
+    "path": "providers/__init__.py",
+    "source_sha256": "c7f750ffdf1805fa844c552c0ccc5833df5d9f8c2bcc714b565a3093bc3dfb60",
+    "installed_sha256": "c7f750ffdf1805fa844c552c0ccc5833df5d9f8c2bcc714b565a3093bc3dfb60",
+    "matches": true
+  },
+  {
+    "path": "providers/anthropic_provider.py",
+    "source_sha256": "4b1468823b58e4d53be2a3624715bc3c234d99422d1f7e4a5d0ad1448fdc52d2",
+    "installed_sha256": "4b1468823b58e4d53be2a3624715bc3c234d99422d1f7e4a5d0ad1448fdc52d2",
+    "matches": true
+  },
+  {
+    "path": "providers/azure_openai_provider.py",
+    "source_sha256": "88e4e62ae060679d5dcbf597161d84ffb44d49edcb11a912e60d82808749a568",
+    "installed_sha256": "88e4e62ae060679d5dcbf597161d84ffb44d49edcb11a912e60d82808749a568",
+    "matches": true
+  },
+  {
+    "path": "providers/base.py",
+    "source_sha256": "4bd67d781135690083ce4fb7a366ff16d7254b6e5c23e8d30a7e25780f8eb760",
+    "installed_sha256": "4bd67d781135690083ce4fb7a366ff16d7254b6e5c23e8d30a7e25780f8eb760",
+    "matches": true
+  },
+  {
+    "path": "providers/bedrock_provider.py",
+    "source_sha256": "2fb7c1d4fdc6422148845c02dc3293479d38e5854e7726ee7b29817cb060aafe",
+    "installed_sha256": "2fb7c1d4fdc6422148845c02dc3293479d38e5854e7726ee7b29817cb060aafe",
+    "matches": true
+  },
+  {
+    "path": "providers/conversation_state.py",
+    "source_sha256": "c39ece8abc64969086649a36ffbc8772c6984e9f02d86b046112fbfe673efc30",
+    "installed_sha256": "c39ece8abc64969086649a36ffbc8772c6984e9f02d86b046112fbfe673efc30",
+    "matches": true
+  },
+  {
+    "path": "providers/factory.py",
+    "source_sha256": "5f173417317ec5961f09d8d8ca3a71d23fb3f78279c3438be61fbdac2ddda36c",
+    "installed_sha256": "5f173417317ec5961f09d8d8ca3a71d23fb3f78279c3438be61fbdac2ddda36c",
+    "matches": true
+  },
+  {
+    "path": "providers/fallback_provider.py",
+    "source_sha256": "df8bc271f505be790b5396c163952ffbe3fecf6402a1da1f904c7fc934bff426",
+    "installed_sha256": "df8bc271f505be790b5396c163952ffbe3fecf6402a1da1f904c7fc934bff426",
+    "matches": true
+  },
+  {
+    "path": "providers/github_copilot_provider.py",
+    "source_sha256": "92716321daa9d83c3d128864c5c50b65781d4eeb4b6f28b5808948dd9af78d30",
+    "installed_sha256": "92716321daa9d83c3d128864c5c50b65781d4eeb4b6f28b5808948dd9af78d30",
+    "matches": true
+  },
+  {
+    "path": "providers/image_generation.py",
+    "source_sha256": "6710741ad856ba552f62369015a9fb405a6f6223dfab04ecb7380a7db243459f",
+    "installed_sha256": "6710741ad856ba552f62369015a9fb405a6f6223dfab04ecb7380a7db243459f",
+    "matches": true
+  },
+  {
+    "path": "providers/oauth_guidance.py",
+    "source_sha256": "476468d32ff4a6065ea0deefb2dd93d515e53a36683e919298c08a0756debe36",
+    "installed_sha256": "476468d32ff4a6065ea0deefb2dd93d515e53a36683e919298c08a0756debe36",
+    "matches": true
+  },
+  {
+    "path": "providers/oauth_model_catalog.py",
+    "source_sha256": "906c08b62cffadb84599d12e3ab6d90bae641ad8c42f33834ac18860c26e7877",
+    "installed_sha256": "906c08b62cffadb84599d12e3ab6d90bae641ad8c42f33834ac18860c26e7877",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_codex_oauth.py",
+    "source_sha256": "2d008293aea95a262925fd6420310efd864dd7d5fc601d2b4c230ae9fba0af8c",
+    "installed_sha256": "2d008293aea95a262925fd6420310efd864dd7d5fc601d2b4c230ae9fba0af8c",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_codex_provider.py",
+    "source_sha256": "4729cd950b83ca8cad3de19c68ca3f3702f75146d82ef3c43c55062399972ab7",
+    "installed_sha256": "4729cd950b83ca8cad3de19c68ca3f3702f75146d82ef3c43c55062399972ab7",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_compat_provider.py",
+    "source_sha256": "f4540b336b22a591923ef7b62c82a39c5341767553fbf840f90c06d11ffe711b",
+    "installed_sha256": "f4540b336b22a591923ef7b62c82a39c5341767553fbf840f90c06d11ffe711b",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_responses/__init__.py",
+    "source_sha256": "dd42b3b2008b4b25615bffcb074c0766c71f8c5b3fd8bff8faff0e51f19b86e4",
+    "installed_sha256": "dd42b3b2008b4b25615bffcb074c0766c71f8c5b3fd8bff8faff0e51f19b86e4",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_responses/converters.py",
+    "source_sha256": "aa197a9bea5e72ec5fe848e3c358b16018b04049f7ea49fadc9d17a3054ceacc",
+    "installed_sha256": "aa197a9bea5e72ec5fe848e3c358b16018b04049f7ea49fadc9d17a3054ceacc",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_responses/parsing.py",
+    "source_sha256": "7fb7badc06f76830a1c5864686d414a565f2538d5db9444a937952ccedecffd3",
+    "installed_sha256": "7fb7badc06f76830a1c5864686d414a565f2538d5db9444a937952ccedecffd3",
+    "matches": true
+  },
+  {
+    "path": "providers/openai_responses/state.py",
+    "source_sha256": "0d72ac20210e62b5a59823b9e7166d4eb2c914fc5016a70c421aa757cdbc574f",
+    "installed_sha256": "0d72ac20210e62b5a59823b9e7166d4eb2c914fc5016a70c421aa757cdbc574f",
+    "matches": true
+  },
+  {
+    "path": "providers/registry.py",
+    "source_sha256": "4cc5719f4ab6c6488499d5ecf212d192d486d16f68ec5296c9981b769e8b4dc6",
+    "installed_sha256": "4cc5719f4ab6c6488499d5ecf212d192d486d16f68ec5296c9981b769e8b4dc6",
+    "matches": true
+  },
+  {
+    "path": "providers/transcription.py",
+    "source_sha256": "32838fe6fea56730bbb6ad36c7e3229a5232c95ff6c374e27529753a23adddbd",
+    "installed_sha256": "32838fe6fea56730bbb6ad36c7e3229a5232c95ff6c374e27529753a23adddbd",
+    "matches": true
+  },
+  {
+    "path": "providers/unconfigured_provider.py",
+    "source_sha256": "146fd26c1de86cce43161fb00c91d28d61309f7d2ecd9542874d2d6f0fe8a27d",
+    "installed_sha256": "146fd26c1de86cce43161fb00c91d28d61309f7d2ecd9542874d2d6f0fe8a27d",
+    "matches": true
+  },
+  {
+    "path": "providers/xai_grok_provider.py",
+    "source_sha256": "e452ea512f60f7ffc3dc416ca6d603ed22bb821ed5be24f749631c86db1632eb",
+    "installed_sha256": "e452ea512f60f7ffc3dc416ca6d603ed22bb821ed5be24f749631c86db1632eb",
+    "matches": true
+  },
+  {
+    "path": "providers/xai_oauth.py",
+    "source_sha256": "f9e1e68dc68659aeb4017cc492e8d9ae68fa479d53a4ce8d1f5fce87af426fab",
+    "installed_sha256": "f9e1e68dc68659aeb4017cc492e8d9ae68fa479d53a4ce8d1f5fce87af426fab",
+    "matches": true
+  },
+  {
+    "path": "runtime_context.py",
+    "source_sha256": "e74c50b8d7d68a063721c0aa7ee52af5737e13875d8e88efaa490cc87da026ce",
+    "installed_sha256": "e74c50b8d7d68a063721c0aa7ee52af5737e13875d8e88efaa490cc87da026ce",
+    "matches": true
+  },
+  {
+    "path": "sdk/__init__.py",
+    "source_sha256": "85c4b3a7a49d95957c936c88b6425ea151069d535e0021b188008c457731541e",
+    "installed_sha256": "85c4b3a7a49d95957c936c88b6425ea151069d535e0021b188008c457731541e",
+    "matches": true
+  },
+  {
+    "path": "sdk/clients.py",
+    "source_sha256": "1fa99426de080c0a8f86480b4b02412342d6d40afa1ee9754056b43bca06b709",
+    "installed_sha256": "1fa99426de080c0a8f86480b4b02412342d6d40afa1ee9754056b43bca06b709",
+    "matches": true
+  },
+  {
+    "path": "sdk/runtime.py",
+    "source_sha256": "a16ad48f030e135f30f1081d1c54fad7806025d68ef8ef4f09e355824ec98211",
+    "installed_sha256": "a16ad48f030e135f30f1081d1c54fad7806025d68ef8ef4f09e355824ec98211",
+    "matches": true
+  },
+  {
+    "path": "sdk/streaming.py",
+    "source_sha256": "264004c9381e90ec2b79040b37cec3ac90366c8266a610329a180e39f953799a",
+    "installed_sha256": "264004c9381e90ec2b79040b37cec3ac90366c8266a610329a180e39f953799a",
+    "matches": true
+  },
+  {
+    "path": "sdk/types.py",
+    "source_sha256": "70580f72eda34bc11bc56aeffa18cba53f34635fe4f1eab4acb85bd75b14b1a4",
+    "installed_sha256": "70580f72eda34bc11bc56aeffa18cba53f34635fe4f1eab4acb85bd75b14b1a4",
+    "matches": true
+  },
+  {
+    "path": "security/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "installed_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "matches": true
+  },
+  {
+    "path": "security/network.py",
+    "source_sha256": "ecec72953ba3ed99b4921d2ba0951f0eecdf6297f3e429daa19545276f94aa24",
+    "installed_sha256": "ecec72953ba3ed99b4921d2ba0951f0eecdf6297f3e429daa19545276f94aa24",
+    "matches": true
+  },
+  {
+    "path": "security/workspace_access.py",
+    "source_sha256": "3d405504f795f23ff46ab4c2257ace3275bf4883cce5065ec3d87b09ecf4cf98",
+    "installed_sha256": "3d405504f795f23ff46ab4c2257ace3275bf4883cce5065ec3d87b09ecf4cf98",
+    "matches": true
+  },
+  {
+    "path": "security/workspace_policy.py",
+    "source_sha256": "d7d20f243a80015735120548378a0652b318852d156f7b5782b5db627a80d598",
+    "installed_sha256": "d7d20f243a80015735120548378a0652b318852d156f7b5782b5db627a80d598",
+    "matches": true
+  },
+  {
+    "path": "session/__init__.py",
+    "source_sha256": "867f844414a0d934954693e0fe653a14577ca3276684fe0417b85844740ad14f",
+    "installed_sha256": "867f844414a0d934954693e0fe653a14577ca3276684fe0417b85844740ad14f",
+    "matches": true
+  },
+  {
+    "path": "session/automation_turns.py",
+    "source_sha256": "e6cfbf16f79b9bba0d2a89ed613b13f39ff3aa09d3af2edf73792d7c3167ee14",
+    "installed_sha256": "e6cfbf16f79b9bba0d2a89ed613b13f39ff3aa09d3af2edf73792d7c3167ee14",
+    "matches": true
+  },
+  {
+    "path": "session/goal_state.py",
+    "source_sha256": "0bf55b339e1951591b32556dee5b11730163ffda04974078569236c56c26b3ff",
+    "installed_sha256": "0bf55b339e1951591b32556dee5b11730163ffda04974078569236c56c26b3ff",
+    "matches": true
+  },
+  {
+    "path": "session/history_visibility.py",
+    "source_sha256": "479d2b15a8a8718733d148a9442539983ff267bbcdee5123320549c4613814af",
+    "installed_sha256": "479d2b15a8a8718733d148a9442539983ff267bbcdee5123320549c4613814af",
+    "matches": true
+  },
+  {
+    "path": "session/keys.py",
+    "source_sha256": "58a4807948cdabb57b0cd659a7b6bdf62327192fbc4bc457c39f306998e0cee3",
+    "installed_sha256": "58a4807948cdabb57b0cd659a7b6bdf62327192fbc4bc457c39f306998e0cee3",
+    "matches": true
+  },
+  {
+    "path": "session/manager.py",
+    "source_sha256": "24fc4a1c8744072e27e5ba9fe56dc2d16775d9fa26aca9e5157c084c4b419d68",
+    "installed_sha256": "24fc4a1c8744072e27e5ba9fe56dc2d16775d9fa26aca9e5157c084c4b419d68",
+    "matches": true
+  },
+  {
+    "path": "session/model_selection.py",
+    "source_sha256": "8018531f0fb7df8c6c34e2c5c3d01ba2f8fcfecac32263a17eaad8de43c6f88a",
+    "installed_sha256": "8018531f0fb7df8c6c34e2c5c3d01ba2f8fcfecac32263a17eaad8de43c6f88a",
+    "matches": true
+  },
+  {
+    "path": "session/recovery.py",
+    "source_sha256": "b55578602ac3c71a9c2cceba1066393ab0177fbe3ca8a7022d8019ad0ab746c0",
+    "installed_sha256": "b55578602ac3c71a9c2cceba1066393ab0177fbe3ca8a7022d8019ad0ab746c0",
+    "matches": true
+  },
+  {
+    "path": "session/session_handles.py",
+    "source_sha256": "84e0d194b9874a745198544cf8f71a00ccf0c7f0e4c4d7755cee6945b901235f",
+    "installed_sha256": "84e0d194b9874a745198544cf8f71a00ccf0c7f0e4c4d7755cee6945b901235f",
+    "matches": true
+  },
+  {
+    "path": "session/session_messages.py",
+    "source_sha256": "be448d16b7db1860ce7872857bffdaad02dfcb0ccb7550ea500408b671f6125c",
+    "installed_sha256": "be448d16b7db1860ce7872857bffdaad02dfcb0ccb7550ea500408b671f6125c",
+    "matches": true
+  },
+  {
+    "path": "session/summary.py",
+    "source_sha256": "362821c9ac00e057463f8f76aba1242297e42ce50f316883d8a02a0fa28cf5e9",
+    "installed_sha256": "362821c9ac00e057463f8f76aba1242297e42ce50f316883d8a02a0fa28cf5e9",
+    "matches": true
+  },
+  {
+    "path": "session/turn_continuation.py",
+    "source_sha256": "c85d69bb236aa191e3fa317c4552ef9c31a3903144ed08e48ec762a5de1a24a0",
+    "installed_sha256": "c85d69bb236aa191e3fa317c4552ef9c31a3903144ed08e48ec762a5de1a24a0",
+    "matches": true
+  },
+  {
+    "path": "session/webui_turns.py",
+    "source_sha256": "ec30f7312ed9f2c2e8d77ad9604e378137c56e08cb8c82014e55ae9adb31eb8a",
+    "installed_sha256": "ec30f7312ed9f2c2e8d77ad9604e378137c56e08cb8c82014e55ae9adb31eb8a",
+    "matches": true
+  },
+  {
+    "path": "skills/skill-creator/scripts/init_skill.py",
+    "source_sha256": "51ca06582b00737a647245796a2f4d9895ac3d9b81d20d00d8fbbbed5cd6b793",
+    "installed_sha256": "51ca06582b00737a647245796a2f4d9895ac3d9b81d20d00d8fbbbed5cd6b793",
+    "matches": true
+  },
+  {
+    "path": "skills/skill-creator/scripts/package_skill.py",
+    "source_sha256": "6bb0d4390e5d7dc2bc12206b26180acea52f554c6655395568b58698a228e2ec",
+    "installed_sha256": "6bb0d4390e5d7dc2bc12206b26180acea52f554c6655395568b58698a228e2ec",
+    "matches": true
+  },
+  {
+    "path": "skills/skill-creator/scripts/quick_validate.py",
+    "source_sha256": "99dd4b6972274d65d115aa332d038d9122009d4282c3f485e508ec983f3a3277",
+    "installed_sha256": "99dd4b6972274d65d115aa332d038d9122009d4282c3f485e508ec983f3a3277",
+    "matches": true
+  },
+  {
+    "path": "templates/__init__.py",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matches": true
+  },
+  {
+    "path": "templates/memory/__init__.py",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matches": true
+  },
+  {
+    "path": "triggers/__init__.py",
+    "source_sha256": "9e0703d776fd4d92d7fd371f47c969e018f16956ea00dadd0cda4ba938e080e8",
+    "installed_sha256": "9e0703d776fd4d92d7fd371f47c969e018f16956ea00dadd0cda4ba938e080e8",
+    "matches": true
+  },
+  {
+    "path": "triggers/local_runner.py",
+    "source_sha256": "d9653ed6598a6e1ecd65811f23b01f0fb8d4e20e4adce04627c6bd3e5c3c3a14",
+    "installed_sha256": "d9653ed6598a6e1ecd65811f23b01f0fb8d4e20e4adce04627c6bd3e5c3c3a14",
+    "matches": true
+  },
+  {
+    "path": "triggers/local_session_turns.py",
+    "source_sha256": "1433dac42de18ecb89e7f8a8a5efa675d77002334f17f55a01260644fc68dbfe",
+    "installed_sha256": "1433dac42de18ecb89e7f8a8a5efa675d77002334f17f55a01260644fc68dbfe",
+    "matches": true
+  },
+  {
+    "path": "triggers/local_store.py",
+    "source_sha256": "5b26ce4bde374af1aa0e0bc0230e4e5256d05bc23857012ca1d7ad0811453331",
+    "installed_sha256": "5b26ce4bde374af1aa0e0bc0230e4e5256d05bc23857012ca1d7ad0811453331",
+    "matches": true
+  },
+  {
+    "path": "triggers/local_turns.py",
+    "source_sha256": "676e49dc2f2cf7b91632f1f6c897e94fdedfd20931d2ca537c66bf1f69d01fdf",
+    "installed_sha256": "676e49dc2f2cf7b91632f1f6c897e94fdedfd20931d2ca537c66bf1f69d01fdf",
+    "matches": true
+  },
+  {
+    "path": "triggers/local_types.py",
+    "source_sha256": "fa0d242c632d8c7f48f4f2665c6b8fd9a5fe6898d0e10160cf599ffdafb3df5e",
+    "installed_sha256": "fa0d242c632d8c7f48f4f2665c6b8fd9a5fe6898d0e10160cf599ffdafb3df5e",
+    "matches": true
+  },
+  {
+    "path": "utils/__init__.py",
+    "source_sha256": "45750cb00ecb6fa5cd51ef4b555c0da3e7d4bc36ec6e59257aab2952095b230b",
+    "installed_sha256": "45750cb00ecb6fa5cd51ef4b555c0da3e7d4bc36ec6e59257aab2952095b230b",
+    "matches": true
+  },
+  {
+    "path": "utils/artifacts.py",
+    "source_sha256": "dbaf92662085fc5c54c9373bd1fe6760cadff3a0acf892fb07685ec751f5d45e",
+    "installed_sha256": "dbaf92662085fc5c54c9373bd1fe6760cadff3a0acf892fb07685ec751f5d45e",
+    "matches": true
+  },
+  {
+    "path": "utils/cancellation.py",
+    "source_sha256": "926afd4dada35dee33c8b97aad43205520a5466aef54e034b5996cea021ea149",
+    "installed_sha256": "926afd4dada35dee33c8b97aad43205520a5466aef54e034b5996cea021ea149",
+    "matches": true
+  },
+  {
+    "path": "utils/dict_keys.py",
+    "source_sha256": "52cb11210a9074db37e5c1c7ae3d5ecd3ffead8ba6765b2e3fc485d01249ad21",
+    "installed_sha256": "52cb11210a9074db37e5c1c7ae3d5ecd3ffead8ba6765b2e3fc485d01249ad21",
+    "matches": true
+  },
+  {
+    "path": "utils/document.py",
+    "source_sha256": "ebe316fe5c1ef4d866cbaa63e685e07d8cb1d291de1649b2d569bea32be40cd4",
+    "installed_sha256": "ebe316fe5c1ef4d866cbaa63e685e07d8cb1d291de1649b2d569bea32be40cd4",
+    "matches": true
+  },
+  {
+    "path": "utils/evaluator.py",
+    "source_sha256": "0fd994e848de0a14dc433429b1f0100cae5c403f36e477150aab7509245b9346",
+    "installed_sha256": "0fd994e848de0a14dc433429b1f0100cae5c403f36e477150aab7509245b9346",
+    "matches": true
+  },
+  {
+    "path": "utils/file_edit_events.py",
+    "source_sha256": "7f48b771f456e8bd57df58bd9f6d72668bb8af7ffbf2f9b85b3c53703424eee7",
+    "installed_sha256": "7f48b771f456e8bd57df58bd9f6d72668bb8af7ffbf2f9b85b3c53703424eee7",
+    "matches": true
+  },
+  {
+    "path": "utils/gitstore.py",
+    "source_sha256": "62c265e38bde3e74749387a12d486ef015127754c116892196e03a27d5ea7560",
+    "installed_sha256": "62c265e38bde3e74749387a12d486ef015127754c116892196e03a27d5ea7560",
+    "matches": true
+  },
+  {
+    "path": "utils/helpers.py",
+    "source_sha256": "e0e6ab5499a1c2b8de8ac1f154ebdd503f732f64a19115aad9fa6bf07b030d3b",
+    "installed_sha256": "e0e6ab5499a1c2b8de8ac1f154ebdd503f732f64a19115aad9fa6bf07b030d3b",
+    "matches": true
+  },
+  {
+    "path": "utils/llm_runtime.py",
+    "source_sha256": "5f0f2f6849a39f5f3721ef0c1096da2ea4458d9a68f01625cbfc0b6134690d9c",
+    "installed_sha256": "5f0f2f6849a39f5f3721ef0c1096da2ea4458d9a68f01625cbfc0b6134690d9c",
+    "matches": true
+  },
+  {
+    "path": "utils/logging_bridge.py",
+    "source_sha256": "84b74f02f4c292674919293f61f7fc1337ea1fe61d2886bd26d34587a432dab4",
+    "installed_sha256": "84b74f02f4c292674919293f61f7fc1337ea1fe61d2886bd26d34587a432dab4",
+    "matches": true
+  },
+  {
+    "path": "utils/media_decode.py",
+    "source_sha256": "03f52d230258eaf06087105bf5a1ca2ab4129e1b988596ae52b7b1f429000dbf",
+    "installed_sha256": "03f52d230258eaf06087105bf5a1ca2ab4129e1b988596ae52b7b1f429000dbf",
+    "matches": true
+  },
+  {
+    "path": "utils/path.py",
+    "source_sha256": "b02f84d40e9e725d33f2bc831c7133488dd853ad414f7cd3ea41439538959e3b",
+    "installed_sha256": "b02f84d40e9e725d33f2bc831c7133488dd853ad414f7cd3ea41439538959e3b",
+    "matches": true
+  },
+  {
+    "path": "utils/progress_events.py",
+    "source_sha256": "70851f4cf92a9a227e8a600f7612a0d86e853403bd9d147380ec0345c49719c8",
+    "installed_sha256": "70851f4cf92a9a227e8a600f7612a0d86e853403bd9d147380ec0345c49719c8",
+    "matches": true
+  },
+  {
+    "path": "utils/prompt_templates.py",
+    "source_sha256": "6d052c2d5c0c974adb5e46cde2f3e0358f4657d3eb400c757797abd6efe39020",
+    "installed_sha256": "6d052c2d5c0c974adb5e46cde2f3e0358f4657d3eb400c757797abd6efe39020",
+    "matches": true
+  },
+  {
+    "path": "utils/restart.py",
+    "source_sha256": "475b892fb8e763689b0fc1c6be3b0ee37132e252a44b4e9ce1b3f62d20ac45f6",
+    "installed_sha256": "475b892fb8e763689b0fc1c6be3b0ee37132e252a44b4e9ce1b3f62d20ac45f6",
+    "matches": true
+  },
+  {
+    "path": "utils/run_records.py",
+    "source_sha256": "af1b9a74e1a5dfaae0b98706e498ae617b4b3ee57d3c40910e98e868d1cdf7b4",
+    "installed_sha256": "af1b9a74e1a5dfaae0b98706e498ae617b4b3ee57d3c40910e98e868d1cdf7b4",
+    "matches": true
+  },
+  {
+    "path": "utils/runtime.py",
+    "source_sha256": "465a2683349124e854f39f590013415eda52e10f550d30985a9b9211ab379f5d",
+    "installed_sha256": "465a2683349124e854f39f590013415eda52e10f550d30985a9b9211ab379f5d",
+    "matches": true
+  },
+  {
+    "path": "utils/searchusage.py",
+    "source_sha256": "25933741e4318e6918745fb031ce8d44e7cdd4f3458dc6827d5a419f5832cebc",
+    "installed_sha256": "25933741e4318e6918745fb031ce8d44e7cdd4f3458dc6827d5a419f5832cebc",
+    "matches": true
+  },
+  {
+    "path": "utils/subagent_channel_display.py",
+    "source_sha256": "9de04ae84a72ddea4f32d429e89bde079eb9150ca635d4b7f0d26a6de7581afa",
+    "installed_sha256": "9de04ae84a72ddea4f32d429e89bde079eb9150ca635d4b7f0d26a6de7581afa",
+    "matches": true
+  },
+  {
+    "path": "utils/tool_hints.py",
+    "source_sha256": "091a6e5b6e650c654f9339906dfa31db6b2a6f57a0701e9d4928bfd1d3a7d500",
+    "installed_sha256": "091a6e5b6e650c654f9339906dfa31db6b2a6f57a0701e9d4928bfd1d3a7d500",
+    "matches": true
+  },
+  {
+    "path": "utils/workspace_prompts.py",
+    "source_sha256": "b75c85dd5ddf71a258ec61d9bceee3f43f583a6488e4beccaa33c5a7ed9edc96",
+    "installed_sha256": "b75c85dd5ddf71a258ec61d9bceee3f43f583a6488e4beccaa33c5a7ed9edc96",
+    "matches": true
+  },
+  {
+    "path": "web/__init__.py",
+    "source_sha256": "2e9a9df019be5248bf7c26cec1c7d9ff65c7b5d6b466398663b705e1a8985d1a",
+    "installed_sha256": "2e9a9df019be5248bf7c26cec1c7d9ff65c7b5d6b466398663b705e1a8985d1a",
+    "matches": true
+  },
+  {
+    "path": "webui/__init__.py",
+    "source_sha256": "fdc5bdabc80a24ee7a1428ef089558868ab4ebc67b583757153c1233ade8cc11",
+    "installed_sha256": "fdc5bdabc80a24ee7a1428ef089558868ab4ebc67b583757153c1233ade8cc11",
+    "matches": true
+  },
+  {
+    "path": "webui/attachment_ingress.py",
+    "source_sha256": "b00997be8769bbbed15c3b2f4b07512ad5f4df2873bd8dfc8a460c5df217dd31",
+    "installed_sha256": "b00997be8769bbbed15c3b2f4b07512ad5f4df2873bd8dfc8a460c5df217dd31",
+    "matches": true
+  },
+  {
+    "path": "webui/automation_results.py",
+    "source_sha256": "cba9e027e441895f4435eae8fcd0da2ac115e890c65e0061b572bde65eac06fa",
+    "installed_sha256": "cba9e027e441895f4435eae8fcd0da2ac115e890c65e0061b572bde65eac06fa",
+    "matches": true
+  },
+  {
+    "path": "webui/build.py",
+    "source_sha256": "e2c7f040e923d5f8091775bd4a388cfd640c7bf4effbc87e0a19b3786c4aea17",
+    "installed_sha256": "e2c7f040e923d5f8091775bd4a388cfd640c7bf4effbc87e0a19b3786c4aea17",
+    "matches": true
+  },
+  {
+    "path": "webui/cli_apps_api.py",
+    "source_sha256": "05180d0be88505734ba197d9402a03851211ecf6dbb4b14556d63a6e3f5e2392",
+    "installed_sha256": "05180d0be88505734ba197d9402a03851211ecf6dbb4b14556d63a6e3f5e2392",
+    "matches": true
+  },
+  {
+    "path": "webui/dev.py",
+    "source_sha256": "337f9e540cb19be510b91cbf77d2d35f3dd26ee3800fe0f54ccc9f113989aa12",
+    "installed_sha256": "337f9e540cb19be510b91cbf77d2d35f3dd26ee3800fe0f54ccc9f113989aa12",
+    "matches": true
+  },
+  {
+    "path": "webui/file_preview.py",
+    "source_sha256": "c43754f3755cc0f74f5da777a55dc3a09e20d1b280d38f675106c881a0622920",
+    "installed_sha256": "c43754f3755cc0f74f5da777a55dc3a09e20d1b280d38f675106c881a0622920",
+    "matches": true
+  },
+  {
+    "path": "webui/forking.py",
+    "source_sha256": "1d7365717d5c4923010a8782e9160ea0a48a711592d4d1e9e01b9a3dac2885f4",
+    "installed_sha256": "1d7365717d5c4923010a8782e9160ea0a48a711592d4d1e9e01b9a3dac2885f4",
+    "matches": true
+  },
+  {
+    "path": "webui/gateway_endpoint.py",
+    "source_sha256": "8a4cc8cb8d059d5eb92eec7a9fa16bf7146debf17d82dbbe5e6e9f2893690b77",
+    "installed_sha256": "8a4cc8cb8d059d5eb92eec7a9fa16bf7146debf17d82dbbe5e6e9f2893690b77",
+    "matches": true
+  },
+  {
+    "path": "webui/gateway_services.py",
+    "source_sha256": "ad98514f1b90826645b880208f9d9e85ded2b24da66548cc50c1e4490cda9936",
+    "installed_sha256": "ad98514f1b90826645b880208f9d9e85ded2b24da66548cc50c1e4490cda9936",
+    "matches": true
+  },
+  {
+    "path": "webui/gateway_tokens.py",
+    "source_sha256": "73a9ce40f942f6044c6098d4ea9aaeda4526a94970c7a4b0a211cf01efc5907a",
+    "installed_sha256": "73a9ce40f942f6044c6098d4ea9aaeda4526a94970c7a4b0a211cf01efc5907a",
+    "matches": true
+  },
+  {
+    "path": "webui/http_utils.py",
+    "source_sha256": "af0bf79f50f8ba8e7c5dc262d8d69556bdf338569dbc7da6ed7cf8cddbef195f",
+    "installed_sha256": "af0bf79f50f8ba8e7c5dc262d8d69556bdf338569dbc7da6ed7cf8cddbef195f",
+    "matches": true
+  },
+  {
+    "path": "webui/inbound_commands.py",
+    "source_sha256": "320a18d1dd6c675157d091f93c7dcea2b4cb918e7b7f1691e7704c86743aced2",
+    "installed_sha256": "320a18d1dd6c675157d091f93c7dcea2b4cb918e7b7f1691e7704c86743aced2",
+    "matches": true
+  },
+  {
+    "path": "webui/ingress_policy.py",
+    "source_sha256": "e7144fd2d705324362d48c3a39441e3b0be9d7dba790f43df09004ec39e57d9d",
+    "installed_sha256": "e7144fd2d705324362d48c3a39441e3b0be9d7dba790f43df09004ec39e57d9d",
+    "matches": true
+  },
+  {
+    "path": "webui/mcp_oauth_api.py",
+    "source_sha256": "2b13ba01477dac41ff7719c626118c849406c96ddcef8f1a0cae5e02d3104a17",
+    "installed_sha256": "2b13ba01477dac41ff7719c626118c849406c96ddcef8f1a0cae5e02d3104a17",
+    "matches": true
+  },
+  {
+    "path": "webui/mcp_presets_api.py",
+    "source_sha256": "98b511c29612ff7f15e6843b0dd94fff6a144aa20e74ad93dd06cce57aa4c824",
+    "installed_sha256": "98b511c29612ff7f15e6843b0dd94fff6a144aa20e74ad93dd06cce57aa4c824",
+    "matches": true
+  },
+  {
+    "path": "webui/mcp_presets_runtime.py",
+    "source_sha256": "cd7f4efb7f79aa9457870388bc64a508d94c25bbe9039d09d40c8bdf66efdcca",
+    "installed_sha256": "cd7f4efb7f79aa9457870388bc64a508d94c25bbe9039d09d40c8bdf66efdcca",
+    "matches": true
+  },
+  {
+    "path": "webui/media_api.py",
+    "source_sha256": "337bfce5fb3511395d6ff84275f31ad08f3ef487f10c24c5e290813aeb0518e6",
+    "installed_sha256": "337bfce5fb3511395d6ff84275f31ad08f3ef487f10c24c5e290813aeb0518e6",
+    "matches": true
+  },
+  {
+    "path": "webui/media_gateway.py",
+    "source_sha256": "4b95f56fd8b9c418ac6352452201ae5101422c94d13f0eef94aea02e101a99d2",
+    "installed_sha256": "4b95f56fd8b9c418ac6352452201ae5101422c94d13f0eef94aea02e101a99d2",
+    "matches": true
+  },
+  {
+    "path": "webui/metadata.py",
+    "source_sha256": "5c71786bff0bd90b522a0ea061a3618b8f432b93af04175d6ada58d14444f617",
+    "installed_sha256": "5c71786bff0bd90b522a0ea061a3618b8f432b93af04175d6ada58d14444f617",
+    "matches": true
+  },
+  {
+    "path": "webui/nanobot_features_api.py",
+    "source_sha256": "f8a97d38083e1491ec5b9ce297625b1f71c89feea711b93f6079945a0b999c5c",
+    "installed_sha256": "f8a97d38083e1491ec5b9ce297625b1f71c89feea711b93f6079945a0b999c5c",
+    "matches": true
+  },
+  {
+    "path": "webui/native_folder_picker.py",
+    "source_sha256": "7f74c83b116ade20e02542e05b4c05b15efea7ec2dc114e4f3ccc6fd0fe1718f",
+    "installed_sha256": "7f74c83b116ade20e02542e05b4c05b15efea7ec2dc114e4f3ccc6fd0fe1718f",
+    "matches": true
+  },
+  {
+    "path": "webui/outbound_projection.py",
+    "source_sha256": "634a32554d7955003983a4fb4508a2f082a536ab50174b848551e9984345be76",
+    "installed_sha256": "634a32554d7955003983a4fb4508a2f082a536ab50174b848551e9984345be76",
+    "matches": true
+  },
+  {
+    "path": "webui/outbound_wire.py",
+    "source_sha256": "671834aa5a0dba2dec353fdeb42e8109b14ef8d29f6b0c2b74ec52063b6d41a5",
+    "installed_sha256": "671834aa5a0dba2dec353fdeb42e8109b14ef8d29f6b0c2b74ec52063b6d41a5",
+    "matches": true
+  },
+  {
+    "path": "webui/session_access.py",
+    "source_sha256": "3ca2074e18c597d445f182d558799683eab7bc4c20d911f2dad70455aed9fc63",
+    "installed_sha256": "3ca2074e18c597d445f182d558799683eab7bc4c20d911f2dad70455aed9fc63",
+    "matches": true
+  },
+  {
+    "path": "webui/session_automations.py",
+    "source_sha256": "69db28bafc067c908ffa6e8481a41c95a1c3f5f35b3787e647230e01cc74f462",
+    "installed_sha256": "69db28bafc067c908ffa6e8481a41c95a1c3f5f35b3787e647230e01cc74f462",
+    "matches": true
+  },
+  {
+    "path": "webui/session_context.py",
+    "source_sha256": "17435b66a6fec59dea0d446fb16a3031ffe6f6ca4fc93f1afb15c7fdb54c01b4",
+    "installed_sha256": "17435b66a6fec59dea0d446fb16a3031ffe6f6ca4fc93f1afb15c7fdb54c01b4",
+    "matches": true
+  },
+  {
+    "path": "webui/session_identity.py",
+    "source_sha256": "a3b074275e0047c5595490a013c10076d4f383d14f041cd773221b86fd0c95fb",
+    "installed_sha256": "a3b074275e0047c5595490a013c10076d4f383d14f041cd773221b86fd0c95fb",
+    "matches": true
+  },
+  {
+    "path": "webui/session_list_index.py",
+    "source_sha256": "5cb7f44534e14828b17e44853f1f6b538bf037a6ce5e63d10ad695ba9e9b507c",
+    "installed_sha256": "5cb7f44534e14828b17e44853f1f6b538bf037a6ce5e63d10ad695ba9e9b507c",
+    "matches": true
+  },
+  {
+    "path": "webui/session_projection.py",
+    "source_sha256": "a34a67f23e39b5f18b174347af8510d8a21f20161c8ef1aeb05119312eb9463b",
+    "installed_sha256": "a34a67f23e39b5f18b174347af8510d8a21f20161c8ef1aeb05119312eb9463b",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_api.py",
+    "source_sha256": "9f0d10c6efbb1a0d3ccfad2b77e09611df92fb8d443eba72da7fecc2b5ce93ba",
+    "installed_sha256": "9f0d10c6efbb1a0d3ccfad2b77e09611df92fb8d443eba72da7fecc2b5ce93ba",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_capabilities.py",
+    "source_sha256": "502f7b2767ab0fecd6e8769e9c86cafe018081b524db0f8320ed1f4a8497fd2b",
+    "installed_sha256": "502f7b2767ab0fecd6e8769e9c86cafe018081b524db0f8320ed1f4a8497fd2b",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_contracts.py",
+    "source_sha256": "20b81e7a8716dc8bd9bd6f050b38c1eba09bc7e37fb734f0f554b6262c781ab2",
+    "installed_sha256": "20b81e7a8716dc8bd9bd6f050b38c1eba09bc7e37fb734f0f554b6262c781ab2",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_models.py",
+    "source_sha256": "c7cc2e4ffb59a76da7caf7dfa88f3635bf042e053e022b37c2dcd9905958876d",
+    "installed_sha256": "c7cc2e4ffb59a76da7caf7dfa88f3635bf042e053e022b37c2dcd9905958876d",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_routes.py",
+    "source_sha256": "109235ba9ca632e32d168025c2a3e7a4ca2eb4c8150f8f47b6255a4c0c2321da",
+    "installed_sha256": "109235ba9ca632e32d168025c2a3e7a4ca2eb4c8150f8f47b6255a4c0c2321da",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_runtime.py",
+    "source_sha256": "9168a1bd68f052fe461467e184ee34188d064547b1eaaffde96b49485deb7b22",
+    "installed_sha256": "9168a1bd68f052fe461467e184ee34188d064547b1eaaffde96b49485deb7b22",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_services.py",
+    "source_sha256": "ba73f2cbf4c1b7d0429617633cc3ff5fb8c87d0b1a2929e2dfc4ceb3f3f36827",
+    "installed_sha256": "ba73f2cbf4c1b7d0429617633cc3ff5fb8c87d0b1a2929e2dfc4ceb3f3f36827",
+    "matches": true
+  },
+  {
+    "path": "webui/settings_system.py",
+    "source_sha256": "a2ee038501c1d021aacf00b408952661da676005680affa6ead6b2fead09079f",
+    "installed_sha256": "a2ee038501c1d021aacf00b408952661da676005680affa6ead6b2fead09079f",
+    "matches": true
+  },
+  {
+    "path": "webui/sidebar_state.py",
+    "source_sha256": "ae230f9cad36476ab5297cd8229ea91195fa977e9b0b42ce7c6c3062faa66617",
+    "installed_sha256": "ae230f9cad36476ab5297cd8229ea91195fa977e9b0b42ce7c6c3062faa66617",
+    "matches": true
+  },
+  {
+    "path": "webui/skills_api.py",
+    "source_sha256": "05d8bcf61212559ce70c39f0d5493f5d70c183fca9b2a65884a5ee230da606f2",
+    "installed_sha256": "05d8bcf61212559ce70c39f0d5493f5d70c183fca9b2a65884a5ee230da606f2",
+    "matches": true
+  },
+  {
+    "path": "webui/skills_marketplace.py",
+    "source_sha256": "940de783d183b9607112215fcf0f4ee317fb77beb845b2835f69cbc8d99156c7",
+    "installed_sha256": "940de783d183b9607112215fcf0f4ee317fb77beb845b2835f69cbc8d99156c7",
+    "matches": true
+  },
+  {
+    "path": "webui/temporary_chats.py",
+    "source_sha256": "10e4799b45e785628d33a40bde48a575b11eddf1adad61183699b78e20c3c2df",
+    "installed_sha256": "10e4799b45e785628d33a40bde48a575b11eddf1adad61183699b78e20c3c2df",
+    "matches": true
+  },
+  {
+    "path": "webui/thread_disk.py",
+    "source_sha256": "58fe53df0938e9b193a76b52180efbf15e1a666f674112fadb8f770efeb3b5fa",
+    "installed_sha256": "58fe53df0938e9b193a76b52180efbf15e1a666f674112fadb8f770efeb3b5fa",
+    "matches": true
+  },
+  {
+    "path": "webui/transcript.py",
+    "source_sha256": "6b4d497b8c89372730b3c20d36b375c35feb31cfeda4962d8d840d06512ba567",
+    "installed_sha256": "6b4d497b8c89372730b3c20d36b375c35feb31cfeda4962d8d840d06512ba567",
+    "matches": true
+  },
+  {
+    "path": "webui/transcription_ws.py",
+    "source_sha256": "5fad69a2ecc08950971ac1977ff3c8e33867211b0236bf1493e245a2ca21aebe",
+    "installed_sha256": "5fad69a2ecc08950971ac1977ff3c8e33867211b0236bf1493e245a2ca21aebe",
+    "matches": true
+  },
+  {
+    "path": "webui/version_check.py",
+    "source_sha256": "792d5ec8c0e08ddd1a3e15e5d211a245bfc695bc2462db454a45f65ab9b7bafa",
+    "installed_sha256": "792d5ec8c0e08ddd1a3e15e5d211a245bfc695bc2462db454a45f65ab9b7bafa",
+    "matches": true
+  },
+  {
+    "path": "webui/websocket_logging.py",
+    "source_sha256": "c60839824bd32d5f3b929d9d605dc924629dd18c9fc79050561ea3716ac91e7b",
+    "installed_sha256": "c60839824bd32d5f3b929d9d605dc924629dd18c9fc79050561ea3716ac91e7b",
+    "matches": true
+  },
+  {
+    "path": "webui/workspaces.py",
+    "source_sha256": "3fc0ca1ca449ec8853cbc9c4f75ae764ba59481b05e3d6c8c02741ef4eec0d86",
+    "installed_sha256": "3fc0ca1ca449ec8853cbc9c4f75ae764ba59481b05e3d6c8c02741ef4eec0d86",
+    "matches": true
+  },
+  {
+    "path": "webui/ws_http.py",
+    "source_sha256": "2d493f0183d806ad41c14fa524f448526a714b96fbd0f0120d5077ac5f13d9ef",
+    "installed_sha256": "2d493f0183d806ad41c14fa524f448526a714b96fbd0f0120d5077ac5f13d9ef",
+    "matches": true
+  }
+]

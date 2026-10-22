@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K02-ui-reuse",
+  "kind": "INTEGRATION",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/bin/python",
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/verify_saved_check.py",
+    "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/reuse-current-evidence/receipt.json"
+  ],
+  "started_at": "2026-10-22T07:00:11.406545+00:00",
+  "ended_at": "2026-10-22T07:00:12.137104+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/business.py",
+      "sha256": "f96822557b6b2e24a68ab0511c311d91f30dae17871b5d1f2d9293f98870b8cd"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/controls.py",
+      "sha256": "a314b396ab6f086e9fd8cd20a45dfd2e901a74c1bce90dcf03f1dd283c81f32a"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/service.py",
+      "sha256": "aa20876ef01fe357eea3de434de1a48e6c12573188bc0ce9298f351ef901bf79"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/connection.py",
+      "sha256": "35c2ab52715cc2b9bb0f7bc03fc0e6fb6ad19a085ef7192d433706e2b3f9d7dc"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/model_probe.py",
+      "sha256": "fe9be50f4d5954f27c9614ab954cecc8f33e1e85e515385b32cc340dcedf88da"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/application.py",
+      "sha256": "9846a70bbd7e2fa180c60340388de21850778172e92ec7be142968f696d1ca40"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/role_channel.py",
+      "sha256": "7b94f36dcc6d5498a53daa86e5c5a2a2f2d0ab7ea93e6ff604a2f2b71ccdd456"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_reuse.py",
+      "sha256": "17a35be877ccdb84bc41f0b7fc30b4e7d35447a510e86aeb88cea88604cd7d5d"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_ui_business.py",
+      "sha256": "887394faf5f999d1058e84795776a34f009c19f7119c5022df93ed7b3661859a"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/check_admin.py",
+      "sha256": "78c903a54539f108f2fd0f5725037502bd341097c285e40187003417e0f355fc"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/capture_reuse.py",
+      "sha256": "ce0d8184fc8e7f8d4c289f3d6228d9f577ca8ef55797d33f0ef9abe09efbfd9c"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/uv.lock",
+      "sha256": "fb258e6c0f6f7e8ed991c6d3c0641ef6fefa08564947bf5f1a6723787fbad401"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/pyproject.toml",
+      "sha256": "46ae3d3483febf129e110a3f051d61227d1304c466fc896a5b5f6cc376641c3d"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/connection.json",
+      "sha256": "96edcc7170015c17d605061ed055719c3700a704a3e422910090a8e1d2921bff"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/selection-probe.json",
+      "sha256": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/reuse-current-evidence/receipt.json",
+      "sha256": "bf0911e62a57580251cd68089e326714e7cd72cff8e52dffe2ad4f02b9683937"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/verify_saved_check.py",
+      "sha256": "61e0a3188b90c7483869a085fba74644b3daabd47607f04ff54db22e43c47d1b"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/bind_saved_checks.py",
+      "sha256": "9a3cb1c8940c3e09a494805afa82c1b20ca9db11498ebda08be36dc7d31001ab"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/选型环境.md",
+      "sha256": "3072ce784d9be194669a7dc624e472be0417abe08905b81c4e0ad1df13611243"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/stage-decision.json",
+      "sha256": "6240e17a96f0909cd2793f42e158a4b2b639da971e1e8ce2a616f7f54028c5cd"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/feasibility-bound-reuse/output.log",
+      "sha256": "3772f4c0e8c8ffcf54c503f06f3af97406cf0eafe824f613ed4c2924eb0ade42"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/reuse-current-evidence/output.log",
+      "sha256": "9e226d8eeb6261dc1ac45c674b01afc567fbcdd25d1e8a08c1912e9a3c6036b0"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/reuse-current-evidence/receipt.json",
+      "sha256": "bf0911e62a57580251cd68089e326714e7cd72cff8e52dffe2ad4f02b9683937"
+    }
+  ]
+}

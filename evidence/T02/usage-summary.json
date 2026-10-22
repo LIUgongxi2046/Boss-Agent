@@ -1,0 +1,629 @@
+{
+  "at": "2026-10-22T07:01:58.645562+00:00",
+  "provider": "deepseek",
+  "model_id": "deepseek-flash",
+  "observed_api_type": "chat_completions",
+  "pricing_date": "2026-10-22",
+  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "currency": "USD",
+  "price_per_million": {
+    "off_peak": {
+      "cache_hit": "0.003",
+      "cache_miss": "0.15",
+      "output": "0.6"
+    },
+    "peak": {
+      "cache_hit": "0.006",
+      "cache_miss": "0.3",
+      "output": "1.2"
+    }
+  },
+  "requests_in_retained_transports": 271,
+  "requests_with_retained_reported_usage": 211,
+  "priced_request_count": 211,
+  "known_input_tokens": 1764420,
+  "known_output_tokens": 50143,
+  "known_subset_estimate_range_usd": [
+    "0.054581376",
+    "0.109162752"
+  ],
+  "actual_total_cost": null,
+  "missing_usage": [
+    {
+      "path": "application/http-requests.json",
+      "missing_usage_requests": 47
+    },
+    {
+      "path": "deepseek-0-b8c1e982-43e9-4fd4-9b42-14b075aabc81/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/actual-request-timeout-e10b4dfb-cfd9-4c71-a757-887de6259f3e/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/consumer-disconnect-8be080eb-5a3e-4298-9020-aee1bd0f56ef/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/explicit-cancel-6cd75844-bd36-4abe-9beb-274ab8e66750/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/actual-request-timeout-a0480382-9cdb-4d6e-a1a9-ac23252a5369/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/business-timeout-78a194df-5a34-4b37-8152-3f4f84835aa9/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/business-unavailable-76bfc5ad-3798-46a2-92f1-2659992df41b/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/consumer-disconnect-ba3b52b1-4667-4ccd-9f59-66e82970dfd0/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/explicit-cancel-3ecb6fc5-7c9c-4d64-a8eb-20160fed0ae0/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/maximum-rounds-960bf54c-920b-47ff-a127-5981faf274e5/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/written-then-client-closed-3e95d3eb-8de6-4106-b2e8-1c0fe6d119dc/http-requests.json",
+      "reason": "Hook 用量记录数量超过保留的 transport 请求数量，不能建立逐请求关联；原始事件完整保留，本文件的用量不计入已关联费用小计。",
+      "unmatched_usage_records": 2
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/written-then-client-closed-3e95d3eb-8de6-4106-b2e8-1c0fe6d119dc/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/consumer-disconnect-ee54800b-329f-4189-a71d-d0928f7c5093/http-requests.json",
+      "missing_usage_requests": 1
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/explicit-cancel-a61e263c-33ef-47b1-94d3-3a3199f3a784/http-requests.json",
+      "missing_usage_requests": 1
+    }
+  ],
+  "historical_coverage_limit": "早期应用进程重启曾覆盖该实例部分 transport 和事件文件；日志及各次失败目录保留，但不能据此重建全部计费。取消和超时请求可能没有最终 usage。估算区间只覆盖当前保留且可计价的已报告用量，峰谷条件不确定时使用两种公开费率界限。",
+  "budget_and_experience_acceptable": null,
+  "threshold_source": "D05 数值尚未确定",
+  "runs": [
+    {
+      "path": "application/http-requests.json",
+      "requests": 86,
+      "known_usage_requests": 39,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 47,
+      "response_ids": [
+        "006fb4ad-9cfa-4d55-b707-7e1fe5cf7d32",
+        "0ce22b1a-98d5-402d-9ac3-9d77151ffc50",
+        "18ec9f50-6896-4beb-9480-40dc6d34835c",
+        "1ac6793e-d020-43ab-9fb9-82d875c2e574",
+        "1aef7aed-61dc-43fa-8a9f-39c126f48d32",
+        "1c2f9ad7-28e5-4c21-887f-dfd03a44327d",
+        "2270f405-dced-44e4-a3b9-52f0403c784e",
+        "2714d969-3244-4f17-ad65-a6a0a3df600b",
+        "324d187d-e7b0-4db2-8883-340c0442aa8e",
+        "36808a4f-8d7d-4011-b751-30b6efbea324",
+        "36d1f545-ae6c-4df5-98af-a175f489ff68",
+        "3c481eff-740c-4bdf-9b8a-53a945b7d424",
+        "40a55d20-189f-44cd-a545-460c151fe884",
+        "5676479e-b37e-4b4b-8d78-7efd77eb14e0",
+        "641549cf-9b50-4feb-bfd4-32f7dde71e1b",
+        "67877e25-67ef-4def-af01-2d4c41dcdd35",
+        "723fbff8-7b0c-4d78-a6c4-2fc047436605",
+        "7d8db999-b810-4745-ad66-7bc76356a1e6",
+        "8241e2a2-91ab-45aa-853e-03bc93852788",
+        "88a0f479-ddc3-4e45-8d77-bb7f42ab87c6",
+        "8d4c046f-16df-4701-bb93-3420efd5e5b1",
+        "8f6d442f-31e0-498e-8a67-355accaf11a7",
+        "8fed0154-908c-45c3-8652-e7a720029b33",
+        "9208a27f-8d25-4cd8-a5d3-40bf47b211f7",
+        "978774c7-922a-4d54-98eb-12aa8f5cb50a",
+        "a0e3e9b8-bf69-4f06-8b5c-b53744167340",
+        "abc55e5c-62e8-4ba7-be8a-97e8fb25be90",
+        "b1304fe2-886e-483a-87dd-762233acc214",
+        "bbb8615b-ba0d-4129-836d-a18d7f8ac557",
+        "c37d4f82-0d87-4676-8ffb-255b2c94da39",
+        "c3c33772-4e45-4727-ab92-4062d83b9b9d",
+        "d4129792-e13b-422e-a19e-80e2a16b8ac3",
+        "d5acdb67-6270-4c84-95bf-d1cbac27cfeb",
+        "d85b2093-66fe-493d-9059-786378aa0623",
+        "db35c6b7-6367-4839-85a7-2744f95685a6",
+        "dfe259a0-0abc-4569-ab77-6ee7ab713319",
+        "eae35271-d23f-4dd9-9f9e-5e23feba2852",
+        "f7bdfb7d-7d72-480e-b3d3-0875f9bc8395",
+        "f7f4b997-cd36-4f53-94b1-98bf6edd9a4c"
+      ]
+    },
+    {
+      "path": "deepseek-0-01081b41-92cd-483c-9531-1337d79abd3d/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-0-266c73d2-e712-483f-b058-6e810ac47eac/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-0-26fb8e7f-1ee5-45d5-be75-02a4f22bd3d0/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "02677472-b153-4ca8-a79c-3d9acdbc98ea",
+        "2417c389-2c0f-4990-bf0c-8562c4b817bf",
+        "44f21ea2-09df-458a-81d6-61eb559cfdfa",
+        "4c41e657-fcca-4a70-a8f5-27a48f4571e0",
+        "6db11075-75d1-4ea4-b756-97dd99bf5f24",
+        "746a38e0-0265-4797-b03e-dec4695fd90a",
+        "7fd44351-9f50-4792-a0dd-f32e59cfd6dc",
+        "a530cf0e-457b-4731-9e56-3772c75720ea",
+        "a53c0bc4-7726-4b1d-93c7-55dbae3a0570",
+        "cb8b64b3-8616-442a-bc4d-7c4e539bd379",
+        "f6d11de1-2b4c-4804-a979-45f226aaceb9"
+      ]
+    },
+    {
+      "path": "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "06c21068-86f2-4663-b370-2939190fe421",
+        "2db21c50-3911-4dc4-ac70-fd55ec9e36aa",
+        "6abb04d0-274a-4acb-82b5-6e97e3a91ee9",
+        "7ddcdb31-59f4-4a1b-b73b-529e60770bb8",
+        "8c9a5f4a-157a-4910-8309-272b8623d459",
+        "ac39f987-c686-4d0e-b2f5-f223ebb60f4c",
+        "b0d6c731-8c44-486f-b47c-c3d12a014e46",
+        "c1499b4f-b39b-4966-b2f1-f148caf2c14c",
+        "d26bdcf8-ab3a-456d-a529-df11db222d7b",
+        "f545c13f-a047-41c2-9c79-fee6d0d847a8",
+        "fc724d61-f80f-4a38-9d7e-4f87f5502ac5"
+      ]
+    },
+    {
+      "path": "deepseek-0-674c8772-0fb0-4b46-bbe9-5e51dc763664/http-requests.json",
+      "requests": 9,
+      "known_usage_requests": 9,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-0-88475234-e81f-456a-bcc9-125dd29fb3d5/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "566f3323-1694-4c93-a611-84e4fed2d3f7",
+        "693eff82-51ce-401f-8480-5f77bb5e899a",
+        "755ab4c7-9e9a-4861-88e8-ca600c7c7a77",
+        "8b945e1a-ec13-46b0-9eff-d1241fdb0307",
+        "9c697694-2494-4d14-813e-ca4f35a7ae50",
+        "a6694463-66ae-4d5e-a64a-4f167d147a85",
+        "ab338dbe-d0b7-4f10-9b85-6ab5a3661867",
+        "b32fc542-045e-4827-a997-5758d4d0081b",
+        "bdabeee8-68e7-44f3-8e5a-ff28a829f7f3",
+        "e8b8b384-5884-47c1-b3d0-cc10b69ba117",
+        "eefa28bf-4d34-4a26-96d1-d65b072c4d89"
+      ]
+    },
+    {
+      "path": "deepseek-0-b8c1e982-43e9-4fd4-9b42-14b075aabc81/http-requests.json",
+      "requests": 16,
+      "known_usage_requests": 15,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "0750c026-31f4-46b5-a557-44e69ab1c231",
+        "11129704-dba5-4e7b-a62b-73df476e17fa",
+        "1688e09b-c213-40dd-bfe9-865dedadd754",
+        "3adc8f4e-587a-4da8-857a-79c8b2d60420",
+        "8c49a668-aeea-4bbd-a37e-84f7bb0a69d9",
+        "9610b4b1-13fb-4ed7-98ea-d3d987261762",
+        "b29fd3c6-1d40-4617-9984-ace53fdcd53b",
+        "c1399c4c-da3d-4296-b319-67ba7b847dab",
+        "c8821a10-2e1c-48b0-854d-2b4e208c12ea",
+        "d342174e-9851-4792-a04f-7ec70378644c",
+        "e6ae13ea-0bbd-4223-a1b5-66603bacad39"
+      ]
+    },
+    {
+      "path": "deepseek-1-7f6501a8-2a8d-454a-9d47-3feef5522203/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "0b4d8db0-22bd-41ad-bd7c-d6f7789a929e",
+        "200df595-5f43-444b-9240-a1499410e494",
+        "288ba535-da47-48f0-b975-bd4a96aff9d6",
+        "3d682a66-4880-4f12-bb22-f592160e4d77",
+        "547582e1-5931-45ae-9f92-d1fd24dd52f3",
+        "8658f063-cb27-4228-b0bb-c850f1a64a6a",
+        "97199076-0bcc-4f86-b5d8-127a0d6d5a2c",
+        "9950941f-c6a8-4bc1-8143-1513259d4a52",
+        "b570aa57-c940-47e4-a60b-0b69d0427272",
+        "c3360480-56b4-42ba-af9a-4cf587531a9a",
+        "ffc932e3-ed24-4762-bb54-1ee0f7490d44"
+      ]
+    },
+    {
+      "path": "deepseek-1-9ff7bbff-350d-4348-be93-86fc14160553/http-requests.json",
+      "requests": 9,
+      "known_usage_requests": 9,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-1-ac347847-3825-4781-8afd-fdd143cd0f89/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "01d2d6a7-ce5a-4e85-a23e-7af4d6fe84bc",
+        "1516eef5-8207-4b7f-b1b9-139bbc6e3e2e",
+        "4fe12f5a-43b3-41f2-afb3-cf4278668965",
+        "5568daf3-895c-4798-83b1-3c04f9c6f26c",
+        "6ee7a8be-23cb-4254-b39d-3f89df200f01",
+        "74d66bee-982c-4967-a63e-06047cb164bf",
+        "788bbb7a-c664-44cd-b87d-1906537e146e",
+        "a14509c8-b8b5-4e2b-afcd-dca4f1b7249a",
+        "b95766f4-650f-428f-bad4-3f7263c76af8",
+        "c6ba031c-4fac-406d-9141-5764f0e3e7d0",
+        "cd07e894-8ee6-456a-9144-4ee9cd864942"
+      ]
+    },
+    {
+      "path": "deepseek-1-ad7cb307-1e9e-4562-a1db-e0a849cb7908/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "deepseek-1-b51cea68-de48-4f22-8bd8-263cf132f1ed/http-requests.json",
+      "requests": 11,
+      "known_usage_requests": 11,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "066c3174-ad60-4a2c-a29a-1d74a3c98edb",
+        "09529c87-291a-4dd9-848d-acd445c4d725",
+        "0b6d955a-1b46-465d-b7ae-37d17927ed4b",
+        "1aed5987-1e43-4cac-8d98-c503a3506acb",
+        "36018979-e395-4a1b-aa65-d0f45674dce3",
+        "3b6257c0-def2-4bcf-8a91-1a948781d165",
+        "59070733-55a2-4870-9d8e-3f9a2a2fa40c",
+        "5fef1bfb-caa8-439a-bff5-93999f92542f",
+        "66f14714-ef0d-443c-a935-788c91a629f1",
+        "a677dadf-480d-439f-ae60-f41c9e86991a",
+        "e53c3407-b72d-4199-84aa-5901b252c816"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/actual-request-timeout-e10b4dfb-cfd9-4c71-a757-887de6259f3e/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": [
+        "aa6b4bae-b714-41d2-846c-160544d482ce"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/business-timeout-b35c9326-f4d8-4a21-a00c-b5457033e2e2/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 1,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "dcd953b1-f776-42ce-92d6-8b73192f1509"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/business-unavailable-0ad62af6-e263-45de-bba8-c3501bc5dfbb/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 1,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "e81fd902-9e83-4d58-b11b-7c1a20aa81be"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/consumer-disconnect-8be080eb-5a3e-4298-9020-aee1bd0f56ef/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": [
+        "e9f9eab9-6178-4c43-acab-dbfbd42e3c01"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/explicit-cancel-6cd75844-bd36-4abe-9beb-274ab8e66750/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": [
+        "16d3a2df-9462-4002-8b25-4aca788e21ef"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/maximum-rounds-06303fe0-3fcc-44e9-bba0-8374be70ed47/http-requests.json",
+      "requests": 2,
+      "known_usage_requests": 2,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "54201f50-0001-4f0e-87d1-1d844b6de6c8",
+        "6b50c255-a59b-469c-bc55-67c6e77f0c54"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/variant-and-injection-d67a9d0e-1645-4795-83c3-0e70efb3ff9d/http-requests.json",
+      "requests": 3,
+      "known_usage_requests": 3,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "880e4936-b974-48b4-9e30-52c8320f7443",
+        "92a070a9-6022-4e26-8c2b-cd80281478f1",
+        "d0a454e8-92b3-4bbd-bcdb-a193eec47583"
+      ]
+    },
+    {
+      "path": "faults-2284c793-b3bf-489e-ab35-239240c52c11/written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 1,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "14413f9c-f54a-4651-8fcf-4a47c877e8c6"
+      ]
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/actual-request-timeout-a0480382-9cdb-4d6e-a1a9-ac23252a5369/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/business-timeout-78a194df-5a34-4b37-8152-3f4f84835aa9/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/business-unavailable-76bfc5ad-3798-46a2-92f1-2659992df41b/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/consumer-disconnect-ba3b52b1-4667-4ccd-9f59-66e82970dfd0/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/explicit-cancel-3ecb6fc5-7c9c-4d64-a8eb-20160fed0ae0/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/maximum-rounds-960bf54c-920b-47ff-a127-5981faf274e5/http-requests.json",
+      "requests": 2,
+      "known_usage_requests": 1,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/variant-and-injection-ac570ebd-f6fb-4de1-96ab-745b2089f711/http-requests.json",
+      "requests": 3,
+      "known_usage_requests": 3,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": []
+    },
+    {
+      "path": "faults-44f39cff-33c3-4558-8b1b-97af7094cfc0/written-then-client-closed-3e95d3eb-8de6-4106-b2e8-1c0fe6d119dc/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 2,
+      "missing_usage_requests": 1,
+      "response_ids": []
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/consumer-disconnect-ee54800b-329f-4189-a71d-d0928f7c5093/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": [
+        "79274c5d-73d3-4214-b994-6becd97df007"
+      ]
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/explicit-cancel-a61e263c-33ef-47b1-94d3-3a3199f3a784/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 0,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 1,
+      "response_ids": [
+        "3f7b689e-e6fb-454f-8a0f-1838f6c86f11"
+      ]
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/maximum-rounds-692de370-8fd3-49c8-924c-e892861dde35/http-requests.json",
+      "requests": 2,
+      "known_usage_requests": 2,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "7570ac09-3c6f-450f-b2aa-9a02add64242",
+        "f623ae4e-fcb3-4292-b81b-d25d9b9329c6"
+      ]
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/variant-and-injection-9537a31e-fb66-414b-8599-0b1b58d63f23/http-requests.json",
+      "requests": 3,
+      "known_usage_requests": 3,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "383ed084-e613-47f8-a5ab-1429537c3ed1",
+        "4d56373d-81b3-473d-8b8c-0f8b3473ce98",
+        "8df9c58a-0b9d-4859-bb82-3ad021ec7b77"
+      ]
+    },
+    {
+      "path": "faults-ee81dd11-62cc-4ace-8bd4-566c9ca73b27/written-then-client-closed-8532b5b3-3adf-4763-8130-c496674d4a57/http-requests.json",
+      "requests": 1,
+      "known_usage_requests": 1,
+      "unmatched_usage_records": 0,
+      "missing_usage_requests": 0,
+      "response_ids": [
+        "3019dbe3-0b28-46aa-bfec-d66f995890b6"
+      ]
+    }
+  ],
+  "workflow_timings": [
+    {
+      "run": "deepseek-0-01081b41-92cd-483c-9531-1337d79abd3d",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 20.908341
+    },
+    {
+      "run": "deepseek-0-266c73d2-e712-483f-b058-6e810ac47eac",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 25.433433
+    },
+    {
+      "run": "deepseek-0-26fb8e7f-1ee5-45d5-be75-02a4f22bd3d0",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 18.745967
+    },
+    {
+      "run": "deepseek-0-4d888b91-9413-4054-b2d5-67005e9e9f4d",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 25.015797
+    },
+    {
+      "run": "deepseek-0-674c8772-0fb0-4b46-bbe9-5e51dc763664",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 16.165751
+    },
+    {
+      "run": "deepseek-0-88475234-e81f-456a-bcc9-125dd29fb3d5",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 18.317637
+    },
+    {
+      "run": "deepseek-0-b8c1e982-43e9-4fd4-9b42-14b075aabc81",
+      "turns_started": 2,
+      "turns_completed": 2,
+      "elapsed_seconds": 43.690397
+    },
+    {
+      "run": "deepseek-0-fa625078-7aa7-40aa-b52e-c170a8e5b2f4",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 18.828493
+    },
+    {
+      "run": "deepseek-1-7f6501a8-2a8d-454a-9d47-3feef5522203",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 20.958653
+    },
+    {
+      "run": "deepseek-1-84f6e53e-c966-45e8-ac85-b727b634066e",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 21.612334
+    },
+    {
+      "run": "deepseek-1-9ff7bbff-350d-4348-be93-86fc14160553",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 14.992052
+    },
+    {
+      "run": "deepseek-1-ac347847-3825-4781-8afd-fdd143cd0f89",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 17.881726
+    },
+    {
+      "run": "deepseek-1-ad7cb307-1e9e-4562-a1db-e0a849cb7908",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 17.179678
+    },
+    {
+      "run": "deepseek-1-b51cea68-de48-4f22-8bd8-263cf132f1ed",
+      "turns_started": 4,
+      "turns_completed": 4,
+      "elapsed_seconds": 18.816374
+    }
+  ]
+}

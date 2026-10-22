@@ -1,0 +1,71 @@
+{"receipt_path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/t02-selection-current/prerequisite/receipt.json", "receipt_sha256": "7c35c5f9625181de6802511a4480bb7498688c0416020dc5298d6b9a884f953f", "exit_code": 0, "inputs_unchanged": true}
+{"receipt_path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T01/t02-selection-current/prd/receipt.json", "receipt_sha256": "1a8a0dd061287692552778c821ff522b0016515629d40942ba1d076cb2f18a6d", "exit_code": 0, "inputs_unchanged": true}
+{
+  "check_id": "K00",
+  "scope": "战略设计及文档引用，业务效果未验证",
+  "requirements": 32,
+  "secretary_tasks": 13,
+  "agriculture_topics": 10,
+  "shared_capabilities": 9,
+  "goals": 4,
+  "hypotheses": 37,
+  "metrics": 17,
+  "protocols": 8,
+  "handoffs": 3,
+  "review_dimensions": 5,
+  "external_perspectives": 4,
+  "observed_values_unknown": true,
+  "requirement_source_sha256": "854e6e6d49397874d6ed22583b249d753a3caa84135ad20922fab970af1e11e4",
+  "local_links_checked": 19,
+  "python": "3.12.7",
+  "markdown_it_py": "4.2.0",
+  "jsonschema": "4.25.1",
+  "semantic_review": "docs/Boss-Agent项目计划.md 第 12 节"
+}
+
+{
+  "check_id": "K01",
+  "kind": "STATIC",
+  "capability": "DESIGN",
+  "scope": "完整需求映射、规则、BDD、方法 Schema、引用及语义审阅依据；未执行产品业务",
+  "requirements": 32,
+  "functional_requirements": 32,
+  "bdd_acceptance_definitions": 64,
+  "secretary_tasks": 13,
+  "agriculture_topics": 10,
+  "shared_capabilities": 9,
+  "goal_ids": [
+    "G01",
+    "G02",
+    "G03",
+    "G04"
+  ],
+  "hypotheses": 37,
+  "metrics": 17,
+  "simulation_interfaces": 14,
+  "management_capabilities": 16,
+  "functional_wireframes": 32,
+  "management_wireframes": 16,
+  "mermaid_syntax": {
+    "parsed_diagrams": 52,
+    "rendered": false,
+    "visual": "NOT_RUN"
+  },
+  "probe_steps": 15,
+  "probe_assertions": 37,
+  "probe_schema_definitions": 15,
+  "local_links_checked": 20,
+  "external_sources": [
+    "https://claude.com/product/cowork",
+    "https://learn.microsoft.com/en-us/microsoft-365/copilot/researcher-agent",
+    "https://www.anthropic.com/research/building-effective-agents",
+    "https://www.anthropic.com/research/demystifying-evals-for-ai-agents"
+  ],
+  "semantic_review": "docs/PRD.md 第 13.2 节",
+  "business_execution": "NOT_RUN",
+  "visual": "NOT_RUN",
+  "python": "3.12.7",
+  "markdown_it_py": "4.2.0",
+  "jsonschema": "4.25.1"
+}
+

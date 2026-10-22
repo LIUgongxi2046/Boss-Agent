@@ -1,0 +1,12 @@
+{"status":"PASS","at":"2026-10-22T06:04:11.519Z","scope":"Electron 实际启动、两端状态采用、IPC 拒绝、窗口关闭与进程重启；系统休眠及 OS 权限完整过程尚未执行","checks":15,"system_sleep":"NOT_RUN","os_permissions":"PARTIAL","evidence":"/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/desktop-c202dd4f-350a-4732-a879-856dcb165262"}
+/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/node_modules/playwright-core/lib/inProcessFactory.js:55
+    return dispatcherConnection._dispatcherByGuid.get(x._guid)._object;
+                                                              ^
+
+TypeError: Cannot read properties of undefined (reading '_object')
+    at clientConnection.toImpl (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/node_modules/playwright-core/lib/inProcessFactory.js:55:63)
+    at ElectronApplication.process (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/node_modules/playwright-core/lib/client/electron.js:78:37)
+    at /Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:149:38
+    at <anonymous>
+
+Node.js v24.13.0

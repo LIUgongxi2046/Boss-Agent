@@ -1,0 +1,1300 @@
+[
+  {
+    "event": "ready",
+    "chat_id": "d3565007-9b1a-47e6-a1d0-424d0fe1c54c",
+    "client_id": "anon-327e432ac34a"
+  },
+  {
+    "event": "attached",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "model_preset": null
+  },
+  {
+    "event": "session_updated",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "scope": "metadata",
+    "workspace_scope": {
+      "project_path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/application/workspace",
+      "access_mode": "restricted",
+      "project_name": "workspace",
+      "restrict_to_workspace": true,
+      "sandbox_status": {
+        "restrict_to_workspace": true,
+        "workspace_root": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/application/workspace",
+        "level": "application",
+        "enforced": false,
+        "provider": "none",
+        "provider_label": "None",
+        "summary": "Workspace restriction uses nanobot application-level guards."
+      }
+    }
+  },
+  {
+    "event": "attached",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "model_preset": null
+  },
+  {
+    "event": "attached",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "model_preset": null
+  },
+  {
+    "event": "message_accepted",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "starts_turn": true,
+    "active_turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "started_at": 1792646921.574653
+  },
+  {
+    "event": "retry_status",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "state": "cleared",
+    "attempt": 1,
+    "error_kind": "unknown",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98"
+  },
+  {
+    "event": "attached",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "model_preset": null
+  },
+  {
+    "event": "goal_status",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "status": "running",
+    "started_at": 1792646921.574653,
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98"
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "我会",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:0",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 2
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "先查询指标，然后读取原始依据。",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:0",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 3
+  },
+  {
+    "event": "stream_end",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:0",
+    "resuming": true,
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 4
+  },
+  {
+    "event": "message",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "query_metrics(\"region-1 的 product-1 和 product-2 在 2026…\")",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "tool_events": [
+      {
+        "version": 1,
+        "phase": "start",
+        "call_id": "call_00_tgNcvYS2LpDlWoCJVmNI3255",
+        "name": "query_metrics",
+        "arguments": {
+          "question": "region-1 的 product-1 和 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的销量、收入、成本、毛利、毛利率、吨毛利",
+          "metric_ids": [
+            "sales_quantity",
+            "revenue",
+            "cost",
+            "gross_profit",
+            "gross_margin",
+            "gross_profit_per_tonne"
+          ],
+          "region_id": "region-1",
+          "product_ids": [
+            "product-1",
+            "product-2"
+          ],
+          "period_start": "2026-10-01",
+          "period_end": "2026-10-10",
+          "comparison_start": "2026-09-01",
+          "comparison_end": "2026-09-10",
+          "currency": "CNY",
+          "trade_scope": "EXTERNAL_SALES",
+          "definition_version": "1"
+        },
+        "result": null,
+        "error": null,
+        "files": [],
+        "embeds": []
+      }
+    ],
+    "kind": "tool_hint",
+    "turn_phase": "activity",
+    "turn_seq": 5
+  },
+  {
+    "event": "message",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "tool_events": [
+      {
+        "version": 1,
+        "phase": "end",
+        "call_id": "call_00_tgNcvYS2LpDlWoCJVmNI3255",
+        "name": "query_metrics",
+        "arguments": {
+          "question": "region-1 的 product-1 和 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的销量、收入、成本、毛利、毛利率、吨毛利",
+          "metric_ids": [
+            "sales_quantity",
+            "revenue",
+            "cost",
+            "gross_profit",
+            "gross_margin",
+            "gross_profit_per_tonne"
+          ],
+          "region_id": "region-1",
+          "product_ids": [
+            "product-1",
+            "product-2"
+          ],
+          "period_start": "2026-10-01",
+          "period_end": "2026-10-10",
+          "comparison_start": "2026-09-01",
+          "comparison_end": "2026-09-10",
+          "currency": "CNY",
+          "trade_scope": "EXTERNAL_SALES",
+          "definition_version": "1"
+        },
+        "result": "{\"detail_refs\":[\"BASE-0\",\"BASE-1\",\"BASE-2\",\"BASE-3\",\"CURRENT-0\",\"CURRENT-1\",\"CURRENT-2\",\"CURRENT-3\"],\"envelope\":{\"dataset_id\":\"selection\",\"dataset_version\":\"1\",\"execution_namespace\":\"ui-check\",\"owner_id\":\"boss-1\",\"request_id\":\"ui-check\",\"session_id\":\"ui-check\"},\"missing_fields\":[],\"query_id\":\"81bc9066-eb64-4b04-86a6-6a81b322d20d\",\"sources\":[{\"business_as_of\":\"2026-10-10T23:59:59+08:00\",\"coverage\":\"region-1 水产饲料外销，两个十日期间\",\"locator\":\"sqlite:documents/finance-note\",\"quality_state\":\"COMPLETE\",\"read_at\":\"2026-10-22T05:28:46.267783+00:00\",\"source_id\":\"finance-note\",\"source_type\":\"SIMULATED\",\"source_updated_at\":\"2026-10-11T08:00:00+08:00\",\"version\":\"1\"}],\"unexplained_causes\":[\"原因贡献明细尚未提供\"],\"values\":[{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(quantity_tonnes)\",\"metric_id\":\"sales_quantity\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"吨\",\"value\":\"10000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(revenue_cny)\",\"metric_id\":\"revenue\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"40000000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(cost_cny)\",\"metric_id\":\"cost\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"36000000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"revenue-cost\",\"metric_id\":\"gross_profit\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"4000000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"gross_profit/revenue*100\",\"metric_id\":\"gross_margin\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"%\",\"value\":\"10.0\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"gross_profit/quantity\",\"metric_id\":\"gross_profit_per_tonne\",\"period_scope\":\"BASE\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY/吨\",\"value\":\"400\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(quantity_tonnes)\",\"metric_id\":\"sales_quantity\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"吨\",\"value\":\"12000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(revenue_cny)\",\"metric_id\":\"revenue\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"48000000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"SUM(cost_cny)\",\"metric_id\":\"cost\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"44160000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"revenue-cost\",\"metric_id\":\"gross_profit\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY\",\"value\":\"3840000\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"gross_profit/revenue*100\",\"metric_id\":\"gross_margin\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"%\",\"value\":\"8.00\"},{\"definition_version\":\"1\",\"display_rounding\":\"原始 Decimal 精度\",\"formula\":\"gross_profit/quantity\",\"metric_id\":\"gross_profit_per_tonne\",\"period_scope\":\"CURRENT\",\"scope_description\":\"region-1 ['product-1', 'product-2']\",\"unit\":\"CNY/吨\",\"value\":\"320\"}]}",
+        "error": null,
+        "files": [],
+        "embeds": []
+      }
+    ],
+    "kind": "progress",
+    "turn_phase": "activity",
+    "turn_seq": 6
+  },
+  {
+    "event": "retry_status",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "state": "cleared",
+    "attempt": 1,
+    "error_kind": "unknown",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98"
+  },
+  {
+    "event": "stream_end",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:1",
+    "resuming": true,
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 7
+  },
+  {
+    "event": "message",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "read_evidence(\"81bc9066-eb64-4b04-86a6-6a81b322d20d\")",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "tool_events": [
+      {
+        "version": 1,
+        "phase": "start",
+        "call_id": "call_00_Fh6E5jQsXGEeKiAr2Yfl8660",
+        "name": "read_evidence",
+        "arguments": {
+          "query_id": "81bc9066-eb64-4b04-86a6-6a81b322d20d",
+          "source_ids": [
+            "finance-note"
+          ],
+          "detail_refs": [
+            "BASE-0",
+            "BASE-1",
+            "BASE-2",
+            "BASE-3",
+            "CURRENT-0",
+            "CURRENT-1",
+            "CURRENT-2",
+            "CURRENT-3"
+          ]
+        },
+        "result": null,
+        "error": null,
+        "files": [],
+        "embeds": []
+      }
+    ],
+    "kind": "tool_hint",
+    "turn_phase": "activity",
+    "turn_seq": 8
+  },
+  {
+    "event": "message",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "tool_events": [
+      {
+        "version": 1,
+        "phase": "end",
+        "call_id": "call_00_Fh6E5jQsXGEeKiAr2Yfl8660",
+        "name": "read_evidence",
+        "arguments": {
+          "query_id": "81bc9066-eb64-4b04-86a6-6a81b322d20d",
+          "source_ids": [
+            "finance-note"
+          ],
+          "detail_refs": [
+            "BASE-0",
+            "BASE-1",
+            "BASE-2",
+            "BASE-3",
+            "CURRENT-0",
+            "CURRENT-1",
+            "CURRENT-2",
+            "CURRENT-3"
+          ]
+        },
+        "result": "{\"conflicts\":[],\"definition_version\":\"1\",\"missing_fields\":[\"原因贡献明细\"],\"original_records\":[{\"content\":{\"cost_cny\":\"9000000\",\"customer_id\":\"customer-1\",\"factory_id\":\"factory-1\",\"legal_entity_id\":\"entity-1\",\"period\":\"BASE\",\"product_id\":\"product-1\",\"quantity_tonnes\":\"2500\",\"record_id\":\"BASE-0\",\"region_id\":\"region-1\",\"revenue_cny\":\"10000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"BASE-0\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"9000000\",\"customer_id\":\"customer-2\",\"factory_id\":\"factory-2\",\"legal_entity_id\":\"entity-1\",\"period\":\"BASE\",\"product_id\":\"product-2\",\"quantity_tonnes\":\"2500\",\"record_id\":\"BASE-1\",\"region_id\":\"region-1\",\"revenue_cny\":\"10000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"BASE-1\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"9000000\",\"customer_id\":\"customer-3\",\"factory_id\":\"factory-1\",\"legal_entity_id\":\"entity-1\",\"period\":\"BASE\",\"product_id\":\"product-1\",\"quantity_tonnes\":\"2500\",\"record_id\":\"BASE-2\",\"region_id\":\"region-1\",\"revenue_cny\":\"10000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"BASE-2\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"9000000\",\"customer_id\":\"customer-4\",\"factory_id\":\"factory-2\",\"legal_entity_id\":\"entity-1\",\"period\":\"BASE\",\"product_id\":\"product-2\",\"quantity_tonnes\":\"2500\",\"record_id\":\"BASE-3\",\"region_id\":\"region-1\",\"revenue_cny\":\"10000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"BASE-3\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"11040000\",\"customer_id\":\"customer-1\",\"factory_id\":\"factory-1\",\"legal_entity_id\":\"entity-1\",\"period\":\"CURRENT\",\"product_id\":\"product-1\",\"quantity_tonnes\":\"3000\",\"record_id\":\"CURRENT-0\",\"region_id\":\"region-1\",\"revenue_cny\":\"12000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"CURRENT-0\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"11040000\",\"customer_id\":\"customer-2\",\"factory_id\":\"factory-2\",\"legal_entity_id\":\"entity-1\",\"period\":\"CURRENT\",\"product_id\":\"product-2\",\"quantity_tonnes\":\"3000\",\"record_id\":\"CURRENT-1\",\"region_id\":\"region-1\",\"revenue_cny\":\"12000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"CURRENT-1\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"11040000\",\"customer_id\":\"customer-3\",\"factory_id\":\"factory-1\",\"legal_entity_id\":\"entity-1\",\"period\":\"CURRENT\",\"product_id\":\"product-1\",\"quantity_tonnes\":\"3000\",\"record_id\":\"CURRENT-2\",\"region_id\":\"region-1\",\"revenue_cny\":\"12000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"CURRENT-2\",\"version\":\"1\"},{\"content\":{\"cost_cny\":\"11040000\",\"customer_id\":\"customer-4\",\"factory_id\":\"factory-2\",\"legal_entity_id\":\"entity-1\",\"period\":\"CURRENT\",\"product_id\":\"product-2\",\"quantity_tonnes\":\"3000\",\"record_id\":\"CURRENT-3\",\"region_id\":\"region-1\",\"revenue_cny\":\"12000000\",\"trade_type\":\"EXTERNAL_SALES\",\"version\":\"1\"},\"record_id\":\"CURRENT-3\",\"version\":\"1\"},{\"content\":{\"access_scope\":\"boss-1\",\"author_contact_id\":\"finance-1\",\"content\":\"合成水产饲料外销明细；毛利=收入减成本，毛利率=毛利除收入，单吨毛利=毛利除吨数。原因贡献明细尚未提供。\",\"original_locator\":\"sqlite:documents/finance-note\",\"published_at\":\"2026-10-11T08:00:00+08:00\",\"source_id\":\"finance-note\",\"source_type\":\"SIMULATED\",\"valid_from\":\"2026-10-11T08:00:00+08:00\",\"version\":\"1\"},\"record_id\":\"finance-note\",\"version\":\"1\"}],\"sources\":[{\"business_as_of\":\"2026-10-10T23:59:59+08:00\",\"coverage\":\"region-1 水产饲料外销，两个十日期间\",\"locator\":\"sqlite:documents/finance-note\",\"quality_state\":\"COMPLETE\",\"read_at\":\"2026-10-22T05:28:47.414690+00:00\",\"source_id\":\"finance-note\",\"source_type\":\"SIMULATED\",\"source_updated_at\":\"2026-10-11T08:00:00+08:00\",\"version\":\"1\"}]}",
+        "error": null,
+        "files": [],
+        "embeds": []
+      }
+    ],
+    "kind": "progress",
+    "turn_phase": "activity",
+    "turn_seq": 9
+  },
+  {
+    "event": "retry_status",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "state": "cleared",
+    "attempt": 1,
+    "error_kind": "unknown",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98"
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "##",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 10
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " region",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 11
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "-1 ·",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 12
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " product-1 + product-2 ·",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 13
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 外销（CNY",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 14
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "，definition_version=1）\n\n**本期",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 15
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 2026-10-01~",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 16
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "10-10 对比",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 17
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 基期 2026-",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 18
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "09-01~09-10**\n\n| 指标 |",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 19
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 基",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 20
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "期 | 本期 | 变化 |\n|---|---|---|---|\n| 销量 | 10",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 21
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ",000 吨 |",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 22
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 12,000 吨 |",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 23
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " +2,000",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 24
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 吨（+20.0%） |\n| 收入 | 40,000,000 CNY | 48,000,000 CNY | +8,000,000（+20.0%） |\n| 成本 | 36,000,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 25
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "000 CNY | 44,160,000 CNY | +8,160,000（+22.7%） |\n| 毛利 | 4,000,000 CNY | 3,840,000 CNY | −160,000（−4.0%） |\n| 毛利率 | 10.0% | 8.00",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 26
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "% | −2.0 个百分点 |\n| 吨毛利 | 400 CNY/吨 | 320 CNY/吨 | −80 CNY/吨（−20.0%） |\n\n**要点**\n- 销量和收入同步",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 27
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "增长 20%，但成本增长 22.7%，增速快于收入，因此毛利反而下降 4%。\n- 吨售价",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 28
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "保持 4,000 CNY/吨不变（基期和本期均为 40,000,000/10,000 与 48,000,000/12,000），",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 29
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "吨成本从 3,600 升至 3,680 CNY/吨，是毛利率",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 30
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "下滑 2 个百分点的直接原因。\n- 四个明细记录（product-1、product-2 各两条",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 31
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "，客户 customer-1~",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 32
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "4）数值",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 33
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "完全一致，说明",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 34
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "本期与",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 35
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "基期的",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 36
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "结构",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 37
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "没有变化，变化",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 38
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "来自单价和",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 39
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "单位",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 40
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "成本，而不是",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 41
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "产品",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 42
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "组合。\n\n**原始",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 43
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "依据**\n- 来源",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 44
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "：`finance",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 45
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "-note`（SIMUL",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 46
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "ATED，version",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 47
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 1，业务",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 48
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "截止",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 49
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 2026-10",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 50
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "-10",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 51
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 23:59:59 +",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 52
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "08:00，更新",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 53
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "于",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 54
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 2026-10-",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 55
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "11 08:00",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 56
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " +",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 57
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "08:00，质量状态",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 58
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " COMPLETE，覆盖 region",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 59
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "-1 水产",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 60
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "饲料外销两个十日",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 61
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "期间",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 62
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "）。\n- 明细",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 63
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "记录",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 64
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 8 条",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 65
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "：\n  - 基期：",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 66
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "BASE-0（",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 67
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "product-1，2",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 68
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ",500 吨，收入",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 69
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 10,000,000",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 70
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "，成本 9,000",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 71
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ",000）、BASE-1",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 72
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "（product-2，2",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 73
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ",500 吨，",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 74
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "10,000,000/",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 75
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "9,000,000）、",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 76
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "BASE-2（product-",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 77
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "1，2,500",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 78
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 吨，10,000,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 79
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "000/9,000,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 80
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "000）、BASE-3（",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 81
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "product-2，2,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 82
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "500 吨，10,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 83
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "000,000/9,",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 84
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "000,000）。\n  -",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 85
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 本期：CURRENT",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 86
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "-0~",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 87
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "3",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 88
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 结构相同",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 89
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "，各 3,000",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 90
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 吨，收入 12",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 91
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ",000,000，成本",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 92
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 11,040,000。\n- 口径",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 93
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "说明",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 94
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "（原文）：毛利=",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 95
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "收入减成本，",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 96
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "毛利率=毛利除",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 97
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "收入，单吨毛利=",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 98
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "毛利除吨数。\n\n**",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 99
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "缺口",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 100
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "与",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 101
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "提示",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 102
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "**\n- `",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 103
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "missing_fields`：原因",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 104
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "贡献明细；`un",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 105
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "explained_causes`：原因贡献明细尚未提供。也就是说",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 106
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "，成本上涨",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 107
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": " 2",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 108
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": ".7% 的具体驱动",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 109
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "（",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 110
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "原料、工厂",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 111
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "、运费",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 112
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "等）目前没有",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 113
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "拆分",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 114
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "依据，不能",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 115
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "归",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 116
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "因",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 117
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "。\n- 数据为合成",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 118
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "模拟数据，仅",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 119
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "用于演示",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 120
+  },
+  {
+    "event": "delta",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "text": "。",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 121
+  },
+  {
+    "event": "stream_end",
+    "chat_id": "3a55a7d6-7065-473b-8616-d61fec81794e",
+    "stream_id": "websocket:3a55a7d6-7065-473b-8616-d61fec81794e:1792646921580584000:2",
+    "turn_id": "ef6cbcc7-2422-418d-937a-a86ccc980c98",
+    "turn_phase": "answer",
+    "turn_seq": 122
+  }
+]

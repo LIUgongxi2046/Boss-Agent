@@ -1,0 +1,16 @@
+{
+  "name": "boss-agent-selection-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "package": "node package.mjs"
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "@electron/packager": "20.3.0",
+    "@playwright/test": "1.55.0",
+    "playwright": "1.55.0"
+  }
+}

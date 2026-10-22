@@ -1,0 +1,104 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "@koso region-1 产品经营指标对比查询"
+          - button "Topic actions for region-1 产品经营指标对比查询":
+            - img
+        - listitem:
+          - button "@dova region-1 产品经营指标对比查询"
+          - button "Topic actions for region-1 产品经营指标对比查询":
+            - img
+        - listitem:
+          - button "@royi 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@lolu 生成简报并查询region-1经营指标"
+          - button "Topic actions for 生成简报并查询region-1经营指标":
+            - img
+        - listitem:
+          - button "@gane 当前会话无已确认阅读要求"
+          - button "Topic actions for 当前会话无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@soro 生成简报并查询区域销售指标"
+          - button "Topic actions for 生成简报并查询区域销售指标":
+            - img
+        - listitem:
+          - button "@mita 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@havi 生成简报并查询 region-1 指标"
+          - button "Topic actions for 生成简报并查询 region-1 指标":
+            - img
+      - button "9 hidden topics"
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "region-1 产品经营指标对比查询":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 02:42 PM
+      - button "Copy"
+      - paragraph: "本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpose\": \"提交当前会议关联的毛利变化解释、措施和证据\", \"due_at\": \"2026-10-25T17:00:00+08:00\", \"timezone\": \"Asia/Shanghai\", \"evidence_requirements\": [\"原因明细\", \"措施及证据\"], \"related_meeting_id\": \"meeting-1\", \"related_event_ids\": [\"event-1\"], \"source_refs\": [\"finance-note\"]}"
+      - time: 02:42 PM
+      - button "Copy"
+      - button "Worked for 9s" [expanded]
+      - text: Completed Create assignment Completed Read assignment
+      - paragraph: 交办已创建，并已按授权发出。
+      - heading "交办状态" [level=2]
+      - list:
+        - listitem:
+          - text: task_id：
+          - code: f51a21e1-6639-49f9-9c19-89deeed6b8ef
+        - listitem:
+          - text: 授权 ID：
+          - code: b1d636e2-1ccf-4620-af3a-23b92e96068b
+        - listitem:
+          - text: 当前状态：
+          - strong: WAITING_FEEDBACK
+          - text: （等待反馈），版本 2
+        - listitem: 执行协调人：coordinator-1
+        - listitem: 截止时间：2026-10-25 17:00（Asia/Shanghai）
+        - listitem: 关联会议：meeting-1；关联事件：event-1
+        - listitem: 依据来源：finance-note
+        - listitem: 证据要求：原因明细、措施及证据
+        - listitem:
+          - text: 消息 ID：
+          - code: 5111243e-1be3-4b7d-bb52-ecba3bd9a91a
+      - paragraph: 说明：创建后状态已从 OPEN 推进到 WAITING_FEEDBACK，说明交办已送达协调人并进入等待回执阶段。后续如需催办或查看反馈，可凭 task_id 重新查询。
+      - button "Copy"
+      - button "Fork"
+      - time: 02:43 PM
+      - 'button "Jump to prompt: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2..."'
+      - 'button "Jump to prompt: 本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpo..."'
+    - textbox "Message region-1 产品经营指标对比查询"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Context 4%. Open context usage"
+    - button "Voice input":
+      - img
+    - button "Send message" [disabled]:
+      - img

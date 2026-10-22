@@ -1,0 +1,3515 @@
+[
+  {
+    "id": "A01",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A01-档案与访问.html",
+    "technical": true,
+    "title": "档案与访问",
+    "text": "技术维护 / 档案与访问 · A01 静态 UI 设计稿档案与访问维护获准的技术档案与访问范围，严格隔离老板私人内容。当前档案待选择身份待选择配置版本待选择查询 / 应用内容与配置授权档案字段待填写 / 待查询对象范围待填写 / 待查询技术访问权限待填写 / 待查询本人确认状态（只读）待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界合法访问待查询 / 待核查拒绝记录待查询 / 待核查下一次访问检查待查询 / 待核查来源与依据可见范围待核查访问冲突待核查正文无访问权限待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查技术配置草稿合法访问状态与操作独立核查待确认拒绝记录状态与操作独立核查待确认下一次访问检查状态与操作独立核查待确认档案与访问 · 主页面设计稿 · 数据及执行状态以实际连接为准保存草稿校验启用查看记录",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存草稿",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "校验",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存草稿",
+      "校验",
+      "启用",
+      "查看记录"
+    ]
+  },
+  {
+    "id": "A02",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A02-接口目录.html",
+    "technical": true,
+    "title": "接口目录",
+    "text": "技术维护 / 模拟中心 · A02 静态 UI 设计稿接口目录按接口版本、参数及模拟空间核对单次人工调用。工具 / 接口目录SI01—SI14 接口目录待验证请求定义待验证实际响应待验证工具映射待验证Schema 与映射待验证Schema 与映射Input Schema{ \"type\": \"object\", \"properties\": {}}Output Schema{ \"type\": \"object\", \"properties\": {}}请求参数待填写 / 待查询Input Schema待填写 / 待查询接口方法待填写 / 待查询权限范围待填写 / 待查询Output Schema待填写 / 待查询实际请求与结果尚未调用没有真实请求记录参数或连接验证后显示可读的真实结果来源与依据实际请求与响应待核查错误详情待核查保存对象待核查请求耗时待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。模拟中心 · 主页面设计稿 · 数据及执行状态以实际连接为准人工调用重新查询查看映射",
+    "buttons": [
+      {
+        "text": "人工调用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重新查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看映射",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "人工调用",
+      "重新查询",
+      "查看映射"
+    ]
+  },
+  {
+    "id": "A03",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A03-数据集.html",
+    "technical": true,
+    "title": "数据集",
+    "text": "技术维护 / 模拟中心 · A03 静态 UI 设计稿数据集在隔离执行空间中生成、核查与载入可复现的模拟数据。数据集与版本待配置 当前资料尚未生成seed（随机种子）待配置 当前资料尚未生成业务时钟待配置 当前资料尚未生成execution_namespace待配置 SIMULATED · 隔离空间模拟运行与可观测信息SIMULATED实体关系尚未载入有效模拟结果数值平衡尚未载入有效模拟结果来源属性尚未载入有效模拟结果生成记录尚未载入有效模拟结果组件请求或事件执行时间结果状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页允许的模拟操作生成模拟数据载入数据检查关系重置空间重置仅作用于当前执行空间；旧空间记录应保留。技术维护不能代替老板授权或确认任务完成。来源与依据历史空间保留待核查重置影响范围待核查校验记录待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查数据待生成实体关系状态与操作独立核查待确认数值平衡状态与操作独立核查待确认来源属性状态与操作独立核查待确认模拟中心 · 主页面设计稿 · 数据及执行状态以实际连接为准生成模拟数据载入数据检查关系重置空间",
+    "buttons": [
+      {
+        "text": "生成模拟数据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "载入数据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查关系",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重置空间",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "生成模拟数据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "载入数据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查关系",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重置空间",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "生成模拟数据",
+      "载入数据",
+      "检查关系",
+      "重置空间"
+    ]
+  },
+  {
+    "id": "A04",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A04-场景与事件.html",
+    "technical": true,
+    "title": "场景与事件",
+    "text": "技术维护 / 模拟中心 · A04 静态 UI 设计稿场景与事件通过注入事件与模拟回复，检查 Agent 对业务变化的处理。数据集与版本待配置 当前资料尚未生成seed（随机种子）待配置 当前资料尚未生成业务时钟待配置 当前资料尚未生成execution_namespace待配置 SIMULATED · 隔离空间模拟运行与可观测信息SIMULATED事件注入尚未载入有效模拟结果模拟回复尚未载入有效模拟结果任务触发尚未载入有效模拟结果执行记录尚未载入有效模拟结果组件请求或事件执行时间结果状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页允许的模拟操作注入事件提供模拟回复推进时钟查看通知重置仅作用于当前执行空间；旧空间记录应保留。技术维护不能代替老板授权或确认任务完成。来源与依据保存结果待核查触发任务待核查独立Agent结果待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查事件待提交事件注入状态与操作独立核查待确认模拟回复状态与操作独立核查待确认任务触发状态与操作独立核查待确认模拟中心 · 主页面设计稿 · 数据及执行状态以实际连接为准注入事件提供模拟回复推进时钟查看通知",
+    "buttons": [
+      {
+        "text": "注入事件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提供模拟回复",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "推进时钟",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看通知",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "注入事件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提供模拟回复",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "推进时钟",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看通知",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "注入事件",
+      "提供模拟回复",
+      "推进时钟",
+      "查看通知"
+    ]
+  },
+  {
+    "id": "A05",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A05-Prompt版本.html",
+    "technical": true,
+    "title": "Prompt版本",
+    "text": "技术维护 / Agent配置 · A05 静态 UI 设计稿Prompt版本管理秘书职责与任务 Prompt 的草稿、校验、启用和实际采用。内容目录秘书职责表达要求任务提示启用版本当前草稿与生效版本分别记录，避免草稿被误当作执行配置。版本内容内容适用任务引用资料变更说明Prompt草稿当前内容 · 待配置内容待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。适用任务待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。引用资料待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。变更说明待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。来源与依据版本差异待核查工具权限边界待核查关联评测待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。版本与实际采用当前草稿待校验生效版本待查询下次实际采用尚无记录Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存草稿校验启用查看实际采用",
+    "buttons": [
+      {
+        "text": "保存草稿",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "校验",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看实际采用",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存草稿",
+      "校验",
+      "启用",
+      "查看实际采用"
+    ]
+  },
+  {
+    "id": "A06",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A06-SOP与Skills.html",
+    "technical": true,
+    "title": "SOP与Skills",
+    "text": "技术维护 / Agent配置 · A06 静态 UI 设计稿SOP与Skills用可核查的 SOP 与 Skills 步骤组织同一个 Agent 的任务执行。任务方法待选择农业资料方法待选择版本待选择查询 / 应用流程步骤与执行条件1方法步骤待核查2方法依赖待核查3版本采用待核查4引用核查待核查步骤触发与输入工具引用授权条件输出当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页责任与质量约束触发条件待填写 / 待查询输入待填写 / 待查询工具引用待填写 / 待查询授权条件待填写 / 待查询来源与依据依赖关系待核查授权范围待核查关联评测待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查方法草稿方法步骤状态与操作独立核查待确认方法依赖状态与操作独立核查待确认版本采用状态与操作独立核查待确认Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存校验启用停用",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "校验",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "停用",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存",
+      "校验",
+      "启用",
+      "停用",
+      "查看实际步骤"
+    ]
+  },
+  {
+    "id": "A07",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A07-Knowledge Base.html",
+    "technical": true,
+    "title": "Knowledge Base",
+    "text": "技术维护 / Agent配置 · A07 静态 UI 设计稿Knowledge Base维护获准的知识来源、有效期、摄取索引和引用关系。获准知识目录上传获准资料文档目录待配置摄取结果待配置检索命中待配置撤销状态待配置来源资料与版本作者待填写 / 待查询观察日期待填写 / 待查询发布日期待填写 / 待查询有效期限待填写 / 待查询可见范围待填写 / 待查询来源文件作者与日期版本可见范围索引状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页检索检查尚未摄取可用文档摄取后展示实际命中片段与原文引用来源与依据原文位置待核查访问权限待核查检索校验待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准摄取资料更新版本检索检查撤销资料",
+    "buttons": [
+      {
+        "text": "上传获准资料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "摄取资料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "更新版本",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检索检查",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "撤销资料",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "摄取资料",
+      "更新版本",
+      "检索检查",
+      "撤销资料"
+    ]
+  },
+  {
+    "id": "A08",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A08-模型连接.html",
+    "technical": true,
+    "title": "模型连接",
+    "text": "技术维护 / Agent配置 · A08 静态 UI 设计稿模型连接配置模型提供方与服务端凭据引用，验证真实连接和能力。模型基本配置GPT 配置DeepSeek 配置当前启用版本model_id待选择 / 待配置服务端凭据引用待填写 / 待查询能力范围待填写 / 待查询超时秒数待填写 / 待查询轮数限制待填写 / 待查询用量计价待填写 / 待查询启用能力□ 对话□ 工具调用□ 多模态理解服务端凭据只显示引用，不在界面暴露 API 密钥。未完成真实验证前不表示模型可用。连接状态未验证等待实际连接验证连接记录、耗时和错误在真实调用后生成共同任务检查基础对话待验证知识库检索待验证工具调用待验证结果追踪尚未执行Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存配置实际验证启用模型查看共同任务结果",
+    "buttons": [
+      {
+        "text": "保存配置",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "实际验证",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用模型",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看共同任务结果",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存配置",
+      "实际验证",
+      "启用模型",
+      "查看共同任务结果"
+    ]
+  },
+  {
+    "id": "A09",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A09-Tools与连接.html",
+    "technical": true,
+    "title": "Tools与连接",
+    "text": "技术维护 / Agent配置 · A09 静态 UI 设计稿Tools与连接管理 Agent 工具的 Schema、接口映射、权限及实际调用结果。工具 / 接口目录工具目录待验证配置详情待验证真实请求结果待验证权限审查待验证Schema 与映射待验证Schema 与映射基础配置接口配置安全与权限高级设置Input Schema{ \"type\": \"object\", \"properties\": {}}Output Schema{ \"type\": \"object\", \"properties\": {}}输入 Schema待填写 / 待查询输出 Schema待填写 / 待查询接口映射待填写 / 待查询副作用待填写 / 待查询权限待填写 / 待查询超时待填写 / 待查询实际请求与结果尚未调用没有真实请求记录参数或连接验证后显示可读的真实结果来源与依据参数核查待核查调用结果待核查权限边界待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存配置验证参数与连接启用查看实际调用",
+    "buttons": [
+      {
+        "text": "保存配置",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "验证参数与连接",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看实际调用",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存配置",
+      "验证参数与连接",
+      "启用",
+      "查看实际调用"
+    ]
+  },
+  {
+    "id": "A10",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A10-指标与规则.html",
+    "technical": true,
+    "title": "指标与规则",
+    "text": "技术维护 / Agent配置 · A10 静态 UI 设计稿指标与规则分别定义指标公式与提醒阈值，保留独立复算和抑制依据。指标定义待选择提醒规则待选择规则版本待选择查询 / 应用内容与配置指标公式待填写 / 待查询统计维度待填写 / 待查询单位与精度待填写 / 待查询刷新条件待填写 / 待查询阈值待填写 / 待查询恢复条件待填写 / 待查询冷却时间待填写 / 待查询免打扰待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界指标定义待查询 / 待核查提醒规则待查询 / 待核查独立复算待查询 / 待核查来源与依据触发依据待核查恢复记录待核查抑制原因待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查规则草稿指标定义状态与操作独立核查待确认提醒规则状态与操作独立核查待确认独立复算状态与操作独立核查待确认Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存独立复算启用查看记录",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "独立复算",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存",
+      "独立复算",
+      "启用",
+      "查看记录"
+    ]
+  },
+  {
+    "id": "A11",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A11-关联对象.html",
+    "technical": true,
+    "title": "关联对象",
+    "text": "技术维护 / 模拟中心 · A11 静态 UI 设计稿关联对象核对模拟联系人、会议、事项与证据间的关系，正式决定只读。对象与记录对象类型待选择职责有效期待选择模拟范围待选择查询 / 应用稳定对象 ID模拟来源职责字段关联记录当前状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查资料待选择模拟联系人状态与操作独立核查待确认会议事项状态与操作独立核查待确认关系证据状态与操作独立核查待确认模拟中心 · 主页面设计稿 · 数据及执行状态以实际连接为准维护模拟资料查询关系提供反馈打开证据",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "维护模拟资料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询关系",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提供反馈",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开证据",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "维护模拟资料",
+      "查询关系",
+      "提供反馈",
+      "打开证据"
+    ]
+  },
+  {
+    "id": "A12",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A12-记忆技术维护.html",
+    "technical": true,
+    "title": "记忆技术维护",
+    "text": "技术维护 / 档案与访问 · A12 静态 UI 设计稿记忆技术维护只检查记忆的技术状态与传播结果，不访问私人记忆正文。老板范围待选择索引状态待选择当前版本待选择查询 / 应用获准元信息核查确认状态（只读）待填写 / 待查询有效期限待填写 / 待查询删除传播待填写 / 待查询正文访问限制待填写 / 待查询仅显示当前技术身份被许可的元信息。老板私人正文、录音与授权决定不可由技术维护修改。只读记录与状态对象与范围事件版本状态审计入口当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据无正文访问权限待核查派生索引清理待核查停止采用待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查技术状态待查询索引同步状态与操作独立核查待确认新会话采用状态与操作独立核查待确认删除传播状态与操作独立核查待确认档案与访问 · 主页面设计稿 · 数据及执行状态以实际连接为准检查技术状态查看获准记录定位失败",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查技术状态",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看获准记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "定位失败",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "检查技术状态",
+      "查看获准记录",
+      "定位失败"
+    ]
+  },
+  {
+    "id": "A13",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A13-调度计划.html",
+    "technical": true,
+    "title": "调度计划",
+    "text": "技术维护 / Agent配置 · A13 静态 UI 设计稿调度计划统一配置任务的定时和事件调度，校验授权及去重行为。计划目录待选择执行责任组件待选择配置版本待选择查询 / 应用计划与运行条件计划名称待填写 / 待查询时间或事件条件待填写 / 待查询IANA 时区待选择 / 待配置执行规则待填写 / 待查询获准任务范围待填写 / 待查询时间与事件条件定时触发Cron 表达式 · 待配置事件触发事件来源、触发规则 · 待选择没有经过验证的执行责任或有效授权时，下次执行时间显示“待确认”。执行边界触发运行待核查 / 待配置暂停取消待核查 / 待配置重复抑制待核查 / 待配置重启恢复待核查 / 待配置来源与依据下次时间待确认待核查授权验证待核查配置冲突待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查计划草稿触发运行状态与操作独立核查待确认暂停取消状态与操作独立核查待确认重复抑制状态与操作独立核查待确认Agent配置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存计划启用暂停取消",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存计划",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "暂停",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存计划",
+      "启用",
+      "暂停",
+      "取消",
+      "获准手动执行"
+    ]
+  },
+  {
+    "id": "A14",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A14-动作授权记录.html",
+    "technical": true,
+    "title": "动作授权记录",
+    "text": "技术维护 / 档案与访问 · A14 静态 UI 设计稿动作授权记录只读核查老板动作的有效授权、撤销及实际执行记录。关联任务待选择动作类型待选择授权状态待选择执行时间待选择查询 / 应用获准元信息核查动作对象待填写 / 待查询内容版本待选择 / 待配置授权范围待填写 / 待查询有效期待填写 / 待查询授权引用待填写 / 待查询仅显示当前技术身份被许可的元信息。老板私人正文、录音与授权决定不可由技术维护修改。只读记录与状态对象与范围事件版本状态审计入口当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据已执行范围待核查撤销状态待核查正文访问限制待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查获准记录待查询授权记录状态与操作独立核查待确认工具请求状态与操作独立核查待确认实际执行对象状态与操作独立核查待确认档案与访问 · 主页面设计稿 · 数据及执行状态以实际连接为准查询元信息查看执行结果重新查询",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询元信息",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看执行结果",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重新查询",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查询元信息",
+      "查看执行结果",
+      "重新查询"
+    ]
+  },
+  {
+    "id": "A15",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A15-运行记录.html",
+    "technical": true,
+    "title": "运行记录",
+    "text": "技术维护 / 运行与评测 · A15 静态 UI 设计稿运行记录审阅真实运行、模型与工具返回、终止原因及分项用量。Provider待选择run_id待选择真实时间待选择数据集待选择错误类型待选择查询 / 应用执行概览模型请求待填写 / 待查询工具结果待填写 / 待查询配置版本待选择 / 待配置业务结果待填写 / 待查询终止原因待填写 / 待查询运行步骤与工具结果尚未读取真实运行记录暂无可显示的工具请求、返回或终止原因用量与分项计费资源类型用量缓存计价日期费用未查询到可核算的实际用量数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据Token 与缓存待核查语音检索费用待核查计价日期币种待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查记录待查询运行记录状态与操作独立核查待确认获准详情状态与操作独立核查待确认错误分析状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准查询记录打开记录核查明细查看关联任务",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "核查明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看关联任务",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查询记录",
+      "打开记录",
+      "核查明细",
+      "查看关联任务"
+    ]
+  },
+  {
+    "id": "A16",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/A16-评测管理.html",
+    "technical": true,
+    "title": "评测管理",
+    "text": "技术维护 / 运行与评测 · A16 静态 UI 设计稿评测管理按固定任务与未知变体执行独立评测，失败与证据完整保留。评测任务集待选择数据快照待选择模型版本待选择Prompt版本待选择查询 / 应用评测任务与执行方法输入与有效授权待填写 / 待查询独立断言待填写 / 待查询人工配对条件待填写 / 待查询访问隔离待填写 / 待查询独立核查条件全部尝试未配置 / 待校验正式状态检查未配置 / 待校验质量错误未配置 / 待校验原始证据未配置 / 待校验全部尝试与失败证据尝试编号任务与版本状态断言结果原始证据尚未启动实际评测；没有评分与通过率数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据未运行待核查评分条件待定待核查费用统计待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查未运行全部尝试状态与操作独立核查待确认正式状态检查状态与操作独立核查待确认质量错误状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准开始评测独立重置查看失败检查来源",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "开始评测",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "独立重置",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看失败",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查来源",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "开始评测",
+      "独立重置",
+      "查看失败",
+      "检查来源"
+    ]
+  },
+  {
+    "id": "D01",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D01-来源原文与支持关系.html",
+    "technical": false,
+    "title": "来源原文与支持关系",
+    "text": "老板工作台 / 经营关注 · D01 静态 UI 设计稿来源原文与支持关系从经营结论追溯到来源原文、版本与断言支持范围。当前经营查询上下文来源名称待查询单位、期间和来源待读取作者待查询单位、期间和来源待读取发布日期待查询单位、期间和来源待读取观察时间待查询单位、期间和来源待读取当前来源尚未加载回到查询页，可保留当前指标与期间条件来源原文 · 400px 阅读区来源名称待填写 / 待查询作者待填写 / 待查询发布日期待填写 / 待查询观察时间待填写 / 待查询接收时间待填写 / 待查询版本待选择 / 待配置有效期待填写 / 待查询原文位置尚未读取资料原文尚未提供。此处不生成引用段落，也不将未经核实的资料当作事实依据。打开获准原文经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开完整原文查看支持范围返回查询",
+    "buttons": [
+      {
+        "text": "打开获准原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开完整原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看支持范围",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回查询",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开完整原文",
+      "查看支持范围",
+      "返回查询"
+    ]
+  },
+  {
+    "id": "D02",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D02-当前动作必要决定.html",
+    "technical": false,
+    "title": "当前动作必要决定",
+    "text": "老板工作台 / 任务与承诺 · D02 静态 UI 设计稿当前动作必要决定只在决定性条件不足时，让老板确认具体对象及动作后果。原任务上下文动作对象待查询单位、期间和来源待读取负责人或收件人待查询单位、期间和来源待读取正文或金额待查询单位、期间和来源待读取币种待查询单位、期间和来源待读取条件与内容来源当前版本授权状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页当前动作必要决定当前对象与操作条件清晰可读，保留原任务上下文动作对象待填写 / 待查询负责人或收件人待填写 / 待查询正文或金额未知 / 待补充币种待填写 / 待查询时区待填写 / 待查询附件待填写 / 待查询只在决定性条件不足时，让老板确认具体对象及动作后果。 未执行步骤可取消，实际操作以有效授权及正式状态为准。补充必要决定取消未执行操作",
+    "buttons": [
+      {
+        "text": "补充必要决定",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行操作",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 1,
+    "configured_actions": [
+      "补充必要决定",
+      "取消未执行操作"
+    ]
+  },
+  {
+    "id": "D03",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D03-执行结果核查.html",
+    "technical": false,
+    "title": "执行结果核查",
+    "text": "老板工作台 / 聊天交办 · D03 静态 UI 设计稿执行结果核查处理中断后的执行状态核查，阻止不确定动作被重复发送。当前任务待选择run_id待选择执行状态待选择查询 / 应用当前对象与有效条件已知已执行项待填写 / 待查询尚未执行项待填写 / 待查询待核查项待填写 / 待查询终止原因待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线执行核查事件与资料待读取，暂无已验证记录业务结果事件与资料待读取，暂无已验证记录取消范围事件与资料待读取，暂无已验证记录来源与依据重复发送已禁用待核查核查中待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查RECONCILING执行核查状态与操作独立核查待确认业务结果状态与操作独立核查待确认取消范围状态与操作独立核查待确认聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准查询原执行结果取消未执行步骤返回对话",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询原执行结果",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行步骤",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回对话",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查询原执行结果",
+      "取消未执行步骤",
+      "返回对话"
+    ]
+  },
+  {
+    "id": "D04",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D04-选择负责人.html",
+    "technical": false,
+    "title": "选择负责人",
+    "text": "老板工作台 / 任务与承诺 · D04 静态 UI 设计稿选择负责人按稳定 ID、组织和职责选择唯一负责人，避免同名误指派。原任务上下文联系人稳定 ID待查询单位、期间和来源待读取当前组织待查询单位、期间和来源待读取当前职责待查询单位、期间和来源待读取职责有效期待查询单位、期间和来源待读取条件与内容来源当前版本授权状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选择负责人当前对象与操作条件清晰可读，保留原任务上下文联系人稳定 ID待填写 / 待查询当前组织待填写 / 待查询当前职责待填写 / 待查询职责有效期待填写 / 待查询按稳定 ID、组织和职责选择唯一负责人，避免同名误指派。 未执行步骤可取消，实际操作以有效授权及正式状态为准。确认负责人取消选择",
+    "buttons": [
+      {
+        "text": "确认负责人",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消选择",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 1,
+    "configured_actions": [
+      "确认负责人",
+      "取消选择"
+    ]
+  },
+  {
+    "id": "D05",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D05-选择时间与时区.html",
+    "technical": false,
+    "title": "选择时间与时区",
+    "text": "老板工作台 / 任务与承诺 · D05 静态 UI 设计稿选择时间与时区精确选择日期、时间与 IANA 时区，核对跨日与暂缓影响。原任务上下文具体时刻待查询单位、期间和来源待读取老板时间待查询单位、期间和来源待读取本地时间待查询单位、期间和来源待读取UTC 偏移待查询单位、期间和来源待读取条件与内容来源当前版本授权状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选择时间与时区当前对象与操作条件清晰可读，保留原任务上下文具体时刻待填写 / 待查询老板时间待填写 / 待查询本地时间待填写 / 待查询UTC 偏移待填写 / 待查询夏令时状态待填写 / 待查询精确选择日期、时间与 IANA 时区，核对跨日与暂缓影响。 未执行步骤可取消，实际操作以有效授权及正式状态为准。确认当前时间取消选择",
+    "buttons": [
+      {
+        "text": "确认当前时间",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消选择",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 1,
+    "configured_actions": [
+      "确认当前时间",
+      "取消选择"
+    ]
+  },
+  {
+    "id": "D06",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D06-未保存修改提醒.html",
+    "technical": false,
+    "title": "未保存修改提醒",
+    "text": "老板工作台 / 会议与资料 · D06 静态 UI 设计稿未保存修改提醒纪要修改离开前保护未保存内容，区分草稿和正式发送。原任务上下文未保存编辑范围待查询单位、期间和来源待读取关联交办待查询单位、期间和来源待读取已有有效内容待查询单位、期间和来源待读取覆盖范围待查询单位、期间和来源待读取条件与内容来源当前版本授权状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页未保存修改提醒当前对象与操作条件清晰可读，保留原任务上下文未保存编辑范围待填写 / 待查询关联交办待填写 / 待查询已有有效内容尚未读取资料纪要修改离开前保护未保存内容，区分草稿和正式发送。 未执行步骤可取消，实际操作以有效授权及正式状态为准。继续编辑保存草稿并离开放弃本次编辑",
+    "buttons": [
+      {
+        "text": "继续编辑",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存草稿并离开",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "放弃本次编辑",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 1,
+    "configured_actions": [
+      "继续编辑",
+      "保存草稿并离开",
+      "放弃本次编辑"
+    ]
+  },
+  {
+    "id": "D07",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D07-访问权限限制.html",
+    "technical": true,
+    "title": "访问权限限制",
+    "text": "技术维护 / 档案与访问 · D07 静态 UI 设计稿访问权限限制技术维护身份无权访问老板的私人正文、录音及附件。无法访问此内容技术维护身份没有该对象的读取或操作权限。私人正文、录音、附件和派生摘要不会出现在页面中。返回获准页面查询获准访问记录",
+    "buttons": [
+      {
+        "text": "返回获准页面",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询获准访问记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "返回获准页面",
+      "查询访问记录"
+    ]
+  },
+  {
+    "id": "D08",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D08-登录状态已过期.html",
+    "technical": false,
+    "title": "登录状态已过期",
+    "text": "登录状态已过期重新认证后可按当前权限查询已有运行结果。会话已失效需要重新验证身份。未完成的写入不会自动重放，已运行结果可以在重新认证后查询。重新认证返回登录",
+    "buttons": [
+      {
+        "text": "重新认证",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回登录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "重新认证",
+      "返回登录"
+    ]
+  },
+  {
+    "id": "D09",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/D09-历史通知只读详情.html",
+    "technical": false,
+    "title": "历史通知只读详情",
+    "text": "老板工作台 / 通知与设置 · D09 静态 UI 设计稿历史通知只读详情从历史通知查看旧执行空间记录，区分历史状态与当前事项。原数据集待选择旧命名空间待选择历史版本待选择查询 / 应用当前对象与有效条件历史来源尚未读取资料对象链接待填写 / 待查询当前对应事项待填写 / 待查询状态待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线历史空间提示事件与资料待读取，暂无已验证记录获准记录事件与资料待读取，暂无已验证记录当前空间查询事件与资料待读取，暂无已验证记录来源与依据历史只读待核查无对应对象时提示待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查历史对象只读历史空间提示状态与操作独立核查待确认获准记录状态与操作独立核查待确认当前空间查询状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准返回通知查询对应事项查看历史记录",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回通知",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询对应事项",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看历史记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "返回通知",
+      "查询对应事项",
+      "查看历史记录"
+    ]
+  },
+  {
+    "id": "F01",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F01-今日工作.html",
+    "technical": false,
+    "title": "早上好，张总 · 今天想推进什么？",
+    "text": "老板工作台 / 今日工作 · F01 静态 UI 设计稿早上好，张总 · 今天想推进什么？今天需要决定、协调和知晓的事项集中呈现，由 Agent 帮你推进。现在就交给大鹏自然语言发起查询、分析、会议准备与交办描述您的需求，例如：“帮我查看上一季度饲料业务经营情况，生成一份摘要”知识库查数据做分析写方案发送任务待决定当前事项待读取尚无获准的当前事项记录；读取后按参与原因和期限排序。待协调当前事项待读取尚无获准的当前事项记录；读取后按参与原因和期限排序。需要知晓当前事项待读取尚无获准的当前事项记录；读取后按参与原因和期限排序。我的当前事项事项标题处理人有效期限当前状态参与原因当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页当前需我关注需要本人决定尚未读取最新事项会议与承诺尚未读取最新事项可能的时间冲突尚未读取最新事项来源与依据资料覆盖范围待核查数据尚待读取待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。",
+    "buttons": [
+      {
+        "text": "知识库",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查数据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "做分析",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "写方案",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "发送任务",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续讨论",
+      "查看依据",
+      "准备交办"
+    ]
+  },
+  {
+    "id": "F02",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F02-经营提醒.html",
+    "technical": false,
+    "title": "经营提醒",
+    "text": "老板工作台 / 经营关注 · F02 静态 UI 设计稿经营提醒解释经营提醒由何触发、谁在处理，以及你需要参与的原因。关联提醒待选择规则版本待选择通知状态待选择查询 / 应用当前对象与有效条件当前值待填写 / 待查询比较期间待填写 / 待查询持续时间待填写 / 待查询措施负责人待填写 / 待查询触发依据待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线恢复记录事件与资料待读取，暂无已验证记录冷却与免打扰事件与资料待读取，暂无已验证记录关联任务事件与资料待读取，暂无已验证记录来源与依据原始来源待核查当前事件状态待核查参与原因待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查待处理状态的设计表达恢复记录状态与操作独立核查待确认冷却与免打扰状态与操作独立核查待确认关联任务状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准知晓选择暂缓加入会议交办",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "知晓",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "选择暂缓",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "加入会议",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "交办",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "知晓",
+      "选择暂缓",
+      "加入会议",
+      "交办",
+      "关闭提醒"
+    ]
+  },
+  {
+    "id": "F03",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F03-经营查询与追问.html",
+    "technical": false,
+    "title": "经营查询与追问",
+    "text": "老板工作台 / 经营关注 · F03 静态 UI 设计稿经营查询与追问按指标、产品、区域与期间查询经营数据，并连续追问来源。指标待选择产品待选择区域待选择法人待选择当前期间待选择比较期间待选择查询 / 应用经营指标与趋势指标名称待查询单位、期间和来源待读取数值与单位待查询单位、期间和来源待读取变化量待查询单位、期间和来源待读取截至时间待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件指标对比 待查询经营趋势 待查询明细记录 待查询统计口径 待查询数据明细与资料覆盖指标名称数值与单位变化量截至时间覆盖范围当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据指标公式版本待核查展示舍入待核查来源范围待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查查询条件可编辑指标对比状态与操作独立核查待确认经营趋势状态与操作独立核查待确认明细记录状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准提交查询继续追问打开原文",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提交查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续追问",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开原文",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "提交查询",
+      "继续追问",
+      "打开原文"
+    ]
+  },
+  {
+    "id": "F04",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F04-会前材料.html",
+    "technical": false,
+    "title": "会前材料",
+    "text": "老板工作台 / 会议与资料 · F04 静态 UI 设计稿会前材料为经营会议准备议题、历史承诺、资料依据和缺口清单。会议对象待选择日期时间待选择时区待选择参会联系人待选择查询 / 应用内容与配置议题历史承诺待决定材料缺口议题待填写 / 待查询已确认共识待填写 / 待查询待决定事项待填写 / 待查询资料缺口待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界议题资料待查询 / 待核查历史承诺待查询 / 待核查准备进度待查询 / 待核查来源与依据材料作者与版本待核查准备期限待核查发送需授权待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待选择会议议题资料状态与操作独立核查待确认历史承诺状态与操作独立核查待确认准备进度状态与操作独立核查待确认会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准生成会前材料打开来源准备资料请求查看交办",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "生成会前材料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开来源",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备资料请求",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看交办",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "生成会前材料",
+      "打开来源",
+      "准备资料请求",
+      "查看交办"
+    ]
+  },
+  {
+    "id": "F05",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F05-纪要核查.html",
+    "technical": false,
+    "title": "纪要核查",
+    "text": "老板工作台 / 会议与资料 · F05 静态 UI 设计稿纪要核查从会议原文梳理意见、明确决定与交办草稿，逐项核查。内容目录意见与建议明确决定交办草稿原文证据当前草稿与生效版本分别记录，避免草稿被误当作执行配置。版本内容意见建议明确决定交办草稿草稿编辑当前内容 · 待配置唯一负责人待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。期限与时区待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。产物待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。证据要求待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。来源与依据原文与草稿对应待核查发送状态待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。版本与实际采用当前草稿待校验生效版本待查询下次实际采用尚无记录会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准保存纪要确认当前内容逐项创建获准发送",
+    "buttons": [
+      {
+        "text": "保存纪要",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "确认当前内容",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "逐项创建",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "获准发送",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存纪要",
+      "确认当前内容",
+      "逐项创建",
+      "获准发送"
+    ]
+  },
+  {
+    "id": "F06",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F06-交办详情.html",
+    "technical": false,
+    "title": "交办详情",
+    "text": "老板工作台 / 任务与承诺 · F06 静态 UI 设计稿交办详情完整追踪交办、反馈、延期申请、结果证据和老板完成确认。任务类型待选择任务状态待选择内容版本待选择查询 / 应用当前对象与有效条件目的待填写 / 待查询唯一负责人待填写 / 待查询期限与时区待填写 / 待查询产物待填写 / 待查询证据要求尚未读取资料关联会议待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线模拟发送事件与资料待读取，暂无已验证记录进展反馈事件与资料待读取，暂无已验证记录延期申请事件与资料待读取，暂无已验证记录结果附件事件与资料待读取，暂无已验证记录来源与依据原有效期限与申请期限待核查逾期属性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待补全交办条件模拟发送状态与操作独立核查待确认进展反馈状态与操作独立核查待确认延期申请状态与操作独立核查待确认任务与承诺 · 主页面设计稿 · 数据及执行状态以实际连接为准创建交办发送或催办决定延期查看证据",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "创建交办",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "发送或催办",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "决定延期",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看证据",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "创建交办",
+      "发送或催办",
+      "决定延期",
+      "查看证据",
+      "确认完成"
+    ]
+  },
+  {
+    "id": "F07",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F07-申请审阅.html",
+    "technical": false,
+    "title": "申请审阅",
+    "text": "老板工作台 / 会议与资料 · F07 静态 UI 设计稿申请审阅审阅当前版本申请，按材料与金额范围作出明确决定。申请对象待选择当前版本待选择材料状态待选择查询 / 应用内容与配置金额与币种未知 / 待补充申请摘要待填写 / 待查询原始附件待填写 / 待查询前后版本差异待选择 / 待配置编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界关键材料待查询 / 待核查证据完整度待查询 / 待核查当前授权范围待查询 / 待核查来源与依据资料缺口待核查授权后果待核查取消未执行操作待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查待材料关键材料状态与操作独立核查待确认证据完整度状态与操作独立核查待确认当前授权范围状态与操作独立核查待确认会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准同意拒绝请求补充提交当前版本决定",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "同意",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "拒绝",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "请求补充",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提交当前版本决定",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "同意",
+      "拒绝",
+      "请求补充",
+      "提交当前版本决定"
+    ]
+  },
+  {
+    "id": "F08",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F08-消息编辑.html",
+    "technical": false,
+    "title": "消息编辑",
+    "text": "老板工作台 / 聊天交办 · F08 静态 UI 设计稿消息编辑编辑获准消息并跟踪草稿、发送、送达、回复的独立状态。收件人待选择关联事项待选择内容版本待选择查询 / 应用内容与配置稳定联系人ID待填写 / 待查询组织职责待填写 / 待查询正文待填写 / 待查询附件待填写 / 待查询可见范围待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界消息草稿待查询 / 待核查历史沟通待查询 / 待核查收件人核查待查询 / 待核查来源与依据发送后果待核查授权来源待核查状态记录待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查消息草稿消息草稿状态与操作独立核查待确认历史沟通状态与操作独立核查待确认收件人核查状态与操作独立核查待确认聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准保存草稿按有效授权发送查看发件箱",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存草稿",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "按有效授权发送",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看发件箱",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存草稿",
+      "按有效授权发送",
+      "查看发件箱"
+    ]
+  },
+  {
+    "id": "F09",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F09-专题研究.html",
+    "technical": false,
+    "title": "专题研究",
+    "text": "老板工作台 / 会议与资料 · F09 静态 UI 设计稿专题研究围绕专题问题组织事实、专家意见、模型推断与待核查项。研究问题待选择期间待选择国别待选择业务关系待选择查询 / 应用事实、观点与推断分层可核查事实待提供尚无经过核对的资料内容作者意见待提供尚无经过核对的资料内容模型推断待提供尚无经过核对的资料内容待验证问题待提供尚无经过核对的资料内容查询范围与研究要求获准资料待填写 / 待查询研究范围待填写 / 待查询来源版本待选择 / 待配置冲突证据尚未读取资料来源与依据来源属性与时间待核查过期与撤销提示待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查研究条件输入可核查事实状态与操作独立核查待确认作者意见状态与操作独立核查待确认模型推断状态与操作独立核查待确认会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准开始研究打开引用继续追问准备核查请求",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "开始研究",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开引用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续追问",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备核查请求",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "开始研究",
+      "打开引用",
+      "继续追问",
+      "准备核查请求"
+    ]
+  },
+  {
+    "id": "F10",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F10-人员会面.html",
+    "technical": false,
+    "title": "人员会面",
+    "text": "老板工作台 / 会议与资料 · F10 静态 UI 设计稿人员会面为人员会面组织当前职责、历史承诺、反馈和讨论重点。会面对象待选择当前职责待选择会面目的待选择查询 / 应用内容与配置历史交办尚未读取资料承诺待填写 / 待查询当前反馈待填写 / 待查询待回答问题待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界会面目标待查询 / 待核查背景材料待查询 / 待核查关联会议待查询 / 待核查来源与依据联系人的稳定ID待核查来源版本待核查职责有效期待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待选择会面对象会面目标状态与操作独立核查待确认背景材料状态与操作独立核查待确认关联会议状态与操作独立核查待确认会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准准备材料打开原文加入会议",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备材料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "加入会议",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "准备材料",
+      "打开原文",
+      "加入会议"
+    ]
+  },
+  {
+    "id": "F11",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F11-行程安排.html",
+    "technical": false,
+    "title": "行程安排",
+    "text": "老板工作台 / 今日工作 · F11 静态 UI 设计稿行程安排协调多地行程、当地时区、会议缓冲和受影响事项。出发日期待选择返回日期待选择地点待选择接待联系人待选择查询 / 应用计划与运行条件IANA 时区待选择 / 待配置本地时间待填写 / 待查询老板时间待填写 / 待查询交通资料待填写 / 待查询缓冲时段待填写 / 待查询时间与事件条件定时触发Cron 表达式 · 待配置事件触发事件来源、触发规则 · 待选择没有经过验证的执行责任或有效授权时，下次执行时间显示“待确认”。执行边界日程安排待核查 / 待配置时间冲突待核查 / 待配置准备期限待核查 / 待配置受影响会议待核查 / 待配置来源与依据交通与天气来源待核查跨日风险待核查变更清单待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查行程编辑日程安排状态与操作独立核查待确认时间冲突状态与操作独立核查待确认准备期限状态与操作独立核查待确认今日工作 · 主页面设计稿 · 数据及执行状态以实际连接为准检查影响编辑行程确认具体变更取消",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查影响",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "编辑行程",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "确认具体变更",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "检查影响",
+      "编辑行程",
+      "确认具体变更",
+      "取消"
+    ]
+  },
+  {
+    "id": "F12",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F12-本人私人安排.html",
+    "technical": false,
+    "title": "本人私人安排",
+    "text": "老板工作台 / 通知与设置 · F12 静态 UI 设计稿本人私人安排本人可见的私人安排独立保存，分享权限仅限获准字段。私人时段待选择时区待选择可见范围待选择查询 / 应用内容与配置标题待填写 / 待查询正文待填写 / 待查询地点待填写 / 待查询附件待填写 / 待查询分享对象待填写 / 待查询用途待填写 / 待查询到期时间待填写 / 待查询编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界私人日程待查询 / 待核查分享范围待查询 / 待核查工作冲突待查询 / 待核查来源与依据本人可见待核查默认仅分享占用时间待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查本人私人内容编辑结构私人日程状态与操作独立核查待确认分享范围状态与操作独立核查待确认工作冲突状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准检查工作冲突保存分享占用时间撤销",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "检查工作冲突",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "分享占用时间",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "撤销",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "检查工作冲突",
+      "保存",
+      "分享占用时间",
+      "撤销",
+      "删除"
+    ]
+  },
+  {
+    "id": "F13",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F13-个人记忆.html",
+    "technical": false,
+    "title": "个人记忆",
+    "text": "老板工作台 / 通知与设置 · F13 静态 UI 设计稿个人记忆管理候选要求、有效个人记忆、历史决定和实际采用。内容目录候选要求有效要求历史决定传播状态当前草稿与生效版本分别记录，避免草稿被误当作执行配置。版本内容候选要求有效要求历史决定等待读取记忆当前内容 · 待配置要求内容待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。来源待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。有效期待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。可见范围待配置当前栏目尚未录入经过确认的内容；编辑并校验后才能按授权启用。来源与依据新会话采用待核查删除传播待核查版本依据待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。版本与实际采用当前草稿待校验生效版本待查询下次实际采用尚无记录通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准确认修改删除查看关联决定",
+    "buttons": [
+      {
+        "text": "确认",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "修改",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "删除",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看关联决定",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "确认",
+      "修改",
+      "删除",
+      "查看关联决定"
+    ]
+  },
+  {
+    "id": "F14",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F14-原料与饲料.html",
+    "technical": false,
+    "title": "原料与饲料",
+    "text": "老板工作台 / 经营关注 · F14 静态 UI 设计稿原料与饲料核对原料行情、合同和实际领用成本，识别配方与交付缺口。原料待选择产品待选择法人待选择期间待选择查询 / 应用经营指标与趋势行情价格待查询单位、期间和来源待读取合同价格待查询单位、期间和来源待读取入库成本待查询单位、期间和来源待读取领用成本待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件价格口径 待查询库存与配方 待查询生产批次 待查询订单交付 待查询数据明细与资料覆盖行情价格合同价格入库成本领用成本库存质量当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据有效配方版本待核查资料缺口待核查待检库存待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待选择业务范围价格口径状态与操作独立核查待确认库存与配方状态与操作独立核查待确认生产批次状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准查看明细准备会议授权资源协调",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会议",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "授权资源协调",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看明细",
+      "准备会议",
+      "授权资源协调"
+    ]
+  },
+  {
+    "id": "F15",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F15-水产季节.html",
+    "technical": false,
+    "title": "水产季节",
+    "text": "老板工作台 / 经营关注 · F15 静态 UI 设计稿水产季节比较水产季节性指标与渠道反馈，核查阶段和覆盖差异。区域待选择品种待选择阶段待选择比较周期待选择查询 / 应用经营指标与趋势订单待查询单位、期间和来源待读取渠道库存待查询单位、期间和来源待读取投苗投喂待查询单位、期间和来源待读取回访分子分母待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件季节比较 待查询客户反馈 待查询原因假设 待查询下次复查 待查询数据明细与资料覆盖订单渠道库存投苗投喂回访分子分母天气观察当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据观察日期待核查阶段可比性待核查覆盖不足待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查比较条件待输入季节比较状态与操作独立核查待确认客户反馈状态与操作独立核查待确认原因假设状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准核查原因选择统筹负责人交办安排复查",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "核查原因",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "选择统筹负责人",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "交办",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "安排复查",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "核查原因",
+      "选择统筹负责人",
+      "交办",
+      "安排复查"
+    ]
+  },
+  {
+    "id": "F16",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F16-苗种批次.html",
+    "technical": false,
+    "title": "苗种批次",
+    "text": "老板工作台 / 经营关注 · F16 静态 UI 设计稿苗种批次串联苗种繁育、检验、交付和养殖反馈，核查同批关系。养户反馈待选择苗种批次待选择养殖批次待选择查询 / 应用关系与来源核查繁育待核查尚无可确认的关联证据检验待核查尚无可确认的关联证据运输待核查尚无可确认的关联证据接收待核查尚无可确认的关联证据放养待核查尚无可确认的关联证据回访待核查尚无可确认的关联证据只有经资料核实的对象关系才会标记为“已确认”；待核查关系不绘制确定性关联线。关联记录记录对象关系类型观察时间作者与版本确认状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据样本和覆盖分母待核查未确认关系待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查批次关系待核查关联关系清单状态与操作独立核查待确认共同批次状态与操作独立核查待确认差异条件状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开关系证据创建联合核查查看专业反馈",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开关系证据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "创建联合核查",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看专业反馈",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开关系证据",
+      "创建联合核查",
+      "查看专业反馈"
+    ]
+  },
+  {
+    "id": "F17",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F17-动保与技服.html",
+    "technical": false,
+    "title": "动保与技服",
+    "text": "老板工作台 / 经营关注 · F17 静态 UI 设计稿动保与技服整理动保与技服观察、采样、专业确认、执行反馈和复查。区域待选择批次待选择专业责任人待选择查询 / 应用流程步骤与执行条件1观察阶段待核查2专业确认待核查3服务反馈待核查4资源缺口待核查步骤触发与输入工具引用授权条件输出当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页责任与质量约束资料有效期待填写 / 待查询采样检测待填写 / 待查询专业意见待填写 / 待查询执行反馈待填写 / 待查询来源与依据作者与证据待核查确认程度待核查资料缺口待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查待专业确认观察阶段状态与操作独立核查待确认专业确认状态与操作独立核查待确认服务反馈状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开专业资料授权资源协调安排后续查询",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开专业资料",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "授权资源协调",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "安排后续查询",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开专业资料",
+      "授权资源协调",
+      "安排后续查询"
+    ]
+  },
+  {
+    "id": "F18",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F18-生猪合作.html",
+    "technical": false,
+    "title": "生猪合作",
+    "text": "老板工作台 / 经营关注 · F18 静态 UI 设计稿生猪合作分开核对生猪合作的存栏、出栏、投入及结算结果。合作主体待选择批次待选择周期待选择结算状态待选择查询 / 应用经营指标与趋势存栏待查询单位、期间和来源待读取转群待查询单位、期间和来源待读取出栏重量待查询单位、期间和来源待读取出栏价格待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件批次与数量 待查询投入成本 待查询未结算项目 待查询预计结果 待查询数据明细与资料覆盖存栏转群出栏重量出栏价格投入费用当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据公司与农场归属待核查负责人解释待核查差异提示待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待读取同批次资料批次与数量状态与操作独立核查待确认投入成本状态与操作独立核查待确认未结算项目状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准查看明细准备经营复查授权核查任务",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备经营复查",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "授权核查任务",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看明细",
+      "准备经营复查",
+      "授权核查任务"
+    ]
+  },
+  {
+    "id": "F19",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F19-禽类与反刍.html",
+    "technical": false,
+    "title": "禽类与反刍",
+    "text": "老板工作台 / 经营关注 · F19 静态 UI 设计稿禽类与反刍按畜禽用途独立查看供料与养殖指标，避免混用不可比口径。用途待选择阶段待选择客户待选择观察期待选择查询 / 应用经营指标与趋势肉禽蛋禽奶畜肉用牛羊供料数量待查询单位、期间和来源待读取体重待查询单位、期间和来源待读取出栏待查询单位、期间和来源待读取适用单位待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件肉禽 待查询蛋禽 待查询奶畜 待查询肉用牛羊 待查询数据明细与资料覆盖供料数量体重出栏适用单位资料时间当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据来源版本待核查阶段与单位可比性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查肉禽用途待查询肉禽状态与操作独立核查待确认蛋禽状态与操作独立核查待确认奶畜状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准继续查询查看明细准备会面资源协调",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会面",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "资源协调",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续查询",
+      "查看明细",
+      "准备会面",
+      "资源协调"
+    ]
+  },
+  {
+    "id": "F20",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F20-公司水产养殖.html",
+    "technical": false,
+    "title": "公司水产养殖",
+    "text": "老板工作台 / 经营关注 · F20 静态 UI 设计稿公司水产养殖核对公司水产养殖的设备事件、观察时间与批次关系。自营法人待选择养殖单元待选择设备待选择批次待选择查询 / 应用关系与来源核查observed_at待核查尚无可确认的关联证据received_at待核查尚无可确认的关联证据测量方法待核查尚无可确认的关联证据当前措施待核查尚无可确认的关联证据批次关系待核查尚无可确认的关联证据关系证据待核查尚无可确认的关联证据只有经资料核实的对象关系才会标记为“已确认”；待核查关系不绘制确定性关联线。关联记录记录对象关系类型观察时间作者与版本确认状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据费用归属待核查观察过期待核查关系缺口待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查观察资料待核查事件与观察状态与操作独立核查待确认专业确认状态与操作独立核查待确认估计影响状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准查看依据授权设备协调查看专业复查",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看依据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "授权设备协调",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看专业复查",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看依据",
+      "授权设备协调",
+      "查看专业复查"
+    ]
+  },
+  {
+    "id": "F21",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F21-食品与品质.html",
+    "technical": false,
+    "title": "食品与品质",
+    "text": "老板工作台 / 经营关注 · F21 静态 UI 设计稿食品与品质追溯食品质量事件的原料、加工批次、检验和交付关联。客诉待选择原料批次待选择加工批次待选择查询范围待选择查询 / 应用关系与来源核查检验状态待核查尚无可确认的关联证据库存数量待核查尚无可确认的关联证据交付客户待核查尚无可确认的关联证据关系证据待核查尚无可确认的关联证据关系证据待核查尚无可确认的关联证据关系证据待核查尚无可确认的关联证据只有经资料核实的对象关系才会标记为“已确认”；待核查关系不绘制确定性关联线。关联记录记录对象关系类型观察时间作者与版本确认状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据专业作者待核查有效期限待核查原事件独立状态待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查追溯范围待核查已确认范围状态与操作独立核查待确认可能关联状态与操作独立核查待确认追溯缺口状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开原始记录授权统筹交办查看后续检查",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开原始记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "授权统筹交办",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看后续检查",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开原始记录",
+      "授权统筹交办",
+      "查看后续检查"
+    ]
+  },
+  {
+    "id": "F22",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F22-海外业务.html",
+    "technical": false,
+    "title": "海外业务",
+    "text": "老板工作台 / 经营关注 · F22 静态 UI 设计稿海外业务区分本币与集团折算金额，核对跨国订单与交付范围。国别待选择法人待选择本地期间待选择集团期间待选择币种待选择时区待选择查询 / 应用经营指标与趋势订单待查询单位、期间和来源待读取工段能力待查询单位、期间和来源待读取交付缺口待查询单位、期间和来源待读取回款范围待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件本币金额 待查询折算金额 待查询资源选项 待查询跨时区会议 待查询数据明细与资料覆盖订单工段能力交付缺口回款范围汇率类型当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据汇率日期来源待核查国别资料有效期待核查决策期限待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查可比条件待核查本币金额状态与操作独立核查待确认折算金额状态与操作独立核查待确认资源选项状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准查看选项准备跨时区会议记录资源决定",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看选项",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备跨时区会议",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "记录资源决定",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看选项",
+      "准备跨时区会议",
+      "记录资源决定"
+    ]
+  },
+  {
+    "id": "F23",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F23-研发应用.html",
+    "technical": false,
+    "title": "研发应用",
+    "text": "老板工作台 / 经营关注 · F23 静态 UI 设计稿研发应用对研发试验的对照、样本、观察期和专业评审进行复核。研发项目待选择试验版本待选择专业评审待选择决定问题待选择查询 / 应用事实、观点与推断分层试验方案待提供尚无经过核对的资料内容效果证据待提供尚无经过核对的资料内容专家评审待提供尚无经过核对的资料内容适用范围待提供尚无经过核对的资料内容查询范围与研究要求试验条件待填写 / 待查询对照组待填写 / 待查询样本分母待填写 / 待查询观察期待填写 / 待查询来源与依据客户反馈待核查未验证条件待核查来源有效性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查试验条件待查询试验方案状态与操作独立核查待确认效果证据状态与操作独立核查待确认专家评审状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开原文继续验证调整项目记录安排",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续验证",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "调整项目",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "记录安排",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开原文",
+      "继续验证",
+      "调整项目",
+      "记录安排"
+    ]
+  },
+  {
+    "id": "F24",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F24-运行详情.html",
+    "technical": false,
+    "title": "运行详情",
+    "text": "老板工作台 / 聊天交办 · F24 静态 UI 设计稿运行详情让老板看到可观察执行步骤、工具结果及可以取消的未执行动作。当前任务待选择run_id待选择开始时间待选择查询 / 应用执行概览任务目标待填写 / 待查询运行状态待填写 / 待查询当前任务版本待选择 / 待配置待输入条件待填写 / 待查询运行步骤与工具结果尚未读取真实运行记录暂无可显示的工具请求、返回或终止原因用量与分项计费资源类型用量缓存计价日期费用未查询到可核算的实际用量数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据引用资料待核查运行记录待核查终止原因待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查尚未启动运行执行步骤状态与操作独立核查待确认工具结果状态与操作独立核查待确认已执行动作状态与操作独立核查待确认聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准补充输入取消未执行步骤查询执行结果打开产物",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "补充输入",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行步骤",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询执行结果",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开产物",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "补充输入",
+      "取消未执行步骤",
+      "查询执行结果",
+      "打开产物"
+    ]
+  },
+  {
+    "id": "F25",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F25-模拟中心.html",
+    "technical": true,
+    "title": "模拟中心",
+    "text": "技术维护 / 模拟中心 · F25 静态 UI 设计稿模拟中心在受控模拟空间测试数据、接口、事件与 Agent 的实际行为。数据集与版本待配置 当前资料尚未生成seed（随机种子）待配置 当前资料尚未生成业务时钟待配置 当前资料尚未生成execution_namespace待配置 SIMULATED · 隔离空间模拟运行与可观测信息SIMULATED数据生成尚未载入有效模拟结果关系检查尚未载入有效模拟结果事件与回复尚未载入有效模拟结果人工调用尚未载入有效模拟结果组件请求或事件执行时间结果状态详情当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页允许的模拟操作生成或载入人工调用注入事件推进时钟重置重置仅作用于当前执行空间；旧空间记录应保留。技术维护不能代替老板授权或确认任务完成。来源与依据SIMULATED待核查请求与响应待核查保存对象待核查模型运行关联待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查尚未载入数据集数据生成状态与操作独立核查待确认关系检查状态与操作独立核查待确认事件与回复状态与操作独立核查待确认模拟中心 · 主页面设计稿 · 数据及执行状态以实际连接为准生成或载入人工调用注入事件推进时钟",
+    "buttons": [
+      {
+        "text": "生成或载入",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "人工调用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "注入事件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "推进时钟",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重置",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "生成或载入",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "人工调用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "注入事件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "推进时钟",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "生成或载入",
+      "人工调用",
+      "注入事件",
+      "推进时钟",
+      "重置"
+    ]
+  },
+  {
+    "id": "F26",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F26-应用入口与本人设置.html",
+    "technical": false,
+    "title": "应用入口与本人设置",
+    "text": "老板工作台 / 通知与设置 · F26 静态 UI 设计稿应用入口与本人设置集中管理本人目标、关注事项、通知、记忆与隐私范围。本人身份待选择当前工作区待选择查询 / 应用本人设置与访问入口本人设置入口查看内容、当前状态与可用操作 →资料可见范围查看内容、当前状态与可用操作 →已授权动作查看内容、当前状态与可用操作 →本人目标查看内容、当前状态与可用操作 →关注要求查看内容、当前状态与可用操作 →通知要求查看内容、当前状态与可用操作 →个人记忆查看内容、当前状态与可用操作 →本人计划查看内容、当前状态与可用操作 →个人范围与可见性本人目标待填写 / 待查询关注要求待填写 / 待查询通知要求待填写 / 待查询个人记忆待填写 / 待查询来源与依据个人内容本人确认待核查维护配置隔离待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查本人设置尚未填写本人设置入口状态与操作独立核查待确认资料可见范围状态与操作独立核查待确认已授权动作状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准编辑本人目标查看通知要求管理记忆查看授权",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "编辑本人目标",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看通知要求",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "管理记忆",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看授权",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "编辑本人目标",
+      "查看通知要求",
+      "管理记忆",
+      "查看授权"
+    ]
+  },
+  {
+    "id": "F27",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F27-语音交办.html",
+    "technical": false,
+    "title": "语音交办",
+    "text": "老板工作台 / 聊天交办 · F27 静态 UI 设计稿语音交办对录音与转写进行逐项核查，再确认人名、金额和时间。录音与转写核查1录音同意2录制或上传3转写4文本核查5提交交办等待录音许可没有录音时不展示虚构音频时长或波形同意并开始录音上传音频取消实际转写文本尚未上传音频，也没有真实转写结果。实际文本可逐项核查人名、时间、金额和动作。文字核查与提交录音时长待填写 / 待查询原始转写待填写 / 待查询文本版本待选择 / 待配置修改后文本待填写 / 待查询来源与依据服务用量待查询待核查失败记录待核查关联任务待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查等待录音同意录音步骤状态与操作独立核查待确认上传与转写状态与操作独立核查待确认文字核查状态与操作独立核查待确认聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准开始录音停止录音上传音频确认文本并提交",
+    "buttons": [
+      {
+        "text": "同意并开始录音",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "上传音频",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "开始录音",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "停止录音",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "上传音频",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "确认文本并提交",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "开始录音",
+      "停止录音",
+      "上传音频",
+      "确认文本并提交",
+      "取消"
+    ]
+  },
+  {
+    "id": "F28",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F28-动作授权详情.html",
+    "technical": false,
+    "title": "动作授权详情",
+    "text": "老板工作台 / 通知与设置 · F28 静态 UI 设计稿动作授权详情把业务动作绑定到具体对象、内容版本、范围和有效期。老板本人待选择目标事项待选择当前版本待选择查询 / 应用当前对象与有效条件动作与对象待填写 / 待查询负责人待填写 / 待查询正文或金额未知 / 待补充币种待填写 / 待查询时间待填写 / 待查询附件待填写 / 待查询可见范围待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线有效指令引用事件与资料待读取，暂无已验证记录缺失条件事件与资料待读取，暂无已验证记录已执行记录事件与资料待读取，暂无已验证记录授权后果事件与资料待读取，暂无已验证记录来源与依据内容版本待核查已变化条件待核查具体执行后果待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查必要条件待补充有效指令引用状态与操作独立核查待确认缺失条件状态与操作独立核查待确认已执行记录状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准提交必要决定撤销授权取消未执行动作查看记录",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提交必要决定",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "撤销授权",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行动作",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "提交必要决定",
+      "撤销授权",
+      "取消未执行动作",
+      "查看记录"
+    ]
+  },
+  {
+    "id": "F29",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F29-任务异常详情.html",
+    "technical": false,
+    "title": "任务异常详情",
+    "text": "老板工作台 / 聊天交办 · F29 静态 UI 设计稿任务异常详情清楚区分任务失败、待补充条件与正在核查的执行结果。当前问题待选择任务状态待选择获准运行待选择查询 / 应用当前对象与有效条件实际原因待填写 / 待查询已执行动作待填写 / 待查询未执行动作待填写 / 待查询缺少条件待填写 / 待查询授权、变更与执行范围当前状态尚未从正式记录中读取；对象、内容版本、授权边界和执行结果必须分别核查。事件与反馈时间线异常详情事件与资料待读取，暂无已验证记录结果核查事件与资料待读取，暂无已验证记录运行记录事件与资料待读取，暂无已验证记录已有产物事件与资料待读取，暂无已验证记录来源与依据正式业务状态待核查重复发送禁用待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查执行结果核查中异常详情状态与操作独立核查待确认结果核查状态与操作独立核查待确认运行记录状态与操作独立核查待确认聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准补充信息重新查询获准新尝试取消未执行步骤",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "补充信息",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "重新查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "获准新尝试",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行步骤",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "补充信息",
+      "重新查询",
+      "获准新尝试",
+      "取消未执行步骤"
+    ]
+  },
+  {
+    "id": "F30",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F30-运行与用量详情.html",
+    "technical": true,
+    "title": "运行与用量详情",
+    "text": "技术维护 / 运行与评测 · F30 静态 UI 设计稿运行与用量详情追查模型和工具实际运行与分项用量，未知费用保持未知。run_id待选择Provider待选择真实日期待选择数据集待选择状态待选择查询 / 应用执行概览模型请求待填写 / 待查询工具输入结果待填写 / 待查询授权状态待填写 / 待查询配置版本待选择 / 待配置终止原因待填写 / 待查询运行步骤与工具结果尚未读取真实运行记录暂无可显示的工具请求、返回或终止原因用量与分项计费资源类型用量缓存计价日期费用未查询到可核算的实际用量数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据Token缓存待核查检索语音待核查币种及计价日期待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查尚未选择运行模型调用状态与操作独立核查待确认工具结果状态与操作独立核查待确认业务状态状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准查看获准记录打开关联任务核查费用",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看获准记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开关联任务",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "核查费用",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看获准记录",
+      "打开关联任务",
+      "核查费用"
+    ]
+  },
+  {
+    "id": "F31",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F31-演示评测.html",
+    "technical": true,
+    "title": "演示评测",
+    "text": "技术维护 / 运行与评测 · F31 静态 UI 设计稿演示评测在隔离执行空间中按统一断言测评实际运行和失败案例。任务集待选择数据版本待选择模型配置待选择任务类型待选择查询 / 应用评测任务与执行方法有效授权待填写 / 待查询独立断言待填写 / 待查询配对条件待填写 / 待查询原始证据尚未读取资料独立核查条件方法配置未配置 / 待校验全部尝试未配置 / 待校验逐项状态未配置 / 待校验质量错误未配置 / 待校验全部尝试与失败证据尝试编号任务与版本状态断言结果原始证据尚未启动实际评测；没有评分与通过率数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据未运行待核查评分待定待核查来源追踪待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查未运行方法配置状态与操作独立核查待确认全部尝试状态与操作独立核查待确认逐项状态状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准启动实际评测取消未执行项查看证据独立重置",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "启动实际评测",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行项",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看证据",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "独立重置",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "启动实际评测",
+      "取消未执行项",
+      "查看证据",
+      "独立重置"
+    ]
+  },
+  {
+    "id": "F32",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/F32-本地运行与交接.html",
+    "technical": true,
+    "title": "本地运行与交接",
+    "text": "技术维护 / 运行与评测 · F32 静态 UI 设计稿本地运行与交接为本地运行、重启、恢复、验收与交接保留可核查说明。对象与记录应用版本待选择上游版本待选择设备待选择服务状态待选择查询 / 应用安装步骤启动命令重启与重置恢复说明当前状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查运行条件未验证运行说明状态与操作独立核查待确认验收记录状态与操作独立核查待确认来源复用状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准打开说明查询状态获准维护查看交接记录",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开说明",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询状态",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "获准维护",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看交接记录",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开说明",
+      "查询状态",
+      "获准维护",
+      "查看交接记录"
+    ]
+  },
+  {
+    "id": "N01",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N01-身份登录.html",
+    "technical": false,
+    "title": "Boss Agent",
+    "text": "Boss Agent让重要的事，推进得更确定。蓝 · 绿 · 白 统一品牌系统欢迎使用 Boss Agent请通过实际配置的认证服务验证身份老板本人授权决策与日常工作技术维护配置、模拟与评测认证服务等待企业认证方式配置继续认证未接入真实认证服务前，不展示扫码成功或已经登录的用户数据。",
+    "buttons": [
+      {
+        "text": "继续认证",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续认证",
+      "查看认证帮助"
+    ]
+  },
+  {
+    "id": "N02",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N02-聊天交办.html",
+    "technical": false,
+    "title": "聊天交办",
+    "text": "老板工作台 / 聊天交办 · N02 静态 UI 设计稿聊天交办连续追问、补充材料、查看 Agent 的执行过程与当前产物。历史会话开始新会话尚无可用会话本页不会编造老板的对话内容连续对话 · 新会话今天希望我帮您推进哪件事？可以自然语言提问、交办或继续追问已有任务输入消息、粘贴资料或描述需要执行的任务…添加附件语音输入查看来源提交消息任务执行面板尚未发起任务这里展示执行进度与结果产物来源与依据依据与来源待核查任务版本待核查结果状态待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。聊天交办 · 主页面设计稿 · 数据及执行状态以实际连接为准发送消息上传附件语音输入取消未执行步骤",
+    "buttons": [
+      {
+        "text": "开始新会话",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "添加附件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "语音输入",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看来源",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "提交消息",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "发送消息",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "上传附件",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "语音输入",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消未执行步骤",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "发送消息",
+      "上传附件",
+      "语音输入",
+      "取消未执行步骤"
+    ]
+  },
+  {
+    "id": "N03",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N03-经营关注.html",
+    "technical": false,
+    "title": "经营关注",
+    "text": "老板工作台 / 经营关注 · N03 静态 UI 设计稿经营关注按经营专题查看可用数据、参与提醒与关联事项。期间待选择法人待选择区域待选择关注范围待选择查询 / 应用工作领域原料与饲料查看内容、当前状态与可用操作 →水产季节查看内容、当前状态与可用操作 →苗种批次查看内容、当前状态与可用操作 →动保与技服查看内容、当前状态与可用操作 →生猪合作查看内容、当前状态与可用操作 →海外业务查看内容、当前状态与可用操作 →食品与品质查看内容、当前状态与可用操作 →研发应用查看内容、当前状态与可用操作 →当前范围与状态模块已读取资料当前状态更新时间入口当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页智能检索可按业务主题、任务目标或相关资料发起搜索…让大鹏帮我查找状态与核查关注范围待查询原料与饲料状态与操作独立核查待确认水产季节状态与操作独立核查待确认苗种批次状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准打开专题查询指标查看提醒",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "让大鹏帮我查找",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开专题",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询指标",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看提醒",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开专题",
+      "查询指标",
+      "查看提醒"
+    ]
+  },
+  {
+    "id": "N04",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N04-会议与资料.html",
+    "technical": false,
+    "title": "会议与资料",
+    "text": "老板工作台 / 会议与资料 · N04 静态 UI 设计稿会议与资料会议、资料、申请与研究材料在统一入口组织和检索。对象与记录会议资料待决定申请研究材料人员会面日期待选择关联对象待选择材料状态待选择查询 / 应用标题时间时区来源版本材料缺口关联事项当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查目录待读取会议状态与操作独立核查待确认资料状态与操作独立核查待确认待决定申请状态与操作独立核查待确认会议与资料 · 主页面设计稿 · 数据及执行状态以实际连接为准准备会议阅读原文打开纪要查看历史决定",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会议",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "阅读原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开纪要",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看历史决定",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "准备会议",
+      "阅读原文",
+      "打开纪要",
+      "查看历史决定"
+    ]
+  },
+  {
+    "id": "N05",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N05-任务与承诺.html",
+    "technical": false,
+    "title": "任务与承诺",
+    "text": "老板工作台 / 任务与承诺 · N05 静态 UI 设计稿任务与承诺按本人承诺与他人交办跟踪期限、反馈证据和待核查结果。对象与记录本人承诺他人交办等待反馈待核查结果负责人待选择有效期限待选择任务状态待选择关联会议待选择查询 / 应用任务目的唯一负责人期限与时区当前进展证据状态当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查列表待查询本人承诺状态与操作独立核查待确认他人交办状态与操作独立核查待确认等待反馈状态与操作独立核查待确认任务与承诺 · 主页面设计稿 · 数据及执行状态以实际连接为准创建交办进入详情查看反馈返回今日",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "创建交办",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "进入详情",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看反馈",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回今日",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "创建交办",
+      "进入详情",
+      "查看反馈",
+      "返回今日"
+    ]
+  },
+  {
+    "id": "N06",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N06-通知中心.html",
+    "technical": false,
+    "title": "通知中心",
+    "text": "老板工作台 / 通知与设置 · N06 静态 UI 设计稿通知中心统一处理当前与历史通知，区分知晓、暂缓和关闭提醒。对象与记录全部未读已知晓已暂缓已关闭通知范围待选择来源日期待选择关联对象待选择查询 / 应用事项参与原因规则版本任务状态来源时间当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查通知待读取全部状态与操作独立核查待确认未读状态与操作独立核查待确认已知晓状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准打开任务知晓选择暂缓时间关闭提醒",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开任务",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "知晓",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "选择暂缓时间",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "关闭提醒",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开任务",
+      "知晓",
+      "选择暂缓时间",
+      "关闭提醒"
+    ]
+  },
+  {
+    "id": "N07",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N07-本人目标与关注要求.html",
+    "technical": false,
+    "title": "本人目标与关注要求",
+    "text": "老板工作台 / 通知与设置 · N07 静态 UI 设计稿本人目标与关注要求由本人保存并确认长期目标、关注要求与阅读偏好。适用范围待选择目标期限待选择查询 / 应用内容与配置目标内容尚未读取资料关注主题待填写 / 待查询阅读要求待填写 / 待查询来源待填写 / 待查询版本待选择 / 待配置编辑内容与说明尚未填写真实内容。后续版本变更、附件和引用均需与当前对象绑定。关联内容与处理边界当前要求待查询 / 待核查本人确认待查询 / 待核查历史版本待查询 / 待核查来源与依据候选尚未生效待核查当前有效版本待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查本人要求待填写当前要求状态与操作独立核查待确认本人确认状态与操作独立核查待确认历史版本状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存确认当前要求查看历史查看实际采用",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "确认当前要求",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看历史",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看实际采用",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存",
+      "确认当前要求",
+      "查看历史",
+      "查看实际采用"
+    ]
+  },
+  {
+    "id": "N08",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N08-通知要求与可见范围.html",
+    "technical": false,
+    "title": "通知要求与可见范围",
+    "text": "老板工作台 / 通知与设置 · N08 静态 UI 设计稿通知要求与可见范围设置本人通知时间、免打扰、重要事件和资料分享边界。通知时间待选择IANA 时区待选择可见范围待选择查询 / 应用本人设置与访问入口通知要求查看内容、当前状态与可用操作 →分享字段查看内容、当前状态与可用操作 →当前有效版本查看内容、当前状态与可用操作 →个人内容访问查看内容、当前状态与可用操作 →免打扰时段查看内容、当前状态与可用操作 →事件升级查看内容、当前状态与可用操作 →阅读格式查看内容、当前状态与可用操作 →分享对象查看内容、当前状态与可用操作 →个人范围与可见性免打扰时段待填写 / 待查询事件升级待填写 / 待查询阅读格式待填写 / 待查询分享对象待填写 / 待查询来源与依据私人正文仅本人可见待核查默认分享占用时间待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查本人通知要求待确认通知要求状态与操作独立核查待确认分享字段状态与操作独立核查待确认当前有效版本状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准保存要求暂停计划查看授权进入私人安排",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "保存要求",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "暂停计划",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看授权",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "进入私人安排",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "保存要求",
+      "暂停计划",
+      "查看授权",
+      "进入私人安排"
+    ]
+  },
+  {
+    "id": "N09",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N09-本人计划.html",
+    "technical": false,
+    "title": "本人计划",
+    "text": "老板工作台 / 通知与设置 · N09 静态 UI 设计稿本人计划查看本人授权的晨间安排、事项复查等唯一调度计划。当前状态待选择计划类型待选择时区待选择查询 / 应用计划与运行条件任务范围待填写 / 待查询时间或事件条件待填写 / 待查询规则版本待选择 / 待配置有效授权待填写 / 待查询时间与事件条件定时触发Cron 表达式 · 待配置事件触发事件来源、触发规则 · 待选择没有经过验证的执行责任或有效授权时，下次执行时间显示“待确认”。执行边界本人计划列表待核查 / 待配置下一次时间待核查 / 待配置暂停与取消后果待核查 / 待配置来源与依据技术调度责任只读待核查无第二套计划待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查本人计划待读取本人计划列表状态与操作独立核查待确认下一次时间状态与操作独立核查待确认暂停与取消后果状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准创建获准计划修改范围暂停取消",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "创建获准计划",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "修改范围",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "暂停",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "取消",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "创建获准计划",
+      "修改范围",
+      "暂停",
+      "取消",
+      "查看执行结果"
+    ]
+  },
+  {
+    "id": "N10",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N10-本人授权.html",
+    "technical": false,
+    "title": "本人授权",
+    "text": "老板工作台 / 通知与设置 · N10 静态 UI 设计稿本人授权查询按对象、内容版本和有效期限定的本人授权。对象与记录当前有效已到期已撤销已执行有效授权待选择已到期待选择已撤销待选择已执行待选择查询 / 应用目标对象授权动作内容版本范围有效期当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页选中记录尚未选择记录选择实际条目后查看对象、来源及操作状态与核查授权待查询授权记录状态与操作独立核查待确认执行清单状态与操作独立核查待确认未执行范围状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准查看当前内容打开任务撤销授权查询实际结果",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看当前内容",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开任务",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "撤销授权",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查询实际结果",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "查看当前内容",
+      "打开任务",
+      "撤销授权",
+      "查询实际结果"
+    ]
+  },
+  {
+    "id": "N11",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N11-历史决定.html",
+    "technical": false,
+    "title": "历史决定",
+    "text": "老板工作台 / 通知与设置 · N11 静态 UI 设计稿历史决定以当时资料版本保存历史决定，后来来源变化不改写事实。期间待选择会议待选择决定类型待选择来源待选择查询 / 应用历史决定时间线历史时间线尚未读取真实历史记录及当时依据原始记录尚未读取真实历史记录及当时依据当前事项尚未读取真实历史记录及当时依据记忆引用尚未读取真实历史记录及当时依据历史决定保留当时版本，后续资料变化不会改写已作出的决定。来源与依据历史依据版本待核查当前条件变化待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查历史决定待查询历史时间线状态与操作独立核查待确认原始记录状态与操作独立核查待确认当前事项状态与操作独立核查待确认通知与设置 · 主页面设计稿 · 数据及执行状态以实际连接为准打开原文查看当前事项继续讨论返回记忆",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开原文",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看当前事项",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续讨论",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "返回记忆",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开原文",
+      "查看当前事项",
+      "继续讨论",
+      "返回记忆"
+    ]
+  },
+  {
+    "id": "N12",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/N12-运行概况.html",
+    "technical": true,
+    "title": "运行概况",
+    "text": "技术维护 / 运行与评测 · N12 静态 UI 设计稿运行概况汇总当前服务、配置、数据空间和调度检查的可读状态。应用版本待选择上游版本待选择数据集待选择查询 / 应用工作领域服务概况查看内容、当前状态与可用操作 →配置采用查看内容、当前状态与可用操作 →数据空间查看内容、当前状态与可用操作 →最近运行查看内容、当前状态与可用操作 →未检查查看内容、当前状态与可用操作 →总数未知查看内容、当前状态与可用操作 →维护权限边界查看内容、当前状态与可用操作 →当前范围与状态模块已读取资料当前状态更新时间入口当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页智能检索可按业务主题、任务目标或相关资料发起搜索…让大鹏帮我查找状态与核查运行条件待检查服务概况状态与操作独立核查待确认配置采用状态与操作独立核查待确认数据空间状态与操作独立核查待确认运行与评测 · 主页面设计稿 · 数据及执行状态以实际连接为准打开模拟中心模型连接运行记录评测中心",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "让大鹏帮我查找",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "打开模拟中心",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "模型连接",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "运行记录",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "评测中心",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "打开模拟中心",
+      "模型连接",
+      "运行记录",
+      "评测中心"
+    ]
+  },
+  {
+    "id": "V19-BEEF",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/V19-BEEF-禽类与反刍.html",
+    "technical": false,
+    "title": "禽类与反刍 · 肉用牛羊",
+    "text": "老板工作台 / 经营关注 · V19-BEEF 静态 UI 设计稿禽类与反刍 · 肉用牛羊肉用牛羊专题独立查看供料、生长、出栏与专业反馈。牛或羊待选择用途待选择生长阶段待选择客户待选择观察期待选择查询 / 应用经营指标与趋势肉禽蛋禽奶畜肉用牛羊供料量待查询单位、期间和来源待读取生长表现待查询单位、期间和来源待读取出栏待查询单位、期间和来源待读取适用单位待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件肉禽 待查询蛋禽 待查询奶畜 待查询肉用牛羊 待查询数据明细与资料覆盖供料量生长表现出栏适用单位资料时间当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据覆盖分母待核查专业反馈待核查阶段可比性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查肉用牛羊用途待查询肉禽状态与操作独立核查待确认蛋禽状态与操作独立核查待确认奶畜状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准继续查询查看明细准备会面资源协调",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会面",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "资源协调",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续查询",
+      "查看明细",
+      "准备会面",
+      "资源协调"
+    ]
+  },
+  {
+    "id": "V19-EGG",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/V19-EGG-禽类与反刍.html",
+    "technical": false,
+    "title": "禽类与反刍 · 蛋禽",
+    "text": "老板工作台 / 经营关注 · V19-EGG 静态 UI 设计稿禽类与反刍 · 蛋禽蛋禽专题独立核对供料、产蛋表现及合格蛋重。蛋禽阶段待选择客户待选择日龄待选择观察期待选择查询 / 应用经营指标与趋势肉禽蛋禽奶畜肉用牛羊供料待查询单位、期间和来源待读取产蛋量待查询单位、期间和来源待读取合格蛋重待查询单位、期间和来源待读取适用单位待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件肉禽 待查询蛋禽 待查询奶畜 待查询肉用牛羊 待查询数据明细与资料覆盖供料产蛋量合格蛋重适用单位资料时间当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据覆盖分母待核查专业反馈待核查阶段可比性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查蛋禽用途待查询肉禽状态与操作独立核查待确认蛋禽状态与操作独立核查待确认奶畜状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准继续查询查看明细准备会面资源协调",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会面",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "资源协调",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续查询",
+      "查看明细",
+      "准备会面",
+      "资源协调"
+    ]
+  },
+  {
+    "id": "V19-MILK",
+    "file": "Boss-Agent-Desktop-Complete-v5/pages/V19-MILK-禽类与反刍.html",
+    "technical": false,
+    "title": "禽类与反刍 · 奶畜",
+    "text": "老板工作台 / 经营关注 · V19-MILK 静态 UI 设计稿禽类与反刍 · 奶畜奶畜专题按泌乳阶段独立查询供料、产奶与资料覆盖。动物待选择客户待选择泌乳阶段待选择观察期待选择查询 / 应用经营指标与趋势肉禽蛋禽奶畜肉用牛羊供料量待查询单位、期间和来源待读取产奶表现待查询单位、期间和来源待读取计量单位待查询单位、期间和来源待读取观察期待查询单位、期间和来源待读取起始期间截止尚未读取数据查询后显示经过核对的实际趋势指标说明与适用条件肉禽 待查询蛋禽 待查询奶畜 待查询肉用牛羊 待查询数据明细与资料覆盖供料量产奶表现计量单位观察期资料时间当前条件下尚无已读取的记录数据接入或查询后，按当前字段显示完整记录结果数：待查询 · 每页 10 条上一页 1 下一页来源与依据覆盖分母待核查专业反馈待核查阶段可比性待核查当前仅为设计状态。资料未接入时不展示推断数值、虚构来源或已执行结果。状态与核查奶畜用途待查询肉禽状态与操作独立核查待确认蛋禽状态与操作独立核查待确认奶畜状态与操作独立核查待确认经营关注 · 主页面设计稿 · 数据及执行状态以实际连接为准继续查询查看明细准备会面资源协调",
+    "buttons": [
+      {
+        "text": "查询 / 应用",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "继续查询",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "查看明细",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "准备会面",
+        "disabled": false,
+        "aria": null
+      },
+      {
+        "text": "资源协调",
+        "disabled": false,
+        "aria": null
+      }
+    ],
+    "links": [
+      {
+        "text": "Boss Agent",
+        "href": "../index.html"
+      }
+    ],
+    "missing_assets": [],
+    "native_inputs": 0,
+    "scripts": 0,
+    "aria_dialogs": 0,
+    "generic_modal": 0,
+    "configured_actions": [
+      "继续查询",
+      "查看明细",
+      "准备会面",
+      "资源协调"
+    ]
+  }
+]

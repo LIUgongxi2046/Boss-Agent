@@ -1,0 +1,88 @@
+- main:
+  - region "Conversation workbench":
+    - button "Toggle sidebar":
+      - img
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Toggle theme from header":
+      - img
+    - region "根据当前已确认要求生成简报，并查询 region-1 的 product-1 和 product-2，2026-1…":
+      - paragraph: 根据当前已确认要求生成简报，并查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询六个经营指标并读取依据。
+      - time: 02:05 PM
+      - button "Copy"
+      - paragraph:
+        - strong: 本人决定优先
+      - paragraph:
+        - strong: 一、经营指标（region-1，product-1 + product-2，外销，CNY，口径 v1）
+      - region "Data table":
+        - table:
+          - rowgroup:
+            - row "指标 2026-09-01~09-10（基期） 2026-10-01~10-10（本期） 变化":
+              - cell "指标"
+              - cell "2026-09-01~09-10（基期）"
+              - cell "2026-10-01~10-10（本期）"
+              - cell "变化"
+          - rowgroup:
+            - row "销量 10,000 吨 12,000 吨 +2,000 吨（+20.0%）":
+              - cell "销量"
+              - cell "10,000 吨"
+              - cell "12,000 吨"
+              - cell "+2,000 吨（+20.0%）"
+            - row "收入 40,000,000 元 48,000,000 元 +8,000,000 元（+20.0%）":
+              - cell "收入"
+              - cell "40,000,000 元"
+              - cell "48,000,000 元"
+              - cell "+8,000,000 元（+20.0%）"
+            - row "成本 36,000,000 元 44,160,000 元 +8,160,000 元（+22.7%）":
+              - cell "成本"
+              - cell "36,000,000 元"
+              - cell "44,160,000 元"
+              - cell "+8,160,000 元（+22.7%）"
+            - row "毛利 4,000,000 元 3,840,000 元 −160,000 元（−4.0%）":
+              - cell "毛利"
+              - cell "4,000,000 元"
+              - cell "3,840,000 元"
+              - cell "−160,000 元（−4.0%）"
+            - row "毛利率 10.00% 8.00% −2.00 个百分点":
+              - cell "毛利率"
+              - cell "10.00%"
+              - cell "8.00%"
+              - cell "−2.00 个百分点"
+            - row "单吨毛利 400 元/吨 320 元/吨 −80 元/吨（−20.0%）":
+              - cell "单吨毛利"
+              - cell "400 元/吨"
+              - cell "320 元/吨"
+              - cell "−80 元/吨（−20.0%）"
+      - paragraph:
+        - strong: 二、要点
+      - list:
+        - listitem: 销量和收入同步增长 20%，但成本增长 22.7%，增速快于收入，导致毛利下降 4.0%。
+        - listitem: 单吨收入由 4,000 元升至 4,000 元（持平），单吨成本由 3,600 元升至 3,680 元（+80 元/吨），毛利下滑全部来自成本端。
+        - listitem: 明细显示，product-1 与 product-2 的四个客户记录结构一致：基期各 2,500 吨、收入 1,000 万元、成本 900 万元；本期各 3,000 吨、收入 1,200 万元、成本 1,104 万元。两个产品之间没有差异，问题具有普遍性，并非单一产品个案。
+      - paragraph:
+        - strong: 三、待办
+      - list:
+        - listitem: 请财务或业务补充“原因贡献明细”（当前缺失），定位单吨成本上涨 80 元的构成（原料、加工、运费等）。
+        - listitem: 复核本期定价与成本传导机制：销量增长 20% 却未带来毛利增长，需评估是否以价换量。
+        - listitem: 数据质量说明：来源为模拟数据（finance-note，业务时点 2026-10-10），覆盖完整、无冲突；结论仅适用于上述两个十日期间与两个产品。
+      - paragraph:
+        - text: 依据：query_id
+        - code: c6f18083-9268-48cc-a721-5dd9b16bff6d
+        - text: ，明细 BASE-0~3、CURRENT-0~3，来源 finance-note v1。
+      - button "Copy"
+      - button "Fork"
+      - time: 02:05 PM
+    - textbox "Message 根据当前已确认要求生成简报，并查询 region-1 的 product-1 和 product-2，2026-1…"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Context 3%. Open context usage"
+    - button "Voice input":
+      - img
+    - button "Send message" [disabled]:
+      - img

@@ -1,0 +1,216 @@
+import hashlib
+import json
+import sqlite3
+import uuid
+from datetime import datetime, timezone
+from decimal import Decimal
+from pathlib import Path
+
+from aiohttp import web
+from jsonschema import Draft202012Validator, FormatChecker
+
+ROOT = Path(__file__).resolve().parent
+SPEC = json.loads((ROOT.parent / "specs/selection-probe.json").read_text())
+OPERATIONS = {item["operation_id"]: item for item in SPEC["operations"]}
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def encode(value):
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def checksum(value):
+    return hashlib.sha256(encode(value).encode()).hexdigest()
+
+
+def require(condition, message, error=web.HTTPConflict):
+    if not condition:
+        raise error(text=message)
+
+
+def validate(name, value):
+    schema = {**SPEC["io_schema"], "$ref": f"#/$defs/{name}"}
+    errors = list(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(value))
+    require(not errors, f"Schema 校验失败：{name}", web.HTTPBadRequest)
+
+
+def initial_materials():
+    details = []
+    for period, quantity, revenue, cost in [("BASE", 10000, 40000000, 36000000), ("CURRENT", 12000, 48000000, 44160000)]:
+        for index in range(4):
+            details.append({"record_id": f"{period}-{index}", "region_id": "region-1", "product_id": f"product-{index % 2 + 1}", "legal_entity_id": "entity-1", "customer_id": f"customer-{index + 1}", "factory_id": f"factory-{index % 2 + 1}", "period": period, "quantity_tonnes": str(quantity // 4), "revenue_cny": str(revenue // 4), "cost_cny": str(cost // 4), "trade_type": "EXTERNAL_SALES", "version": "1"})
+    return {
+        "source_type": "SIMULATED", "generator_version": "T02-3", "seed": 20261022,
+        "owner_id": "boss-1", "dataset_id": "selection", "dataset_version": "1",
+        "boss_profile": {"owner_id": "boss-1", "goals": ["增长质量", "现金", "本人承诺"], "timezone": "Asia/Shanghai", "confirmed_reading_requirement": "简报优先展示现金与本人承诺。", "version": "1"},
+        "metric_definitions": [{"metric_id": metric, "formula": formula, "unit": unit, "precision": "Decimal", "definition_version": "1", "scope": "region-1 EXTERNAL_SALES CNY", "settlement_state": "SETTLED"} for metric, formula, unit in [("sales_quantity", "SUM(quantity_tonnes)", "吨"), ("revenue", "SUM(revenue_cny)", "CNY"), ("cost", "SUM(cost_cny)", "CNY"), ("gross_profit", "revenue-cost", "CNY"), ("gross_margin", "gross_profit/revenue*100", "%"), ("gross_profit_per_tonne", "gross_profit/sales_quantity", "CNY/吨")]],
+        "periods": {"BASE": ["2026-09-01", "2026-09-10"], "CURRENT": ["2026-10-01", "2026-10-10"]},
+        "details": details,
+        "contacts": [{"contact_id": "coordinator-1", "name": "陈明", "organization": "合成区域", "responsibility": "业务统筹", "valid_from": "2026-01-01", "valid_until": "2027-01-01"}, {"contact_id": "finance-1", "name": "李文", "organization": "合成财务", "responsibility": "财务材料作者", "valid_from": "2026-01-01", "valid_until": "2027-01-01"}, {"contact_id": "contact-2", "name": "陈明", "organization": "合成客户", "responsibility": "客户联系人", "valid_from": "2026-01-01", "valid_until": "2027-01-01"}],
+        "meeting": {"meeting_id": "meeting-1", "owner_id": "boss-1", "participant_ids": ["coordinator-1", "finance-1"], "starts_at": "2026-10-23T09:00:00+08:00", "timezone": "Asia/Shanghai", "material_ids": ["finance-note", "meeting-minutes", "event-1"], "historical_commitment_ids": ["historical-1"], "version": "1"},
+        "event": {"event_id": "event-1", "owner_id": "boss-1", "task_id": "historical-1", "coordinator_id": "coordinator-1", "meeting_id": "meeting-1", "status": "OPEN", "due_at": "2026-10-24T17:00:00+08:00", "evidence_requirements": ["经营原始明细"], "version": "1"},
+        "historical_task": {"task_id": "historical-1", "owner_id": "boss-1", "status": "IN_PROGRESS", "due_at": "2026-10-24T17:00:00+08:00", "evidence_requirements": ["经营原始明细"], "version": "1"},
+        "documents": [{"source_id": "finance-note", "author_contact_id": "finance-1", "version": "1", "source_type": "SIMULATED", "published_at": "2026-10-11T08:00:00+08:00", "valid_from": "2026-10-11T08:00:00+08:00", "access_scope": "boss-1", "original_locator": "sqlite:documents/finance-note", "content": "合成水产饲料外销明细；毛利=收入减成本，毛利率=毛利除收入，单吨毛利=毛利除吨数。原因贡献明细尚未提供。"}, {"source_id": "meeting-minutes", "author_contact_id": "coordinator-1", "version": "1", "source_type": "SIMULATED", "published_at": "2026-10-12T10:00:00+08:00", "valid_from": "2026-10-12T10:00:00+08:00", "access_scope": "boss-1", "original_locator": "sqlite:documents/meeting-minutes", "content": "合成历史会议纪要：historical-1 由 coordinator-1 统筹准备经营原始明细，尚未收到本人完成决定；关联经营事件 event-1 保持 OPEN。"}],
+        "private_calendar": {"calendar_id": "private-1", "owner_id": "boss-1", "starts_at": "2026-10-24T18:00:00+08:00", "ends_at": "2026-10-24T19:00:00+08:00", "timezone": "Asia/Shanghai", "private_body": "获准模拟私人安排", "visibility": "PRIVATE"},
+        "memory": {"memory_id": "memory-1", "memory_version": "1", "version": "1", "confirmation_state": "CONFIRMED", "text": "简报优先展示现金与本人承诺。"},
+    }
+
+
+class Store:
+    def __init__(self, path):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self.connect() as db:
+            db.executescript("""
+                CREATE TABLE IF NOT EXISTS objects(namespace TEXT, kind TEXT, id TEXT, body TEXT NOT NULL, PRIMARY KEY(namespace, kind, id));
+                CREATE TABLE IF NOT EXISTS spaces(namespace TEXT PRIMARY KEY, active INTEGER NOT NULL, snapshot TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS idempotency(namespace TEXT, operation TEXT, key TEXT, digest TEXT, result TEXT, PRIMARY KEY(namespace, operation, key));
+                CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, namespace TEXT, operation TEXT, input TEXT, output TEXT, created_at TEXT);
+            """)
+
+    def connect(self):
+        db = sqlite3.connect(self.path, timeout=10)
+        db.execute("PRAGMA foreign_keys=ON")
+        db.execute("PRAGMA journal_mode=WAL")
+        return db
+
+    def get(self, db, ns, kind, key):
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind=? AND id=?", (ns, kind, key)).fetchone()
+        require(row is not None, "对象不存在", web.HTTPNotFound)
+        return json.loads(row[0])
+
+    def put(self, db, ns, kind, key, value):
+        db.execute("INSERT INTO objects VALUES(?,?,?,?) ON CONFLICT(namespace,kind,id) DO UPDATE SET body=excluded.body", (ns, kind, key, encode(value)))
+
+    def initialize(self, ns):
+        data = initial_materials()
+        with self.connect() as db:
+            self.initialize_in_transaction(db, ns, data)
+        return {"namespace": ns, "snapshot_sha256": checksum(data)}
+
+    def initialize_in_transaction(self, db, ns, data):
+        db.execute("INSERT INTO spaces VALUES(?,1,?)", (ns, checksum(data)))
+        self.put(db, ns, "initial", "snapshot", data)
+        self.put(db, ns, "memory", "current", data["memory"])
+        self.put(db, ns, "configuration", "current", {"config_id": "runtime-1", "version": "1", "provider": "deepseek", "api_type": "chat_completions", "model_id": "deepseek-flash", "credential_ref": "connection.json:credential_file", "tool_scope": list(OPERATIONS), "max_tool_rounds": 12, "timeout": 120, "enabled": True})
+        self.put(db, ns, "schedule", "current", {"schedule_id": "schedule-1", "schedule_version": "1", "version": "1", "trigger": "EVENT_OR_TIME", "timezone": "Asia/Shanghai", "enabled": True, "canceled": False})
+        self.put(db, ns, "clock", "current", {"at": "2026-10-22T09:00:00+08:00", "version": "1"})
+        db.execute("CREATE VIRTUAL TABLE IF NOT EXISTS knowledge USING fts5(namespace UNINDEXED, source_id UNINDEXED, content)")
+        for document in data["documents"]:
+            self.put(db, ns, "document", document["source_id"], document)
+            db.execute("INSERT INTO knowledge VALUES(?,?,?)", (ns, document["source_id"], document["content"]))
+
+    def active(self, db, ns):
+        row = db.execute("SELECT active FROM spaces WHERE namespace=?", (ns,)).fetchone()
+        require(row is not None and row[0] == 1, "执行空间已失效")
+
+    def authorize(self, ns, action, payload):
+        require(action in ("create_assignment", "send_assignment", "extend_assignment", "complete_assignment"), "动作无效", web.HTTPBadRequest)
+        auth_id = str(uuid.uuid4())
+        with self.connect() as db:
+            self.active(db, ns)
+            self.put(db, ns, "authorization", auth_id, {"authorization_id": auth_id, "owner_id": "boss-1", "issuer_identity": "BOSS", "issuer": "boss-1", "source_instruction_id": str(uuid.uuid4()), "source_instruction": encode(payload), "action": action, "target_id": payload.get("task_id", "new-assignment"), "content_version": payload.get("content_version", "1"), "scope": ns, "payload": payload, "version": "1", "revoked": False, "revoked_at": None, "valid_from": now(), "valid_until": "2027-01-01T00:00:00+08:00"})
+            self.put(db, ns, "authorization_binding", action, {"authorization_id": auth_id, "idempotency_key": checksum({"action": action, "payload": payload})})
+        return auth_id
+
+    def invoke(self, operation, payload):
+        require(operation in OPERATIONS, "未知业务操作", web.HTTPNotFound)
+        validate(OPERATIONS[operation]["input_schema"].rsplit("/", 1)[1], payload)
+        env = payload["envelope"]
+        ns = env["execution_namespace"]
+        require(env["owner_id"] == "boss-1" and env["dataset_id"] == "selection" and env["dataset_version"] == "1", "本人或数据版本不符", web.HTTPForbidden)
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            self.active(db, ns)
+            data = self.get(db, ns, "initial", "snapshot")
+            if operation in ("create_assignment", "send_assignment"):
+                auth = self.get(db, ns, "authorization", payload["authorization_id"])
+                require(not auth["revoked"] and auth["action"] == operation and datetime.fromisoformat(auth["valid_until"]) > datetime.now(timezone.utc), "授权无效", web.HTTPForbidden)
+                content = {k: v for k, v in payload.items() if k not in ("envelope", "authorization_id", "idempotency_key")}
+                require(content == auth["payload"], "授权对象或内容版本不符", web.HTTPForbidden)
+                digest = checksum(content)
+                previous = db.execute("SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?", (ns, operation, payload["idempotency_key"])).fetchone()
+                if previous:
+                    require(previous[0] == digest, "幂等内容冲突")
+                    return json.loads(previous[1])
+            result = getattr(self, operation)(db, ns, data, payload)
+            validate(OPERATIONS[operation]["output_schema"].rsplit("/", 1)[1], result)
+            if operation in ("create_assignment", "send_assignment"):
+                db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (ns, operation, payload["idempotency_key"], digest, encode(result)))
+            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(payload), encode(result), now()))
+        return result
+
+    def source(self):
+        return {"source_id": "finance-note", "source_type": "SIMULATED", "version": "1", "locator": "sqlite:documents/finance-note", "business_as_of": "2026-10-10T23:59:59+08:00", "source_updated_at": "2026-10-11T08:00:00+08:00", "read_at": now(), "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": "COMPLETE"}
+
+    def query_metrics(self, db, ns, data, p):
+        document = self.get(db, ns, "document", "finance-note")
+        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
+        require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
+        require([p["period_start"], p["period_end"]] == data["periods"]["CURRENT"] and [p["comparison_start"], p["comparison_end"]] == data["periods"]["BASE"], "期间不可比", web.HTTPBadRequest)
+        require(set(p["product_ids"]) <= {"product-1", "product-2"}, "产品资料缺少", web.HTTPBadRequest)
+        records = [r for r in data["details"] if r["product_id"] in p["product_ids"]]
+        values = []
+        for period in ("BASE", "CURRENT"):
+            group = [r for r in records if r["period"] == period]
+            q, r, c = [sum(Decimal(row[key]) for row in group) for key in ("quantity_tonnes", "revenue_cny", "cost_cny")]
+            metrics = {"sales_quantity": (q, "吨", "SUM(quantity_tonnes)"), "revenue": (r, "CNY", "SUM(revenue_cny)"), "cost": (c, "CNY", "SUM(cost_cny)"), "gross_profit": (r-c, "CNY", "revenue-cost"), "gross_margin": ((r-c)/r*100 if r else None, "%", "gross_profit/revenue*100"), "gross_profit_per_tonne": ((r-c)/q if q else None, "CNY/吨", "gross_profit/quantity")}
+            for metric in p["metric_ids"]:
+                value, unit, formula = metrics[metric]
+                values.append({"metric_id": metric, "period_scope": period, "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
+        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": [], "unexplained_causes": ["原因贡献明细尚未提供"]}
+        self.put(db, ns, "query", result["query_id"], result)
+        return result
+
+    def read_evidence(self, db, ns, data, p):
+        query = self.get(db, ns, "query", p["query_id"])
+        require(set(p["detail_refs"]) <= set(query["detail_refs"]) and p["source_ids"] == ["finance-note"], "依据范围不符", web.HTTPForbidden)
+        document = self.get(db, ns, "document", "finance-note")
+        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
+        return {"sources": [self.source()], "original_records": [{"record_id": r["record_id"], "version": r["version"], "content": r} for r in data["details"] if r["record_id"] in p["detail_refs"]] + [{"record_id": "finance-note", "version": "1", "content": document}], "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
+
+    def create_assignment(self, db, ns, data, p):
+        require(p["coordinator_id"] == "coordinator-1" and p["related_meeting_id"] == "meeting-1" and p["related_event_ids"] == ["event-1"], "关联对象不符", web.HTTPBadRequest)
+        require(p["timezone"] == "Asia/Shanghai" and set(p["source_refs"]) == {"finance-note"}, "时区或来源不符", web.HTTPBadRequest)
+        task_id = str(uuid.uuid4())
+        task = {k: p[k] for k in ("purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements", "authorization_id", "related_meeting_id", "related_event_ids", "source_refs")}
+        task.update(task_id=task_id, status="OPEN", version="1", message_ids=[], feedback_ids=[], completion_authorization_id=None, execution_namespace=ns)
+        self.put(db, ns, "task", task_id, task)
+        return {"task_id": task_id, "status": "OPEN", "version": "1", "authorization_id": p["authorization_id"], "execution_namespace": ns, "persisted_at": now()}
+
+    def send_assignment(self, db, ns, data, p):
+        task = self.get(db, ns, "task", p["task_id"])
+        require(task["version"] == p["task_version"] and task["status"] == "OPEN", "任务版本或状态冲突")
+        require(task["coordinator_id"] == p["recipient_id"], "收件人不符", web.HTTPForbidden)
+        result = {"message_id": str(uuid.uuid4()), "task_id": p["task_id"], "message_status": "SENT", "task_status": "WAITING_FEEDBACK", "task_version": "2", "source_type": "SIMULATED", "sent_at": now()}
+        self.put(db, ns, "outbox", result["message_id"], {**p, **result})
+        task.update(status="WAITING_FEEDBACK", version="2", message_ids=[result["message_id"]])
+        self.put(db, ns, "task", p["task_id"], task)
+        return result
+
+    def read_assignment(self, db, ns, data, p):
+        return self.get(db, ns, "task", p["task_id"])
+
+    def context(self, ns):
+        with self.connect() as db:
+            self.active(db, ns)
+            memory = self.get(db, ns, "memory", "current")
+            return {"memory": memory if memory["confirmation_state"] == "CONFIRMED" else None, "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
+
+    def notify(self, ns, event_id):
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            self.active(db, ns)
+            schedule = self.get(db, ns, "schedule", "current")
+            if not schedule["enabled"] or schedule["canceled"]:
+                return {"state": "SUPPRESSED", "reason": "计划暂停或取消"}
+            key = f"notification:{event_id}"
+            previous = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='notification' AND id=?", (ns, key)).fetchone()
+            if previous:
+                return {"state": "SUPPRESSED", "reason": "重复事件"}
+            result = {"state": "DELIVERED", "event_id": event_id, "schedule_version": schedule["version"], "source_type": "SIMULATED", "created_at": now()}
+            self.put(db, ns, "notification", key, result)
+            return result

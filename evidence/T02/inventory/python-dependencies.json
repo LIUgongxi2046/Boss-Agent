@@ -1,0 +1,3445 @@
+[
+  {
+    "name": "aiohappyeyeballs",
+    "version": "2.7.1",
+    "license_expression": null,
+    "license_declaration": "PSF-2.0",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Natural Language :: English",
+      "Operating System :: OS Independent",
+      "Topic :: Software Development :: Libraries",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "License :: OSI Approved :: Python Software Foundation License"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "aiohttp",
+    "version": "3.14.5",
+    "license_expression": "Apache-2.0 AND MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt",
+      "vendor/llhttp/LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Framework :: AsyncIO",
+      "Intended Audience :: Developers",
+      "Operating System :: POSIX",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "aiohappyeyeballs>=2.5.0",
+      "aiosignal>=1.4.0",
+      "async-timeout<6.0,>=4.0; python_version < \"3.11\"",
+      "attrs>=17.3.0",
+      "frozenlist>=1.1.1",
+      "multidict<8.0,>=4.5",
+      "propcache>=0.2.0",
+      "typing_extensions>=4.4; python_version < \"3.13\"",
+      "yarl<2.0,>=1.25.1",
+      "aiodns>=3.3.0; (sys_platform != \"android\" and sys_platform != \"ios\") and extra == \"speedups\"",
+      "Brotli>=1.2; (platform_python_implementation == \"CPython\" and sys_platform != \"android\" and sys_platform != \"ios\") and extra == \"speedups\"",
+      "brotlicffi>=1.2; platform_python_implementation != \"CPython\" and extra == \"speedups\"",
+      "backports.zstd; (platform_python_implementation == \"CPython\" and python_version < \"3.14\" and sys_platform != \"android\" and sys_platform != \"ios\") and extra == \"speedups\""
+    ]
+  },
+  {
+    "name": "aiosignal",
+    "version": "1.4.0",
+    "license_expression": null,
+    "license_declaration": "Apache 2.0",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Development Status :: 5 - Production/Stable",
+      "Operating System :: POSIX",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Framework :: AsyncIO"
+    ],
+    "requires_dist": [
+      "frozenlist>=1.1.0",
+      "typing-extensions>=4.2; python_version < \"3.13\""
+    ]
+  },
+  {
+    "name": "annotated-doc",
+    "version": "0.0.5",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Intended Audience :: Information Technology",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python",
+      "Topic :: Internet",
+      "Topic :: Software Development :: Libraries :: Application Frameworks",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Software Development",
+      "Typing :: Typed",
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "annotated-types",
+    "version": "0.8.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Environment :: Console",
+      "Environment :: MacOS X",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: Unix",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "anthropic",
+    "version": "0.125.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [],
+    "classifiers": [
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: OS Independent",
+      "Operating System :: POSIX",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "anyio<5,>=3.5.0",
+      "distro<2,>=1.7.0",
+      "docstring-parser<1,>=0.15",
+      "httpx<1,>=0.25.0",
+      "jiter<1,>=0.4.0",
+      "pydantic<3,>=1.9.0",
+      "sniffio<2,>=1",
+      "typing-extensions<5,>=4.14",
+      "aiohttp<4,>=3; extra == 'aiohttp'",
+      "httpx-aiohttp<1,>=0.1.9; extra == 'aiohttp'",
+      "boto3<2,>=1.28.57; extra == 'aws'",
+      "botocore<2,>=1.31.57; extra == 'aws'",
+      "boto3<2,>=1.28.57; extra == 'bedrock'",
+      "botocore<2,>=1.31.57; extra == 'bedrock'",
+      "google-auth[requests]<3,>=2; extra == 'google-cloud'",
+      "mcp<3,>=1.0; (python_version >= '3.10') and extra == 'mcp'",
+      "google-auth[requests]<3,>=2; extra == 'vertex'",
+      "standardwebhooks<2,>=1.0.1; extra == 'webhooks'"
+    ]
+  },
+  {
+    "name": "anyio",
+    "version": "4.15.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Framework :: AnyIO",
+      "Typing :: Typed",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Free Threading :: 2 - Beta"
+    ],
+    "requires_dist": [
+      "exceptiongroup>=1.0.2; python_version < \"3.11\"",
+      "idna>=2.8",
+      "typing_extensions>=4.16.0; python_version < \"3.15\"",
+      "trio>=0.32.0; extra == \"trio\""
+    ]
+  },
+  {
+    "name": "arrow",
+    "version": "1.4.0",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "License :: OSI Approved :: Apache Software License",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Operating System :: OS Independent"
+    ],
+    "requires_dist": [
+      "python-dateutil>=2.7.0",
+      "backports.zoneinfo==0.2.1;python_version<'3.9'",
+      "tzdata;python_version>='3.9'",
+      "doc8 ; extra == \"doc\"",
+      "sphinx>=7.0.0 ; extra == \"doc\"",
+      "sphinx-autobuild ; extra == \"doc\"",
+      "sphinx-autodoc-typehints ; extra == \"doc\"",
+      "sphinx_rtd_theme>=1.3.0 ; extra == \"doc\"",
+      "dateparser==1.* ; extra == \"test\"",
+      "pre-commit ; extra == \"test\"",
+      "pytest ; extra == \"test\"",
+      "pytest-cov ; extra == \"test\"",
+      "pytest-mock ; extra == \"test\"",
+      "pytz==2025.2 ; extra == \"test\"",
+      "simplejson==3.* ; extra == \"test\""
+    ]
+  },
+  {
+    "name": "attrs",
+    "version": "26.1.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "certifi",
+    "version": "2026.10.19",
+    "license_expression": null,
+    "license_declaration": "MPL-2.0",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+      "Natural Language :: English",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "cffi",
+    "version": "2.1.1",
+    "license_expression": "MIT-0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Free Threading :: 2 - Beta",
+      "Programming Language :: Python :: Implementation :: CPython"
+    ],
+    "requires_dist": [
+      "pycparser; implementation_name != \"PyPy\""
+    ]
+  },
+  {
+    "name": "chardet",
+    "version": "5.2.0",
+    "license_expression": null,
+    "license_declaration": "LGPL",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing :: Linguistic"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "charset-normalizer",
+    "version": "3.5.2",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Free Threading :: 4 - Resilient",
+      "Environment :: WebAssembly",
+      "Environment :: WebAssembly :: Emscripten",
+      "Topic :: Text Processing :: Linguistic",
+      "Topic :: Utilities",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "click",
+    "version": "8.5.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "croniter",
+    "version": "6.2.4",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13"
+    ],
+    "requires_dist": [
+      "python-dateutil"
+    ]
+  },
+  {
+    "name": "cryptography",
+    "version": "50.0.2",
+    "license_expression": "Apache-2.0 OR BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "LICENSE.APACHE",
+      "LICENSE.BSD"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Natural Language :: English",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: POSIX",
+      "Operating System :: POSIX :: BSD",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: Microsoft :: Windows",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Free Threading :: 3 - Stable",
+      "Topic :: Security :: Cryptography"
+    ],
+    "requires_dist": [
+      "cffi>=2.0.0 ; platform_python_implementation != 'PyPy'",
+      "typing-extensions>=4.13.2 ; python_full_version < '3.11'",
+      "bcrypt>=3.1.5 ; extra == 'ssh'"
+    ]
+  },
+  {
+    "name": "cssselect",
+    "version": "1.3.0",
+    "license_expression": null,
+    "license_declaration": "BSD",
+    "license_files": [
+      "LICENSE",
+      "AUTHORS"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "ddgs",
+    "version": "9.16.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "click>=8.1.8",
+      "primp>=1.3.1",
+      "lxml>=4.9.4",
+      "mypy>=1.17.1; extra == \"dev\"",
+      "prek; extra == \"dev\"",
+      "pytest>=8.4.1; extra == \"dev\"",
+      "pytest-trio; extra == \"dev\"",
+      "ruff>=0.13.0; extra == \"dev\"",
+      "lxml-stubs; extra == \"dev\"",
+      "types-Pygments; extra == \"dev\"",
+      "types-pexpect; extra == \"dev\"",
+      "types-PyYAML; extra == \"dev\"",
+      "types-ujson; extra == \"dev\"",
+      "mcp>=2.0; extra == \"mcp\"",
+      "fastapi>=0.135.1; extra == \"api\"",
+      "uvicorn[standard]>=0.41.0; extra == \"api\""
+    ]
+  },
+  {
+    "name": "defusedxml",
+    "version": "0.7.1",
+    "license_expression": null,
+    "license_declaration": "PSFL",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Python Software Foundation License",
+      "Natural Language :: English",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Topic :: Text Processing :: Markup :: XML"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "distro",
+    "version": "1.9.0",
+    "license_expression": null,
+    "license_declaration": "Apache License, Version 2.0",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Intended Audience :: System Administrators",
+      "License :: OSI Approved :: Apache Software License",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: POSIX :: BSD",
+      "Operating System :: POSIX :: BSD :: FreeBSD",
+      "Operating System :: POSIX :: BSD :: NetBSD",
+      "Operating System :: POSIX :: BSD :: OpenBSD",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: System :: Operating System"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "docstring_parser",
+    "version": "0.18.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Environment :: Other Environment",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Natural Language :: English",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Documentation :: Sphinx",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing :: Markup"
+    ],
+    "requires_dist": [
+      "pre-commit>=2.16.0; (python_version >= '3.9') and extra == 'dev'",
+      "pydoctor>=25.4.0; extra == 'dev'",
+      "pytest; extra == 'dev'",
+      "pydoctor>=25.4.0; extra == 'docs'",
+      "pytest; extra == 'test'"
+    ]
+  },
+  {
+    "name": "dulwich",
+    "version": "0.25.2",
+    "license_expression": "Apache-2.0 OR GPL-2.0-or-later",
+    "license_declaration": null,
+    "license_files": [
+      "COPYING"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Operating System :: POSIX",
+      "Operating System :: Microsoft :: Windows",
+      "Topic :: Software Development :: Version Control"
+    ],
+    "requires_dist": [
+      "urllib3>=2.2.2",
+      "typing_extensions>=4.6.0; python_version < \"3.12\"",
+      "fastimport; extra == \"fastimport\"",
+      "urllib3>=2.2.2; extra == \"https\"",
+      "gpg; extra == \"pgp\"",
+      "paramiko; extra == \"paramiko\"",
+      "rich; extra == \"colordiff\"",
+      "ruff==0.14.10; extra == \"dev\"",
+      "mypy==1.19.1; extra == \"dev\"",
+      "dissolve>=0.1.1; extra == \"dev\"",
+      "codespell==2.4.1; extra == \"dev\"",
+      "merge3; extra == \"merge\"",
+      "atheris; extra == \"fuzzing\"",
+      "patiencediff; extra == \"patiencediff\"",
+      "aiohttp; extra == \"aiohttp\""
+    ]
+  },
+  {
+    "name": "et_xmlfile",
+    "version": "2.0.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENCE.python",
+      "LICENCE.rst",
+      "AUTHORS.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "filelock",
+    "version": "4.2.4",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Internet",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: System"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "fqdn",
+    "version": "1.6.0",
+    "license_expression": "MPL-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: Name Service (DNS)",
+      "Topic :: Internet",
+      "Topic :: System :: Systems Administration",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": [
+      "cached-property>=1.3.0; python_version < \"3.8\"",
+      "myst-parser>=3.0; python_version >= \"3.9\" and extra == \"docs\"",
+      "sphinx>=7.2; python_version >= \"3.9\" and extra == \"docs\""
+    ]
+  },
+  {
+    "name": "frozenlist",
+    "version": "1.8.0",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: POSIX",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Programming Language :: Cython",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "greenlet",
+    "version": "3.5.6",
+    "license_expression": "MIT AND PSF-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "LICENSE.PSF"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Natural Language :: English",
+      "Programming Language :: C",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Operating System :: OS Independent",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "Sphinx; extra == \"docs\"",
+      "furo; extra == \"docs\"",
+      "objgraph; extra == \"test\"",
+      "psutil; extra == \"test\"",
+      "setuptools; extra == \"test\""
+    ]
+  },
+  {
+    "name": "h11",
+    "version": "0.16.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: System :: Networking"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "httpcore",
+    "version": "1.0.9",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Environment :: Web Environment",
+      "Framework :: AsyncIO",
+      "Framework :: Trio",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "certifi",
+      "h11>=0.16",
+      "anyio<5.0,>=4.0; extra == 'asyncio'",
+      "h2<5,>=3; extra == 'http2'",
+      "socksio==1.*; extra == 'socks'",
+      "trio<1.0,>=0.22.0; extra == 'trio'"
+    ]
+  },
+  {
+    "name": "httpcore2",
+    "version": "2.16.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Framework :: AnyIO",
+      "Framework :: AsyncIO",
+      "Framework :: Trio",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "h11>=0.16",
+      "truststore>=0.10",
+      "anyio<5.0,>=4.5.0; extra == 'asyncio'",
+      "h2<5,>=3; extra == 'http2'",
+      "socksio==1.*; extra == 'socks'",
+      "trio<1.0,>=0.34.0; extra == 'trio'"
+    ]
+  },
+  {
+    "name": "httpx",
+    "version": "0.28.1",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Environment :: Web Environment",
+      "Framework :: AsyncIO",
+      "Framework :: Trio",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "anyio",
+      "certifi",
+      "httpcore==1.*",
+      "idna",
+      "brotli; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+      "brotlicffi; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+      "click==8.*; extra == 'cli'",
+      "pygments==2.*; extra == 'cli'",
+      "rich<14,>=10; extra == 'cli'",
+      "h2<5,>=3; extra == 'http2'",
+      "socksio==1.*; extra == 'socks'",
+      "zstandard>=0.18.0; extra == 'zstd'"
+    ]
+  },
+  {
+    "name": "httpx-sse",
+    "version": "0.4.3",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "httpx2",
+    "version": "2.16.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Framework :: AnyIO",
+      "Framework :: AsyncIO",
+      "Framework :: Trio",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "anyio>=4.10; sys_platform != 'emscripten'",
+      "httpcore2==2.16.0; sys_platform != 'emscripten'",
+      "httpx2-jsfetch; sys_platform == 'emscripten' and python_version >= '3.12'",
+      "idna>=3.18",
+      "truststore>=0.10; sys_platform != 'emscripten'",
+      "typing-extensions>=4.5.0; python_version < '3.13'",
+      "brotli>=1.2.0; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+      "brotlicffi>=1.2.0.2; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+      "click>=8.4.2; extra == 'cli'",
+      "pygments==2.*; extra == 'cli'",
+      "rich<16,>=10; extra == 'cli'",
+      "h2<5,>=3; extra == 'http2'",
+      "socksio==1.*; extra == 'socks'",
+      "wsproto>=1.2; extra == 'ws'",
+      "backports-zstd>=1.0.0; (python_version <= '3.13') and extra == 'zstd'"
+    ]
+  },
+  {
+    "name": "idna",
+    "version": "3.20",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: Name Service (DNS)",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": [
+      "ruff >= 0.16.0 ; extra == \"all\"",
+      "mypy >= 1.11.2 ; extra == \"all\"",
+      "ty >= 0.0.37 ; extra == \"all\"",
+      "pytest >= 8.3.2 ; extra == \"all\"",
+      "hypothesis >= 6.141.1 ; extra == \"all\"",
+      "coverage >= 7.10.0 ; extra == \"all\""
+    ]
+  },
+  {
+    "name": "iniconfig",
+    "version": "2.3.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "isoduration",
+    "version": "20.11.0",
+    "license_expression": null,
+    "license_declaration": "UNKNOWN",
+    "license_files": [],
+    "classifiers": [
+      "Programming Language :: Python :: 3",
+      "Operating System :: OS Independent",
+      "License :: OSI Approved :: ISC License (ISCL)",
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "arrow (>=0.15.0)"
+    ]
+  },
+  {
+    "name": "Jinja2",
+    "version": "3.1.6",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+      "Topic :: Text Processing :: Markup :: HTML",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "MarkupSafe>=2.0",
+      "Babel>=2.7 ; extra == \"i18n\""
+    ]
+  },
+  {
+    "name": "jiter",
+    "version": "0.17.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: GraalPy",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Intended Audience :: System Administrators",
+      "Operating System :: Unix",
+      "Operating System :: POSIX :: Linux",
+      "Environment :: Console",
+      "Environment :: MacOS X",
+      "Topic :: File Formats :: JSON",
+      "Framework :: Pydantic :: 2"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "json_repair",
+    "version": "0.64.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Programming Language :: Python :: 3",
+      "Operating System :: OS Independent"
+    ],
+    "requires_dist": [
+      "jsonschema>=4.21; extra == \"schema\"",
+      "pydantic>=2; extra == \"schema\""
+    ]
+  },
+  {
+    "name": "jsonpointer",
+    "version": "3.4",
+    "license_expression": null,
+    "license_declaration": "Modified BSD License",
+    "license_files": [
+      "LICENSE.txt",
+      "AUTHORS"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "jsonschema",
+    "version": "4.25.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "COPYING"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: File Formats :: JSON",
+      "Topic :: File Formats :: JSON :: JSON Schema"
+    ],
+    "requires_dist": [
+      "attrs>=22.2.0",
+      "jsonschema-specifications>=2023.03.6",
+      "referencing>=0.28.4",
+      "rpds-py>=0.7.1",
+      "fqdn; extra == 'format'",
+      "idna; extra == 'format'",
+      "isoduration; extra == 'format'",
+      "jsonpointer>1.13; extra == 'format'",
+      "rfc3339-validator; extra == 'format'",
+      "rfc3987; extra == 'format'",
+      "uri-template; extra == 'format'",
+      "webcolors>=1.11; extra == 'format'",
+      "fqdn; extra == 'format-nongpl'",
+      "idna; extra == 'format-nongpl'",
+      "isoduration; extra == 'format-nongpl'",
+      "jsonpointer>1.13; extra == 'format-nongpl'",
+      "rfc3339-validator; extra == 'format-nongpl'",
+      "rfc3986-validator>0.1.0; extra == 'format-nongpl'",
+      "rfc3987-syntax>=1.1.0; extra == 'format-nongpl'",
+      "uri-template; extra == 'format-nongpl'",
+      "webcolors>=24.6.0; extra == 'format-nongpl'"
+    ]
+  },
+  {
+    "name": "jsonschema-specifications",
+    "version": "2025.9.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "COPYING"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: File Formats :: JSON",
+      "Topic :: File Formats :: JSON :: JSON Schema"
+    ],
+    "requires_dist": [
+      "referencing>=0.31.0"
+    ]
+  },
+  {
+    "name": "loguru",
+    "version": "0.7.3",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Topic :: System :: Logging",
+      "Intended Audience :: Developers",
+      "Natural Language :: English",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Implementation :: CPython"
+    ],
+    "requires_dist": [
+      "colorama>=0.3.4 ; sys_platform=='win32'",
+      "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+      "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+      "pre-commit==4.0.1  ; extra == \"dev\" and ( python_version>='3.9')",
+      "tox==3.27.1  ; extra == \"dev\" and ( python_version<'3.8')",
+      "tox==4.23.2  ; extra == \"dev\" and ( python_version>='3.8')",
+      "pytest==6.1.2  ; extra == \"dev\" and ( python_version<'3.8')",
+      "pytest==8.3.2  ; extra == \"dev\" and ( python_version>='3.8')",
+      "pytest-cov==2.12.1  ; extra == \"dev\" and ( python_version<'3.8')",
+      "pytest-cov==5.0.0  ; extra == \"dev\" and ( python_version>='3.8' and python_version<'3.9')",
+      "pytest-cov==6.0.0  ; extra == \"dev\" and ( python_version>='3.9')",
+      "pytest-mypy-plugins==1.9.3  ; extra == \"dev\" and ( python_version>='3.6' and python_version<'3.8')",
+      "pytest-mypy-plugins==3.1.0  ; extra == \"dev\" and ( python_version>='3.8')",
+      "colorama==0.4.5  ; extra == \"dev\" and ( python_version<'3.8')",
+      "colorama==0.4.6  ; extra == \"dev\" and ( python_version>='3.8')",
+      "freezegun==1.1.0  ; extra == \"dev\" and ( python_version<'3.8')",
+      "freezegun==1.5.0  ; extra == \"dev\" and ( python_version>='3.8')",
+      "exceptiongroup==1.1.3  ; extra == \"dev\" and ( python_version>='3.7' and python_version<'3.11')",
+      "mypy==v0.910  ; extra == \"dev\" and ( python_version<'3.6')",
+      "mypy==v0.971  ; extra == \"dev\" and ( python_version>='3.6' and python_version<'3.7')",
+      "mypy==v1.4.1  ; extra == \"dev\" and ( python_version>='3.7' and python_version<'3.8')",
+      "mypy==v1.13.0  ; extra == \"dev\" and ( python_version>='3.8')",
+      "Sphinx==8.1.3  ; extra == \"dev\" and ( python_version>='3.11')",
+      "sphinx-rtd-theme==3.0.2  ; extra == \"dev\" and ( python_version>='3.11')",
+      "myst-parser==4.0.0  ; extra == \"dev\" and ( python_version>='3.11')",
+      "build==1.2.2  ; extra == \"dev\" and ( python_version>='3.11')",
+      "twine==6.0.1  ; extra == \"dev\" and ( python_version>='3.11')"
+    ]
+  },
+  {
+    "name": "lxml",
+    "version": "6.1.3",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [
+      "LICENSE.txt",
+      "LICENSES.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Programming Language :: Cython",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: C",
+      "Operating System :: OS Independent",
+      "Topic :: Text Processing :: Markup :: HTML",
+      "Topic :: Text Processing :: Markup :: XML",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "cssselect>=0.7; extra == \"cssselect\"",
+      "html5lib; extra == \"html5\"",
+      "BeautifulSoup4; extra == \"htmlsoup\"",
+      "lxml_html_clean; extra == \"html-clean\""
+    ]
+  },
+  {
+    "name": "lxml_html_clean",
+    "version": "0.4.5",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "lxml>=6.1.1"
+    ]
+  },
+  {
+    "name": "markdown-it-py",
+    "version": "4.2.0",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "LICENSE.markdown-it"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing :: Markup"
+    ],
+    "requires_dist": [
+      "mdurl~=0.1",
+      "psutil ; extra == \"benchmarking\"",
+      "pytest ; extra == \"benchmarking\"",
+      "pytest-benchmark ; extra == \"benchmarking\"",
+      "commonmark~=0.9 ; extra == \"compare\"",
+      "markdown~=3.4 ; extra == \"compare\"",
+      "mistletoe~=1.0 ; extra == \"compare\"",
+      "mistune~=3.0 ; extra == \"compare\"",
+      "panflute~=2.3 ; extra == \"compare\"",
+      "markdown-it-pyrs ; extra == \"compare\"",
+      "linkify-it-py>=1,<3 ; extra == \"linkify\"",
+      "mdit-py-plugins>=0.5.0 ; extra == \"plugins\"",
+      "gprof2dot ; extra == \"profiling\"",
+      "mdit-py-plugins>=0.5.0 ; extra == \"rtd\"",
+      "myst-parser ; extra == \"rtd\"",
+      "pyyaml ; extra == \"rtd\"",
+      "sphinx ; extra == \"rtd\"",
+      "sphinx-copybutton ; extra == \"rtd\"",
+      "sphinx-design ; extra == \"rtd\"",
+      "sphinx-book-theme~=1.0 ; extra == \"rtd\"",
+      "jupyter_sphinx ; extra == \"rtd\"",
+      "ipykernel ; extra == \"rtd\"",
+      "coverage ; extra == \"testing\"",
+      "pytest ; extra == \"testing\"",
+      "pytest-cov ; extra == \"testing\"",
+      "pytest-regressions ; extra == \"testing\"",
+      "pytest-timeout ; extra == \"testing\"",
+      "requests ; extra == \"testing\""
+    ]
+  },
+  {
+    "name": "MarkupSafe",
+    "version": "3.0.4",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+      "Topic :: Text Processing :: Markup :: HTML",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "mcp",
+    "version": "1.30.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "anyio>=4.5",
+      "httpx-sse>=0.4",
+      "httpx<1.0.0,>=0.27.1",
+      "jsonschema>=4.20.0",
+      "pydantic-settings>=2.5.2",
+      "pydantic<3.0.0,>=2.11.0; python_version < '3.14'",
+      "pydantic<3.0.0,>=2.12.0; python_version >= '3.14'",
+      "pyjwt[crypto]>=2.10.1",
+      "python-multipart>=0.0.9",
+      "pywin32>=310; sys_platform == 'win32' and python_version < '3.14'",
+      "pywin32>=311; sys_platform == 'win32' and python_version >= '3.14'",
+      "sse-starlette>=1.6.1",
+      "starlette>=0.27; python_version < '3.14'",
+      "starlette>=0.48.0; python_version >= '3.14'",
+      "typing-extensions>=4.9.0",
+      "typing-inspection>=0.4.1",
+      "uvicorn>=0.31.1; sys_platform != 'emscripten'",
+      "python-dotenv>=1.0.0; extra == 'cli'",
+      "typer>=0.16.0; extra == 'cli'",
+      "rich>=13.9.4; extra == 'rich'",
+      "websockets>=15.0.1; extra == 'ws'"
+    ]
+  },
+  {
+    "name": "mdurl",
+    "version": "0.1.2",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [],
+    "classifiers": [
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "multidict",
+    "version": "7.1.0",
+    "license_expression": "Apache-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "typing-extensions>=4.1.0; python_version < \"3.11\""
+    ]
+  },
+  {
+    "name": "nanobot-ai",
+    "version": "0.3.5",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12"
+    ],
+    "requires_dist": [
+      "anthropic<1.0.0,>=0.100.0",
+      "chardet<6.0.0,>=3.0.2",
+      "croniter<7.0.0,>=6.0.0",
+      "ddgs<10.0.0,>=9.5.5",
+      "defusedxml<1.0.0,>=0.7.1",
+      "dulwich<1.0.0,>=0.22.0",
+      "filelock>=3.25.2",
+      "httpx[socks]<1.0.0,>=0.28.0",
+      "jinja2<4.0.0,>=3.1.0",
+      "json-repair<1.0.0,>=0.57.0",
+      "loguru<1.0.0,>=0.7.3",
+      "lxml-html-clean<1.0.0,>=0.4.0",
+      "mcp<2.0.0,>=1.26.0",
+      "oauth-cli-kit<1.0.0,>=0.1.6",
+      "openai>=2.8.0",
+      "openpyxl<4.0.0,>=3.1.0",
+      "packaging>=24.0",
+      "prompt-toolkit<4.0.0,>=3.0.50",
+      "pydantic-settings<3.0.0,>=2.12.0",
+      "pydantic<3.0.0,>=2.12.0",
+      "pypdf<6.0.0,>=5.0.0",
+      "python-docx<2.0.0,>=1.1.0",
+      "python-pptx<2.0.0,>=1.0.0",
+      "pyyaml<7.0.0,>=6.0",
+      "qrcode[pil]>=8.0",
+      "questionary<3.0.0,>=2.0.0",
+      "rapidfuzz<4.0.0,>=3.14.6",
+      "readability-lxml<1.0.0,>=0.8.4",
+      "rich<15.0.0,>=14.0.0",
+      "setproctitle<2.0.0,>=1.3.7; sys_platform != 'win32'",
+      "tiktoken<1.0.0,>=0.12.0",
+      "typer<1.0.0,>=0.20.0",
+      "tzdata>=2025.2",
+      "tzlocal<6.0.0,>=5.3.1",
+      "watchfiles<2.0.0,>=1.1.1",
+      "websockets<17.0,>=15.0",
+      "aiohttp<4.0.0,>=3.9.0; extra == 'api'",
+      "azure-identity<2.0.0,>=1.19.0; extra == 'azure'",
+      "boto3>=1.43.0; extra == 'bedrock'",
+      "aiohttp<4.0.0,>=3.9.0; extra == 'dev'",
+      "basedpyright<2.0.0,>=1.39.0; extra == 'dev'",
+      "msgpack<2.0.0,>=1.1.0; extra == 'dev'",
+      "openpyxl<4.0.0,>=3.1.0; extra == 'dev'",
+      "pymupdf>=1.25.0; extra == 'dev'",
+      "pypdf<6.0.0,>=5.0.0; extra == 'dev'",
+      "pytest-asyncio<2.0.0,>=1.3.0; extra == 'dev'",
+      "pytest-cov<7.0.0,>=6.0.0; extra == 'dev'",
+      "pytest-xdist<4.0.0,>=3.8.0; extra == 'dev'",
+      "pytest<10.0.0,>=9.0.0; extra == 'dev'",
+      "python-docx<2.0.0,>=1.1.0; extra == 'dev'",
+      "python-pptx<2.0.0,>=1.0.0; extra == 'dev'",
+      "python-socketio<6.0.0,>=5.16.0; extra == 'dev'",
+      "ruff>=0.1.0; extra == 'dev'",
+      "defusedxml<1.0.0,>=0.7.1; extra == 'documents'",
+      "openpyxl<4.0.0,>=3.1.0; extra == 'documents'",
+      "pypdf<6.0.0,>=5.0.0; extra == 'documents'",
+      "python-docx<2.0.0,>=1.1.0; extra == 'documents'",
+      "python-pptx<2.0.0,>=1.0.0; extra == 'documents'",
+      "langfuse<4.0.0,>=3.0.0; extra == 'langfuse'",
+      "olostep>=0.1.0; (python_version < '3.14') and extra == 'olostep'",
+      "pypdf<6.0.0,>=5.0.0; extra == 'pdf'"
+    ]
+  },
+  {
+    "name": "oauth-cli-kit",
+    "version": "0.1.6",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12"
+    ],
+    "requires_dist": [
+      "httpx>=0.26.0",
+      "platformdirs>=4.0.0",
+      "pytest>=8.0.0; extra == 'dev'"
+    ]
+  },
+  {
+    "name": "openai",
+    "version": "3.36.1",
+    "license_expression": "Apache-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Apache Software License",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: OS Independent",
+      "Operating System :: POSIX",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "anyio<5,>=4.10.0",
+      "httpx2<3,>=2.12.0",
+      "jiter<1,>=0.16.0",
+      "pydantic!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.*,<3,>=1.10.13",
+      "sniffio",
+      "typing-extensions<5,>=4.14",
+      "aiohttp>=3.14.3; extra == 'aiohttp'",
+      "botocore<2,>=1.40.0; extra == 'bedrock'",
+      "urllib3<3,>=2.7.0; extra == 'bedrock'",
+      "numpy>=1; extra == 'datalib'",
+      "pandas>=1.2.3; extra == 'datalib'",
+      "websockets<16,>=13; extra == 'realtime'",
+      "google-auth[requests]<3,>=2.36; extra == 'vertex'",
+      "numpy>=2.0.2; extra == 'voice-helpers'",
+      "sounddevice>=0.5.1; extra == 'voice-helpers'"
+    ]
+  },
+  {
+    "name": "openpyxl",
+    "version": "3.1.5",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENCE.rst"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11"
+    ],
+    "requires_dist": [
+      "et-xmlfile"
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "license_expression": "Apache-2.0 OR BSD-2-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "LICENSE.APACHE",
+      "LICENSE.BSD"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Free Threading :: 4 - Resilient",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "pillow",
+    "version": "13.0.0",
+    "license_expression": "MIT-CMU",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 6 - Mature",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Multimedia :: Graphics",
+      "Topic :: Multimedia :: Graphics :: Capture :: Digital Camera",
+      "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
+      "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+      "Topic :: Multimedia :: Graphics :: Viewers",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "furo; extra == \"docs\"",
+      "olefile; extra == \"docs\"",
+      "sphinx>=8.2; extra == \"docs\"",
+      "sphinx-autobuild; extra == \"docs\"",
+      "sphinx-copybutton; extra == \"docs\"",
+      "sphinx-inline-tabs; extra == \"docs\"",
+      "sphinxext-opengraph; extra == \"docs\"",
+      "olefile; extra == \"fpx\"",
+      "olefile; extra == \"mic\"",
+      "arro3-compute; extra == \"test-arrow\"",
+      "arro3-core; extra == \"test-arrow\"",
+      "nanoarrow; extra == \"test-arrow\"",
+      "pyarrow; extra == \"test-arrow\"",
+      "coverage>=7.4.2; extra == \"tests\"",
+      "defusedxml; extra == \"tests\"",
+      "markdown2; extra == \"tests\"",
+      "olefile; extra == \"tests\"",
+      "packaging; extra == \"tests\"",
+      "psutil; (sys_platform == \"linux\" or sys_platform == \"darwin\") and extra == \"tests\"",
+      "pytest; extra == \"tests\"",
+      "pytest-cov; extra == \"tests\"",
+      "pytest-timeout; extra == \"tests\"",
+      "pytest-xdist; extra == \"tests\"",
+      "setuptools; extra == \"tests\"",
+      "trove-classifiers>=2024.10.12; extra == \"tests\"",
+      "defusedxml; extra == \"xmp\""
+    ]
+  },
+  {
+    "name": "platformdirs",
+    "version": "4.13.5",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "playwright",
+    "version": "1.55.0",
+    "license_expression": "Apache-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Topic :: Software Development :: Testing",
+      "Topic :: Internet :: WWW/HTTP :: Browsers",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Operating System :: OS Independent"
+    ],
+    "requires_dist": [
+      "pyee<14,>=13",
+      "greenlet<4.0.0,>=3.1.1"
+    ]
+  },
+  {
+    "name": "pluggy",
+    "version": "1.7.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 6 - Mature",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: MacOS :: MacOS X",
+      "Topic :: Software Development :: Testing",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Utilities",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "primp",
+    "version": "2.0.1",
+    "license_expression": null,
+    "license_declaration": "MIT License",
+    "license_files": [],
+    "classifiers": [
+      "Programming Language :: Rust",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "certifi ; extra == 'dev'",
+      "pytest>=8.1.1 ; extra == 'dev'",
+      "pytest-asyncio>=0.25.3 ; extra == 'dev'",
+      "typing-extensions ; python_full_version < '3.12' and extra == 'dev'",
+      "mypy>=1.14.1 ; extra == 'dev'",
+      "ruff>=0.9.2 ; extra == 'dev'"
+    ]
+  },
+  {
+    "name": "prompt_toolkit",
+    "version": "3.0.53",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "AUTHORS.rst"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: Free Threading :: 3 - Stable",
+      "Programming Language :: Python",
+      "Topic :: Software Development"
+    ],
+    "requires_dist": [
+      "wcwidth>=0.1.4"
+    ]
+  },
+  {
+    "name": "propcache",
+    "version": "0.5.4",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "NOTICE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Cython",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "pycparser",
+    "version": "3.11",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "pydantic",
+    "version": "2.14.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Framework :: Hypothesis",
+      "Framework :: Pydantic",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "annotated-types>=0.6.0",
+      "pydantic-core==2.50.1",
+      "typing-extensions>=4.16.0",
+      "typing-inspection>=0.4.4",
+      "email-validator>=2.0.0; extra == 'email'",
+      "tzdata; (platform_system == 'Windows') and extra == 'timezone'"
+    ]
+  },
+  {
+    "name": "pydantic-settings",
+    "version": "2.16.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Environment :: MacOS X",
+      "Framework :: Pydantic",
+      "Framework :: Pydantic :: 2",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Intended Audience :: System Administrators",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: Unix",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Internet",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "pydantic>=2.7.0",
+      "python-dotenv>=1.2.2",
+      "typing-extensions>=4.0.0",
+      "typing-inspection>=0.4.0",
+      "boto3>=1.35.0; extra == 'aws-secrets-manager'",
+      "boto3>=1.35.0; extra == 'aws-systems-manager'",
+      "azure-identity>=1.16.0; extra == 'azure-key-vault'",
+      "azure-keyvault-secrets>=4.8.0; extra == 'azure-key-vault'",
+      "google-cloud-secret-manager>=2.23.1; extra == 'gcp-secret-manager'",
+      "pyyaml>=6.0.1; extra == 'yaml'"
+    ]
+  },
+  {
+    "name": "pydantic_core",
+    "version": "2.50.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Implementation :: GraalPy",
+      "Programming Language :: Rust",
+      "Framework :: Pydantic",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: MacOS",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "typing-extensions>=4.16.0"
+    ]
+  },
+  {
+    "name": "pyee",
+    "version": "13.0.1",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Programming Language :: Python",
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Topic :: Other/Nonlisted Topic"
+    ],
+    "requires_dist": [
+      "typing-extensions",
+      "build; extra == \"dev\"",
+      "flake8; extra == \"dev\"",
+      "flake8-black; extra == \"dev\"",
+      "pytest; extra == \"dev\"",
+      "pytest-asyncio; python_version >= \"3.4\" and extra == \"dev\"",
+      "pytest-trio; python_version >= \"3.7\" and extra == \"dev\"",
+      "black; extra == \"dev\"",
+      "isort; extra == \"dev\"",
+      "jupyter-console; extra == \"dev\"",
+      "mkdocs; extra == \"dev\"",
+      "mkdocs-include-markdown-plugin; extra == \"dev\"",
+      "mkdocstrings[python]; extra == \"dev\"",
+      "mypy; extra == \"dev\"",
+      "sphinx; extra == \"dev\"",
+      "toml; extra == \"dev\"",
+      "tox; extra == \"dev\"",
+      "trio; extra == \"dev\"",
+      "trio; python_version > \"3.6\" and extra == \"dev\"",
+      "trio-typing; python_version > \"3.6\" and extra == \"dev\"",
+      "twine; extra == \"dev\"",
+      "twisted; extra == \"dev\"",
+      "validate-pyproject[all]; extra == \"dev\""
+    ]
+  },
+  {
+    "name": "Pygments",
+    "version": "2.21.0",
+    "license_expression": "BSD-2-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "AUTHORS",
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 6 - Mature",
+      "Intended Audience :: Developers",
+      "Intended Audience :: End Users/Desktop",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Text Processing :: Filters",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": [
+      "colorama>=0.4.6; extra == 'windows-terminal'"
+    ]
+  },
+  {
+    "name": "PyJWT",
+    "version": "2.15.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "AUTHORS.rst"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Natural Language :: English",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": [
+      "typing_extensions>=4.0; python_version < \"3.11\"",
+      "cryptography>=3.4.0; extra == \"crypto\""
+    ]
+  },
+  {
+    "name": "pypdf",
+    "version": "5.9.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Operating System :: OS Independent",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "typing_extensions >= 4.0; python_version < '3.11'",
+      "cryptography ; extra == \"crypto\"",
+      "PyCryptodome ; extra == \"cryptodome\"",
+      "black ; extra == \"dev\"",
+      "flit ; extra == \"dev\"",
+      "pip-tools ; extra == \"dev\"",
+      "pre-commit ; extra == \"dev\"",
+      "pytest-cov ; extra == \"dev\"",
+      "pytest-socket ; extra == \"dev\"",
+      "pytest-timeout ; extra == \"dev\"",
+      "pytest-xdist ; extra == \"dev\"",
+      "wheel ; extra == \"dev\"",
+      "myst_parser ; extra == \"docs\"",
+      "sphinx ; extra == \"docs\"",
+      "sphinx_rtd_theme ; extra == \"docs\"",
+      "cryptography ; extra == \"full\"",
+      "Pillow>=8.0.0 ; extra == \"full\"",
+      "Pillow>=8.0.0 ; extra == \"image\""
+    ]
+  },
+  {
+    "name": "pytest",
+    "version": "8.4.2",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE",
+      "AUTHORS"
+    ],
+    "classifiers": [
+      "Development Status :: 6 - Mature",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX",
+      "Operating System :: Unix",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Software Development :: Testing",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": [
+      "colorama>=0.4; sys_platform == \"win32\"",
+      "exceptiongroup>=1; python_version < \"3.11\"",
+      "iniconfig>=1",
+      "packaging>=20",
+      "pluggy<2,>=1.5",
+      "pygments>=2.7.2",
+      "tomli>=1; python_version < \"3.11\"",
+      "argcomplete; extra == \"dev\"",
+      "attrs>=19.2; extra == \"dev\"",
+      "hypothesis>=3.56; extra == \"dev\"",
+      "mock; extra == \"dev\"",
+      "requests; extra == \"dev\"",
+      "setuptools; extra == \"dev\"",
+      "xmlschema; extra == \"dev\""
+    ]
+  },
+  {
+    "name": "python-dateutil",
+    "version": "3.0.0",
+    "license_expression": null,
+    "license_declaration": "Dual License",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "License :: OSI Approved :: Apache Software License",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.3",
+      "Programming Language :: Python :: 3.4",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Free Threading :: 2 - Beta",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "six>=1.6",
+      "tzdata"
+    ]
+  },
+  {
+    "name": "python-docx",
+    "version": "1.2.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Topic :: Office/Business :: Office Suites",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "lxml>=3.1.0",
+      "typing_extensions>=4.9.0"
+    ]
+  },
+  {
+    "name": "python-dotenv",
+    "version": "1.2.4",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Intended Audience :: Developers",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Topic :: System :: Systems Administration",
+      "Topic :: Utilities",
+      "Environment :: Web Environment"
+    ],
+    "requires_dist": [
+      "click>=5.0; extra == \"cli\""
+    ]
+  },
+  {
+    "name": "python-multipart",
+    "version": "0.0.32",
+    "license_expression": "Apache-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Apache Software License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "python-pptx",
+    "version": "1.0.2",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Office/Business :: Office Suites",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "Pillow >=3.3.2",
+      "XlsxWriter >=0.5.7",
+      "lxml >=3.1.0",
+      "typing-extensions >=4.9.0"
+    ]
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Cython",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing :: Markup"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "qrcode",
+    "version": "8.2",
+    "license_expression": null,
+    "license_declaration": "BSD",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "License :: Other/Proprietary License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.13",
+      "Topic :: Multimedia :: Graphics",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "colorama ; sys_platform == \"win32\"",
+      "pillow (>=9.1.0) ; extra == \"pil\" or extra == \"all\"",
+      "pypng ; extra == \"png\" or extra == \"all\""
+    ]
+  },
+  {
+    "name": "questionary",
+    "version": "2.1.1",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.8",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "prompt_toolkit (>=2.0,<4.0)"
+    ]
+  },
+  {
+    "name": "RapidFuzz",
+    "version": "3.14.6",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [],
+    "classifiers": [
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "numpy; extra == \"all\""
+    ]
+  },
+  {
+    "name": "readability-lxml",
+    "version": "0.9",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "NOTICE"
+    ],
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "chardet (>=5.2.0,<6.0.0)",
+      "cssselect (>=1.2,<1.3) ; python_version < \"3.9\"",
+      "cssselect (>=1.3,<1.4) ; python_version >= \"3.9\"",
+      "lxml-html-clean (>=0.4.2,<0.5.0) ; python_version < \"3.11\"",
+      "lxml[html-clean] (>=5.4,<7)"
+    ]
+  },
+  {
+    "name": "referencing",
+    "version": "0.37.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "COPYING"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: File Formats :: JSON",
+      "Topic :: File Formats :: JSON :: JSON Schema"
+    ],
+    "requires_dist": [
+      "attrs>=22.2.0",
+      "rpds-py>=0.7.0",
+      "typing-extensions>=4.4.0; python_version < '3.13'"
+    ]
+  },
+  {
+    "name": "regex",
+    "version": "2026.9.29",
+    "license_expression": "Apache-2.0 AND CNRI-Python",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Scientific/Engineering :: Information Analysis",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing",
+      "Topic :: Text Processing :: General"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "requests",
+    "version": "2.34.2",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "NOTICE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Apache Software License",
+      "Natural Language :: English",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Programming Language :: Python :: Free Threading :: 2 - Beta",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "charset_normalizer<4,>=2",
+      "idna<4,>=2.5",
+      "urllib3<3,>=1.26",
+      "certifi>=2023.5.7",
+      "PySocks!=1.5.7,>=1.5.6; extra == \"socks\"",
+      "chardet<8,>=3.0.2; extra == \"use-chardet-on-py3\""
+    ]
+  },
+  {
+    "name": "rfc3339-validator",
+    "version": "0.1.4",
+    "license_expression": null,
+    "license_declaration": "MIT license",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 2 - Pre-Alpha",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Natural Language :: English",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8"
+    ],
+    "requires_dist": [
+      "six"
+    ]
+  },
+  {
+    "name": "rfc3987",
+    "version": "1.3.8",
+    "license_expression": null,
+    "license_declaration": "GNU GPLv3+",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 2.6",
+      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.2",
+      "Programming Language :: Python :: 3.3",
+      "Programming Language :: Python :: 3.4",
+      "Programming Language :: Python :: 3.5",
+      "Programming Language :: Python :: 3.6",
+      "Topic :: Internet"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "rich",
+    "version": "14.3.4",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Framework :: IPython",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "ipywidgets (>=7.5.1,<9) ; extra == \"jupyter\"",
+      "markdown-it-py (>=2.2.0)",
+      "pygments (>=2.13.0,<3.0.0)"
+    ]
+  },
+  {
+    "name": "rpds-py",
+    "version": "2026.9.1",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Rust",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "setproctitle",
+    "version": "1.3.8",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: C",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: POSIX :: BSD",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Topic :: Software Development"
+    ],
+    "requires_dist": [
+      "pytest; extra == \"test\""
+    ]
+  },
+  {
+    "name": "shellingham",
+    "version": "1.5.4",
+    "license_expression": null,
+    "license_declaration": "ISC License",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: ISC License (ISCL)",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 3",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "sniffio",
+    "version": "1.3.1",
+    "license_expression": null,
+    "license_declaration": "MIT OR Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "LICENSE.APACHE2",
+      "LICENSE.MIT"
+    ],
+    "classifiers": [
+      "License :: OSI Approved :: MIT License",
+      "License :: OSI Approved :: Apache Software License",
+      "Framework :: Trio",
+      "Framework :: AsyncIO",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Intended Audience :: Developers",
+      "Development Status :: 5 - Production/Stable"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "socksio",
+    "version": "1.0.0",
+    "license_expression": null,
+    "license_declaration": "UNKNOWN",
+    "license_files": [],
+    "classifiers": [
+      "License :: OSI Approved :: MIT License",
+      "Programming Language :: Python :: 3.6",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3 :: Only",
+      "Topic :: Internet :: Proxy Servers"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "sse-starlette",
+    "version": "3.5.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE",
+      "AUTHORS"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "starlette>=0.49.1",
+      "anyio>=4.7.0",
+      "uvicorn>=0.34.0; extra == \"examples\"",
+      "fastapi>=0.115.12; extra == \"examples\"",
+      "pydantic>=2; extra == \"examples\"",
+      "sqlalchemy[asyncio]>=2.0.41; extra == \"examples-db\"",
+      "aiosqlite>=0.21.0; extra == \"examples-db\"",
+      "uvicorn>=0.34.0; extra == \"uvicorn\"",
+      "granian>=2.3.1; extra == \"granian\"",
+      "daphne>=4.2.0; extra == \"daphne\""
+    ]
+  },
+  {
+    "name": "starlette",
+    "version": "1.9.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Environment :: Web Environment",
+      "Framework :: AnyIO",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "anyio<5,>=4.0.0",
+      "typing-extensions>=4.10.0; python_version < '3.13'",
+      "httpx2>=2.0.0; extra == 'full'",
+      "httpx<0.29.0,>=0.27.0; extra == 'full'",
+      "itsdangerous; extra == 'full'",
+      "jinja2; extra == 'full'",
+      "opentelemetry-api; extra == 'full'",
+      "python-multipart>=0.0.18; extra == 'full'",
+      "pyyaml; extra == 'full'"
+    ]
+  },
+  {
+    "name": "tiktoken",
+    "version": "0.14.0",
+    "license_expression": null,
+    "license_declaration": "MIT License\n\nCopyright (c) 2022 OpenAI, Shantanu Jain\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [],
+    "requires_dist": [
+      "regex",
+      "requests",
+      "blobfile>=3; extra == \"blobfile\""
+    ]
+  },
+  {
+    "name": "truststore",
+    "version": "0.10.5",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Operating System :: MacOS",
+      "Operating System :: Microsoft",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "typer",
+    "version": "0.27.3",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Intended Audience :: Information Technology",
+      "Intended Audience :: System Administrators",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python",
+      "Topic :: Software Development :: Libraries :: Application Frameworks",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Software Development",
+      "Typing :: Typed",
+      "Development Status :: 4 - Beta",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "shellingham>=1.3.0",
+      "rich>=13.8.0",
+      "annotated-doc>=0.0.2",
+      "colorama; platform_system == \"Windows\""
+    ]
+  },
+  {
+    "name": "typing-inspection",
+    "version": "0.4.4",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 3 - Alpha",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Typing :: Typed"
+    ],
+    "requires_dist": [
+      "typing-extensions>=4.15.0"
+    ]
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "license_expression": "PSF-2.0",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Software Development"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "tzdata",
+    "version": "2026.5",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "licenses/LICENSE_APACHE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 3"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "tzlocal",
+    "version": "5.4.4",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 6 - Mature",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: Unix",
+      "Operating System :: MacOS :: MacOS X",
+      "Typing :: Typed",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": [
+      "tzdata; platform_system == \"Windows\"",
+      "pytest>=4.3; extra == \"testing\"",
+      "pytest-mock>=3.3; extra == \"testing\"",
+      "pytest-cov; extra == \"testing\"",
+      "check_manifest; extra == \"testing\"",
+      "pyroma; extra == \"testing\"",
+      "ruff; extra == \"testing\"",
+      "zest.releaser; extra == \"devenv\""
+    ]
+  },
+  {
+    "name": "uri-template",
+    "version": "1.3.0",
+    "license_expression": null,
+    "license_declaration": "MIT License",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.7",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "types-PyYAML ; extra == 'dev'",
+      "mypy ; extra == 'dev'",
+      "flake8 ; extra == 'dev'",
+      "flake8-annotations ; extra == 'dev'",
+      "flake8-bandit ; extra == 'dev'",
+      "flake8-bugbear ; extra == 'dev'",
+      "flake8-commas ; extra == 'dev'",
+      "flake8-comprehensions ; extra == 'dev'",
+      "flake8-continuation ; extra == 'dev'",
+      "flake8-datetimez ; extra == 'dev'",
+      "flake8-docstrings ; extra == 'dev'",
+      "flake8-import-order ; extra == 'dev'",
+      "flake8-literal ; extra == 'dev'",
+      "flake8-modern-annotations ; extra == 'dev'",
+      "flake8-noqa ; extra == 'dev'",
+      "flake8-pyproject ; extra == 'dev'",
+      "flake8-requirements ; extra == 'dev'",
+      "flake8-typechecking-import ; extra == 'dev'",
+      "flake8-use-fstring ; extra == 'dev'",
+      "pep8-naming ; extra == 'dev'"
+    ]
+  },
+  {
+    "name": "urllib3",
+    "version": "2.8.0",
+    "license_expression": "MIT",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Free Threading :: 2 - Beta",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: Software Development :: Libraries"
+    ],
+    "requires_dist": [
+      "brotli>=1.2.0; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+      "brotlicffi>=1.2.0.0; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+      "h2<5,>=4; extra == 'h2'",
+      "pysocks!=1.5.7,<2.0,>=1.5.6; extra == 'socks'",
+      "backports-zstd>=1.0.0; (python_version < '3.14') and extra == 'zstd'"
+    ]
+  },
+  {
+    "name": "uvicorn",
+    "version": "0.54.0",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.md"
+    ],
+    "classifiers": [
+      "Development Status :: 4 - Beta",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: WWW/HTTP"
+    ],
+    "requires_dist": [
+      "click>=7.0",
+      "h11>=0.8",
+      "typing-extensions>=4.0; python_version < '3.11'",
+      "httptools>=0.8.0; extra == 'standard'",
+      "python-dotenv>=0.13; extra == 'standard'",
+      "pyyaml>=5.1; extra == 'standard'",
+      "uvloop>=0.15.1; (sys_platform != 'win32' and (sys_platform != 'cygwin' and platform_python_implementation != 'PyPy')) and extra == 'standard'",
+      "watchfiles>=0.20; extra == 'standard'",
+      "websockets>=13.0; extra == 'standard'"
+    ]
+  },
+  {
+    "name": "watchfiles",
+    "version": "1.3.0",
+    "license_expression": null,
+    "license_declaration": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Intended Audience :: Developers",
+      "Intended Audience :: Information Technology",
+      "Intended Audience :: System Administrators",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX :: Linux",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: MacOS",
+      "Environment :: MacOS X",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: System :: Filesystems",
+      "Framework :: AnyIO"
+    ],
+    "requires_dist": [
+      "anyio>=3.0.0"
+    ]
+  },
+  {
+    "name": "wcwidth",
+    "version": "0.9.3",
+    "license_expression": null,
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Natural Language :: English",
+      "Operating System :: POSIX",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Topic :: Software Development :: Internationalization",
+      "Topic :: Software Development :: Libraries",
+      "Topic :: Software Development :: Localization",
+      "Topic :: Terminals",
+      "Typing :: Typed"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "webcolors",
+    "version": "25.10.0",
+    "license_expression": null,
+    "license_declaration": "BSD-3-Clause",
+    "license_files": [],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: BSD License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Utilities"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "websockets",
+    "version": "16.1.1",
+    "license_expression": "BSD-3-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Operating System :: OS Independent",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "xlsxwriter",
+    "version": "3.3.0",
+    "license_expression": "BSD-2-Clause",
+    "license_declaration": null,
+    "license_files": [
+      "LICENSE.txt"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14"
+    ],
+    "requires_dist": []
+  },
+  {
+    "name": "yarl",
+    "version": "1.25.1",
+    "license_expression": null,
+    "license_declaration": "Apache-2.0",
+    "license_files": [
+      "LICENSE",
+      "NOTICE"
+    ],
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "Programming Language :: Cython",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Internet :: WWW/HTTP",
+      "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "requires_dist": [
+      "idna>=2.0",
+      "multidict>=4.0",
+      "propcache>=0.2.1"
+    ]
+  }
+]

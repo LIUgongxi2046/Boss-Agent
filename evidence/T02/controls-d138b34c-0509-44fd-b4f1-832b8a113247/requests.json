@@ -1,0 +1,948 @@
+[
+  {
+    "at": "2026-10-22T05:50:13.283180+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/datasets",
+    "input": {
+      "namespace": "controls-check"
+    },
+    "status": 200,
+    "result": {
+      "namespace": "controls-check",
+      "snapshot_sha256": "28d1edaae8279bfbf9dbb5fe89a8cace2ecc3e3a2c96519ad8b066ac5557c5a6"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.287355+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "controls-check",
+      "action": "create_assignment",
+      "payload": {
+        "content_version": "1",
+        "coordinator_id": "coordinator-1",
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "related_meeting_id": "meeting-1",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "source_refs": [
+          "finance-note"
+        ]
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.295932+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "controls-d138b34c-0509-44fd-b4f1-832b8a113247",
+        "owner_id": "boss-1",
+        "execution_namespace": "controls-check",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "control-session"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+      "idempotency_key": "create-1"
+    },
+    "status": 200,
+    "result": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "status": "OPEN",
+      "version": "1",
+      "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+      "execution_namespace": "controls-check",
+      "persisted_at": "2026-10-22T05:50:13.293990+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.299155+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "controls-check",
+      "action": "send_assignment",
+      "payload": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "1",
+        "recipient_id": "coordinator-1",
+        "body": "提交当前会议关联的毛利变化解释、措施和证据",
+        "content_version": "1"
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "0f29da7d-0ab0-4ff4-a5fd-d8628c740873"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.303759+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/send_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "controls-d138b34c-0509-44fd-b4f1-832b8a113247",
+        "owner_id": "boss-1",
+        "execution_namespace": "controls-check",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "control-session"
+      },
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "1",
+      "recipient_id": "coordinator-1",
+      "body": "提交当前会议关联的毛利变化解释、措施和证据",
+      "content_version": "1",
+      "authorization_id": "0f29da7d-0ab0-4ff4-a5fd-d8628c740873",
+      "idempotency_key": "send-1"
+    },
+    "status": 200,
+    "result": {
+      "message_id": "661603ed-345e-4eef-854c-d0a18f25f569",
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "message_status": "SENT",
+      "task_status": "WAITING_FEEDBACK",
+      "task_version": "2",
+      "source_type": "SIMULATED",
+      "sent_at": "2026-10-22T05:50:13.302190+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.308689+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/feedback",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "2",
+      "author_contact_id": "coordinator-1",
+      "kind": "PROGRESS",
+      "content": "正在准备获准模拟明细"
+    },
+    "status": 200,
+    "result": {
+      "feedback": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "2",
+        "author_contact_id": "coordinator-1",
+        "kind": "PROGRESS",
+        "content": "正在准备获准模拟明细",
+        "feedback_id": "fb66258c-7d5b-4b1e-8b24-e09d625855ef",
+        "source_type": "SIMULATED",
+        "submitted_at": "2026-10-22T05:50:13.306156+00:00"
+      },
+      "task": {
+        "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+        "completion_authorization_id": null,
+        "coordinator_id": "coordinator-1",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "execution_namespace": "controls-check",
+        "feedback_ids": [
+          "fb66258c-7d5b-4b1e-8b24-e09d625855ef"
+        ],
+        "message_ids": [
+          "661603ed-345e-4eef-854c-d0a18f25f569"
+        ],
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "related_meeting_id": "meeting-1",
+        "source_refs": [
+          "finance-note"
+        ],
+        "status": "IN_PROGRESS",
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "timezone": "Asia/Shanghai",
+        "version": "3"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.314463+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/feedback",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "3",
+      "author_contact_id": "coordinator-1",
+      "kind": "EXTENSION_REQUEST",
+      "content": "正在准备获准模拟明细",
+      "proposed_due_at": "2026-10-26T17:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "feedback": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "3",
+        "author_contact_id": "coordinator-1",
+        "kind": "EXTENSION_REQUEST",
+        "content": "正在准备获准模拟明细",
+        "proposed_due_at": "2026-10-26T17:00:00+08:00",
+        "feedback_id": "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+        "source_type": "SIMULATED",
+        "submitted_at": "2026-10-22T05:50:13.311414+00:00"
+      },
+      "task": {
+        "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+        "completion_authorization_id": null,
+        "coordinator_id": "coordinator-1",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "execution_namespace": "controls-check",
+        "feedback_ids": [
+          "fb66258c-7d5b-4b1e-8b24-e09d625855ef",
+          "13effcc2-a43e-4f66-bb8d-f2bd31a33211"
+        ],
+        "message_ids": [
+          "661603ed-345e-4eef-854c-d0a18f25f569"
+        ],
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "related_meeting_id": "meeting-1",
+        "source_refs": [
+          "finance-note"
+        ],
+        "status": "IN_PROGRESS",
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "timezone": "Asia/Shanghai",
+        "version": "4"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.319617+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "controls-check",
+      "action": "extend_assignment",
+      "payload": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "4",
+        "feedback_id": "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+        "due_at": "2026-10-26T17:00:00+08:00"
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "a4b5ab10-dcb9-4c50-ac05-9a1a6c297ce5"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.322735+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/decide",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "4",
+      "feedback_id": "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+      "due_at": "2026-10-26T17:00:00+08:00",
+      "authorization_id": "a4b5ab10-dcb9-4c50-ac05-9a1a6c297ce5"
+    },
+    "status": 403,
+    "result": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T05:50:13.330037+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/decide",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "4",
+      "feedback_id": "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+      "due_at": "2026-10-26T17:00:00+08:00",
+      "authorization_id": "a4b5ab10-dcb9-4c50-ac05-9a1a6c297ce5"
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+      "completion_authorization_id": null,
+      "coordinator_id": "coordinator-1",
+      "due_at": "2026-10-26T17:00:00+08:00",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "execution_namespace": "controls-check",
+      "feedback_ids": [
+        "fb66258c-7d5b-4b1e-8b24-e09d625855ef",
+        "13effcc2-a43e-4f66-bb8d-f2bd31a33211"
+      ],
+      "message_ids": [
+        "661603ed-345e-4eef-854c-d0a18f25f569"
+      ],
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "related_meeting_id": "meeting-1",
+      "source_refs": [
+        "finance-note"
+      ],
+      "status": "IN_PROGRESS",
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "timezone": "Asia/Shanghai",
+      "version": "5"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.338856+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/feedback",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "5",
+      "author_contact_id": "coordinator-1",
+      "kind": "RESULT_SUBMITTED",
+      "content": "获准模拟措施及证据已经提交",
+      "evidence_refs": [
+        "finance-note"
+      ]
+    },
+    "status": 200,
+    "result": {
+      "feedback": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "5",
+        "author_contact_id": "coordinator-1",
+        "kind": "RESULT_SUBMITTED",
+        "content": "获准模拟措施及证据已经提交",
+        "evidence_refs": [
+          "finance-note"
+        ],
+        "feedback_id": "6d6c3de7-63e4-47be-a076-cee3d24834d2",
+        "source_type": "SIMULATED",
+        "submitted_at": "2026-10-22T05:50:13.336862+00:00"
+      },
+      "task": {
+        "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+        "completion_authorization_id": null,
+        "coordinator_id": "coordinator-1",
+        "due_at": "2026-10-26T17:00:00+08:00",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "execution_namespace": "controls-check",
+        "feedback_ids": [
+          "fb66258c-7d5b-4b1e-8b24-e09d625855ef",
+          "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+          "6d6c3de7-63e4-47be-a076-cee3d24834d2"
+        ],
+        "message_ids": [
+          "661603ed-345e-4eef-854c-d0a18f25f569"
+        ],
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "related_meeting_id": "meeting-1",
+        "source_refs": [
+          "finance-note"
+        ],
+        "status": "RESULT_SUBMITTED",
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "timezone": "Asia/Shanghai",
+        "version": "6"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.343909+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "controls-check",
+      "action": "complete_assignment",
+      "payload": {
+        "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+        "task_version": "6",
+        "feedback_id": "6d6c3de7-63e4-47be-a076-cee3d24834d2"
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "24b8a6e6-63e1-47c6-8267-cb4359a354d5"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.348552+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/decide",
+    "input": {
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "task_version": "6",
+      "feedback_id": "6d6c3de7-63e4-47be-a076-cee3d24834d2",
+      "authorization_id": "24b8a6e6-63e1-47c6-8267-cb4359a354d5"
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "33324990-04fc-4d7d-93c4-ac8485d89a66",
+      "completion_authorization_id": "24b8a6e6-63e1-47c6-8267-cb4359a354d5",
+      "coordinator_id": "coordinator-1",
+      "due_at": "2026-10-26T17:00:00+08:00",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "execution_namespace": "controls-check",
+      "feedback_ids": [
+        "fb66258c-7d5b-4b1e-8b24-e09d625855ef",
+        "13effcc2-a43e-4f66-bb8d-f2bd31a33211",
+        "6d6c3de7-63e4-47be-a076-cee3d24834d2"
+      ],
+      "message_ids": [
+        "661603ed-345e-4eef-854c-d0a18f25f569"
+      ],
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "related_meeting_id": "meeting-1",
+      "source_refs": [
+        "finance-note"
+      ],
+      "status": "COMPLETED_CONFIRMED",
+      "task_id": "107c5529-2d2f-4e6f-99a6-2a630a4e4eb9",
+      "timezone": "Asia/Shanghai",
+      "version": "7"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.354435+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/authorizations",
+    "input": {
+      "namespace": "controls-check",
+      "action": "create_assignment",
+      "payload": {
+        "content_version": "1",
+        "coordinator_id": "coordinator-1",
+        "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+        "due_at": "2026-10-25T17:00:00+08:00",
+        "timezone": "Asia/Shanghai",
+        "evidence_requirements": [
+          "原因明细",
+          "措施及证据"
+        ],
+        "related_meeting_id": "meeting-1",
+        "related_event_ids": [
+          "event-1"
+        ],
+        "source_refs": [
+          "finance-note"
+        ]
+      }
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "10cbc8d2-fdfb-4db3-b76d-c13e8c1dcf2c"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.358762+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/revoke",
+    "input": {
+      "authorization_id": "10cbc8d2-fdfb-4db3-b76d-c13e8c1dcf2c"
+    },
+    "status": 200,
+    "result": {
+      "authorization_id": "10cbc8d2-fdfb-4db3-b76d-c13e8c1dcf2c",
+      "revoked_at": "2026-10-22T05:50:13.357711+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.364182+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/operations/create_assignment",
+    "input": {
+      "envelope": {
+        "request_id": "controls-d138b34c-0509-44fd-b4f1-832b8a113247",
+        "owner_id": "boss-1",
+        "execution_namespace": "controls-check",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "control-session"
+      },
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "authorization_id": "10cbc8d2-fdfb-4db3-b76d-c13e8c1dcf2c",
+      "idempotency_key": "revoked"
+    },
+    "status": 403,
+    "result": "授权无效"
+  },
+  {
+    "at": "2026-10-22T05:50:13.367944+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/private_calendar",
+    "input": {},
+    "status": 200,
+    "result": {
+      "calendar_id": "private-1",
+      "private_body_visible": true
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.370395+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/private_calendar",
+    "input": {},
+    "status": 403,
+    "result": "身份权限不足"
+  },
+  {
+    "at": "2026-10-22T05:50:13.372584+00:00",
+    "role": "CONTACT",
+    "method": "GET",
+    "route": "/health",
+    "input": null,
+    "status": 401,
+    "result": "未认证"
+  },
+  {
+    "at": "2026-10-22T05:50:13.376542+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/search",
+    "input": {
+      "query": "毛利"
+    },
+    "status": 200,
+    "result": {
+      "results": [
+        {
+          "source_id": "finance-note",
+          "content": "合成水产饲料外销明细；毛利=收入减成本，毛利率=毛利除收入，单吨毛利=毛利除吨数。原因贡献明细尚未提供。"
+        }
+      ]
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.380916+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/withdraw",
+    "input": {
+      "source_id": "finance-note",
+      "version": "1"
+    },
+    "status": 200,
+    "result": {
+      "source_id": "finance-note",
+      "withdrawn": true,
+      "derived_summaries": []
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.385276+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/controls-check/controls/search",
+    "input": {
+      "query": "毛利"
+    },
+    "status": 200,
+    "result": {
+      "results": []
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.396578+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/datasets",
+    "input": {
+      "namespace": "rules-check"
+    },
+    "status": 200,
+    "result": {
+      "namespace": "rules-check",
+      "snapshot_sha256": "28d1edaae8279bfbf9dbb5fe89a8cace2ecc3e3a2c96519ad8b066ac5557c5a6"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.402506+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/rules",
+    "input": {
+      "version": "1",
+      "cooldown_seconds": 1800,
+      "quiet_start": 22,
+      "quiet_end": 7,
+      "timezone": "Asia/Shanghai",
+      "important_escalation": false
+    },
+    "status": 200,
+    "result": {
+      "version": "1",
+      "cooldown_seconds": 1800,
+      "quiet_start": 22,
+      "quiet_end": 7,
+      "timezone": "Asia/Shanghai",
+      "important_escalation": false
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.406246+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/event",
+    "input": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "event_id": "business-event",
+      "version": "1",
+      "state": "OPEN",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:13.825400+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/event",
+    "input": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "event_id": "business-event",
+      "version": "2",
+      "state": "OPEN",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.032780+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/clock",
+    "input": {
+      "at": "2026-10-22T22:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "at": "2026-10-22T22:00:00+08:00",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.232588+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/event",
+    "input": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "event_id": "business-event",
+      "version": "3",
+      "state": "OPEN",
+      "impact": "IMPORTANT",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.436079+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/rules",
+    "input": {
+      "version": "2",
+      "cooldown_seconds": 1800,
+      "quiet_start": 22,
+      "quiet_end": 7,
+      "timezone": "Asia/Shanghai",
+      "important_escalation": true
+    },
+    "status": 200,
+    "result": {
+      "version": "2",
+      "cooldown_seconds": 1800,
+      "quiet_start": 22,
+      "quiet_end": 7,
+      "timezone": "Asia/Shanghai",
+      "important_escalation": true
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.639486+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/reminder",
+    "input": {
+      "event_id": "business-event",
+      "state": "SNOOZED",
+      "until": "2026-10-22T22:30:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "state": "SNOOZED",
+      "until": "2026-10-22T22:30:00+08:00",
+      "event_id": "business-event"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.643996+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/event",
+    "input": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "event_id": "business-event",
+      "version": "4",
+      "state": "OPEN",
+      "impact": "IMPORTANT",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:14.845086+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/reminder",
+    "input": {
+      "event_id": "business-event",
+      "state": "CLOSED"
+    },
+    "status": 200,
+    "result": {
+      "state": "CLOSED",
+      "until": null,
+      "event_id": "business-event"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.048862+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/clock",
+    "input": {
+      "at": "2026-10-23T08:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "at": "2026-10-23T08:00:00+08:00",
+      "version": "3"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.053774+00:00",
+    "role": "MAINTAINER",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/event",
+    "input": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    },
+    "status": 200,
+    "result": {
+      "event_id": "business-event",
+      "version": "5",
+      "state": "RECOVERED",
+      "impact": "NORMAL",
+      "due_at": "2026-10-22T09:00:00+08:00"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.057832+00:00",
+    "role": "BOSS",
+    "method": "POST",
+    "route": "/spaces/rules-check/controls/reminder",
+    "input": {
+      "event_id": "business-event",
+      "state": "ACKNOWLEDGED"
+    },
+    "status": 200,
+    "result": {
+      "state": "ACKNOWLEDGED",
+      "until": null,
+      "event_id": "business-event"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.274183+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/rules-check/schedule",
+    "input": {
+      "version": "1",
+      "enabled": false
+    },
+    "status": 200,
+    "result": {
+      "canceled": false,
+      "enabled": false,
+      "schedule_id": "schedule-1",
+      "schedule_version": "2",
+      "timezone": "Asia/Shanghai",
+      "trigger": "EVENT_OR_TIME",
+      "version": "2"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.458056+00:00",
+    "role": "MAINTAINER",
+    "method": "PUT",
+    "route": "/spaces/rules-check/schedule",
+    "input": {
+      "version": "2",
+      "enabled": true,
+      "canceled": true
+    },
+    "status": 200,
+    "result": {
+      "canceled": true,
+      "enabled": true,
+      "schedule_id": "schedule-1",
+      "schedule_version": "3",
+      "timezone": "Asia/Shanghai",
+      "trigger": "EVENT_OR_TIME",
+      "version": "3"
+    }
+  },
+  {
+    "at": "2026-10-22T05:50:15.660304+00:00",
+    "role": "BOSS",
+    "method": "GET",
+    "route": "/spaces/rules-check/objects/notification",
+    "input": null,
+    "status": 200,
+    "result": [
+      {
+        "business_at": "2026-10-22T09:00:00+08:00",
+        "delivered_at": "2026-10-22T09:00:00+08:00",
+        "event_id": "business-event",
+        "event_version": "1",
+        "reason": null,
+        "rule_version": "1",
+        "schedule_version": "1",
+        "source_type": "SIMULATED",
+        "state": "DELIVERED"
+      },
+      {
+        "business_at": "2026-10-22T22:00:00+08:00",
+        "delivered_at": "2026-10-22T22:00:00+08:00",
+        "event_id": "business-event",
+        "event_version": "3",
+        "reason": null,
+        "rule_version": "2",
+        "schedule_version": "1",
+        "source_type": "SIMULATED",
+        "state": "DELIVERED"
+      },
+      {
+        "business_at": "2026-10-23T08:00:00+08:00",
+        "delivered_at": "2026-10-23T08:00:00+08:00",
+        "event_id": "business-event",
+        "event_version": "5",
+        "reason": null,
+        "rule_version": "2",
+        "schedule_version": "1",
+        "source_type": "SIMULATED",
+        "state": "DELIVERED"
+      }
+    ]
+  }
+]

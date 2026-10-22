@@ -1,0 +1,127 @@
+- main:
+  - complementary:
+    - button "Back to chat"
+    - navigation "Settings sections":
+      - button "Overview"
+      - button "Appearance"
+      - button "Models"
+      - button "Capabilities"
+      - button "System"
+      - button "Advanced"
+      - button "About"
+    - status: Saved. Restart to apply changes.
+    - button "Restart"
+    - button "Sign out"
+  - heading "Web safety" [level=2]
+  - button "Local services"
+  - switch "Local services" [checked]: "On"
+  - button "Default access"
+  - button "Default Permission" [pressed]
+  - button "Full Access"
+  - region "Agent limits":
+    - heading "Agent limits" [level=2]
+    - group "Agent limits":
+      - text: Agent limits
+      - button "Keep retrying model requests"
+      - text: Keep retrying requests after recoverable errors. Turn off to use standard retries.
+      - switch "Keep retrying model requests"
+      - button "Tool iterations per turn"
+      - text: Maximum number of model and tool rounds for each reply.
+      - spinbutton "Tool iterations per turn": "8"
+      - button "Concurrent subagents"
+      - text: Maximum number of subagents running at the same time.
+      - spinbutton "Concurrent subagents": "4"
+      - button "Tool result length (characters)"
+      - text: Maximum number of characters from each tool result sent to the model.
+      - spinbutton "Tool result length (characters)": "16000"
+      - button "Tool activity summary length (characters)"
+      - text: Maximum number of characters shown in a tool activity summary.
+      - spinbutton "Tool activity summary length (characters)": "40"
+      - button "Session message tool limit (per minute)"
+      - text: Maximum number of messages tools can send to the same session each minute.
+      - spinbutton "Session message tool limit (per minute)": "6"
+      - status: Saved.
+  - region "Shell and sandbox":
+    - heading "Shell and sandbox" [level=2]
+    - group "Shell and sandbox":
+      - text: Shell and sandbox
+      - button "Command timeout (seconds)"
+      - text: Stop commands that exceed this duration. Set to 0 for no time limit.
+      - spinbutton "Command timeout (seconds)": "60"
+      - button "Prepend to PATH"
+      - text: Directories added to the start of PATH. Separate entries with semicolons on Windows or colons on Linux and macOS.
+      - textbox "Prepend to PATH"
+      - button "Append to PATH"
+      - text: Directories added to the end of PATH. Separate entries with semicolons on Windows or colons on Linux and macOS.
+      - textbox "Append to PATH"
+      - button "Command sandbox"
+      - text: Use bwrap on Linux or Seatbelt on macOS. Workspace checks alone do not isolate processes.
+      - combobox "Command sandbox": None
+      - button "Allowed environment variables"
+      - text: Additional environment variables to pass from the host to commands, alongside required variables. One name per line.
+      - button "Allowed environment variables"
+      - button "Allowed command patterns"
+      - text: One regular expression per line. When set, every command segment must fully match an allow rule. Matches override built-in and custom deny rules; workspace and network restrictions still apply.
+      - button "Allowed command patterns"
+      - button "Denied command patterns"
+      - text: One regular expression per line, checked alongside built-in deny rules. Commands that fully match allow rules skip these checks.
+      - button "Denied command patterns"
+  - region "Web connections":
+    - heading "Web connections" [level=2]
+    - group "Web connections":
+      - text: Web connections
+      - button "Web proxy"
+      - text: Proxy URL for web tools. Leave empty to use the default network configuration.
+      - textbox "Web proxy"
+      - button "User agent"
+      - text: User-Agent header sent with web requests. Leave blank to use the default.
+      - textbox "User agent"
+  - region "Global access policies":
+    - heading "Global access policies" [level=2]
+    - group "Global access policies":
+      - text: Global access policies
+      - button "Restrict tools to the workspace"
+      - text: Global tool access policy. Per-chat WebUI permissions are configured separately.
+      - switch "Restrict tools to the workspace" [checked]
+      - button "Remote package installation"
+      - text: Allow WebUI browsers on other devices to install optional packages and skills. This setting can only be changed on the gateway host.
+      - switch "Remote package installation"
+      - button "Allowed IP addresses and networks"
+      - text: Allow outbound requests to these otherwise restricted addresses. Enter one IP address or CIDR range per line.
+      - button "Allowed IP addresses and networks"
+  - region "CLI app limits":
+    - heading "CLI app limits" [level=2]
+    - group "CLI app limits":
+      - text: CLI app limits
+      - button "Install timeout (seconds)"
+      - text: Time allowed for CLI app installation.
+      - spinbutton "Install timeout (seconds)": "300"
+      - button "Run timeout (seconds)"
+      - text: Time allowed for a CLI app command.
+      - spinbutton "Run timeout (seconds)": "60"
+      - button "Catalog cache duration (seconds)"
+      - text: How long the CLI app catalog stays cached.
+      - spinbutton "Catalog cache duration (seconds)": "3600"
+  - region "Gateway process":
+    - heading "Gateway process" [level=2]
+    - group "Gateway process":
+      - text: Gateway process
+      - button "Gateway bind address"
+      - text: Address used by the gateway. Configure the WebUI listener separately under Channels → WebSocket.
+      - textbox "Gateway bind address": 127.0.0.1
+      - button "Gateway port"
+      - text: Port used by the gateway. Command-line arguments override this setting.
+      - spinbutton "Gateway port": "18791"
+      - button "Restart mode"
+      - text: Choose how the gateway restarts. Automatic selects a method for your environment.
+      - combobox "Restart mode": Automatic
+  - region "API server details":
+    - heading "API server details" [level=2]
+    - group "API server details":
+      - text: API server details
+      - button "API bind address"
+      - text: Set an API key in System before binding to a network address. Restart the API service to apply changes.
+      - textbox "API bind address": 127.0.0.1
+      - button "API request timeout (seconds)"
+      - text: How long each API request can take. Restart the API service to apply changes.
+      - spinbutton "API request timeout (seconds)": "120"

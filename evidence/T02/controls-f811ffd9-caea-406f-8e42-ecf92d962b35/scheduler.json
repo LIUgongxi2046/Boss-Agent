@@ -1,0 +1,167 @@
+[
+  {
+    "at": "2026-10-22T06:23:00.503945+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "1",
+        "state": "DELIVERED",
+        "reason": null,
+        "rule_version": "1",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T09:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:00.707546+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "1",
+        "state": "SUPPRESSED",
+        "reason": "DUPLICATE_EVENT",
+        "rule_version": "1",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T09:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:00.911743+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "2",
+        "state": "SUPPRESSED",
+        "reason": "COOLDOWN",
+        "rule_version": "1",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T09:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:01.115494+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "2",
+        "state": "SUPPRESSED",
+        "reason": "QUIET_HOURS",
+        "rule_version": "1",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T22:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:01.318812+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "3",
+        "state": "SUPPRESSED",
+        "reason": "QUIET_HOURS",
+        "rule_version": "1",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T22:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:01.523069+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "3",
+        "state": "DELIVERED",
+        "reason": null,
+        "rule_version": "2",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T22:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:01.728752+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "4",
+        "state": "SUPPRESSED",
+        "reason": "BOSS_SNOOZED",
+        "rule_version": "2",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T22:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:01.932834+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "4",
+        "state": "SUPPRESSED",
+        "reason": "BOSS_CLOSED",
+        "rule_version": "2",
+        "schedule_version": "1",
+        "business_at": "2026-10-22T22:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:02.136528+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "5",
+        "state": "DELIVERED",
+        "reason": null,
+        "rule_version": "2",
+        "schedule_version": "1",
+        "business_at": "2026-10-23T08:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:02.339622+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "5",
+        "state": "SUPPRESSED",
+        "reason": "PLAN_PAUSED_OR_CANCELED",
+        "rule_version": "2",
+        "schedule_version": "2",
+        "business_at": "2026-10-23T08:00:00+08:00"
+      }
+    ]
+  },
+  {
+    "at": "2026-10-22T06:23:02.542393+00:00",
+    "job_id": "fe5cca0d",
+    "results": [
+      {
+        "event_id": "business-event",
+        "event_version": "5",
+        "state": "SUPPRESSED",
+        "reason": "PLAN_PAUSED_OR_CANCELED",
+        "rule_version": "2",
+        "schedule_version": "3",
+        "business_at": "2026-10-23T08:00:00+08:00"
+      }
+    ]
+  }
+]

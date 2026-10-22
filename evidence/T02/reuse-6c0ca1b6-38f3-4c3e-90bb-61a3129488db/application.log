@@ -1,0 +1,650 @@
+2026-10-22 14:40:42.327 | INFO     | nanobot.agent.loop:_register_default_tools:641 - Registered 22 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 14:40:42.779 | INFO     | nanobot.channels.manager:_init_channels:303 - WebSocket channel enabled as websocket
+2026-10-22 14:40:42.788 | INFO     | nanobot.cron.service:start:492 - Cron service started with 1 jobs
+应用验证服务已启动
+2026-10-22 14:40:42.790 | INFO     | nanobot.channels.manager:_start_channel_task:392 - Starting websocket channel...
+2026-10-22 14:40:42.790 | INFO     | nanobot.agent.loop:run:1265 - Agent loop started
+2026-10-22 14:40:42.791 | INFO     | nanobot.channels.manager:_dispatch_outbound_loop:769 - Outbound dispatcher started
+2026-10-22 14:40:42.792 | INFO     | nanobot.channels.websocket.runtime:_log_listener_ready:656 - WebSocket server listening on ws://127.0.0.1:8872/
+2026-10-22 14:40:43.288 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:43.290 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:43.791 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:43.792 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:44.294 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:44.296 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:44.797 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:44.798 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:45.301 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:45.302 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:45.803 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:45.804 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:46.306 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:46.307 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:46.808 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:46.860 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:47.361 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:47.363 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:47.865 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:47.867 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:48.372 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:48.373 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:48.879 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:48.881 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:49.388 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:49.389 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:49.892 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:49.893 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:50.394 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:50.395 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:50.896 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:50.897 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:51.398 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:51.399 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:51.901 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:51.902 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:52.404 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:52.407 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:52.908 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:52.909 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:53.409 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:53.411 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:53.913 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:53.914 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:54.415 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:54.416 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:54.918 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:54.920 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:55.421 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:55.422 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:55.966 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:55.967 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:56.470 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:56.472 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:56.976 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:56.977 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:57.479 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:57.481 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:57.987 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:57.989 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:58.497 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:58.498 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:59.004 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:59.006 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:40:59.509 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:40:59.512 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:00.019 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:00.021 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:00.524 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:00.547 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:01.104 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:01.105 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:01.606 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:01.607 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:02.110 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:02.111 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:02.612 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:02.613 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:03.117 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:03.118 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:03.619 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:03.619 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:04.255 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:04.256 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:04.799 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:04.800 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:05.266 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026...
+2026-10-22 14:41:07.247 | WARNING  | nanobot.webui.ws_http:_log_webui_thread_diagnostics:931 - webui thread replay session_hash=390ac41ced6e status=200 limit=40 source_bytes=0 parsed_records=0 selected_bytes=0 selected_records=0 compacted_deltas=0 manifest_rebuilt=False manifest_rebuild_ms=0 capped_bytes=False capped_records=False truncated_turn=False replay_ms=0 build_ms=4.1 json_ms=0.0 gzip_ms=0.0 gzip=False response_bytes=881 event_loop_lag_ms=0.0 total_ms=2023.0
+2026-10-22 14:41:07.276 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:07.277 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:07.780 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:07.781 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:08.441 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:08.442 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:08.953 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:08.954 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:09.763 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: query_metrics({"question": "region-1 的 product-1 和 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的全部六个经营指标", "metric_ids": ["sales_quantity", "revenue", "cost", "gross_profit", "gross_margin", "gro)
+2026-10-22 14:41:10.172 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:10.172 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:10.971 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:10.972 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:11.577 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_evidence({"query_id": "edd9792d-8694-4a1d-89cd-ffaa272e1bf1", "source_ids": ["finance-note"], "detail_refs": ["BASE-0", "BASE-1", "BASE-2", "BASE-3", "CURRENT-0", "CURRENT-1", "CURRENT-2", "CURRENT-3"]})
+2026-10-22 14:41:12.353 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:12.353 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:13.720 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:13.730 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:14.379 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:14.380 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:14.881 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:14.883 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:15.397 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:15.401 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:16.799 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 已查询并读取原始依据。口径：region-1、product-1 + product-2、CNY、EXTERNAL_SALES、definition_version=1；本期 2026-10-01~10-10，对比期 2026-09-01~...
+2026-10-22 14:41:16.801 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:16.802 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:18.625 | WARNING  | nanobot.webui.ws_http:_log_slow_http:628 - slow webui http route path=/api/sessions status=200 duration_ms=1244
+2026-10-22 14:41:19.189 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:19.190 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:19.363 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权创建以下交办：{"content_version": "1", "coordinator_id": "coordinator-1", "purpose"...
+2026-10-22 14:41:20.285 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:20.286 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:20.952 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:20.953 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:21.459 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:21.460 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:21.796 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: create_assignment({"content_version": "1", "coordinator_id": "coordinator-1", "purpose": "提交当前会议关联的毛利变化解释、措施和证据", "due_at": "2026-10-25T17:00:00+08:00", "timezone": "Asia/Shanghai", "evidence_requirements": ["原因明细", "措)
+2026-10-22 14:41:22.105 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:22.106 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:22.869 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:22.870 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:23.321 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 14:41:23.680 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:23.682 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:24.590 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:24.591 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:25.095 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:25.096 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:25.600 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:25.600 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:26.197 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:26.198 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:26.224 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 交办已按授权创建，并已复核正式状态。
+
+## 创建结果
+- task_id：`f51a21e1-6639-49f9-9c19-89deeed6b8ef`
+- 授权 ID：`b1d636e2-1ccf-4620-af3a-23b92e9606...
+2026-10-22 14:41:26.699 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权按以下内容模拟发送：{"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version"...
+2026-10-22 14:41:27.419 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:27.420 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:27.923 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:27.924 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:28.522 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:28.524 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:29.025 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:29.026 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:29.317 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: send_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version": "1", "recipient_id": "coordinator-1", "body": "提交当前会议关联的毛利变化解释、措施和证据", "content_version": "1"})
+2026-10-22 14:41:29.582 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:29.583 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:30.118 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:30.120 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:30.476 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 14:41:30.783 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:30.784 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:31.347 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:31.348 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:31.849 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:31.850 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:32.480 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:32.481 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:32.505 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 模拟发送已完成，并已复核正式状态。
+
+## 发送结果
+- 消息 ID：`5111243e-1be3-4b7d-bb52-ecba3bd9a91a`
+- 消息状态：`SENT`（SIMULATED，模拟发送）
+- 发送时间：2026-10-2...
+2026-10-22 14:41:32.758 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。
+2026-10-22 14:41:33.318 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:33.319 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:33.905 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:33.910 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:34.428 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 14:41:34.721 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:34.722 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:35.655 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:35.657 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:36.160 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:36.164 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:36.812 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 已重新读取任务 `f51a21e1-6639-49f9-9c19-89deeed6b8ef` 的正式状态。
+
+## 当前正式状态
+- 状态：`WAITING_FEEDBACK`（等待协调人反馈）
+- 版本：version 2
+- 协调人：c...
+2026-10-22 14:41:36.813 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:36.814 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:37.322 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:37.323 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:37.852 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:37.853 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:38.364 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:38.365 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:38.866 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:38.867 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:39.370 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:39.371 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:39.873 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:39.874 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:40.378 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:40.381 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:40.884 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:40.885 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:41.387 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:41.388 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:41.890 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:41.891 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:42.392 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:42.393 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:42.893 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:42.895 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:43.396 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:43.397 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:43.898 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:43.899 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:44.400 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:44.401 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:44.904 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:44.905 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:45.405 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:45.407 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:45.908 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:45.910 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:46.412 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:46.413 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:46.914 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:46.916 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:47.418 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:47.420 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:47.921 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:47.921 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:48.422 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:48.422 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:48.925 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:48.926 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:49.427 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:49.429 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:49.930 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:49.938 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+{"evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/ui-business-83dae1c6-825e-4f58-bcc5-c2cee791e5ff", "status": "PASS"}
+2026-10-22 14:41:50.439 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:50.440 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:50.941 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:50.942 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:51.445 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:51.446 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:51.947 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:51.947 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:52.449 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:52.452 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:52.954 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:52.956 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:53.462 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:53.465 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:53.968 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:53.971 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:54.482 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:54.483 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:54.985 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:54.989 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:55.533 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:55.537 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:56.058 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:56.059 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:56.561 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:56.562 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:57.069 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:57.073 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:57.577 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:57.578 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:58.082 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:58.083 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:58.587 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:58.589 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:59.090 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:59.091 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:41:59.594 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:41:59.595 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:00.096 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:00.096 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:00.599 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:00.599 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:01.100 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:01.102 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:01.604 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:01.605 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:02.108 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:02.109 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:02.611 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:02.612 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:03.114 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:03.116 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:03.618 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:03.620 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:04.121 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:04.122 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:04.624 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:04.626 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:05.127 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:05.129 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:05.633 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:05.634 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:06.136 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:06.138 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:06.639 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:06.640 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:07.141 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:07.142 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:07.645 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:07.646 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:08.148 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:08.149 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:08.652 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:08.653 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:09.156 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:09.157 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:09.659 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:09.660 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:10.162 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:10.163 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:10.664 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:10.665 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+{"at": "2026-10-22T06:42:00.053745+00:00", "status": "PASS", "scope": "维护身份管理配置 DOM 保存重载、HTTP 私人会话拒绝、WebSocket 业务决定拒绝、未认证与联系人伪造拒绝", "saved_max_tool_rounds": 9, "next_task_adoption": "等待实际服务重启后的新任务", "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/admin-bf7f8133-99ff-4450-909c-814a8ca6a9fa"}
+2026-10-22 14:42:11.166 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:11.167 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:11.668 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:11.669 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:12.170 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:12.171 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:12.674 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:12.675 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:13.179 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:13.180 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:13.685 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:13.687 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:14.188 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:14.188 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:14.690 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:14.691 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:15.195 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:15.196 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:15.732 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:15.733 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:16.236 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:16.237 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:16.738 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:16.739 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:17.294 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:17.299 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:17.809 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:17.811 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:18.313 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:18.314 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:18.816 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:18.818 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:19.320 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:19.322 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:19.824 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:19.828 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:20.329 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:20.330 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:20.831 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:20.832 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:21.334 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:21.336 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:21.837 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:21.838 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:22.339 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:22.339 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:22.842 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:22.843 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:23.344 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:23.345 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:23.847 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:23.848 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:24.349 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:24.350 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:24.851 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:24.852 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:25.353 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:25.354 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:25.855 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:25.856 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:26.357 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:26.359 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:26.860 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:26.861 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:27.363 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:27.363 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:27.865 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:27.867 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:28.369 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:28.371 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:28.873 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:28.873 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:29.375 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:29.375 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:29.876 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:29.877 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:30.379 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:30.380 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+{"at": "2026-10-22T06:42:19.938658+00:00", "status": "PASS", "scope": "维护身份管理配置 DOM 保存重载、HTTP 私人会话拒绝、WebSocket 业务决定拒绝、未认证与联系人伪造拒绝", "saved_max_tool_rounds": 8, "next_task_adoption": "等待实际服务重启后的新任务", "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/admin-b9c00b0a-f11d-4f43-bc2a-ed000fc8895a"}
+2026-10-22 14:42:30.598 | INFO     | nanobot.agent.loop:stop:1592 - Agent loop stopping
+2026-10-22 14:42:30.599 | INFO     | nanobot.channels.manager:stop_all:670 - Stopping all channels...
+2026-10-22 14:42:30.600 | INFO     | nanobot.channels.manager:_stop_channel_runtime:414 - Stopped websocket channel
+2026-10-22 14:42:34.922 | INFO     | nanobot.agent.loop:_register_default_tools:641 - Registered 22 tools: ['apply_patch', 'run_cli_app', 'create_goal', 'edit_file', 'exec_session', 'exec', 'find_files', 'grep', 'list_dir', 'list_exec_sessions', 'list_sessions', 'message', 'my', 'read_file', 'read_session', 'search_sessions', 'send_session_message', 'spawn', 'update_goal', 'web_fetch', 'web_search', 'write_file']
+2026-10-22 14:42:35.161 | INFO     | nanobot.channels.manager:_init_channels:303 - WebSocket channel enabled as websocket
+2026-10-22 14:42:35.167 | INFO     | nanobot.cron.service:start:492 - Cron service started with 1 jobs
+应用验证服务已启动
+2026-10-22 14:42:35.169 | INFO     | nanobot.channels.manager:_start_channel_task:392 - Starting websocket channel...
+2026-10-22 14:42:35.169 | INFO     | nanobot.agent.loop:run:1265 - Agent loop started
+2026-10-22 14:42:35.169 | INFO     | nanobot.channels.manager:_dispatch_outbound_loop:769 - Outbound dispatcher started
+2026-10-22 14:42:35.170 | INFO     | nanobot.channels.websocket.runtime:_log_listener_ready:656 - WebSocket server listening on ws://127.0.0.1:8872/
+2026-10-22 14:42:35.668 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:35.669 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:36.188 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:36.189 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:36.690 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:36.691 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:37.198 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:37.200 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:37.701 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:37.703 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:38.205 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:38.206 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:38.709 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:38.710 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:39.212 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:39.213 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:39.714 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:39.715 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:40.218 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:40.219 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:40.720 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:40.722 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:41.227 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:41.231 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:41.732 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:41.733 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:42.240 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:42.242 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:42.763 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:42.766 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:43.268 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:43.269 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:43.789 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:43.801 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:44.305 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:44.306 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:44.421 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026...
+2026-10-22 14:42:45.436 | WARNING  | nanobot.webui.ws_http:_log_webui_thread_diagnostics:931 - webui thread replay session_hash=080343702bf0 status=200 limit=40 source_bytes=395 parsed_records=1 selected_bytes=395 selected_records=1 compacted_deltas=0 manifest_rebuilt=False manifest_rebuild_ms=0 capped_bytes=False capped_records=False truncated_turn=False replay_ms=0 build_ms=8.2 json_ms=0.2 gzip_ms=0.0 gzip=False response_bytes=1260 event_loop_lag_ms=988.8 total_ms=1039.0
+2026-10-22 14:42:45.439 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:45.445 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:45.953 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:45.955 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:46.589 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:46.591 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:47.093 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:47.094 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:47.595 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:47.596 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:47.808 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: query_metrics({"question": "region-1 的 product-1 和 product-2 在 2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10 的全部六个经营指标", "metric_ids": ["sales_quantity", "revenue", "cost", "gross_profit", "gross_margin", "gro)
+2026-10-22 14:42:48.098 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:48.100 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:48.619 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:48.623 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:49.131 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:49.132 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:49.434 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_evidence({"query_id": "ec3b086a-9ad7-42f5-8375-de4b19090fdd", "source_ids": ["finance-note"], "detail_refs": ["BASE-0", "BASE-1", "BASE-2", "BASE-3", "CURRENT-0", "CURRENT-1", "CURRENT-2", "CURRENT-3"]})
+2026-10-22 14:42:49.710 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:49.711 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:50.259 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:50.261 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:50.764 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:50.765 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:51.273 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:51.274 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:51.775 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:51.777 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:52.283 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:52.284 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:52.954 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 查询完成，原始依据已读取。
+
+## 查询口径
+- 区域：region-1；产品：product-1、product-2
+- 本期（CURRENT）：2026-10-01 至 2026-10-10
+- 基期（BASE）：2026-09-01 ...
+2026-10-22 14:42:53.194 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:53.195 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:53.896 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:53.898 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:54.491 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:54.492 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:54.521 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权创建以下交办：{"content_version": "1", "coordinator_id": "coordinator-1", "purpose"...
+2026-10-22 14:42:55.375 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:55.385 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:59.038 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:42:59.041 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:42:59.071 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: create_assignment({"content_version": "1", "coordinator_id": "coordinator-1", "purpose": "提交当前会议关联的毛利变化解释、措施和证据", "due_at": "2026-10-25T17:00:00+08:00", "timezone": "Asia/Shanghai", "evidence_requirements": ["原因明细", "措)
+2026-10-22 14:43:00.330 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:00.331 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:01.075 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 14:43:01.438 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:01.439 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:02.079 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:02.080 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:02.581 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:02.582 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:03.785 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:03.786 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:03.818 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 交办已创建，并已按授权发出。
+
+## 交办状态
+- task_id：`f51a21e1-6639-49f9-9c19-89deeed6b8ef`
+- 授权 ID：`b1d636e2-1ccf-4620-af3a-23b92e96068b`
+...
+2026-10-22 14:43:04.055 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 本人授权按以下内容模拟发送：{"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version"...
+2026-10-22 14:43:04.628 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:04.630 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:05.133 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:05.133 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:05.635 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:05.636 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:05.970 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: send_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef", "task_version": "1", "recipient_id": "coordinator-1", "body": "提交当前会议关联的毛利变化解释、措施和证据", "content_version": "1"})
+2026-10-22 14:43:06.372 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:06.374 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:07.178 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:07.179 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:07.682 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:07.683 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:08.148 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 模拟发送已完成。
+
+## 发送结果
+- task_id：`f51a21e1-6639-49f9-9c19-89deeed6b8ef`
+- 收件人：coordinator-1
+- 消息 ID：`5111243e-1be3-4b7d-bb52-...
+2026-10-22 14:43:08.192 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:08.193 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:08.717 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:08.718 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:08.721 | INFO     | nanobot.agent.loop:_restore_turn:1783 - Processing message from websocket:boss-1: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。
+2026-10-22 14:43:09.276 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:09.277 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:09.881 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:09.884 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:10.385 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:10.386 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:10.621 | INFO     | nanobot.agent.progress_hook:before_execute_tools:145 - Tool call: read_assignment({"task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef"})
+2026-10-22 14:43:10.898 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:10.899 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:11.448 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:11.449 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:11.957 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:11.958 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:12.470 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:12.471 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:13.088 | INFO     | nanobot.agent.loop:_assemble_outbound:1729 - Response to websocket:boss-1: 已重新读取任务 `f51a21e1-6639-49f9-9c19-89deeed6b8ef` 的正式状态。
+
+## 当前正式状态
+- 状态：**WAITING_FEEDBACK**（等待反馈）
+- 版本：2
+- 协调人：coordinato...
+2026-10-22 14:43:13.089 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:13.090 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:13.636 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:13.644 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:14.148 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:14.153 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:14.653 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:14.654 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:15.155 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:15.156 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:15.656 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:15.657 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:16.159 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:16.161 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:16.662 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:16.664 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:17.165 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:17.167 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:17.668 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:17.669 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:18.170 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:18.171 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:18.673 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:18.674 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:19.175 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:19.176 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:19.677 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:19.678 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:20.180 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:20.182 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:20.683 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:20.685 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:21.186 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:21.187 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:21.688 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:21.689 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:22.190 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:22.192 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:22.694 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:22.695 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:23.197 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:23.199 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:23.701 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:23.703 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:24.204 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:24.205 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:24.706 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:24.707 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:25.209 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:25.210 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:25.715 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:25.716 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:26.217 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:26.218 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:26.719 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:26.720 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:27.223 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:27.224 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:27.725 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:27.726 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:28.228 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:28.230 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:28.731 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:28.732 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:29.233 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:29.234 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+{"evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/ui-business-85979739-8b1b-438c-9daa-319a5b26095b", "status": "PASS"}
+2026-10-22 14:43:29.735 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job 'boss-events' (810b08e8)
+2026-10-22 14:43:29.738 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job 'boss-events' completed
+2026-10-22 14:43:29.836 | INFO     | nanobot.agent.loop:stop:1592 - Agent loop stopping
+2026-10-22 14:43:29.837 | INFO     | nanobot.channels.manager:stop_all:670 - Stopping all channels...
+2026-10-22 14:43:29.837 | INFO     | nanobot.channels.manager:_stop_channel_runtime:414 - Stopped websocket channel

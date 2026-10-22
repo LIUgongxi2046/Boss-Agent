@@ -1,0 +1,1267 @@
+prompt_id,name,source_ids,viewport,variant,file,status
+F01,F01 【核心】今日工作,WF-FR-01,desktop,primary,desktop/F01.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S00,states/desktop/F01/S00.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S01,states/desktop/F01/S01.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S02,states/desktop/F01/S02.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S03,states/desktop/F01/S03.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S04,states/desktop/F01/S04.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S05,states/desktop/F01/S05.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S06,states/desktop/F01/S06.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S07,states/desktop/F01/S07.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S08,states/desktop/F01/S08.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S09,states/desktop/F01/S09.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop,S10,states/desktop/F01/S10.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,primary,desktop-compact/F01.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S00,states/desktop-compact/F01/S00.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S01,states/desktop-compact/F01/S01.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S02,states/desktop-compact/F01/S02.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S03,states/desktop-compact/F01/S03.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S04,states/desktop-compact/F01/S04.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S05,states/desktop-compact/F01/S05.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S06,states/desktop-compact/F01/S06.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S07,states/desktop-compact/F01/S07.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S08,states/desktop-compact/F01/S08.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S09,states/desktop-compact/F01/S09.txt,PROMPT_ONLY
+F01,F01 【核心】今日工作,WF-FR-01,desktop-compact,S10,states/desktop-compact/F01/S10.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,primary,desktop/F02.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S00,states/desktop/F02/S00.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S01,states/desktop/F02/S01.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S02,states/desktop/F02/S02.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S03,states/desktop/F02/S03.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S04,states/desktop/F02/S04.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S05,states/desktop/F02/S05.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S06,states/desktop/F02/S06.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S07,states/desktop/F02/S07.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S08,states/desktop/F02/S08.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S09,states/desktop/F02/S09.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop,S10,states/desktop/F02/S10.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,primary,desktop-compact/F02.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S00,states/desktop-compact/F02/S00.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S01,states/desktop-compact/F02/S01.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S02,states/desktop-compact/F02/S02.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S03,states/desktop-compact/F02/S03.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S04,states/desktop-compact/F02/S04.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S05,states/desktop-compact/F02/S05.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S06,states/desktop-compact/F02/S06.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S07,states/desktop-compact/F02/S07.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S08,states/desktop-compact/F02/S08.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S09,states/desktop-compact/F02/S09.txt,PROMPT_ONLY
+F02,F02 经营提醒详情,WF-FR-02,desktop-compact,S10,states/desktop-compact/F02/S10.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,primary,desktop/F03.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S00,states/desktop/F03/S00.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S01,states/desktop/F03/S01.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S02,states/desktop/F03/S02.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S03,states/desktop/F03/S03.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S04,states/desktop/F03/S04.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S05,states/desktop/F03/S05.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S06,states/desktop/F03/S06.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S07,states/desktop/F03/S07.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S08,states/desktop/F03/S08.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S09,states/desktop/F03/S09.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop,S10,states/desktop/F03/S10.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,primary,desktop-compact/F03.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S00,states/desktop-compact/F03/S00.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S01,states/desktop-compact/F03/S01.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S02,states/desktop-compact/F03/S02.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S03,states/desktop-compact/F03/S03.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S04,states/desktop-compact/F03/S04.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S05,states/desktop-compact/F03/S05.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S06,states/desktop-compact/F03/S06.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S07,states/desktop-compact/F03/S07.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S08,states/desktop-compact/F03/S08.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S09,states/desktop-compact/F03/S09.txt,PROMPT_ONLY
+F03,F03 【核心】BI 查询与连续追问,WF-FR-03,desktop-compact,S10,states/desktop-compact/F03/S10.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,primary,desktop/F04.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S00,states/desktop/F04/S00.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S01,states/desktop/F04/S01.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S02,states/desktop/F04/S02.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S03,states/desktop/F04/S03.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S04,states/desktop/F04/S04.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S05,states/desktop/F04/S05.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S06,states/desktop/F04/S06.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S07,states/desktop/F04/S07.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S08,states/desktop/F04/S08.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S09,states/desktop/F04/S09.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop,S10,states/desktop/F04/S10.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,primary,desktop-compact/F04.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S00,states/desktop-compact/F04/S00.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S01,states/desktop-compact/F04/S01.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S02,states/desktop-compact/F04/S02.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S03,states/desktop-compact/F04/S03.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S04,states/desktop-compact/F04/S04.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S05,states/desktop-compact/F04/S05.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S06,states/desktop-compact/F04/S06.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S07,states/desktop-compact/F04/S07.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S08,states/desktop-compact/F04/S08.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S09,states/desktop-compact/F04/S09.txt,PROMPT_ONLY
+F04,F04 【核心】会前准备,WF-FR-04,desktop-compact,S10,states/desktop-compact/F04/S10.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,primary,desktop/F05.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S00,states/desktop/F05/S00.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S01,states/desktop/F05/S01.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S02,states/desktop/F05/S02.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S03,states/desktop/F05/S03.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S04,states/desktop/F05/S04.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S05,states/desktop/F05/S05.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S06,states/desktop/F05/S06.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S07,states/desktop/F05/S07.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S08,states/desktop/F05/S08.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S09,states/desktop/F05/S09.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop,S10,states/desktop/F05/S10.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,primary,desktop-compact/F05.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S00,states/desktop-compact/F05/S00.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S01,states/desktop-compact/F05/S01.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S02,states/desktop-compact/F05/S02.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S03,states/desktop-compact/F05/S03.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S04,states/desktop-compact/F05/S04.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S05,states/desktop-compact/F05/S05.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S06,states/desktop-compact/F05/S06.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S07,states/desktop-compact/F05/S07.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S08,states/desktop-compact/F05/S08.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S09,states/desktop-compact/F05/S09.txt,PROMPT_ONLY
+F05,F05 【核心】会后纪要核查,WF-FR-05,desktop-compact,S10,states/desktop-compact/F05/S10.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,primary,desktop/F06.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S00,states/desktop/F06/S00.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S01,states/desktop/F06/S01.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S02,states/desktop/F06/S02.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S03,states/desktop/F06/S03.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S04,states/desktop/F06/S04.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S05,states/desktop/F06/S05.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S06,states/desktop/F06/S06.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S07,states/desktop/F06/S07.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S08,states/desktop/F06/S08.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S09,states/desktop/F06/S09.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop,S10,states/desktop/F06/S10.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,primary,desktop-compact/F06.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S00,states/desktop-compact/F06/S00.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S01,states/desktop-compact/F06/S01.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S02,states/desktop-compact/F06/S02.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S03,states/desktop-compact/F06/S03.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S04,states/desktop-compact/F06/S04.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S05,states/desktop-compact/F06/S05.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S06,states/desktop-compact/F06/S06.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S07,states/desktop-compact/F06/S07.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S08,states/desktop-compact/F06/S08.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S09,states/desktop-compact/F06/S09.txt,PROMPT_ONLY
+F06,F06 【核心】交办与承诺详情,WF-FR-06,desktop-compact,S10,states/desktop-compact/F06/S10.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,primary,desktop/F07.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S00,states/desktop/F07/S00.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S01,states/desktop/F07/S01.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S02,states/desktop/F07/S02.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S03,states/desktop/F07/S03.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S04,states/desktop/F07/S04.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S05,states/desktop/F07/S05.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S06,states/desktop/F07/S06.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S07,states/desktop/F07/S07.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S08,states/desktop/F07/S08.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S09,states/desktop/F07/S09.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop,S10,states/desktop/F07/S10.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,primary,desktop-compact/F07.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S00,states/desktop-compact/F07/S00.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S01,states/desktop-compact/F07/S01.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S02,states/desktop-compact/F07/S02.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S03,states/desktop-compact/F07/S03.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S04,states/desktop-compact/F07/S04.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S05,states/desktop-compact/F07/S05.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S06,states/desktop-compact/F07/S06.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S07,states/desktop-compact/F07/S07.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S08,states/desktop-compact/F07/S08.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S09,states/desktop-compact/F07/S09.txt,PROMPT_ONLY
+F07,F07 申请审阅与本人决定,WF-FR-07,desktop-compact,S10,states/desktop-compact/F07/S10.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,primary,desktop/F08.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S00,states/desktop/F08/S00.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S01,states/desktop/F08/S01.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S02,states/desktop/F08/S02.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S03,states/desktop/F08/S03.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S04,states/desktop/F08/S04.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S05,states/desktop/F08/S05.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S06,states/desktop/F08/S06.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S07,states/desktop/F08/S07.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S08,states/desktop/F08/S08.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S09,states/desktop/F08/S09.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop,S10,states/desktop/F08/S10.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,primary,desktop-compact/F08.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S00,states/desktop-compact/F08/S00.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S01,states/desktop-compact/F08/S01.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S02,states/desktop-compact/F08/S02.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S03,states/desktop-compact/F08/S03.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S04,states/desktop-compact/F08/S04.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S05,states/desktop-compact/F08/S05.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S06,states/desktop-compact/F08/S06.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S07,states/desktop-compact/F08/S07.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S08,states/desktop-compact/F08/S08.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S09,states/desktop-compact/F08/S09.txt,PROMPT_ONLY
+F08,F08 消息编辑与发件箱,WF-FR-08,desktop-compact,S10,states/desktop-compact/F08/S10.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,primary,desktop/F09.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S00,states/desktop/F09/S00.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S01,states/desktop/F09/S01.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S02,states/desktop/F09/S02.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S03,states/desktop/F09/S03.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S04,states/desktop/F09/S04.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S05,states/desktop/F09/S05.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S06,states/desktop/F09/S06.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S07,states/desktop/F09/S07.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S08,states/desktop/F09/S08.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S09,states/desktop/F09/S09.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop,S10,states/desktop/F09/S10.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,primary,desktop-compact/F09.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S00,states/desktop-compact/F09/S00.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S01,states/desktop-compact/F09/S01.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S02,states/desktop-compact/F09/S02.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S03,states/desktop-compact/F09/S03.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S04,states/desktop-compact/F09/S04.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S05,states/desktop-compact/F09/S05.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S06,states/desktop-compact/F09/S06.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S07,states/desktop-compact/F09/S07.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S08,states/desktop-compact/F09/S08.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S09,states/desktop-compact/F09/S09.txt,PROMPT_ONLY
+F09,F09 专题研究,WF-FR-09,desktop-compact,S10,states/desktop-compact/F09/S10.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,primary,desktop/F10.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S00,states/desktop/F10/S00.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S01,states/desktop/F10/S01.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S02,states/desktop/F10/S02.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S03,states/desktop/F10/S03.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S04,states/desktop/F10/S04.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S05,states/desktop/F10/S05.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S06,states/desktop/F10/S06.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S07,states/desktop/F10/S07.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S08,states/desktop/F10/S08.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S09,states/desktop/F10/S09.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop,S10,states/desktop/F10/S10.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,primary,desktop-compact/F10.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S00,states/desktop-compact/F10/S00.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S01,states/desktop-compact/F10/S01.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S02,states/desktop-compact/F10/S02.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S03,states/desktop-compact/F10/S03.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S04,states/desktop-compact/F10/S04.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S05,states/desktop-compact/F10/S05.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S06,states/desktop-compact/F10/S06.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S07,states/desktop-compact/F10/S07.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S08,states/desktop-compact/F10/S08.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S09,states/desktop-compact/F10/S09.txt,PROMPT_ONLY
+F10,F10 人员会面准备,WF-FR-10,desktop-compact,S10,states/desktop-compact/F10/S10.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,primary,desktop/F11.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S00,states/desktop/F11/S00.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S01,states/desktop/F11/S01.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S02,states/desktop/F11/S02.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S03,states/desktop/F11/S03.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S04,states/desktop/F11/S04.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S05,states/desktop/F11/S05.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S06,states/desktop/F11/S06.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S07,states/desktop/F11/S07.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S08,states/desktop/F11/S08.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S09,states/desktop/F11/S09.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop,S10,states/desktop/F11/S10.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,primary,desktop-compact/F11.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S00,states/desktop-compact/F11/S00.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S01,states/desktop-compact/F11/S01.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S02,states/desktop-compact/F11/S02.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S03,states/desktop-compact/F11/S03.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S04,states/desktop-compact/F11/S04.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S05,states/desktop-compact/F11/S05.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S06,states/desktop-compact/F11/S06.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S07,states/desktop-compact/F11/S07.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S08,states/desktop-compact/F11/S08.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S09,states/desktop-compact/F11/S09.txt,PROMPT_ONLY
+F11,F11 行程与接待安排,WF-FR-11,desktop-compact,S10,states/desktop-compact/F11/S10.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,primary,desktop/F12.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S00,states/desktop/F12/S00.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S01,states/desktop/F12/S01.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S02,states/desktop/F12/S02.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S03,states/desktop/F12/S03.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S04,states/desktop/F12/S04.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S05,states/desktop/F12/S05.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S06,states/desktop/F12/S06.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S07,states/desktop/F12/S07.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S08,states/desktop/F12/S08.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S09,states/desktop/F12/S09.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop,S10,states/desktop/F12/S10.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,primary,desktop-compact/F12.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S00,states/desktop-compact/F12/S00.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S01,states/desktop-compact/F12/S01.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S02,states/desktop-compact/F12/S02.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S03,states/desktop-compact/F12/S03.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S04,states/desktop-compact/F12/S04.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S05,states/desktop-compact/F12/S05.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S06,states/desktop-compact/F12/S06.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S07,states/desktop-compact/F12/S07.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S08,states/desktop-compact/F12/S08.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S09,states/desktop-compact/F12/S09.txt,PROMPT_ONLY
+F12,F12 私人安排与分享范围,WF-FR-12,desktop-compact,S10,states/desktop-compact/F12/S10.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,primary,desktop/F13.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S00,states/desktop/F13/S00.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S01,states/desktop/F13/S01.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S02,states/desktop/F13/S02.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S03,states/desktop/F13/S03.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S04,states/desktop/F13/S04.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S05,states/desktop/F13/S05.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S06,states/desktop/F13/S06.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S07,states/desktop/F13/S07.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S08,states/desktop/F13/S08.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S09,states/desktop/F13/S09.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop,S10,states/desktop/F13/S10.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,primary,desktop-compact/F13.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S00,states/desktop-compact/F13/S00.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S01,states/desktop-compact/F13/S01.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S02,states/desktop-compact/F13/S02.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S03,states/desktop-compact/F13/S03.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S04,states/desktop-compact/F13/S04.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S05,states/desktop-compact/F13/S05.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S06,states/desktop-compact/F13/S06.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S07,states/desktop-compact/F13/S07.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S08,states/desktop-compact/F13/S08.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S09,states/desktop-compact/F13/S09.txt,PROMPT_ONLY
+F13,F13 个人记忆与长期决定,WF-FR-13,desktop-compact,S10,states/desktop-compact/F13/S10.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,primary,desktop/F14.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S00,states/desktop/F14/S00.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S01,states/desktop/F14/S01.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S02,states/desktop/F14/S02.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S03,states/desktop/F14/S03.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S04,states/desktop/F14/S04.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S05,states/desktop/F14/S05.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S06,states/desktop/F14/S06.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S07,states/desktop/F14/S07.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S08,states/desktop/F14/S08.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S09,states/desktop/F14/S09.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop,S10,states/desktop/F14/S10.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,primary,desktop-compact/F14.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S00,states/desktop-compact/F14/S00.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S01,states/desktop-compact/F14/S01.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S02,states/desktop-compact/F14/S02.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S03,states/desktop-compact/F14/S03.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S04,states/desktop-compact/F14/S04.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S05,states/desktop-compact/F14/S05.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S06,states/desktop-compact/F14/S06.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S07,states/desktop-compact/F14/S07.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S08,states/desktop-compact/F14/S08.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S09,states/desktop-compact/F14/S09.txt,PROMPT_ONLY
+F14,F14 原料与饲料专题,WF-FR-14,desktop-compact,S10,states/desktop-compact/F14/S10.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,primary,desktop/F15.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S00,states/desktop/F15/S00.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S01,states/desktop/F15/S01.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S02,states/desktop/F15/S02.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S03,states/desktop/F15/S03.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S04,states/desktop/F15/S04.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S05,states/desktop/F15/S05.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S06,states/desktop/F15/S06.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S07,states/desktop/F15/S07.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S08,states/desktop/F15/S08.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S09,states/desktop/F15/S09.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop,S10,states/desktop/F15/S10.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,primary,desktop-compact/F15.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S00,states/desktop-compact/F15/S00.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S01,states/desktop-compact/F15/S01.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S02,states/desktop-compact/F15/S02.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S03,states/desktop-compact/F15/S03.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S04,states/desktop-compact/F15/S04.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S05,states/desktop-compact/F15/S05.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S06,states/desktop-compact/F15/S06.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S07,states/desktop-compact/F15/S07.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S08,states/desktop-compact/F15/S08.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S09,states/desktop-compact/F15/S09.txt,PROMPT_ONLY
+F15,F15 水产季节专题,WF-FR-15,desktop-compact,S10,states/desktop-compact/F15/S10.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,primary,desktop/F16.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S00,states/desktop/F16/S00.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S01,states/desktop/F16/S01.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S02,states/desktop/F16/S02.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S03,states/desktop/F16/S03.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S04,states/desktop/F16/S04.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S05,states/desktop/F16/S05.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S06,states/desktop/F16/S06.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S07,states/desktop/F16/S07.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S08,states/desktop/F16/S08.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S09,states/desktop/F16/S09.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop,S10,states/desktop/F16/S10.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,primary,desktop-compact/F16.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S00,states/desktop-compact/F16/S00.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S01,states/desktop-compact/F16/S01.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S02,states/desktop-compact/F16/S02.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S03,states/desktop-compact/F16/S03.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S04,states/desktop-compact/F16/S04.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S05,states/desktop-compact/F16/S05.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S06,states/desktop-compact/F16/S06.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S07,states/desktop-compact/F16/S07.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S08,states/desktop-compact/F16/S08.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S09,states/desktop-compact/F16/S09.txt,PROMPT_ONLY
+F16,F16 苗种批次专题,WF-FR-16,desktop-compact,S10,states/desktop-compact/F16/S10.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,primary,desktop/F17.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S00,states/desktop/F17/S00.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S01,states/desktop/F17/S01.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S02,states/desktop/F17/S02.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S03,states/desktop/F17/S03.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S04,states/desktop/F17/S04.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S05,states/desktop/F17/S05.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S06,states/desktop/F17/S06.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S07,states/desktop/F17/S07.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S08,states/desktop/F17/S08.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S09,states/desktop/F17/S09.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop,S10,states/desktop/F17/S10.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,primary,desktop-compact/F17.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S00,states/desktop-compact/F17/S00.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S01,states/desktop-compact/F17/S01.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S02,states/desktop-compact/F17/S02.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S03,states/desktop-compact/F17/S03.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S04,states/desktop-compact/F17/S04.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S05,states/desktop-compact/F17/S05.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S06,states/desktop-compact/F17/S06.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S07,states/desktop-compact/F17/S07.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S08,states/desktop-compact/F17/S08.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S09,states/desktop-compact/F17/S09.txt,PROMPT_ONLY
+F17,F17 动保与技服专题,WF-FR-17,desktop-compact,S10,states/desktop-compact/F17/S10.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,primary,desktop/F18.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S00,states/desktop/F18/S00.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S01,states/desktop/F18/S01.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S02,states/desktop/F18/S02.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S03,states/desktop/F18/S03.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S04,states/desktop/F18/S04.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S05,states/desktop/F18/S05.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S06,states/desktop/F18/S06.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S07,states/desktop/F18/S07.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S08,states/desktop/F18/S08.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S09,states/desktop/F18/S09.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop,S10,states/desktop/F18/S10.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,primary,desktop-compact/F18.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S00,states/desktop-compact/F18/S00.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S01,states/desktop-compact/F18/S01.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S02,states/desktop-compact/F18/S02.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S03,states/desktop-compact/F18/S03.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S04,states/desktop-compact/F18/S04.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S05,states/desktop-compact/F18/S05.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S06,states/desktop-compact/F18/S06.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S07,states/desktop-compact/F18/S07.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S08,states/desktop-compact/F18/S08.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S09,states/desktop-compact/F18/S09.txt,PROMPT_ONLY
+F18,F18 生猪合作专题,WF-FR-18,desktop-compact,S10,states/desktop-compact/F18/S10.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,primary,desktop/F19.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S00,states/desktop/F19/S00.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S01,states/desktop/F19/S01.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S02,states/desktop/F19/S02.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S03,states/desktop/F19/S03.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S04,states/desktop/F19/S04.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S05,states/desktop/F19/S05.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S06,states/desktop/F19/S06.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S07,states/desktop/F19/S07.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S08,states/desktop/F19/S08.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S09,states/desktop/F19/S09.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop,S10,states/desktop/F19/S10.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,primary,desktop-compact/F19.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S00,states/desktop-compact/F19/S00.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S01,states/desktop-compact/F19/S01.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S02,states/desktop-compact/F19/S02.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S03,states/desktop-compact/F19/S03.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S04,states/desktop-compact/F19/S04.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S05,states/desktop-compact/F19/S05.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S06,states/desktop-compact/F19/S06.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S07,states/desktop-compact/F19/S07.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S08,states/desktop-compact/F19/S08.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S09,states/desktop-compact/F19/S09.txt,PROMPT_ONLY
+F19,F19 禽类与反刍：肉禽,WF-FR-19,desktop-compact,S10,states/desktop-compact/F19/S10.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,primary,desktop/F20.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S00,states/desktop/F20/S00.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S01,states/desktop/F20/S01.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S02,states/desktop/F20/S02.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S03,states/desktop/F20/S03.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S04,states/desktop/F20/S04.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S05,states/desktop/F20/S05.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S06,states/desktop/F20/S06.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S07,states/desktop/F20/S07.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S08,states/desktop/F20/S08.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S09,states/desktop/F20/S09.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop,S10,states/desktop/F20/S10.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,primary,desktop-compact/F20.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S00,states/desktop-compact/F20/S00.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S01,states/desktop-compact/F20/S01.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S02,states/desktop-compact/F20/S02.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S03,states/desktop-compact/F20/S03.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S04,states/desktop-compact/F20/S04.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S05,states/desktop-compact/F20/S05.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S06,states/desktop-compact/F20/S06.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S07,states/desktop-compact/F20/S07.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S08,states/desktop-compact/F20/S08.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S09,states/desktop-compact/F20/S09.txt,PROMPT_ONLY
+F20,F20 公司水产养殖专题,WF-FR-20,desktop-compact,S10,states/desktop-compact/F20/S10.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,primary,desktop/F21.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S00,states/desktop/F21/S00.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S01,states/desktop/F21/S01.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S02,states/desktop/F21/S02.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S03,states/desktop/F21/S03.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S04,states/desktop/F21/S04.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S05,states/desktop/F21/S05.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S06,states/desktop/F21/S06.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S07,states/desktop/F21/S07.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S08,states/desktop/F21/S08.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S09,states/desktop/F21/S09.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop,S10,states/desktop/F21/S10.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,primary,desktop-compact/F21.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S00,states/desktop-compact/F21/S00.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S01,states/desktop-compact/F21/S01.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S02,states/desktop-compact/F21/S02.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S03,states/desktop-compact/F21/S03.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S04,states/desktop-compact/F21/S04.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S05,states/desktop-compact/F21/S05.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S06,states/desktop-compact/F21/S06.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S07,states/desktop-compact/F21/S07.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S08,states/desktop-compact/F21/S08.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S09,states/desktop-compact/F21/S09.txt,PROMPT_ONLY
+F21,F21 食品与品质专题,WF-FR-21,desktop-compact,S10,states/desktop-compact/F21/S10.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,primary,desktop/F22.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S00,states/desktop/F22/S00.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S01,states/desktop/F22/S01.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S02,states/desktop/F22/S02.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S03,states/desktop/F22/S03.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S04,states/desktop/F22/S04.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S05,states/desktop/F22/S05.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S06,states/desktop/F22/S06.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S07,states/desktop/F22/S07.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S08,states/desktop/F22/S08.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S09,states/desktop/F22/S09.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop,S10,states/desktop/F22/S10.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,primary,desktop-compact/F22.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S00,states/desktop-compact/F22/S00.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S01,states/desktop-compact/F22/S01.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S02,states/desktop-compact/F22/S02.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S03,states/desktop-compact/F22/S03.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S04,states/desktop-compact/F22/S04.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S05,states/desktop-compact/F22/S05.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S06,states/desktop-compact/F22/S06.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S07,states/desktop-compact/F22/S07.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S08,states/desktop-compact/F22/S08.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S09,states/desktop-compact/F22/S09.txt,PROMPT_ONLY
+F22,F22 海外业务专题,WF-FR-22,desktop-compact,S10,states/desktop-compact/F22/S10.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,primary,desktop/F23.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S00,states/desktop/F23/S00.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S01,states/desktop/F23/S01.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S02,states/desktop/F23/S02.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S03,states/desktop/F23/S03.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S04,states/desktop/F23/S04.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S05,states/desktop/F23/S05.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S06,states/desktop/F23/S06.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S07,states/desktop/F23/S07.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S08,states/desktop/F23/S08.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S09,states/desktop/F23/S09.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop,S10,states/desktop/F23/S10.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,primary,desktop-compact/F23.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S00,states/desktop-compact/F23/S00.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S01,states/desktop-compact/F23/S01.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S02,states/desktop-compact/F23/S02.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S03,states/desktop-compact/F23/S03.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S04,states/desktop-compact/F23/S04.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S05,states/desktop-compact/F23/S05.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S06,states/desktop-compact/F23/S06.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S07,states/desktop-compact/F23/S07.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S08,states/desktop-compact/F23/S08.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S09,states/desktop-compact/F23/S09.txt,PROMPT_ONLY
+F23,F23 研发应用专题,WF-FR-23,desktop-compact,S10,states/desktop-compact/F23/S10.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,primary,desktop/F24.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S00,states/desktop/F24/S00.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S01,states/desktop/F24/S01.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S02,states/desktop/F24/S02.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S03,states/desktop/F24/S03.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S04,states/desktop/F24/S04.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S05,states/desktop/F24/S05.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S06,states/desktop/F24/S06.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S07,states/desktop/F24/S07.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S08,states/desktop/F24/S08.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S09,states/desktop/F24/S09.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop,S10,states/desktop/F24/S10.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,primary,desktop-compact/F24.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S00,states/desktop-compact/F24/S00.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S01,states/desktop-compact/F24/S01.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S02,states/desktop-compact/F24/S02.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S03,states/desktop-compact/F24/S03.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S04,states/desktop-compact/F24/S04.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S05,states/desktop-compact/F24/S05.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S06,states/desktop-compact/F24/S06.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S07,states/desktop-compact/F24/S07.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S08,states/desktop-compact/F24/S08.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S09,states/desktop-compact/F24/S09.txt,PROMPT_ONLY
+F24,F24 实际运行详情,WF-FR-24,desktop-compact,S10,states/desktop-compact/F24/S10.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,primary,desktop/F25.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S00,states/desktop/F25/S00.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S01,states/desktop/F25/S01.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S02,states/desktop/F25/S02.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S03,states/desktop/F25/S03.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S04,states/desktop/F25/S04.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S05,states/desktop/F25/S05.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S06,states/desktop/F25/S06.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S07,states/desktop/F25/S07.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S08,states/desktop/F25/S08.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S09,states/desktop/F25/S09.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop,S10,states/desktop/F25/S10.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,primary,desktop-compact/F25.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S00,states/desktop-compact/F25/S00.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S01,states/desktop-compact/F25/S01.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S02,states/desktop-compact/F25/S02.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S03,states/desktop-compact/F25/S03.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S04,states/desktop-compact/F25/S04.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S05,states/desktop-compact/F25/S05.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S06,states/desktop-compact/F25/S06.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S07,states/desktop-compact/F25/S07.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S08,states/desktop-compact/F25/S08.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S09,states/desktop-compact/F25/S09.txt,PROMPT_ONLY
+F25,F25 【核心】模拟中心总览,WF-FR-25,desktop-compact,S10,states/desktop-compact/F25/S10.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,primary,desktop/F26.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S00,states/desktop/F26/S00.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S01,states/desktop/F26/S01.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S02,states/desktop/F26/S02.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S03,states/desktop/F26/S03.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S04,states/desktop/F26/S04.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S05,states/desktop/F26/S05.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S06,states/desktop/F26/S06.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S07,states/desktop/F26/S07.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S08,states/desktop/F26/S08.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S09,states/desktop/F26/S09.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop,S10,states/desktop/F26/S10.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,primary,desktop-compact/F26.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S00,states/desktop-compact/F26/S00.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S01,states/desktop-compact/F26/S01.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S02,states/desktop-compact/F26/S02.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S03,states/desktop-compact/F26/S03.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S04,states/desktop-compact/F26/S04.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S05,states/desktop-compact/F26/S05.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S06,states/desktop-compact/F26/S06.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S07,states/desktop-compact/F26/S07.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S08,states/desktop-compact/F26/S08.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S09,states/desktop-compact/F26/S09.txt,PROMPT_ONLY
+F26,F26 应用入口与身份导航,WF-FR-26,desktop-compact,S10,states/desktop-compact/F26/S10.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,primary,desktop/F27.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S00,states/desktop/F27/S00.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S01,states/desktop/F27/S01.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S02,states/desktop/F27/S02.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S03,states/desktop/F27/S03.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S04,states/desktop/F27/S04.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S05,states/desktop/F27/S05.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S06,states/desktop/F27/S06.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S07,states/desktop/F27/S07.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S08,states/desktop/F27/S08.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S09,states/desktop/F27/S09.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop,S10,states/desktop/F27/S10.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,primary,desktop-compact/F27.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S00,states/desktop-compact/F27/S00.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S01,states/desktop-compact/F27/S01.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S02,states/desktop-compact/F27/S02.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S03,states/desktop-compact/F27/S03.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S04,states/desktop-compact/F27/S04.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S05,states/desktop-compact/F27/S05.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S06,states/desktop-compact/F27/S06.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S07,states/desktop-compact/F27/S07.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S08,states/desktop-compact/F27/S08.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S09,states/desktop-compact/F27/S09.txt,PROMPT_ONLY
+F27,F27 【核心】语音输入与文本核查,WF-FR-27,desktop-compact,S10,states/desktop-compact/F27/S10.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,primary,desktop/F28.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S00,states/desktop/F28/S00.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S01,states/desktop/F28/S01.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S02,states/desktop/F28/S02.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S03,states/desktop/F28/S03.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S04,states/desktop/F28/S04.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S05,states/desktop/F28/S05.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S06,states/desktop/F28/S06.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S07,states/desktop/F28/S07.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S08,states/desktop/F28/S08.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S09,states/desktop/F28/S09.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop,S10,states/desktop/F28/S10.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,primary,desktop-compact/F28.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S00,states/desktop-compact/F28/S00.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S01,states/desktop-compact/F28/S01.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S02,states/desktop-compact/F28/S02.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S03,states/desktop-compact/F28/S03.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S04,states/desktop-compact/F28/S04.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S05,states/desktop-compact/F28/S05.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S06,states/desktop-compact/F28/S06.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S07,states/desktop-compact/F28/S07.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S08,states/desktop-compact/F28/S08.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S09,states/desktop-compact/F28/S09.txt,PROMPT_ONLY
+F28,F28 动作授权详情,WF-FR-28,desktop-compact,S10,states/desktop-compact/F28/S10.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,primary,desktop/F29.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S00,states/desktop/F29/S00.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S01,states/desktop/F29/S01.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S02,states/desktop/F29/S02.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S03,states/desktop/F29/S03.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S04,states/desktop/F29/S04.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S05,states/desktop/F29/S05.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S06,states/desktop/F29/S06.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S07,states/desktop/F29/S07.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S08,states/desktop/F29/S08.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S09,states/desktop/F29/S09.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop,S10,states/desktop/F29/S10.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,primary,desktop-compact/F29.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S00,states/desktop-compact/F29/S00.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S01,states/desktop-compact/F29/S01.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S02,states/desktop-compact/F29/S02.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S03,states/desktop-compact/F29/S03.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S04,states/desktop-compact/F29/S04.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S05,states/desktop-compact/F29/S05.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S06,states/desktop-compact/F29/S06.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S07,states/desktop-compact/F29/S07.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S08,states/desktop-compact/F29/S08.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S09,states/desktop-compact/F29/S09.txt,PROMPT_ONLY
+F29,F29 异常与结果核查,WF-FR-29,desktop-compact,S10,states/desktop-compact/F29/S10.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,primary,desktop/F30.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S00,states/desktop/F30/S00.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S01,states/desktop/F30/S01.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S02,states/desktop/F30/S02.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S03,states/desktop/F30/S03.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S04,states/desktop/F30/S04.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S05,states/desktop/F30/S05.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S06,states/desktop/F30/S06.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S07,states/desktop/F30/S07.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S08,states/desktop/F30/S08.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S09,states/desktop/F30/S09.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop,S10,states/desktop/F30/S10.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,primary,desktop-compact/F30.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S00,states/desktop-compact/F30/S00.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S01,states/desktop-compact/F30/S01.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S02,states/desktop-compact/F30/S02.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S03,states/desktop-compact/F30/S03.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S04,states/desktop-compact/F30/S04.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S05,states/desktop-compact/F30/S05.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S06,states/desktop-compact/F30/S06.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S07,states/desktop-compact/F30/S07.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S08,states/desktop-compact/F30/S08.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S09,states/desktop-compact/F30/S09.txt,PROMPT_ONLY
+F30,F30 运行与费用详情,WF-FR-30,desktop-compact,S10,states/desktop-compact/F30/S10.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,primary,desktop/F31.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S00,states/desktop/F31/S00.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S01,states/desktop/F31/S01.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S02,states/desktop/F31/S02.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S03,states/desktop/F31/S03.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S04,states/desktop/F31/S04.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S05,states/desktop/F31/S05.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S06,states/desktop/F31/S06.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S07,states/desktop/F31/S07.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S08,states/desktop/F31/S08.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S09,states/desktop/F31/S09.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop,S10,states/desktop/F31/S10.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,primary,desktop-compact/F31.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S00,states/desktop-compact/F31/S00.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S01,states/desktop-compact/F31/S01.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S02,states/desktop-compact/F31/S02.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S03,states/desktop-compact/F31/S03.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S04,states/desktop-compact/F31/S04.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S05,states/desktop-compact/F31/S05.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S06,states/desktop-compact/F31/S06.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S07,states/desktop-compact/F31/S07.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S08,states/desktop-compact/F31/S08.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S09,states/desktop-compact/F31/S09.txt,PROMPT_ONLY
+F31,F31 独立评测,WF-FR-31,desktop-compact,S10,states/desktop-compact/F31/S10.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,primary,desktop/F32.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S00,states/desktop/F32/S00.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S01,states/desktop/F32/S01.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S02,states/desktop/F32/S02.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S03,states/desktop/F32/S03.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S04,states/desktop/F32/S04.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S05,states/desktop/F32/S05.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S06,states/desktop/F32/S06.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S07,states/desktop/F32/S07.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S08,states/desktop/F32/S08.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S09,states/desktop/F32/S09.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop,S10,states/desktop/F32/S10.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,primary,desktop-compact/F32.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S00,states/desktop-compact/F32/S00.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S01,states/desktop-compact/F32/S01.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S02,states/desktop-compact/F32/S02.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S03,states/desktop-compact/F32/S03.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S04,states/desktop-compact/F32/S04.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S05,states/desktop-compact/F32/S05.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S06,states/desktop-compact/F32/S06.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S07,states/desktop-compact/F32/S07.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S08,states/desktop-compact/F32/S08.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S09,states/desktop-compact/F32/S09.txt,PROMPT_ONLY
+F32,F32 本地运行与交接,WF-FR-32,desktop-compact,S10,states/desktop-compact/F32/S10.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,primary,desktop/A01.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S00,states/desktop/A01/S00.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S01,states/desktop/A01/S01.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S02,states/desktop/A01/S02.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S03,states/desktop/A01/S03.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S04,states/desktop/A01/S04.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S05,states/desktop/A01/S05.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S06,states/desktop/A01/S06.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S07,states/desktop/A01/S07.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S08,states/desktop/A01/S08.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S09,states/desktop/A01/S09.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop,S10,states/desktop/A01/S10.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,primary,desktop-compact/A01.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S00,states/desktop-compact/A01/S00.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S01,states/desktop-compact/A01/S01.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S02,states/desktop-compact/A01/S02.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S03,states/desktop-compact/A01/S03.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S04,states/desktop-compact/A01/S04.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S05,states/desktop-compact/A01/S05.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S06,states/desktop-compact/A01/S06.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S07,states/desktop-compact/A01/S07.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S08,states/desktop-compact/A01/S08.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S09,states/desktop-compact/A01/S09.txt,PROMPT_ONLY
+A01,A01 档案与访问配置,WF-AD01,desktop-compact,S10,states/desktop-compact/A01/S10.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,primary,desktop/A02.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S00,states/desktop/A02/S00.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S01,states/desktop/A02/S01.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S02,states/desktop/A02/S02.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S03,states/desktop/A02/S03.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S04,states/desktop/A02/S04.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S05,states/desktop/A02/S05.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S06,states/desktop/A02/S06.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S07,states/desktop/A02/S07.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S08,states/desktop/A02/S08.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S09,states/desktop/A02/S09.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop,S10,states/desktop/A02/S10.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,primary,desktop-compact/A02.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S00,states/desktop-compact/A02/S00.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S01,states/desktop-compact/A02/S01.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S02,states/desktop-compact/A02/S02.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S03,states/desktop-compact/A02/S03.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S04,states/desktop-compact/A02/S04.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S05,states/desktop-compact/A02/S05.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S06,states/desktop-compact/A02/S06.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S07,states/desktop-compact/A02/S07.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S08,states/desktop-compact/A02/S08.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S09,states/desktop-compact/A02/S09.txt,PROMPT_ONLY
+A02,A02 模拟接口目录与调用,WF-AD02,desktop-compact,S10,states/desktop-compact/A02/S10.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,primary,desktop/A03.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S00,states/desktop/A03/S00.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S01,states/desktop/A03/S01.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S02,states/desktop/A03/S02.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S03,states/desktop/A03/S03.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S04,states/desktop/A03/S04.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S05,states/desktop/A03/S05.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S06,states/desktop/A03/S06.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S07,states/desktop/A03/S07.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S08,states/desktop/A03/S08.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S09,states/desktop/A03/S09.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop,S10,states/desktop/A03/S10.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,primary,desktop-compact/A03.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S00,states/desktop-compact/A03/S00.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S01,states/desktop-compact/A03/S01.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S02,states/desktop-compact/A03/S02.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S03,states/desktop-compact/A03/S03.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S04,states/desktop-compact/A03/S04.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S05,states/desktop-compact/A03/S05.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S06,states/desktop-compact/A03/S06.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S07,states/desktop-compact/A03/S07.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S08,states/desktop-compact/A03/S08.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S09,states/desktop-compact/A03/S09.txt,PROMPT_ONLY
+A03,A03 模拟数据集,WF-AD03,desktop-compact,S10,states/desktop-compact/A03/S10.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,primary,desktop/A04.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S00,states/desktop/A04/S00.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S01,states/desktop/A04/S01.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S02,states/desktop/A04/S02.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S03,states/desktop/A04/S03.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S04,states/desktop/A04/S04.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S05,states/desktop/A04/S05.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S06,states/desktop/A04/S06.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S07,states/desktop/A04/S07.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S08,states/desktop/A04/S08.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S09,states/desktop/A04/S09.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop,S10,states/desktop/A04/S10.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,primary,desktop-compact/A04.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S00,states/desktop-compact/A04/S00.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S01,states/desktop-compact/A04/S01.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S02,states/desktop-compact/A04/S02.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S03,states/desktop-compact/A04/S03.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S04,states/desktop-compact/A04/S04.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S05,states/desktop-compact/A04/S05.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S06,states/desktop-compact/A04/S06.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S07,states/desktop-compact/A04/S07.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S08,states/desktop-compact/A04/S08.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S09,states/desktop-compact/A04/S09.txt,PROMPT_ONLY
+A04,A04 场景与事件,WF-AD04,desktop-compact,S10,states/desktop-compact/A04/S10.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,primary,desktop/A05.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S00,states/desktop/A05/S00.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S01,states/desktop/A05/S01.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S02,states/desktop/A05/S02.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S03,states/desktop/A05/S03.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S04,states/desktop/A05/S04.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S05,states/desktop/A05/S05.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S06,states/desktop/A05/S06.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S07,states/desktop/A05/S07.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S08,states/desktop/A05/S08.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S09,states/desktop/A05/S09.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop,S10,states/desktop/A05/S10.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,primary,desktop-compact/A05.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S00,states/desktop-compact/A05/S00.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S01,states/desktop-compact/A05/S01.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S02,states/desktop-compact/A05/S02.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S03,states/desktop-compact/A05/S03.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S04,states/desktop-compact/A05/S04.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S05,states/desktop-compact/A05/S05.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S06,states/desktop-compact/A05/S06.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S07,states/desktop-compact/A05/S07.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S08,states/desktop-compact/A05/S08.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S09,states/desktop-compact/A05/S09.txt,PROMPT_ONLY
+A05,A05 【核心】Prompt 版本,WF-AD05,desktop-compact,S10,states/desktop-compact/A05/S10.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,primary,desktop/A06.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S00,states/desktop/A06/S00.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S01,states/desktop/A06/S01.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S02,states/desktop/A06/S02.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S03,states/desktop/A06/S03.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S04,states/desktop/A06/S04.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S05,states/desktop/A06/S05.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S06,states/desktop/A06/S06.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S07,states/desktop/A06/S07.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S08,states/desktop/A06/S08.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S09,states/desktop/A06/S09.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop,S10,states/desktop/A06/S10.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,primary,desktop-compact/A06.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S00,states/desktop-compact/A06/S00.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S01,states/desktop-compact/A06/S01.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S02,states/desktop-compact/A06/S02.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S03,states/desktop-compact/A06/S03.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S04,states/desktop-compact/A06/S04.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S05,states/desktop-compact/A06/S05.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S06,states/desktop-compact/A06/S06.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S07,states/desktop-compact/A06/S07.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S08,states/desktop-compact/A06/S08.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S09,states/desktop-compact/A06/S09.txt,PROMPT_ONLY
+A06,A06 SOP 与 Skills,WF-AD06,desktop-compact,S10,states/desktop-compact/A06/S10.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,primary,desktop/A07.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S00,states/desktop/A07/S00.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S01,states/desktop/A07/S01.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S02,states/desktop/A07/S02.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S03,states/desktop/A07/S03.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S04,states/desktop/A07/S04.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S05,states/desktop/A07/S05.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S06,states/desktop/A07/S06.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S07,states/desktop/A07/S07.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S08,states/desktop/A07/S08.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S09,states/desktop/A07/S09.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop,S10,states/desktop/A07/S10.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,primary,desktop-compact/A07.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S00,states/desktop-compact/A07/S00.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S01,states/desktop-compact/A07/S01.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S02,states/desktop-compact/A07/S02.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S03,states/desktop-compact/A07/S03.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S04,states/desktop-compact/A07/S04.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S05,states/desktop-compact/A07/S05.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S06,states/desktop-compact/A07/S06.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S07,states/desktop-compact/A07/S07.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S08,states/desktop-compact/A07/S08.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S09,states/desktop-compact/A07/S09.txt,PROMPT_ONLY
+A07,A07 Knowledge Base,WF-AD07,desktop-compact,S10,states/desktop-compact/A07/S10.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,primary,desktop/A08.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S00,states/desktop/A08/S00.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S01,states/desktop/A08/S01.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S02,states/desktop/A08/S02.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S03,states/desktop/A08/S03.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S04,states/desktop/A08/S04.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S05,states/desktop/A08/S05.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S06,states/desktop/A08/S06.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S07,states/desktop/A08/S07.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S08,states/desktop/A08/S08.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S09,states/desktop/A08/S09.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop,S10,states/desktop/A08/S10.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,primary,desktop-compact/A08.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S00,states/desktop-compact/A08/S00.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S01,states/desktop-compact/A08/S01.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S02,states/desktop-compact/A08/S02.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S03,states/desktop-compact/A08/S03.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S04,states/desktop-compact/A08/S04.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S05,states/desktop-compact/A08/S05.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S06,states/desktop-compact/A08/S06.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S07,states/desktop-compact/A08/S07.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S08,states/desktop-compact/A08/S08.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S09,states/desktop-compact/A08/S09.txt,PROMPT_ONLY
+A08,A08 【核心】模型与 Provider,WF-AD08,desktop-compact,S10,states/desktop-compact/A08/S10.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,primary,desktop/A09.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S00,states/desktop/A09/S00.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S01,states/desktop/A09/S01.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S02,states/desktop/A09/S02.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S03,states/desktop/A09/S03.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S04,states/desktop/A09/S04.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S05,states/desktop/A09/S05.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S06,states/desktop/A09/S06.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S07,states/desktop/A09/S07.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S08,states/desktop/A09/S08.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S09,states/desktop/A09/S09.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop,S10,states/desktop/A09/S10.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,primary,desktop-compact/A09.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S00,states/desktop-compact/A09/S00.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S01,states/desktop-compact/A09/S01.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S02,states/desktop-compact/A09/S02.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S03,states/desktop-compact/A09/S03.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S04,states/desktop-compact/A09/S04.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S05,states/desktop-compact/A09/S05.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S06,states/desktop-compact/A09/S06.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S07,states/desktop-compact/A09/S07.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S08,states/desktop-compact/A09/S08.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S09,states/desktop-compact/A09/S09.txt,PROMPT_ONLY
+A09,A09 【核心】Tools 与连接,WF-AD09,desktop-compact,S10,states/desktop-compact/A09/S10.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,primary,desktop/A10.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S00,states/desktop/A10/S00.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S01,states/desktop/A10/S01.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S02,states/desktop/A10/S02.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S03,states/desktop/A10/S03.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S04,states/desktop/A10/S04.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S05,states/desktop/A10/S05.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S06,states/desktop/A10/S06.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S07,states/desktop/A10/S07.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S08,states/desktop/A10/S08.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S09,states/desktop/A10/S09.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop,S10,states/desktop/A10/S10.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,primary,desktop-compact/A10.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S00,states/desktop-compact/A10/S00.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S01,states/desktop-compact/A10/S01.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S02,states/desktop-compact/A10/S02.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S03,states/desktop-compact/A10/S03.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S04,states/desktop-compact/A10/S04.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S05,states/desktop-compact/A10/S05.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S06,states/desktop-compact/A10/S06.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S07,states/desktop-compact/A10/S07.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S08,states/desktop-compact/A10/S08.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S09,states/desktop-compact/A10/S09.txt,PROMPT_ONLY
+A10,A10 指标与提醒规则,WF-AD10,desktop-compact,S10,states/desktop-compact/A10/S10.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,primary,desktop/A11.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S00,states/desktop/A11/S00.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S01,states/desktop/A11/S01.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S02,states/desktop/A11/S02.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S03,states/desktop/A11/S03.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S04,states/desktop/A11/S04.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S05,states/desktop/A11/S05.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S06,states/desktop/A11/S06.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S07,states/desktop/A11/S07.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S08,states/desktop/A11/S08.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S09,states/desktop/A11/S09.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop,S10,states/desktop/A11/S10.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,primary,desktop-compact/A11.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S00,states/desktop-compact/A11/S00.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S01,states/desktop-compact/A11/S01.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S02,states/desktop-compact/A11/S02.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S03,states/desktop-compact/A11/S03.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S04,states/desktop-compact/A11/S04.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S05,states/desktop-compact/A11/S05.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S06,states/desktop-compact/A11/S06.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S07,states/desktop-compact/A11/S07.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S08,states/desktop-compact/A11/S08.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S09,states/desktop-compact/A11/S09.txt,PROMPT_ONLY
+A11,A11 会议、联系人和事项资料,WF-AD11,desktop-compact,S10,states/desktop-compact/A11/S10.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,primary,desktop/A12.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S00,states/desktop/A12/S00.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S01,states/desktop/A12/S01.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S02,states/desktop/A12/S02.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S03,states/desktop/A12/S03.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S04,states/desktop/A12/S04.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S05,states/desktop/A12/S05.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S06,states/desktop/A12/S06.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S07,states/desktop/A12/S07.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S08,states/desktop/A12/S08.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S09,states/desktop/A12/S09.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop,S10,states/desktop/A12/S10.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,primary,desktop-compact/A12.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S00,states/desktop-compact/A12/S00.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S01,states/desktop-compact/A12/S01.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S02,states/desktop-compact/A12/S02.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S03,states/desktop-compact/A12/S03.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S04,states/desktop-compact/A12/S04.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S05,states/desktop-compact/A12/S05.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S06,states/desktop-compact/A12/S06.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S07,states/desktop-compact/A12/S07.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S08,states/desktop-compact/A12/S08.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S09,states/desktop-compact/A12/S09.txt,PROMPT_ONLY
+A12,A12 记忆技术维护,WF-AD12,desktop-compact,S10,states/desktop-compact/A12/S10.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,primary,desktop/A13.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S00,states/desktop/A13/S00.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S01,states/desktop/A13/S01.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S02,states/desktop/A13/S02.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S03,states/desktop/A13/S03.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S04,states/desktop/A13/S04.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S05,states/desktop/A13/S05.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S06,states/desktop/A13/S06.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S07,states/desktop/A13/S07.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S08,states/desktop/A13/S08.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S09,states/desktop/A13/S09.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop,S10,states/desktop/A13/S10.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,primary,desktop-compact/A13.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S00,states/desktop-compact/A13/S00.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S01,states/desktop-compact/A13/S01.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S02,states/desktop-compact/A13/S02.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S03,states/desktop-compact/A13/S03.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S04,states/desktop-compact/A13/S04.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S05,states/desktop-compact/A13/S05.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S06,states/desktop-compact/A13/S06.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S07,states/desktop-compact/A13/S07.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S08,states/desktop-compact/A13/S08.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S09,states/desktop-compact/A13/S09.txt,PROMPT_ONLY
+A13,A13 【核心】调度计划,WF-AD13,desktop-compact,S10,states/desktop-compact/A13/S10.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,primary,desktop/A14.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S00,states/desktop/A14/S00.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S01,states/desktop/A14/S01.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S02,states/desktop/A14/S02.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S03,states/desktop/A14/S03.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S04,states/desktop/A14/S04.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S05,states/desktop/A14/S05.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S06,states/desktop/A14/S06.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S07,states/desktop/A14/S07.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S08,states/desktop/A14/S08.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S09,states/desktop/A14/S09.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop,S10,states/desktop/A14/S10.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,primary,desktop-compact/A14.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S00,states/desktop-compact/A14/S00.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S01,states/desktop-compact/A14/S01.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S02,states/desktop-compact/A14/S02.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S03,states/desktop-compact/A14/S03.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S04,states/desktop-compact/A14/S04.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S05,states/desktop-compact/A14/S05.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S06,states/desktop-compact/A14/S06.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S07,states/desktop-compact/A14/S07.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S08,states/desktop-compact/A14/S08.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S09,states/desktop-compact/A14/S09.txt,PROMPT_ONLY
+A14,A14 动作授权记录,WF-AD14,desktop-compact,S10,states/desktop-compact/A14/S10.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,primary,desktop/A15.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S00,states/desktop/A15/S00.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S01,states/desktop/A15/S01.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S02,states/desktop/A15/S02.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S03,states/desktop/A15/S03.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S04,states/desktop/A15/S04.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S05,states/desktop/A15/S05.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S06,states/desktop/A15/S06.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S07,states/desktop/A15/S07.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S08,states/desktop/A15/S08.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S09,states/desktop/A15/S09.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop,S10,states/desktop/A15/S10.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,primary,desktop-compact/A15.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S00,states/desktop-compact/A15/S00.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S01,states/desktop-compact/A15/S01.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S02,states/desktop-compact/A15/S02.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S03,states/desktop-compact/A15/S03.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S04,states/desktop-compact/A15/S04.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S05,states/desktop-compact/A15/S05.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S06,states/desktop-compact/A15/S06.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S07,states/desktop-compact/A15/S07.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S08,states/desktop-compact/A15/S08.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S09,states/desktop-compact/A15/S09.txt,PROMPT_ONLY
+A15,A15 【核心】运行记录与用量,WF-AD15,desktop-compact,S10,states/desktop-compact/A15/S10.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,primary,desktop/A16.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S00,states/desktop/A16/S00.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S01,states/desktop/A16/S01.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S02,states/desktop/A16/S02.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S03,states/desktop/A16/S03.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S04,states/desktop/A16/S04.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S05,states/desktop/A16/S05.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S06,states/desktop/A16/S06.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S07,states/desktop/A16/S07.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S08,states/desktop/A16/S08.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S09,states/desktop/A16/S09.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop,S10,states/desktop/A16/S10.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,primary,desktop-compact/A16.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S00,states/desktop-compact/A16/S00.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S01,states/desktop-compact/A16/S01.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S02,states/desktop-compact/A16/S02.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S03,states/desktop-compact/A16/S03.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S04,states/desktop-compact/A16/S04.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S05,states/desktop-compact/A16/S05.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S06,states/desktop-compact/A16/S06.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S07,states/desktop-compact/A16/S07.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S08,states/desktop-compact/A16/S08.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S09,states/desktop-compact/A16/S09.txt,PROMPT_ONLY
+A16,A16 评测管理,WF-AD16,desktop-compact,S10,states/desktop-compact/A16/S10.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,primary,desktop/V19-EGG.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S00,states/desktop/V19-EGG/S00.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S01,states/desktop/V19-EGG/S01.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S02,states/desktop/V19-EGG/S02.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S03,states/desktop/V19-EGG/S03.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S04,states/desktop/V19-EGG/S04.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S05,states/desktop/V19-EGG/S05.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S06,states/desktop/V19-EGG/S06.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S07,states/desktop/V19-EGG/S07.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S08,states/desktop/V19-EGG/S08.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S09,states/desktop/V19-EGG/S09.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop,S10,states/desktop/V19-EGG/S10.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,primary,desktop-compact/V19-EGG.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S00,states/desktop-compact/V19-EGG/S00.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S01,states/desktop-compact/V19-EGG/S01.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S02,states/desktop-compact/V19-EGG/S02.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S03,states/desktop-compact/V19-EGG/S03.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S04,states/desktop-compact/V19-EGG/S04.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S05,states/desktop-compact/V19-EGG/S05.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S06,states/desktop-compact/V19-EGG/S06.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S07,states/desktop-compact/V19-EGG/S07.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S08,states/desktop-compact/V19-EGG/S08.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S09,states/desktop-compact/V19-EGG/S09.txt,PROMPT_ONLY
+V19-EGG,V19-EGG 禽类与反刍：蛋禽,WF-FR-19,desktop-compact,S10,states/desktop-compact/V19-EGG/S10.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,primary,desktop/V19-MILK.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S00,states/desktop/V19-MILK/S00.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S01,states/desktop/V19-MILK/S01.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S02,states/desktop/V19-MILK/S02.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S03,states/desktop/V19-MILK/S03.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S04,states/desktop/V19-MILK/S04.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S05,states/desktop/V19-MILK/S05.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S06,states/desktop/V19-MILK/S06.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S07,states/desktop/V19-MILK/S07.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S08,states/desktop/V19-MILK/S08.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S09,states/desktop/V19-MILK/S09.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop,S10,states/desktop/V19-MILK/S10.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,primary,desktop-compact/V19-MILK.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S00,states/desktop-compact/V19-MILK/S00.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S01,states/desktop-compact/V19-MILK/S01.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S02,states/desktop-compact/V19-MILK/S02.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S03,states/desktop-compact/V19-MILK/S03.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S04,states/desktop-compact/V19-MILK/S04.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S05,states/desktop-compact/V19-MILK/S05.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S06,states/desktop-compact/V19-MILK/S06.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S07,states/desktop-compact/V19-MILK/S07.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S08,states/desktop-compact/V19-MILK/S08.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S09,states/desktop-compact/V19-MILK/S09.txt,PROMPT_ONLY
+V19-MILK,V19-MILK 禽类与反刍：奶畜,WF-FR-19,desktop-compact,S10,states/desktop-compact/V19-MILK/S10.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,primary,desktop/V19-BEEF.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S00,states/desktop/V19-BEEF/S00.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S01,states/desktop/V19-BEEF/S01.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S02,states/desktop/V19-BEEF/S02.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S03,states/desktop/V19-BEEF/S03.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S04,states/desktop/V19-BEEF/S04.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S05,states/desktop/V19-BEEF/S05.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S06,states/desktop/V19-BEEF/S06.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S07,states/desktop/V19-BEEF/S07.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S08,states/desktop/V19-BEEF/S08.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S09,states/desktop/V19-BEEF/S09.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop,S10,states/desktop/V19-BEEF/S10.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,primary,desktop-compact/V19-BEEF.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S00,states/desktop-compact/V19-BEEF/S00.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S01,states/desktop-compact/V19-BEEF/S01.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S02,states/desktop-compact/V19-BEEF/S02.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S03,states/desktop-compact/V19-BEEF/S03.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S04,states/desktop-compact/V19-BEEF/S04.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S05,states/desktop-compact/V19-BEEF/S05.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S06,states/desktop-compact/V19-BEEF/S06.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S07,states/desktop-compact/V19-BEEF/S07.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S08,states/desktop-compact/V19-BEEF/S08.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S09,states/desktop-compact/V19-BEEF/S09.txt,PROMPT_ONLY
+V19-BEEF,V19-BEEF 禽类与反刍：肉用牛羊,WF-FR-19,desktop-compact,S10,states/desktop-compact/V19-BEEF/S10.txt,PROMPT_ONLY
+N01,N01 登录与身份入口,WF-FR-26;WF-FR-28,desktop,primary,desktop/N01.txt,PROMPT_ONLY
+N01,N01 登录与身份入口,WF-FR-26;WF-FR-28,desktop-compact,primary,desktop-compact/N01.txt,PROMPT_ONLY
+N02,N02 【核心】连续对话工作页,WF-FR-08;WF-FR-24;WF-FR-27;WF-FR-29,desktop,primary,desktop/N02.txt,PROMPT_ONLY
+N02,N02 【核心】连续对话工作页,WF-FR-08;WF-FR-24;WF-FR-27;WF-FR-29,desktop-compact,primary,desktop-compact/N02.txt,PROMPT_ONLY
+N03,N03 经营关注总览,WF-FR-02;WF-FR-03;WF-FR-14;WF-FR-23,desktop,primary,desktop/N03.txt,PROMPT_ONLY
+N03,N03 经营关注总览,WF-FR-02;WF-FR-03;WF-FR-14;WF-FR-23,desktop-compact,primary,desktop-compact/N03.txt,PROMPT_ONLY
+N04,N04 会议与资料目录,WF-FR-04;WF-FR-05;WF-FR-07;WF-FR-09;WF-FR-10,desktop,primary,desktop/N04.txt,PROMPT_ONLY
+N04,N04 会议与资料目录,WF-FR-04;WF-FR-05;WF-FR-07;WF-FR-09;WF-FR-10,desktop-compact,primary,desktop-compact/N04.txt,PROMPT_ONLY
+N05,N05 任务与承诺总览,WF-FR-06,desktop,primary,desktop/N05.txt,PROMPT_ONLY
+N05,N05 任务与承诺总览,WF-FR-06,desktop-compact,primary,desktop-compact/N05.txt,PROMPT_ONLY
+N06,N06 【核心】通知中心,WF-FR-02;WF-FR-26,desktop,primary,desktop/N06.txt,PROMPT_ONLY
+N06,N06 【核心】通知中心,WF-FR-02;WF-FR-26,desktop-compact,primary,desktop-compact/N06.txt,PROMPT_ONLY
+N07,N07 本人目标与关注要求,WF-FR-01;WF-FR-13;WF-FR-26,desktop,primary,desktop/N07.txt,PROMPT_ONLY
+N07,N07 本人目标与关注要求,WF-FR-01;WF-FR-13;WF-FR-26,desktop-compact,primary,desktop-compact/N07.txt,PROMPT_ONLY
+N08,N08 通知要求与可见范围,WF-FR-02;WF-FR-12;WF-FR-13;WF-FR-26,desktop,primary,desktop/N08.txt,PROMPT_ONLY
+N08,N08 通知要求与可见范围,WF-FR-02;WF-FR-12;WF-FR-13;WF-FR-26,desktop-compact,primary,desktop-compact/N08.txt,PROMPT_ONLY
+N09,N09 老板本人计划,WF-FR-02;WF-FR-26;WF-AD13,desktop,primary,desktop/N09.txt,PROMPT_ONLY
+N09,N09 老板本人计划,WF-FR-02;WF-FR-26;WF-AD13,desktop-compact,primary,desktop-compact/N09.txt,PROMPT_ONLY
+N10,N10 本人授权列表,WF-FR-28,desktop,primary,desktop/N10.txt,PROMPT_ONLY
+N10,N10 本人授权列表,WF-FR-28,desktop-compact,primary,desktop-compact/N10.txt,PROMPT_ONLY
+N11,N11 历史决定与当时依据,WF-FR-13;WF-FR-05;WF-FR-07,desktop,primary,desktop/N11.txt,PROMPT_ONLY
+N11,N11 历史决定与当时依据,WF-FR-13;WF-FR-05;WF-FR-07,desktop-compact,primary,desktop-compact/N11.txt,PROMPT_ONLY
+N12,N12 技术维护概况,WF-FR-26;WF-FR-30;WF-FR-32,desktop,primary,desktop/N12.txt,PROMPT_ONLY
+N12,N12 技术维护概况,WF-FR-26;WF-FR-30;WF-FR-32,desktop-compact,primary,desktop-compact/N12.txt,PROMPT_ONLY
+D01,D01 【核心】来源原文与支持关系,WF-FR-03;WF-FR-09,desktop,primary,desktop/D01.txt,PROMPT_ONLY
+D01,D01 【核心】来源原文与支持关系,WF-FR-03;WF-FR-09,desktop-compact,primary,desktop-compact/D01.txt,PROMPT_ONLY
+D02,D02 【核心】当前动作必要决定,WF-FR-28,desktop,primary,desktop/D02.txt,PROMPT_ONLY
+D02,D02 【核心】当前动作必要决定,WF-FR-28,desktop-compact,primary,desktop-compact/D02.txt,PROMPT_ONLY
+D03,D03 中断后的执行结果核查,WF-FR-29,desktop,primary,desktop/D03.txt,PROMPT_ONLY
+D03,D03 中断后的执行结果核查,WF-FR-29,desktop-compact,primary,desktop-compact/D03.txt,PROMPT_ONLY
+D04,D04 联系人与负责人选择,WF-FR-06;WF-FR-08,desktop,primary,desktop/D04.txt,PROMPT_ONLY
+D04,D04 联系人与负责人选择,WF-FR-06;WF-FR-08,desktop-compact,primary,desktop-compact/D04.txt,PROMPT_ONLY
+D05,D05 期限、暂缓与时区选择,WF-FR-02;WF-FR-06;WF-FR-11,desktop,primary,desktop/D05.txt,PROMPT_ONLY
+D05,D05 期限、暂缓与时区选择,WF-FR-02;WF-FR-06;WF-FR-11,desktop-compact,primary,desktop-compact/D05.txt,PROMPT_ONLY
+D06,D06 未保存编辑确认,WF-FR-05;WF-FR-08,desktop,primary,desktop/D06.txt,PROMPT_ONLY
+D06,D06 未保存编辑确认,WF-FR-05;WF-FR-08,desktop-compact,primary,desktop-compact/D06.txt,PROMPT_ONLY
+D07,D07 无权限访问,WF-FR-28;WF-FR-29,desktop,primary,desktop/D07.txt,PROMPT_ONLY
+D07,D07 无权限访问,WF-FR-28;WF-FR-29,desktop-compact,primary,desktop-compact/D07.txt,PROMPT_ONLY
+D08,D08 登录失效与重新认证,WF-FR-26;WF-FR-28,desktop,primary,desktop/D08.txt,PROMPT_ONLY
+D08,D08 登录失效与重新认证,WF-FR-26;WF-FR-28,desktop-compact,primary,desktop-compact/D08.txt,PROMPT_ONLY
+D09,D09 地址失效与历史空间,WF-FR-25;WF-FR-29,desktop,primary,desktop/D09.txt,PROMPT_ONLY
+D09,D09 地址失效与历史空间,WF-FR-25;WF-FR-29,desktop-compact,primary,desktop-compact/D09.txt,PROMPT_ONLY

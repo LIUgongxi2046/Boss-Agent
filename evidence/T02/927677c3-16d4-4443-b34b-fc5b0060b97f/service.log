@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/service.py", line 103, in <module>
+    web.run_app(application(args.database), host="127.0.0.1", port=args.port, access_log=None)
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web.py", line 502, in run_app
+    loop.run_until_complete(main_task)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web.py", line 404, in _run_app
+    await site.start()
+  File "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.venv/lib/python3.12/site-packages/aiohttp/web_runner.py", line 138, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 1571, in create_server
+    raise OSError(err.errno, msg) from None
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 8871): [errno 1] operation not permitted

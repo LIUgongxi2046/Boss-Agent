@@ -1,0 +1,121 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "@dova region-1 产品经营指标对比查询"
+          - img "Agent running"
+          - button "Topic actions for region-1 产品经营指标对比查询":
+            - img
+        - listitem:
+          - button "@royi 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@lolu 生成简报并查询region-1经营指标"
+          - button "Topic actions for 生成简报并查询region-1经营指标":
+            - img
+        - listitem:
+          - button "@gane 当前会话无已确认阅读要求"
+          - button "Topic actions for 当前会话无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@soro 生成简报并查询区域销售指标"
+          - button "Topic actions for 生成简报并查询区域销售指标":
+            - img
+        - listitem:
+          - button "@mita 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@havi 生成简报并查询 region-1 指标"
+          - button "Topic actions for 生成简报并查询 region-1 指标":
+            - img
+        - listitem:
+          - button "@tiyu 生成简报并查询 region-1 经营指标"
+          - button "Topic actions for 生成简报并查询 region-1 经营指标":
+            - img
+      - button "8 hidden topics"
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "region-1 产品经营指标对比查询":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 02:41 PM
+      - button "Copy"
+      - paragraph: "本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpose\": \"提交当前会议关联的毛利变化解释、措施和证据\", \"due_at\": \"2026-10-25T17:00:00+08:00\", \"timezone\": \"Asia/Shanghai\", \"evidence_requirements\": [\"原因明细\", \"措施及证据\"], \"related_meeting_id\": \"meeting-1\", \"related_event_ids\": [\"event-1\"], \"source_refs\": [\"finance-note\"]}"
+      - time: 02:41 PM
+      - button "Copy"
+      - paragraph: "本人授权按以下内容模拟发送：{\"task_id\": \"f51a21e1-6639-49f9-9c19-89deeed6b8ef\", \"task_version\": \"1\", \"recipient_id\": \"coordinator-1\", \"body\": \"提交当前会议关联的毛利变化解释、措施和证据\", \"content_version\": \"1\"}"
+      - time: 02:41 PM
+      - button "Copy"
+      - paragraph: 模拟发送已完成，并已复核正式状态。
+      - heading "发送结果" [level=2]
+      - list:
+        - listitem:
+          - text: 消息 ID：
+          - code: 5111243e-1be3-4b7d-bb52-ecba3bd9a91a
+        - listitem:
+          - text: 消息状态：
+          - code: SENT
+          - text: （SIMULATED，模拟发送）
+        - listitem: 发送时间：2026-10-22 05:40:06 UTC
+        - listitem: 收件人：coordinator-1
+        - listitem:
+          - text: 交办：
+          - code: f51a21e1-6639-49f9-9c19-89deeed6b8ef
+          - text: ，当前 version 2，状态
+          - code: WAITING_FEEDBACK
+        - listitem: 正文：提交当前会议关联的毛利变化解释、措施和证据
+      - heading "说明" [level=2]
+      - list:
+        - listitem:
+          - text: 发送时传入的
+          - code: task_version
+          - text: 为 1，系统实际处理的是当前版本 2；消息已成功挂到该交办下，
+          - code: message_ids
+          - text: 中只有这一条，未产生重复消息。
+        - listitem:
+          - text: 交办仍处于等待反馈状态，
+          - code: feedback_ids
+          - text: 为空，尚无协调人回复；截止时间为 2026-10-25 17:00（Asia/Shanghai）。
+        - listitem: 后续如需催办或查看反馈，可再次读取该交办状态。
+      - button "Copy"
+      - button "Fork"
+      - time: 02:41 PM
+      - paragraph: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。
+      - time: 02:41 PM
+      - button "Copy"
+      - status "Working for 1s"
+      - 'button "Jump to prompt: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2..."'
+      - 'button "Jump to prompt: 本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpo..."'
+      - 'button "Jump to prompt: 本人授权按以下内容模拟发送：{\"task_id\": \"f51a21e1-6639-49f9-9c19-89deeed6b8ef\", \"task_versi..."'
+      - 'button "Jump to prompt: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。"'
+    - textbox "Message region-1 产品经营指标对比查询"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission" [disabled]':
+      - img
+      - img
+    - text: Default
+    - button "Context 4%. Open context usage"
+    - button "Voice input":
+      - img
+    - button "Stop response":
+      - img

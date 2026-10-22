@@ -1,0 +1,13 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: 'New topic', exact: true })[22m
+
+    at main (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:77:70) {
+  name: 'TimeoutError'
+}
+
+Node.js v24.13.0

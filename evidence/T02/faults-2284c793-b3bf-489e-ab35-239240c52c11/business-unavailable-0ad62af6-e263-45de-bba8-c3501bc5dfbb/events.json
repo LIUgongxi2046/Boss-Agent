@@ -1,0 +1,23 @@
+[
+  {
+    "type": "business_http",
+    "name": "query_metrics",
+    "status": 503,
+    "body": "获准模拟业务接口当前不可用",
+    "at": "2026-10-22T06:37:45.856894+00:00"
+  },
+  {
+    "at": "2026-10-22T06:37:45.861301+00:00",
+    "type": "tool_error",
+    "name": "query_metrics",
+    "error_type": "HTTPStatusError",
+    "error": "Server error '503 Service Unavailable' for url 'http://127.0.0.1:8874/operations/query_metrics'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
+  },
+  {
+    "at": "2026-10-22T06:37:45.862289+00:00",
+    "type": "run_error",
+    "stop_reason": "error",
+    "exception_type": "RuntimeError",
+    "error": "业务接口实际请求失败"
+  }
+]

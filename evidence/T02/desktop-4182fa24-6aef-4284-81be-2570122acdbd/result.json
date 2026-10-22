@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T06:38:38.797Z",
+  "scope": "Electron 实际启动、两端状态采用、IPC 拒绝、窗口关闭与进程重启；系统休眠及 OS 权限完整过程尚未执行",
+  "checks": 15,
+  "system_sleep": "NOT_RUN",
+  "os_permissions": "PARTIAL"
+}

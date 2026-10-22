@@ -1,0 +1,17 @@
+order,prompt_id,name,desktop,desktop_compact
+1,F01,F01 【核心】今日工作,desktop/F01.txt,desktop-compact/F01.txt
+2,N02,N02 【核心】连续对话工作页,desktop/N02.txt,desktop-compact/N02.txt
+3,F03,F03 【核心】BI 查询与连续追问,desktop/F03.txt,desktop-compact/F03.txt
+4,D01,D01 【核心】来源原文与支持关系,desktop/D01.txt,desktop-compact/D01.txt
+5,F04,F04 【核心】会前准备,desktop/F04.txt,desktop-compact/F04.txt
+6,F05,F05 【核心】会后纪要核查,desktop/F05.txt,desktop-compact/F05.txt
+7,F06,F06 【核心】交办与承诺详情,desktop/F06.txt,desktop-compact/F06.txt
+8,D02,D02 【核心】当前动作必要决定,desktop/D02.txt,desktop-compact/D02.txt
+9,N06,N06 【核心】通知中心,desktop/N06.txt,desktop-compact/N06.txt
+10,F27,F27 【核心】语音输入与文本核查,desktop/F27.txt,desktop-compact/F27.txt
+11,F25,F25 【核心】模拟中心总览,desktop/F25.txt,desktop-compact/F25.txt
+12,A08,A08 【核心】模型与 Provider,desktop/A08.txt,desktop-compact/A08.txt
+13,A05,A05 【核心】Prompt 版本,desktop/A05.txt,desktop-compact/A05.txt
+14,A09,A09 【核心】Tools 与连接,desktop/A09.txt,desktop-compact/A09.txt
+15,A13,A13 【核心】调度计划,desktop/A13.txt,desktop-compact/A13.txt
+16,A15,A15 【核心】运行记录与用量,desktop/A15.txt,desktop-compact/A15.txt

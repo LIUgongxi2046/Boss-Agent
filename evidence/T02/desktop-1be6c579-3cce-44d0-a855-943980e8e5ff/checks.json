@@ -1,0 +1,168 @@
+[
+  {
+    "at": "2026-10-22T06:31:57.969Z",
+    "check": "desktop_start",
+    "result": {
+      "versions": {
+        "node": "24.22.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "150",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.11",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.6.75.19-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "45.0.0",
+        "chrome": "156.0.8078.48"
+      },
+      "service_pid": 17279,
+      "platform": "darwin",
+      "architecture": "x64",
+      "microphone": "granted",
+      "notifications_supported": true
+    }
+  },
+  {
+    "at": "2026-10-22T06:31:57.974Z",
+    "check": "admin_configuration_reloaded",
+    "result": {
+      "at": "2026-10-22T06:31:53.928350+00:00",
+      "baseline": {
+        "namespace": "ui-check",
+        "snapshot_sha256": "8e4b87f946494174f14fb350667364ebce3b517efbba230982d975860560a401"
+      },
+      "max_output_tokens": 4096,
+      "max_tool_rounds": 8,
+      "model": "deepseek-flash",
+      "pid": 17279
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:19.820Z",
+    "check": "next_model_task_configuration_and_memory",
+    "result": {
+      "memory_version": "9",
+      "configuration": {
+        "provider": "deepseek",
+        "model_id": "deepseek-flash",
+        "max_tool_rounds": 8,
+        "max_output_tokens": 4096,
+        "config_sha256": "14b61afab28fa3ab460529e81b9c18c2f00d282ad6f49f734e32c32a209f9be4"
+      }
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:29.605Z",
+    "check": "new_session_deleted_memory_excluded",
+    "result": {
+      "request_url": "https://api.deepseek.com/chat/completions",
+      "memory": null
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:40.830Z",
+    "check": "desktop_state_readback",
+    "result": {
+      "task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef",
+      "state": "WAITING_FEEDBACK",
+      "outbox_count": 1
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:40.988Z",
+    "check": "ipc_role_and_capability_denied",
+    "result": {
+      "arbitrary_command": "DENIED",
+      "unauthenticated": "DENIED",
+      "maintainer_boss_operation": "DENIED"
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:41.626Z",
+    "check": "ipc_foreign_renderer_denied",
+    "result": true
+  },
+  {
+    "at": "2026-10-22T06:32:46.863Z",
+    "check": "host_permission_denial",
+    "result": {
+      "microphone": "DENIED_BY_HOST",
+      "browser_notifications": "DENIED_BY_HOST",
+      "os_microphone_state": "granted",
+      "os_allow_deny_revoke": "NOT_RUN"
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:46.909Z",
+    "check": "content_window",
+    "result": {
+      "width": 1024,
+      "height": 768,
+      "navigation_accessible": true
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:46.983Z",
+    "check": "content_window",
+    "result": {
+      "width": 1280,
+      "height": 800,
+      "navigation_accessible": true
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:47.045Z",
+    "check": "content_window",
+    "result": {
+      "width": 1440,
+      "height": 1024,
+      "navigation_accessible": true
+    }
+  },
+  {
+    "at": "2026-10-22T06:32:47.170Z",
+    "check": "zoom_200_percent",
+    "result": true
+  },
+  {
+    "at": "2026-10-22T06:32:49.394Z",
+    "check": "duplicate_start_single_service",
+    "result": true
+  },
+  {
+    "at": "2026-10-22T06:32:51.342Z",
+    "check": "last_window_closes_service_and_scheduler",
+    "result": true
+  },
+  {
+    "at": "2026-10-22T06:33:02.930Z",
+    "check": "actual_desktop_restart_state",
+    "result": {
+      "pid": 17377,
+      "task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef",
+      "deleted_memory": true,
+      "outbox_count": 1
+    }
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "check_id": "K00",
+  "scope": "战略设计及文档引用，业务效果未验证",
+  "requirements": 32,
+  "secretary_tasks": 13,
+  "agriculture_topics": 10,
+  "shared_capabilities": 9,
+  "goals": 4,
+  "hypotheses": 37,
+  "metrics": 17,
+  "protocols": 8,
+  "handoffs": 3,
+  "review_dimensions": 5,
+  "external_perspectives": 4,
+  "observed_values_unknown": true,
+  "requirement_source_sha256": "854e6e6d49397874d6ed22583b249d753a3caa84135ad20922fab970af1e11e4",
+  "local_links_checked": 19,
+  "python": "3.12.7",
+  "markdown_it_py": "4.2.0",
+  "jsonschema": "4.25.1",
+  "semantic_review": "docs/Boss-Agent项目计划.md 第 12 节"
+}

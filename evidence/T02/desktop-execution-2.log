@@ -1,0 +1,8 @@
+/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:61
+  await expect(page.locator('main')).toContainText('本人决定优先');
+        ^
+
+TypeError: expect is not a function
+    at main (/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/desktop/check-desktop.cjs:61:9)
+
+Node.js v24.13.0

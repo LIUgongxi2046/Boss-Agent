@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T06:43:29.835335+00:00",
+  "scope": "实际原生用户端 DOM 与正式状态、维护管理配置保存重载、角色拒绝、实际重启后下一任务采用及有效配置 hash",
+  "initial_pid": 17906,
+  "restarted_pid": 18113,
+  "adopted_configuration": {
+    "provider": "deepseek",
+    "model_id": "deepseek-flash",
+    "max_tool_rounds": 8,
+    "max_output_tokens": 4096,
+    "config_sha256": "14b61afab28fa3ab460529e81b9c18c2f00d282ad6f49f734e32c32a209f9be4"
+  },
+  "details": "application.log 中各实际 DOM 命令输出定位原始证据目录；同一逻辑交办复跑使用服务端同一幂等意图，不产生重复任务或发送"
+}

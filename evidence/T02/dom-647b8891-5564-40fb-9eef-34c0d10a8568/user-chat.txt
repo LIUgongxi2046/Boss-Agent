@@ -1,0 +1,5 @@
+- dialog "Restart before leaving?":
+  - heading "Restart before leaving?" [level=2]
+  - paragraph: Your changes are saved. Restart to apply them.
+  - button "Restart later"
+  - button "Restart"

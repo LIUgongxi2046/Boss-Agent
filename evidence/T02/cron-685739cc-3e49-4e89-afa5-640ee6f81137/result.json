@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T06:22:58.358251+00:00",
+  "scope": "上游 CronService 真实计时触发、重复抑制、暂停保存、独立进程恢复与取消",
+  "processes": [
+    16580,
+    16587
+  ],
+  "model_request_sent": false,
+  "business_clock": "NOT_RUN",
+  "multiple_process_ownership": "NOT_RUN",
+  "desktop_lifecycle": "NOT_RUN"
+}

@@ -1,0 +1,41 @@
+{
+  "access_checks": [
+    {
+      "role": "MAINTAINER",
+      "path": "/api/sessions",
+      "status": 403
+    },
+    {
+      "role": "MAINTAINER",
+      "path": "/api/boss/identity",
+      "status": 200
+    },
+    {
+      "role": "MAINTAINER",
+      "path": "/api/settings",
+      "status": 200
+    },
+    {
+      "role": "MAINTAINER",
+      "transport": "WEBSOCKET",
+      "operation": "message",
+      "result": {
+        "event": "error",
+        "detail": "access_denied",
+        "reason": "身份权限不足"
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "type": "webui_request",
+      "request_id": "cc4b3ac1-5d8a-4afd-87c4-b71353c77ec5",
+      "action": "settings.runtime_config.update",
+      "payload": {
+        "values": {
+          "agents.defaults.max_tool_iterations": 9
+        }
+      }
+    }
+  ]
+}

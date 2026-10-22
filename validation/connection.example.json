@@ -1,0 +1,11 @@
+{
+  "provider": "deepseek",
+  "credential_file": "../boss agent.md",
+  "model_id": "deepseek-flash",
+  "base_url": "https://api.deepseek.com",
+  "api_type": "chat_completions",
+  "thinking": "disabled",
+  "timeout_seconds": 120,
+  "max_tool_rounds": 12,
+  "max_output_tokens": 4096
+}

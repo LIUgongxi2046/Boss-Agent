@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "document_id": "SP-T01",
+  "version": "1.3.0",
+  "updated_at": "2026-10-22",
+  "timezone": "Asia/Shanghai",
+  "task_id": "T01",
+  "receiving_task": "T02",
+  "acceptance_id": "A02",
+  "capability": "DESIGN",
+  "purpose": "定义固定开源版本及 DeepSeek 共同任务的验证方法，不保存运行结果；模型范围引用 D04。",
+  "sources": [
+    "docs/PRD.md 第 5、8.3、8.6、8.13、8.24—8.32、11—13 节",
+    "docs/Boss-Agent需求输入.md 第 8.8、12.5、13.2、14 节",
+    "docs/Boss-Agent项目计划.md 第 6、10、11—12 节",
+    "docs/项目决策记录.md D02—D11、D16—D17",
+    "specs/value-validation.json"
+  ],
+  "traceability": {
+    "requirement_ids": ["R03", "R06", "R13", "R24", "R25", "R26", "R28", "R29", "R30", "R31", "R32"],
+    "fr_ids": ["FR-03", "FR-06", "FR-13", "FR-24", "FR-25", "FR-26", "FR-28", "FR-29", "FR-30", "FR-31", "FR-32"],
+    "goal_ids": ["G01", "G02", "G03", "G04"],
+    "hypothesis_ids": ["H03", "H06", "H13", "H24", "H25", "H26", "H28", "H29", "H30", "H31", "H32", "H33", "H34", "H36", "H37"],
+    "metric_ids": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12", "M13", "M14", "M15", "M16"],
+    "protocol_ids": ["VP-CORE", "VP-FAULT", "VP-RESOURCE", "VP-CONTRIBUTION"],
+    "threshold_ids": ["TH-QUALITY", "TH-D05", "TH-D06", "TH-EVIDENCE"]
+  },
+  "execution_policy": {
+    "business_data": "仅使用 D02 获准的 SIMULATED 业务事实；T02 实际生成、保存、查询和变更。",
+    "real_execution": ["固定版本 Runtime", "DeepSeek 请求", "工具执行", "保存与重读", "知识摄取与检索", "记忆采用", "调度触发", "运行与用量记录"],
+    "forbidden_substitutions": ["预设模型回答", "伪造工具或服务成功", "另一模型结果替代目标模型", "仅凭 HTTP 成功判定交办完成", "评分答案或带结论场景标签进入模型", "维护身份替代老板决定"],
+    "entrypoint": "T02 在 validation/ 定义真实命令、配置引用、依赖锁定和服务入口；本文件中的操作名称为产品能力标识，不声明已有 API。",
+    "credential_policy": "只使用服务端凭据引用；请求和证据不得包含密钥。",
+    "failure_policy": "错误在发生位置明确报告，停止依赖步骤，保留已执行动作和真实费用。写入结果不确定时先重新查询；不自动切换模型。",
+    "unknown_policy": "未运行或资料缺少的测量由 T02 记为 null 并说明原因；本定义文件没有实测字段。",
+    "visual_policy": "只使用文本、服务请求和适用 DOM 检查，视觉保持未验证。"
+  },
+  "preconditions": [
+    {"id":"PC01","requirement":"T00/A00 与 T01/A01 设计产物及当前决定可读，完整范围保持 D11。","failure":"停止对应设计通过声明，不猜测缺少规则。"},
+    {"id":"PC02","requirement":"核查候选固定 tag/commit、完整匹配文档、许可证声明、SDK、Tools、Streaming、Memory、Scheduler、用户端和管理端页面源码及依赖。","failure":"不能登记该版本具备未核实能力；仅 SDK 或通用 UI 库不满足 D16 两端复用要求。"},
+    {"id":"PC03","requirement":"核查 DeepSeek 配置、API 类型、Tool Calling、Streaming、参数及网络；凭据由用户后续提供，不自动采购。","failure":"具体 Provider 记录缺少条件，其他独立检查继续。"},
+    {"id":"PC04","requirement":"T02 创建实际模拟服务与存储；老板、维护分别认证，联系人仅数据对象；验证检查器拥有独立只读核查途径。","failure":"不能用内存预设返回或模型自评代替状态证据。"},
+    {"id":"PC05","requirement":"有效模型运行限制、超时、最大轮数和工具范围按当前服务配置明确记录；D05 上限未知仅限制可接受性判断。","failure":"运行保护配置缺少时不得执行无边界循环。"}
+  ],
+  "open_source_reuse_definition": {
+    "decision_ref": "D16",
+    "required_surfaces": ["RUNTIME", "USER_APP", "ADMIN_APP"],
+    "mapping_denominator": ["六类老板入口", "AD01—AD16", "Runtime/Memory/Task State/Scheduler/Permissions/Observability"],
+    "required_mapping_fields": ["requirement_or_management_id", "surface", "upstream_repository", "tag_or_commit", "license_file", "source_path", "page_or_api_entry", "reuse_mode", "extension_path", "state_owner", "verification_method"],
+    "reuse_modes": ["DIRECT_REUSE", "EXTEND_EXISTING", "NEW_BUSINESS_CAPABILITY"],
+    "rule": "USER_APP 与 ADMIN_APP 各自必须有实际复用的上游应用页面和源码；新增能力记录业务必要性。只有 Runtime、UI 库、静态截图或展示页不能证明两端复用。配置、个人记忆和调度各有唯一维护位置。",
+    "agent_components": ["Prompt", "Workflow/SOP", "Knowledge Base", "LLM/DSLM", "Tools", "Evaluation"],
+    "dslm_policy": "领域专用语言模型为可选；当前使用 DeepSeek 与领域知识工具，实际不采用时说明依据。",
+    "future_evidence": "T02 实际结果记录源码、DOM 操作、服务请求、保存重载、下一任务采用与权限拒绝；T18/T19 继续完成全部业务页面验收。"
+  },
+  "desktop_definition": {
+    "decision_ref": "D17",
+    "product_form": "DESKTOP_APPLICATION",
+    "required_surfaces": ["USER_APP", "ADMIN_APP"],
+    "target_environment_fields": ["os", "os_version", "architecture", "desktop_host", "host_version", "rendering_engine", "installer_format", "installer_checksum", "signature_conditions"],
+    "environment_rule": "T02 核查实际演示设备与候选依赖，记录目标环境，不预设桌面框架或多系统兼容。",
+    "window_checks": ["1024x768", "1280x800", "1440x1024", "200% zoom"],
+    "window_basis": "INFERRED；内容窗口尺寸不含系统标题栏；缩放与工作区不足时重排及可访问滚动，不删字段动作。",
+    "default_lifecycle": "关闭最后窗口请求完整退出，后台运行与自启动默认关闭；完整退出停止本地调度，保存已确认状态；在途结果不确定时恢复后重新查询。",
+    "resume_rule": "唤醒、重启、重新联网后读取当前状态、授权及计划版本；已取消、已完成及授权过期事件不执行；有效事件按业务规则处理且不得重复发送。",
+    "system_permissions": "真实检查麦克风、系统通知、文件选择与外部来源；拒绝麦克风保留文字输入，拒绝系统通知保留应用内通知；系统通知不含私人正文。",
+    "host_boundary": "IPC 仅允许已定义能力，逐次校验发送方、身份、参数及授权；模型无任意本地文件、命令或凭据访问；使用服务端配置引用。",
+    "handoff_rule": "T02 保存真实桌面安装启动及生命周期证据，完整界面和系统能力由 T18—T20/T24/T25 继续验证；本文件仅定义方法。"
+  },
+  "initial_materials": {
+    "source_type": "SIMULATED",
+    "generation_owner": "T02",
+    "generation_method": "按需求 13.2 的已授权合成数值实际生成有关联明细，使用确定性计算核查；不在 T01 生成业务数据或预写模型答案。",
+    "identity_roles": [
+      {"role":"BOSS","product_account":true,"agent_count":1,"scope":"唯一 owner_id 的任务、资料与本人决定"},
+      {"role":"MAINTAINER","product_account":true,"agent_count":0,"scope":"配置、获准模拟资料和运行元信息；无默认私人正文与业务决定权"},
+      {"role":"CONTACT","product_account":false,"agent_count":0,"scope":"统筹负责人、材料作者、收件人或专业确认人"}
+    ],
+    "objects": [
+      {"id":"IM01","kind":"boss_profile","required_fields":["owner_id","goals","timezone","confirmed_reading_requirement","version"],"condition":"增长质量、现金、本人承诺；老板确认后采用"},
+      {"id":"IM02","kind":"contacts","required_fields":["contact_id","name","organization","responsibility","valid_from","valid_until"],"condition":"包括业务统筹、财务作者及另一个同名联系人；同名对象不能共用 ID"},
+      {"id":"IM03","kind":"business_details","required_fields":["record_id","region_id","product_id","legal_entity_id","customer_id","factory_id","period","quantity_tonnes","revenue_cny","cost_cny","trade_type","version"],"condition":"两段同长度可比期间，同一合成区域的水产饲料外销；按产品、客户和工厂可查"},
+      {"id":"IM04","kind":"metric_definitions","required_fields":["metric_id","formula","unit","precision","definition_version","scope","settlement_state"],"condition":"毛利=收入−成本；毛利率=毛利/收入；单吨毛利=毛利/吨数；汇总比例重算分子分母"},
+      {"id":"IM05","kind":"meeting","required_fields":["meeting_id","owner_id","participant_ids","starts_at","timezone","material_ids","historical_commitment_ids","version"],"condition":"同一经营会议关联业务负责人、历史承诺、财务材料与经营事件"},
+      {"id":"IM06","kind":"documents","required_fields":["source_id","author_contact_id","version","source_type","published_at","valid_from","access_scope","original_locator"],"condition":"含指标解释、财务说明、历史纪要；缺少原因明细的变体保持原因未知"},
+      {"id":"IM07","kind":"event_and_task","required_fields":["event_id","coordinator_id","meeting_id","task_id","owner_id","status","due_at","evidence_requirements","version"],"condition":"初始历史交办与新交办可区分；经营事件状态和任务状态分别存储"},
+      {"id":"IM08","kind":"private_calendar","required_fields":["calendar_id","owner_id","starts_at","ends_at","timezone","private_body","visibility"],"condition":"仅老板正文可见，维护可见范围不包含正文、标题、附件或派生摘要"},
+      {"id":"IM09","kind":"runtime_configuration","required_fields":["config_id","version","provider","api_type","model_id","credential_ref","tool_scope","timeout","max_tool_rounds"],"condition":"实际配置，凭据仅引用；模型切换不改变业务权限"},
+      {"id":"IM10","kind":"schedule_and_memory","required_fields":["schedule_id","schedule_version","trigger","timezone","enabled","memory_id","memory_version","confirmation_state"],"condition":"唯一计划责任及老板确认记忆；重启后可重新读取"}
+    ],
+    "relations": [
+      {"from":"boss_profile.owner_id","to":"meeting.owner_id,event_and_task.owner_id,private_calendar.owner_id","assertion":"所有本人对象属于同一老板"},
+      {"from":"contacts.contact_id","to":"meeting.participant_ids,event_and_task.coordinator_id,documents.author_contact_id","assertion":"职责、作者及收件人可回查；联系人不可认证"},
+      {"from":"business_details.record_id","to":"metric_query.detail_refs,documents.original_locator","assertion":"查询结果可以回到同一版本原始明细"},
+      {"from":"event_and_task.event_id","to":"meeting.material_ids,new_task.related_event_ids","assertion":"经营变化、会议材料和新交办关联"},
+      {"from":"new_task.task_id","to":"outbox.related_task_id,feedback.related_task_id","assertion":"发送、回复及完成证据关联同一任务"},
+      {"from":"authorization.authorization_id","to":"new_task.authorization_id,outbox.authorization_id,completion.authorization_id","assertion":"每个动作具有对应老板指令和内容版本"},
+      {"from":"dataset.execution_namespace","to":"session,memory,schedule,task,outbox,run","assertion":"每次独立试验与重置隔离状态，历史归属保留"}
+    ],
+    "numeric_fixture_specification": {
+      "source_ref": "docs/Boss-Agent需求输入.md 第 13.2 节",
+      "unit_policy": "数量为吨，金额为人民币元，使用 Decimal 或等效精确数值类型；展示可换算万元并记录舍入规则。",
+      "base_period": {"quantity_tonnes":10000,"revenue_cny":40000000,"cost_cny":36000000},
+      "current_period": {"quantity_tonnes":12000,"revenue_cny":48000000,"cost_cny":44160000},
+      "evaluator_only_expected": {"quantity_growth_percent":20,"revenue_growth_percent":20,"gross_profit_change_percent":-4,"gross_margin_change_percentage_points":-2,"gross_profit_per_tonne_change_percent":-20},
+      "isolation": "只将查询所需业务事实交给模型；本字段中的预期值、评分规则与断言编号不进入模型上下文。"
+    },
+    "provenance_required": ["source_type","source_id","source_version","dataset_id","dataset_version","business_as_of","source_updated_at","read_at","coverage","quality_state"],
+    "same_initial_conditions": {
+      "immutable_snapshot": "保存生成参数、seed、生成器版本和初始业务快照校验和；每个 Provider 从此快照建立独立执行空间。",
+      "shared_inputs": ["老板档案与已确认要求","经营明细","会议与历史交办","资料与索引版本","业务时间","工具定义","老板授权文本及等价对象映射","预期业务断言"],
+      "independent_state": ["execution_namespace","session_id","run_id","新任务","发件箱","反馈","调度执行记录","修改后的记忆"],
+      "minimum_reset_runs_per_provider": 2,
+      "sample_limit": "两次用于检查重复性，不构成统计充分；样本扩展由 T09 定义。"
+    }
+  },
+  "authorization": {
+    "issuer": "BOSS",
+    "required_binding": ["authorization_id","owner_id","issuer_identity","source_instruction_id","action","target_id","content_version","scope","valid_from","valid_until","revoked_at"],
+    "query_scope": "允许读取该老板获准数据集中的经营、会议、联系人和工作材料；私人正文只限本人对应授权。",
+    "assignment_instruction_template": "请让已确认的负责人就当前会议关联的毛利变化提交解释、措施和证据，在明确的日期、时区和期限前回复；按本人已核查的内容创建交办并模拟发送。",
+    "assignment_required_inputs": ["唯一 recipient_id","任务目的","绝对期限与 IANA 时区","所需产物和证据","会议及事件关联","当前正文版本","明确创建及模拟发送动作"],
+    "completion_rule": "完成授权由老板在检查当前结果与证据后单独产生；反馈提供者不能产生老板确认。",
+    "reuse_rule": "有效且内容未变的明确授权持续适用，不重复要求确认；对象、正文、金额、时间或范围改变时重新核查必要决定。",
+    "maintainer_allowed": ["生成模拟资料","注入署名模拟反馈","配置真实模型连接","启用获准技术规则","检查获准元信息"],
+    "maintainer_denied": ["代替老板发送业务消息","批准申请","确认任务完成","自行修改本人记忆","默认读取私人正文"],
+    "professional_actions_denied": ["采购成交","配方发布","用药指令","设备控制","质量放行","生产排程","资金交易"]
+  },
+  "io_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:boss-agent:selection-probe:io:1",
+    "$defs": {
+      "identifier": {"type":"string","minLength":1},
+      "decimal": {"type":"string","pattern":"^-?[0-9]+([.][0-9]+)?$"},
+      "envelope": {
+        "type":"object","additionalProperties":false,
+        "required":["request_id","owner_id","execution_namespace","dataset_id","dataset_version","session_id"],
+        "properties":{"request_id":{"$ref":"#/$defs/identifier"},"owner_id":{"$ref":"#/$defs/identifier"},"execution_namespace":{"$ref":"#/$defs/identifier"},"dataset_id":{"$ref":"#/$defs/identifier"},"dataset_version":{"$ref":"#/$defs/identifier"},"session_id":{"$ref":"#/$defs/identifier"}}
+      },
+      "source": {
+        "type":"object","additionalProperties":false,
+        "required":["source_id","source_type","version","locator","business_as_of","source_updated_at","read_at","coverage","quality_state"],
+        "properties":{"source_id":{"$ref":"#/$defs/identifier"},"source_type":{"enum":["SIMULATED","PUBLIC_SOURCE","RUNTIME_RECORD"]},"version":{"$ref":"#/$defs/identifier"},"locator":{"type":"string","minLength":1},"business_as_of":{"type":"string","format":"date-time"},"source_updated_at":{"type":"string","format":"date-time"},"read_at":{"type":"string","format":"date-time"},"coverage":{"type":"string","minLength":1},"quality_state":{"enum":["COMPLETE","INCOMPLETE","STALE","CONFLICTED"]}}
+      },
+      "query_input": {
+        "type":"object","additionalProperties":false,
+        "required":["envelope","question","metric_ids","region_id","product_ids","period_start","period_end","comparison_start","comparison_end","currency","trade_scope","definition_version"],
+        "properties":{"envelope":{"$ref":"#/$defs/envelope"},"question":{"type":"string","minLength":1},"metric_ids":{"type":"array","minItems":1,"uniqueItems":true,"items":{"enum":["sales_quantity","revenue","cost","gross_profit","gross_margin","gross_profit_per_tonne"]}},"region_id":{"$ref":"#/$defs/identifier"},"product_ids":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/$defs/identifier"}},"period_start":{"type":"string","format":"date"},"period_end":{"type":"string","format":"date"},"comparison_start":{"type":"string","format":"date"},"comparison_end":{"type":"string","format":"date"},"currency":{"const":"CNY"},"trade_scope":{"const":"EXTERNAL_SALES"},"definition_version":{"$ref":"#/$defs/identifier"}}
+      },
+      "query_output": {
+        "type":"object","additionalProperties":false,
+        "required":["query_id","envelope","values","detail_refs","sources","missing_fields","unexplained_causes"],
+        "properties":{"query_id":{"$ref":"#/$defs/identifier"},"envelope":{"$ref":"#/$defs/envelope"},"values":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["metric_id","period_scope","scope_description","value","unit","formula","definition_version","display_rounding"],"properties":{"metric_id":{"$ref":"#/$defs/identifier"},"period_scope":{"enum":["BASE","CURRENT","CHANGE"]},"scope_description":{"type":"string","minLength":1},"value":{"anyOf":[{"$ref":"#/$defs/decimal"},{"type":"null"}]},"unit":{"type":"string","minLength":1},"formula":{"type":"string","minLength":1},"definition_version":{"$ref":"#/$defs/identifier"},"display_rounding":{"type":"string","minLength":1}}}},"detail_refs":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"sources":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/source"}},"missing_fields":{"type":"array","items":{"type":"string"}},"unexplained_causes":{"type":"array","items":{"type":"string"}}}
+      },
+      "evidence_input": {
+        "type":"object","additionalProperties":false,"required":["envelope","query_id","source_ids","detail_refs"],
+        "properties":{"envelope":{"$ref":"#/$defs/envelope"},"query_id":{"$ref":"#/$defs/identifier"},"source_ids":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/identifier"}},"detail_refs":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/identifier"}}}
+      },
+      "evidence_output": {
+        "type":"object","additionalProperties":false,"required":["sources","original_records","definition_version","conflicts","missing_fields"],
+        "properties":{"sources":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/source"}},"original_records":{"type":"array","minItems":1,"items":{"type":"object","required":["record_id","version","content"],"properties":{"record_id":{"$ref":"#/$defs/identifier"},"version":{"$ref":"#/$defs/identifier"},"content":{"type":"object"}}}},"definition_version":{"$ref":"#/$defs/identifier"},"conflicts":{"type":"array","items":{"type":"string"}},"missing_fields":{"type":"array","items":{"type":"string"}}}
+      },
+      "assignment_input": {
+        "type":"object","additionalProperties":false,
+        "required":["envelope","authorization_id","content_version","idempotency_key","coordinator_id","purpose","due_at","timezone","evidence_requirements","related_meeting_id","related_event_ids","source_refs"],
+        "properties":{"envelope":{"$ref":"#/$defs/envelope"},"authorization_id":{"$ref":"#/$defs/identifier"},"content_version":{"$ref":"#/$defs/identifier"},"idempotency_key":{"$ref":"#/$defs/identifier"},"coordinator_id":{"$ref":"#/$defs/identifier"},"purpose":{"type":"string","minLength":1},"due_at":{"type":"string","format":"date-time"},"timezone":{"type":"string","minLength":1},"evidence_requirements":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},"related_meeting_id":{"$ref":"#/$defs/identifier"},"related_event_ids":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/identifier"}},"source_refs":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/identifier"}}}
+      },
+      "assignment_output": {
+        "type":"object","additionalProperties":false,"required":["task_id","status","version","authorization_id","execution_namespace","persisted_at"],
+        "properties":{"task_id":{"$ref":"#/$defs/identifier"},"status":{"const":"OPEN"},"version":{"$ref":"#/$defs/identifier"},"authorization_id":{"$ref":"#/$defs/identifier"},"execution_namespace":{"$ref":"#/$defs/identifier"},"persisted_at":{"type":"string","format":"date-time"}}
+      },
+      "send_input": {
+        "type":"object","additionalProperties":false,"required":["envelope","task_id","task_version","recipient_id","body","content_version","authorization_id","idempotency_key"],
+        "properties":{"envelope":{"$ref":"#/$defs/envelope"},"task_id":{"$ref":"#/$defs/identifier"},"task_version":{"$ref":"#/$defs/identifier"},"recipient_id":{"$ref":"#/$defs/identifier"},"body":{"type":"string","minLength":1},"content_version":{"$ref":"#/$defs/identifier"},"authorization_id":{"$ref":"#/$defs/identifier"},"idempotency_key":{"$ref":"#/$defs/identifier"}}
+      },
+      "send_output": {
+        "type":"object","additionalProperties":false,"required":["message_id","task_id","message_status","task_status","task_version","source_type","sent_at"],
+        "properties":{"message_id":{"$ref":"#/$defs/identifier"},"task_id":{"$ref":"#/$defs/identifier"},"message_status":{"const":"SENT"},"task_status":{"const":"WAITING_FEEDBACK"},"task_version":{"$ref":"#/$defs/identifier"},"source_type":{"const":"SIMULATED"},"sent_at":{"type":"string","format":"date-time"}}
+      },
+      "read_input": {
+        "type":"object","additionalProperties":false,"required":["envelope","task_id"],
+        "properties":{"envelope":{"$ref":"#/$defs/envelope"},"task_id":{"$ref":"#/$defs/identifier"}}
+      },
+      "read_output": {
+        "type":"object","additionalProperties":false,"required":["task_id","status","version","purpose","coordinator_id","due_at","timezone","evidence_requirements","authorization_id","related_meeting_id","related_event_ids","source_refs","message_ids","feedback_ids","completion_authorization_id","execution_namespace"],
+        "properties":{"task_id":{"$ref":"#/$defs/identifier"},"status":{"enum":["OPEN","WAITING_FEEDBACK","IN_PROGRESS","WAITING_MATERIAL","RESULT_SUBMITTED","COMPLETED_CONFIRMED","CANCELED"]},"version":{"$ref":"#/$defs/identifier"},"purpose":{"type":"string","minLength":1},"coordinator_id":{"$ref":"#/$defs/identifier"},"due_at":{"type":"string","format":"date-time"},"timezone":{"type":"string","minLength":1},"evidence_requirements":{"type":"array","minItems":1,"items":{"type":"string"}},"authorization_id":{"$ref":"#/$defs/identifier"},"related_meeting_id":{"$ref":"#/$defs/identifier"},"related_event_ids":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"source_refs":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"message_ids":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"feedback_ids":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"completion_authorization_id":{"anyOf":[{"$ref":"#/$defs/identifier"},{"type":"null"}]},"execution_namespace":{"$ref":"#/$defs/identifier"}}
+      },
+      "error_output": {
+        "type":"object","additionalProperties":false,"required":["code","message","request_id","failed_operation","execution_state","persisted_object_ids","required_input"],
+        "properties":{"code":{"enum":["UNAUTHENTICATED","FORBIDDEN","INVALID_INPUT","VERSION_CONFLICT","IDEMPOTENCY_CONFLICT","SOURCE_UNAVAILABLE","MODEL_ERROR","TIMEOUT","CANCELED","LIMIT_REACHED","PERSISTENCE_ERROR"]},"message":{"type":"string","minLength":1},"request_id":{"$ref":"#/$defs/identifier"},"failed_operation":{"$ref":"#/$defs/identifier"},"execution_state":{"enum":["NOT_EXECUTED","PARTIALLY_EXECUTED","EXECUTED","RECONCILING"]},"persisted_object_ids":{"type":"array","items":{"$ref":"#/$defs/identifier"}},"required_input":{"type":"array","items":{"type":"string"}}}
+      }
+    }
+  },
+  "operations": [
+    {"operation_id":"query_metrics","input_schema":"#/$defs/query_input","output_schema":"#/$defs/query_output","error_schema":"#/$defs/error_output","authorization":"老板查询范围","side_effect":"NONE","invariants":["同一快照版本","期间范围匹配","原始精度计算","缺少数值为 null"]},
+    {"operation_id":"read_evidence","input_schema":"#/$defs/evidence_input","output_schema":"#/$defs/evidence_output","error_schema":"#/$defs/error_output","authorization":"原文与明细访问范围","side_effect":"NONE","invariants":["来源实际可读","版本与查询一致","原文支持断言"]},
+    {"operation_id":"create_assignment","input_schema":"#/$defs/assignment_input","output_schema":"#/$defs/assignment_output","error_schema":"#/$defs/error_output","authorization":"老板明确创建指令","side_effect":"TASK_WRITE","invariants":["联系人唯一","当前内容授权","幂等写入","仅 OPEN，不自动完成"]},
+    {"operation_id":"send_assignment","input_schema":"#/$defs/send_input","output_schema":"#/$defs/send_output","error_schema":"#/$defs/error_output","authorization":"老板明确模拟发送指令","side_effect":"OUTBOX_WRITE","invariants":["收件人与正文版本匹配","发件箱可重读","任务转 WAITING_FEEDBACK","失败分项保留"]},
+    {"operation_id":"read_assignment","input_schema":"#/$defs/read_input","output_schema":"#/$defs/read_output","error_schema":"#/$defs/error_output","authorization":"本人任务范围","side_effect":"NONE","invariants":["读取持久状态","消息反馈可关联","收到反馈不等于完成"]}
+  ],
+  "steps": [
+    {"step_id":"P01","actor":"MAINTAINER","action":"固定版本和真实服务，生成并校验 initial_materials，建立当前 Provider 的独立执行空间。","inputs":["PC01—PC05","初始快照"],"outputs":["可读取资料","版本清单","独立 namespace"],"assertion_ids":["SP-A01","SP-A02","SP-A03"]},
+    {"step_id":"P02","actor":"BOSS","action":"以自然语言查询同一合成区域当前与基准期间的销量、收入、毛利和单吨毛利。","inputs":["query_input","老板查询范围"],"outputs":["query_output","真实模型和工具事件"],"assertion_ids":["SP-A04","SP-A05","SP-A06"]},
+    {"step_id":"P03","actor":"BOSS","action":"继续要求原始依据，并按产品追问变化原因。","inputs":["P02.query_id","evidence_input","新的产品维度"],"outputs":["evidence_output","新查询参数","已确认与未知原因"],"assertion_ids":["SP-A06","SP-A07","SP-A08"]},
+    {"step_id":"P04","actor":"BOSS","action":"提供明确联系人、期限、材料要求和当前正文，授权创建交办及模拟发送。","inputs":["assignment_input","send_input","老板当前授权"],"outputs":["assignment_output","send_output"],"assertion_ids":["SP-A09","SP-A10","SP-A11"]},
+    {"step_id":"P05","actor":"BOSS","action":"在新查询中读取刚创建的交办和模拟发件箱，检查负责人、期限、证据及状态。","inputs":["read_input","P04.task_id"],"outputs":["read_output","可查询发件箱"],"assertion_ids":["SP-A10","SP-A11","SP-A12"]},
+    {"step_id":"P06","actor":"MAINTAINER_THEN_BOSS","action":"维护注入进展、延期申请及结果证据；老板查看，再明确决定延期或确认完成。","inputs":["原任务与消息 ID","署名模拟反馈","独立老板决定"],"outputs":["反馈历史","有效期限","老板完成记录"],"assertion_ids":["SP-A13","SP-A14"]},
+    {"step_id":"P07","actor":"BOSS","action":"确认修改简报要求，新会话查询；再删除一条记忆并撤销一份资料，重新检索。","inputs":["当前记忆和资料版本","本人修改删除指令"],"outputs":["新版本采用","失效内容排除证据"],"assertion_ids":["SP-A15","SP-A16"]},
+    {"step_id":"P08","actor":"MAINTAINER","action":"保存、校验并启用模型参数或提醒规则的新版本，重新加载后启动新任务。","inputs":["已验证参数","当前配置版本"],"outputs":["保存与启用版本","新任务采用记录"],"assertion_ids":["SP-A17"]},
+    {"step_id":"P09","actor":"MAINTAINER","action":"停止并重启实际进程，重新读取任务、发件箱、记忆、配置和计划。","inputs":["实际持久存储","重启命令"],"outputs":["重启后的状态和采用证据"],"assertion_ids":["SP-A18","SP-A19"]},
+    {"step_id":"P10","actor":"MAINTAINER_THEN_BOSS","action":"推进业务时钟触发一次计划任务，重复事件、暂停、取消、恢复事件与重启分别检查。","inputs":["唯一计划","业务事件","本人提醒设置"],"outputs":["实际调度","通知记录","抑制原因"],"assertion_ids":["SP-A19","SP-A20","SP-A21"]},
+    {"step_id":"P11","actor":"EVALUATOR","action":"分别执行老板合法路径、维护越权、未认证、联系人伪造、文档注入及范围改变检查。","inputs":["权限矩阵","实际服务请求","私人资料"],"outputs":["拒绝记录","正式状态重读","无正文泄露检查"],"assertion_ids":["SP-A22","SP-A23","SP-A24"]},
+    {"step_id":"P12","actor":"EVALUATOR","action":"执行重复、版本并发、接口不可用、流式中断、取消、轮数上限与写入后模型失败检查。","inputs":["获准模拟业务故障","真实 Runtime 运行条件","已保存动作"],"outputs":["原始错误","已执行与未执行动作","重读结果"],"assertion_ids":["SP-A25","SP-A26","SP-A27","SP-A28"]},
+    {"step_id":"P13","actor":"MAINTAINER","action":"重置当前执行空间，DeepSeek 从相同初始资料至少执行两次；汇集所有尝试。","inputs":["同初始快照","新 namespace","DeepSeek 的真实配置"],"outputs":["独立运行证据","用量和费用覆盖","复用位置与限制"],"assertion_ids":["SP-A29","SP-A30","SP-A31","SP-A32"]},
+    {"step_id":"P14","actor":"MAINTAINER_THEN_BOSS","action":"启动固定版本的开源用户端和管理端，以实际 DOM 操作执行老板查询与交办重读、后台配置保存重载及下一任务采用；逐项核对源码复用和六类 Agent 组件。","inputs":["open_source_reuse_definition","P01—P13 的同版本环境","独立老板及维护身份","PRD WF-1.1"],"outputs":["两端源码及能力映射","DOM 与真实服务操作证据","配置采用和权限拒绝","六类组件职责及版本"],"assertion_ids":["SP-A33","SP-A34","SP-A35"]},
+    {"step_id":"P15","actor":"MAINTAINER_THEN_BOSS","action":"在实际目标电脑安装启动桌面应用并访问两端；分别关闭窗口、完整退出、重启、休眠恢复和重新联网，核查系统权限及桌面宿主请求边界。","inputs":["desktop_definition","目标设备","实际安装包与配置","P14 两端页面","已保存任务、记忆、调度及本人授权"],"outputs":["目标系统与安装包记录","两端桌面操作和窗口适配证据","进程与调度状态及恢复重读","系统权限与 IPC 拒绝记录"],"assertion_ids":["SP-A36","SP-A37"]}
+  ],
+  "assertions": [
+    {"assertion_id":"SP-A01","category":"baseline","method":"读取 tag/commit、依赖锁定及官方匹配资料，核查 Runtime/Tools/Memory/Scheduler 实际接入位置。","expected":"固定版本、复用与自建责任可定位，候选建议不被当作通过证据。","prd_ac_ids":["AC-24-S","AC-32-S"]},
+    {"assertion_id":"SP-A02","category":"relations","method":"实际查询初始资料，独立检查实体关系和全部明细汇总。","expected":"数值符合需求 13.2；会议、人员、事件、资料、历史任务的引用有效。","prd_ac_ids":["AC-03-S","AC-25-S"]},
+    {"assertion_id":"SP-A03","category":"model_isolation","method":"检查模型实际收到的业务输入及 DeepSeek 两次独立运行的快照校验和。","expected":"初始事实和授权等价，执行空间独立，无评分答案或结论标签。","prd_ac_ids":["AC-24-S","AC-31-S"]},
+    {"assertion_id":"SP-A04","category":"real_model","method":"核对实际 Provider 请求标识、API 类型、model_id、工具调用及工具结果回传。","expected":"DeepSeek 真实执行；至少完成查询、依据、创建和重读过程。","prd_ac_ids":["AC-24-S"]},
+    {"assertion_id":"SP-A05","category":"numeric","method":"独立从明细复算五项变化与当前/基准毛利率、单吨毛利。","expected":"与 evaluator_only_expected 一致；使用原始精度和明确舍入，百分点和百分比分开。","prd_ac_ids":["AC-03-S"]},
+    {"assertion_id":"SP-A06","category":"provenance","method":"打开实际返回的原文/明细及版本，检查其支持回答断言。","expected":"来源、属性、单位、范围、期间、时效与覆盖完整，来源可访问。","prd_ac_ids":["AC-03-S","AC-03-E"]},
+    {"assertion_id":"SP-A07","category":"unknown_questions","method":"演示者现场改变产品、地区或期间问法，检查新工具参数和独立复算。","expected":"按新输入重新查询，维度变化不会沿用不匹配结果。","prd_ac_ids":["AC-03-S","AC-29-S"]},
+    {"assertion_id":"SP-A08","category":"missing_material","method":"通过模拟服务移除原因明细、标记未同步范围或提供冲突说明后查询。","expected":"不编造原因、不把缺少值记零，冲突和资料需求明确。","prd_ac_ids":["AC-03-E","AC-29-E"]},
+    {"assertion_id":"SP-A09","category":"authorization","method":"核对本人明确指令、当前目标对象、正文版本、期限与工具执行授权。","expected":"有效授权继续执行，不重复询问；缺少决定性条件不写入。","prd_ac_ids":["AC-06-S","AC-28-S"]},
+    {"assertion_id":"SP-A10","category":"assignment","method":"通过独立只读路径重新查询实际持久任务及全部必需字段。","expected":"任务目的、唯一负责人、期限时区、证据要求、会议事件关联及授权一致。","prd_ac_ids":["AC-06-S"]},
+    {"assertion_id":"SP-A11","category":"send","method":"查询模拟发件箱、任务版本及 message_id 关联。","expected":"单条 SENT 记录且任务 WAITING_FEEDBACK；保存任务与发送分别有状态。","prd_ac_ids":["AC-06-S","AC-08-S"]},
+    {"assertion_id":"SP-A12","category":"state_readback","method":"结束当前模型运行后建立新查询读取任务及消息。","expected":"结果来自业务持久状态，未收到反馈时不声称完成。","prd_ac_ids":["AC-06-S","AC-24-S"]},
+    {"assertion_id":"SP-A13","category":"feedback","method":"实际注入进展、延期申请及结果证据，分别读取任务。","expected":"进展、RESULT_SUBMITTED 和延期申请独立可查；原期限不自行改变，完成授权为空。","prd_ac_ids":["AC-06-S","AC-06-E"]},
+    {"assertion_id":"SP-A14","category":"completion","method":"老板针对当前结果明确批准延期或确认完成，再读取任务与提醒。","expected":"只有本人决定产生新期限或 COMPLETED_CONFIRMED；原始事件及专业状态保持独立。","prd_ac_ids":["AC-06-S"]},
+    {"assertion_id":"SP-A15","category":"memory","method":"老板修改确认要求后使用新的 session_id 实际生成简报，检查采用的 memory_version。","expected":"当前要求进入新任务，短期交办不自动成为长期记忆。","prd_ac_ids":["AC-13-S"]},
+    {"assertion_id":"SP-A16","category":"memory_deletion","method":"删除一条记忆、撤销一份资料后检查索引、派生摘要及新会话查询。","expected":"失效内容不再进入模型和结果，历史决定按权限显示原引用失效标记。","prd_ac_ids":["AC-13-E"]},
+    {"assertion_id":"SP-A17","category":"configuration","method":"保存、重载、校验、启用一个真实支持的配置变更，再运行新任务。","expected":"页面、服务有效版本及实际请求一致；旧在途任务保持启动快照，写入仍校验当前授权。","prd_ac_ids":["AC-24-S","AC-26-S"]},
+    {"assertion_id":"SP-A18","category":"restart","method":"实际停止并重启 Runtime 和业务服务，通过新进程读取任务、消息、配置和记忆。","expected":"确认写入保留、当前要求生效、删除内容不恢复，没有重复发送。","prd_ac_ids":["AC-13-S","AC-13-E","AC-32-S"]},
+    {"assertion_id":"SP-A19","category":"scheduler_owner","method":"检查实际调度承载进程、计划版本、启动注册及重启执行记录。","expected":"同一计划只有唯一执行责任；SDK 存在不能代替实际调度证据。","prd_ac_ids":["AC-02-S","AC-24-S"]},
+    {"assertion_id":"SP-A20","category":"scheduler_controls","method":"推进业务时钟，触发计划和重复事件；分别暂停及取消计划，继续推进并重启。","expected":"实际通知一次，重复抑制可查；暂停取消后没有新运行或业务写入。","prd_ac_ids":["AC-02-E"]},
+    {"assertion_id":"SP-A21","category":"reminder_rules","method":"依次检查冷却、免打扰、有效升级、老板暂缓、关闭及源事件恢复。","expected":"行为与当前规则版本一致；提醒状态不改变原期限、专业结论或交办完成。","prd_ac_ids":["AC-02-S","AC-02-E"]},
+    {"assertion_id":"SP-A22","category":"permissions","method":"老板合法查询和写入后，维护请求同一业务决定、私人正文及记忆修改，并独立重读。","expected":"合法路径有效；维护越权拒绝，零业务变更且无正文泄露。","prd_ac_ids":["AC-12-S","AC-12-E","AC-28-S","AC-28-E"]},
+    {"assertion_id":"SP-A23","category":"authentication","method":"未认证请求和使用 contact_id 伪造登录或授权的请求实际访问服务。","expected":"全部拒绝；联系人没有产品账号或独立 Agent。","prd_ac_ids":["AC-28-E"]},
+    {"assertion_id":"SP-A24","category":"injection_and_revocation","method":"模拟资料含越权操作要求，同时检查老板撤销授权后工具读取与提交。","expected":"资料不能授予权限，已撤销授权不执行，证据和日志不暴露私人正文。","prd_ac_ids":["AC-28-E","AC-29-E"]},
+    {"assertion_id":"SP-A25","category":"idempotency_and_conflict","method":"重复相同请求、同幂等标识不同内容、并发版本更新后提交。","expected":"相同意图单一结果；冲突明确拒绝；没有重复任务、发送或旧版本覆盖。","prd_ac_ids":["AC-06-E","AC-29-E"]},
+    {"assertion_id":"SP-A26","category":"upstream_failure","method":"由获准模拟业务接口真实返回不可用/超时，检查模型与后续动作；模型接入错误使用实际不兼容条件留证。","expected":"明确错误位置，依赖动作停止，不自动换模型或生成预设成功。","prd_ac_ids":["AC-24-E","AC-29-E"]},
+    {"assertion_id":"SP-A27","category":"partial_execution","method":"实际业务写入成功后中断后续模型请求，再用独立查询读取任务与发件箱。","expected":"已执行动作如实保留，运行失败与业务成功分别呈现，重试前读取既有结果。","prd_ac_ids":["AC-24-E","AC-29-E"]},
+    {"assertion_id":"SP-A28","category":"runtime_limits","method":"真实运行中取消、断开事件流，并使用有效配置触发超时及最大轮数。","expected":"stop_reason 明确，未执行动作停止，重连重新查询状态；不重复已执行动作。","prd_ac_ids":["AC-24-E","AC-29-E"]},
+    {"assertion_id":"SP-A29","category":"reset","method":"重置后检查新数据集与 session/memory/schedule/task/outbox，尝试旧 namespace 写入。","expected":"初始事实可重现，历史记录归属不变，旧写入被拒绝，旧记忆和结果不混入。","prd_ac_ids":["AC-25-S","AC-25-E","AC-31-S"]},
+    {"assertion_id":"SP-A30","category":"repeatability","method":"每种 Provider 至少两次独立重置执行共同过程，核查全部尝试。","expected":"用相同事实授权及状态断言检查，措辞差异允许，失败不得省略。","prd_ac_ids":["AC-24-S","AC-31-S"]},
+    {"assertion_id":"SP-A31","category":"usage_and_cost","method":"核查真实请求用量、服务时间、计价日期币种、失败费用及已知覆盖。","expected":"用量缺少或价格缺少时总额 null；不填零；费用和时间是否可接受等待 D05。","prd_ac_ids":["AC-30-S","AC-30-E"]},
+    {"assertion_id":"SP-A32","category":"handoff","method":"逐项定位固定版本、复用/扩展位置、实际命令、独立断言、原始证据和限制。","expected":"T03/T04/T07/T16 可按同版本证据设计，未验证内容不登记通过；没有真实企业收益声明。","prd_ac_ids":["AC-32-S","AC-32-E"]},
+    {"assertion_id":"SP-A33","category":"open_source_user_app","method":"定位上游用户端 tag/commit、许可证、页面与组件源码；实际启动，以老板身份通过 DOM 提交共同任务并刷新重读任务、引用和发送结果。","expected":"存在实际复用的应用页面，六类老板入口均有复用或业务扩展映射；用户端结果与正式状态一致，静态展示或仅 SDK 不构成通过。","prd_ac_ids":["AC-26-S","AC-32-S"]},
+    {"assertion_id":"SP-A34","category":"open_source_admin_app","method":"定位上游管理端源码和正式 API；按 AD01—AD16 建立复用矩阵；实际通过页面保存重载一项受支持配置、启动任务检查采用，并尝试老板决定和私人资料访问。","expected":"存在实际复用的管理页面，配置有唯一有效来源；运行采用对应版本；维护越权拒绝，联系人无产品账号；业务扩展有位置及责任。","prd_ac_ids":["AC-26-S","AC-26-E","AC-28-E"]},
+    {"assertion_id":"SP-A35","category":"agent_components","method":"沿共同任务实际记录定位 Prompt、SOP、知识、模型、工具和独立 Evaluation 的版本及采用关系；检查方法更新后的任务结果及评分资料隔离。","expected":"六类组件职责明确，动态查询遵守程序授权和状态校验；实际结果参与后续步骤，停止条件有效；DSLM 可选有依据，组件存在不替代独立质量判定。","prd_ac_ids":["AC-24-S","AC-24-E","AC-31-S","AC-31-E"]},
+    {"assertion_id":"SP-A36","category":"desktop_lifecycle","method":"核查系统版本、架构及安装包，实际安装启动、重复启动、关闭窗口、完整退出、重启和休眠恢复；中断网络后重新联网，独立读取任务、记忆、计划、授权、发件箱与服务进程；按 desktop_definition 检查窗口尺寸及缩放可访问结构。","expected":"两端由桌面应用承载；已确认状态持久，关闭和退出语义明确，完整退出停止本地调度，重复启动不增加执行者；恢复仅处理有效事件且无重复动作，未确认结果先查询；不兼容系统和网络失败明确，桌面运行不等于模型离线可用。","prd_ac_ids":["AC-26-S","AC-32-S","AC-32-E"]},
+    {"assertion_id":"SP-A37","category":"desktop_permissions","method":"在实际系统分别允许、拒绝和撤销麦克风及通知权限，执行文件选择与外部来源打开；经真实 IPC 请求未授权能力，以维护身份和未认证身份重试老板操作，并检查正式状态及可见内容。","expected":"权限拒绝可解释且文字及应用内通知保留，麦克风撤销停止采集；系统通知无私人正文；文件仅在授权范围访问，IPC 不授予任意命令或文件权限；维护不能代办老板决定，凭据不进入渲染界面或日志。","prd_ac_ids":["AC-26-E","AC-27-E","AC-28-E"]}
+  ],
+  "measurement_and_evidence": {
+    "definition_source": "specs/value-validation.json metrics、common_protocol、protocols、thresholds；沿用 PRD-0 第 11.9.1 节。",
+    "collection_owner": "T02 实际执行者；T09/T24 继承方法及后续测量责任。",
+    "future_output_root": "evidence/T02/<run_id>/",
+    "required_context": ["Provider 与 API 类型","model_id","开源 tag/commit","依赖锁定","代码或文件校验和","环境设备与网络","数据快照与 namespace","seed 与生成器版本","Prompt/Skill/工具/索引/记忆/调度版本","老板身份与授权引用","真实时间及业务时间","实际命令及退出状态"],
+    "required_artifacts": ["实际模型请求元信息与用量","实际工具参数及返回","独立明细复算","授权拒绝和无写入检查","持久状态重读","新会话采用","实际重启记录","调度与发件箱去重检查","全部尝试与错误","价格来源及未知条件","复用与扩展清单"],
+    "future_result_definition": "由 T02 的独立结果文件记录 assertion_id、Provider、run_id、PASS/FAIL/NOT_RUN/BLOCKED、实际值、证据位置与限制；不得回填本定义文件。",
+    "acceptance_rule": "A02 需要 DeepSeek、运行机制、两端开源复用及六类组件分别有实际证据；每个适用断言通过。费用、等待和资源可接受性独立使用当前 D05/D06，未知不伪报达标。",
+    "stop_rule": "发现未授权动作、隐私暴露、错误正式状态、错误数值或重复写入时停止受影响试验及通过声明，保存状态并修复复验。",
+    "handoff_targets": ["T03", "T04", "T07", "T16"],
+    "reevaluation_conditions": ["模型或 API 类型改变","开源或依赖升级","工具参数或权限改变","数据、Prompt、Skill、记忆或索引版本改变","调度责任或设备环境改变","新增失败证据","价格及预算改变"]
+  }
+}

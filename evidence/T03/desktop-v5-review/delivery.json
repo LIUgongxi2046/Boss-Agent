@@ -1,0 +1,691 @@
+{
+  "review_date": "2026-10-22",
+  "scope": "desktop",
+  "images": [
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A01-档案与访问.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A02-接口目录.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A03-数据集.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A04-场景与事件.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A05-Prompt版本.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A06-SOP与Skills.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A07-Knowledge Base.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A08-模型连接.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A09-Tools与连接.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A10-指标与规则.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A11-关联对象.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A12-记忆技术维护.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A13-调度计划.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A14-动作授权记录.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A15-运行记录.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/A16-评测管理.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D01-来源原文与支持关系.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D02-当前动作必要决定.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D03-执行结果核查.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D04-选择负责人.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D05-选择时间与时区.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D06-未保存修改提醒.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D07-访问权限限制.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D08-登录状态已过期.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/D09-历史通知只读详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F01-今日工作.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F02-经营提醒.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F03-经营查询与追问.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F04-会前材料.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F05-纪要核查.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F06-交办详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F07-申请审阅.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F08-消息编辑.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F09-专题研究.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F10-人员会面.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F11-行程安排.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F12-本人私人安排.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F13-个人记忆.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F14-原料与饲料.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F15-水产季节.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F16-苗种批次.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F17-动保与技服.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F18-生猪合作.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F19-禽类与反刍.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F20-公司水产养殖.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F21-食品与品质.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F22-海外业务.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F23-研发应用.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F24-运行详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F25-模拟中心.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F26-应用入口与本人设置.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F27-语音交办.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F28-动作授权详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F29-任务异常详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F30-运行与用量详情.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F31-演示评测.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/F32-本地运行与交接.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N01-身份登录.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N02-聊天交办.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N03-经营关注.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N04-会议与资料.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N05-任务与承诺.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N06-通知中心.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N07-本人目标与关注要求.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N08-通知要求与可见范围.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N09-本人计划.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N10-本人授权.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N11-历史决定.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/N12-运行概况.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/V19-BEEF-禽类与反刍.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/V19-EGG-禽类与反刍.png",
+      "width": 2880,
+      "height": 2048
+    },
+    {
+      "file": "Boss-Agent-Desktop-Complete-v5/images/V19-MILK-禽类与反刍.png",
+      "width": 2880,
+      "height": 2048
+    }
+  ],
+  "indexed_state_rows": 561,
+  "state_index_columns": [
+    "主页面ID",
+    "状态编号",
+    "状态提示词路径",
+    "本批PNG覆盖"
+  ],
+  "state_index_first": {
+    "主页面ID": "A01",
+    "状态编号": "S00",
+    "状态提示词路径": "states/desktop/A01/S00.txt",
+    "本批PNG覆盖": "否：仅主页面视图"
+  },
+  "state_coverage_values": [
+    "否：仅主页面视图"
+  ],
+  "pdf_files": [],
+  "file_count": 259,
+  "source_sha256": {
+    "Boss-Agent-Desktop-Complete-v5/.DS_Store": "cfbbba4b544ea8e2e50b7ecf5c081e910dc1993ce11e1a26aaaf98b6d8881a64",
+    "Boss-Agent-Desktop-Complete-v5/animation/01-待机悬浮-封面.png": "2b061737fadf7421755ba1426d58c4a8d3c6fc925e2c886631f36f02a5723233",
+    "Boss-Agent-Desktop-Complete-v5/animation/01-待机悬浮.mp4": "7b815ffc54b3434b1d1c250d9682278612ad0ddc4b6b8ccb4c85e91c8e1ee377",
+    "Boss-Agent-Desktop-Complete-v5/animation/01-待机悬浮.webp": "15a632c68f8fa992553df4f42577214d0760d65280c8314124e84e78a5edf225",
+    "Boss-Agent-Desktop-Complete-v5/animation/02-语音倾听-封面.png": "c948de528a8aee99053f333b502b5d0a00806e3ed3c868f10e1fe4440f1340f8",
+    "Boss-Agent-Desktop-Complete-v5/animation/02-语音倾听.mp4": "fcbc6092e7b09765d2b80053b4643fd51286b2c25802ab8a61fe5405717bf839",
+    "Boss-Agent-Desktop-Complete-v5/animation/02-语音倾听.webp": "3429a69db354fb76fd56e1910e345653181c9b939bbd3441fc286620950074bb",
+    "Boss-Agent-Desktop-Complete-v5/animation/03-思考分析-封面.png": "8c39a43b8843bd27978cd805070f45f3c2ed9b0f8b8af7ea50069c3a4e103afc",
+    "Boss-Agent-Desktop-Complete-v5/animation/03-思考分析.mp4": "6f9f2dd5fe79f5dd4134bc141b87f99c3fd292e7f183cff82493cb0ab5fe9417",
+    "Boss-Agent-Desktop-Complete-v5/animation/03-思考分析.webp": "c4ca31efd6ae3f4d0eb11d66e50f61220ebe9fe9a32d73d8f8ac138208f8b9ab",
+    "Boss-Agent-Desktop-Complete-v5/animation/04-执行推进-封面.png": "a927106642a66d750b732e64ba79d484a7c414e20bdafb9da4df102f0a058bfd",
+    "Boss-Agent-Desktop-Complete-v5/animation/04-执行推进.mp4": "982034c23e7468d1e31f704b451f14a3126a363199ebc9f18ef68a8d9b0a5c22",
+    "Boss-Agent-Desktop-Complete-v5/animation/04-执行推进.webp": "e46fc68804a46d38925a08c1e573f530575720a29095012a5427d96ff9d8069f",
+    "Boss-Agent-Desktop-Complete-v5/animation/05-完成确认-封面.png": "b2dc7dcb44090eb9865788011f6a39a3f559ce814ca91414295192c5941e0ecf",
+    "Boss-Agent-Desktop-Complete-v5/animation/05-完成确认.mp4": "19b0991fb7e83dec8a0cbbec30ee97f2c6e4ac431b4a5c97ea894124b5e7c057",
+    "Boss-Agent-Desktop-Complete-v5/animation/05-完成确认.webp": "3c180e407ecdc5536888e3319034481c7f8b3f21ca02a3abba5f9fbb7f4336f8",
+    "Boss-Agent-Desktop-Complete-v5/animation/06-通知提醒-封面.png": "9085feb97e5cb9976df812ef94a14b5a141bd4f4d983b2d0119f1e3cf6a04e1b",
+    "Boss-Agent-Desktop-Complete-v5/animation/06-通知提醒.mp4": "790be6fac386121e4cf5d1936702f05e096e32e4863b9c64f273464aa6cb0db1",
+    "Boss-Agent-Desktop-Complete-v5/animation/06-通知提醒.webp": "ea648b28b87bd1784eee8f5813b58a0cf76c90d1e0b78e091c3b1f930d3a97a0",
+    "Boss-Agent-Desktop-Complete-v5/animation/index.html": "726b875a1e21832b6e8a25d9b28b04f31d84c4fba1b14f940bc9344e8ab3ad34",
+    "Boss-Agent-Desktop-Complete-v5/assets/boss-logo-from-reference.png": "527435af697270e3d846077261aefe7f07084227c2a28da3dbac35a4807f1be1",
+    "Boss-Agent-Desktop-Complete-v5/assets/dapeng-execute.png": "667020b33d6b9bdad34bf1c91bfb0653a6ba318e088c31532efaf1bd779cf785",
+    "Boss-Agent-Desktop-Complete-v5/assets/dapeng-front.png": "77cc3bdf5603f55f3d50fde89bee47b7d9196d1028618207c3a36c712f278b2b",
+    "Boss-Agent-Desktop-Complete-v5/assets/dapeng-side.png": "006cff68cc7328384c788212e017fbf8bbc4a6bfe413a3101b07d5253a66cef8",
+    "Boss-Agent-Desktop-Complete-v5/assets/dapeng-think.png": "dbdbb9b90b0aa0df161a9a7133fc1b4d2fceda4b9e550b96c1c30b7d49e39a91",
+    "Boss-Agent-Desktop-Complete-v5/images/A01-档案与访问.png": "24d9248c817e88b953862e96d88057e9dca2ff08ad671768718eab536bc86fd1",
+    "Boss-Agent-Desktop-Complete-v5/images/A02-接口目录.png": "dc1cf4f06ba74f8d12db535954869f0c7d1d08e0ef17c544f009d9b169760a8e",
+    "Boss-Agent-Desktop-Complete-v5/images/A03-数据集.png": "2dea0c6a21033e3819528dd5a750764e769a9b036ab3d0358cc6ee85816d6353",
+    "Boss-Agent-Desktop-Complete-v5/images/A04-场景与事件.png": "5a8eff5be5524129528ab959447fdba579035c4440451ebab9e12736489b7e59",
+    "Boss-Agent-Desktop-Complete-v5/images/A05-Prompt版本.png": "e3c2b4f24aafc8ace667d8a053f1f2c9853544316d8aec6e11163184adc844c3",
+    "Boss-Agent-Desktop-Complete-v5/images/A06-SOP与Skills.png": "76be003cdb6dc838ef5781d1a6b801e30f7ff739eb790cf7281fbc5122a81ed9",
+    "Boss-Agent-Desktop-Complete-v5/images/A07-Knowledge Base.png": "e2dfebdf5e8e2e002efdf3a1088baf35a6a8344ddf9001a9f1f58cfd48da885c",
+    "Boss-Agent-Desktop-Complete-v5/images/A08-模型连接.png": "22b378f50726198ae317109d7751bfa472e1cfd728961484699039b76a6414c0",
+    "Boss-Agent-Desktop-Complete-v5/images/A09-Tools与连接.png": "8185d163060705b2f78a521c8313a1bebbb302cb20b039fd31a81ef81251dd8f",
+    "Boss-Agent-Desktop-Complete-v5/images/A10-指标与规则.png": "e3ae35dc4288d3c643b55b016657fa9dbcd92f0df3a0da044bed67cf72de327b",
+    "Boss-Agent-Desktop-Complete-v5/images/A11-关联对象.png": "7f98976f9979461979fbcb44d1473055ca90467baa1bd6982b92ae18770bf67f",
+    "Boss-Agent-Desktop-Complete-v5/images/A12-记忆技术维护.png": "8229e7c934352583d315cd3a1bbaadd02938b94d72676ab97a88ac27d46e9a24",
+    "Boss-Agent-Desktop-Complete-v5/images/A13-调度计划.png": "5d11a2a997fa1862f05351118e44b070c7888fe166f99a8b5d747db5f360945d",
+    "Boss-Agent-Desktop-Complete-v5/images/A14-动作授权记录.png": "272a8dfc222c8815fb9eb8a1b37be27cad713fe524c1b116becd025fb302f039",
+    "Boss-Agent-Desktop-Complete-v5/images/A15-运行记录.png": "40216eb35d2e9337c967d12400e71b537cb5a586d4ba9f590af6b08de1d3b4a5",
+    "Boss-Agent-Desktop-Complete-v5/images/A16-评测管理.png": "bb2174c32f6b7584aac823c5e54a30e5213c4ddce095add6fbf19c4b1540ed83",
+    "Boss-Agent-Desktop-Complete-v5/images/D01-来源原文与支持关系.png": "3d4a0a3773deac120170f3cef3a93b11c64402fc17f5045f3492d8da5b02c3ff",
+    "Boss-Agent-Desktop-Complete-v5/images/D02-当前动作必要决定.png": "21b7fdc12a576e7ecf86e86bfa7ca475da94e6e3e73b30a81e00a19962aca3f5",
+    "Boss-Agent-Desktop-Complete-v5/images/D03-执行结果核查.png": "ce8e517a74ef80a369a96a68968a163c8388c0cec6a8d6e35993a00cd58f5118",
+    "Boss-Agent-Desktop-Complete-v5/images/D04-选择负责人.png": "5644735e91bbbb6309b29e5f6e5b9495847e8468ebcd28e14fe856d4365df8f6",
+    "Boss-Agent-Desktop-Complete-v5/images/D05-选择时间与时区.png": "c79216669b6280e9183f1ff1b4f19623b1c775f003fa6f5a8d1b3f240897674a",
+    "Boss-Agent-Desktop-Complete-v5/images/D06-未保存修改提醒.png": "a8d5056e42d2db23545beb88fbeb9ec56dee78dcb2416e884df1cddfdad6493f",
+    "Boss-Agent-Desktop-Complete-v5/images/D07-访问权限限制.png": "6d51227c4f57c8e8ab80acb493407698594c2fcf4fdf3ece6b24ceb0f2695f3e",
+    "Boss-Agent-Desktop-Complete-v5/images/D08-登录状态已过期.png": "0a8f2450911685888d2c6bee261f037837ab506d77897f0ab539837fd5f749a5",
+    "Boss-Agent-Desktop-Complete-v5/images/D09-历史通知只读详情.png": "a999d1d56c899656347351c0e4170cb63c10229d8ed8061ea8428583e02f0340",
+    "Boss-Agent-Desktop-Complete-v5/images/F01-今日工作.png": "53843719f5658723b09d466c86ee545b45e73085ad770b50318f3476fadaadd1",
+    "Boss-Agent-Desktop-Complete-v5/images/F02-经营提醒.png": "81737194164b5f5c403409c2ffc04a627b483854493b39faaf5376e9d673d4b6",
+    "Boss-Agent-Desktop-Complete-v5/images/F03-经营查询与追问.png": "a9d9ce3bbbb770af8e0cd2704943314d117669bb2ea082ad957564c266a40d05",
+    "Boss-Agent-Desktop-Complete-v5/images/F04-会前材料.png": "76b42ab738d9bf6d983db49a1909c61a537bbc7f9482d135b4c93938624be0f2",
+    "Boss-Agent-Desktop-Complete-v5/images/F05-纪要核查.png": "39ff5b9ffcee85c4de177f80e331b9c283e22083fd4e32c1b994bc537eff8395",
+    "Boss-Agent-Desktop-Complete-v5/images/F06-交办详情.png": "19b7167ba933f883ba61fd59af56395e36bb0a14173df08a1b235dbc9fd41394",
+    "Boss-Agent-Desktop-Complete-v5/images/F07-申请审阅.png": "49fa983c21e35d4d3866764aa2ca5c0b0e5642767527d00c29d4ef3be381af51",
+    "Boss-Agent-Desktop-Complete-v5/images/F08-消息编辑.png": "f4e25bda6815e67836444a113143b9067c76f9d42d2f288031a990472f4bc580",
+    "Boss-Agent-Desktop-Complete-v5/images/F09-专题研究.png": "d1ad6c7f24ad368f8d4cadf40b4b719527b275ebaca46879989df61db605a5b1",
+    "Boss-Agent-Desktop-Complete-v5/images/F10-人员会面.png": "276c3e9a5d5edbee496be99529e666737959af5615184abd71ccd9ed3f803482",
+    "Boss-Agent-Desktop-Complete-v5/images/F11-行程安排.png": "6929202f1a2258a95159924110e3372fd3dc82ed09cbf617d3ddbda18fab6a32",
+    "Boss-Agent-Desktop-Complete-v5/images/F12-本人私人安排.png": "53ed045562d43bbb3dfaedafa458d80858c1cf37cfd342365c3fb503b5cebe2c",
+    "Boss-Agent-Desktop-Complete-v5/images/F13-个人记忆.png": "6fd89c9324705931862c01195e195bbbcb57ea133cd227f88ef509aaaf94dcbe",
+    "Boss-Agent-Desktop-Complete-v5/images/F14-原料与饲料.png": "a95e282c18e731ebbdc41087a994d85c6f5127476c52fd07c7afd31881cb5e48",
+    "Boss-Agent-Desktop-Complete-v5/images/F15-水产季节.png": "edb4bf58da20fd74a38b167ea66d241044219262a4da746030fd6ea26e8b490a",
+    "Boss-Agent-Desktop-Complete-v5/images/F16-苗种批次.png": "a95a72e582b4e90bca51dd514da8cb21fe989f8ddb4b270271facef9f21eff59",
+    "Boss-Agent-Desktop-Complete-v5/images/F17-动保与技服.png": "dd08c3a80672e157c6f1cec8a78fc1e4ca138ef0f85a928f18ae455e3fd85662",
+    "Boss-Agent-Desktop-Complete-v5/images/F18-生猪合作.png": "85ac6cd9b9c45104099e8ab1d1ea01925017a933b39ebf4454986aa4d686dbc6",
+    "Boss-Agent-Desktop-Complete-v5/images/F19-禽类与反刍.png": "fb7b47bcb21d9ebf5641dc4a4d632158b45d4677d0d70a7e67dcc8a5601ad196",
+    "Boss-Agent-Desktop-Complete-v5/images/F20-公司水产养殖.png": "ed5e0a5584ed47ffa6871c2ba61d76b118cc5496ec1b0ef3344a8e60b4c4b467",
+    "Boss-Agent-Desktop-Complete-v5/images/F21-食品与品质.png": "9d87a7a32ec4360755f265bf69f3131eb036a865caaf70a1257026ba46c4615c",
+    "Boss-Agent-Desktop-Complete-v5/images/F22-海外业务.png": "ab74673359aa6cfbbd4707eaab53465e0a4bd5d9999a32e85277086b3dd2858f",
+    "Boss-Agent-Desktop-Complete-v5/images/F23-研发应用.png": "af16208b01ae7dc2e584fa4a6742ae9922e0a04c4d06945c037f682786a52245",
+    "Boss-Agent-Desktop-Complete-v5/images/F24-运行详情.png": "83a514cb0533c5cfef448a8fc347b8a113a92247bf7dfadbfacc7862c04561df",
+    "Boss-Agent-Desktop-Complete-v5/images/F25-模拟中心.png": "707221ecd528209f6e33f5c1f43b0ed485824d2aba4798dd8ec72a74111ec49d",
+    "Boss-Agent-Desktop-Complete-v5/images/F26-应用入口与本人设置.png": "33f45dcac11f65ac5b21762aad5fd28426de67c16fcd73934ec95cb470523906",
+    "Boss-Agent-Desktop-Complete-v5/images/F27-语音交办.png": "dea1e3f8a5be3cdcebd724cbb664159cd5d1a1771e6617e07fa69880fa9c5e01",
+    "Boss-Agent-Desktop-Complete-v5/images/F28-动作授权详情.png": "fc325fc52165bd4b170daae70a5d993c926f8ad7d610308d233bdd4a88159a67",
+    "Boss-Agent-Desktop-Complete-v5/images/F29-任务异常详情.png": "6c177b4bc6281b59f9244236ba5867ca8c8f8d78461331146c61a6f686dffbff",
+    "Boss-Agent-Desktop-Complete-v5/images/F30-运行与用量详情.png": "77648a7d01473a4afa4fb167ca3bdd82be563ba3d56f2f232028dd5465455523",
+    "Boss-Agent-Desktop-Complete-v5/images/F31-演示评测.png": "14d2799d7663a30f1614a13c645da397e1fb46221ee9f3efdec705fca4b1afb6",
+    "Boss-Agent-Desktop-Complete-v5/images/F32-本地运行与交接.png": "e048d9543d736e045846df7a90ebf54ebcb4389980b670ba5c8ae0070ef6a72e",
+    "Boss-Agent-Desktop-Complete-v5/images/N01-身份登录.png": "3dda10e785475e8c356df1f49c1599202285a66ba83f572b26c71296dcc3ef50",
+    "Boss-Agent-Desktop-Complete-v5/images/N02-聊天交办.png": "5b9e047843bbdae13fb0274faedef9c0b283ea6432c7af77c71ed43a65b26fa8",
+    "Boss-Agent-Desktop-Complete-v5/images/N03-经营关注.png": "965f92656f1ab7ca9d2f1cb23f7d09e2256f10e11041a291c64f9345ba8975aa",
+    "Boss-Agent-Desktop-Complete-v5/images/N04-会议与资料.png": "50bd3ef10af118ed976bf8c3128432a7f01f047fa1c7a949886cd29aa307c3d7",
+    "Boss-Agent-Desktop-Complete-v5/images/N05-任务与承诺.png": "94fa9efbc6554b36a12f533c325b2ac46ee1c574a423050948f693d43f0e2570",
+    "Boss-Agent-Desktop-Complete-v5/images/N06-通知中心.png": "85fcff83a72eabe14fe0339b7e7b0840b1aabe86c0ce9edb71dfa4d0f50b9730",
+    "Boss-Agent-Desktop-Complete-v5/images/N07-本人目标与关注要求.png": "8f9b084f9c735f721f33a4ed91189f77a5d759677317b8a6c302cc0e2e0b3443",
+    "Boss-Agent-Desktop-Complete-v5/images/N08-通知要求与可见范围.png": "bede07e159f30b31e5d48ef786a1e27ae15bd286f74af12eb1eb731f2c34f8b0",
+    "Boss-Agent-Desktop-Complete-v5/images/N09-本人计划.png": "50da07b1725938f7437d5c9d9b9a5cd0fa7b1d0145ff75a5f89ed3ecce2926f2",
+    "Boss-Agent-Desktop-Complete-v5/images/N10-本人授权.png": "a482a373b40df8f8b3b021c096b31fa0c1e0082a20968a871452a099c4cb3260",
+    "Boss-Agent-Desktop-Complete-v5/images/N11-历史决定.png": "c943656e56ffbd957265c68ecaee02340ed1c690af8379ba9718c4a4d3854b56",
+    "Boss-Agent-Desktop-Complete-v5/images/N12-运行概况.png": "281180cd05697ef90b9ffad35dd2fdb96cc7c23a038e353e447f976b2225275f",
+    "Boss-Agent-Desktop-Complete-v5/images/V19-BEEF-禽类与反刍.png": "35d7e4e310b27c03202f3516a0fc99578e9c128a994d6db849a5c18f7247937e",
+    "Boss-Agent-Desktop-Complete-v5/images/V19-EGG-禽类与反刍.png": "8f13253ede5eb299f861e5d568195565e8232de9aa75172e73a4ad2de276c928",
+    "Boss-Agent-Desktop-Complete-v5/images/V19-MILK-禽类与反刍.png": "2109ae2f55006589031d261fe0434c7026c5da82a22c1ffe73bcd653938a6cb4",
+    "Boss-Agent-Desktop-Complete-v5/index.html": "4c2e87c7e234ae499fe22940e6bfe8a1594c6f5ef99916937090dae4ae0e639d",
+    "Boss-Agent-Desktop-Complete-v5/meta/progress.txt": "e16f42c531644bff7d94b7a6e5e507ebb68f3ac7784070f6e85455b3b573a106",
+    "Boss-Agent-Desktop-Complete-v5/meta/screenshot-qa.json": "3471e35a944af6a895b0ed5a10dcdc42fa33ea1923f97c4da776b1ad44cf7878",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A01.txt": "d362ffaf0906af9b1fb3931c188c29622968122b104816a46acb85200a5c0922",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A02.txt": "e175ccbac683416600e275c833d46c357ea6da4d01f2424b63390b454ac3cf22",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A03.txt": "b55b12fb6c794fe15a75250343125a8af08b8520e0909462a26973d2f982fa71",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A04.txt": "72528c60a8c69f193278dc3b00a40272db72d5c8969bd9ae89022d67bbe7161f",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A05.txt": "5153034f4d9e66ed7ae11de900fcabc67d3b1495eedf7a79d7deef30ea4e063a",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A06.txt": "1925833e69b9bf841b1dfcdf22ec3f3ea011cebea6de80036df7545eb04ba467",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A07.txt": "2ce2d0e35e601037f42f1102738fffcfdd0ad8cd820530ac9c1f987fdfdc6584",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A08.txt": "22d438c50dee146e7f406cb6ed4900e212f63ab8c7b7a5f926ca73845b365adb",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A09.txt": "703ec7549c1a4d6c8045deda2d35f1b4eb3fb691f1cbf61d1cf51b61031e3e5e",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A10.txt": "48fce1130e5740cddcd7dca9b1a0be62d9415c2503391751d0421d9cd502f81f",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A11.txt": "fd5599f0646f8f354791de795265da881a9f038799aecc2dc5f071d342cb45b4",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A12.txt": "de9445f8a291b899f94d2102ede39f1c1e22b00095a00236242eba73636e3670",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A13.txt": "29c01d4fd8f448a88185702c70aafd41b62043c5279077cc74d5bed230121649",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A14.txt": "51a51b027b1b087686d6e68a885dc00da079d35f8b5d18fa3bc47afcd0e69989",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A15.txt": "0be0793dbdff4edcfa588e95a18c32191a78478646941b3feb32963cc0a7a190",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/A16.txt": "b931ce5bd3c1ccfeaf9a37d305d415ed83652b7f3c9a6ddf2c472ad2eabe784a",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D01.txt": "90ddc65717809d9d2c0240c1249cd12b532edc0bad220ae1f9817ae52cf827cd",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D02.txt": "e04149dc7285c0784f4aa7e59eff286709867ef7590f925761419ab75f7be7cd",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D03.txt": "d3a4f541d3eace0497ade46d2c7fb758ee4ef3dab65e67a5df45a472c25979f8",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D04.txt": "9e2e21b6bc4f45c38fea1efe015074e34b4bb536ede04286f88b99b4eb397949",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D05.txt": "70bcaab27cc947d76e4036d6fdd6100d56acedd124f457b7d2dddbc4c12bf9ff",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D06.txt": "216115d7ee75b75c5f0975fc5be920606c64259fe45124d86006d0b6eb0afd30",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D07.txt": "5a99f9abe9e84fb56b282cadc68f52718cc636d09ffd911abf462577617f9350",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D08.txt": "001a160d262e7685acbbcb5f867588b78d111a1567d977dae5870756d4cc196a",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/D09.txt": "8ab66091079e0b511cca8bf213bb2e3d1298da1f5641cc24decdc67e803db3bc",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F01.txt": "08f4969e2e759f0903ad8f458e838d1ccd98f90a37884c8c8c0d5433b0da66ec",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F02.txt": "bcdb585cbe83e068218fa4ddb8b04164db74e99d95a00b1ef283fc4537aef068",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F03.txt": "48f8857503e746a35f49250e1296329ad109c8cff8618d4eb7c6b3beb0a7c7c9",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F04.txt": "d3bdc6f88235276363dc9a2a960ae1a0c86ff2cdf758fe6c147851906ecc6542",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F05.txt": "f4f4302fc32ff81f43bf032a7c240a71c76f0f2006ec65f1ef8d0d67fa1027fb",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F06.txt": "14e28986c929a903f059b65ab10dd5c0dc6082b0aade248f76e1ee96e1d54c25",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F07.txt": "8ab6b8933f75b19f45f46501f3a5c2e39e6c03e0ea40a4ab603bafc1b1074f80",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F08.txt": "cd96c7c111692e5af7069f7dceef70cbd4cfb90a607822a1eeda3103f6223cad",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F09.txt": "2766d8774f78c17486a3ec02be9772814abf018058119519b66877f00e94b6fe",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F10.txt": "050251d57d42daa60948ab64165879f98d4e871433785b9c2a831774051765db",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F11.txt": "8c5f869b435d48a6092c59e51a5bc1fdc8e6da38e701371ba7a462b74af63c56",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F12.txt": "77423f963e7001f211bf527de19a7fcaa9dc5fd5825f2f7b1e345c86aaa5251e",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F13.txt": "44a1a69ec71fea93508047d12f7c8a67b06fa4d441a7b9056151d9120c4f4f0b",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F14.txt": "97eb200c4d290efaf8e2762b638aebda862210692cc27912d622dd9bc741f3b3",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F15.txt": "096a3aad4028fb924733b62ff8bd4e852859adf8a3969cde853e7481762253ad",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F16.txt": "73c461bc9a327f0ce596d858ff51c041a4c1c94f738b7951aaf76e8036f37e28",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F17.txt": "ca3746d386fa987fbf596a06a2868e1f4f0f208212dabd17877bf99843e9fafd",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F18.txt": "823556386675c6f7cfa66c6832b42c186ec0bf84059b66279e7020260fe53457",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F19.txt": "ef7e7ea8619d55996673cdab8a708027f97d173e13b3b2244071d658d37c0f2e",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F20.txt": "60ae9693de28dd84ea3d9eddf1b676dfd8f16fcd45a54c81336ede65c19bfd4c",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F21.txt": "a28346322e33eb46d4b497aa5f575136e2fb26613e4a50ae45c79f87970095f1",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F22.txt": "bc734a20b5389cad5bfa96a57a5ae5c905dede00dc99bf4070d9df1f21d02e66",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F23.txt": "9f8e2ad097a4a437e9c0c31a7af01cf280b6bd3acf6b27b5ae60204c90a07b13",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F24.txt": "52092214414bfc3953a9d28c092228efbcd6bebb702379f66f2abfae5e959d3d",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F25.txt": "8f4d60e59c301506e5eb345f00fa8a1ab3b0ad29310a5837f24bc17a96593498",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F26.txt": "b962f661e40f05a91f6f40ce1ad4c3feb3cf7610d7d421bf68b9c990c64697b8",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F27.txt": "fc8c3f5eaea821cc6a6ad4fc57f5bfd65cc17196d9b1b0903eb25c641311a29d",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F28.txt": "99c009abfd3ff5cb2f8c7359693fd2f4209391d001c2ef3aa49b3e7af9c9b88b",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F29.txt": "f9722b96c5b3695e147f996afb2df029eaa5dcb247e52c3e169bf7140c101bc8",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F30.txt": "380ba1c1adbddf123250b7b6cc27d4fc40eb80e28d62b1f54afd4c4d65a94150",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F31.txt": "dfafe93c59698e64a62fb66b9b8a486b408127bfd640dbcb77c04c57b08c9f6b",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/F32.txt": "159373fbd9bf553e1275ddef65f8d5b52f2753fbad1b307e8305a5a127c2d4d4",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N01.txt": "1e5977792293c8f935a2b8dca59ff2b58482bc8885d47aecd0b6be921b096572",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N02.txt": "0507db41e3e5781160f3aa202dc33316b64ba0855230f1cdec16049bbd7aaeb0",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N03.txt": "1f2838ec8c21e929a3eff80df3135c2a598383299915525fa7b537dbeb0f9455",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N04.txt": "f9ace4cf5a6a859fdf415bd8154ff14a703d46440e9ea1c1d58c588ca2055b0e",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N05.txt": "15e0bc08aa85df0c1109aba680364e861b36fe7fd616f7dd0cc4365475588964",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N06.txt": "301aae16cbba545d524a774675bf5cc017a4ead09de435c8282d292dc4d1f734",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N07.txt": "8a10c1c9ee7524daba643dd4f02d1b1f30687368396db687b78c455d3ba649b5",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N08.txt": "6f31419a9341f3bb10a1e9ac4b7eec9e50768552de89c547d43fd409ac95374b",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N09.txt": "e56dc38f7ccd2c4d1f3014c58b09f7b99299f99cb39b19ffa4ae51bf2eab4c9e",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N10.txt": "ceffe192cdac437c7a37cf7ca7eafa0f015193143da3779a9a15f75d20433b32",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N11.txt": "9b6c07fd8a299c5c09a2e7d6e35e44ad34ad6116f5699676f4511b372b241a2a",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/N12.txt": "01788dd78cb52e2665dbab3a16e15322758f998b2968fc39e5823a7786d630b1",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/V19-BEEF.txt": "56ce79bccbabcad65a0720aaffd6c828edac932941cb704dda5e2a685ddfab16",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/V19-EGG.txt": "a3358213359d0873bd8006a0b65cb7baa138fac21b87b5fcc02a4716609f3ac5",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始提示词/V19-MILK.txt": "0b35fea460e8924054c4523120064091fdcd0ffa86ab8d56feef2e7fd8668fa3",
+    "Boss-Agent-Desktop-Complete-v5/meta/原始页面清单.csv": "d3e0bd0447f1f08a56190ff4912105fc68b3857707d2c8ecd1d639e770417b78",
+    "Boss-Agent-Desktop-Complete-v5/meta/状态变体索引.csv": "67e1c7f9fef349cfcbe8dbeb609003c49c14bcce7a3ee82d51fa87beb7bbabf4",
+    "Boss-Agent-Desktop-Complete-v5/meta/页面配置.json": "a2d6b26e792db2f758041b78bc442f51bea667de22ab57b4f7a1afb82cafdad2",
+    "Boss-Agent-Desktop-Complete-v5/pages/A01-档案与访问.html": "a46768d582848b93f55c83b2845cdbc313129407f039b9434947c82db7fb1884",
+    "Boss-Agent-Desktop-Complete-v5/pages/A02-接口目录.html": "7c2ea7e2535b744f84027bac709a215a8da3a769b6d89a1738f2f6ef9b807df7",
+    "Boss-Agent-Desktop-Complete-v5/pages/A03-数据集.html": "92943f82498e03dc9fcbd24db70711075965140a681dcfc6015d05855fd353a3",
+    "Boss-Agent-Desktop-Complete-v5/pages/A04-场景与事件.html": "5f0fb39fbb88af51d99c3db6d9271a892efceb74cd65aa3560b70e01e3153be8",
+    "Boss-Agent-Desktop-Complete-v5/pages/A05-Prompt版本.html": "3af93f57b9d13c18ea9cc9985b63fa0c833086c0b721bfb568f73dbfbfe01779",
+    "Boss-Agent-Desktop-Complete-v5/pages/A06-SOP与Skills.html": "11a05650003d76a7fc791a5ab7e4bf1a9f534431be81282c902dde69d696b767",
+    "Boss-Agent-Desktop-Complete-v5/pages/A07-Knowledge Base.html": "c4c41d1a54a22458db192c8b41902223f7e66142a1472ebd9b291bf8574233f8",
+    "Boss-Agent-Desktop-Complete-v5/pages/A08-模型连接.html": "2ae87e3012bf4e14c41168c189b1592352ace2b61466356c6206c86faf465e87",
+    "Boss-Agent-Desktop-Complete-v5/pages/A09-Tools与连接.html": "95765859241ac15f7d9d11c8fdd48799d514722a0adea0c1f31b84a7e81b8a09",
+    "Boss-Agent-Desktop-Complete-v5/pages/A10-指标与规则.html": "81f49d50b0e10113719cde69a4b932e32c5405f4cef7dcc233d9108038ea611e",
+    "Boss-Agent-Desktop-Complete-v5/pages/A11-关联对象.html": "504ad451e7c12c9732db1ecd5872afa0d10278fee92f528982b0634442641885",
+    "Boss-Agent-Desktop-Complete-v5/pages/A12-记忆技术维护.html": "f76a14382053adc13732d64064acbd703075ffa6ce43e66b725e9ca37ad8c6d9",
+    "Boss-Agent-Desktop-Complete-v5/pages/A13-调度计划.html": "50aa755d28aeec0df7b91332a4d2c1a697189f68f407057f49f1922862a59b45",
+    "Boss-Agent-Desktop-Complete-v5/pages/A14-动作授权记录.html": "0551d0483a4f4a698e1bb9633865c842ca191314d8e34e4cc3b9da7886df8e4b",
+    "Boss-Agent-Desktop-Complete-v5/pages/A15-运行记录.html": "53a1bbb2395c3e1a0d8efaeaa056cd9c0a7bd0ad1ff1068b7665b48c6f1a9502",
+    "Boss-Agent-Desktop-Complete-v5/pages/A16-评测管理.html": "a749c04d32a6010736b0d039d96c5c6024db88243dcac5e86c63aa657820b54a",
+    "Boss-Agent-Desktop-Complete-v5/pages/D01-来源原文与支持关系.html": "ebc92256c4cee63a4d556501f934eccf5d5549b2a4f6eede017fd886f4e44ea7",
+    "Boss-Agent-Desktop-Complete-v5/pages/D02-当前动作必要决定.html": "b92df22acbcc5dfc57de57106e679401a1f1b2ae564b8ec9d48f914208a31f5f",
+    "Boss-Agent-Desktop-Complete-v5/pages/D03-执行结果核查.html": "cfa4594a9f9f1869b718d959b3719954bbfb96f94ef2da83804a5e0800d7c9f2",
+    "Boss-Agent-Desktop-Complete-v5/pages/D04-选择负责人.html": "02bbfd92967e398e5ddc7045b0ed911e133255cd5dde07de6e14b1a7c1a38dc1",
+    "Boss-Agent-Desktop-Complete-v5/pages/D05-选择时间与时区.html": "af8ed041626ee5ace7150bab54cba69e912cdc567146065a1b2cf7de760c04a8",
+    "Boss-Agent-Desktop-Complete-v5/pages/D06-未保存修改提醒.html": "caed5c9fd970f1787339cf36d3896cc31ffbb4af158c20b6fe7a757573bf7129",
+    "Boss-Agent-Desktop-Complete-v5/pages/D07-访问权限限制.html": "06c3864a4889a44ed79614bc5f6a16c8c92ef85756a238648358919004b7afb1",
+    "Boss-Agent-Desktop-Complete-v5/pages/D08-登录状态已过期.html": "d3d30379c3d8bb5221dfca35a696e5b7b2899ab45c104f29487243027a96b583",
+    "Boss-Agent-Desktop-Complete-v5/pages/D09-历史通知只读详情.html": "c1d0374ebc51dfb7148e02be274a386249d1c3be34d3500e4f881dcb08b62e66",
+    "Boss-Agent-Desktop-Complete-v5/pages/F01-今日工作.html": "ca60f597544895ba7ef94de99120226db8eede3ecf76ec9853cb1546273a8e07",
+    "Boss-Agent-Desktop-Complete-v5/pages/F02-经营提醒.html": "a36d444883694d1de84ef9825d29aa353e84c376f8e24e06126c9fb46e7dd970",
+    "Boss-Agent-Desktop-Complete-v5/pages/F03-经营查询与追问.html": "a906894bfecc8de6d2145e3ca283027cf630fadababed48a597fafe972b30aa6",
+    "Boss-Agent-Desktop-Complete-v5/pages/F04-会前材料.html": "dd26a1a342b8ca5ecf85858f93156344e9f027a5e46d7d47c9d98efb8d394f8a",
+    "Boss-Agent-Desktop-Complete-v5/pages/F05-纪要核查.html": "2516b59031a00da32a0554fad9c9683d55d4f7f0de261defb4b73ab2c6884bda",
+    "Boss-Agent-Desktop-Complete-v5/pages/F06-交办详情.html": "b854151329d81f4828d47cfe3b77c1ac324266a8e9281ba5f35236aa2300ac72",
+    "Boss-Agent-Desktop-Complete-v5/pages/F07-申请审阅.html": "5b126a17d26c9572887a701fbea3c53cae59f382e0e923f51397d5aea6ab8520",
+    "Boss-Agent-Desktop-Complete-v5/pages/F08-消息编辑.html": "fd7a6b5e5e61544ff373a59b01eedf5de4fa1c230b1fdf2f1ac5ecfa1f2c59e8",
+    "Boss-Agent-Desktop-Complete-v5/pages/F09-专题研究.html": "6f6e36608921c7d9a8dbb261a3c0b2b3616f574734a2bb0aefddfbae7dd6258a",
+    "Boss-Agent-Desktop-Complete-v5/pages/F10-人员会面.html": "c21094dd7b5ee1293dd88dd2cdb1929dde1861635d110771d34661cab18689ae",
+    "Boss-Agent-Desktop-Complete-v5/pages/F11-行程安排.html": "cdc88868e210a4a01893519ccd97eccf5407ba23312b352c2edda3b030e29622",
+    "Boss-Agent-Desktop-Complete-v5/pages/F12-本人私人安排.html": "a2145164c4a739ae89f9365b9d4031c6102b80318cc93d5bada0ea5e90aee23a",
+    "Boss-Agent-Desktop-Complete-v5/pages/F13-个人记忆.html": "5a1ed39e94a9642dba69d436bd7bbd994c055eedffb85166651b756b6637727c",
+    "Boss-Agent-Desktop-Complete-v5/pages/F14-原料与饲料.html": "555a908d81e4261c9cdfe0590bc31f68ee85317cad7df29c7df6d5071986fda5",
+    "Boss-Agent-Desktop-Complete-v5/pages/F15-水产季节.html": "f9f1a11f74ee80d8fc1a6c48b620c375a039a657ef167eaea706ff00cf2b9413",
+    "Boss-Agent-Desktop-Complete-v5/pages/F16-苗种批次.html": "65875d93eaeee7bba3dcfafdd84593bc8426134c0fce4185a198fa06db3e1e12",
+    "Boss-Agent-Desktop-Complete-v5/pages/F17-动保与技服.html": "5909c292df61d566064c241acdd2c64024d947e6406e75a6ccc6d5962f3f3899",
+    "Boss-Agent-Desktop-Complete-v5/pages/F18-生猪合作.html": "4a2c1f2b6b75f150fb014e26c2408bee6cda54f1ccbfc962ba8131fc77184766",
+    "Boss-Agent-Desktop-Complete-v5/pages/F19-禽类与反刍.html": "4686774ab7e28bc13e2a12fbd7c990461fbd8251cb6015f83da22c85ddd68553",
+    "Boss-Agent-Desktop-Complete-v5/pages/F20-公司水产养殖.html": "2b2b38e5f3540da41aa85617b78c10b5f61870a3641cb943a5cceef94a3ea7db",
+    "Boss-Agent-Desktop-Complete-v5/pages/F21-食品与品质.html": "1b3e67f9df43da92c607f6c0c0a78c8cf0e90194289f7f4a7efc5dcf387b5568",
+    "Boss-Agent-Desktop-Complete-v5/pages/F22-海外业务.html": "dbcb50bd2f26c7be2c0a519603b518fae5499d506991a3a66ef501925d4c516d",
+    "Boss-Agent-Desktop-Complete-v5/pages/F23-研发应用.html": "aef0cd595f044826b9432b5fac1baea07160899a2e9858c840dd69467baeb230",
+    "Boss-Agent-Desktop-Complete-v5/pages/F24-运行详情.html": "ab612b314d029d0a332216c5a729ecdb431cae050243516154c9a97ddaafda04",
+    "Boss-Agent-Desktop-Complete-v5/pages/F25-模拟中心.html": "15c23000daab1a98ac250fbfc8a3fce5ddb33730e69ccf4ce018f2340a73e13a",
+    "Boss-Agent-Desktop-Complete-v5/pages/F26-应用入口与本人设置.html": "ef21ff5056eea045ad5500d5c8e4b2d0c805bb7b8e5ce01593edf569d29b5a12",
+    "Boss-Agent-Desktop-Complete-v5/pages/F27-语音交办.html": "f5cc399b392b6a150c3d74a5b620f505d0d4349dfffb7e2072b67eee0128d156",
+    "Boss-Agent-Desktop-Complete-v5/pages/F28-动作授权详情.html": "5ca99929a234266d04fb70dc9e8410f59aec75bc2af1135183a8dfa0592c4bd4",
+    "Boss-Agent-Desktop-Complete-v5/pages/F29-任务异常详情.html": "5bec67dbc856379f1a11fba5efc71ae7618a9f648ff584b78a65462fd5d2babb",
+    "Boss-Agent-Desktop-Complete-v5/pages/F30-运行与用量详情.html": "fa798e65a1496155f3e1dbff60428991a4eb8d64831eafe79dc9e2fc6dc020e0",
+    "Boss-Agent-Desktop-Complete-v5/pages/F31-演示评测.html": "a2b056387bd81dc74a89766a264d2b258236e2afcf2bfada3b93154b12b5f7f0",
+    "Boss-Agent-Desktop-Complete-v5/pages/F32-本地运行与交接.html": "91d8a40fc487ea1918762e84b8785764a7a9ae93e0132dc628b8a149be52c08b",
+    "Boss-Agent-Desktop-Complete-v5/pages/N01-身份登录.html": "3c9bd922b37eda13577160039131073d5fb209b9a6e6417917d97b01a2f748b7",
+    "Boss-Agent-Desktop-Complete-v5/pages/N02-聊天交办.html": "dbaa9036b5ca79be80347fa69ab878427eb1e752b2725413355876ab65d2c45e",
+    "Boss-Agent-Desktop-Complete-v5/pages/N03-经营关注.html": "120e8d2cf36c4294342917572424ccaec3d23efcb3ef64e9bd9c220c1dcb1d15",
+    "Boss-Agent-Desktop-Complete-v5/pages/N04-会议与资料.html": "24ff5e28681e4db1cba2880776db649144e47af2dbbaf48c087f813794694aee",
+    "Boss-Agent-Desktop-Complete-v5/pages/N05-任务与承诺.html": "65902f64f7bf407c69b1d6c90a04217b9b0798456f8003ba911418681913d6d8",
+    "Boss-Agent-Desktop-Complete-v5/pages/N06-通知中心.html": "063016b978f61a7a8e389614e884c7d9055acbb1ee7feaa7e48df5d07bbb8752",
+    "Boss-Agent-Desktop-Complete-v5/pages/N07-本人目标与关注要求.html": "795a8183791675929ec06a28dec443dc74db33ac361677fcc608baa28018c67c",
+    "Boss-Agent-Desktop-Complete-v5/pages/N08-通知要求与可见范围.html": "a3c54d52d449c19b7365f7a6e602b915fa9cea57c1d9c9eb23a06be19d47487a",
+    "Boss-Agent-Desktop-Complete-v5/pages/N09-本人计划.html": "12c5baf811af855ee57f9850a7cfac61a3a03b6f01698ecc670712c30e3a3d28",
+    "Boss-Agent-Desktop-Complete-v5/pages/N10-本人授权.html": "92b7fad6590b97427d43690e830f639ed1345382e41294f7f20a564d203ce933",
+    "Boss-Agent-Desktop-Complete-v5/pages/N11-历史决定.html": "a2ce40db0b6a8b88669c2bc832eb956c20ed6fb493c09f8e75820919766b0ce1",
+    "Boss-Agent-Desktop-Complete-v5/pages/N12-运行概况.html": "20e9046a37f3424822a13279e7dadb433605a90ef64d64f45ebffa8c5d36015e",
+    "Boss-Agent-Desktop-Complete-v5/pages/V19-BEEF-禽类与反刍.html": "487761d2ba98d37539c9e6c8c8db82762232ace521cc8a4d7ad1337eb502b338",
+    "Boss-Agent-Desktop-Complete-v5/pages/V19-EGG-禽类与反刍.html": "70f234e9cefcbd54a728403cf00fe16ec795cddd763f0fc544a5e0c01ed5c3cb",
+    "Boss-Agent-Desktop-Complete-v5/pages/V19-MILK-禽类与反刍.html": "90fc5e365dc062ce56dcb4351c86133f4e5543955d8e139df56f7d18ed029621",
+    "Boss-Agent-Desktop-Complete-v5/previews/00-核心16页总览.png": "2da42d28ca6dc8bc65db5c89dd9926d9d33c8cd2ae934055933515e79bf08ef7",
+    "Boss-Agent-Desktop-Complete-v5/previews/01-全部72页总览.png": "cfd3c76d21729d886374c0cc5d2e1c9d5f2e663b13199763216c4a16050ea700",
+    "Boss-Agent-Desktop-Complete-v5/previews/02-第1组9页详览.png": "c09f412a20a930a55821dd905cca34af1c5fb415424035e1fbd71022b52e73b6",
+    "Boss-Agent-Desktop-Complete-v5/previews/03-第2组9页详览.png": "5055f60f0bd4f86d3ef71cfe7defc865d9e94895d47b754125151bab606c7802",
+    "Boss-Agent-Desktop-Complete-v5/previews/04-第3组9页详览.png": "561cabefdad8220bbb03ab31a8fd4079a8b560c31478385a2046038ab32484f9",
+    "Boss-Agent-Desktop-Complete-v5/previews/05-第4组9页详览.png": "133c40a6c52e71e6e7221d0fc1457ed41257fe2585617219b71f0bdf66d55108",
+    "Boss-Agent-Desktop-Complete-v5/previews/06-第5组9页详览.png": "76648a64b3bc8aa6469e4b6f9269dd3ad644d97547e8384b8ca4a7dd9fcbe314",
+    "Boss-Agent-Desktop-Complete-v5/previews/07-第6组9页详览.png": "59509badedaf6a4c198e69ab6f1b4978833a987a2118ea03b9d1ddc9671b1454",
+    "Boss-Agent-Desktop-Complete-v5/previews/08-第7组9页详览.png": "513fcd1379c329f565cf38bb7b53c3aafb96dafc9e2b04e8d523e830e723ca14",
+    "Boss-Agent-Desktop-Complete-v5/previews/09-第8组9页详览.png": "6fd493476016f4f5413b7c8714b26b4af9c1bbe55e24bad5d43cfd7473cc5f3c",
+    "Boss-Agent-Desktop-Complete-v5/style.css": "b28ce4de88972bb4f064e42cfc3d5e06a0dc704d9b21efbb3e24f589a1626338",
+    "Boss-Agent-Desktop-Complete-v5/使用说明.md": "2b1e02dc5e6d09bdc11823793eaf5684a69ac380268bfbf064dfe64a076b1877"
+  },
+  "contrast_pairs": [
+    {
+      "selector": ".caption",
+      "foreground": [
+        130,
+        152,
+        180
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 2.958
+    },
+    {
+      "selector": ".form-value",
+      "foreground": [
+        132,
+        153,
+        179
+      ],
+      "background": [
+        249,
+        252,
+        255
+      ],
+      "ratio": 2.837
+    },
+    {
+      "selector": ".footer-actions .hint",
+      "foreground": [
+        143,
+        162,
+        185
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 2.613
+    }
+  ],
+  "browser_layout_test": "NOT_RUN",
+  "browser_keyboard_test": "NOT_RUN"
+}

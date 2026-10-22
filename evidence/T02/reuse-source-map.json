@@ -1,0 +1,167 @@
+{
+  "tag": "v0.3.5",
+  "commit": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+  "source_root": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/.work/upstream/nanobot-0.3.5",
+  "components": [
+    {
+      "component": "Sidebar",
+      "path": "webui/src/components/Sidebar.tsx",
+      "sha256": "8621a6f8c8cf4bbfac3a08ccd825f619a4edd09146001236c860e34a904bc0de"
+    },
+    {
+      "component": "ThreadShell",
+      "path": "webui/src/components/thread/ThreadShell.tsx",
+      "sha256": "9828d8bbe63c6e1b6bf84c006d29efcabc4828cc8e25b7b21bbf493d98eecf8f"
+    },
+    {
+      "component": "ThreadComposer",
+      "path": "webui/src/components/thread/ThreadComposer.tsx",
+      "sha256": "48b1cfefbfef25bea2cf12c2f4f840ae45ad3366bc3ac0c29c6ac733cd9c835f"
+    },
+    {
+      "component": "ThreadMessages",
+      "path": "webui/src/components/thread/ThreadMessages.tsx",
+      "sha256": "91991abba89e038a0f905280a171335038b68ecb799b60235dd1961959b6710f"
+    },
+    {
+      "component": "GenericToolRun",
+      "path": "webui/src/components/thread/activity/GenericToolRun.tsx",
+      "sha256": "378301dde8f1670a3c8db3aa6a0e1e1fe7ff701ee84b486ac206bd25628fbaed"
+    },
+    {
+      "component": "FilePreviewPanel",
+      "path": "webui/src/components/FilePreviewPanel.tsx",
+      "sha256": "852fda090549a73b34fb660ddca2950f6231b9c8a55cb4080f8906e356b35039"
+    },
+    {
+      "component": "AttachmentTile",
+      "path": "webui/src/components/AttachmentTile.tsx",
+      "sha256": "be75da5fc7cb12551b5c45cc349802143c75acaa4e859d048d7f8077585669d4"
+    },
+    {
+      "component": "ChatList",
+      "path": "webui/src/components/ChatList.tsx",
+      "sha256": "99bb706e6d32c02dfe05de4053ac53e6c0769c3a0e968d0537709390f62ba6f9"
+    },
+    {
+      "component": "AutomationsSettings",
+      "path": "webui/src/components/settings/system/AutomationsSettings.tsx",
+      "sha256": "7193f269a56ca2e8ecb90273030169b6982b1ea20f05d3bbf2a8b8cf00fba323"
+    },
+    {
+      "component": "SettingsPage",
+      "path": "webui/src/components/settings/SettingsPage.tsx",
+      "sha256": "9388991f0d267c7401b0a29221299d6652f3a541b13f74230c97220794301665"
+    },
+    {
+      "component": "SettingsView",
+      "path": "webui/src/components/settings/SettingsView.tsx",
+      "sha256": "295d27a1c1913e399f262854e330fa6eb176dfc44fc117216bea3c9ee2c06c82"
+    },
+    {
+      "component": "SecuritySettings",
+      "path": "webui/src/components/settings/capabilities/SecuritySettings.tsx",
+      "sha256": "d876f9dd4f7e56dd231752216ed8eda85322d85b085887923e6ecc9539886b39"
+    },
+    {
+      "component": "RuntimeConfigSettings",
+      "path": "webui/src/components/settings/system/RuntimeConfigSettings.tsx",
+      "sha256": "a8fff9fda9ed35aed1ca5abdb54936cc1f08fd75e9d6b23bb599f5c81791e0d3"
+    },
+    {
+      "component": "AppsSettings",
+      "path": "webui/src/components/settings/system/AppsSettings.tsx",
+      "sha256": "2cab25762afe3f58c253e59787d8b041794eadb5605c0d98b0d42ef814b35ca3"
+    },
+    {
+      "component": "SkillsCatalogSettings",
+      "path": "webui/src/components/settings/SkillsCatalogSettings.tsx",
+      "sha256": "073bed0e5f3c0aeb6a57e42bee9bb7d0b6273a6e2d790d20dc9c3afe4d01c43f"
+    },
+    {
+      "component": "ModelsSettings",
+      "path": "webui/src/components/settings/models/ModelsSettings.tsx",
+      "sha256": "f01d66d3d65a0862d66b46024567cdb71434b79119220a201133e33c5d410c13"
+    },
+    {
+      "component": "ProviderSettings",
+      "path": "webui/src/components/settings/models/ProviderSettings.tsx",
+      "sha256": "3e45dd54c08eae1af76c6bbe0d331276e50ea764ce1a77e29847b24ce9ec705d"
+    },
+    {
+      "component": "TokenUsageCard",
+      "path": "webui/src/components/settings/TokenUsageCard.tsx",
+      "sha256": "d6faebf6e86a01ee3620a1b5dbfb159058ecdc33bd43dba73e32d07848a8b5ce"
+    },
+    {
+      "component": "TokenUsageDetails",
+      "path": "webui/src/components/settings/TokenUsageDetails.tsx",
+      "sha256": "47aac4c1d37beda3907f678ba4ac25a3b7df1b3d6e2c7029b58421a1c5c36303"
+    },
+    {
+      "component": "nanobot/nanobot.py",
+      "path": "nanobot/nanobot.py",
+      "sha256": "ebc9323d8df1a66082947e853dae9096c3f6ed2ad69cc06b4777c4c893e6a8cc"
+    },
+    {
+      "component": "nanobot/sdk/clients.py",
+      "path": "nanobot/sdk/clients.py",
+      "sha256": "1fa99426de080c0a8f86480b4b02412342d6d40afa1ee9754056b43bca06b709"
+    },
+    {
+      "component": "nanobot/sdk/streaming.py",
+      "path": "nanobot/sdk/streaming.py",
+      "sha256": "264004c9381e90ec2b79040b37cec3ac90366c8266a610329a180e39f953799a"
+    },
+    {
+      "component": "nanobot/agent/loop.py",
+      "path": "nanobot/agent/loop.py",
+      "sha256": "658468c8ae5eb4111e2227b8c5ab69b97f13828996966bcc9834050d9036a307"
+    },
+    {
+      "component": "nanobot/agent/runner.py",
+      "path": "nanobot/agent/runner.py",
+      "sha256": "72ecdd211827762f098da376b85f79f5722d6b506bf7935ce6b418c814864662"
+    },
+    {
+      "component": "nanobot/agent/hook.py",
+      "path": "nanobot/agent/hook.py",
+      "sha256": "6ab7fc6dbd53f3366083d014a89c773d9a554e3b78a12128d48262264794bdfa"
+    },
+    {
+      "component": "nanobot/cron/service.py",
+      "path": "nanobot/cron/service.py",
+      "sha256": "889e8689903596b9e8b19d6755c89495cfd9b32f381bfe28584abcda69085b91"
+    },
+    {
+      "component": "nanobot/session/webui_turns.py",
+      "path": "nanobot/session/webui_turns.py",
+      "sha256": "ec30f7312ed9f2c2e8d77ad9604e378137c56e08cb8c82014e55ae9adb31eb8a"
+    },
+    {
+      "component": "nanobot/providers/openai_compat_provider.py",
+      "path": "nanobot/providers/openai_compat_provider.py",
+      "sha256": "f4540b336b22a591923ef7b62c82a39c5341767553fbf840f90c06d11ffe711b"
+    },
+    {
+      "component": "nanobot/webui/settings_runtime.py",
+      "path": "nanobot/webui/settings_runtime.py",
+      "sha256": "9168a1bd68f052fe461467e184ee34188d064547b1eaaffde96b49485deb7b22"
+    },
+    {
+      "component": "nanobot/webui/settings_routes.py",
+      "path": "nanobot/webui/settings_routes.py",
+      "sha256": "109235ba9ca632e32d168025c2a3e7a4ca2eb4c8150f8f47b6255a4c0c2321da"
+    },
+    {
+      "component": "nanobot/webui/session_automations.py",
+      "path": "nanobot/webui/session_automations.py",
+      "sha256": "69db28bafc067c908ffa6e8481a41c95a1c3f5f35b3787e647230e01cc74f462"
+    },
+    {
+      "component": "webui/src/lib/api.ts",
+      "path": "webui/src/lib/api.ts",
+      "sha256": "f8449ffdcfea5519a0fbb4cf10b770defca93638c523a70719e4b2ab5617d248"
+    }
+  ]
+}

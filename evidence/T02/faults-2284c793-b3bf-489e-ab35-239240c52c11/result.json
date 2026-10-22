@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-22T06:37:55.411781+00:00",
+  "status": "PASS",
+  "scope": "真实 DeepSeek、SDK 取消和中断、获准模拟业务服务故障；未修改或伪造模型返回",
+  "checks": [
+    {
+      "check": "product_variant_missing_causes_document_injection",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/variant-and-injection-d67a9d0e-1645-4795-83c3-0e70efb3ff9d",
+      "detail_count": 4,
+      "task_count": 0
+    },
+    {
+      "check": "maximum_rounds",
+      "status": "PASS",
+      "stop_reason": "max_iterations",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/maximum-rounds-06303fe0-3fcc-44e9-bba0-8374be70ed47"
+    },
+    {
+      "check": "committed_write_followed_by_model_transport_failure",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a",
+      "task_status": "OPEN",
+      "outbox_count": 0
+    },
+    {
+      "check": "explicit-cancel",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/explicit-cancel-6cd75844-bd36-4abe-9beb-274ab8e66750",
+      "stop_reason": "cancelled"
+    },
+    {
+      "check": "consumer-disconnect",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/consumer-disconnect-8be080eb-5a3e-4298-9020-aee1bd0f56ef",
+      "stop_reason": "cancelled"
+    },
+    {
+      "check": "runtime_timeout_after_request_started",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/actual-request-timeout-e10b4dfb-cfd9-4c71-a757-887de6259f3e",
+      "deadline_seconds": 0.5
+    },
+    {
+      "check": "business_interface_unavailable",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/business-unavailable-0ad62af6-e263-45de-bba8-c3501bc5dfbb",
+      "task_count": 0
+    },
+    {
+      "check": "business_interface_timeout",
+      "status": "PASS",
+      "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/faults-2284c793-b3bf-489e-ab35-239240c52c11/business-timeout-b35c9326-f4d8-4a21-a00c-b5457033e2e2",
+      "task_count": 0
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-22T06:21:32.458715+00:00",
+  "status": "PASS",
+  "scope": "完整归档文件一致性、全部上游 nanobot Python 文件编译、完整官方 docs 资料集及本机 npm 依赖和许可文件收集；人工审查范围单独说明",
+  "archive_files_checked": 1471,
+  "python_files_compiled": 399,
+  "official_document_count": 54,
+  "frontend_dependency_entries": 727,
+  "desktop_dependency_entries": 55,
+  "upstream_missing_local_links": [],
+  "manual_review_limit": "核心 SDK、架构、配置、Provider、WebUI、WebSocket、记忆、调度、开发、部署和采用路径已阅读；全部其他渠道指南、全部源码逐行和全部传递依赖条款的人工审查未完成"
+}

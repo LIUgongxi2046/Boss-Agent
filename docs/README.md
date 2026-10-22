@@ -1,0 +1,20 @@
+# Boss-Agent 文档索引
+
+| doc_id | 内容与关键词 | 当前文件 | 维护责任 | 状态 | last_verified |
+|---|---|---|---|---|---|
+| DOC-REQ | 电脑桌面应用、老板秘书、农业经营、模拟服务、模型与验收 | [需求输入](Boss-Agent需求输入.md) | S002 | CURRENT | 2026-10-22 |
+| DOC-PLAN | S001—S012、老板范围、R01—R32、依赖、工单；第 8 节桌面任务与验收，第 11—12 节战略设计与 A00 审查 | [项目计划](Boss-Agent项目计划.md) | S000/S007；S001 维护战略章节 | CURRENT | 2026-10-22 |
+| DOC-DEC | 授权、候选、模型、预算、语音、资源及 D17 桌面产品决定 | [决策记录](项目决策记录.md) | S000 | CURRENT | 2026-10-22 |
+| DOC-LEDGER | 承诺、验收、任务状态与全部未完成项 | [delivery-ledger.json](../delivery-ledger.json) | S000/S007 | CURRENT | 2026-10-22 |
+| DOC-ENV | 需求版本、目录状态与计划检查范围 | [计划环境记录](计划环境记录.md) | S000 | CURRENT | 2026-10-22 |
+| DOC-VALUE | G01—G04、H01—H37、M01—M17、协议、未知阈值与桌面资源条件 | [价值验证定义](../specs/value-validation.json) | S001；S009 采集结果 | CURRENT | 2026-10-22 |
+| DOC-PRD | 32 项 FR/BR/AC、48 个功能与管理线框、六类 Agent 组件、两端开源复用；第 10.5 节桌面窗口、权限与生命周期 | [PRD](PRD.md) | S002 | IN_REVIEW | 2026-10-22 |
+| DOC-PROBE | T02 的 15 步骤、37 断言；DeepSeek、记忆、调度、权限、两端复用及桌面安装恢复 | [共同验证定义](../specs/selection-probe.json) | S002；T02 执行 | DEFINITION_ONLY | 2026-10-22 |
+| DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |
+| DOC-SELECTION-ENV | 本机依赖、独立验证程序、服务端配置及运行命令 | [选型环境](选型环境.md)、[验证工程](../validation/README.md) | S004 | CURRENT | 2026-10-22 |
+| DOC-UI | 桌面六类老板入口、16 类管理能力、48 个线框映射与系统权限；第 13 节规定最终高保真和素材，等待 T02 完成制作与绑定 | [交互与页面规范](交互与页面规范.md) | S003-1/S003-2；T08 接收 | PARTIAL_HANDOFF | 2026-10-22 |
+| DOC-PROMPT | 72 个视图、电脑标准及紧凑窗口、16 个核心视图、统一配色；1266 份文字提示词 | [全页面提示词](全页面图片生成提示词.md)、[桌面提示词包](../deliverables/T03/Boss-Agent-desktop-page-prompts.zip) | S003-1/S003-2 | PROMPT_ONLY | 2026-10-22 |
+
+`CURRENT` 表示已核查文档引用与需求版本。任务及验收状态只读取台账。T00 战略设计与 T01 PRD 作为当前来源；T03 文字交互规范已形成，T08 可读取业务交互、组件职责和样式要求。T02 已按 D18 完成选型可行性，交付两端页面/API 矩阵和真实模型、DOM、业务及桌面证据，T03 可继续绑定，T04/T07/T16 引用同一固定基础。选型验证第 6 节保留后续产品检查的实际状态和责任。T03 必须交付全部高保真页面及适用状态稿、可编辑来源、可操作预览、设计 PDF 和真实素材压缩包；PARTIAL_HANDOFF 表示尚未完成全部交接。检查证据位于 `evidence/T00/`、`evidence/T01/`、`evidence/T02/`、`evidence/T03/`。真实企业效果数值保持未知，T02 实际用量及费用覆盖单独记录。PRD 的 IN_REVIEW 表示尚未登记用户批准，A01 评价设计完整性。HLD、LLD、接口规范、开发记录、测试和运行文档的路径、生产任务及内容要求见项目计划第 9—10 节；相应任务产出后更新本索引。S000 与 S007 共同维护这一份项目计划。
+
+S008 实施每项工单时保存 `docs/development/Txx.md` 与 `docs/development/index.md`，记录输入、实际修改、运行命令、结果和关联资料。跨模块知识按实际产生的内容维护，本索引提供检索入口。

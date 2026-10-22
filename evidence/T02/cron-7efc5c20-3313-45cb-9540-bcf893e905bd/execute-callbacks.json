@@ -1,0 +1,23 @@
+[
+  {
+    "at": "2026-10-22T04:21:38.867074+00:00",
+    "pid": 6702,
+    "job_id": "bc2b5782",
+    "result": {
+      "state": "DELIVERED",
+      "event_id": "fixed-event",
+      "schedule_version": "1",
+      "source_type": "SIMULATED",
+      "created_at": "2026-10-22T04:21:38.866468+00:00"
+    }
+  },
+  {
+    "at": "2026-10-22T04:21:38.876980+00:00",
+    "pid": 6702,
+    "job_id": "bc2b5782",
+    "result": {
+      "state": "SUPPRESSED",
+      "reason": "重复事件"
+    }
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "scope": "SDK 共同任务；完整 A02 仍需其他断言",
+  "provider": "deepseek",
+  "model_id": "deepseek-flash",
+  "observed_api_type": "chat_completions",
+  "transport_evidence": "http-requests.json",
+  "baseline": {
+    "namespace": "deepseek-1-9ff7bbff-350d-4348-be93-86fc14160553",
+    "snapshot_sha256": "8e4b87f946494174f14fb350667364ebce3b517efbba230982d975860560a401"
+  },
+  "state": {
+    "authorization_id": "98d5731c-15c5-4d69-a201-c6c3525600bc",
+    "completion_authorization_id": null,
+    "coordinator_id": "coordinator-1",
+    "due_at": "2026-10-25T17:00:00+08:00",
+    "evidence_requirements": [
+      "原因明细",
+      "措施及证据"
+    ],
+    "execution_namespace": "deepseek-1-9ff7bbff-350d-4348-be93-86fc14160553",
+    "feedback_ids": [],
+    "message_ids": [
+      "651cdb04-defc-4a17-843f-d5764653e137"
+    ],
+    "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+    "related_event_ids": [
+      "event-1"
+    ],
+    "related_meeting_id": "meeting-1",
+    "source_refs": [
+      "finance-note"
+    ],
+    "status": "WAITING_FEEDBACK",
+    "task_id": "39222d75-e7b6-4b21-bec9-7e4b12ab65d5",
+    "timezone": "Asia/Shanghai",
+    "version": "2"
+  },
+  "cost": null,
+  "at": "2026-10-22T05:24:00.238669+00:00"
+}

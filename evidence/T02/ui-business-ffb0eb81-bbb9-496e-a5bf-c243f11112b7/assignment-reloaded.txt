@@ -1,0 +1,140 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "@peti 查询 region-1 六项经营指标对比"
+          - button "Topic actions for 查询 region-1 六项经营指标对比":
+            - img
+        - listitem:
+          - button "@kevu 查询 region-1 产品对比与原始依据"
+          - button "Topic actions for 查询 region-1 产品对比与原始依据":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+        - listitem:
+          - button "查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…"
+          - button "Topic actions for 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-…":
+            - img
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "查询 region-1 六项经营指标对比":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 01:39 PM
+      - button "Copy"
+      - paragraph: "本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpose\": \"提交当前会议关联的毛利变化解释、措施和证据\", \"due_at\": \"2026-10-25T17:00:00+08:00\", \"timezone\": \"Asia/Shanghai\", \"evidence_requirements\": [\"原因明细\", \"措施及证据\"], \"related_meeting_id\": \"meeting-1\", \"related_event_ids\": [\"event-1\"], \"source_refs\": [\"finance-note\"]}"
+      - time: 01:39 PM
+      - button "Copy"
+      - paragraph: "本人授权按以下内容模拟发送：{\"task_id\": \"f51a21e1-6639-49f9-9c19-89deeed6b8ef\", \"task_version\": \"1\", \"recipient_id\": \"coordinator-1\", \"body\": \"提交当前会议关联的毛利变化解释、措施和证据\", \"content_version\": \"1\"}"
+      - time: 01:40 PM
+      - button "Copy"
+      - paragraph: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。
+      - time: 01:40 PM
+      - button "Copy"
+      - heading "任务正式状态（重新读取）" [level=2]
+      - region "Data table":
+        - table:
+          - rowgroup:
+            - row "字段 值":
+              - cell "字段"
+              - cell "值"
+          - rowgroup:
+            - row "任务 ID f51a21e1-6639-49f9-9c19-89deeed6b8ef":
+              - cell "任务 ID"
+              - cell "f51a21e1-6639-49f9-9c19-89deeed6b8ef":
+                - code: f51a21e1-6639-49f9-9c19-89deeed6b8ef
+            - row "状态 WAITING_FEEDBACK（等待反馈）":
+              - cell "状态"
+              - cell "WAITING_FEEDBACK（等待反馈）":
+                - strong: WAITING_FEEDBACK
+                - text: （等待反馈）
+            - row "版本 2":
+              - cell "版本"
+              - cell "2"
+            - row "协调人 coordinator-1":
+              - cell "协调人"
+              - cell "coordinator-1"
+            - row "目的 提交当前会议关联的毛利变化解释、措施和证据":
+              - cell "目的"
+              - cell "提交当前会议关联的毛利变化解释、措施和证据"
+            - row "截止 2026-10-25 17:00（Asia/Shanghai）":
+              - cell "截止"
+              - cell "2026-10-25 17:00（Asia/Shanghai）"
+            - row "证据要求 原因明细；措施及证据":
+              - cell "证据要求"
+              - cell "原因明细；措施及证据"
+            - row "关联会议 meeting-1":
+              - cell "关联会议"
+              - cell "meeting-1"
+            - row "关联事件 event-1":
+              - cell "关联事件"
+              - cell "event-1"
+            - row "来源引用 finance-note":
+              - cell "来源引用"
+              - cell "finance-note"
+            - row "创建授权 ID b1d636e2-1ccf-4620-af3a-23b92e96068b":
+              - cell "创建授权 ID"
+              - cell "b1d636e2-1ccf-4620-af3a-23b92e96068b":
+                - code: b1d636e2-1ccf-4620-af3a-23b92e96068b
+            - row "完成授权 ID 无（尚未确认完成）":
+              - cell "完成授权 ID"
+              - cell "无（尚未确认完成）"
+            - row "执行命名空间 ui-check":
+              - cell "执行命名空间"
+              - cell "ui-check"
+      - paragraph:
+        - strong: 消息关联
+      - list:
+        - listitem:
+          - text: 已发送消息：
+          - code: 5111243e-1be3-4b7d-bb52-ecba3bd9a91a
+          - text: （共 1 条，状态 SENT / SIMULATED）
+        - listitem:
+          - text: 反馈记录：暂无（
+          - code: feedback_ids
+          - text: 为空）
+      - paragraph:
+        - strong: 判断
+        - text: ：交办已送达，但协调人尚未回传任何反馈或结果，因此任务仍停留在等待反馈阶段，未进入 IN_PROGRESS 或 RESULT_SUBMITTED，也没有完成确认。距截止还有约 3 天（当前 2026-10-22）。需要我设置到期前提醒吗？
+      - button "Copy"
+      - button "Fork"
+      - time: 01:40 PM
+      - 'button "Jump to prompt: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2..."'
+      - 'button "Jump to prompt: 本人授权创建以下交办：{\"content_version\": \"1\", \"coordinator_id\": \"coordinator-1\", \"purpo..."'
+      - 'button "Jump to prompt: 本人授权按以下内容模拟发送：{\"task_id\": \"f51a21e1-6639-49f9-9c19-89deeed6b8ef\", \"task_versi..."'
+      - 'button "Jump to prompt: 重新读取任务 f51a21e1-6639-49f9-9c19-89deeed6b8ef，给出当前正式状态和消息关联。"'
+    - textbox "Message 查询 region-1 六项经营指标对比"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Context 12%. Open context usage"
+    - button "Voice input":
+      - img
+    - button "Send message" [disabled]:
+      - img

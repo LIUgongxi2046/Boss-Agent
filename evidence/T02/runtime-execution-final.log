@@ -1,0 +1,64 @@
+{"at":"2026-10-22T06:12:09.941655+00:00","baseline":{"namespace":"materials-509e3bc6-665d-47e5-936e-1cd4654ea05a","snapshot_sha256":"75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"},"credential_ref":"connection.json:credential_file","evidence":"/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/materials-509e3bc6-665d-47e5-936e-1cd4654ea05a","fields":[{"object_id":"IM01","required_fields":["owner_id","goals","timezone","confirmed_reading_requirement","version"],"rows":1,"status":"PASS"},{"object_id":"IM02","required_fields":["contact_id","name","organization","responsibility","valid_from","valid_until"],"rows":3,"status":"PASS"},{"object_id":"IM03","required_fields":["record_id","region_id","product_id","legal_entity_id","customer_id","factory_id","period","quantity_tonnes","revenue_cny","cost_cny","trade_type","version"],"rows":8,"status":"PASS"},{"object_id":"IM04","required_fields":["metric_id","formula","unit","precision","definition_version","scope","settlement_state"],"rows":6,"status":"PASS"},{"object_id":"IM05","required_fields":["meeting_id","owner_id","participant_ids","starts_at","timezone","material_ids","historical_commitment_ids","version"],"rows":1,"status":"PASS"},{"object_id":"IM06","required_fields":["source_id","author_contact_id","version","source_type","published_at","valid_from","access_scope","original_locator"],"rows":2,"status":"PASS"},{"object_id":"IM07","required_fields":["event_id","coordinator_id","meeting_id","task_id","owner_id","status","due_at","evidence_requirements","version"],"rows":1,"status":"PASS"},{"object_id":"IM08","required_fields":["calendar_id","owner_id","starts_at","ends_at","timezone","private_body","visibility"],"rows":1,"status":"PASS"},{"object_id":"IM09","required_fields":["config_id","version","provider","api_type","model_id","credential_ref","tool_scope","timeout","max_tool_rounds"],"rows":1,"status":"PASS"},{"object_id":"IM10","required_fields":["schedule_id","schedule_version","trigger","timezone","enabled","memory_id","memory_version","confirmation_state"],"rows":1,"status":"PASS"}],"generator_version":"T02-3","relations":"老板归属、同名人员独立标识、作者、参会人、事件、会议和历史任务关联均已独立检查","status":"PASS"}
+{
+  "status": "PASS",
+  "scope": "真实 HTTP 与 SQLite 模拟业务服务检查；不代表模型、上游页面或桌面验收",
+  "run_id": "9062dd16-55d6-466b-bb7b-82f0fb1f586f",
+  "requests": 37,
+  "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+  "numeric_changes": {
+    "sales_quantity": "20.0",
+    "revenue": "20.0",
+    "gross_profit": "-4.00",
+    "gross_profit_per_tonne": "-20.0"
+  },
+  "checks": [
+    "相同初始快照",
+    "明细复算",
+    "产品维度查询",
+    "原始依据",
+    "授权创建与发送",
+    "独立重读",
+    "重复写入",
+    "内容越权拒绝",
+    "维护越权拒绝",
+    "未认证拒绝",
+    "记忆版本与删除",
+    "配置版本与冲突",
+    "事件重复抑制",
+    "暂停",
+    "实际进程重启",
+    "重置隔离"
+  ],
+  "finished_at": "2026-10-22T06:12:12.349580+00:00",
+  "code_sha256": {
+    "business.py": "f96822557b6b2e24a68ab0511c311d91f30dae17871b5d1f2d9293f98870b8cd",
+    "service.py": "6107ae5e6aaa5795ae45bc19ec20cfe5b67aa08b7517a3558c5ea277f96a1e94",
+    "check_local.py": "baef69d82deb861408b9c22f5b2fb7ae27cbca35e09ebc989efcc6b976ca4803"
+  }
+}
+{"status": "PASS", "at": "2026-10-22T06:12:19.134724+00:00", "scope": "上游 CronService 真实计时触发、重复抑制、暂停保存、独立进程恢复与取消", "processes": [15887, 15889], "model_request_sent": false, "business_clock": "NOT_RUN", "multiple_process_ownership": "NOT_RUN", "desktop_lifecycle": "NOT_RUN", "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/cron-f6b0dce2-37a3-484a-82d0-15b52d506f8e"}
+2026-10-22 14:12:21.101 | INFO     | nanobot.cron.service:start:492 - Cron service started with 0 jobs
+2026-10-22 14:12:21.103 | INFO     | nanobot.cron.service:add_job:740 - Cron: added job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:21.302 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:21.305 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:21.507 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:21.509 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:21.716 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:21.718 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:21.921 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:21.924 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:22.125 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:22.127 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:22.329 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:22.330 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:22.533 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:22.536 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:22.739 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:22.742 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:22.943 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:22.945 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:23.148 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:23.151 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+2026-10-22 14:12:23.354 | INFO     | nanobot.cron.service:_execute_job:604 - Cron: executing job '获准业务时钟' (e430c8e5)
+2026-10-22 14:12:23.355 | INFO     | nanobot.cron.service:_execute_job:613 - Cron: job '获准业务时钟' completed
+{"status": "PASS", "at": "2026-10-22T06:12:23.367133+00:00", "requests": 38, "scope": "反馈、老板延期与完成、授权撤销、私人正文权限、联系人拒绝、资料摄取检索撤销、并发版本及上游实际调度采用业务时钟和提醒规则", "baseline": {"namespace": "controls-check", "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"}, "concurrent_statuses": [200, 409], "completed_task": {"authorization_id": "0b8f29ca-0063-490a-b18d-7f685d950443", "completion_authorization_id": "025deece-ce6b-4e19-a612-30c01882b73a", "coordinator_id": "coordinator-1", "due_at": "2026-10-26T17:00:00+08:00", "evidence_requirements": ["原因明细", "措施及证据"], "execution_namespace": "controls-check", "feedback_ids": ["cb2192f5-f71b-4535-8fee-feeec24c1169", "645f19bb-332b-4543-867d-e4d8bef65691", "215b75d0-5aba-4b8e-8b96-94b74efcde6c"], "message_ids": ["1258709a-607f-4b17-9900-4851f35453b5"], "purpose": "提交当前会议关联的毛利变化解释、措施和证据", "related_event_ids": ["event-1"], "related_meeting_id": "meeting-1", "source_refs": ["finance-note"], "status": "COMPLETED_CONFIRMED", "task_id": "16939e3e-8e10-4dc8-9c3f-e1288c71bad6", "timezone": "Asia/Shanghai", "version": "7"}, "evidence": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/controls-69a70207-ed3d-41c5-9f31-5dec9eb242d6"}

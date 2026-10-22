@@ -1,0 +1,45 @@
+{
+  "check_id": "K01",
+  "kind": "STATIC",
+  "capability": "DESIGN",
+  "scope": "完整需求映射、规则、BDD、方法 Schema、引用及语义审阅依据；未执行产品业务",
+  "requirements": 32,
+  "functional_requirements": 32,
+  "bdd_acceptance_definitions": 64,
+  "secretary_tasks": 13,
+  "agriculture_topics": 10,
+  "shared_capabilities": 9,
+  "goal_ids": [
+    "G01",
+    "G02",
+    "G03",
+    "G04"
+  ],
+  "hypotheses": 37,
+  "metrics": 17,
+  "simulation_interfaces": 14,
+  "management_capabilities": 16,
+  "functional_wireframes": 32,
+  "management_wireframes": 16,
+  "mermaid_syntax": {
+    "parsed_diagrams": 52,
+    "rendered": false,
+    "visual": "NOT_RUN"
+  },
+  "probe_steps": 15,
+  "probe_assertions": 37,
+  "probe_schema_definitions": 15,
+  "local_links_checked": 17,
+  "external_sources": [
+    "https://claude.com/product/cowork",
+    "https://learn.microsoft.com/en-us/microsoft-365/copilot/researcher-agent",
+    "https://www.anthropic.com/research/building-effective-agents",
+    "https://www.anthropic.com/research/demystifying-evals-for-ai-agents"
+  ],
+  "semantic_review": "docs/PRD.md 第 13.2 节",
+  "business_execution": "NOT_RUN",
+  "visual": "NOT_RUN",
+  "python": "3.12.7",
+  "markdown_it_py": "4.2.0",
+  "jsonschema": "4.26.0"
+}

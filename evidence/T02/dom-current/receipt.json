@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K02-ui-reuse",
+  "kind": "INTEGRATION",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent",
+  "command": [
+    "validation/.venv/bin/python",
+    "validation/dom_probe.py"
+  ],
+  "started_at": "2026-10-22T04:50:45.637181+00:00",
+  "ended_at": "2026-10-22T04:51:11.933039+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/dom_probe.py",
+      "sha256": "ab58a378eb578fb6639c933afa013f492939c2778f8a9de6971dc74bdc00daf5"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/upstream.py",
+      "sha256": "55d11be8727d5d3f47320abfe90b307c3b5035b101c3c3b6ce37ea5360288987"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/validation/uv.lock",
+      "sha256": "4a9a5b7a3d34863c90504521ccb5f0635828f9bb561e1f1f37fdc604a3ec17d2"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    },
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/选型环境.md",
+      "sha256": "61e50238362e609a88256329aabc59807c1d78e83ac7d7abd1c8b248b1b42d7b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/evidence/T02/dom-current/output.log",
+      "sha256": "abecb2f3c590c25509c4a0dca0809c710d444d700d92e7d64f5f1ce6219eac0f"
+    }
+  ]
+}

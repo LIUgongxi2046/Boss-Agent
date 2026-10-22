@@ -1,0 +1,73 @@
+- complementary:
+  - navigation "Sidebar navigation":
+    - button "Search"
+    - button "New topic"
+    - button "Apps"
+    - button "Skills"
+    - button "Automations"
+    - button "Channels"
+    - region "Topics":
+      - text: Topics
+      - list:
+        - listitem:
+          - button "New topic"
+          - button "Topic actions for New topic":
+            - img
+        - listitem:
+          - button "@royi 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@lolu 生成简报并查询region-1经营指标"
+          - button "Topic actions for 生成简报并查询region-1经营指标":
+            - img
+        - listitem:
+          - button "@gane 当前会话无已确认阅读要求"
+          - button "Topic actions for 当前会话无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@soro 生成简报并查询区域销售指标"
+          - button "Topic actions for 生成简报并查询区域销售指标":
+            - img
+        - listitem:
+          - button "@mita 当前无已确认阅读要求"
+          - button "Topic actions for 当前无已确认阅读要求":
+            - img
+        - listitem:
+          - button "@havi 生成简报并查询 region-1 指标"
+          - button "Topic actions for 生成简报并查询 region-1 指标":
+            - img
+        - listitem:
+          - button "@tiyu 生成简报并查询 region-1 经营指标"
+          - button "Topic actions for 生成简报并查询 region-1 经营指标":
+            - img
+      - button "8 hidden topics"
+    - button "Settings"
+    - status "Connected"
+  - separator "Resize sidebar"
+- main:
+  - region "Conversation workbench":
+    - button "Session details":
+      - img
+    - button "Open prompt navigator":
+      - img
+    - button "Add pane"
+    - button "Toggle theme from header":
+      - img
+    - region "New topic":
+      - paragraph: 查询 region-1 的 product-1 和 product-2，2026-10-01 至 2026-10-10 对比 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1，查询全部六个经营指标并读取原始依据。
+      - time: 02:41 PM
+      - status: Sending…
+      - button "Copy"
+      - status "Working for 1s"
+    - textbox "Message New topic"
+    - button "Attach files":
+      - img
+    - 'button "Workspace access mode: Default Permission"':
+      - img
+      - img
+    - text: Default
+    - button "Voice input":
+      - img
+    - button "Stop response":
+      - img

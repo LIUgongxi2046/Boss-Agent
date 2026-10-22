@@ -1,0 +1,15 @@
+{
+  "version": "6.0",
+  "source": "桌面设计修改清单-v5.md",
+  "page_count": 72,
+  "state_mappings": 561,
+  "2x_png_count": 72,
+  "1x_png_count": 72,
+  "html_page_count": 72,
+  "focus_page_count": 21,
+  "status_preview_images": 12,
+  "pdf_pages": 88,
+  "full_browser_qa": "21专项界面脚本及9项多尺寸静态抽查；正式业务与宿主未验证",
+  "error_count": 0,
+  "errors": []
+}

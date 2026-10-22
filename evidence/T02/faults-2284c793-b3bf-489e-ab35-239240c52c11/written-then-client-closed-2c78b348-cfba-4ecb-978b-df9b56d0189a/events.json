@@ -1,0 +1,106 @@
+[
+  {
+    "type": "tool",
+    "name": "create_assignment",
+    "input": {
+      "content_version": "1",
+      "coordinator_id": "coordinator-1",
+      "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+      "due_at": "2026-10-25T17:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "evidence_requirements": [
+        "原因明细",
+        "措施及证据"
+      ],
+      "related_meeting_id": "meeting-1",
+      "related_event_ids": [
+        "event-1"
+      ],
+      "source_refs": [
+        "finance-note"
+      ],
+      "envelope": {
+        "request_id": "written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a",
+        "owner_id": "boss-1",
+        "execution_namespace": "written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "session_id": "written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a"
+      },
+      "authorization_id": "fc1c9cf1-87a5-415e-984c-9a31ecd720f6",
+      "idempotency_key": "write-before-failure"
+    },
+    "output": {
+      "task_id": "fe668f90-ca82-4545-83cb-a341013e6471",
+      "status": "OPEN",
+      "version": "1",
+      "authorization_id": "fc1c9cf1-87a5-415e-984c-9a31ecd720f6",
+      "execution_namespace": "written-then-client-closed-2c78b348-cfba-4ecb-978b-df9b56d0189a",
+      "persisted_at": "2026-10-22T06:37:31.770725+00:00"
+    },
+    "at": "2026-10-22T06:37:31.772652+00:00"
+  },
+  {
+    "at": "2026-10-22T06:37:31.772715+00:00",
+    "type": "actual_client_closed_after_committed_write"
+  },
+  {
+    "at": "2026-10-22T06:37:31.777185+00:00",
+    "type": "iteration",
+    "iteration": 0,
+    "usage": {
+      "input_tokens": 3399,
+      "output_tokens": 233,
+      "total_tokens": 3632,
+      "cache_read_tokens": 3200,
+      "cache_write_tokens": null,
+      "reported_tokens": 3632,
+      "estimated_tokens": 0,
+      "source": "reported",
+      "generation_ms": 0,
+      "measured_output_tokens": 0,
+      "ttft_ms": 0,
+      "timed_requests": 0,
+      "context_tokens": 3399,
+      "request_count": 1
+    },
+    "stop_reason": null,
+    "error": null
+  },
+  {
+    "at": "2026-10-22T06:37:31.804081+00:00",
+    "type": "iteration",
+    "iteration": 1,
+    "usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "reported_tokens": 0,
+      "estimated_tokens": 0,
+      "source": "reported",
+      "generation_ms": 0,
+      "measured_output_tokens": 0,
+      "ttft_ms": 0,
+      "timed_requests": 0,
+      "context_tokens": null,
+      "request_count": 1
+    },
+    "stop_reason": "error",
+    "error": "Error calling LLM: Cannot send a request, as the client has been closed."
+  },
+  {
+    "at": "2026-10-22T06:37:31.805423+00:00",
+    "type": "run_error",
+    "stop_reason": "error",
+    "exception_type": "NoneType",
+    "error": "None"
+  },
+  {
+    "at": "2026-10-22T06:37:31.811970+00:00",
+    "type": "run_end",
+    "stop_reason": "error",
+    "error": "Error calling LLM: Cannot send a request, as the client has been closed."
+  }
+]

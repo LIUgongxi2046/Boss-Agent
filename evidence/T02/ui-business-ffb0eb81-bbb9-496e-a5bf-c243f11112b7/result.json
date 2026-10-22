@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-22T05:40:19.582556+00:00",
+  "status": "PASS",
+  "scope": "原生用户端 DOM 共同任务、刷新重读与独立正式状态核查",
+  "task": {
+    "authorization_id": "b1d636e2-1ccf-4620-af3a-23b92e96068b",
+    "completion_authorization_id": null,
+    "coordinator_id": "coordinator-1",
+    "due_at": "2026-10-25T17:00:00+08:00",
+    "evidence_requirements": [
+      "原因明细",
+      "措施及证据"
+    ],
+    "execution_namespace": "ui-check",
+    "feedback_ids": [],
+    "message_ids": [
+      "5111243e-1be3-4b7d-bb52-ecba3bd9a91a"
+    ],
+    "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+    "related_event_ids": [
+      "event-1"
+    ],
+    "related_meeting_id": "meeting-1",
+    "source_refs": [
+      "finance-note"
+    ],
+    "status": "WAITING_FEEDBACK",
+    "task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef",
+    "timezone": "Asia/Shanghai",
+    "version": "2"
+  },
+  "outbox": [
+    {
+      "authorization_id": "b055a1a7-ca29-4aa7-a96b-0feb4a7626f7",
+      "body": "提交当前会议关联的毛利变化解释、措施和证据",
+      "content_version": "1",
+      "envelope": {
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "execution_namespace": "ui-check",
+        "owner_id": "boss-1",
+        "request_id": "ui-check",
+        "session_id": "ui-check"
+      },
+      "idempotency_key": "eb24654950811db2a91acec25f3d669eb192448568b16f7e8b489b1ecd4640ae",
+      "message_id": "5111243e-1be3-4b7d-bb52-ecba3bd9a91a",
+      "message_status": "SENT",
+      "recipient_id": "coordinator-1",
+      "sent_at": "2026-10-22T05:40:06.219875+00:00",
+      "source_type": "SIMULATED",
+      "task_id": "f51a21e1-6639-49f9-9c19-89deeed6b8ef",
+      "task_status": "WAITING_FEEDBACK",
+      "task_version": "2"
+    }
+  ]
+}
