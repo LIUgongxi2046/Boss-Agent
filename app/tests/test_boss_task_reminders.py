@@ -289,3 +289,43 @@ def test_approved_extension_feedback_cannot_be_reused_for_another_deadline(conte
         assert db.execute(
             "SELECT COUNT(*) FROM audit WHERE operation='boss.assignment.extend'"
         ).fetchone()[0] == 1
+
+
+
+def test_progress_and_extension_require_no_evidence_but_result_submission_does(context):
+    api, _ = context
+    task = create(api)[1]
+    assert send(api, task["task_id"])[0] == 200
+
+    progress = act(
+        api, "MAINTAINER", "boss.simulation.feedback", "progress-without-attachment",
+        task_id=task["task_id"], task_version="2",
+        author_contact_id="coordinator-1", kind="PROGRESS",
+        content="已收到交办，正在收集材料", evidence_refs=[],
+    )
+    assert progress[0] == 200, progress
+    assert progress[1]["task"]["status"] == "IN_PROGRESS"
+
+    refused = act(
+        api, "MAINTAINER", "boss.simulation.feedback",
+        "result-without-attachment", task_id=task["task_id"],
+        task_version=progress[1]["task"]["version"],
+        author_contact_id="coordinator-1", kind="RESULT_SUBMITTED",
+        content="声称已经提交完成", evidence_refs=[],
+    )
+    assert refused[0] == 400
+    with api.store.connect() as db:
+        current_task = api.store.get(db, "ui-check", "task", task["task_id"])
+        assert current_task["status"] == "IN_PROGRESS"
+        assert len(current_task["feedback_ids"]) == 1
+
+    completed = act(
+        api, "MAINTAINER", "boss.simulation.feedback",
+        "result-with-real-attachment", task_id=task["task_id"],
+        task_version=progress[1]["task"]["version"],
+        author_contact_id="coordinator-1", kind="RESULT_SUBMITTED",
+        content="已提交来源可核查的结果", evidence_refs=["finance-note"],
+    )
+    assert completed[0] == 200, completed
+    assert completed[1]["task"]["status"] == "RESULT_SUBMITTED"
+    assert due(api, task["task_id"])["state"] == "OPEN"
