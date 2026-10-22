@@ -25,6 +25,7 @@ from boss_message_calendar import (
     message_save, message_send, message_reply, calendar_save,
     calendar_share, calendar_revoke, calendar_delete,
 )
+from boss_meeting_brief import prepare as meeting_brief_prepare
 from boss_meeting_approval import (
     minutes_save, minutes_confirm, application_seed, application_revise, approval_decide,
 )
@@ -88,6 +89,7 @@ class BossCommandAPI:
         "boss.reminder.ack": "BOSS",
         "boss.reminder.snooze": "BOSS",
         "boss.reminder.close": "BOSS",
+        "boss.meeting.brief.prepare": "BOSS",
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
         "boss.approval.decide": "BOSS",
@@ -225,6 +227,8 @@ class BossCommandAPI:
                 result = self._memory_delete(db, payload)
             elif action.startswith("boss.reminder."):
                 result = self._reminder(db, payload, action)
+            elif action == "boss.meeting.brief.prepare":
+                result = meeting_brief_prepare(self, db, data, payload)
             elif action == "boss.minutes.save":
                 result = minutes_save(self, db, data, payload)
             elif action == "boss.minutes.confirm":
