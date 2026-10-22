@@ -30,7 +30,10 @@
     "F07 application approvals must originate from explicit MAINTAINER simulated data in A03, with exact amount/currency and source version. REJECT/APPROVE/REQUEST_MORE are distinct. Revision after REQUEST_MORE invalidates old approvals; no financial transaction.",
     "The redesigned Desktop v6 shell now follows source desktop layout geometry (64px topbar, 146/122px Hero, 204px sidebar, 278px right information column); macOS screenshot pixel diff remains NOT_RUN.",
     "F08 now has versioned draft/save/simulated send/reply with actual SQLite records and owner consent; SENT_SIMULATED is distinct from external delivery and reply. Reply injection is a separate MAINTAINER action; it does not confirm task completion.",
-    "F12 owner-only private calendar edit/delete and busy-only scope sharing/revocation: title/location/body cannot enter the share object; private content is not readable through maintenance API. No actual external invite is sent."
+    "F12 owner-only private calendar edit/delete and busy-only scope sharing/revocation: title/location/body cannot enter the share object; private content is not readable through maintenance API. No actual external invite is sent.",
+    "Functional priority patch: F05/F06/F07/F08/F12/F13/N06/N07/N08/A04 can re-query a persisted original idempotency receipt after uncertain WebSocket responses; absence is NOT proof of failed delivery. No datasets added.",
+    "FR12 calendar-conflict reads the same authoritative single-meeting conflict classification used by calendar.save; missing meeting end remains unknown. Busy shares are ineffective after expiry, revoke or calendar-version change; owner preview only, no recipient account or external delivery.",
+    "F08 cannot send a message linked to an OPEN assignment before separate owner-authorized assignment send; contact ID validity is checked against current simulated clock and duplicate attachments are rejected."
   ],
   "pages": [
     {
@@ -232,7 +235,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/organization",
         "GET /api/boss/ui/workspace/minutes",
-        "GET /api/boss/ui/evidence"
+        "GET /api/boss/ui/evidence",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.minutes.save",
@@ -249,12 +253,18 @@
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
         "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_meeting_approval.py"
+        "app/tests/test_boss_meeting_approval.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "F06",
@@ -279,7 +289,8 @@
       "component_name": "BossAssignmentFlow (nested in BossDesktop)",
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
-        "GET /api/boss/ui/tasks"
+        "GET /api/boss/ui/tasks",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.assignment.create",
@@ -300,12 +311,18 @@
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_command_api.py"
+        "app/tests/test_boss_command_api.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "F07",
@@ -331,7 +348,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/sources",
         "GET /api/boss/ui/workspace/approvals",
-        "GET /api/boss/ui/evidence"
+        "GET /api/boss/ui/evidence",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.approval.decide"
@@ -346,12 +364,18 @@
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
         "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_meeting_approval.py"
+        "app/tests/test_boss_meeting_approval.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "F08",
@@ -375,7 +399,8 @@
       "component_file": "app/webui/BossCommunicationCalendar.tsx",
       "component_name": "BossCommunicationCalendar",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/outbox"
+        "GET /api/boss/ui/workspace/outbox",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.message.draft.save",
@@ -392,13 +417,19 @@
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
         "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_message_calendar.py"
+        "app/tests/test_boss_message_calendar.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
       ],
-      "external_delivery_verified": false
+      "external_delivery_verified": false,
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "F09",
@@ -542,7 +573,10 @@
       "component_file": "app/webui/BossCommunicationCalendar.tsx",
       "component_name": "BossCommunicationCalendar",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/calendar"
+        "GET /api/boss/ui/workspace/calendar",
+        "GET /api/boss/ui/operation-status",
+        "GET /api/boss/ui/calendar-share-preview",
+        "GET /api/boss/ui/calendar-conflict"
       ],
       "code_wired_write_actions": [
         "boss.calendar.save",
@@ -562,13 +596,22 @@
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
         "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_message_calendar.py"
+        "app/tests/test_boss_message_calendar.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
       ],
-      "external_delivery_verified": false
+      "external_delivery_verified": false,
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      },
+      "work_conflict_check": "SERVER_CHECK_SAME_RULE_AS_SAVE_BUT_MEETING_END_UNKNOWN",
+      "calendar_share_preview": "BUSY_FIELDS_ONLY_ROLE_SCOPED",
+      "effective_share_status": "BUSINESS_CLOCK_AND_CALENDAR_VERSION"
     },
     {
       "page_id": "F13",
@@ -592,7 +635,8 @@
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/memory"
+        "GET /api/boss/ui/workspace/memory",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.memory.confirm",
@@ -609,12 +653,18 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "F14",
@@ -1681,7 +1731,8 @@
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/notifications"
+        "GET /api/boss/ui/workspace/notifications",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.reminder.ack",
@@ -1699,12 +1750,18 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "N07",
@@ -1731,7 +1788,8 @@
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/memory"
+        "GET /api/boss/ui/workspace/memory",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.memory.confirm",
@@ -1746,12 +1804,18 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "N08",
@@ -1778,7 +1842,8 @@
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/notifications"
+        "GET /api/boss/ui/workspace/notifications",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.reminder.ack",
@@ -1794,12 +1859,18 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "N09",
@@ -2464,7 +2535,8 @@
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
         "GET /api/boss/ui/maintenance",
-        "GET /api/boss/ui/workspace/relationships"
+        "GET /api/boss/ui/workspace/relationships",
+        "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
         "boss.simulation.feedback",
@@ -2483,12 +2555,18 @@
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_command_api.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_recovery.py"
       ],
       "source_task_ids": [
         "T19",
         "T24"
-      ]
+      ],
+      "resilience": {
+        "idempotency_result_lookup": "CODE_WIRED",
+        "result_verified_by_browser_on_target_mac": false,
+        "retry_policy": "SAME_CLIENT_REQUEST_ID_AND_SERVER_RESULT_RECHECK"
+      }
     },
     {
       "page_id": "A05",
