@@ -248,6 +248,36 @@ def _calendar(db, data):
     }
 
 
+
+def work_meeting_conflict(start, end, meeting_start):
+    """Explain the *known* selected meeting start without inferring an end.
+
+    Returns the same acknowledgement decision used by calendar.save, so the
+    preflight UI and persisted mutation never disagree about the known input.
+    """
+    if start <= meeting_start < end:
+        status = "KNOWN_MEETING_START_OVERLAP"
+        acknowledgement = True
+    elif 0 <= (start - meeting_start).total_seconds() < 86400:
+        status = "POSSIBLE_CONFLICT_MEETING_END_UNKNOWN"
+        acknowledgement = True
+    elif 0 <= (meeting_start - end).total_seconds() < 86400:
+        status = "ENDS_BEFORE_KNOWN_MEETING_START"
+        acknowledgement = True
+    else:
+        status = "NO_OVERLAP_IDENTIFIED_WITH_KNOWN_START"
+        acknowledgement = False
+    return {
+        "status": status,
+        "meeting_starts_at": meeting_start.isoformat(),
+        "meeting_ends_at": None,
+        "meeting_end_known": False,
+        "requires_owner_acknowledgement": acknowledgement,
+        "conflict_proven_absent": False,
+        "coverage": "CURRENT_APPROVED_SIMULATED_MEETING_ONLY",
+    }
+
+
 def calendar_save(api, db, data, payload):
     api._exact(payload, {
         "client_request_id", "expected_version", "starts_at", "ends_at",
@@ -275,11 +305,9 @@ def calendar_save(api, db, data, payload):
     mstart = datetime.fromisoformat(meeting["starts_at"])
     # The selected fixture does not provide a meeting end; we *cannot*
     # infer an exact duration or claim a full conflict check.
-    overlap_unknown = (
-        abs((start - mstart).total_seconds()) < 86400
-        or abs((end - mstart).total_seconds()) < 86400
-    )
-    require(not overlap_unknown or payload["acknowledge_conflict"],
+    conflict = work_meeting_conflict(start, end, mstart)
+    require(not conflict["requires_owner_acknowledgement"]
+            or payload["acknowledge_conflict"],
             "会议缺少结束时间，邻近安排必须由本人确认冲突风险")
     if _exists(db, "private_calendar", "private-1"):
         api.store.put(db, NS, "private_calendar_revision",
@@ -321,6 +349,7 @@ def calendar_save(api, db, data, payload):
         "authorization_id": auth_id,
         "active_shares_invalidated": True,
         "calendar_conflict_proven_absent": False,
+        "conflict_status": conflict["status"],
         "external_calendar_updated": False,
     }
 
