@@ -170,10 +170,46 @@ class BossPageAPI:
                 if row.get("generated_by") == "BOSS_AUTHORIZED_TASK"
                 and row.get("task_id")
             ]
+            available = {
+                row["source_id"]: row for row in
+                self._items(db, self.namespace, "document")
+            }
+            tasks = []
+            for task in self._items(db, self.namespace, "task"):
+                item = self._public_task(task)
+                pinned = task.get("source_versions")
+                violations = []
+                sources = task.get("source_refs", [])
+                if not isinstance(pinned, dict) or set(pinned) != set(sources):
+                    violations.append("UNPINNED_SOURCE_VERSION")
+                for source_id in sources:
+                    doc = available.get(source_id)
+                    if doc is None or doc.get("withdrawn") or (
+                        doc.get("access_scope") != data["owner_id"]
+                        or doc.get("source_type") != "SIMULATED"
+                    ):
+                        violations.append("SOURCE_UNAVAILABLE")
+                    elif isinstance(pinned, dict) and doc.get("version") != pinned.get(source_id):
+                        violations.append("SOURCE_VERSION_CHANGED")
+                original_id = task.get("origin_source_id")
+                if original_id:
+                    doc = available.get(original_id)
+                    if doc is None or doc.get("withdrawn") or (
+                        doc.get("access_scope") != data["owner_id"]
+                        or doc.get("source_type") != "SIMULATED"
+                    ):
+                        violations.append("MINUTE_SOURCE_UNAVAILABLE")
+                    elif doc.get("version") != task.get("origin_source_version"):
+                        violations.append("MINUTE_VERSION_CHANGED")
+                item["source_reference_state"] = (
+                    "NEEDS_REVIEW" if violations else "CURRENT"
+                )
+                item["source_reference_reasons"] = sorted(set(violations))
+                tasks.append(item)
             return {
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
-                "tasks": [self._public_task(v) for v in self._items(db, self.namespace, "task")],
+                "tasks": tasks,
                 "linked_messages": linked_messages,
                 "task_due_events": task_due_events,
                 "feedback": [
