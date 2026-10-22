@@ -72,7 +72,7 @@ def test_open_task_has_no_reminder_before_independent_owner_send(context):
         api, "MAINTAINER", "boss.simulation.feedback",
         "feedback-before-authorization", task_id=task["task_id"],
         task_version="1", author_contact_id="coordinator-1",
-        kind="PROGRESS", content="不可以通过维护侧触发任务", evidence_refs=["finance-note"],
+        kind="PROGRESS", content="不可以通过维护侧触发任务", evidence_refs=[],
     )
     assert status == 409
     assert due(api, task["task_id"]) is None
@@ -153,7 +153,7 @@ def test_extension_updates_due_atomically_only_after_owner_confirm(context):
         task_id=task["task_id"], task_version="2",
         author_contact_id="coordinator-1", kind="EXTENSION_REQUEST",
         content="申请补充真实来源后延期",
-        evidence_refs=["finance-note"], proposed_due_at="2026-10-26T17:00:00+08:00",
+        evidence_refs=[], proposed_due_at="2026-10-26T17:00:00+08:00",
     )
     assert request[0] == 200, request
     assert due(api, task["task_id"])["version"] == "1"
@@ -263,7 +263,7 @@ def test_approved_extension_feedback_cannot_be_reused_for_another_deadline(conte
         api, "MAINTAINER", "boss.simulation.feedback",
         "one-extension-feedback", task_id=task["task_id"], task_version="2",
         author_contact_id="coordinator-1", kind="EXTENSION_REQUEST",
-        content="请允许调整交办截止时间", evidence_refs=["finance-note"],
+        content="请允许调整交办截止时间", evidence_refs=[],
         proposed_due_at="2026-10-26T17:00:00+08:00",
     )
     assert request[0] == 200, request
