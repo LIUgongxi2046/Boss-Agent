@@ -54,7 +54,8 @@ export interface MaintenanceTaskRef {
 type Action =
   | "boss.assignment.create" | "boss.assignment.send"
   | "boss.assignment.complete" | "boss.assignment.extend"
-  | "boss.assignment.cancel" | "boss.simulation.feedback";
+  | "boss.assignment.cancel" | "boss.simulation.feedback"
+  | "boss.message.draft.save";
 type Result = {
   task_id?: string; task?: { task_id: string; status: string; version: string };
   status?: string; version?: string; feedback_id?: string;
@@ -255,6 +256,27 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       "正文："+message,"仅写入模拟发件箱，不会真正发送至外部人员。",
     ]);
   });
+  const prepareFollowup=()=>safe(()=>{
+    if(!current||!current.version||!current.coordinator_id)
+      throw new Error("请先选择已保存的交办任务");
+    if(!["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status))
+      throw new Error("只有已经独立发送、正在等待或处理反馈的任务可以准备催办");
+    if(current.source_reference_state!=="CURRENT")
+      throw new Error("原始资料已经变化，不能据此继续催办");
+    const message=required(body,"催办草稿正文");
+    propose("boss.message.draft.save",{
+      draft_id:null,expected_version:"0",
+      recipient_id:current.coordinator_id,
+      related_task_id:current.task_id,body:message,
+      attachment_refs:[],visibility:"RECIPIENT_ONLY",
+    },"保存当前交办的催办草稿",[
+      "关联任务："+current.task_id,
+      "唯一负责人："+current.coordinator_id,
+      "当前任务状态："+current.status,
+      "催办正文："+message,
+      "只保存 F08 DRAFT，不会自动发送或生成送达回执。",
+    ]);
+  });
   const prepareComplete=()=>safe(()=>{
     if(!current||!completed||current.status!=="RESULT_SUBMITTED"||!current.version)
       throw new Error("当前没有已经提交且具备证据的核查结果。");
@@ -374,6 +396,17 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
               <MessageSquareText size={15}/> 核对并模拟发送</button></div>
           </>:<p className="boss-helper">请先选择或创建交办。</p>}
           <p className="boss-helper">模拟 SENT 只代表本地发件箱已记录；任务仍需反馈。</p>
+          {current&&["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status)&&
+            <div className="boss-actions">
+              <button type="button" className="boss-btn"
+                disabled={busy||current.source_reference_state!=="CURRENT"}
+                onClick={prepareFollowup}>
+                <MessageSquareText size={15}/> 保存关联催办草稿（F08）
+              </button>
+              <button type="button" className="boss-btn" onClick={onViewMessages}>
+                打开 F08 草稿与模拟发件箱
+              </button>
+            </div>}
         </section>
         <section className="boss-panel">
           <div className="boss-panel-head">
