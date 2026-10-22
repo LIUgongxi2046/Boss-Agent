@@ -16,6 +16,7 @@ import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
+import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -762,6 +763,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 (SECTOR_PAGE_IDS as readonly string[]).includes(page) ? <BossSectorView
                   key={page} pageId={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
+                /> :
+                (page === "F08" || page === "F12") ? <BossCommunicationCalendar
+                  key={page} pageId={page} onViewSource={goSource}
+                  onNavigate={id=>navigate(id)}
                 /> :
                 (page === "F05" || page === "F07") ? <BossMeetingApprovalView
                   key={page} pageId={page}
