@@ -622,6 +622,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onDraftSaved={()=>setAssignmentDirty(false)}
                   onOpenCoordinatorPicker={()=>navigate("D04")}
                   onOpenDuePicker={()=>navigate("D05")}
+                  onViewMessages={()=>navigate("F08")}
                 /> :
                 (page==="D04"||page==="D05") ? <BossAssignmentPicker
                   key={page} pageId={page} contacts={dashboard?.contacts||[]}
