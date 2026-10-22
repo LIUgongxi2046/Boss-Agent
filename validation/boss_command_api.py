@@ -21,6 +21,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from business import checksum, encode, now, require, validate
 from controls import FIELDS
+from boss_prompt_lifecycle import draft_save as prompt_draft_save, validate as prompt_validate, activate as prompt_activate
 from boss_message_calendar import (
     message_save, message_send, message_reply, calendar_save,
     calendar_share, calendar_revoke, calendar_delete,
@@ -99,6 +100,9 @@ class BossCommandAPI:
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
         "boss.minutes.assignment.create": "BOSS",
+        "boss.prompt.draft.save": "MAINTAINER",
+        "boss.prompt.validate": "MAINTAINER",
+        "boss.prompt.activate": "MAINTAINER",
         "boss.knowledge.source.create": "MAINTAINER",
         "boss.knowledge.source.revise": "MAINTAINER",
         "boss.knowledge.source.withdraw": "MAINTAINER",
@@ -267,6 +271,12 @@ class BossCommandAPI:
                 result = minutes_confirm(self, db, data, payload)
             elif action == "boss.minutes.assignment.create":
                 result = minutes_assignment_create(self, db, data, payload, key)
+            elif action == "boss.prompt.draft.save":
+                result = prompt_draft_save(self, db, data, payload)
+            elif action == "boss.prompt.validate":
+                result = prompt_validate(self, db, data, payload)
+            elif action == "boss.prompt.activate":
+                result = prompt_activate(self, db, data, payload)
             elif action == "boss.knowledge.source.create":
                 result = source_create(self, db, data, payload)
             elif action == "boss.knowledge.source.revise":
