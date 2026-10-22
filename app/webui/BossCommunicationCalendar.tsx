@@ -40,6 +40,13 @@ type BusyShare = {
   expires_at:string;revoked:boolean;
   effective_state:"ACTIVE_SIMULATED"|"EXPIRED"|"REVOKED"|"OUTDATED"|"INVALID";
 };
+type ConflictCheck = {
+  source_type:"SIMULATED";meeting_id:string;meeting_version:string;
+  proposed_starts_at:string;proposed_ends_at:string;
+  status:string;meeting_starts_at:string;meeting_ends_at:null;
+  meeting_end_known:false;requires_owner_acknowledgement:boolean;
+  conflict_proven_absent:false;coverage:string;read_only:true;
+};
 type BusyPreview = {
   share_id:string;share_status:"ACTIVE_SIMULATED";recipient_id:string;
   busy:true;starts_at:string;ends_at:string;timezone:string;
@@ -210,6 +217,8 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
   const [title,setTitle]=useState("");
   const [privateBody,setPrivateBody]=useState("");
   const [location,setLocation]=useState("");
+  const [conflictCheck,setConflictCheck]=useState<ConflictCheck|null>(null);
+  const [conflictBusy,setConflictBusy]=useState(false);
   const [privateAttachmentId,setPrivateAttachmentId]=useState("");
   const [privateAttachmentVersion,setPrivateAttachmentVersion]=useState("1");
   const [busyPreview,setBusyPreview]=useState<BusyPreview|null>(null);
@@ -228,7 +237,7 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
     const abort=new AbortController();
     const token=getToken();
     if(!token){setError("当前登录已失效");return;}
-    setLoading(true);setError("");setState(null);setBusyPreview(null);
+    setLoading(true);setError("");setState(null);setBusyPreview(null);setConflictCheck(null);
     const key=isMessage?"outbox":"calendar";
     void fetch("/api/boss/ui/workspace/"+key,{
       headers:{"Authorization":"Bearer "+token},cache:"no-store",signal:abort.signal,
@@ -311,10 +320,40 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
       "成功时仅写入模拟发件箱 SENT_SIMULATED；送达/回复各自独立核查。",
     ]);
   }
+  async function checkCalendarConflict(){
+    setError("");
+    const token=getToken();
+    if(!token){setError("身份已过期，不能查询工作会议");return;}
+    let starts_at="",ends_at="";
+    try{
+      starts_at=isoShanghai(start);ends_at=isoShanghai(end);
+    }catch(e){setError(e instanceof Error?e.message:String(e));return;}
+    setConflictBusy(true);setConflictCheck(null);
+    try{
+      const qs=new URLSearchParams({starts_at,ends_at,timezone:"Asia/Shanghai"});
+      const response=await fetch("/api/boss/ui/calendar-conflict?"+qs.toString(),{
+        headers:{Authorization:"Bearer "+token},cache:"no-store",
+      });
+      if(!response.ok)throw Error("会议信息检查未完成（HTTP "+response.status+"）");
+      const result=await response.json() as ConflictCheck;
+      if(result.source_type!=="SIMULATED"||!result.read_only||
+         result.proposed_starts_at!==starts_at||result.proposed_ends_at!==ends_at||
+         result.meeting_end_known!==false||result.conflict_proven_absent!==false)
+        throw Error("当前会议信息的校验结果与申请窗口不符");
+      setConflictCheck(result);
+    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    finally{setConflictBusy(false);}
+  }
   function saveCalendar(){
     setError("");
     if(!calendars?.calendar){setError("当前私人日程未加载");return;}
     try{
+      if(!conflictCheck||
+         conflictCheck.proposed_starts_at!==isoShanghai(start)||
+         conflictCheck.proposed_ends_at!==isoShanghai(end)){
+        setError("先按当前起止时间执行工作会议冲突检查，核对结果后再保存。");
+        return;
+      }
       const c=calendars.calendar;
       propose("boss.calendar.save",{
         expected_version:c.version,starts_at:isoShanghai(start),ends_at:isoShanghai(end),
@@ -484,9 +523,9 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
           <Block title="私人安排编辑" note="FR12 · 标题、地点、正文默认仅本人可见">
             {calendars?.calendar?<div className="boss-form-grid">
               <label>开始（北京时间）<input type="datetime-local" value={start} disabled={!calendars.can_edit}
-                onChange={e=>{setStart(e.target.value);setDirty(true);}}/></label>
+                onChange={e=>{setStart(e.target.value);setDirty(true);setConflictCheck(null);setConflictAcknowledged(false);}}/></label>
               <label>结束（北京时间）<input type="datetime-local" value={end} disabled={!calendars.can_edit}
-                onChange={e=>{setEnd(e.target.value);setDirty(true);}}/></label>
+                onChange={e=>{setEnd(e.target.value);setDirty(true);setConflictCheck(null);setConflictAcknowledged(false);}}/></label>
               <label>私人标题<input value={title} disabled={!calendars.can_edit}
                 onChange={e=>{setTitle(e.target.value);setDirty(true);}}/></label>
               <label>地点<input value={location} disabled={!calendars.can_edit}
@@ -505,6 +544,22 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
             <textarea id="boss-private-body" rows={4} value={privateBody}
               disabled={!calendars?.can_edit}
               onChange={e=>{setPrivateBody(e.target.value);setDirty(true);}}/>
+            <div className="boss-actions">
+              <button type="button" className="boss-btn" disabled={!calendars?.can_edit||conflictBusy}
+                onClick={()=>void checkCalendarConflict()}>
+                {conflictBusy&&<Loader2 size={15} className="boss-spin"/>}
+                <Clock3 size={15}/> 检查工作会议冲突
+              </button>
+            </div>
+            {conflictCheck&&<div className="boss-status boss-status-warn" role="status">
+              <Clock3 size={16}/>
+              <span>服务端核查：{conflictCheck.status}。参照会议 {conflictCheck.meeting_id}
+                （开始 {conflictCheck.meeting_starts_at.replace("T"," ")}，
+                结束时间未知）。{conflictCheck.requires_owner_acknowledgement?
+                "该范围需要本人明确确认风险。":
+                "仅当前获准会议资料未发现必须确认的重叠，不代表全部日程无冲突。"}
+              </span>
+            </div>}
             <label className="boss-confirm-check">
               <input type="checkbox" checked={conflictAcknowledged}
                 onChange={e=>setConflictAcknowledged(e.target.checked)}/>
