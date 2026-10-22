@@ -332,11 +332,12 @@ class BossCommandAPI:
         require(task["version"] == payload["task_version"], "任务版本变化")
         require(task["status"] not in ("CANCELED", "COMPLETED_CONFIRMED"),
                 "已结束任务不能取消")
-        self._authorize(
+        auth_id = self._authorize(
             db, "cancel_assignment",
             {k: v for k, v in payload.items() if k != "client_request_id"},
             task["task_id"], task["version"],
         )
+        task["cancellation_authorization_id"] = auth_id
         task["status"] = "CANCELED"
         task["version"] = str(int(task["version"]) + 1)
         task["cancellation_reason"] = payload["reason"]
@@ -344,4 +345,5 @@ class BossCommandAPI:
         self.store.put(db, NAMESPACE, "task", task["task_id"], task)
         return {"source_type": "SIMULATED", "task_id": task["task_id"],
                 "status": "CANCELED", "version": task["version"],
+                "authorization_id": auth_id,
                 "previous_message_ids": task.get("message_ids", [])}
