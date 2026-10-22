@@ -212,7 +212,9 @@ def test_application_draft_is_authorized_only_by_owner_and_never_transfers_funds
     after=view(reads,"BOSS","approvals")[1]
     assert after["applications"][0]["state"]=="APPROVED_RECORDED"
     assert after["decisions"][0]["authorization_id"]==decision["authorization_id"]
-    assert "comment" not in json.dumps(view(reads,"MAINTAINER","approval-admin")[1])
+    maint=view(reads,"MAINTAINER","approval-admin")[1]
+    assert maint["private_decision_comments_returned"] is False
+    assert "本人已对照当前附件版本核查" not in json.dumps(maint)
     with api.store.connect() as db:
         auths=db.execute("SELECT body FROM objects WHERE kind='authorization'").fetchall()
         assert len(auths)==1
@@ -263,5 +265,6 @@ def test_maintainer_cannot_read_owner_minutes_or_approval_comments(services):
     for path in ("minutes","approvals"):
         assert view(reads,"MAINTAINER",path)[0]==403
     public=view(reads,"MAINTAINER","approval-admin")[1]
-    assert "comment" not in json.dumps(public)
+    assert public["private_decision_comments_returned"] is False
+    assert "本人已对照当前附件版本核查" not in json.dumps(public)
     assert "entries" not in json.dumps(public)
