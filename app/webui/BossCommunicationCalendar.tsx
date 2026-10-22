@@ -41,7 +41,7 @@ type BusyShare = {
 };
 type CalendarData = {
   source_type:"SIMULATED";projection:"calendar";data_version:string;
-  calendar:Calendar;shares:BusyShare[];
+  calendar:Calendar;shares:BusyShare[];contacts:Contact[];
   meeting:{meeting_id:string;starts_at:string;ends_at:null;end_is_known:false};
   can_edit:boolean;physical_secure_erasure_verified:false;
 };
@@ -438,9 +438,9 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
               <label>分享给稳定联系人
                 <select value={shareRecipient} onChange={e=>setShareRecipient(e.target.value)}>
                   <option value="">请选择联系人 ID</option>
-                  <option value="coordinator-1">陈明 · 业务统筹 [coordinator-1]</option>
-                  <option value="finance-1">李文 · 财务材料作者 [finance-1]</option>
-                  <option value="contact-2">陈明 · 客户联系人 [contact-2]</option>
+                  {(calendars?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
+                    {c.name} · {c.organization} · {c.responsibility} [{c.contact_id}]
+                  </option>)}
                 </select>
               </label>
               <label>授权有效期（北京时间）<input type="datetime-local"
