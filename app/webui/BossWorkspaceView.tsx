@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { AlertCircle, ArrowRight, CalendarDays, CheckCircle2, Clock3,
-  Database, FileSearch, FolderOpen, Loader2, RefreshCw,
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { AlertCircle, ArrowRight, CheckCircle2, Clock3,
+  FileSearch, FolderOpen, Loader2, RefreshCw,
   ShieldCheck, Sparkles } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 
@@ -67,6 +67,9 @@ type Workspace = {
   operations?: RecordItem[]; metric_definitions?: RecordItem[];
   entity_counts?: Record<string, number>; technical_links?: Record<string, string>;
   notification_draft_only?: boolean; can_edit?: boolean;
+  simulated_business_time?: string;
+  installed_mac_app_verified?: boolean;
+  model_connection_verified_here?: boolean;
 };
 
 type Pending = {
@@ -88,14 +91,14 @@ function dateWithZone(value: string): string {
   return value + ":00+08:00";
 }
 function Layer({title, children, description}: {
-  title: string; description?: string; children: React.ReactNode;
+  title: string; description?: string; children: ReactNode;
 }) {
   return <section className="boss-panel">
     <div className="boss-panel-head"><h2>{title}</h2>{description&&<small>{description}</small>}</div>
     {children}
   </section>;
 }
-function Fact({label, children}: {label: string; children?: React.ReactNode}) {
+function Fact({label, children}: {label: string; children?: ReactNode}) {
   return <div className="boss-kv"><span>{label}</span><strong>{children??"待核查"}</strong></div>;
 }
 function Empty({message}: {message:string}) {
