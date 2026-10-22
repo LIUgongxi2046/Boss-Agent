@@ -295,6 +295,12 @@ class BossCommandAPI:
                 "负责人不在当前获准资料内", web.HTTPBadRequest)
         require(payload["coordinator_id"] == "coordinator-1",
                 "当前模拟交办仅允许经过验证的统筹负责人", web.HTTPBadRequest)
+        current_clock = self.store.get(db, NAMESPACE, "clock", "current")
+        today = datetime.fromisoformat(current_clock["at"]).date().isoformat()
+        coordinator = next(c for c in data["contacts"]
+                           if c["contact_id"] == payload["coordinator_id"])
+        require(coordinator["valid_from"] <= today <= coordinator["valid_until"],
+                "负责人在当前模拟业务时钟下已失效", web.HTTPForbidden)
         require(payload["related_meeting_id"] == data["meeting"]["meeting_id"],
                 "关联会议不符", web.HTTPBadRequest)
         require(payload["related_event_ids"] == [data["event"]["event_id"]],
@@ -342,6 +348,14 @@ class BossCommandAPI:
                 "任务版本变化或已经发送")
         require(task["coordinator_id"] == payload["recipient_id"],
                 "收件人不是当前唯一负责人", web.HTTPForbidden)
+        clock = self.store.get(db, NAMESPACE, "clock", "current")
+        today = datetime.fromisoformat(clock["at"]).date().isoformat()
+        person = next((c for c in data["contacts"]
+                       if c["contact_id"] == task["coordinator_id"]), None)
+        require(person is not None
+                and person["valid_from"] <= today <= person["valid_until"],
+                "当前任务负责人已不在有效联系人期内，禁止发送",
+                web.HTTPForbidden)
         self._require_current_task_sources(db, data, task)
         bound = {k: v for k, v in payload.items() if k != "client_request_id"}
         auth_id = self._authorize(db, "send_assignment", bound, payload["task_id"], "1")
