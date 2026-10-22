@@ -503,6 +503,12 @@ export function MaintainerApplicationSeed() {
       if(data.projection!=="approval-admin"||data.source_type!=="SIMULATED")
         throw Error("模拟资料来源不符");
       setData(data);setLoading(false);
+      const existing=data.applications.find(x=>x.application_id==="application-1");
+      if(existing?.state==="WAITING_MATERIAL"){
+        setApplicant(existing.applicant_contact_id);
+        setAmount(existing.amount);
+        setTitle(existing.title);
+      }
     }).catch(e=>{
       if(abort.signal.aborted)return;
       setError(e instanceof Error?e.message:String(e));setLoading(false);
@@ -511,8 +517,10 @@ export function MaintainerApplicationSeed() {
   },[revision,getToken]);
   const seed=()=>{
     setError("");
-    if((data?.applications||[]).some(x=>x.application_id==="application-1")){
-      setError("当前数据集已存在模拟申请。不能自动覆盖或伪造新版本。");return;
+    const current=(data?.applications||[]).find(x=>x.application_id==="application-1");
+    const revising=current?.state==="WAITING_MATERIAL";
+    if(current&&!revising){
+      setError("申请已经存在。只有老板明确请求补充后，维护端才能更新这个模拟版本。");return;
     }
     if(!data?.eligible_applicant_contact_ids?.includes(applicant)){
       setError("请选择获准模拟内部申请联系人");return;
@@ -525,11 +533,14 @@ export function MaintainerApplicationSeed() {
       const d=ifText(description,1500,"申请说明");
       const a=ifText(attachment,2500,"模拟附件");
       if(a.length<12)throw Error("附件至少需要12个字的模拟资料内容");
-      mutation.propose("boss.simulation.application.seed",{
-        application_id:"application-1",applicant_contact_id:applicant,
+      mutation.propose(revising?"boss.simulation.application.revise":"boss.simulation.application.seed",{
+        application_id:"application-1",
+        ...(revising?{expected_version:current?.version}:{}),
+        applicant_contact_id:applicant,
         amount_cny:amount,title:t,description:d,attachment_text:a,
-      },"确认录入模拟审批申请",[
+      },revising?"确认补充申请材料并递增版本":"确认录入模拟审批申请",[
         "申请 ID：application-1",
+        ...(revising?["上一申请版本："+current?.version+"（仅在WAITING_MATERIAL状态下更新）"]:[]),
         "模拟申请人标识："+applicant,
         "金额："+amount+" CNY（不是实付或待交易资金）",
         "标题："+t,"说明："+d,"附件内容："+a,
@@ -546,7 +557,8 @@ export function MaintainerApplicationSeed() {
         <small>附件：{app.source_id} v{app.source_version} · {app.attachment_status}</small>
       </div>)}
       {!data?.applications?.length&&!loading&&<Empty>当前没有模拟申请。</Empty>}
-      {!data?.applications?.length&&<>
+      {(!data?.applications?.length||data.applications.some(x=>x.state==="WAITING_MATERIAL"))&&<>
+        {data?.applications?.some(x=>x.state==="WAITING_MATERIAL")&&<Tip warning>老板已请求补充材料。只能依照当前申请版本录入新说明、金额及附件；旧申请和原始附件会保留历史版本。</Tip>}
         <div className="boss-form-grid">
           <label>模拟申请人<select value={applicant} onChange={e=>setApplicant(e.target.value)}>
             <option value="">请选择内部合成联系人</option>
@@ -563,7 +575,7 @@ export function MaintainerApplicationSeed() {
           placeholder="必须写入获准的模拟资料。此正文只供老板端按权限查看。"/>
         <div className="boss-actions">
           <button type="button" className="boss-btn boss-btn-primary" onClick={seed}
-            disabled={!data||mutation.busy}><ShieldCheck size={15}/> 审阅并录入模拟申请</button>
+            disabled={!data||mutation.busy}><ShieldCheck size={15}/> {data?.applications?.some(x=>x.state==="WAITING_MATERIAL")?"核对并补充当前申请材料":"审阅并录入模拟申请"}</button>
         </div>
       </>}
       <div className="boss-actions"><button className="boss-btn" type="button"
