@@ -39,7 +39,8 @@
     "F06 task page now reads a unified actual SQLite link timeline for independently approved F06 assignment outbox messages and F08 follow-up messages, with separate send/delivery/reply statuses; no external delivery success is assumed.",
     "F09 is an owner-scoped versioned research draft with exact quote/source-id/offset and publication cutoff. Missing causality/model inference/country relation remains explicitly unknown. No simulated source converted into verified factual claim. No public-web/semantic ingestion and no Mac pixel acceptance.",
     "A07 technical knowledge lifecycle: explicit SIMULATED source create/revise/withdraw with CAS and SQLite FTS indexing. MAINTAINER only sees metadata; BOSS F09 sees approved, current text. External crawling and multi-format ingestion remain pending.",
-    "FR05->FR06 confirmed minute entry link is independently authorized and creates exactly one OPEN task per entry/version; sending still requires separate BOSS action. Latest creation/sending validates coordinator validity against actual simulation clock."
+    "FR05->FR06 confirmed minute entry link is independently authorized and creates exactly one OPEN task per entry/version; sending still requires separate BOSS action. Latest creation/sending validates coordinator validity against actual simulation clock.",
+    "A05 now renders real versioned Prompt save/structure validation/activation/deactivation and MAINTAINER-only runtime context loading metadata; activation alone does not prove a DeepSeek call or evaluation quality. Technical guidance cannot modify BOSS permissions."
   ],
   "pages": [
     {
@@ -2636,30 +2637,38 @@
       "logical_architecture_route": "/app/maintain/A05",
       "actual_webui_navigation": "?bossPage=A05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_REAL_PROMPT_DRAFT_VALIDATION_ACTIVATION_NEXT_CONTEXT_ADOPTION",
+      "component_file": "app/webui/MaintainerPromptVersion.tsx",
+      "component_name": "MaintainerPromptVersion",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/system"
+        "GET /api/boss/ui/workspace/prompt-versions",
+        "GET /api/boss/ui/operation-status"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.prompt.save",
+        "boss.prompt.validate",
+        "boss.prompt.activate",
+        "boss.prompt.deactivate"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "prompt_versions.save",
-        "prompt_versions.validate",
-        "prompt_versions.activate"
+        "prompt_versions.actual_DeepSeek_turn_and_runtime_quality_e2e",
+        "prompt_versions.independent_security_and_prompt_injection_evaluation",
+        "prompt_versions.cross_session_mac_ui_pixel_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_prompt_context_adoption.py"
       ],
       "source_task_ids": [
         "T19",
         "T24"
-      ]
+      ],
+      "runtime_adoption_evidence": "NANOBOT_RUNTIME_CONTEXT_INVOCATION_ONLY_NOT_LLM_COMPLETION"
     },
     {
       "page_id": "A06",
