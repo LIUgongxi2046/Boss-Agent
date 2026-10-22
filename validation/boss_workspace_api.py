@@ -190,7 +190,10 @@ class BossWorkspaceAPI:
                     "name": c["name"],
                     "organization": c["organization"],
                     "responsibility": c["responsibility"],
-                    "allowed_for_fixture_assignment": c["contact_id"] == "coordinator-1",
+                    "allowed_for_fixture_assignment": c["contact_id"] == "coordinator-1"
+                    and c["valid_from"] <=
+                    self.store.get(db, self.namespace, "clock", "current")["at"][:10]
+                    <= c["valid_until"],
                 } for c in data["contacts"]],
                 "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
                 "task_created_by_minutes": bool(linked),
