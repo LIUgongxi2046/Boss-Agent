@@ -203,12 +203,14 @@ def test_cancel_preserves_sent_message_and_blocks_late_feedback(demo):
     })
     assert status == 200, canceled
     assert canceled["status"] == "CANCELED"
+    assert canceled["authorization_id"]
     assert canceled["previous_message_ids"] == [sent["message_id"]]
     assert demo.execute("MAINTAINER", "boss.simulation.feedback", feedback_input({
         "task_id": created["task_id"], "version": canceled["version"]
     }))[0] == 409
     with demo.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 1
+        assert demo.store.get(db, "ui-check", "task", created["task_id"])["cancellation_authorization_id"] == canceled["authorization_id"]
 
 
 def test_progress_and_extension_request_do_not_change_due_automatically(demo):
