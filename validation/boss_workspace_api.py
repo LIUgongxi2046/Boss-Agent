@@ -208,6 +208,7 @@ class BossWorkspaceAPI:
                     "generator_version": data.get("generator_version"),
                     "seed": data.get("seed"), "object_counts": dict(c),
                     "business_periods": data["periods"],
+                    "simulated_event_id": data["event"]["event_id"],
                     "owner_text_visible": False}
         if key == "tool-catalog":
             return {"operations": [
@@ -229,7 +230,9 @@ class BossWorkspaceAPI:
             }, "technical_links": {
                 "meeting_id": data["meeting"]["meeting_id"],
                 "event_id": data["event"]["event_id"],
-            }, "owner_body_access": False}
+            },
+            "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
+            "owner_body_access": False}
         if key == "scheduler":
             schedule = self.store.get(db, self.namespace, "schedule", "current")
             clock = self.store.get(db, self.namespace, "clock", "current")
