@@ -9,12 +9,12 @@ Endpoints are deliberately under the authenticated RoleChannel gateway.
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from pathlib import Path
 from urllib.parse import parse_qs
 
 from aiohttp import web
 
-from business import OPERATIONS, now
+from business import OPERATIONS, ROOT, now
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -23,7 +23,7 @@ BOSS_PAGES = {
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
-    "relationships", "scheduler", "audit", "system",
+    "relationships", "scheduler", "audit", "system", "evaluation",
 }
 
 
@@ -251,6 +251,27 @@ class BossWorkspaceAPI:
                 {"sequence": r[0], "operation": r[1], "created_at": r[2]}
                 for r in rows
             ], "private_values_included": False}
+        if key == "evaluation":
+            contract_path = ROOT.parent / "specs" / "selection-probe.json"
+            if not contract_path.is_file():
+                raise web.HTTPServiceUnavailable(text="独立验证定义未安装")
+            contract = json.loads(contract_path.read_text(encoding="utf-8"))
+            return {
+                "definition_id": contract["document_id"],
+                "definition_version": contract["version"],
+                "defined_step_count": len(contract["steps"]),
+                "defined_assertion_count": len(contract["assertions"]),
+                "steps": [
+                    {"step_id": row["step_id"], "actor": row["actor"],
+                     "action": row["action"]}
+                    for row in contract["steps"][:30]
+                ],
+                "independent_product_evaluation_completed": False,
+                "actual_score": None,
+                "coverage": "T02_SELECTION_PROBE_DEFINITION_ONLY",
+                "can_start_run_from_ui": False,
+                "source_file": "specs/selection-probe.json",
+            }
         if key == "system":
             rows = db.execute(
                 "SELECT kind,COUNT(*) FROM objects WHERE namespace=? "
