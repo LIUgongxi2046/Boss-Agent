@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from aiohttp import web
@@ -149,10 +149,21 @@ class BossCommandAPI:
             "content_version": content_version, "scope": NAMESPACE,
             "payload": bound_payload, "version": "1", "revoked": False,
             "revoked_at": None, "valid_from": now(),
-            "valid_until": "2027-01-01T00:00:00+08:00",
+            "valid_until": (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat(),
         }
         self.store.put(db, NAMESPACE, "authorization", auth_id, auth)
         return auth_id
+
+    def _require_current_source(self, db, data, source_id):
+        require(_is_text(source_id, 128), "来源标识无效", web.HTTPBadRequest)
+        doc = self.store.get(db, NAMESPACE, "document", source_id)
+        require(
+            not doc.get("withdrawn") and doc.get("access_scope") == data["owner_id"]
+            and doc.get("source_type") == "SIMULATED",
+            "来源已撤销或不可作为当前执行依据",
+            web.HTTPForbidden,
+        )
+        return doc
 
     def _transaction(self, action, payload):
         with self.store.connect() as db:
@@ -197,9 +208,7 @@ class BossCommandAPI:
         require(isinstance(refs, list) and refs == ["finance-note"],
                 "当前交办资料范围不符", web.HTTPBadRequest)
         for source_id in refs:
-            doc = self.store.get(db, NAMESPACE, "document", source_id)
-            require(not doc.get("withdrawn") and doc.get("access_scope") == data["owner_id"],
-                    "资料已撤销或没有访问权限", web.HTTPForbidden)
+            self._require_current_source(db, data, source_id)
         due = _aware_due(payload["due_at"], payload["timezone"])
         clock = self.store.get(db, NAMESPACE, "clock", "current")
         require(due > datetime.fromisoformat(clock["at"]), "期限必须在模拟业务时钟之后", web.HTTPBadRequest)
@@ -230,6 +239,8 @@ class BossCommandAPI:
                 "任务版本变化或已经发送")
         require(task["coordinator_id"] == payload["recipient_id"],
                 "收件人不是当前唯一负责人", web.HTTPForbidden)
+        for source_id in task.get("source_refs", []):
+            self._require_current_source(db, data, source_id)
         bound = {k: v for k, v in payload.items() if k != "client_request_id"}
         auth_id = self._authorize(db, "send_assignment", bound, payload["task_id"], "1")
         tool_input = {**bound, "authorization_id": auth_id,
@@ -257,6 +268,11 @@ class BossCommandAPI:
             format_checker=FormatChecker(),
         )
         require(not list(validator.iter_errors(body)), "反馈 Schema 无效", web.HTTPBadRequest)
+        # Feedback may cite only currently available, scope-checked simulated
+        # sources. The maintainer has no capability to forge a source ID.
+        data = self.store.get(db, NAMESPACE, "initial", "snapshot")
+        for source_id in body["evidence_refs"]:
+            self._require_current_source(db, data, source_id)
         # No BOSS authorization is granted by simulated feedback; simulation
         # authors cannot approve a deadline or mark the task completed.
         result = self.store.control_feedback(db, NAMESPACE, body)
@@ -281,14 +297,18 @@ class BossCommandAPI:
                     feedback["kind"] == "RESULT_SUBMITTED" and
                     feedback.get("evidence_refs"),
                     "缺少已提交的完成证据", web.HTTPBadRequest)
+            data = self.store.get(db, NAMESPACE, "initial", "snapshot")
+            for source_id in feedback["evidence_refs"]:
+                self._require_current_source(db, data, source_id)
             action_name = "complete_assignment"
         else:
             require(feedback["kind"] == "EXTENSION_REQUEST" and
                     task["status"] not in ("CANCELED", "COMPLETED_CONFIRMED"),
                     "延期申请或任务状态无效", web.HTTPBadRequest)
             require(_is_text(payload["due_at"], 100), "新期限缺少", web.HTTPBadRequest)
-            require(datetime.fromisoformat(payload["due_at"]).tzinfo is not None,
-                    "新期限必须包含时区", web.HTTPBadRequest)
+            requested = _aware_due(payload["due_at"], task["timezone"])
+            require(requested > datetime.fromisoformat(task["due_at"]),
+                    "延期后的期限必须晚于当前有效期限", web.HTTPBadRequest)
             action_name = "extend_assignment"
         bound = {k: v for k, v in payload.items() if k != "client_request_id"}
         auth_id = self._authorize(db, action_name, bound, payload["task_id"],
