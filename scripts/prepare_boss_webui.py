@@ -74,6 +74,17 @@ def copy_overlay() -> None:
     states = json.loads((DESIGN / "meta" / "v6-状态关联.json").read_text(encoding="utf-8"))
     if len(states) != 561:
         raise RuntimeError("561 个 v6 状态索引缺失，拒绝构建。")
+    mapping = json.loads((ROOT / "specs" / "hld-72-page-map.json").read_text(encoding="utf-8"))
+    mapped = {row["page_id"]: row for row in mapping["pages"]}
+    if set(mapped) != set(catalogue):
+        raise RuntimeError("架构72页映射与设计源不一致，拒绝构建。")
+    for page_id, metadata in catalogue.items():
+        item = mapped[page_id]
+        if item["title"] != metadata["title"] or not item["upstream_reuse_anchor_ids"]:
+            raise RuntimeError(f"设计到开源复用锚点失配：{page_id}")
+    indexed = {row["page_id"] for row in states}
+    if len(indexed) != 51 or len(set(catalogue) - indexed) != 21:
+        raise RuntimeError("F/A/V 状态页与 N/D 通用状态继承数量不一致。")
 
     BOSS_DIR.mkdir(parents=True, exist_ok=True)
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
