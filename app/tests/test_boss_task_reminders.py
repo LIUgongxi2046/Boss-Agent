@@ -329,3 +329,43 @@ def test_progress_and_extension_require_no_evidence_but_result_submission_does(c
     assert completed[0] == 200, completed
     assert completed[1]["task"]["status"] == "RESULT_SUBMITTED"
     assert due(api, task["task_id"])["state"] == "OPEN"
+
+
+
+def test_revoked_original_task_source_blocks_completion_without_fake_success(context):
+    api, pages = context
+    task = create(api)[1]
+    assert send(api, task["task_id"])[0] == 200
+    submitted = act(
+        api, "MAINTAINER", "boss.simulation.feedback", "result-before-withdrawal",
+        task_id=task["task_id"], task_version="2",
+        author_contact_id="coordinator-1", kind="RESULT_SUBMITTED",
+        content="模拟已提交带有来源引用的经营结果", evidence_refs=["finance-note"],
+    )
+    assert submitted[0] == 200, submitted
+    api.store.control(
+        "ui-check", "withdraw",
+        {"source_id": "finance-note", "version": "1"},
+    )
+    refused = act(
+        api, "BOSS", "boss.assignment.complete", "complete-withdrawn-source",
+        task_id=task["task_id"],
+        task_version=submitted[1]["task"]["version"],
+        feedback_id=submitted[1]["feedback_id"],
+    )
+    assert refused[0] == 403
+    task_now = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
+    assert task_now["status"] == "RESULT_SUBMITTED"
+    assert due(api, task["task_id"])["state"] == "OPEN"
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM audit WHERE operation='boss.assignment.complete'"
+        ).fetchone()[0] == 0
+    canceled = act(
+        api, "BOSS", "boss.assignment.cancel", "cancel-after-source-withdrawal",
+        task_id=task["task_id"],
+        task_version=submitted[1]["task"]["version"],
+        reason="来源已经撤销，不确认完成并取消催办",
+    )
+    assert canceled[0] == 200
+    assert due(api, task["task_id"])["state"] == "CANCELED"
