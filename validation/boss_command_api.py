@@ -240,10 +240,13 @@ class BossCommandAPI:
         return {**result, "authorization_id": auth_id}
 
     def _feedback(self, db, payload):
-        self._exact(payload, {
+        required = {
             "client_request_id", "task_id", "task_version", "author_contact_id",
             "kind", "content", "evidence_refs",
-        })
+        }
+        if payload.get("kind") == "EXTENSION_REQUEST":
+            required.add("proposed_due_at")
+        self._exact(payload, required)
         require(_is_text(payload["content"], MAX_MESSAGE),
                 "反馈内容缺少或过长", web.HTTPBadRequest)
         fields, required = FIELDS["feedback"]
