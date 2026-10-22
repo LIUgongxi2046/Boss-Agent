@@ -221,6 +221,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [productScope, setProductScope] = useState("product-1,product-2");
   const [selectedTaskId, setSelectedTaskId] = useState("");
   const [sourceId, setSourceId] = useState("finance-note");
+  const [sourceAnchor, setSourceAnchor] = useState<{
+    source_id:string;version:string;start:number;end:number;
+  }|null>(null);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [tasks, setTasks] = useState<Tasks | null>(null);
@@ -350,8 +353,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
        p.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role]);
   const refresh = () => setRequestVersion((v) => v + 1);
-  const goSource = (id = "finance-note") => {
-    setSourceId(id); navigate("D01", page);
+  const goSource = (id = "finance-note", anchor?:{
+    version:string;start:number;end:number;
+  }) => {
+    setSourceId(id);
+    setSourceAnchor(anchor?{source_id:id,...anchor}:null);
+    navigate("D01", page);
   };
   const selectTask = (id: string) => { setSelectedTaskId(id); navigate("F06", page); };
   const sendQuestion = async (event: FormEvent) => {
@@ -752,8 +759,27 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                       <Value label="版本" value={evidence?.version}/>
                       <Value label="来源属性" value={evidence?.source_type}/>
                       <Value label="作者" value={evidence?.author_contact_id}/>
-                      {evidence?.content ? <blockquote className="boss-source">{evidence.content}</blockquote> :
+                      {evidence?.content ? <blockquote className="boss-source">{
+                        sourceAnchor &&
+                        evidence.source_id===sourceAnchor.source_id &&
+                        evidence.version===sourceAnchor.version &&
+                        Number.isInteger(sourceAnchor.start) &&
+                        Number.isInteger(sourceAnchor.end) &&
+                        sourceAnchor.start>=0 &&
+                        sourceAnchor.end<=evidence.content.length &&
+                        sourceAnchor.start<sourceAnchor.end ? <>
+                          {evidence.content.slice(0,sourceAnchor.start)}
+                          <mark className="boss-source-highlight" id="boss-source-citation">
+                            {evidence.content.slice(sourceAnchor.start,sourceAnchor.end)}
+                          </mark>
+                          {evidence.content.slice(sourceAnchor.end)}
+                        </> : evidence.content
+                      }</blockquote> :
                         <Quiet message="尚未读取原文；无效、超范围和已撤销文件不会显示正文。" />}
+                      {sourceAnchor && evidence &&
+                        (evidence.source_id!==sourceAnchor.source_id ||
+                         evidence.version!==sourceAnchor.version) &&
+                        <StatusLine variant="warn" text="研究引用的原始版本已发生变化。本页不会把新版本原文错误标记为旧版本的证据。" />}
                     </Panel>
                   </div>
                   <div className="boss-column">
