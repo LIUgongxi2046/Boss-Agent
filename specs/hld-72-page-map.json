@@ -1,0 +1,4760 @@
+{
+  "schema_version": "1.0.0",
+  "baseline_id": "BA-HLD-PAGE-MAP-20261022",
+  "status": "ARCHITECTURE_DESIGN_BASELINE_FROZEN",
+  "source_commit_expected": "dae80cb7ff50e352af699705949cc4bf549059ec",
+  "source_design": "Boss-Agent-Desktop-Complete-v6",
+  "owner": "T04",
+  "page_count": 72,
+  "page_groups": {
+    "F": 32,
+    "N": 12,
+    "D": 9,
+    "A": 16,
+    "V": 3
+  },
+  "design_state_link_count": 561,
+  "design_state_page_count": 51,
+  "common_state_only_page_count": 21,
+  "not_for_t08_or_t06_operational_contracts": true,
+  "route_contract_scope": "PROPOSED_LOGICAL_DESKTOP_ROUTES_NOT_PRESENT_IN_UPSTREAM",
+  "runtime_version": "HKUDS/nanobot v0.3.5 commit 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+  "electron_version": "45.0.0",
+  "model_provider": "DeepSeek only, deepseek-flash; no fallback",
+  "system_states": [
+    "SYS-STARTUP",
+    "SYS-CLOSE",
+    "SYS-EXIT",
+    "SYS-RESTORE",
+    "SYS-NETWORK",
+    "SYS-NOTIFICATION",
+    "SYS-MICROPHONE",
+    "SYS-FILE"
+  ],
+  "upstream_anchors_source": "evidence/T02/reuse-source-map.json",
+  "upstream_reuse_anchors": {
+    "SHELL": {
+      "source": "webui/src/components/Sidebar.tsx",
+      "component": "Sidebar",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "THREAD": {
+      "source": "webui/src/components/thread/ThreadShell.tsx",
+      "component": "ThreadShell",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "COMPOSER": {
+      "source": "webui/src/components/thread/ThreadComposer.tsx",
+      "component": "ThreadComposer",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "MESSAGES": {
+      "source": "webui/src/components/thread/ThreadMessages.tsx",
+      "component": "ThreadMessages",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "TOOLRUN": {
+      "source": "webui/src/components/thread/activity/GenericToolRun.tsx",
+      "component": "GenericToolRun",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "SOURCE": {
+      "source": "webui/src/components/FilePreviewPanel.tsx",
+      "component": "FilePreviewPanel",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "ATTACHMENT": {
+      "source": "webui/src/components/AttachmentTile.tsx",
+      "component": "AttachmentTile",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "CHATLIST": {
+      "source": "webui/src/components/ChatList.tsx",
+      "component": "ChatList",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "SETTINGS": {
+      "source": "webui/src/components/settings/SettingsPage.tsx",
+      "component": "SettingsPage",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "SETTINGS_VIEW": {
+      "source": "webui/src/components/settings/SettingsView.tsx",
+      "component": "SettingsView",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "AUTOMATION": {
+      "source": "webui/src/components/settings/system/AutomationsSettings.tsx",
+      "component": "AutomationsSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "SECURITY": {
+      "source": "webui/src/components/settings/capabilities/SecuritySettings.tsx",
+      "component": "SecuritySettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "RUNTIME_SETTINGS": {
+      "source": "webui/src/components/settings/system/RuntimeConfigSettings.tsx",
+      "component": "RuntimeConfigSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "APPS": {
+      "source": "webui/src/components/settings/system/AppsSettings.tsx",
+      "component": "AppsSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "SKILLS": {
+      "source": "webui/src/components/settings/SkillsCatalogSettings.tsx",
+      "component": "SkillsCatalogSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "MODELS": {
+      "source": "webui/src/components/settings/models/ModelsSettings.tsx",
+      "component": "ModelsSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "PROVIDER": {
+      "source": "webui/src/components/settings/models/ProviderSettings.tsx",
+      "component": "ProviderSettings",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "USAGE": {
+      "source": "webui/src/components/settings/TokenUsageDetails.tsx",
+      "component": "TokenUsageDetails",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "TOKEN_CARD": {
+      "source": "webui/src/components/settings/TokenUsageCard.tsx",
+      "component": "TokenUsageCard",
+      "kind": "UPSTREAM_VIEW_REUSE"
+    },
+    "AUTH_CLIENT": {
+      "source": "webui/src/lib/api.ts",
+      "component": "upstream API client",
+      "kind": "UPSTREAM_TRANSPORT_REUSE"
+    }
+  },
+  "contract_notes": [
+    "data_read and command identifiers below are semantic design contract identifiers, not deployed endpoints or operationIds; T06 translates to OpenAPI, T08 binds actual route/component/event/API.",
+    "Existing runtime validations do not demonstrate complete business screens; the separate t02_verified_runtime_operations field is a selected evidence bridge, not full page implementation.",
+    "N01 and D08 are authentication surfaces. D06 and D07 apply to owner and maintainer while private content remains inaccessible after unauthorized access.",
+    "F19 is the default BROILER animal-use scenario; V19-BEEF/EGG/MILK are independent designed views sharing a component, not three new functional requirements.",
+    "N and D page designs carry common states; S00-S10 individual prompt index exists only for 51 F/A/V pages.",
+    "All business state changes are verified server-side against role, owner, namespace, object version, current authorization, idempotency and source validity.",
+    "All page paths and component files are proposed architectural targets, not files currently present in repository; authorization D19 remains architecture only."
+  ],
+  "pages": [
+    {
+      "page_id": "F01",
+      "title": "今日工作",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F01-今日工作.html",
+      "design_meta_key": "F01",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F01",
+      "requirement_refs": [
+        "WF-FR-01",
+        "WF-FR-11",
+        "WF-FR-06"
+      ],
+      "fr_ids": [
+        "FR-01",
+        "FR-11",
+        "FR-06"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-11-S",
+        "AC-11-E",
+        "AC-06-S",
+        "AC-06-E"
+      ],
+      "logical_area": "今日工作",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F01",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "TodayWorkspacePage",
+      "proposed_frontend_source": "webui/src/features/boss/views/TodayWorkspacePage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "THREAD"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "today.read",
+        "tasks.read",
+        "calendar.read"
+      ],
+      "semantic_command_contracts": [
+        "today.reorder",
+        "conversation.start"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F02",
+      "title": "经营提醒",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F02-经营提醒.html",
+      "design_meta_key": "F02",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F02",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-06",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F02",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "BusinessAlertDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/BusinessAlertDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "alerts.read",
+        "alert_rules.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "alerts.ack",
+        "alerts.defer",
+        "alerts.close",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F03",
+      "title": "经营查询与追问",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F03-经营查询与追问.html",
+      "design_meta_key": "F03",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F03",
+      "requirement_refs": [
+        "WF-FR-03"
+      ],
+      "fr_ids": [
+        "FR-03"
+      ],
+      "acceptance_refs": [
+        "AC-03-S",
+        "AC-03-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F03",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MetricExplorerPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/MetricExplorerPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "metrics.query",
+        "evidence.read",
+        "metric_definitions.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.followup"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "query_metrics",
+        "read_evidence"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F04",
+      "title": "会前材料",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F04-会前材料.html",
+      "design_meta_key": "F04",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F04",
+      "requirement_refs": [
+        "WF-FR-04",
+        "WF-FR-06"
+      ],
+      "fr_ids": [
+        "FR-04",
+        "FR-06"
+      ],
+      "acceptance_refs": [
+        "AC-04-S",
+        "AC-04-E",
+        "AC-06-S",
+        "AC-06-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F04",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MeetingPreparationPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/MeetingPreparationPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "meetings.read",
+        "commitments.read",
+        "materials.read"
+      ],
+      "semantic_command_contracts": [
+        "meeting_brief.prepare",
+        "message_draft.save"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F05",
+      "title": "纪要核查",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F05-纪要核查.html",
+      "design_meta_key": "F05",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F05",
+      "requirement_refs": [
+        "WF-FR-05",
+        "WF-FR-06",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-05",
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-05-S",
+        "AC-05-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F05",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MeetingMinutesReviewPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/MeetingMinutesReviewPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "minutes.read",
+        "materials.read",
+        "meeting_decisions.read"
+      ],
+      "semantic_command_contracts": [
+        "minutes.save",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F06",
+      "title": "交办详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F06-交办详情.html",
+      "design_meta_key": "F06",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F06",
+      "requirement_refs": [
+        "WF-FR-06",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "任务与承诺",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F06",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AssignmentDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AssignmentDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "CHATLIST",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "assignments.read",
+        "feedback.read",
+        "authorizations.read"
+      ],
+      "semantic_command_contracts": [
+        "assignments.create",
+        "assignments.send",
+        "assignments.defer",
+        "assignments.complete",
+        "assignments.cancel"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "create_assignment",
+        "send_assignment",
+        "read_assignment"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F07",
+      "title": "申请审阅",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F07-申请审阅.html",
+      "design_meta_key": "F07",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F07",
+      "requirement_refs": [
+        "WF-FR-07",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-07",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-07-S",
+        "AC-07-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F07",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "ApprovalReviewPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/ApprovalReviewPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "applications.read",
+        "application_versions.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "approval.decide"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F08",
+      "title": "消息编辑",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F08-消息编辑.html",
+      "design_meta_key": "F08",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F08",
+      "requirement_refs": [
+        "WF-FR-08",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-08",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-08-S",
+        "AC-08-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F08",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MessageComposePage",
+      "proposed_frontend_source": "webui/src/features/boss/views/MessageComposePage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "COMPOSER",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "message_drafts.read",
+        "contacts.resolve",
+        "message_history.read"
+      ],
+      "semantic_command_contracts": [
+        "message_drafts.save",
+        "messages.send"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "send_assignment"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F09",
+      "title": "专题研究",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F09-专题研究.html",
+      "design_meta_key": "F09",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F09",
+      "requirement_refs": [
+        "WF-FR-09"
+      ],
+      "fr_ids": [
+        "FR-09"
+      ],
+      "acceptance_refs": [
+        "AC-09-S",
+        "AC-09-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F09",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "StrategicResearchPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/StrategicResearchPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "COMPOSER"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "knowledge.search",
+        "evidence.read",
+        "research_topics.read"
+      ],
+      "semantic_command_contracts": [
+        "research.run",
+        "message_drafts.save"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "read_evidence"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F10",
+      "title": "人员会面",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F10-人员会面.html",
+      "design_meta_key": "F10",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F10",
+      "requirement_refs": [
+        "WF-FR-10"
+      ],
+      "fr_ids": [
+        "FR-10"
+      ],
+      "acceptance_refs": [
+        "AC-10-S",
+        "AC-10-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F10",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "PersonnelMeetingPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/PersonnelMeetingPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "CHATLIST"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "contacts.read",
+        "commitments.read",
+        "meetings.read"
+      ],
+      "semantic_command_contracts": [
+        "meeting_brief.prepare",
+        "meeting_schedule.propose"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F11",
+      "title": "行程安排",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F11-行程安排.html",
+      "design_meta_key": "F11",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F11",
+      "requirement_refs": [
+        "WF-FR-11",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-11",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-11-S",
+        "AC-11-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "今日工作",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F11",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "TravelPlanPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/TravelPlanPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "CHATLIST"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "travel.read",
+        "calendar.read",
+        "conflicts.read"
+      ],
+      "semantic_command_contracts": [
+        "travel.propose",
+        "travel.confirm"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F12",
+      "title": "本人私人安排",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F12-本人私人安排.html",
+      "design_meta_key": "F12",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F12",
+      "requirement_refs": [
+        "WF-FR-12",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-12",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-12-S",
+        "AC-12-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F12",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "PrivateSchedulePage",
+      "proposed_frontend_source": "webui/src/features/boss/views/PrivateSchedulePage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "private_calendar.read",
+        "sharing_scope.read",
+        "calendar_conflicts.read"
+      ],
+      "semantic_command_contracts": [
+        "private_calendar.save",
+        "private_calendar.share",
+        "private_calendar.revoke"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F13",
+      "title": "个人记忆",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F13-个人记忆.html",
+      "design_meta_key": "F13",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F13",
+      "requirement_refs": [
+        "WF-FR-13",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-13",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F13",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "PersonalMemoryPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/PersonalMemoryPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_memory.read",
+        "adoption_records.read",
+        "decision_history.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_memory.confirm",
+        "owner_memory.update",
+        "owner_memory.delete"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F14",
+      "title": "原料与饲料",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F14-原料与饲料.html",
+      "design_meta_key": "F14",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F14",
+      "requirement_refs": [
+        "WF-FR-14"
+      ],
+      "fr_ids": [
+        "FR-14"
+      ],
+      "acceptance_refs": [
+        "AC-14-S",
+        "AC-14-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F14",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.feed_costs.read",
+        "agri.raw_materials.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F15",
+      "title": "水产季节",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F15-水产季节.html",
+      "design_meta_key": "F15",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F15",
+      "requirement_refs": [
+        "WF-FR-15"
+      ],
+      "fr_ids": [
+        "FR-15"
+      ],
+      "acceptance_refs": [
+        "AC-15-S",
+        "AC-15-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F15",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.aquaculture_season.read",
+        "agri.customer_coverage.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F16",
+      "title": "苗种批次",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F16-苗种批次.html",
+      "design_meta_key": "F16",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F16",
+      "requirement_refs": [
+        "WF-FR-16"
+      ],
+      "fr_ids": [
+        "FR-16"
+      ],
+      "acceptance_refs": [
+        "AC-16-S",
+        "AC-16-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F16",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.seed_batch_trace.read",
+        "agri.trace_relations.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F17",
+      "title": "动保与技服",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F17-动保与技服.html",
+      "design_meta_key": "F17",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F17",
+      "requirement_refs": [
+        "WF-FR-17"
+      ],
+      "fr_ids": [
+        "FR-17"
+      ],
+      "acceptance_refs": [
+        "AC-17-S",
+        "AC-17-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F17",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.vet_service_cases.read",
+        "agri.professional_review.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F18",
+      "title": "生猪合作",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F18-生猪合作.html",
+      "design_meta_key": "F18",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F18",
+      "requirement_refs": [
+        "WF-FR-18"
+      ],
+      "fr_ids": [
+        "FR-18"
+      ],
+      "acceptance_refs": [
+        "AC-18-S",
+        "AC-18-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F18",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.pig_partnership.read",
+        "agri.settlement.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F19",
+      "title": "禽类与反刍",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F19-禽类与反刍.html",
+      "design_meta_key": "F19",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F19",
+      "requirement_refs": [
+        "WF-FR-19"
+      ],
+      "fr_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F19",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.animal_use_metrics.read",
+        "agri.coverage.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": {
+        "scenario_dimension": "ANIMAL_USE",
+        "default_use": "BROILER",
+        "accepted_uses": [
+          "BROILER",
+          "EGG",
+          "MILK",
+          "BEEF"
+        ]
+      }
+    },
+    {
+      "page_id": "F20",
+      "title": "公司水产养殖",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F20-公司水产养殖.html",
+      "design_meta_key": "F20",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F20",
+      "requirement_refs": [
+        "WF-FR-20"
+      ],
+      "fr_ids": [
+        "FR-20"
+      ],
+      "acceptance_refs": [
+        "AC-20-S",
+        "AC-20-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F20",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.company_farm_units.read",
+        "agri.event_history.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F21",
+      "title": "食品与品质",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F21-食品与品质.html",
+      "design_meta_key": "F21",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F21",
+      "requirement_refs": [
+        "WF-FR-21"
+      ],
+      "fr_ids": [
+        "FR-21"
+      ],
+      "acceptance_refs": [
+        "AC-21-S",
+        "AC-21-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F21",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.food_quality_trace.read",
+        "agri.batch_relations.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F22",
+      "title": "海外业务",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F22-海外业务.html",
+      "design_meta_key": "F22",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F22",
+      "requirement_refs": [
+        "WF-FR-22"
+      ],
+      "fr_ids": [
+        "FR-22"
+      ],
+      "acceptance_refs": [
+        "AC-22-S",
+        "AC-22-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F22",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.overseas_operations.read",
+        "agri.fx_evidence.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "meeting_schedule.propose",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F23",
+      "title": "研发应用",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F23-研发应用.html",
+      "design_meta_key": "F23",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F23",
+      "requirement_refs": [
+        "WF-FR-23"
+      ],
+      "fr_ids": [
+        "FR-23"
+      ],
+      "acceptance_refs": [
+        "AC-23-S",
+        "AC-23-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F23",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.research_projects.read",
+        "agri.evaluation_revisions.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "review.schedule",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F24",
+      "title": "运行详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F24-运行详情.html",
+      "design_meta_key": "F24",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F24",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-29"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F24",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerRunDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerRunDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "THREAD",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_runs.read",
+        "run_business_outcomes.read"
+      ],
+      "semantic_command_contracts": [
+        "runs.cancel_pending",
+        "runs.reconcile"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F25",
+      "title": "模拟中心",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F25-模拟中心.html",
+      "design_meta_key": "F25",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F25",
+      "requirement_refs": [
+        "WF-FR-25",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/F25",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SimulationWorkspacePage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SimulationWorkspacePage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "APPS",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "datasets.read",
+        "simulation_events.read",
+        "simulation_spaces.read"
+      ],
+      "semantic_command_contracts": [
+        "simulation.execute",
+        "simulation.reset",
+        "simulation.inject"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F26",
+      "title": "应用入口与本人设置",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F26-应用入口与本人设置.html",
+      "design_meta_key": "F26",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F26",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F26",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerPreferencesPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerPreferencesPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_profile.read",
+        "owner_navigation.read",
+        "owner_settings.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_settings.save",
+        "auth.logout"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F27",
+      "title": "语音交办",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F27-语音交办.html",
+      "design_meta_key": "F27",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F27",
+      "requirement_refs": [
+        "WF-FR-27",
+        "WF-FR-08",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-27",
+        "FR-08",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-27-S",
+        "AC-27-E",
+        "AC-08-S",
+        "AC-08-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F27",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "VoiceAssignmentPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/VoiceAssignmentPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "COMPOSER",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "voice_recording_status.read",
+        "transcription_result.read"
+      ],
+      "semantic_command_contracts": [
+        "voice.record",
+        "voice.stop",
+        "voice.transcribe",
+        "voice.confirm_text",
+        "conversation.submit_text"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T20",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F28",
+      "title": "动作授权详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F28-动作授权详情.html",
+      "design_meta_key": "F28",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F28",
+      "requirement_refs": [
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F28",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerAuthorizationDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerAuthorizationDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SECURITY"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_authorizations.read",
+        "authorized_object.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_authorizations.grant",
+        "owner_authorizations.revoke"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F29",
+      "title": "任务异常详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F29-任务异常详情.html",
+      "design_meta_key": "F29",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F29",
+      "requirement_refs": [
+        "WF-FR-29",
+        "WF-FR-24"
+      ],
+      "fr_ids": [
+        "FR-29",
+        "FR-24"
+      ],
+      "acceptance_refs": [
+        "AC-29-S",
+        "AC-29-E",
+        "AC-24-S",
+        "AC-24-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/F29",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "RunFailureDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/RunFailureDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "THREAD",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_runs.read",
+        "operation_outcome.read"
+      ],
+      "semantic_command_contracts": [
+        "runs.reconcile",
+        "runs.cancel_pending"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F30",
+      "title": "运行与用量详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F30-运行与用量详情.html",
+      "design_meta_key": "F30",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F30",
+      "requirement_refs": [
+        "WF-FR-30",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-30",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-30-S",
+        "AC-30-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/F30",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MaintainerUsageDetailPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/MaintainerUsageDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "USAGE",
+        "TOKEN_CARD"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "run_telemetry.read",
+        "usage.read",
+        "pricing_evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "usage.recalculate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F31",
+      "title": "演示评测",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F31-演示评测.html",
+      "design_meta_key": "F31",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F31",
+      "requirement_refs": [
+        "WF-FR-31",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-31",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-31-S",
+        "AC-31-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/F31",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "EvaluationOverviewPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/EvaluationOverviewPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "USAGE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "evaluations.read",
+        "assertions.read",
+        "evidence_index.read"
+      ],
+      "semantic_command_contracts": [
+        "evaluation.run",
+        "evaluation.reset"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "F32",
+      "title": "本地运行与交接",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/F32-本地运行与交接.html",
+      "design_meta_key": "F32",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#F32",
+      "requirement_refs": [
+        "WF-FR-32",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-32",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-32-S",
+        "AC-32-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/F32",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "LocalRuntimeHandoffPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/LocalRuntimeHandoffPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "RUNTIME_SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "environment_health.read",
+        "build_manifest.read",
+        "delivery_evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "maintenance.check_health"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T25"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N01",
+      "title": "身份登录",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N01-身份登录.html",
+      "design_meta_key": "N01",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N01",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "登录",
+      "role_gate": "ANONYMOUS",
+      "logical_route": "/app/auth/N01",
+      "route_is_implemented": false,
+      "route_kind": "AUTH_SCREEN",
+      "proposed_react_component": "IdentityLoginPage",
+      "proposed_frontend_source": "webui/src/features/auth/views/IdentityLoginPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "AUTH_CLIENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "auth.challenge.read",
+        "auth.session.read"
+      ],
+      "semantic_command_contracts": [
+        "auth.login"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "LOGIN_WITHOUT_IMPLICIT_BOSS_AUTH",
+      "owner_tasks": [
+        "T18",
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N02",
+      "title": "聊天交办",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N02-聊天交办.html",
+      "design_meta_key": "N02",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N02",
+      "requirement_refs": [
+        "WF-FR-08",
+        "WF-FR-24",
+        "WF-FR-27",
+        "WF-FR-28",
+        "WF-FR-29"
+      ],
+      "fr_ids": [
+        "FR-08",
+        "FR-24",
+        "FR-27",
+        "FR-28",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-08-S",
+        "AC-08-E",
+        "AC-24-S",
+        "AC-24-E",
+        "AC-27-S",
+        "AC-27-E",
+        "AC-28-S",
+        "AC-28-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N02",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerConversationPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerConversationPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "THREAD",
+        "COMPOSER",
+        "MESSAGES",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "sessions.read",
+        "threads.read",
+        "run_business_outcomes.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.submit",
+        "conversation.cancel_pending"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "query_metrics",
+        "read_evidence",
+        "create_assignment",
+        "send_assignment",
+        "read_assignment"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N03",
+      "title": "经营关注",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N03-经营关注.html",
+      "design_meta_key": "N03",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N03",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-03",
+        "WF-FR-14",
+        "WF-FR-15",
+        "WF-FR-16",
+        "WF-FR-17",
+        "WF-FR-18",
+        "WF-FR-19",
+        "WF-FR-20",
+        "WF-FR-21",
+        "WF-FR-22",
+        "WF-FR-23"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-03",
+        "FR-14",
+        "FR-15",
+        "FR-16",
+        "FR-17",
+        "FR-18",
+        "FR-19",
+        "FR-20",
+        "FR-21",
+        "FR-22",
+        "FR-23"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-03-S",
+        "AC-03-E",
+        "AC-14-S",
+        "AC-14-E",
+        "AC-15-S",
+        "AC-15-E",
+        "AC-16-S",
+        "AC-16-E",
+        "AC-17-S",
+        "AC-17-E",
+        "AC-18-S",
+        "AC-18-E",
+        "AC-19-S",
+        "AC-19-E",
+        "AC-20-S",
+        "AC-20-E",
+        "AC-21-S",
+        "AC-21-E",
+        "AC-22-S",
+        "AC-22-E",
+        "AC-23-S",
+        "AC-23-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N03",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "BusinessOverviewPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/BusinessOverviewPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "CHATLIST"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "metrics.overview.read",
+        "alerts.read",
+        "agri.topic_index.read"
+      ],
+      "semantic_command_contracts": [
+        "metrics.query",
+        "conversation.start"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "query_metrics"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N04",
+      "title": "会议与资料",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N04-会议与资料.html",
+      "design_meta_key": "N04",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N04",
+      "requirement_refs": [
+        "WF-FR-04",
+        "WF-FR-05",
+        "WF-FR-07",
+        "WF-FR-09",
+        "WF-FR-10"
+      ],
+      "fr_ids": [
+        "FR-04",
+        "FR-05",
+        "FR-07",
+        "FR-09",
+        "FR-10"
+      ],
+      "acceptance_refs": [
+        "AC-04-S",
+        "AC-04-E",
+        "AC-05-S",
+        "AC-05-E",
+        "AC-07-S",
+        "AC-07-E",
+        "AC-09-S",
+        "AC-09-E",
+        "AC-10-S",
+        "AC-10-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N04",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MeetingsAndMaterialsPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/MeetingsAndMaterialsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "meetings.list",
+        "materials.list",
+        "meeting_decisions.read"
+      ],
+      "semantic_command_contracts": [
+        "meeting_brief.prepare",
+        "meeting_minutes.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N05",
+      "title": "任务与承诺",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N05-任务与承诺.html",
+      "design_meta_key": "N05",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N05",
+      "requirement_refs": [
+        "WF-FR-06",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "任务与承诺",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N05",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AssignmentsAndCommitmentsPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AssignmentsAndCommitmentsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "CHATLIST",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "assignments.list",
+        "commitments.list",
+        "feedback.read"
+      ],
+      "semantic_command_contracts": [
+        "assignment.prepare",
+        "assignment.followup"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "read_assignment"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N06",
+      "title": "通知中心",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N06-通知中心.html",
+      "design_meta_key": "N06",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N06",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N06",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerNotificationCenterPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerNotificationCenterPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "notifications.list",
+        "notifications.unread_count"
+      ],
+      "semantic_command_contracts": [
+        "notifications.ack",
+        "notifications.defer",
+        "notifications.close"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N07",
+      "title": "本人目标与关注要求",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N07-本人目标与关注要求.html",
+      "design_meta_key": "N07",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N07",
+      "requirement_refs": [
+        "WF-FR-01",
+        "WF-FR-13",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-01",
+        "FR-13",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-13-S",
+        "AC-13-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N07",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerGoalsPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerGoalsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "owner_goals.read",
+        "owner_preferences.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_goals.save"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N08",
+      "title": "通知要求与可见范围",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N08-通知要求与可见范围.html",
+      "design_meta_key": "N08",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N08",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-12",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-12",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-12-S",
+        "AC-12-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N08",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "NotificationAndVisibilityPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/NotificationAndVisibilityPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION",
+        "SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "notification_preferences.read",
+        "sharing_scope.read"
+      ],
+      "semantic_command_contracts": [
+        "notification_preferences.save"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N09",
+      "title": "本人计划",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N09-本人计划.html",
+      "design_meta_key": "N09",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N09",
+      "requirement_refs": [
+        "WF-FR-01",
+        "WF-FR-02",
+        "WF-FR-11",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-01",
+        "FR-02",
+        "FR-11",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-02-S",
+        "AC-02-E",
+        "AC-11-S",
+        "AC-11-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N09",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerPlansPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerPlansPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "owner_plans.read",
+        "calendar.read",
+        "scheduled_events.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_plans.save",
+        "owner_plans.pause",
+        "owner_plans.cancel"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N10",
+      "title": "本人授权",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N10-本人授权.html",
+      "design_meta_key": "N10",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N10",
+      "requirement_refs": [
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N10",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerAuthorizationsPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerAuthorizationsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SECURITY"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "owner_authorizations.list",
+        "authorization_history.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_authorizations.revoke"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N11",
+      "title": "历史决定",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N11-历史决定.html",
+      "design_meta_key": "N11",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N11",
+      "requirement_refs": [
+        "WF-FR-13",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-13",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/N11",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "OwnerDecisionHistoryPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/OwnerDecisionHistoryPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "owner_decisions.list",
+        "decision_evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_decisions.annotate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "N12",
+      "title": "运行概况",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/N12-运行概况.html",
+      "design_meta_key": "N12",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#N12",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-30"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/N12",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MaintainerRunOverviewPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/MaintainerRunOverviewPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "USAGE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "run_telemetry.overview",
+        "service_health.read"
+      ],
+      "semantic_command_contracts": [
+        "runs.filter"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D01",
+      "title": "来源原文与支持关系",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D01-来源原文与支持关系.html",
+      "design_meta_key": "D01",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D01",
+      "requirement_refs": [
+        "WF-FR-03",
+        "WF-FR-09"
+      ],
+      "fr_ids": [
+        "FR-03",
+        "FR-09"
+      ],
+      "acceptance_refs": [
+        "AC-03-S",
+        "AC-03-E",
+        "AC-09-S",
+        "AC-09-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D01",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "EvidenceSourceDrawer",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/EvidenceSourceDrawer.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SOURCE"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "evidence.source.read",
+        "evidence.support_relations.read"
+      ],
+      "semantic_command_contracts": [],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "read_evidence"
+      ],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D02",
+      "title": "当前动作必要决定",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D02-当前动作必要决定.html",
+      "design_meta_key": "D02",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D02",
+      "requirement_refs": [
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "任务与承诺",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D02",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "RequiredDecisionDialog",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/RequiredDecisionDialog.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SECURITY"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "owner_authorizations.read",
+        "action_proposal.read"
+      ],
+      "semantic_command_contracts": [
+        "owner_decision.submit"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D03",
+      "title": "执行结果核查",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D03-执行结果核查.html",
+      "design_meta_key": "D03",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D03",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-29"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_area": "聊天交办",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D03",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "ExecutionOutcomeDrawer",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/ExecutionOutcomeDrawer.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "operation_outcome.read",
+        "run_business_outcomes.read"
+      ],
+      "semantic_command_contracts": [
+        "runs.reconcile"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D04",
+      "title": "选择负责人",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D04-选择负责人.html",
+      "design_meta_key": "D04",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D04",
+      "requirement_refs": [
+        "WF-FR-06",
+        "WF-FR-08"
+      ],
+      "fr_ids": [
+        "FR-06",
+        "FR-08"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-08-S",
+        "AC-08-E"
+      ],
+      "logical_area": "任务与承诺",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D04",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "OwnerSelectorDialog",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/OwnerSelectorDialog.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "CHATLIST"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "contacts.resolve",
+        "contact_roles.read"
+      ],
+      "semantic_command_contracts": [
+        "selection.owner.choose"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D05",
+      "title": "选择时间与时区",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D05-选择时间与时区.html",
+      "design_meta_key": "D05",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D05",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-06",
+        "WF-FR-11"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-06",
+        "FR-11"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-11-S",
+        "AC-11-E"
+      ],
+      "logical_area": "任务与承诺",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D05",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "DateTimezoneDialog",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/DateTimezoneDialog.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "timezone_rules.read",
+        "conflicts.read"
+      ],
+      "semantic_command_contracts": [
+        "selection.datetime.choose"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D06",
+      "title": "未保存修改提醒",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D06-未保存修改提醒.html",
+      "design_meta_key": "D06",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D06",
+      "requirement_refs": [
+        "WF-FR-05",
+        "WF-FR-08",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-05",
+        "FR-08",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-05-S",
+        "AC-05-E",
+        "AC-08-S",
+        "AC-08-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "会议与资料",
+      "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
+      "logical_route": "/app/shared/D06",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "UnsavedChangesDialog",
+      "proposed_frontend_source": "webui/src/features/shared/dialogs/UnsavedChangesDialog.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "SETTINGS"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "draft_state.local"
+      ],
+      "semantic_command_contracts": [
+        "draft.discard",
+        "draft.keep_editing",
+        "draft.persist_if_supported"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_RECHECK_AND_HIDE_PRIVATE_DATA",
+      "owner_tasks": [
+        "T18",
+        "T19"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D07",
+      "title": "访问权限限制",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D07-访问权限限制.html",
+      "design_meta_key": "D07",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D07",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "档案与访问",
+      "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
+      "logical_route": "/app/shared/D07",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "AccessDeniedPage",
+      "proposed_frontend_source": "webui/src/features/shared/dialogs/AccessDeniedPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SECURITY"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "access_denial.safe_context"
+      ],
+      "semantic_command_contracts": [],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_RECHECK_AND_HIDE_PRIVATE_DATA",
+      "owner_tasks": [
+        "T18",
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D08",
+      "title": "登录状态已过期",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D08-登录状态已过期.html",
+      "design_meta_key": "D08",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D08",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "重新认证",
+      "role_gate": "ANONYMOUS",
+      "logical_route": "/app/auth/D08",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "SessionExpiredPage",
+      "proposed_frontend_source": "webui/src/features/auth/dialogs/SessionExpiredPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "AUTH_CLIENT"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "auth.session.read"
+      ],
+      "semantic_command_contracts": [
+        "auth.reauthenticate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "LOGIN_WITHOUT_IMPLICIT_BOSS_AUTH",
+      "owner_tasks": [
+        "T18",
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "D09",
+      "title": "历史通知只读详情",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/D09-历史通知只读详情.html",
+      "design_meta_key": "D09",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#D09",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-25",
+        "WF-FR-26"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "通知与设置",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/D09",
+      "route_is_implemented": false,
+      "route_kind": "DIALOG_OR_DRAWER",
+      "proposed_react_component": "HistoricalNotificationDetailPage",
+      "proposed_frontend_source": "webui/src/features/boss/dialogs/HistoricalNotificationDetailPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "NEW_DIALOG_WITH_UPSTREAM_CONTEXT",
+      "design_state_ids": [],
+      "design_state_source": "COMMON_STATE_INHERITANCE_NO_INDIVIDUAL_INDEX",
+      "semantic_read_contracts": [
+        "notifications.history.read",
+        "source_version.read"
+      ],
+      "semantic_command_contracts": [],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A01",
+      "title": "档案与访问",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A01-档案与访问.html",
+      "design_meta_key": "A01",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A01",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28",
+        "WF-AD01"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "档案与访问",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A01",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MaintainerAccessPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/MaintainerAccessPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SETTINGS_VIEW",
+        "SECURITY",
+        "RUNTIME_SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "maintenance.access.read",
+        "owner_profile.metadata.read"
+      ],
+      "semantic_command_contracts": [
+        "maintenance.access.save",
+        "maintenance.access.validate",
+        "maintenance.access.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A02",
+      "title": "接口目录",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A02-接口目录.html",
+      "design_meta_key": "A02",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A02",
+      "requirement_refs": [
+        "WF-FR-25",
+        "WF-FR-26",
+        "WF-AD02"
+      ],
+      "fr_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A02",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SimulationInterfaceCatalogPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SimulationInterfaceCatalogPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "APPS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "simulation.interfaces.read",
+        "simulation.calls.read"
+      ],
+      "semantic_command_contracts": [
+        "simulation.invoke",
+        "simulation.test"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A03",
+      "title": "数据集",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A03-数据集.html",
+      "design_meta_key": "A03",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A03",
+      "requirement_refs": [
+        "WF-FR-25",
+        "WF-FR-26",
+        "WF-AD03"
+      ],
+      "fr_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A03",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SimulationDatasetPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SimulationDatasetPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "APPS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "simulation.datasets.read",
+        "simulation.lineage.read"
+      ],
+      "semantic_command_contracts": [
+        "simulation.datasets.generate",
+        "simulation.reset"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A04",
+      "title": "场景与事件",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A04-场景与事件.html",
+      "design_meta_key": "A04",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A04",
+      "requirement_refs": [
+        "WF-FR-25",
+        "WF-FR-26",
+        "WF-AD04"
+      ],
+      "fr_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A04",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SimulationScenarioEventsPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SimulationScenarioEventsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "simulation.events.read",
+        "simulation.clock.read"
+      ],
+      "semantic_command_contracts": [
+        "simulation.events.inject",
+        "simulation.clock.advance"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A05",
+      "title": "Prompt版本",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A05-Prompt版本.html",
+      "design_meta_key": "A05",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A05",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-26",
+        "WF-FR-30",
+        "WF-AD05"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A05",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "PromptVersionPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/PromptVersionPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SKILLS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "prompt_versions.read",
+        "config_adoption.read"
+      ],
+      "semantic_command_contracts": [
+        "prompt_versions.save",
+        "prompt_versions.validate",
+        "prompt_versions.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "GET /api/webui/skills/{name}"
+      ],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A06",
+      "title": "SOP与Skills",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A06-SOP与Skills.html",
+      "design_meta_key": "A06",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A06",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-26",
+        "WF-AD06"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A06",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SopSkillsPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SopSkillsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SKILLS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "sop_versions.read",
+        "skills_catalog.read"
+      ],
+      "semantic_command_contracts": [
+        "sop.save",
+        "sop.validate",
+        "sop.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A07",
+      "title": "Knowledge Base",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A07-Knowledge Base.html",
+      "design_meta_key": "A07",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A07",
+      "requirement_refs": [
+        "WF-FR-09",
+        "WF-FR-26",
+        "WF-AD07"
+      ],
+      "fr_ids": [
+        "FR-09",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-09-S",
+        "AC-09-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A07",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "KnowledgeManagementPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/KnowledgeManagementPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SOURCE",
+        "ATTACHMENT"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "knowledge_sources.list",
+        "knowledge_index.status"
+      ],
+      "semantic_command_contracts": [
+        "knowledge.ingest",
+        "knowledge.verify",
+        "knowledge.withdraw"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A08",
+      "title": "模型连接",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A08-模型连接.html",
+      "design_meta_key": "A08",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A08",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-26",
+        "WF-FR-30",
+        "WF-AD08"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A08",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "DeepSeekProviderPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/DeepSeekProviderPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "MODELS",
+        "PROVIDER",
+        "RUNTIME_SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "model_config.read",
+        "provider_status.read"
+      ],
+      "semantic_command_contracts": [
+        "model_config.save",
+        "model_config.validate",
+        "model_config.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "settings.provider.update",
+        "settings.model_configuration.update"
+      ],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A09",
+      "title": "Tools与连接",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A09-Tools与连接.html",
+      "design_meta_key": "A09",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A09",
+      "requirement_refs": [
+        "WF-FR-24",
+        "WF-FR-26",
+        "WF-FR-28",
+        "WF-AD09"
+      ],
+      "fr_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A09",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "ToolsConnectionPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/ToolsConnectionPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "APPS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "tools_catalog.read",
+        "connection_health.read"
+      ],
+      "semantic_command_contracts": [
+        "tools.save",
+        "tools.validate",
+        "tools.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A10",
+      "title": "指标与规则",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A10-指标与规则.html",
+      "design_meta_key": "A10",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A10",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-03",
+        "WF-FR-26",
+        "WF-AD10"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-03",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-03-S",
+        "AC-03-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A10",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MetricsRulesPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/MetricsRulesPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "metric_definitions.read",
+        "alert_rules.read"
+      ],
+      "semantic_command_contracts": [
+        "metric_definitions.save",
+        "alert_rules.save",
+        "configuration.activate"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A11",
+      "title": "关联对象",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A11-关联对象.html",
+      "design_meta_key": "A11",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A11",
+      "requirement_refs": [
+        "WF-FR-25",
+        "WF-FR-26",
+        "WF-FR-28",
+        "WF-AD11"
+      ],
+      "fr_ids": [
+        "FR-25",
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A11",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SimulationRelationshipsPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SimulationRelationshipsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "APPS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "simulation.relationships.read",
+        "contacts.metadata.read"
+      ],
+      "semantic_command_contracts": [
+        "simulation.relationships.save",
+        "simulation.feedback.inject"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A12",
+      "title": "记忆技术维护",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A12-记忆技术维护.html",
+      "design_meta_key": "A12",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A12",
+      "requirement_refs": [
+        "WF-FR-13",
+        "WF-FR-26",
+        "WF-AD12"
+      ],
+      "fr_ids": [
+        "FR-13",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "档案与访问",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A12",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "MemoryTechnicalMaintenancePage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/MemoryTechnicalMaintenancePage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "RUNTIME_SETTINGS"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_memory.metadata.read",
+        "memory_index.status"
+      ],
+      "semantic_command_contracts": [
+        "memory_index.verify",
+        "memory_index.repair"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A13",
+      "title": "调度计划",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A13-调度计划.html",
+      "design_meta_key": "A13",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A13",
+      "requirement_refs": [
+        "WF-FR-02",
+        "WF-FR-24",
+        "WF-FR-26",
+        "WF-AD13"
+      ],
+      "fr_ids": [
+        "FR-02",
+        "FR-24",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_area": "Agent配置",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A13",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "SchedulerManagementPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/SchedulerManagementPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "AUTOMATION"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "scheduler.jobs.read",
+        "scheduler_execution.read"
+      ],
+      "semantic_command_contracts": [
+        "scheduler.jobs.save",
+        "scheduler.jobs.pause",
+        "scheduler.jobs.cancel"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [
+        "GET /api/webui/automations"
+      ],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A14",
+      "title": "动作授权记录",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A14-动作授权记录.html",
+      "design_meta_key": "A14",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A14",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-28",
+        "WF-AD14"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_area": "档案与访问",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A14",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AuthorizationAuditPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/AuthorizationAuditPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "SECURITY"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "owner_authorizations.metadata.read",
+        "authorization_audit.read"
+      ],
+      "semantic_command_contracts": [],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A15",
+      "title": "运行记录",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A15-运行记录.html",
+      "design_meta_key": "A15",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A15",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-30",
+        "WF-AD15"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A15",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "RunLogsPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/RunLogsPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "USAGE",
+        "TOKEN_CARD"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "run_telemetry.read",
+        "usage.read",
+        "errors.read"
+      ],
+      "semantic_command_contracts": [],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "A16",
+      "title": "评测管理",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/A16-评测管理.html",
+      "design_meta_key": "A16",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#A16",
+      "requirement_refs": [
+        "WF-FR-26",
+        "WF-FR-31",
+        "WF-AD16"
+      ],
+      "fr_ids": [
+        "FR-26",
+        "FR-31"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-31-S",
+        "AC-31-E"
+      ],
+      "logical_area": "运行与评测",
+      "role_gate": "MAINTAINER",
+      "logical_route": "/app/maintain/A16",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "EvaluationManagementPage",
+      "proposed_frontend_source": "webui/src/features/maintain/views/EvaluationManagementPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SETTINGS",
+        "USAGE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "evaluation_cases.read",
+        "evaluation_results.read"
+      ],
+      "semantic_command_contracts": [
+        "evaluation.run",
+        "evaluation.reset"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_MAINTAINER_META_ONLY",
+      "owner_tasks": [
+        "T19",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": null
+    },
+    {
+      "page_id": "V19-BEEF",
+      "title": "禽类与反刍",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/V19-BEEF-禽类与反刍.html",
+      "design_meta_key": "V19-BEEF",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#V19-BEEF",
+      "requirement_refs": [
+        "WF-FR-19"
+      ],
+      "fr_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/V19-BEEF",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.animal_use_metrics.beef.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": {
+        "scenario_dimension": "ANIMAL_USE",
+        "animal_use": "BEEF",
+        "canonical_source": "F19"
+      }
+    },
+    {
+      "page_id": "V19-EGG",
+      "title": "禽类与反刍",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/V19-EGG-禽类与反刍.html",
+      "design_meta_key": "V19-EGG",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#V19-EGG",
+      "requirement_refs": [
+        "WF-FR-19"
+      ],
+      "fr_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/V19-EGG",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.animal_use_metrics.egg.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": {
+        "scenario_dimension": "ANIMAL_USE",
+        "animal_use": "EGG",
+        "canonical_source": "F19"
+      }
+    },
+    {
+      "page_id": "V19-MILK",
+      "title": "禽类与反刍",
+      "design_html": "Boss-Agent-Desktop-Complete-v6/pages/V19-MILK-禽类与反刍.html",
+      "design_meta_key": "V19-MILK",
+      "source_prompt": "Boss-Agent-Desktop-Complete-v6/meta/页面配置.json#V19-MILK",
+      "requirement_refs": [
+        "WF-FR-19"
+      ],
+      "fr_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_area": "经营关注",
+      "role_gate": "BOSS",
+      "logical_route": "/app/boss/V19-MILK",
+      "route_is_implemented": false,
+      "route_kind": "DESKTOP_VIEW",
+      "proposed_react_component": "AgriScenarioPage",
+      "proposed_frontend_source": "webui/src/features/boss/views/AgriScenarioPage.tsx",
+      "component_is_implemented": false,
+      "upstream_reuse_anchor_ids": [
+        "SHELL",
+        "TOOLRUN",
+        "SOURCE"
+      ],
+      "reuse_decision": "EXTEND_UPSTREAM_WEBUI_WITH_BUSINESS_VIEW",
+      "design_state_ids": [
+        "S00",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10"
+      ],
+      "design_state_source": "V6_561_STATE_INDEX",
+      "semantic_read_contracts": [
+        "agri.animal_use_metrics.milk.read",
+        "evidence.read"
+      ],
+      "semantic_command_contracts": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "semantic_contracts_are_real_api": false,
+      "t02_verified_runtime_operations": [],
+      "guard_policy": "SERVER_OWNER_SCOPE_AND_ACTION_APPROVAL",
+      "owner_tasks": [
+        "T18",
+        "T24"
+      ],
+      "implementation_status": "ARCHITECTURE_MAPPED_NOT_BUILT",
+      "additional_context": {
+        "scenario_dimension": "ANIMAL_USE",
+        "animal_use": "MILK",
+        "canonical_source": "F19"
+      }
+    }
+  ]
+}
