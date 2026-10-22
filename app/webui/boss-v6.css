@@ -471,3 +471,50 @@
   .boss-workspace-item-top{align-items:flex-start;flex-wrap:wrap}
   .boss-workspace-search{grid-template-columns:1fr}
 }
+
+
+/* Agricultural FR-14–FR-23 / V19: same Desktop v6 compact filtering,
+   four-up KPI grid and asymmetric workspace, with honest unknown figures. */
+.boss-sector-filters{margin-bottom:14px}
+.boss-sector-filter-row {
+  display:flex;align-items:flex-end;gap:9px;flex-wrap:wrap;min-width:0;
+}
+.boss-sector-filter-row label{
+  flex:1 1 125px;min-width:108px;max-width:220px;
+  display:flex;flex-direction:column;gap:5px;color:#41617f;
+  font-size:12px;font-weight:680;
+}
+.boss-sector-filter-row input{
+  min-height:44px;width:100%;min-width:0;
+  padding:8px 11px;border:1px solid #d7e7f6;border-radius:9px;
+  background:#fbfdff;color:#315571;font-size:12.5px;font-weight:500;
+}
+.boss-sector-filter-row button{flex-shrink:0}
+.boss-sector-tabs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid #e4effa}
+.boss-sector-tabs button{
+  border:0;border-bottom:2px solid transparent;background:transparent;
+  min-height:42px;padding:9px 13px;color:#6b8aaa;font-size:12.5px;font-weight:700;
+}
+.boss-sector-tabs button.selected{color:#0968c3;border-color:#0879e8}
+.boss-sector-tabs button:hover{background:#eef7ff}
+.boss-sector-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:15px}
+.boss-sector-stat{
+  min-width:0;border:1px solid #deebf8;border-radius:12px;
+  background:linear-gradient(135deg,#fbfdff,#f4f9fe);
+  padding:12px 13px;display:flex;flex-direction:column;gap:5px;
+}
+.boss-sector-stat>span{font-size:11.6px;color:#587796;font-weight:700}
+.boss-sector-stat strong{font-size:18px;color:#547b9b;font-weight:740;line-height:1.5}
+.boss-sector-stat small{font-size:10.8px;line-height:1.55;color:#8a9fb2}
+.boss-sector-chart-empty{
+  border:1px dashed #cbdced;background:linear-gradient(115deg,#f7fbff,#fdfefe);
+  border-radius:11px;padding:18px;min-height:168px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  color:#7193b2;text-align:center;
+}
+.boss-sector-chart-empty strong{font-size:13px;color:#446c8f}
+.boss-sector-chart-empty p{font-size:12px;line-height:1.65;color:#7a94ad;max-width:380px;margin:0}
+.boss-sector-next{display:flex;flex-direction:column;gap:9px;margin-top:17px}
+.boss-sector-next button{width:100%;white-space:normal}
+@media(max-width:1350px){.boss-sector-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:690px){.boss-sector-filter-row label{flex:1 1 40%}.boss-sector-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
