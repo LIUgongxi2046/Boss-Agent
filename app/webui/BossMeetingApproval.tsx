@@ -89,7 +89,8 @@ function VersionValue({label,value}:{label:string;value?:string|number|null}) {
 }
 
 function useConfirmedMutation(onSuccess: ()=>void) {
-  const {client}=useClient();
+  const {client,getToken}=useClient();
+  const [lookupBusy,setLookupBusy]=useState(false);
   const [pending,setPending]=useState<Pending|null>(null);
   const [checked,setChecked]=useState(false);
   const [busy,setBusy]=useState(false);
@@ -141,6 +142,34 @@ function useConfirmedMutation(onSuccess: ()=>void) {
         "。该操作可能已经保存；请先重新读取，必要时使用本弹窗原请求编号重试。");
     }finally{setBusy(false);}
   };
+  const reconcile=async()=>{
+    if(!pending||busy||lookupBusy)return;
+    const token=getToken();
+    if(!token){setError("身份已失效，不能查询本次请求");return;}
+    setLookupBusy(true);setError("");
+    try{
+      const query=new URLSearchParams({
+        action:pending.action,client_request_id:pending.key,
+      });
+      const response=await fetch("/api/boss/ui/operation-status?"+query.toString(),{
+        headers:{Authorization:"Bearer "+token},cache:"no-store",
+      });
+      if(!response.ok)throw Error("当前操作回执读取失败（HTTP "+response.status+"）");
+      const result=await response.json() as {
+        action:string;client_request_id:string;outcome:string;result?:MutationResult;
+      };
+      if(result.action!==pending.action||result.client_request_id!==pending.key)
+        throw Error("服务端回执与本次操作标识不匹配");
+      if(result.outcome==="RECORDED"&&result.result){
+        setNotice("已通过实际 SQLite 回执确认本次纪要/审批操作完成，现重新读取版本与决定。");
+        setPending(null);setChecked(false);onSuccess();
+      }else if(result.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
+        setError("当前没有发现原请求回执，不能因此断定没有执行。先重读正式状态，必要时使用本确认框同一请求编号重试。");
+        onSuccess();
+      }else throw Error("服务端结果无法核验，不重新提交");
+    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    finally{setLookupBusy(false);}
+  };
   const dialog=pending?<div className="boss-confirm-backdrop">
     <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true"
       aria-labelledby="boss-meeting-approval-confirm" className="boss-confirm">
@@ -154,9 +183,13 @@ function useConfirmedMutation(onSuccess: ()=>void) {
       </label>
       {error&&<p className="boss-validation-error" role="alert">{error}</p>}
       <footer className="boss-actions">
-        <button className="boss-btn" type="button" disabled={busy}
+        <button className="boss-btn" type="button" disabled={busy||lookupBusy}
           onClick={()=>{setPending(null);setChecked(false);}}>取消（零写入）</button>
-        <button type="button" className="boss-btn boss-btn-primary" disabled={!checked||busy}
+        <button className="boss-btn" type="button" disabled={busy||lookupBusy}
+          onClick={()=>void reconcile()}>
+          {lookupBusy&&<Loader2 size={15} className="boss-spin"/>} 核对原请求回执
+        </button>
+        <button type="button" className="boss-btn boss-btn-primary" disabled={!checked||busy||lookupBusy}
           onClick={()=>void commit()}>{busy&&<Loader2 className="boss-spin" size={15}/>} 确认并提交</button>
       </footer>
     </section>
