@@ -183,10 +183,19 @@ def project(db,data):
             "revisions":[],
         }
     latest=_source_quotes(db,data,saved["scope"])
-    current_versions={(s["source_id"],s["version"]) for s in latest["matched_sources"]}
-    prior_versions={(s["source_id"],s["version"]) for s in saved["matched_sources"]}
+    # Even a bad upstream import that rewrites content without bumping its
+    # declared version must force review; compare the *actual quote bytes*
+    # as well as citation ID/version/offset.
+    def signatures(rows):
+        return {
+            (item["source_id"],item["version"],item["quote_start"],
+             item["quote_end"],item["quote"])
+            for item in rows
+        }
+    current_versions=signatures(latest["matched_sources"])
+    prior_versions=signatures(saved["matched_sources"])
     status=("CURRENT_SOURCE_EXCERPTS" if current_versions==prior_versions
-            and all(s in current_versions for s in prior_versions) else "NEEDS_REVIEW")
+            else "NEEDS_REVIEW")
     # Always re-check source withdrawal and version before returning text.
     # Historic excerpts never survive a changed or withdrawn reference.
     safe=dict(saved)
