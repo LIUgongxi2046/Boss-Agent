@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  AlertCircle, ArrowLeft, CalendarDays, CheckCircle2, Clock3, FileSearch,
+  AlertCircle, ArrowLeft, CheckCircle2, Clock3, FileSearch,
   FolderOpen, Loader2, MessageSquareText, RefreshCw, Send, ShieldCheck, X,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
@@ -60,8 +60,9 @@ function Block({title,note,children}: {title:string;note?:string;children:ReactN
     <div className="boss-panel-head"><h2>{title}</h2>{note&&<small>{note}</small>}</div>{children}
   </section>;
 }
-function LabelValue({name,value}:{name:string;value?:string|number|boolean|null}) {
-  return <div className="boss-kv"><span>{name}</span><strong>{value===undefined||value===null?"待核查":String(value)}</strong></div>;
+function LabelValue({name,value,children}:{name:string;value?:string|number|boolean|null;children?:string|number|boolean|null}) {
+  const shown=value??children;
+  return <div className="boss-kv"><span>{name}</span><strong>{shown===undefined||shown===null?"待核查":String(shown)}</strong></div>;
 }
 function Empty({children}:{children:ReactNode}) {
   return <div className="boss-empty"><FolderOpen size={20}/><div><strong>暂无已保存记录</strong><p>{children}</p></div></div>;
