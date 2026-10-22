@@ -54,6 +54,24 @@ type Meetings = {
 };
 type Evidence = { source_id: string; source_type: string; version: string; content: string; published_at?: string; author_contact_id?: string };
 type Maintenance = { configured_provider: string; configured_model: string; configuration_version: string; source_type: string; status: string; counts: Record<string, number>; task_refs?: MaintenanceTaskRef[] };
+type ModelHealth = {
+  source_type: string; provider: string; data_source: string;
+  observed_request_count: number; observed_response_count: number;
+  runtime_response_observed: boolean;
+  latest_response: {
+    response_id: string; at: string | null;
+    model: string | null; finish_reasons: string[];
+  } | null;
+  reported_usage: {
+    prompt_tokens: number | null;
+    completion_tokens: number | null;
+    total_tokens: number | null;
+  } | null;
+  cost_total: null;
+  business_task_completed: false;
+  tool_event_count?: number;
+  observed_error_count?: number;
+};
 type Identity = { role: Role | null; owner_id: string | null };
 type Animation = "idle" | "thinking" | "complete" | "notice";
 
@@ -91,7 +109,7 @@ const MAINT_NAV = [
   ["A15", "运行记录", Activity],
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
-const PRODUCT_PAGES = new Set(["F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "A04", "A08", "N12"]);
+const PRODUCT_PAGES = new Set(["F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "A04", "A08", "A15", "N12"]);
 const ANIMATIONS: Record<Animation, string> = {
   idle: "/boss-brand/01-待机悬浮.webp",
   thinking: "/boss-brand/03-思考分析.webp",
@@ -190,6 +208,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [meetings, setMeetings] = useState<Meetings | null>(null);
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
+  const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
   const [loading, setLoading] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
@@ -251,9 +270,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       if (["F01", "F06", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
+      if (page === "F24") read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
       if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
     } else if (["A04", "A08", "N12", "A01", "A15"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
+      if (page === "A15") read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
     }
     if (tasksToRead.length === 0) { setLoading(false); return () => abort.abort(); }
     setLoading(true);
@@ -630,6 +651,35 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
+                page === "F24" ? <div className="boss-columns">
+                  <div className="boss-column">
+                    <Panel title="DeepSeek 实际运行详情" note="F24 · 源自本机脱敏 Provider 回执">
+                      {modelHealth?.runtime_response_observed ?
+                        <StatusLine variant="ok" text="本机服务收到过实际 DeepSeek 模型响应。此状态不代表当前业务已完成。" /> :
+                        <StatusLine variant="warn" text="本次本机运行尚无真实模型响应回执。仅有配置不等于服务已验证可用。" />}
+                      <Value label="Provider 观察" value={modelHealth?.provider}/>
+                      <Value label="当前模型" value={modelHealth?.latest_response?.model ?? "尚未观察"}/>
+                      <Value label="响应标识" value={modelHealth?.latest_response?.response_id}/>
+                      <Value label="响应时间" value={modelHealth?.latest_response?.at}/>
+                      <Value label="结束原因" value={modelHealth?.latest_response?.finish_reasons.join("、") || "待观察"}/>
+                      <div className="boss-actions">
+                        <GlassButton primary onClick={() => navigate("NATIVE")}>进入原生会话</GlassButton>
+                        <GlassButton onClick={refresh}>重新读取运行结果</GlassButton>
+                      </div>
+                    </Panel>
+                  </div>
+                  <div className="boss-column">
+                    <Panel title="Token 用量及费用覆盖">
+                      <Value label="实际请求数" value={modelHealth?.observed_request_count.toString()}/>
+                      <Value label="有回执的响应数" value={modelHealth?.observed_response_count.toString()}/>
+                      <Value label="Prompt Token" value={modelHealth?.reported_usage?.prompt_tokens?.toString()}/>
+                      <Value label="Completion Token" value={modelHealth?.reported_usage?.completion_tokens?.toString()}/>
+                      <Value label="Total Token" value={modelHealth?.reported_usage?.total_tokens?.toString()}/>
+                      <Value label="总费用" value="未知（用量缺口与计价尚待核对）"/>
+                      <StatusLine text="界面只显示真实响应元信息，不读取 Prompt、消息正文、服务端密钥或内部推理。" />
+                    </Panel>
+                  </div>
+                </div> :
                 page === "D01" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="来源原文与支持关系">
@@ -660,6 +710,31 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <p className="boss-helper">动作：{metadata?.actions?.join("、") || "以 PRD 为准"}</p>
                     <StatusLine text="未连接写入动作，不会显示模拟保存/发送成功。" />
                   </Panel></div>
+                </div>
+              ) : page === "A15" ? <div className="boss-columns">
+                <div className="boss-column">
+                  <Panel title="模型及工具实际运行记录" note="A15 · 只读技术元信息">
+                    {modelHealth?.runtime_response_observed ?
+                      <StatusLine variant="ok" text="已观察到本机实际 Provider 响应；请求内容已脱敏。" /> :
+                      <StatusLine variant="warn" text="当前还没有实际模型响应记录；不能将已配置视为运行成功。" />}
+                    <Value label="模型" value={modelHealth?.latest_response?.model ?? "待观察"}/>
+                    <Value label="实际模型请求" value={modelHealth?.observed_request_count.toString()}/>
+                    <Value label="实际响应" value={modelHealth?.observed_response_count.toString()}/>
+                    <Value label="工具事件数" value={modelHealth?.tool_event_count?.toString()}/>
+                    <Value label="错误事件数" value={modelHealth?.observed_error_count?.toString()}/>
+                    <div className="boss-actions">
+                      <GlassButton onClick={refresh}>重新读取脱敏审计</GlassButton>
+                    </div>
+                  </Panel>
+                </div>
+                <div className="boss-column">
+                  <Panel title="费用与使用范围">
+                    <Value label="Total Token" value={modelHealth?.reported_usage?.total_tokens?.toString()}/>
+                    <Value label="统计覆盖" value="仅本机实际已记录请求"/>
+                    <Value label="合计模型费用" value="未知"/>
+                    <Value label="提示词与原文" value="禁止维护角色直接查看"/>
+                    <StatusLine text="部分取消、超时或服务错误可能没有 Token 回执，不能因此计为零费用。" />
+                  </Panel>
                 </div>
               ) : page === "A04" ? <div className="boss-columns">
                 <div className="boss-column">
