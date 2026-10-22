@@ -14,6 +14,8 @@ export interface AssignmentTask {
   origin_minute_id?: string; origin_minute_version?: string;
   origin_entry_id?: string; origin_source_id?: string;
   origin_source_version?: string;
+  source_reference_state?: "CURRENT" | "NEEDS_REVIEW";
+  source_reference_reasons?: string[];
 }
 export interface TaskFeedback {
   feedback_id: string; task_id: string;
@@ -242,6 +244,8 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const prepareSend=()=>safe(()=>{
     if(!current||current.status!=="OPEN"||!current.version||!current.coordinator_id)
       throw new Error("仅 OPEN 且版本有效的交办可以发送。");
+    if(current.source_reference_state!=="CURRENT")
+      throw new Error("任务来源已失效或没有固定版本；必须重新核查后才能发送。");
     const message=required(body,"模拟消息正文");
     propose("boss.assignment.send",{
       task_id:current.task_id,task_version:current.version,
@@ -254,6 +258,8 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const prepareComplete=()=>safe(()=>{
     if(!current||!completed||current.status!=="RESULT_SUBMITTED"||!current.version)
       throw new Error("当前没有已经提交且具备证据的核查结果。");
+    if(current.source_reference_state!=="CURRENT")
+      throw new Error("原始来源已更改或撤销，不能确认完成。");
     propose("boss.assignment.complete",{
       task_id:current.task_id,task_version:current.version,feedback_id:completed.feedback_id,
     },"老板确认完成",[
@@ -338,6 +344,15 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
             <div className="boss-kv"><span>正式状态</span><strong>{current.status}</strong></div>
             <div className="boss-kv"><span>截止时间</span><strong>{displayTime(current.due_at)}</strong></div>
             <div className="boss-kv"><span>证据要求</span><strong>{current.evidence_requirements?.join("、")||"缺少"}</strong></div>
+            <div className="boss-kv"><span>原始依据版本</span>
+              <strong>{current.source_reference_state||"NEEDS_REVIEW"}</strong>
+            </div>
+            {current.source_reference_state!=="CURRENT"&&
+              <div className="boss-status boss-status-warn" role="status">
+                <AlertCircle size={16}/> 当前依据需要复核：
+                {(current.source_reference_reasons||[]).join("、")||"缺少可核验版本"}。
+                旧授权不能应用于已撤销或换版材料。
+              </div>}
             {current.origin_minute_id&&<div className="boss-workspace-item" role="group" aria-label="纪要交办原始来源">
               <strong>已确认纪要关联</strong>
               <div className="boss-kv"><span>纪要 / 条目</span>
@@ -355,7 +370,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
             <label className="boss-label">模拟发件内容</label>
             <textarea rows={3} value={body} onChange={e=>onDraftChange("body",e.target.value)} placeholder="输入准备发给唯一负责人的正文"/>
             <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button"
-              disabled={current.status!=="OPEN"||busy} onClick={prepareSend}>
+              disabled={current.status!=="OPEN"||current.source_reference_state!=="CURRENT"||busy} onClick={prepareSend}>
               <MessageSquareText size={15}/> 核对并模拟发送</button></div>
           </>:<p className="boss-helper">请先选择或创建交办。</p>}
           <p className="boss-helper">模拟 SENT 只代表本地发件箱已记录；任务仍需反馈。</p>
@@ -412,7 +427,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
           </div>):<p className="boss-helper">暂无署名反馈。不能提前认定完成。</p>}
           <div className="boss-actions">
             <button className="boss-btn boss-btn-primary" type="button"
-              disabled={!current||current.status!=="RESULT_SUBMITTED"||!completed||busy} onClick={prepareComplete}>
+              disabled={!current||current.status!=="RESULT_SUBMITTED"||!completed||current.source_reference_state!=="CURRENT"||busy} onClick={prepareComplete}>
               <CheckCircle2 size={15}/> 核查证据并确认完成</button>
           </div>
           <div className="boss-form-grid boss-form-below">
