@@ -119,6 +119,29 @@ class BossWorkspaceAPI:
             current_sources = {
                 d["source_id"]: d for d in _object_list(db, self.namespace, "document")
             }
+            # Persisted confirmed minutes remain immutable for audit, but a
+            # withdrawn/replaced source cannot be revived as a current quote
+            # through this separate read projection.
+            if minute is not None:
+                source = current_sources.get(minute["source_id"])
+                current = bool(
+                    source and not source.get("withdrawn")
+                    and source.get("access_scope") == data["owner_id"]
+                    and source.get("source_type") == "SIMULATED"
+                    and source.get("version") == minute["source_version"]
+                )
+                minute = dict(minute)
+                minute["source_reference_state"] = "CURRENT" if current else "NEEDS_REVIEW"
+                if not current:
+                    minute["entries"] = [{
+                        "entry_id": entry["entry_id"],
+                        "kind": entry["kind"],
+                        "text": "",
+                        "source_anchor": "",
+                        "source_id": entry["source_id"],
+                        "source_version": entry["source_version"],
+                        "reference_state": "NEEDS_REVIEW",
+                    } for entry in minute["entries"]]
             associated = [
                 _safe_source(current_sources[source_id])
                 for source_id in meeting["material_ids"]
