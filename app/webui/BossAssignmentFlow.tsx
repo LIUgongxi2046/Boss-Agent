@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle, ArrowRight, CheckCircle2, Clock3, ClipboardCheck,
-  Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
+  FileSearch, Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 import type { AssignmentDraft } from "./BossAssignmentPicker";
@@ -11,6 +11,9 @@ export interface AssignmentTask {
   coordinator_id?: string; due_at?: string; timezone?: string;
   feedback_ids?: string[]; message_ids?: string[];
   source_refs?: string[]; evidence_requirements?: string[];
+  origin_minute_id?: string; origin_minute_version?: string;
+  origin_entry_id?: string; origin_source_id?: string;
+  origin_source_version?: string;
 }
 export interface TaskFeedback {
   feedback_id: string; task_id: string;
@@ -312,6 +315,20 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
             <div className="boss-kv"><span>正式状态</span><strong>{current.status}</strong></div>
             <div className="boss-kv"><span>截止时间</span><strong>{displayTime(current.due_at)}</strong></div>
             <div className="boss-kv"><span>证据要求</span><strong>{current.evidence_requirements?.join("、")||"缺少"}</strong></div>
+            {current.origin_minute_id&&<div className="boss-workspace-item" role="group" aria-label="纪要交办原始来源">
+              <strong>已确认纪要关联</strong>
+              <div className="boss-kv"><span>纪要 / 条目</span>
+                <strong>{current.origin_minute_id} · {current.origin_entry_id}</strong></div>
+              <div className="boss-kv"><span>纪要版本</span>
+                <strong>v{current.origin_minute_version}</strong></div>
+              <div className="boss-kv"><span>原文来源</span>
+                <strong>{current.origin_source_id} · v{current.origin_source_version}</strong></div>
+              <div className="boss-actions">
+                <button className="boss-btn" type="button" onClick={onViewSource}>
+                  <FileSearch size={15}/> 核对当前业务来源</button>
+              </div>
+              <p className="boss-helper">本次交办由本人单独授权创建；是否发送以当前任务真实状态为准。</p>
+            </div>}
             <label className="boss-label">模拟发件内容</label>
             <textarea rows={3} value={body} onChange={e=>onDraftChange("body",e.target.value)} placeholder="输入准备发给唯一负责人的正文"/>
             <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button"
