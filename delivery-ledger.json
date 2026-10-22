@@ -1,116 +1,1722 @@
 {
   "schema_version": 1,
-  "baseline": {"id": "boss-agent-t00-design-20261021", "environment_ref": "docs/计划环境记录.md"},
+  "baseline": {
+    "id": "boss-agent-t00-design-20261021",
+    "environment_ref": "docs/计划环境记录.md"
+  },
   "commitments": [
-    {"id":"C00","source_ref":"用户要求补全 S001 并合并为一份项目计划；docs/项目决策记录.md D12","outcome":"形成老板 Agent 的产品目标、价值与资源假设、成功标准、PRD-0 及验证定义，供需求、架构与验收使用","disposition":"IN_SCOPE","acceptance_ids":["A00"]},
-    {"id":"C01","source_ref":"docs/Boss-Agent需求输入.md 第 1、4、13—15 节；docs/项目决策记录.md D11","outcome":"形成只服务老板的完整 PRD、本人授权及 R01—R32 验收范围","disposition":"IN_SCOPE","acceptance_ids":["A01"]},
-    {"id":"C02","source_ref":"docs/Boss-Agent需求输入.md 第 1、8.8、12.5 节；用户对本轮选型可行性完成的明确确认；docs/项目决策记录.md D04/D16/D17/D18","outcome":"确定可行的固定开源改造基础，取得 DeepSeek 两次实际执行、Runtime、原生两端和桌面宿主证据，向后续开发交接版本、扩展责任及未验证产品条件","disposition":"IN_SCOPE","acceptance_ids":["A02"]},
-    {"id":"C03","source_ref":"docs/Boss-Agent需求输入.md 第 11 节；用户最终高保真、素材及电脑桌面产品要求；docs/项目决策记录.md D08/D17","outcome":"定义电脑桌面全部老板入口、后台操作与页面状态，并交付完整高保真页面及适用状态稿、可编辑来源、可操作预览、设计 PDF 和真实素材包","disposition":"IN_SCOPE","acceptance_ids":["A03"]},
-    {"id":"C04","source_ref":"docs/Boss-Agent需求输入.md 第 6.2、8.8、11.6、15 节","outcome":"明确组件边界、唯一配置来源、调度与运行责任","disposition":"IN_SCOPE","acceptance_ids":["A04"]},
-    {"id":"C05","source_ref":"docs/Boss-Agent需求输入.md 第 5、10、15 节","outcome":"形成数据、指标、农业关系、时间与资料生命周期设计","disposition":"IN_SCOPE","acceptance_ids":["A05"]},
-    {"id":"C06","source_ref":"docs/Boss-Agent需求输入.md 第 4.6、10、11.4—11.5、15 节","outcome":"形成接口、授权、状态、幂等、并发与错误规范","disposition":"IN_SCOPE","acceptance_ids":["A06"]},
-    {"id":"C07","source_ref":"docs/Boss-Agent需求输入.md 第 6、12、13、15 节；docs/项目决策记录.md D11","outcome":"形成一个老板 Agent 的 SOP、知识、个人记忆、工具与模型采用设计","disposition":"IN_SCOPE","acceptance_ids":["A07"]},
-    {"id":"C08","source_ref":"docs/Boss-Agent需求输入.md 第 11、15 节","outcome":"形成页面、组件、事件与实际服务连接设计","disposition":"IN_SCOPE","acceptance_ids":["A08"]},
-    {"id":"C09","source_ref":"docs/Boss-Agent需求输入.md 第 10.4—10.5、14 节","outcome":"形成一致的设计、测试、安全与业务验收计划","disposition":"IN_SCOPE","acceptance_ids":["A09"]},
-    {"id":"C10","source_ref":"docs/Boss-Agent需求输入.md 第 15 节；用户本次计划请求","outcome":"维护完整开发工单、依赖、记录和验收责任","disposition":"IN_SCOPE","acceptance_ids":["A10"]},
-    {"id":"C11","source_ref":"docs/Boss-Agent需求输入.md 第 6.2、11.4、14 节","outcome":"工程可以启动，身份、配置、存储和运行记录可验证","disposition":"IN_SCOPE","acceptance_ids":["A11"]},
-    {"id":"C12","source_ref":"docs/Boss-Agent需求输入.md 第 9—10、11.3 节；docs/项目决策记录.md D02、D11","outcome":"服务老板任务的 14 类模拟接口、联系人反馈、专业资料、数据、时钟、事件与重置实际运行","disposition":"IN_SCOPE","acceptance_ids":["A12"]},
-    {"id":"C13","source_ref":"docs/Boss-Agent需求输入.md 第 5、13.2、14.3 节","outcome":"经营指标和农业测算有可复算明细、适用口径与时间范围","disposition":"IN_SCOPE","acceptance_ids":["A13"]},
-    {"id":"C14","source_ref":"docs/Boss-Agent需求输入.md 第 4、10.1、11.4—11.5、13.5 节；docs/项目决策记录.md D11","outcome":"老板会议、交办、消息、审批决定、日历、出行与模拟反馈关联可执行并重新查询","disposition":"IN_SCOPE","acceptance_ids":["A14"]},
-    {"id":"C15","source_ref":"docs/Boss-Agent需求输入.md 第 6.2、11.2、12.4、13.5 节","outcome":"资料可检索引用，历史决定及当前个人记忆在新会话中采用","disposition":"IN_SCOPE","acceptance_ids":["A15"]},
-    {"id":"C16","source_ref":"docs/Boss-Agent需求输入.md 第 6、12 节","outcome":"实际模型通过 Runtime 执行全部秘书工具过程并记录配置、动作、用量与错误","disposition":"IN_SCOPE","acceptance_ids":["A16"]},
-    {"id":"C17","source_ref":"docs/Boss-Agent需求输入.md 第 5.3—5.5、6.2、11.2 节","outcome":"时间、事件和数据变化触发主动工作，提醒控制、暂停及取消有效","disposition":"IN_SCOPE","acceptance_ids":["A17"]},
-    {"id":"C18","source_ref":"docs/Boss-Agent需求输入.md 第 11.1、13.5 节；docs/项目决策记录.md D17","outcome":"桌面应用六类老板入口连接同一实际业务状态，支持连续追问、动作、窗口缩放与键盘操作","disposition":"IN_SCOPE","acceptance_ids":["A18"]},
-    {"id":"C19","source_ref":"docs/Boss-Agent需求输入.md 第 10.7、11.2—11.6 节；docs/项目决策记录.md D11/D17","outcome":"桌面应用内 16 类技术管理能力服务老板 Agent，模拟配置和运行检查可操作，维护身份不能替代老板决定","disposition":"IN_SCOPE","acceptance_ids":["A19"]},
-    {"id":"C20","source_ref":"docs/Boss-Agent需求输入.md 第 4.2、12.4 节","outcome":"真实语音转写经过文本核查后进入共同交办流程","disposition":"IN_SCOPE","acceptance_ids":["A20"]},
-    {"id":"C21","source_ref":"docs/Boss-Agent需求输入.md 第 13.7 原料、水产季节、苗种专题及 14.3 节","outcome":"原料与饲料、水产季节、苗种批次分别具备完整秘书任务与变体验证","disposition":"IN_SCOPE","acceptance_ids":["A21a","A21b","A21c"]},
-    {"id":"C22","source_ref":"docs/Boss-Agent需求输入.md 第 13.7 动保、生猪、禽类与反刍专题及 14.3 节","outcome":"动保技服、生猪合作、禽类与反刍分别具备完整秘书任务与变体验证","disposition":"IN_SCOPE","acceptance_ids":["A22a","A22b","A22c"]},
-    {"id":"C23","source_ref":"docs/Boss-Agent需求输入.md 第 13.7 公司养殖、食品、海外、研发专题及 14.3 节","outcome":"公司养殖、食品品质、海外、研发分别具备完整秘书任务与变体验证","disposition":"IN_SCOPE","acceptance_ids":["A23a","A23b","A23c","A23d"]},
-    {"id":"C24","source_ref":"docs/Boss-Agent需求输入.md 第 6.3—6.5、10.5、13—14 节","outcome":"全部 R01—R32、连续演示、专题、后台、安全、异常与模型比较具有有效证据","disposition":"IN_SCOPE","acceptance_ids":["A24"]},
-    {"id":"C25","source_ref":"docs/Boss-Agent需求输入.md 第 1、2、14—15 节；docs/项目决策记录.md D17","outcome":"目标电脑桌面安装包可安装、启动、退出与恢复，文档、复用说明、贡献及实际记录可交接","disposition":"IN_SCOPE","acceptance_ids":["A25"]},
-    {"id":"C26","source_ref":"docs/Boss-Agent需求输入.md 第 14—16 节；用户本次计划请求","outcome":"完整老板范围和实际证据经过最终审查，未完成工作持续保留","disposition":"IN_SCOPE","acceptance_ids":["A26"]},
-    {"id":"X01","source_ref":"用户本次范围决定；docs/项目决策记录.md D11","outcome":"其他职能部门 Agent、部门专属 SOP、部门个人记忆及独立智能体编排","disposition":"EXCLUDED","acceptance_ids":[],"decision_ref":"docs/项目决策记录.md D11"},
-    {"id":"X02","source_ref":"用户本次范围决定；docs/项目决策记录.md D11","outcome":"部门工作台、部门业务账号及员工在本产品内办理部门任务","disposition":"EXCLUDED","acceptance_ids":[],"decision_ref":"docs/项目决策记录.md D11"},
-    {"id":"X03","source_ref":"docs/Boss-Agent需求输入.md 第 1.1、10.7 节；docs/项目决策记录.md D11","outcome":"采购成交、配方发布、用药、设备控制、质量放行、生产排程与资金交易的专业业务执行系统","disposition":"EXCLUDED","acceptance_ids":[],"decision_ref":"docs/项目决策记录.md D11"}
+    {
+      "id": "C00",
+      "source_ref": "用户要求补全 S001 并合并为一份项目计划；docs/项目决策记录.md D12",
+      "outcome": "形成老板 Agent 的产品目标、价值与资源假设、成功标准、PRD-0 及验证定义，供需求、架构与验收使用",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A00"
+      ]
+    },
+    {
+      "id": "C01",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 1、4、13—15 节；docs/项目决策记录.md D11",
+      "outcome": "形成只服务老板的完整 PRD、本人授权及 R01—R32 验收范围",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A01"
+      ]
+    },
+    {
+      "id": "C02",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 1、8.8、12.5 节；用户对本轮选型可行性完成的明确确认；docs/项目决策记录.md D04/D16/D17/D18",
+      "outcome": "确定可行的固定开源改造基础，取得 DeepSeek 两次实际执行、Runtime、原生两端和桌面宿主证据，向后续开发交接版本、扩展责任及未验证产品条件",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A02"
+      ]
+    },
+    {
+      "id": "C03",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 11 节；用户最终高保真、素材及电脑桌面产品要求；docs/项目决策记录.md D08/D17",
+      "outcome": "定义电脑桌面全部老板入口、后台操作与页面状态，并交付完整高保真页面及适用状态稿、可编辑来源、可操作预览、设计 PDF 和真实素材包",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A03"
+      ]
+    },
+    {
+      "id": "C04",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6.2、8.8、11.6、15 节",
+      "outcome": "明确组件边界、唯一配置来源、调度与运行责任",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A04"
+      ]
+    },
+    {
+      "id": "C05",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 5、10、15 节",
+      "outcome": "形成数据、指标、农业关系、时间与资料生命周期设计",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A05"
+      ]
+    },
+    {
+      "id": "C06",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 4.6、10、11.4—11.5、15 节",
+      "outcome": "形成接口、授权、状态、幂等、并发与错误规范",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A06"
+      ]
+    },
+    {
+      "id": "C07",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6、12、13、15 节；docs/项目决策记录.md D11",
+      "outcome": "形成一个老板 Agent 的 SOP、知识、个人记忆、工具与模型采用设计",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A07"
+      ]
+    },
+    {
+      "id": "C08",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 11、15 节",
+      "outcome": "形成页面、组件、事件与实际服务连接设计",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A08"
+      ]
+    },
+    {
+      "id": "C09",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 10.4—10.5、14 节",
+      "outcome": "形成一致的设计、测试、安全与业务验收计划",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A09"
+      ]
+    },
+    {
+      "id": "C10",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 15 节；用户本次计划请求",
+      "outcome": "维护完整开发工单、依赖、记录和验收责任",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A10"
+      ]
+    },
+    {
+      "id": "C11",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6.2、11.4、14 节",
+      "outcome": "工程可以启动，身份、配置、存储和运行记录可验证",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A11"
+      ]
+    },
+    {
+      "id": "C12",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 9—10、11.3 节；docs/项目决策记录.md D02、D11",
+      "outcome": "服务老板任务的 14 类模拟接口、联系人反馈、专业资料、数据、时钟、事件与重置实际运行",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A12"
+      ]
+    },
+    {
+      "id": "C13",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 5、13.2、14.3 节",
+      "outcome": "经营指标和农业测算有可复算明细、适用口径与时间范围",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A13"
+      ]
+    },
+    {
+      "id": "C14",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 4、10.1、11.4—11.5、13.5 节；docs/项目决策记录.md D11",
+      "outcome": "老板会议、交办、消息、审批决定、日历、出行与模拟反馈关联可执行并重新查询",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A14"
+      ]
+    },
+    {
+      "id": "C15",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6.2、11.2、12.4、13.5 节",
+      "outcome": "资料可检索引用，历史决定及当前个人记忆在新会话中采用",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A15"
+      ]
+    },
+    {
+      "id": "C16",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6、12 节",
+      "outcome": "实际模型通过 Runtime 执行全部秘书工具过程并记录配置、动作、用量与错误",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A16"
+      ]
+    },
+    {
+      "id": "C17",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 5.3—5.5、6.2、11.2 节",
+      "outcome": "时间、事件和数据变化触发主动工作，提醒控制、暂停及取消有效",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A17"
+      ]
+    },
+    {
+      "id": "C18",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 11.1、13.5 节；docs/项目决策记录.md D17",
+      "outcome": "桌面应用六类老板入口连接同一实际业务状态，支持连续追问、动作、窗口缩放与键盘操作",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A18"
+      ]
+    },
+    {
+      "id": "C19",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 10.7、11.2—11.6 节；docs/项目决策记录.md D11/D17",
+      "outcome": "桌面应用内 16 类技术管理能力服务老板 Agent，模拟配置和运行检查可操作，维护身份不能替代老板决定",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A19"
+      ]
+    },
+    {
+      "id": "C20",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 4.2、12.4 节",
+      "outcome": "真实语音转写经过文本核查后进入共同交办流程",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A20"
+      ]
+    },
+    {
+      "id": "C21",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 13.7 原料、水产季节、苗种专题及 14.3 节",
+      "outcome": "原料与饲料、水产季节、苗种批次分别具备完整秘书任务与变体验证",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A21a",
+        "A21b",
+        "A21c"
+      ]
+    },
+    {
+      "id": "C22",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 13.7 动保、生猪、禽类与反刍专题及 14.3 节",
+      "outcome": "动保技服、生猪合作、禽类与反刍分别具备完整秘书任务与变体验证",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A22a",
+        "A22b",
+        "A22c"
+      ]
+    },
+    {
+      "id": "C23",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 13.7 公司养殖、食品、海外、研发专题及 14.3 节",
+      "outcome": "公司养殖、食品品质、海外、研发分别具备完整秘书任务与变体验证",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A23a",
+        "A23b",
+        "A23c",
+        "A23d"
+      ]
+    },
+    {
+      "id": "C24",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 6.3—6.5、10.5、13—14 节",
+      "outcome": "全部 R01—R32、连续演示、专题、后台、安全、异常与模型比较具有有效证据",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A24"
+      ]
+    },
+    {
+      "id": "C25",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 1、2、14—15 节；docs/项目决策记录.md D17",
+      "outcome": "目标电脑桌面安装包可安装、启动、退出与恢复，文档、复用说明、贡献及实际记录可交接",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A25"
+      ]
+    },
+    {
+      "id": "C26",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 14—16 节；用户本次计划请求",
+      "outcome": "完整老板范围和实际证据经过最终审查，未完成工作持续保留",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": [
+        "A26"
+      ]
+    },
+    {
+      "id": "X01",
+      "source_ref": "用户本次范围决定；docs/项目决策记录.md D11",
+      "outcome": "其他职能部门 Agent、部门专属 SOP、部门个人记忆及独立智能体编排",
+      "disposition": "EXCLUDED",
+      "acceptance_ids": [],
+      "decision_ref": "docs/项目决策记录.md D11"
+    },
+    {
+      "id": "X02",
+      "source_ref": "用户本次范围决定；docs/项目决策记录.md D11",
+      "outcome": "部门工作台、部门业务账号及员工在本产品内办理部门任务",
+      "disposition": "EXCLUDED",
+      "acceptance_ids": [],
+      "decision_ref": "docs/项目决策记录.md D11"
+    },
+    {
+      "id": "X03",
+      "source_ref": "docs/Boss-Agent需求输入.md 第 1.1、10.7 节；docs/项目决策记录.md D11",
+      "outcome": "采购成交、配方发布、用药、设备控制、质量放行、生产排程与资金交易的专业业务执行系统",
+      "disposition": "EXCLUDED",
+      "acceptance_ids": [],
+      "decision_ref": "docs/项目决策记录.md D11"
+    }
   ],
   "acceptances": [
-    {"id":"A00","commitment_id":"C00","scenario":"核对 PRD-0、价值验证定义、当前范围、全部需求的价值关联及下游交接","expected_result":"R01—R32 均关联目标或必要支撑理由；价值假设有指标、基准方法、样本条件、阈值来源和验证任务；资源未知与实际收益证据状态明确；S002/S004/S009 可以使用","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K00","kind":"STATIC"}],"status":"PASS","evidence_ids":["E00-STRATEGY"],"consumer":{"required":false,"description":"本项检查产品目标与验证设计；实际效果及采用由 T24、T26 核对，不能以设计通过代替"}},
-    {"id":"A01","commitment_id":"C01","scenario":"核对老板专属范围及全部 R01—R32","expected_result":"PRD 包含完整老板任务、授权、维护边界、资料来源、异常和验收；部门人员只作为资料与消息对象；未知决定明确","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K01","kind":"STATIC"}],"status":"PASS","evidence_ids":["E01-PRD"],"consumer":{"required":false,"description":"本项检查产品设计，运行采用由实现与综合验收检查"}},
-    {"id":"A02","commitment_id":"C02","scenario":"按用户 D18 确认的选型可行性阶段，固定 nanobot 0.3.5 和 Electron 45.0.0，实际验证 DeepSeek、Runtime 及原生两端可以承载共同任务和后续业务改造","expected_result":"DeepSeek 同快照两次独立执行有真实 API、工具和保存重读；原生用户 DOM 与管理保存重载及下一任务采用有证据；配置、记忆、调度、角色拒绝及桌面单实例和重启能够运行；固定源码、六类组件、矩阵和命令可交接。未验证系统权限/恢复、完整异常与条款审查保持真实状态并交给后续开发和产品验收","outcome_type":"EXTERNAL","capability":"REAL","required_checks":[{"id":"K02-models","kind":"EXTERNAL"},{"id":"K02-runtime","kind":"INTEGRATION"},{"id":"K02-ui-reuse","kind":"INTEGRATION"},{"id":"K02-desktop","kind":"INTEGRATION"}],"status":"PASS","evidence_ids":["E02-MODELS","E02-RUNTIME","E02-FAULTS","E02-UI","E02-DESKTOP"],"consumer":{"required":true,"description":"实际两端和下一模型任务使用已保存配置与正式状态，桌面重启保留任务且没有重复发送；D18 规定本轮为选型可行性，selection-probe 1.3.0 的完整单项状态和后续责任分别保留","check_id":"K02-runtime"}},
-    {"id":"A03","commitment_id":"C03","scenario":"逐项检查老板和后台操作流程、完整高保真页面及适用状态、可编辑来源、预览与素材包","expected_result":"全部入口、动作、来源及页面状态有文字规范；48 个来源区域及适用状态有高保真设计位置，T02 上游页面组件与正式 API 引用完整；可编辑来源、可操作预览、设计 PDF、真实素材和完整压缩包均已交付；来源许可、尺寸、页面引用、视觉检查和压缩包完整性均有实际证据","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K03","kind":"STATIC"},{"id":"K03-hifi","kind":"VISUAL"},{"id":"K03-assets","kind":"STRUCTURE"}],"status":"BLOCKED","evidence_ids":[],"consumer":{"required":false,"description":"T02 已提供固定版本页面/API 矩阵，T03 尚需完成实际绑定并生成当前版本文字检查；高保真、素材和视觉验收继续保留，正式功能由 A18、A19、A20 检查"}},
-    {"id":"A04","commitment_id":"C04","scenario":"检查组件职责和选型依据","expected_result":"运行、身份、数据、知识、记忆、配置与调度的维护来源唯一且完整","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K04","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查 HLD 及版本依据"}},
-    {"id":"A05","commitment_id":"C05","scenario":"按农业和秘书任务核查实体关系与生命周期","expected_result":"归属、单位、时间、覆盖、估计、批次、指标、知识、记忆和重置规则完整","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K05","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查数据设计，数据运行由 A12、A13 及专题检查"}},
-    {"id":"A06","commitment_id":"C06","scenario":"检查所有接口与业务状态变化","expected_result":"API、对象范围、授权、幂等、版本、确认、取消与已执行状态明确","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K06","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查接口规范，执行状态由 A14、A16 检查"}},
-    {"id":"A07","commitment_id":"C07","scenario":"检查单一老板 Agent 的模型、SOP、工具及资料采用过程","expected_result":"全部方法服务老板；程序负责计算授权与状态，专业结论由来源资料提供，模型采用有效资料，评测答案隔离，语音与检索明确","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K07","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查 Agent 设计，运行采用由 A15—A17、A20 检查"}},
-    {"id":"A08","commitment_id":"C08","scenario":"检查页面、组件、身份、事件及接口映射","expected_result":"全部业务动作和页面状态有服务连接，重载和中断依据正式状态处理","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K08","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查前端设计，运行由 A18、A19 检查"}},
-    {"id":"A09","commitment_id":"C09","scenario":"跨文档评审并核对测试与安全检查范围","expected_result":"设计一致，正常、拒绝、并发、注入、来源、隐私及异常均有实际断言计划，阻塞设计问题处理完成","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K09","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查设计和测试计划，安全执行由 A24 检查"}},
-    {"id":"A10","commitment_id":"C10","scenario":"检查每项承诺、任务依赖、文件、命令和记录要求","expected_result":"完整执行计划可供 S008 使用，全部承诺具有实现及验收，未完成集合完整","outcome_type":"DESIGN","capability":"DESIGN","required_checks":[{"id":"K10","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项检查执行计划与记录规范"}},
-    {"id":"A11","commitment_id":"C11","scenario":"启动服务、保存重读，分别检查老板、技术维护及未认证请求，并使用联系人 ID 请求认证","expected_result":"持久化和配置有效；老板与维护权限分别生效；未认证及联系人伪造身份被拒绝；无凭据明确失败，日志不含密钥","outcome_type":"QUALITY","capability":"REAL","required_checks":[{"id":"K11","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"实际服务读取已保存配置并使用当前身份","check_id":"K11"}},
-    {"id":"A12","commitment_id":"C12","scenario":"生成统一数据集，调用 14 类接口，推进时钟、注入事件并重置","expected_result":"关系、数量、来源、版本一致；相同参数可复现；会话、记忆、任务、调度与发件箱正确隔离，历史归属保留","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K12","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"工具和接口实际读取当前数据集及更新结果","check_id":"K12"}},
-    {"id":"A13","commitment_id":"C13","scenario":"查询明细并独立复算第 13.2 节，变更期间、范围、币种和质量状态","expected_result":"销量收入增长 20%、毛利减少 4%、毛利率减少 2 个百分点、单吨毛利减少 20%；变体遵守各自口径，缺少值保持未知","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K13","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"BI 查询和影响测算采用有效明细与公式版本","check_id":"K13"}},
-    {"id":"A14","commitment_id":"C14","scenario":"老板通过实际 API 处理会议、日历、消息、交办、本人审批决定及取消，模拟接口提供反馈与延期申请","expected_result":"老板确认和正式状态可重读；模拟回复与本人确认完成分别记录；维护身份不能替代老板决定；版本、幂等和并发正确","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K14-business","kind":"BUSINESS"},{"id":"K14-security","kind":"SECURITY"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"老板后续查询、会议、反馈整理和确认采用当前状态","check_id":"K14-business"}},
-    {"id":"A15","commitment_id":"C15","scenario":"实际摄取资料、查询出处、变更版本，修改删除记忆后新建会话并重启","expected_result":"原文与来源可查；权限有效；新会话采用当前要求，已撤销资料与删除记忆不再被检索采用","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K15","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"Agent 的新会话与资料问答采用有效知识和个人记忆","check_id":"K15"}},
-    {"id":"A16","commitment_id":"C16","scenario":"DeepSeek 分别执行两次独立秘书交办、纪要、连续查询与工具动作，检查取消及模型失败","expected_result":"实际工具过程与正式状态一致；配置和用量可查；工具成功后模型失败保留已执行结果；没有自动模型替换","outcome_type":"EXTERNAL","capability":"REAL","required_checks":[{"id":"K16-models","kind":"EXTERNAL"},{"id":"K16-business","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"后续模型步骤和业务查询采用工具的真实结果","check_id":"K16-business"}},
-    {"id":"A17","commitment_id":"C17","scenario":"时间、数据与事件触发晨报及提醒，重复触发、恢复、暂停、取消并重启","expected_result":"规则、冷却、免打扰、升级、暂缓和关闭有效；无重复业务动作；期限与原始事实保持独立","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K17","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"通知中心和老板工作使用实际调度结果与规则版本","check_id":"K17"}},
-    {"id":"A18","commitment_id":"C18","scenario":"老板从六类入口完成晨间、聊天、经营、会议、任务和设置并刷新","expected_result":"页面状态明确，追问和本人授权动作真实执行，引用可打开，老板对象范围有效，刷新后状态一致","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K18","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"老板页面显示并使用服务端正式结果","check_id":"K18"}},
-    {"id":"A19","commitment_id":"C19","scenario":"技术维护者操作 16 类老板 Agent 管理能力，注入模拟反馈，保存重载后启动实际任务，并尝试老板业务决定","expected_result":"全部配置有实际采用或查询证据；模拟材料来源明确；维护身份代替老板决定、改写个人记忆或读取私人正文被拒绝","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K19","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"下一次老板任务采用后台启用的配置、资料、规则和数据关系","check_id":"K19"}},
-    {"id":"A20","commitment_id":"C20","scenario":"真实录音经实际服务转写，核查文本后提交秘书任务并检查服务失败","expected_result":"转写、文本调整与业务结果可查；语音状态和费用独立记录；失败不伪装成功","outcome_type":"EXTERNAL","capability":"REAL","required_checks":[{"id":"K20-service","kind":"EXTERNAL"},{"id":"K20-business","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"秘书任务处理经用户核查的实际转写文本","check_id":"K20-business"}},
-    {"id":"A21a","commitment_id":"C21","scenario":"原料报价变化关联合同、库存、配方、生产与成本，并执行条件缺少或状态变化","expected_result":"影响可复算，条件明确，专业状态与协调交办可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K21a","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"会议及后续交办采用当前影响依据","check_id":"K21a"}},
-    {"id":"A21b","commitment_id":"C21","scenario":"水产订单减少关联同品种季节、天气、渠道和周期，改变观察覆盖或事件","expected_result":"可比范围与覆盖准确，原因有证据，统筹人员与复查安排可查询","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K21b","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"区域协调与复查使用有效资料及已保存任务","check_id":"K21b"}},
-    {"id":"A21c","commitment_id":"C21","scenario":"苗种反馈追溯交付、运输、接收与回访，加入相近名称或缺少关系","expected_result":"只使用已知批次关系，显示覆盖与条件，专业核查和处理进展可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K21c","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"联合核查任务采用可追溯批次依据","check_id":"K21c"}},
-    {"id":"A22a","commitment_id":"C22","scenario":"动保技服观察、采样、专业意见、执行和复查，提供缺少确认的变体","expected_result":"专业责任与状态分别保存，缺少材料明确，协调任务及复查时间可查，不自动发布用药指令","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K22a","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"资源协调采用专业意见及当前复查状态","check_id":"K22a"}},
-    {"id":"A22b","commitment_id":"C22","scenario":"生猪合作批次核对投入、转群、出栏、费用和结算，改变结算或数量资料","expected_result":"数量平衡、费用归属、预计与结算结果可复算，负责人解释和后续任务可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K22b","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"经营复查采用同批次及当前结算资料","check_id":"K22b"}},
-    {"id":"A22c","commitment_id":"C22","scenario":"分别查询肉禽、蛋禽、奶畜和肉用牛羊的供料与产出，改变阶段或资料覆盖","expected_result":"动物、用途、阶段、单位与统计范围适用，反刍可独立查询，资源协调结果可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K22c","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"产品服务及区域协调采用对应阶段指标","check_id":"K22c"}},
-    {"id":"A23a","commitment_id":"C23","scenario":"公司水产养殖设备或环境事件关联单元、批次和当前措施，改变观察时间或状态","expected_result":"归属与时间明确，观察、估计和确认结果有区分，获准交办及专业复查可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K23a","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"跨单位协调采用有效观察和专业反馈","check_id":"K23a"}},
-    {"id":"A23b","commitment_id":"C23","scenario":"食品客诉追溯原料、加工、检验、库存和客户，提供关联缺口或处置变化","expected_result":"关联清单与缺少范围准确，专业结论及任务状态分别可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K23b","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"事件协调使用已确认追溯关系和当前处置资料","check_id":"K23b"}},
-    {"id":"A23c","commitment_id":"C23","scenario":"海外增长核查订单、产能、交付和资金，改变币种、汇率日期或时区","expected_result":"国别、法人、供需及金额可比较，跨时区会议、选项和决定期限可查","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K23c","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"资源申请和会议采用可比数据及正确时区","check_id":"K23c"}},
-    {"id":"A23d","commitment_id":"C23","scenario":"研发应用整理试验条件、对照、评审与客户反馈，改变条件或提供未验证场景","expected_result":"效果说明保留适用范围与限制，专业评审、后续验证要求及老板决定可查询","outcome_type":"BUSINESS","capability":"SIMULATION","required_checks":[{"id":"K23d","kind":"BUSINESS"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"项目复查采用专业评审和有效试验范围","check_id":"K23d"}},
-    {"id":"A24","commitment_id":"C24","scenario":"执行 R01—R32 的老板任务、农业专题、技术后台、未知问法、安全及 DeepSeek 独立重复检查，核查 Agent、身份、路由范围及 PRD-0 指标，并接收 D18 的完整产品验证待办","expected_result":"一个老板 Agent 与两类入口完整运行，联系人不能获得产品权限；全部用例逐项有结果，重置可重复，费用及人工基准真实；目标和假设逐项关联实际测量及结论，真实使用价值缺少证据时明确待验证","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K24-business","kind":"BUSINESS"},{"id":"K24-security","kind":"SECURITY"},{"id":"K24-models","kind":"EXTERNAL"},{"id":"K24-eval","kind":"EVAL"},{"id":"K24-scope","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"老板入口及后续任务使用实际结果，技术后台只执行获准维护操作，模拟属性持续保留；完整异常、资料记忆、重置及系统权限/恢复条件引用选型验证逐项状态","check_id":"K24-business"}},
-    {"id":"A25","commitment_id":"C25","scenario":"在指定 OS、版本及架构的设备按交接文档安装桌面包、启动、关闭窗口、完整退出、重启、休眠恢复、重置并重新演示","expected_result":"安装包与校验和可查询，环境和演示可重复；完整退出停止本地调度，恢复后无重复动作，卸载不默认删除用户资料；依赖、数据、配置、API、用户操作、复用、贡献及开发记录可检索","outcome_type":"BUSINESS","capability":"REAL","required_checks":[{"id":"K25","kind":"INTEGRATION"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":true,"description":"交接执行者按实际文档和配置安装桌面应用并运行完整演示","check_id":"K25"}},
-    {"id":"A26","commitment_id":"C26","scenario":"核对原始需求、当前实现、全部验收、环境与证据版本及开发索引","expected_result":"所有必需项有当前有效证据，无遗漏待办，完成声明与实际范围一致；视觉未验证状态明确","outcome_type":"QUALITY","capability":"REAL","required_checks":[{"id":"K26","kind":"STATIC"}],"status":"NOT_RUN","evidence_ids":[],"consumer":{"required":false,"description":"本项审查交付范围和证据，业务采用由前置验收记录证明"}}
+    {
+      "id": "A00",
+      "commitment_id": "C00",
+      "scenario": "核对 PRD-0、价值验证定义、当前范围、全部需求的价值关联及下游交接",
+      "expected_result": "R01—R32 均关联目标或必要支撑理由；价值假设有指标、基准方法、样本条件、阈值来源和验证任务；资源未知与实际收益证据状态明确；S002/S004/S009 可以使用",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K00",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "PASS",
+      "evidence_ids": [
+        "E00-STRATEGY"
+      ],
+      "consumer": {
+        "required": false,
+        "description": "本项检查产品目标与验证设计；实际效果及采用由 T24、T26 核对，不能以设计通过代替"
+      }
+    },
+    {
+      "id": "A01",
+      "commitment_id": "C01",
+      "scenario": "核对老板专属范围及全部 R01—R32",
+      "expected_result": "PRD 包含完整老板任务、授权、维护边界、资料来源、异常和验收；部门人员只作为资料与消息对象；未知决定明确",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K01",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "PASS",
+      "evidence_ids": [
+        "E01-PRD"
+      ],
+      "consumer": {
+        "required": false,
+        "description": "本项检查产品设计，运行采用由实现与综合验收检查"
+      }
+    },
+    {
+      "id": "A02",
+      "commitment_id": "C02",
+      "scenario": "按用户 D18 确认的选型可行性阶段，固定 nanobot 0.3.5 和 Electron 45.0.0，实际验证 DeepSeek、Runtime 及原生两端可以承载共同任务和后续业务改造",
+      "expected_result": "DeepSeek 同快照两次独立执行有真实 API、工具和保存重读；原生用户 DOM 与管理保存重载及下一任务采用有证据；配置、记忆、调度、角色拒绝及桌面单实例和重启能够运行；固定源码、六类组件、矩阵和命令可交接。未验证系统权限/恢复、完整异常与条款审查保持真实状态并交给后续开发和产品验收",
+      "outcome_type": "EXTERNAL",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K02-models",
+          "kind": "EXTERNAL"
+        },
+        {
+          "id": "K02-runtime",
+          "kind": "INTEGRATION"
+        },
+        {
+          "id": "K02-ui-reuse",
+          "kind": "INTEGRATION"
+        },
+        {
+          "id": "K02-desktop",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "PASS",
+      "evidence_ids": [
+        "E02-MODELS",
+        "E02-RUNTIME",
+        "E02-FAULTS",
+        "E02-UI",
+        "E02-DESKTOP"
+      ],
+      "consumer": {
+        "required": true,
+        "description": "实际两端和下一模型任务使用已保存配置与正式状态，桌面重启保留任务且没有重复发送；D18 规定本轮为选型可行性，selection-probe 1.3.0 的完整单项状态和后续责任分别保留",
+        "check_id": "K02-runtime"
+      }
+    },
+    {
+      "id": "A03",
+      "commitment_id": "C03",
+      "scenario": "逐项检查老板和后台操作流程、完整高保真页面及适用状态、可编辑来源、预览与素材包",
+      "expected_result": "全部入口、动作、来源及页面状态有文字规范；48 个来源区域及适用状态有高保真设计位置，T02 上游页面组件与正式 API 引用完整；可编辑来源、可操作预览、设计 PDF、真实素材和完整压缩包均已交付；来源许可、尺寸、页面引用、视觉检查和压缩包完整性均有实际证据",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K03",
+          "kind": "STATIC"
+        },
+        {
+          "id": "K03-hifi",
+          "kind": "VISUAL"
+        },
+        {
+          "id": "K03-assets",
+          "kind": "STRUCTURE"
+        }
+      ],
+      "status": "BLOCKED",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "T02 已提供固定版本页面/API 矩阵，T03 尚需完成实际绑定并生成当前版本文字检查；高保真、素材和视觉验收继续保留，正式功能由 A18、A19、A20 检查"
+      }
+    },
+    {
+      "id": "A04",
+      "commitment_id": "C04",
+      "scenario": "检查组件职责和选型依据",
+      "expected_result": "运行、身份、数据、知识、记忆、配置与调度的维护来源唯一且完整",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K04",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "PASS",
+      "evidence_ids": [
+        "E04-HLD"
+      ],
+      "consumer": {
+        "required": false,
+        "description": "本项检查 HLD 及版本依据"
+      }
+    },
+    {
+      "id": "A05",
+      "commitment_id": "C05",
+      "scenario": "按农业和秘书任务核查实体关系与生命周期",
+      "expected_result": "归属、单位、时间、覆盖、估计、批次、指标、知识、记忆和重置规则完整",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K05",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查数据设计，数据运行由 A12、A13 及专题检查"
+      }
+    },
+    {
+      "id": "A06",
+      "commitment_id": "C06",
+      "scenario": "检查所有接口与业务状态变化",
+      "expected_result": "API、对象范围、授权、幂等、版本、确认、取消与已执行状态明确",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K06",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查接口规范，执行状态由 A14、A16 检查"
+      }
+    },
+    {
+      "id": "A07",
+      "commitment_id": "C07",
+      "scenario": "检查单一老板 Agent 的模型、SOP、工具及资料采用过程",
+      "expected_result": "全部方法服务老板；程序负责计算授权与状态，专业结论由来源资料提供，模型采用有效资料，评测答案隔离，语音与检索明确",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K07",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查 Agent 设计，运行采用由 A15—A17、A20 检查"
+      }
+    },
+    {
+      "id": "A08",
+      "commitment_id": "C08",
+      "scenario": "检查页面、组件、身份、事件及接口映射",
+      "expected_result": "全部业务动作和页面状态有服务连接，重载和中断依据正式状态处理",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K08",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查前端设计，运行由 A18、A19 检查"
+      }
+    },
+    {
+      "id": "A09",
+      "commitment_id": "C09",
+      "scenario": "跨文档评审并核对测试与安全检查范围",
+      "expected_result": "设计一致，正常、拒绝、并发、注入、来源、隐私及异常均有实际断言计划，阻塞设计问题处理完成",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K09",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查设计和测试计划，安全执行由 A24 检查"
+      }
+    },
+    {
+      "id": "A10",
+      "commitment_id": "C10",
+      "scenario": "检查每项承诺、任务依赖、文件、命令和记录要求",
+      "expected_result": "完整执行计划可供 S008 使用，全部承诺具有实现及验收，未完成集合完整",
+      "outcome_type": "DESIGN",
+      "capability": "DESIGN",
+      "required_checks": [
+        {
+          "id": "K10",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项检查执行计划与记录规范"
+      }
+    },
+    {
+      "id": "A11",
+      "commitment_id": "C11",
+      "scenario": "启动服务、保存重读，分别检查老板、技术维护及未认证请求，并使用联系人 ID 请求认证",
+      "expected_result": "持久化和配置有效；老板与维护权限分别生效；未认证及联系人伪造身份被拒绝；无凭据明确失败，日志不含密钥",
+      "outcome_type": "QUALITY",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K11",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "实际服务读取已保存配置并使用当前身份",
+        "check_id": "K11"
+      }
+    },
+    {
+      "id": "A12",
+      "commitment_id": "C12",
+      "scenario": "生成统一数据集，调用 14 类接口，推进时钟、注入事件并重置",
+      "expected_result": "关系、数量、来源、版本一致；相同参数可复现；会话、记忆、任务、调度与发件箱正确隔离，历史归属保留",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K12",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "工具和接口实际读取当前数据集及更新结果",
+        "check_id": "K12"
+      }
+    },
+    {
+      "id": "A13",
+      "commitment_id": "C13",
+      "scenario": "查询明细并独立复算第 13.2 节，变更期间、范围、币种和质量状态",
+      "expected_result": "销量收入增长 20%、毛利减少 4%、毛利率减少 2 个百分点、单吨毛利减少 20%；变体遵守各自口径，缺少值保持未知",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K13",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "BI 查询和影响测算采用有效明细与公式版本",
+        "check_id": "K13"
+      }
+    },
+    {
+      "id": "A14",
+      "commitment_id": "C14",
+      "scenario": "老板通过实际 API 处理会议、日历、消息、交办、本人审批决定及取消，模拟接口提供反馈与延期申请",
+      "expected_result": "老板确认和正式状态可重读；模拟回复与本人确认完成分别记录；维护身份不能替代老板决定；版本、幂等和并发正确",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K14-business",
+          "kind": "BUSINESS"
+        },
+        {
+          "id": "K14-security",
+          "kind": "SECURITY"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "老板后续查询、会议、反馈整理和确认采用当前状态",
+        "check_id": "K14-business"
+      }
+    },
+    {
+      "id": "A15",
+      "commitment_id": "C15",
+      "scenario": "实际摄取资料、查询出处、变更版本，修改删除记忆后新建会话并重启",
+      "expected_result": "原文与来源可查；权限有效；新会话采用当前要求，已撤销资料与删除记忆不再被检索采用",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K15",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "Agent 的新会话与资料问答采用有效知识和个人记忆",
+        "check_id": "K15"
+      }
+    },
+    {
+      "id": "A16",
+      "commitment_id": "C16",
+      "scenario": "DeepSeek 分别执行两次独立秘书交办、纪要、连续查询与工具动作，检查取消及模型失败",
+      "expected_result": "实际工具过程与正式状态一致；配置和用量可查；工具成功后模型失败保留已执行结果；没有自动模型替换",
+      "outcome_type": "EXTERNAL",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K16-models",
+          "kind": "EXTERNAL"
+        },
+        {
+          "id": "K16-business",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "后续模型步骤和业务查询采用工具的真实结果",
+        "check_id": "K16-business"
+      }
+    },
+    {
+      "id": "A17",
+      "commitment_id": "C17",
+      "scenario": "时间、数据与事件触发晨报及提醒，重复触发、恢复、暂停、取消并重启",
+      "expected_result": "规则、冷却、免打扰、升级、暂缓和关闭有效；无重复业务动作；期限与原始事实保持独立",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K17",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "通知中心和老板工作使用实际调度结果与规则版本",
+        "check_id": "K17"
+      }
+    },
+    {
+      "id": "A18",
+      "commitment_id": "C18",
+      "scenario": "老板从六类入口完成晨间、聊天、经营、会议、任务和设置并刷新",
+      "expected_result": "页面状态明确，追问和本人授权动作真实执行，引用可打开，老板对象范围有效，刷新后状态一致",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K18",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "老板页面显示并使用服务端正式结果",
+        "check_id": "K18"
+      }
+    },
+    {
+      "id": "A19",
+      "commitment_id": "C19",
+      "scenario": "技术维护者操作 16 类老板 Agent 管理能力，注入模拟反馈，保存重载后启动实际任务，并尝试老板业务决定",
+      "expected_result": "全部配置有实际采用或查询证据；模拟材料来源明确；维护身份代替老板决定、改写个人记忆或读取私人正文被拒绝",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K19",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "下一次老板任务采用后台启用的配置、资料、规则和数据关系",
+        "check_id": "K19"
+      }
+    },
+    {
+      "id": "A20",
+      "commitment_id": "C20",
+      "scenario": "真实录音经实际服务转写，核查文本后提交秘书任务并检查服务失败",
+      "expected_result": "转写、文本调整与业务结果可查；语音状态和费用独立记录；失败不伪装成功",
+      "outcome_type": "EXTERNAL",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K20-service",
+          "kind": "EXTERNAL"
+        },
+        {
+          "id": "K20-business",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "秘书任务处理经用户核查的实际转写文本",
+        "check_id": "K20-business"
+      }
+    },
+    {
+      "id": "A21a",
+      "commitment_id": "C21",
+      "scenario": "原料报价变化关联合同、库存、配方、生产与成本，并执行条件缺少或状态变化",
+      "expected_result": "影响可复算，条件明确，专业状态与协调交办可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K21a",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "会议及后续交办采用当前影响依据",
+        "check_id": "K21a"
+      }
+    },
+    {
+      "id": "A21b",
+      "commitment_id": "C21",
+      "scenario": "水产订单减少关联同品种季节、天气、渠道和周期，改变观察覆盖或事件",
+      "expected_result": "可比范围与覆盖准确，原因有证据，统筹人员与复查安排可查询",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K21b",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "区域协调与复查使用有效资料及已保存任务",
+        "check_id": "K21b"
+      }
+    },
+    {
+      "id": "A21c",
+      "commitment_id": "C21",
+      "scenario": "苗种反馈追溯交付、运输、接收与回访，加入相近名称或缺少关系",
+      "expected_result": "只使用已知批次关系，显示覆盖与条件，专业核查和处理进展可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K21c",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "联合核查任务采用可追溯批次依据",
+        "check_id": "K21c"
+      }
+    },
+    {
+      "id": "A22a",
+      "commitment_id": "C22",
+      "scenario": "动保技服观察、采样、专业意见、执行和复查，提供缺少确认的变体",
+      "expected_result": "专业责任与状态分别保存，缺少材料明确，协调任务及复查时间可查，不自动发布用药指令",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K22a",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "资源协调采用专业意见及当前复查状态",
+        "check_id": "K22a"
+      }
+    },
+    {
+      "id": "A22b",
+      "commitment_id": "C22",
+      "scenario": "生猪合作批次核对投入、转群、出栏、费用和结算，改变结算或数量资料",
+      "expected_result": "数量平衡、费用归属、预计与结算结果可复算，负责人解释和后续任务可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K22b",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "经营复查采用同批次及当前结算资料",
+        "check_id": "K22b"
+      }
+    },
+    {
+      "id": "A22c",
+      "commitment_id": "C22",
+      "scenario": "分别查询肉禽、蛋禽、奶畜和肉用牛羊的供料与产出，改变阶段或资料覆盖",
+      "expected_result": "动物、用途、阶段、单位与统计范围适用，反刍可独立查询，资源协调结果可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K22c",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "产品服务及区域协调采用对应阶段指标",
+        "check_id": "K22c"
+      }
+    },
+    {
+      "id": "A23a",
+      "commitment_id": "C23",
+      "scenario": "公司水产养殖设备或环境事件关联单元、批次和当前措施，改变观察时间或状态",
+      "expected_result": "归属与时间明确，观察、估计和确认结果有区分，获准交办及专业复查可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K23a",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "跨单位协调采用有效观察和专业反馈",
+        "check_id": "K23a"
+      }
+    },
+    {
+      "id": "A23b",
+      "commitment_id": "C23",
+      "scenario": "食品客诉追溯原料、加工、检验、库存和客户，提供关联缺口或处置变化",
+      "expected_result": "关联清单与缺少范围准确，专业结论及任务状态分别可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K23b",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "事件协调使用已确认追溯关系和当前处置资料",
+        "check_id": "K23b"
+      }
+    },
+    {
+      "id": "A23c",
+      "commitment_id": "C23",
+      "scenario": "海外增长核查订单、产能、交付和资金，改变币种、汇率日期或时区",
+      "expected_result": "国别、法人、供需及金额可比较，跨时区会议、选项和决定期限可查",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K23c",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "资源申请和会议采用可比数据及正确时区",
+        "check_id": "K23c"
+      }
+    },
+    {
+      "id": "A23d",
+      "commitment_id": "C23",
+      "scenario": "研发应用整理试验条件、对照、评审与客户反馈，改变条件或提供未验证场景",
+      "expected_result": "效果说明保留适用范围与限制，专业评审、后续验证要求及老板决定可查询",
+      "outcome_type": "BUSINESS",
+      "capability": "SIMULATION",
+      "required_checks": [
+        {
+          "id": "K23d",
+          "kind": "BUSINESS"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "项目复查采用专业评审和有效试验范围",
+        "check_id": "K23d"
+      }
+    },
+    {
+      "id": "A24",
+      "commitment_id": "C24",
+      "scenario": "执行 R01—R32 的老板任务、农业专题、技术后台、未知问法、安全及 DeepSeek 独立重复检查，核查 Agent、身份、路由范围及 PRD-0 指标，并接收 D18 的完整产品验证待办",
+      "expected_result": "一个老板 Agent 与两类入口完整运行，联系人不能获得产品权限；全部用例逐项有结果，重置可重复，费用及人工基准真实；目标和假设逐项关联实际测量及结论，真实使用价值缺少证据时明确待验证",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K24-business",
+          "kind": "BUSINESS"
+        },
+        {
+          "id": "K24-security",
+          "kind": "SECURITY"
+        },
+        {
+          "id": "K24-models",
+          "kind": "EXTERNAL"
+        },
+        {
+          "id": "K24-eval",
+          "kind": "EVAL"
+        },
+        {
+          "id": "K24-scope",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "老板入口及后续任务使用实际结果，技术后台只执行获准维护操作，模拟属性持续保留；完整异常、资料记忆、重置及系统权限/恢复条件引用选型验证逐项状态",
+        "check_id": "K24-business"
+      }
+    },
+    {
+      "id": "A25",
+      "commitment_id": "C25",
+      "scenario": "在指定 OS、版本及架构的设备按交接文档安装桌面包、启动、关闭窗口、完整退出、重启、休眠恢复、重置并重新演示",
+      "expected_result": "安装包与校验和可查询，环境和演示可重复；完整退出停止本地调度，恢复后无重复动作，卸载不默认删除用户资料；依赖、数据、配置、API、用户操作、复用、贡献及开发记录可检索",
+      "outcome_type": "BUSINESS",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K25",
+          "kind": "INTEGRATION"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": true,
+        "description": "交接执行者按实际文档和配置安装桌面应用并运行完整演示",
+        "check_id": "K25"
+      }
+    },
+    {
+      "id": "A26",
+      "commitment_id": "C26",
+      "scenario": "核对原始需求、当前实现、全部验收、环境与证据版本及开发索引",
+      "expected_result": "所有必需项有当前有效证据，无遗漏待办，完成声明与实际范围一致；视觉未验证状态明确",
+      "outcome_type": "QUALITY",
+      "capability": "REAL",
+      "required_checks": [
+        {
+          "id": "K26",
+          "kind": "STATIC"
+        }
+      ],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {
+        "required": false,
+        "description": "本项审查交付范围和证据，业务采用由前置验收记录证明"
+      }
+    }
   ],
   "tasks": [
-    {"id":"T00","acceptance_ids":["A00"],"depends_on":[],"state":"ACCEPTED","allowed_paths":["specs/value-validation.json","docs/项目决策记录.md","docs/Boss-Agent项目计划.md","docs/计划环境记录.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T01","acceptance_ids":["A01"],"depends_on":["T00"],"state":"ACCEPTED","allowed_paths":["docs/PRD.md","specs/selection-probe.json","docs/项目决策记录.md","docs/Boss-Agent项目计划.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T02","acceptance_ids":["A02"],"depends_on":["T01"],"state":"ACCEPTED","allowed_paths":["validation/","docs/选型验证.md","docs/选型环境.md","docs/项目决策记录.md","docs/development/","docs/README.md","evidence/","delivery-ledger.json","docs/PRD.md","docs/Boss-Agent需求输入.md","docs/Boss-Agent项目计划.md","specs/selection-probe.json","specs/value-validation.json"],"blockers":[]},
-    {"id":"T03","acceptance_ids":["A03"],"depends_on":["T01"],"state":"IN_PROGRESS","allowed_paths":["docs/交互与页面规范.md","docs/Boss-Agent项目计划.md","docs/项目决策记录.md","docs/README.md","design/T03/","deliverables/T03/","evidence/","delivery-ledger.json"],"blockers":["T02 页面/API 矩阵已可读取；T03 尚需完成 23 项上游绑定并生成当前版本文字检查。最终高保真页面与适用状态稿、可编辑来源、可操作预览、设计 PDF 和真实素材包按交互与页面规范第 13 节继续制作与验收。"]},
-    {"id":"T04","acceptance_ids":["A04"],"depends_on":["T02"],"state":"TODO","allowed_paths":["docs/HLD.md","docs/项目决策记录.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T05","acceptance_ids":["A05"],"depends_on":["T04"],"state":"TODO","allowed_paths":["docs/LLD-data.md","specs/data-dictionary.json","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T06","acceptance_ids":["A06"],"depends_on":["T05"],"state":"TODO","allowed_paths":["docs/LLD-backend.md","specs/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T07","acceptance_ids":["A07"],"depends_on":["T06"],"state":"TODO","allowed_paths":["docs/LLD-agent.md","specs/agent-assets.json","docs/项目决策记录.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T08","acceptance_ids":["A08"],"depends_on":["T03","T07"],"state":"TODO","allowed_paths":["docs/LLD-frontend.md","specs/page-service-map.json","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T09","acceptance_ids":["A09"],"depends_on":["T08"],"state":"TODO","allowed_paths":["docs/设计评审.md","docs/测试与验收计划.md","docs/安全检查计划.md","specs/acceptance-cases.json","docs/PRD.md","docs/HLD.md","docs/LLD-data.md","docs/LLD-backend.md","docs/LLD-agent.md","docs/LLD-frontend.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T10","acceptance_ids":["A10"],"depends_on":["T09"],"state":"TODO","allowed_paths":["docs/Boss-Agent项目计划.md","specs/implementation-map.json","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T11","acceptance_ids":["A11"],"depends_on":["T10"],"state":"TODO","allowed_paths":["src/","tests/","config/","scripts/","docs/development/","docs/运行环境.md","docs/README.md","evidence/",".gitignore","delivery-ledger.json"],"blockers":[]},
-    {"id":"T12","acceptance_ids":["A12"],"depends_on":["T11"],"state":"TODO","allowed_paths":["src/","tests/","config/","data/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T13","acceptance_ids":["A13"],"depends_on":["T12"],"state":"TODO","allowed_paths":["src/","tests/","config/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T14","acceptance_ids":["A14"],"depends_on":["T12"],"state":"TODO","allowed_paths":["src/","tests/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T15","acceptance_ids":["A15"],"depends_on":["T16"],"state":"TODO","allowed_paths":["src/","tests/","config/","docs/development/","docs/knowledge/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T16","acceptance_ids":["A16"],"depends_on":["T13","T14"],"state":"TODO","allowed_paths":["src/","tests/","config/","skills/","prompts/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T17","acceptance_ids":["A17"],"depends_on":["T16"],"state":"TODO","allowed_paths":["src/","tests/","config/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T18","acceptance_ids":["A18"],"depends_on":["T15","T17"],"state":"TODO","allowed_paths":["src/","tests/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T19","acceptance_ids":["A19"],"depends_on":["T15","T17"],"state":"TODO","allowed_paths":["src/","tests/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T20","acceptance_ids":["A20"],"depends_on":["T18"],"state":"TODO","allowed_paths":["src/","tests/","config/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T21","acceptance_ids":["A21a","A21b","A21c"],"depends_on":["T18","T19"],"state":"TODO","allowed_paths":["src/","tests/","config/","skills/","data/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T22","acceptance_ids":["A22a","A22b","A22c"],"depends_on":["T18","T19"],"state":"TODO","allowed_paths":["src/","tests/","config/","skills/","data/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T23","acceptance_ids":["A23a","A23b","A23c","A23d"],"depends_on":["T18","T19"],"state":"TODO","allowed_paths":["src/","tests/","config/","skills/","data/","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T24","acceptance_ids":["A24"],"depends_on":["T20","T21","T22","T23"],"state":"TODO","allowed_paths":["src/","tests/","config/","skills/","prompts/","docs/验收报告.md","docs/development/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T25","acceptance_ids":["A25"],"depends_on":["T24"],"state":"TODO","allowed_paths":["scripts/","config/","docs/运行与交接.md","docs/面试演示.md","docs/运行环境.md","docs/development/","docs/knowledge/","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]},
-    {"id":"T26","acceptance_ids":["A26"],"depends_on":["T25"],"state":"TODO","allowed_paths":["docs/交付审查.md","docs/README.md","evidence/","delivery-ledger.json"],"blockers":[]}
+    {
+      "id": "T00",
+      "acceptance_ids": [
+        "A00"
+      ],
+      "depends_on": [],
+      "state": "ACCEPTED",
+      "allowed_paths": [
+        "specs/value-validation.json",
+        "docs/项目决策记录.md",
+        "docs/Boss-Agent项目计划.md",
+        "docs/计划环境记录.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T01",
+      "acceptance_ids": [
+        "A01"
+      ],
+      "depends_on": [
+        "T00"
+      ],
+      "state": "ACCEPTED",
+      "allowed_paths": [
+        "docs/PRD.md",
+        "specs/selection-probe.json",
+        "docs/项目决策记录.md",
+        "docs/Boss-Agent项目计划.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T02",
+      "acceptance_ids": [
+        "A02"
+      ],
+      "depends_on": [
+        "T01"
+      ],
+      "state": "ACCEPTED",
+      "allowed_paths": [
+        "validation/",
+        "docs/选型验证.md",
+        "docs/选型环境.md",
+        "docs/项目决策记录.md",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json",
+        "docs/PRD.md",
+        "docs/Boss-Agent需求输入.md",
+        "docs/Boss-Agent项目计划.md",
+        "specs/selection-probe.json",
+        "specs/value-validation.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T03",
+      "acceptance_ids": [
+        "A03"
+      ],
+      "depends_on": [
+        "T01"
+      ],
+      "state": "IN_PROGRESS",
+      "allowed_paths": [
+        "docs/交互与页面规范.md",
+        "docs/Boss-Agent项目计划.md",
+        "docs/项目决策记录.md",
+        "docs/README.md",
+        "design/T03/",
+        "deliverables/T03/",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": [
+        "T02 页面/API 矩阵已可读取；T03 尚需完成 23 项上游绑定并生成当前版本文字检查。最终高保真页面与适用状态稿、可编辑来源、可操作预览、设计 PDF 和真实素材包按交互与页面规范第 13 节继续制作与验收。"
+      ]
+    },
+    {
+      "id": "T04",
+      "acceptance_ids": [
+        "A04"
+      ],
+      "depends_on": [
+        "T02"
+      ],
+      "state": "ACCEPTED",
+      "allowed_paths": [
+        "docs/HLD.md",
+        "docs/项目决策记录.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json",
+        "docs/HLD-72页面实现映射.md",
+        "specs/hld-72-page-map.json",
+        "evidence/T04/architecture-static-review.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T05",
+      "acceptance_ids": [
+        "A05"
+      ],
+      "depends_on": [
+        "T04"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/LLD-data.md",
+        "specs/data-dictionary.json",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T06",
+      "acceptance_ids": [
+        "A06"
+      ],
+      "depends_on": [
+        "T05"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/LLD-backend.md",
+        "specs/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T07",
+      "acceptance_ids": [
+        "A07"
+      ],
+      "depends_on": [
+        "T06"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/LLD-agent.md",
+        "specs/agent-assets.json",
+        "docs/项目决策记录.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T08",
+      "acceptance_ids": [
+        "A08"
+      ],
+      "depends_on": [
+        "T03",
+        "T07"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/LLD-frontend.md",
+        "specs/page-service-map.json",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T09",
+      "acceptance_ids": [
+        "A09"
+      ],
+      "depends_on": [
+        "T08"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/设计评审.md",
+        "docs/测试与验收计划.md",
+        "docs/安全检查计划.md",
+        "specs/acceptance-cases.json",
+        "docs/PRD.md",
+        "docs/HLD.md",
+        "docs/LLD-data.md",
+        "docs/LLD-backend.md",
+        "docs/LLD-agent.md",
+        "docs/LLD-frontend.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T10",
+      "acceptance_ids": [
+        "A10"
+      ],
+      "depends_on": [
+        "T09"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/Boss-Agent项目计划.md",
+        "specs/implementation-map.json",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T11",
+      "acceptance_ids": [
+        "A11"
+      ],
+      "depends_on": [
+        "T10"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "scripts/",
+        "docs/development/",
+        "docs/运行环境.md",
+        "docs/README.md",
+        "evidence/",
+        ".gitignore",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T12",
+      "acceptance_ids": [
+        "A12"
+      ],
+      "depends_on": [
+        "T11"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "data/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T13",
+      "acceptance_ids": [
+        "A13"
+      ],
+      "depends_on": [
+        "T12"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T14",
+      "acceptance_ids": [
+        "A14"
+      ],
+      "depends_on": [
+        "T12"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T15",
+      "acceptance_ids": [
+        "A15"
+      ],
+      "depends_on": [
+        "T16"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "docs/development/",
+        "docs/knowledge/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T16",
+      "acceptance_ids": [
+        "A16"
+      ],
+      "depends_on": [
+        "T13",
+        "T14"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "skills/",
+        "prompts/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T17",
+      "acceptance_ids": [
+        "A17"
+      ],
+      "depends_on": [
+        "T16"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T18",
+      "acceptance_ids": [
+        "A18"
+      ],
+      "depends_on": [
+        "T15",
+        "T17"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T19",
+      "acceptance_ids": [
+        "A19"
+      ],
+      "depends_on": [
+        "T15",
+        "T17"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T20",
+      "acceptance_ids": [
+        "A20"
+      ],
+      "depends_on": [
+        "T18"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T21",
+      "acceptance_ids": [
+        "A21a",
+        "A21b",
+        "A21c"
+      ],
+      "depends_on": [
+        "T18",
+        "T19"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "skills/",
+        "data/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T22",
+      "acceptance_ids": [
+        "A22a",
+        "A22b",
+        "A22c"
+      ],
+      "depends_on": [
+        "T18",
+        "T19"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "skills/",
+        "data/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T23",
+      "acceptance_ids": [
+        "A23a",
+        "A23b",
+        "A23c",
+        "A23d"
+      ],
+      "depends_on": [
+        "T18",
+        "T19"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "skills/",
+        "data/",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T24",
+      "acceptance_ids": [
+        "A24"
+      ],
+      "depends_on": [
+        "T20",
+        "T21",
+        "T22",
+        "T23"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "src/",
+        "tests/",
+        "config/",
+        "skills/",
+        "prompts/",
+        "docs/验收报告.md",
+        "docs/development/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T25",
+      "acceptance_ids": [
+        "A25"
+      ],
+      "depends_on": [
+        "T24"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "scripts/",
+        "config/",
+        "docs/运行与交接.md",
+        "docs/面试演示.md",
+        "docs/运行环境.md",
+        "docs/development/",
+        "docs/knowledge/",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "T26",
+      "acceptance_ids": [
+        "A26"
+      ],
+      "depends_on": [
+        "T25"
+      ],
+      "state": "TODO",
+      "allowed_paths": [
+        "docs/交付审查.md",
+        "docs/README.md",
+        "evidence/",
+        "delivery-ledger.json"
+      ],
+      "blockers": []
+    }
   ],
   "evidence": [
-    {"id":"E00-STRATEGY","check_id":"K00","kind":"STATIC","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T01/t02-feasibility-final/prerequisite/receipt.json","receipt_sha256":"6281729b20cc8f1d1da7e1e7b43af3fcab70cfaf9dbfbb071a6a5d231dcb0e2b"},
-    {"id":"E01-PRD","check_id":"K01","kind":"STATIC","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T01/t02-feasibility-final/prd/receipt.json","receipt_sha256":"51689e532386e04fdd24a1371a515de5d78c36040626f65794b93cdfbf932231"},
-    {"id":"E02-MODELS","check_id":"K02-models","kind":"EXTERNAL","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T02/feasibility-bound-models/receipt.json","receipt_sha256":"c859bf0e196f5f5612c530dc5bf52680b15b0e31a2b01455cf3de3b3f512ad18"},
-    {"id":"E02-RUNTIME","check_id":"K02-runtime","kind":"INTEGRATION","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T02/feasibility-bound-runtime/receipt.json","receipt_sha256":"f70e642deafaa0f005f2e02f33dbf898619d6556a4328554c5a2a5560a0c706b"},
-    {"id":"E02-FAULTS","check_id":"K02-runtime","kind":"INTEGRATION","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T02/feasibility-bound-faults/receipt.json","receipt_sha256":"6001550a4cf8c23321c09c71c987317855964f74ea46e0534418eccb9522828f"},
-    {"id":"E02-UI","check_id":"K02-ui-reuse","kind":"INTEGRATION","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T02/feasibility-bound-reuse/receipt.json","receipt_sha256":"9faccd9307f9a7119bd05b07eaf5f6c55c1e825d8f3f215f932f6938ee504ef0"},
-    {"id":"E02-DESKTOP","check_id":"K02-desktop","kind":"INTEGRATION","baseline_id":"boss-agent-t00-design-20261021","receipt_path":"evidence/T02/feasibility-bound-desktop/receipt.json","receipt_sha256":"dba00a62d565116b78855983ca65d971eee7de7c2a6735dbc2a5199afa57856f"}
+    {
+      "id": "E00-STRATEGY",
+      "check_id": "K00",
+      "kind": "STATIC",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T01/t02-feasibility-final/prerequisite/receipt.json",
+      "receipt_sha256": "6281729b20cc8f1d1da7e1e7b43af3fcab70cfaf9dbfbb071a6a5d231dcb0e2b"
+    },
+    {
+      "id": "E01-PRD",
+      "check_id": "K01",
+      "kind": "STATIC",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T01/t02-feasibility-final/prd/receipt.json",
+      "receipt_sha256": "51689e532386e04fdd24a1371a515de5d78c36040626f65794b93cdfbf932231"
+    },
+    {
+      "id": "E02-MODELS",
+      "check_id": "K02-models",
+      "kind": "EXTERNAL",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T02/feasibility-bound-models/receipt.json",
+      "receipt_sha256": "c859bf0e196f5f5612c530dc5bf52680b15b0e31a2b01455cf3de3b3f512ad18"
+    },
+    {
+      "id": "E02-RUNTIME",
+      "check_id": "K02-runtime",
+      "kind": "INTEGRATION",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T02/feasibility-bound-runtime/receipt.json",
+      "receipt_sha256": "f70e642deafaa0f005f2e02f33dbf898619d6556a4328554c5a2a5560a0c706b"
+    },
+    {
+      "id": "E02-FAULTS",
+      "check_id": "K02-runtime",
+      "kind": "INTEGRATION",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T02/feasibility-bound-faults/receipt.json",
+      "receipt_sha256": "6001550a4cf8c23321c09c71c987317855964f74ea46e0534418eccb9522828f"
+    },
+    {
+      "id": "E02-UI",
+      "check_id": "K02-ui-reuse",
+      "kind": "INTEGRATION",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T02/feasibility-bound-reuse/receipt.json",
+      "receipt_sha256": "9faccd9307f9a7119bd05b07eaf5f6c55c1e825d8f3f215f932f6938ee504ef0"
+    },
+    {
+      "id": "E02-DESKTOP",
+      "check_id": "K02-desktop",
+      "kind": "INTEGRATION",
+      "baseline_id": "boss-agent-t00-design-20261021",
+      "receipt_path": "evidence/T02/feasibility-bound-desktop/receipt.json",
+      "receipt_sha256": "dba00a62d565116b78855983ca65d971eee7de7c2a6735dbc2a5199afa57856f"
+    },
+    {
+      "id": "E04-HLD",
+      "check_id": "K04",
+      "kind": "STATIC",
+      "baseline_id": "boss-agent-hld-v1-20261022",
+      "receipt_path": "evidence/T04/architecture-static-review.json",
+      "receipt_sha256": "41b51f26d07020ed3c02166e3f22c0a564669f721200c4608a9226e192d62088"
+    }
   ],
   "continuation": {
     "mode": "SINGLE_TASK",
-    "remaining_task_ids": ["T03","T04","T05","T06","T07","T08","T09","T10","T11","T12","T13","T14","T15","T16","T17","T18","T19","T20","T21","T22","T23","T24","T25","T26"],
-    "next_task_id": "T04",
+    "remaining_task_ids": [
+      "T03",
+      "T05",
+      "T06",
+      "T07",
+      "T08",
+      "T09",
+      "T10",
+      "T11",
+      "T12",
+      "T13",
+      "T14",
+      "T15",
+      "T16",
+      "T17",
+      "T18",
+      "T19",
+      "T20",
+      "T21",
+      "T22",
+      "T23",
+      "T24",
+      "T25",
+      "T26"
+    ],
+    "next_task_id": "T03",
     "constraints": [
       "用户确定当前交付为电脑桌面应用；D17、PRD 第 10.5 节及项目计划第 8 节适用于全部后续工单及验收。保留 R01—R32、两端开源复用、48 个线框、最终高保真及素材。T02 已实际验证 Electron、原生两端、IPC、尺寸缩放、重复启动与退出重启；P15 完整系统过程未验证，T25 交付完整产品安装包。",
       "T03 按 D17 交付全部 48 个 WF-1.1 区域及适用状态。T02 已在 docs/选型验证.md 提供两端矩阵、真实模型业务和桌面证据；T03 可引用固定源码和正式 API 完成绑定，全部待办继续保留。A03 必须有当前文字、视觉与素材检查；T08 接收完整设计，正式功能由 T18—T20 验证。",
@@ -122,8 +1728,21 @@
       "R01—R32 和农业专题均服务唯一老板；部门联系人、反馈和专业结果属于模拟输入，其他部门建设按 D11 排除。",
       "allowed_paths 为规划中的逻辑目录；T10 根据批准设计更新为实际工程路径后，才能开始对应实现。",
       "T02/A02 按用户 D18 确认完成本轮选型可行性，固定 nanobot 0.3.5 commit 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9 与 Electron 45.0.0；D16 的 Runtime 和两端复用均有实际证据。T03/T04/T07/T16 引用同版本和扩展责任；完整人工审查、异常及系统权限/恢复继续由 T09/T12/T15/T16/T24/T25 验证，原单项状态不改为通过。",
-      "每项 S008 工作保存独立开发记录，更新索引，依据真实业务断言维护验收。"
+      "每项 S008 工作保存独立开发记录，更新索引，依据真实业务断言维护验收。",
+      "D19 当前授权只允许架构文档及必要只读核查。T04/A04 为静态架构设计通过；T03 和 T05—T26 的 UI/开发/测试/模型/构建/部署工作不得因任务台账变化自动启动，必须待用户新的明确授权。"
     ],
-    "authorization_refs": ["用户要求根据最新需求制定项目计划","用户确认允许需求指定的模拟业务服务，模型调用与运行记录必须真实","用户要求只针对老板建设 Agent，其他职能部门当前不建设，并完善工单输入文档与输出物；docs/项目决策记录.md D11","用户要求补全 S001 并将项目计划合并为一份；docs/项目决策记录.md D12","用户 2026-10-21 指定执行 T00，完成 PRD-0、value-validation、当前决定与 A00 检查；docs/项目决策记录.md D01","用户 2026-10-21 确认两天完成、本地电脑及现有资源演示，并允许已有 API；docs/项目决策记录.md D05、D06、D10","用户 2026-10-21 指定执行 T01，交付 PRD、selection-probe 与 A01 检查，交接 T02、T03；docs/项目决策记录.md D01","用户 2026-10-21 要求审查待确认事项与需求承接，增加逐功能线框，核查六类 Agent 组件，用户端和管理端基于开源项目扩展；docs/项目决策记录.md D01、D08、D16","用户 2026-10-21 指定执行 T03，使用 S003-1/S003-2 形成交互与页面规范，继承 48 个线框；T02 形成前继续业务定义，框架绑定等待复用证据，当前不调用视觉功能。","用户 2026-10-21 明确要求最终交付高保真设计稿和素材包；docs/交互与页面规范.md 第 13 节、docs/项目决策记录.md D08。","用户 2026-10-22 要求先做电脑桌面端产品并更新相关内容；docs/项目决策记录.md D17。"]
+    "authorization_refs": [
+      "用户要求根据最新需求制定项目计划",
+      "用户确认允许需求指定的模拟业务服务，模型调用与运行记录必须真实",
+      "用户要求只针对老板建设 Agent，其他职能部门当前不建设，并完善工单输入文档与输出物；docs/项目决策记录.md D11",
+      "用户要求补全 S001 并将项目计划合并为一份；docs/项目决策记录.md D12",
+      "用户 2026-10-21 指定执行 T00，完成 PRD-0、value-validation、当前决定与 A00 检查；docs/项目决策记录.md D01",
+      "用户 2026-10-21 确认两天完成、本地电脑及现有资源演示，并允许已有 API；docs/项目决策记录.md D05、D06、D10",
+      "用户 2026-10-21 指定执行 T01，交付 PRD、selection-probe 与 A01 检查，交接 T02、T03；docs/项目决策记录.md D01",
+      "用户 2026-10-21 要求审查待确认事项与需求承接，增加逐功能线框，核查六类 Agent 组件，用户端和管理端基于开源项目扩展；docs/项目决策记录.md D01、D08、D16",
+      "用户 2026-10-21 指定执行 T03，使用 S003-1/S003-2 形成交互与页面规范，继承 48 个线框；T02 形成前继续业务定义，框架绑定等待复用证据，当前不调用视觉功能。",
+      "用户 2026-10-21 明确要求最终交付高保真设计稿和素材包；docs/交互与页面规范.md 第 13 节、docs/项目决策记录.md D08。",
+      "用户 2026-10-22 要求先做电脑桌面端产品并更新相关内容；docs/项目决策记录.md D17。"
+    ]
   }
 }
