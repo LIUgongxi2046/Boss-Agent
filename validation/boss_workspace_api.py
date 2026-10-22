@@ -131,6 +131,25 @@ class BossWorkspaceAPI:
                  "updated_at": row.get("updated_at")}
                 for row in revisions if row["meeting_id"] == meeting["meeting_id"]
             ]
+            linked = []
+            for link in _object_list(db, self.namespace, "minutes_assignment_link"):
+                if link["meeting_id"] != meeting["meeting_id"]:
+                    continue
+                task = self.store.get(db, self.namespace, "task", link["task_id"])
+                linked.append({
+                    "minute_id": link["minute_id"],
+                    "minute_version": link["minute_version"],
+                    "entry_id": link["entry_id"],
+                    "task_id": link["task_id"],
+                    "task_status": task["status"],
+                    "task_version": task["version"],
+                    "send_status": "SENT_SIMULATED" if task.get("message_ids")
+                                   else "NOT_SENT",
+                    "sent_message_count": len(task.get("message_ids", [])),
+                    "authorization_id": link["authorization_id"],
+                    "source_id": link["source_id"],
+                    "source_version": link["source_version"],
+                })
             return {
                 "meeting": {
                     "meeting_id": meeting["meeting_id"], "version": meeting["version"],
@@ -139,8 +158,11 @@ class BossWorkspaceAPI:
                 },
                 "minute": minute,
                 "source_index": associated, "revisions": history,
-                "task_created_by_minutes": False,
-                "message_sent_by_minutes": False,
+                "linked_assignments": linked,
+                "task_created_by_minutes": bool(linked),
+                "message_sent_by_minutes": any(
+                    item["sent_message_count"] > 0 for item in linked
+                ),
             }
         if key == "approvals" or key == "approval-admin":
             apps = _object_list(db, self.namespace, "application")
