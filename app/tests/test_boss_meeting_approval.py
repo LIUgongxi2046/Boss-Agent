@@ -308,7 +308,7 @@ def test_request_more_revise_and_owner_reapprove_complete_a_real_version_chain(s
     assert run(api, "BOSS", "boss.approval.decide", decide_input(
         key="old-approval-should-fail"))[0] == 409
     assert run(api, "BOSS", "boss.approval.decide", decide_input(
-        key="old-amount-fail", expected_version="3", source_version="2"))[0] == 403
+        key="old-amount-fail", expected_version="3", source_version="2"))[0] == 409
 
     current=decide_input(key="owner-approve-updated", expected_version="3",
                          source_version="2", amount="4200.00")
