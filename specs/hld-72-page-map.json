@@ -141,7 +141,7 @@
     "F19 is the default BROILER animal-use scenario; V19-BEEF/EGG/MILK are independent designed views sharing a component, not three new functional requirements.",
     "N and D page designs carry common states; S00-S10 individual prompt index exists only for 51 F/A/V pages.",
     "All business state changes are verified server-side against role, owner, namespace, object version, current authorization, idempotency and source validity.",
-    "All page paths and component files are proposed architectural targets, not files currently present in repository; authorization D19 remains architecture only.",
+    "Architecture-freeze-time source/route targets were not implemented then. D21 later authorized development; current partial implementation status lives in specs/page-service-map.json. This HLD contract keeps original proposed logical route/component target flags until T08 formal acceptance.",
     "D04/D05/N12 and D06 local UI actions are client_only_intents, not backend command endpoints. A D06 explicit save-draft action, if offered by the originating page, must invoke that page's authorized save API and show a durable result."
   ],
   "pages": [

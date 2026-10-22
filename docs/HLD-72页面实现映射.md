@@ -1,8 +1,8 @@
 # Boss-Agent v6 桌面 72 页实现映射（T04 架构基线）
 
-> 版本：1.0.0 · 日期：2026-10-22 · 状态：**架构映射固定，功能未开发**
+> 版本：1.0.1 · 日期：2026-10-22 · 状态：**架构映射固定，开发状态另见当前 page-service-map**
 
-**权威结构化映射**：[`specs/hld-72-page-map.json`](../specs/hld-72-page-map.json)。架构约束见 [`docs/HLD.md`](HLD.md)，验收规则见 PRD V1.2.0 与《交互与页面规范》V1.2.0。本表由设计包 `meta/页面配置.json` 与 `v6-状态关联.json` 一一核对生成。
+**当前真实实施与未完成状态**：[`specs/page-service-map.json`](../specs/page-service-map.json)（已部分接入 11 页，其他仍待开发）。以下是 T04 固定时的逻辑路由和目标组件契约，不等于全部已经开发。\n\n**权威结构化映射**：[`specs/hld-72-page-map.json`](../specs/hld-72-page-map.json)。架构约束见 [`docs/HLD.md`](HLD.md)，验收规则见 PRD V1.2.0 与《交互与页面规范》V1.2.0。本表由设计包 `meta/页面配置.json` 与 `v6-状态关联.json` 一一核对生成。
 
 ## 1. 范围及解释
 
