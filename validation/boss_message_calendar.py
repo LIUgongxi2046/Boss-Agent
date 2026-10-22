@@ -149,8 +149,8 @@ def message_send(api, db, data, payload):
     if draft["related_task_id"]:
         task = api.store.get(db, NS, "task", draft["related_task_id"])
         require(task["coordinator_id"] == draft["recipient_id"]
-                and task["status"] not in ("CANCELED", "COMPLETED_CONFIRMED"),
-                "关联任务已变更或结束")
+                and task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS"),
+                "关联任务尚未由老板单独发送，或当前状态不允许进展回复")
     # Signed payload contains a digest and version only, not confidential body.
     auth_id = api._authorize(db, "message.send", {
         "draft_id": draft["draft_id"], "version": draft["version"],
