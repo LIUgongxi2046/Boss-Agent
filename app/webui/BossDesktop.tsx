@@ -10,6 +10,7 @@ import {
   ShieldCheck, X,
 } from "lucide-react";
 import pageMeta from "./page-meta.json";
+import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -32,6 +33,8 @@ type Dashboard = {
   tasks: Task[]; historical_commitment: HistoricalTask | null;
   meeting: { meeting_id: string; starts_at: string; timezone: string; participant_ids: string[]; material_ids: string[] } | null;
   contacts: { contact_id: string; name: string; organization: string; responsibility: string }[];
+  event?: { event_id: string; status: string };
+  assignment_source_ids?: string[];
   notifications: { event_id: string; state: string }[];
 };
 type Metrics = {
@@ -43,14 +46,14 @@ type Metrics = {
     missing_fields: string[]; unexplained_causes: string[];
   };
 };
-type Tasks = { tasks: Task[]; historical_commitment: HistoricalTask | null; source_type: string };
+type Tasks = TaskListResponse & { historical_commitment: HistoricalTask | null; source_type: string };
 type Meetings = {
   source_type: string;
   meeting: Dashboard["meeting"];
   documents: { source_id: string; version: string; published_at: string; source_type: string }[];
 };
 type Evidence = { source_id: string; source_type: string; version: string; content: string; published_at?: string; author_contact_id?: string };
-type Maintenance = { configured_provider: string; configured_model: string; configuration_version: string; source_type: string; status: string; counts: Record<string, number> };
+type Maintenance = { configured_provider: string; configured_model: string; configuration_version: string; source_type: string; status: string; counts: Record<string, number>; task_refs?: MaintenanceTaskRef[] };
 type Identity = { role: Role | null; owner_id: string | null };
 type Animation = "idle" | "thinking" | "complete" | "notice";
 
@@ -88,7 +91,7 @@ const MAINT_NAV = [
   ["A15", "运行记录", Activity],
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
-const PRODUCT_PAGES = new Set(["F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "A08", "N12"]);
+const PRODUCT_PAGES = new Set(["F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "A04", "A08", "N12"]);
 const ANIMATIONS: Record<Animation, string> = {
   idle: "/boss-brand/01-待机悬浮.webp",
   thinking: "/boss-brand/03-思考分析.webp",
@@ -245,11 +248,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       }));
     };
     if (role === "BOSS") {
-      if (["F01", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
+      if (["F01", "F06", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
       if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
-    } else if (["A08", "N12", "A01", "A15"].includes(page)) {
+    } else if (["A04", "A08", "N12", "A01", "A15"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
     }
     if (tasksToRead.length === 0) { setLoading(false); return () => abort.abort(); }
@@ -553,7 +556,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
-                page === "N05" || page === "F06" ? <div className="boss-columns">
+                page === "F06" ? <BossAssignmentFlow
+                  tasks={tasks}
+                  selectedTaskId={selectedTaskId}
+                  onSelectTask={setSelectedTaskId}
+                  onReload={refresh}
+                  onViewSource={() => goSource("finance-note")}
+                  context={dashboard}
+                /> :
+                page === "N05" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="任务与承诺" note="从 SQLite 正式业务对象读取，不根据设计图生成任务">
                       {tasks?.tasks.length ? tasks.tasks.map((t) =>
@@ -650,7 +661,19 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine text="未连接写入动作，不会显示模拟保存/发送成功。" />
                   </Panel></div>
                 </div>
-              ) : <div className="boss-columns">
+              ) : page === "A04" ? <div className="boss-columns">
+                <div className="boss-column">
+                  <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>
+                </div>
+                <div className="boss-column">
+                  <Panel title="当前模拟资料与角色">
+                    <Value label="身份" value="MAINTAINER"/>
+                    <Value label="可注入的任务对象" value={String(maintenance?.task_refs?.length ?? 0)}/>
+                    <StatusLine text="模拟负责人反馈由维护者注入；老板需另行确认延期、完成或取消。"/>
+                    <GlassButton onClick={refresh}>重读任务元数据</GlassButton>
+                  </Panel>
+                </div>
+              </div> : <div className="boss-columns">
                 <div className="boss-column">
                   <Panel title={metadata?.title || "维护工作"} note="独立维护身份 · 仅获准元信息">
                     {maintenance ? <>
