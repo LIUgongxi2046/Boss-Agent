@@ -737,7 +737,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   </Panel>
                 </div>
               </div>
-              ) : page === "A04" ? <div className="boss-columns">
+              : page === "A04" ? <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>
                 </div>
