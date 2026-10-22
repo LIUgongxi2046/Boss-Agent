@@ -16,6 +16,7 @@ type MinutesResponse = {
     timezone: string; participant_ids: string[] };
   minute: {
     minute_id: string; meeting_id: string; version: string; state: "DRAFT_REVIEW" | "CONFIRMED";
+    source_reference_state?: "CURRENT" | "NEEDS_REVIEW";
     source_id: string; source_version: string; updated_at: string;
     confirmed_at: string | null; entries: (Entry & {entry_id: string})[];
     task_count_created: number; message_count_sent: number;
@@ -89,7 +90,8 @@ function Empty({children}: {children:ReactNode}) {
 function EntryRow({entry}: {entry:Entry}) {
   return <div className="boss-minutes-row">
     <span className="boss-tag boss-tag-blue">{KIND_LABELS[entry.kind]}</span>
-    <p>{entry.text}</p><small>原文位置：{entry.source_anchor}</small>
+    <p>{entry.text||"原文已撤销或版本变化，不能作为当前执行依据"}</p>
+    <small>原文位置：{entry.source_anchor||"待重新核查"}</small>
   </div>;
 }
 function VersionValue({label,value}:{label:string;value?:string|number|null}) {
@@ -364,6 +366,7 @@ export function BossMeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCr
                 <label>会议版本<input readOnly value={minutes.meeting.version}/></label>
                 <label>会议时间<input readOnly value={time(minutes.meeting.starts_at)}/></label>
                 <label>当前纪要状态<input readOnly value={minute?.state||"尚未保存"}/></label>
+                <label>原文引用状态<input readOnly value={minute?.source_reference_state||"待核查"}/></label>
               </div>
               <div className="boss-minutes-tabs">
                 {TABS.map(k=><button type="button" key={k} className={kind===k?"selected":""}
