@@ -16,7 +16,6 @@ from aiohttp import web
 
 from business import OPERATIONS, ROOT, now
 from boss_meeting_brief import briefing_projection
-from boss_prompt_lifecycle import prompt_catalog
 from boss_prompt_config import KINDS, active_runtime_prompts
 from boss_research import project as research_projection
 from boss_recovery_api import calendar_share_state
@@ -28,7 +27,7 @@ BOSS_PAGES = {
     "minutes", "approvals", "briefing", "research",
 }
 MAINT_PAGES = {
-    "dataset", "source-index", "tool-catalog", "prompts", "metric-definitions",
+    "dataset", "source-index", "tool-catalog", "metric-definitions",
     "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin", "message-admin", "prompt-versions",
 }
 
@@ -579,8 +578,6 @@ class BossWorkspaceAPI:
                 "can_start_run_from_ui": False,
                 "source_file": "specs/selection-probe.json",
             }
-        if key == "prompts":
-            return prompt_catalog(db,self.store,self.namespace)
         if key == "system":
             rows = db.execute(
                 "SELECT kind,COUNT(*) FROM objects WHERE namespace=? "
