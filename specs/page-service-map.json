@@ -189,7 +189,6 @@
       "component_file": "app/webui/BossMeetingBrief.tsx",
       "component_name": "BossMeetingBrief",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/organization",
         "GET /api/boss/ui/workspace/briefing",
         "GET /api/boss/ui/operation-status"
       ],
@@ -197,12 +196,16 @@
         "boss.meeting.brief.prepare",
         "boss.message.draft.save"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "F04 missing-material request persists via authorized boss.message.draft.save; real send requires independent F08 owner confirmation"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "meeting_brief.prepare",
-        "message_draft.save"
+        "meeting_brief.external_materials_ingest",
+        "meeting_calendar.schedule_change",
+        "meeting_brief.generate_unstructured_llm_material",
+        "meeting_brief.real_world_report_source"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
