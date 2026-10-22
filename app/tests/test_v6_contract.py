@@ -83,3 +83,40 @@ def test_upstream_revision_and_non_destructive_overlay():
     assert "src/App.tsx" in PREPARE
     assert "shutil.copy2" in PREPARE
     assert "git" in PREPARE
+
+
+def test_page_service_map_is_explicit_about_partial_runtime():
+    service_map = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
+    assert service_map["page_count"] == 72
+    assert len(service_map["pages"]) == 72
+    assert service_map["implemented_page_count"] == 11
+    assert service_map["placeholder_page_count"] == 61
+    assert all(page["actual_e2e_verified"] is False for page in service_map["pages"])
+    assert all(page["visual_pixel_verified"] is False for page in service_map["pages"])
+    by_id = {item["page_id"]: item for item in service_map["pages"]}
+    assert set(by_id) == set(PAGES)
+    assert set(by_id["F06"]["code_wired_write_actions"]) == {
+        "boss.assignment.create", "boss.assignment.send",
+        "boss.assignment.complete", "boss.assignment.extend", "boss.assignment.cancel",
+    }
+    assert by_id["A04"]["code_wired_write_actions"] == ["boss.simulation.feedback"]
+    for item in service_map["pages"]:
+        assert item["component_file"]
+        assert item["role_gate"] == next(p["role_gate"] for p in BASELINE["pages"] if p["page_id"] == item["page_id"])
+        if item["render_status"] == "DESIGN_PLACEHOLDER_ONLY":
+            assert not item["code_wired_write_actions"]
+
+
+def test_boss_websocket_writes_are_never_literal_http_or_client_storage():
+    role_channel = (ROOT / "validation/role_channel.py").read_text(encoding="utf-8")
+    command_api = (ROOT / "validation/boss_command_api.py").read_text(encoding="utf-8")
+    flow = (ROOT / "app/webui/BossAssignmentFlow.tsx").read_text(encoding="utf-8")
+    assert "self.connection_roles.get(connection)" in role_channel
+    assert "self.boss_commands.execute(role, action" in role_channel
+    assert "client.requestMutation" in flow
+    assert "client_request_id" in flow
+    assert "BEGIN IMMEDIATE" in command_api
+    assert "authorization_id" in command_api
+    assert "idempotency" in command_api
+    assert "localStorage.setItem" not in flow
+    assert "dangerouslySetInnerHTML" not in flow
