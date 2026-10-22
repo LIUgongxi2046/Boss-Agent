@@ -82,6 +82,7 @@ export function MaintainerMessageReply() {
         <h2>模拟联系人回复</h2><small>A04 · 非员工登录 · 仅维护注入</small>
       </div>
       <p className="boss-helper">技术端只能读取消息 ID、收件人 ID 与模拟状态，不能查看老板正文。回复由服务端绑定先前模拟收件人；不支持伪造老板完成决定。</p>
+      {loading&&<div className="boss-status" role="status"><Loader2 size={16} className="boss-spin"/> 正在读取有权模拟消息索引…</div>}
       <div className="boss-form-grid">
         <label>选择已模拟发送消息
           <select value={selected} onChange={e=>setSelected(e.target.value)}>
