@@ -413,3 +413,51 @@ def test_f06_timeline_joins_f06_assignment_send_and_f08_message_reply_by_task(ap
     )
     # No simulated message or reply can make the owner mark a task as done.
     assert all(task["status"] != "COMPLETED_CONFIRMED" for task in after["tasks"])
+
+
+
+def test_revoked_origin_minute_blocks_send_after_task_creation_without_outbox(app):
+    cmd, page = app
+    assert save_minutes(cmd)[0] == 200
+    assert confirm_minutes(cmd)[0] == 200
+    task = create_linked_task(cmd)[1]
+    cmd.store.control(
+        "ui-check", "withdraw",
+        {"source_id": "meeting-minutes", "version": "1"},
+    )
+    forbidden = call(
+        cmd, "BOSS", "boss.assignment.send",
+        "send-from-withdrawn-minute", task_id=task["task_id"],
+        task_version=task["version"], recipient_id="coordinator-1",
+        body="原始纪要已撤销，因此消息不能发送", content_version="1",
+    )
+    assert forbidden[0] == 403
+    assert tasks(page)[1]["tasks"][0]["status"] == "OPEN"
+    assert minutes(page)[1]["minute"]["source_reference_state"] == "NEEDS_REVIEW"
+    with cmd.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='event' AND id LIKE 'task-due:%'"
+        ).fetchone()[0] == 0
+        assert db.execute(
+            "SELECT COUNT(*) FROM audit WHERE operation='boss.assignment.send'"
+        ).fetchone()[0] == 0
+
+
+def test_revoked_origin_does_not_prevent_owner_canceling_unsent_task(app):
+    cmd, page = app
+    save_minutes(cmd)
+    confirm_minutes(cmd)
+    task = create_linked_task(cmd)[1]
+    cmd.store.control(
+        "ui-check", "withdraw",
+        {"source_id": "meeting-minutes", "version": "1"},
+    )
+    canceled = call(
+        cmd, "BOSS", "boss.assignment.cancel", "cancel-withdrawn-minute-task",
+        task_id=task["task_id"], task_version=task["version"],
+        reason="原始纪要已经撤销，本人确认取消未发送交办",
+    )
+    assert canceled[0] == 200, canceled
+    assert canceled[1]["status"] == "CANCELED"
+    assert tasks(page)[1]["tasks"][0]["status"] == "CANCELED"
