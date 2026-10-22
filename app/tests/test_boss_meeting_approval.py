@@ -268,3 +268,89 @@ def test_maintainer_cannot_read_owner_minutes_or_approval_comments(services):
     assert public["private_decision_comments_returned"] is False
     assert "本人已对照当前附件版本核查" not in json.dumps(public)
     assert "entries" not in json.dumps(public)
+
+
+def test_request_more_revise_and_owner_reapprove_complete_a_real_version_chain(services):
+    api, reads = services
+    first = run(api, "MAINTAINER", "boss.simulation.application.seed", seed_input())
+    assert first[0] == 200
+    requested = run(api, "BOSS", "boss.approval.decide", decide_input(
+        key="boss-request-more-101",
+        decision="REQUEST_MORE",
+        comment="请补充对应报价证明与适用范围",
+    ))
+    assert requested[0] == 200 and requested[1]["state"] == "WAITING_MATERIAL"
+
+    revised = {
+        "client_request_id": "maint-revise-app-101",
+        "application_id": "application-1",
+        "expected_version": "2",
+        "applicant_contact_id": "finance-1",
+        "amount_cny": "4200.00",
+        "title": "合成内部采购审批申请（补充件）",
+        "description": "模拟申请人明确更新金额与对应附件。",
+        "attachment_text": "模拟申请新版本附件：新报价为4200元，设备数量和材料日期均由维护端显式输入，不代表真实采购。",
+    }
+    assert run(api, "BOSS", "boss.simulation.application.revise", revised)[0] == 403
+    code, new_version = run(api, "MAINTAINER",
+        "boss.simulation.application.revise", revised)
+    assert code == 200, new_version
+    assert new_version["version"] == "3"
+    assert new_version["source_version"] == "2"
+    assert new_version["state"] == "PENDING_DECISION"
+    assert new_version["funds_transferred"] is False
+    assert new_version["owner_authorization_created"] is False
+    assert run(api, "MAINTAINER", "boss.simulation.application.revise",
+               revised) == (code, new_version)
+    assert run(api, "MAINTAINER", "boss.simulation.application.revise",
+               {**revised, "client_request_id": "maint-repeat-revision"})[0] == 409
+
+    assert run(api, "BOSS", "boss.approval.decide", decide_input(
+        key="old-approval-should-fail"))[0] == 409
+    assert run(api, "BOSS", "boss.approval.decide", decide_input(
+        key="old-amount-fail", expected_version="3", source_version="2"))[0] == 403
+
+    current=decide_input(key="owner-approve-updated", expected_version="3",
+                         source_version="2", amount="4200.00")
+    status, approved=run(api, "BOSS", "boss.approval.decide", current)
+    assert status==200,approved
+    assert approved["state"]=="APPROVED_RECORDED"
+    assert approved["funds_transferred"] is False
+    _, view_state=view(reads, "BOSS", "approvals")
+    assert view_state["applications"][0]["version"]=="4"
+    assert view_state["applications"][0]["amount"]=="4200.00"
+    assert len(view_state["decisions"])==2
+    with api.store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='document_revision'"
+        ).fetchone()[0]==1
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='application_revision'"
+        ).fetchone()[0]>=2
+    c, evidence=reads.serve("BOSS","/api/boss/ui/evidence",
+                           "source=application-1-attachment")
+    assert c==200 and evidence["version"]=="2"
+    assert "4200" in evidence["content"]
+
+
+def test_revise_rejects_missing_owner_request_and_bad_contact(services):
+    api, _ = services
+    assert run(api, "MAINTAINER", "boss.simulation.application.seed",
+               seed_input())[0]==200
+    payload={
+        "client_request_id":"maint-revise-no-request",
+        "application_id":"application-1","expected_version":"1",
+        "applicant_contact_id":"finance-1","amount_cny":"500.00",
+        "title":"合成申请更新","description":"尚未经老板请求补充",
+        "attachment_text":"测试申请附件：目前没有收到本人请求补充的意见。",
+    }
+    assert run(api, "MAINTAINER", "boss.simulation.application.revise",
+               payload)[0]==409
+    assert run(api, "BOSS", "boss.approval.decide", decide_input(
+        key="request-more-first",decision="REQUEST_MORE"))[0]==200
+    assert run(api, "MAINTAINER", "boss.simulation.application.revise",
+               {**payload,"client_request_id":"bad-contact-revision",
+                "expected_version":"2","applicant_contact_id":"coordinator-1"})[0]==400
+    assert run(api, "MAINTAINER", "boss.simulation.application.revise",
+               {**payload,"client_request_id":"bad-version-revision",
+                "expected_version":"1"})[0]==409
