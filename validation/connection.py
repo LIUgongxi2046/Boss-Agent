@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import re
@@ -60,18 +61,40 @@ def settings():
 
 
 class RecordedProvider(OpenAICompatProvider):
-    def __init__(self, config, output):
+    def __init__(self, config, output, *, redact_payload=False):
+        self.redact_payload = redact_payload
         super().__init__(api_key=os.environ["DEEPSEEK_API_KEY"], api_base=config["base_url"], default_model=config["model_id"], spec=find_by_name("deepseek"), extra_body={"thinking": {"type": config["thinking"]}}, provider_name="deepseek")
         self.output = Path(output)
         self.requests = json.loads(self.output.read_text()) if self.output.exists() else []
 
     def save(self):
-        self.output.write_text(json.dumps(self.requests, ensure_ascii=False, indent=2))
+        payload = json.dumps(self.requests, ensure_ascii=False, indent=2)
+        if self.redact_payload:
+            self.output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            self.output.parent.chmod(0o700)
+            fd = os.open(self.output, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as output:
+                output.write(payload)
+            return
+        self.output.write_text(payload)
 
     def _build_client(self):
         async def request_hook(request):
             body = json.loads(request.content)
-            self.requests.append({"at": now(), "type": "request", "method": request.method, "url": str(request.url), "model": body.get("model"), "stream": body.get("stream", False), "max_tokens": body.get("max_tokens"), "thinking": body.get("thinking"), "input": body})
+            record = {"at": now(), "type": "request", "method": request.method, "url": str(request.url),
+                      "model": body.get("model"), "stream": body.get("stream", False),
+                      "max_tokens": body.get("max_tokens"), "thinking": body.get("thinking")}
+            if self.redact_payload:
+                record.update({
+                    "request_sha256": hashlib.sha256(request.content).hexdigest(),
+                    "request_bytes": len(request.content),
+                    "message_count": len(body.get("messages", [])),
+                    "tool_count": len(body.get("tools", [])),
+                    "private_contents_recorded": False,
+                })
+            else:
+                record["input"] = body
+            self.requests.append(record)
             self.save()
 
         async def response_hook(response):
@@ -81,7 +104,12 @@ class RecordedProvider(OpenAICompatProvider):
             if response.headers.get("content-type", "").startswith("application/json"):
                 await response.aread()
                 body = response.json()
-                record.update(response_id=body.get("id"), model=body.get("model"), usage=body.get("usage"), error=body.get("error"))
+                record.update(response_id=body.get("id"), model=body.get("model"), usage=body.get("usage"))
+                if self.redact_payload:
+                    if body.get("error"):
+                        record["error_present"] = True
+                else:
+                    record["error"] = body.get("error")
             self.requests.append(record)
             self.save()
 
