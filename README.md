@@ -69,3 +69,10 @@ python3 scripts/visual_diff.py --role boss
 F24 老板运行详情与 A15 维护记录可读取本机 DeepSeek 实际响应 ID、请求次数、Tool 事件、Token 用量及未覆盖费用范围，模型没响应过就明确展示“未观察到”，不会将配置状态冒充实际运行。真实模型测试、真实 Electron 交互和最终 v6 像素比对仍待目标 Mac 运行。
 
 [DeepSeek 接入开发记录](docs/development/T16.md) · [72 页现有组件与 API 接入状态](specs/page-service-map.json) · [GitHub Actions](https://github.com/LIUgongxi2046/Boss-Agent/actions)
+
+
+## 第四批：会议纪要与模拟审批
+
+F05 采用意见、建议、明确决定和交办草稿四类分类，真实保存纪要与来源/版本，老板明确确认后才记录已确认纪要；不会自动给联系人发交办。F07 先在 A03 明确录入模拟申请及附件，老板才能按当前版本和 CNY 金额/附件逐项决定同意、拒绝或请求补充。请求补充后由维护端按版本更新材料，旧审批对新金额失效；无资金交易或专业放行。
+
+本轮 Desktop v6 还校正 1440×1024 主视口的 204px 侧栏、64px 顶栏、146px 主 Hero / 122px 紧凑 Hero、20px 圆角及 278px 右侧信息栏，并在 1024px 下切换 60px 图标侧栏。请参考 [F05/F07 开发记录](docs/development/T18-meeting-approval.md)。视觉截图检查脚本已支持源尺寸比较，但**目标 Mac 的真实截图和最终像素级验收仍未完成**。

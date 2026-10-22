@@ -13,6 +13,7 @@
 | DOC-MODEL-LOCAL | 用户本机 DeepSeek 文件配置、最小真实模型调用、私有脱敏日志、F24/A15 和未完成联调 | [T16开发记录](development/T16.md)、[本机配置脚本](../scripts/configure_local_deepseek.py) | T11/T16/T18/T19 | PARTIAL_CODE；MODEL_RUN_NOT_VERIFIED_ON_TARGET_MAC | 2026-10-22 |
 | DOC-DEV-FIRST | 固定开源 v0.3.5、Desktop v6 React 首批实现、可复现构建、权限测试、剩余阻塞 | [首批开发记录](development/T11.md)、[运行脚本](../scripts/run_boss_local.sh) | S008 / T11，后续 T18 接收 | IN_PROGRESS（不等于 T11/T18 验收通过） | 2026-10-22 |
 | DOC-PAGE-SVC | 72 页真实代码绑定/未实现区分、F06/A04事务动作、视觉像素检查入口 | [当前页面服务映射](../specs/page-service-map.json)、[T18开发记录](development/T18.md)、[T19开发记录](development/T19.md) | T08/T18/T19 | DRAFT_PARTIAL_CODE（非产品验收） | 2026-10-22 |
+| DOC-DEV-MINUTES-APPROVAL | FR05纪要分类/确认、FR07附件和金额版本审批、A03模拟申请与补件升版、v6原稿几何复核 | [开发与测试记录](development/T18-meeting-approval.md)、[72页实际实现映射](../specs/page-service-map.json) | T08/T18/T19 | PARTIAL_CODE；A18/A19 NOT_RUN | 2026-10-22 |
 | DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
 | DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[机器可读契约](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
 | DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |

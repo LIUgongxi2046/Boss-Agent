@@ -1439,16 +1439,23 @@
         "T15",
         "T17"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "src/",
         "tests/",
         "docs/development/",
         "docs/README.md",
         "evidence/",
-        "delivery-ledger.json"
+        "delivery-ledger.json",
+        "app/",
+        "validation/",
+        "specs/page-service-map.json",
+        ".github/workflows/boss-agent-desktop.yml"
       ],
-      "blockers": []
+      "blockers": [
+        "用户 D21 明确授权的前置设计尚未完全通过条件下实施的可回滚业务切片；T05—T10、T15/T17 等依赖仍未 ACCEPTED，不能登记 A18 为 PASS。",
+        "实际目标 macOS Intel 的已认证 WS 流程、真实 DeepSeek 过程、561 UI 状态与 72 页高保真截图/系统权限未联调，T24/T25 总验收仍待执行。"
+      ]
     },
     {
       "id": "T19",
@@ -1459,16 +1466,23 @@
         "T15",
         "T17"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "src/",
         "tests/",
         "docs/development/",
         "docs/README.md",
         "evidence/",
-        "delivery-ledger.json"
+        "delivery-ledger.json",
+        "app/",
+        "validation/",
+        "specs/page-service-map.json",
+        ".github/workflows/boss-agent-desktop.yml"
       ],
-      "blockers": []
+      "blockers": [
+        "用户 D21 明确授权的前置设计尚未完全通过条件下实施的可回滚业务切片；T05—T10、T15/T17 等依赖仍未 ACCEPTED，不能登记 A19 为 PASS。",
+        "实际目标 macOS Intel 的已认证 WS 流程、真实 DeepSeek 过程、561 UI 状态与 72 页高保真截图/系统权限未联调，T24/T25 总验收仍待执行。"
+      ]
     },
     {
       "id": "T20",
@@ -1739,7 +1753,8 @@
       "allowed_paths 为规划中的逻辑目录；T10 根据批准设计更新为实际工程路径后，才能开始对应实现。",
       "T02/A02 按用户 D18 确认完成本轮选型可行性，固定 nanobot 0.3.5 commit 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9 与 Electron 45.0.0；D16 的 Runtime 和两端复用均有实际证据。T03/T04/T07/T16 引用同版本和扩展责任；完整人工审查、异常及系统权限/恢复继续由 T09/T12/T15/T16/T24/T25 验证，原单项状态不改为通过。",
       "每项 S008 工作保存独立开发记录，更新索引，依据真实业务断言维护验收。",
-      "D21 最新用户明确授权在固定开源架构与 Desktop v6 高保真基础上开始产品开发，已覆盖 D19 旧的暂停开发状态；权限、数据、模型与目标系统范围仍受 D03/D04/D11/D16/D17 约束。T11 已开始首批研发切片，但 T05—T10 前置设计和完整 T11/A11 验收仍待完成。"
+      "D21 最新用户明确授权在固定开源架构与 Desktop v6 高保真基础上开始产品开发，已覆盖 D19 旧的暂停开发状态；权限、数据、模型与目标系统范围仍受 D03/D04/D11/D16/D17 约束。T11 已开始首批研发切片，但 T05—T10 前置设计和完整 T11/A11 验收仍待完成。",
+      "2026-10-22 开发切片新增 F05 纪要与 F07 审批的真实模拟 SQLite 事务以及 Desktop v6 几何校正；T18/T19 更新为 IN_PROGRESS，依赖缺口和独立验收仍在，不能把70页部分接入视为70页完整开发。"
     ],
     "authorization_refs": [
       "用户要求根据最新需求制定项目计划",
