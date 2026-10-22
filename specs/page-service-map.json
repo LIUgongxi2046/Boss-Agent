@@ -34,7 +34,8 @@
     "Functional priority patch: F05/F06/F07/F08/F12/F13/N06/N07/N08/A04 can re-query a persisted original idempotency receipt after uncertain WebSocket responses; absence is NOT proof of failed delivery. No datasets added.",
     "FR12 calendar-conflict reads the same authoritative single-meeting conflict classification used by calendar.save; missing meeting end remains unknown. Busy shares are ineffective after expiry, revoke or calendar-version change; owner preview only, no recipient account or external delivery.",
     "F08 cannot send a message linked to an OPEN assignment before separate owner-authorized assignment send; contact ID validity is checked against current simulated clock and duplicate attachments are rejected.",
-    "FR04 owner-authenticated meeting briefing preparation is versioned in real SQLite with deterministic metric aggregation and source state; any document/participant/task/event change can yield NEEDS_REVIEW without rewriting old snapshots. Missing-material requests become F08 DRAFT only, never SENT."
+    "FR04 owner-authenticated meeting briefing preparation is versioned in real SQLite with deterministic metric aggregation and source state; any document/participant/task/event change can yield NEEDS_REVIEW without rewriting old snapshots. Missing-material requests become F08 DRAFT only, never SENT.",
+    "FR05 confirmed minute ASSIGNMENT_DRAFT can be separately authorized into ONE OPEN FR06 task with original minute version, entry ID and document version, using existing Store.create_assignment inside BEGIN IMMEDIATE. F05 and F06 read live link/task status; send remains a distinct owner action. Not a production external delivery."
   ],
   "pages": [
     {
@@ -241,32 +242,37 @@
       "logical_architecture_route": "/app/boss/F05",
       "actual_webui_navigation": "?bossPage=F05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_OWNER_VERSIONED_MINUTES_SAVE_CONFIRM_NO_AUTO_ASSIGN",
+      "render_status": "PARTIAL_OWNER_CONFIRMED_MINUTE_ENTRY_TASK_LINK_NOT_SENT",
       "component_file": "app/webui/BossMeetingApproval.tsx",
-      "component_name": "BossMeetingApproval",
+      "component_name": "BossMeetingApproval + BossMinutesAssignmentActions",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/organization",
         "GET /api/boss/ui/workspace/minutes",
         "GET /api/boss/ui/evidence",
-        "GET /api/boss/ui/operation-status"
+        "GET /api/boss/ui/operation-status",
+        "GET /api/boss/ui/tasks"
       ],
       "code_wired_write_actions": [
         "boss.minutes.save",
-        "boss.minutes.confirm"
+        "boss.minutes.confirm",
+        "boss.minutes.assignment.create"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "confirmed minute ASSIGNMENT_DRAFT -> BOSS-only task create with version-pinned link -> F06 independent task send; no automatic dispatch"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "minutes.save",
-        "assignment.prepare"
+        "minutes.linked_assignment_actual_mac_e2e",
+        "minutes.multi_meeting_source_versions_and_external_delivery"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
         "app/tests/test_boss_memory_notifications.py",
         "app/tests/test_boss_meeting_approval.py",
-        "app/tests/test_boss_recovery.py"
+        "app/tests/test_boss_recovery.py",
+        "app/tests/test_boss_minutes_assignment_chain.py"
       ],
       "source_task_ids": [
         "T18",
@@ -311,7 +317,9 @@
         "boss.assignment.extend",
         "boss.assignment.cancel"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -324,7 +332,8 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_command_api.py",
-        "app/tests/test_boss_recovery.py"
+        "app/tests/test_boss_recovery.py",
+        "app/tests/test_boss_minutes_assignment_chain.py"
       ],
       "source_task_ids": [
         "T18",
