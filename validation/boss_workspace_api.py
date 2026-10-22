@@ -16,6 +16,7 @@ from aiohttp import web
 
 from business import OPERATIONS, ROOT, now
 from boss_meeting_brief import briefing_projection
+from boss_prompt_config import KINDS, active_runtime_prompts
 from boss_research import project as research_projection
 from boss_recovery_api import calendar_share_state
 
@@ -27,7 +28,7 @@ BOSS_PAGES = {
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
-    "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin", "message-admin",
+    "relationships", "scheduler", "audit", "system", "evaluation", "approval-admin", "message-admin", "prompt-versions",
 }
 
 
@@ -468,6 +469,41 @@ class BossWorkspaceAPI:
                 "body_exposed": True,
                 "visibility": "BOSS_ONLY",
                 "external_channel_invoked": False,
+            }
+        if key == "prompt-versions":
+            drafts = _object_list(db, self.namespace, "prompt_draft")
+            active = []
+            for kind in KINDS:
+                record = db.execute(
+                    "SELECT body FROM objects WHERE namespace=? AND kind='prompt_active' AND id=?",
+                    (self.namespace, kind),
+                ).fetchone()
+                if record:
+                    item = json.loads(record[0])
+                    active.append({
+                        "kind": kind, "prompt_id": item["prompt_id"],
+                        "prompt_version": item["prompt_version"],
+                        "active_version": item["active_version"],
+                        "enabled": item["enabled"],
+                        "adoption_policy": item["adoption_policy"],
+                        "actual_model_evaluation_passed": False,
+                    })
+            valid_runtime_ids = {
+                p["prompt_id"] for p in active_runtime_prompts(self.store, self.namespace)
+            }
+            return {
+                "kinds": list(KINDS),
+                "drafts": [{
+                    k: entry[k] for k in (
+                        "prompt_id", "kind", "title", "instruction_text", "version",
+                        "content_sha256", "source_refs", "change_note",
+                        "validation_status", "validated_at", "updated_at",
+                    ) if k in entry
+                } for entry in drafts],
+                "active": active,
+                "adoptable_current_ids": sorted(valid_runtime_ids),
+                "model_evaluation_completed": False,
+                "full_security_evaluation_completed": False,
             }
         if key == "dataset":
             c = db.execute(
