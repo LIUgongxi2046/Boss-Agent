@@ -5,6 +5,7 @@ import {
   ShieldCheck, Trash2,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import { BossMinutesAssignmentActions } from "./BossMinutesAssignmentActions";
 import "./boss-v6.css";
 
 type Kind = "OPINION" | "SUGGESTION" | "DECISION" | "ASSIGNMENT_DRAFT";
@@ -20,6 +21,13 @@ type MinutesResponse = {
     task_count_created: number; message_count_sent: number;
   } | null;
   source_index: {source_id: string; version: string; withdrawn: boolean}[];
+  linked_assignments: {
+    minute_id: string;minute_version: string;entry_id: string;
+    task_id: string;task_status: string;task_version: string;
+    send_status: string;sent_message_count: number;
+    authorization_id: string;source_id: string;source_version: string;
+  }[];
+  task_created_by_minutes: boolean;message_sent_by_minutes: boolean;
   revisions: {version: string; state: string; updated_at: string}[];
 };
 type Approval = {
@@ -197,10 +205,11 @@ function useConfirmedMutation(onSuccess: ()=>void) {
   return {propose,dialog,notice,error,pending,busy,resetNotice:()=>setNotice("")};
 }
 
-export function BossMeetingApprovalView({pageId,onViewSource,onNavigate}:{
+export function BossMeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated}:{
   pageId:"F05"|"F07";
   onViewSource:(sourceId:string)=>void;
   onNavigate:(pageId:string)=>void;
+  onTaskCreated:(taskId:string)=>void;
 }) {
   const {getToken}=useClient();
   const [data,setData]=useState<MinutesResponse|Decisions|null>(null);
@@ -393,9 +402,16 @@ export function BossMeetingApprovalView({pageId,onViewSource,onNavigate}:{
                   <RefreshCw size={15}/> 重读版本
                 </button>
               </div>
-              <Tip warning>确认纪要与发送交办是不同的本人决定。保存或确认均不会自动创建、批准或发送交办；需要单独进入 F06。</Tip>
+              <Tip warning>确认纪要与发送交办是不同的本人决定。逐项创建只能在纪要已确认、来源仍有效且用户再次明确授权后执行。</Tip>
             </>:!loading&&<Empty>尚无可用会议资料。</Empty>}
           </Panel>
+          <BossMinutesAssignmentActions
+            minute={minute||null} participants={minutes?.meeting.participant_ids||[]}
+            links={minutes?.linked_assignments||[]}
+            sourceCurrent={Boolean(source&&minute&&source.source_id===minute.source_id&&source.version===minute.source_version)}
+            editingUnsaved={dirty} onReload={reload}
+            onTaskCreated={onTaskCreated} onNavigate={onNavigate}
+          />
         </>:<>
           <Panel title="当前模拟申请" note="F07 · 对象 / 金额 / 币种 / 附件版本">
             {approvals?.applications.length?<>
@@ -477,11 +493,16 @@ export function BossMeetingApprovalView({pageId,onViewSource,onNavigate}:{
               {minutes?.revisions.map(x=><p key={x.version}>v{x.version} · {x.state} · {time(x.updated_at)}</p>)}
             </div>}
           </Panel>
-          <Panel title="交办动作独立执行">
-            <VersionValue label="本次纪要自动创建任务" value="0"/>
-            <VersionValue label="本次纪要自动发送消息" value="0"/>
-            <button className="boss-btn boss-btn-primary" type="button"
-              onClick={()=>onNavigate("F06")}><ClipboardCheck size={15}/> 进入交办详情</button>
+          <Panel title="关联交办与模拟发送回读">
+            <VersionValue label="人工逐项创建的任务" value={minutes?.linked_assignments.length||0}/>
+            <VersionValue label="已经模拟发送的关联交办" value={
+              minutes?.linked_assignments.filter(x=>x.send_status==="SENT_SIMULATED").length||0}/>
+            <VersionValue label="是否自动创建交办" value="否"/>
+            <VersionValue label="是否自动发送" value="否"/>
+            <div className="boss-actions">
+              <button className="boss-btn boss-btn-primary" type="button"
+                onClick={()=>onNavigate("F06")}><ClipboardCheck size={15}/> 进入 F06 交办详情</button>
+            </div>
           </Panel>
         </>:<>
           <Panel title="审批安全边界" note="仅当前申请版本">
