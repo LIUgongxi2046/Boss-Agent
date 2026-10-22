@@ -30,6 +30,7 @@ from controls import ControlStore
 from model_probe import Audit, BusinessTool
 from role_channel import RoleChannel
 from safe_diagnostics import RedactedEventList
+from boss_prompt_config import active_runtime_prompts
 from service import application as business_application
 
 WORK = ROOT / ".work/application"
@@ -130,7 +131,14 @@ async def serve():
     async with Nanobot(loop, config=config) as bot:
         async def context(request):
             current = store.context("ui-check")
-            return RuntimeContextBlock(source="boss-confirmed-memory", content=encode({"memory": current["memory"], "runtime": audit.runtime_snapshot()}))
+            return RuntimeContextBlock(
+                source="boss-confirmed-memory",
+                content=encode({
+                    "memory": current["memory"],
+                    "maintained_prompts": active_runtime_prompts(store, "ui-check"),
+                    "runtime": audit.runtime_snapshot(),
+                }),
+            )
         bot.runtime.add_context_provider(context)
         await cron.start()
         if not any(job.name == "boss-events" for job in cron.list_jobs(include_disabled=True)):
