@@ -342,3 +342,74 @@ def test_wrong_meeting_or_explicit_source_version_cannot_reuse_old_approval(app)
     status, page_body = minutes(page)
     assert status == 200
     assert page_body["linked_assignments"] == []
+
+
+
+def test_f06_timeline_joins_f06_assignment_send_and_f08_message_reply_by_task(app):
+    cmd, page = app
+    save_minutes(cmd)
+    confirm_minutes(cmd)
+    created = create_linked_task(cmd)[1]
+    task_id = created["task_id"]
+    status, before = tasks(page)
+    assert status == 200
+    assert before["linked_messages"] == []  # an OPEN task has never been sent
+
+    task_send = call(
+        cmd, "BOSS", "boss.assignment.send", "timeline-owner-send",
+        task_id=task_id, task_version="1", recipient_id="coordinator-1",
+        body="独立授权的原始模拟交办内容", content_version="1",
+    )
+    assert task_send[0] == 200, task_send
+    post = tasks(page)[1]
+    assert len(post["linked_messages"]) == 1
+    message = post["linked_messages"][0]
+    assert message["task_id"] == task_id
+    assert message["type"] == "ASSIGNMENT_SEND"
+    assert message["send_state"] == "SENT_SIMULATED"
+    assert message["delivery_state"] == "NOT_VERIFIED"
+    assert message["external_channel_invoked"] is False
+
+    saved = call(
+        cmd, "BOSS", "boss.message.draft.save", "timeline-followup-draft",
+        draft_id=None, expected_version="0",
+        recipient_id="coordinator-1", related_task_id=task_id,
+        body="第二次模拟资料请求：请反馈进度与当前资料缺口",
+        attachment_refs=[], visibility="RECIPIENT_ONLY",
+    )
+    assert saved[0] == 200, saved
+    draft = page.serve("BOSS", "/api/boss/ui/workspace/outbox")[1]["drafts"][0]
+    sent_followup = call(
+        cmd, "BOSS", "boss.message.send", "timeline-followup-send",
+        draft_id=draft["draft_id"], expected_version=draft["version"],
+        recipient_id="coordinator-1",
+        expected_content_sha256=draft["content_sha256"],
+    )
+    assert sent_followup[0] == 200
+    current = tasks(page)[1]
+    kinds = {row["type"] for row in current["linked_messages"]}
+    assert kinds == {"ASSIGNMENT_SEND", "FOLLOWUP_MESSAGE"}
+    ids = {row["message_id"] for row in current["linked_messages"]}
+    assert sent_followup[1]["message_id"] in ids
+    assert "第二次模拟资料请求" not in json.dumps(current["linked_messages"])
+    assert page.serve("MAINTAINER", "/api/boss/ui/tasks")[0] == 403
+
+    simulated = call(
+        cmd, "MAINTAINER", "boss.simulation.message.reply",
+        "timeline-followup-reply",
+        message_id=sent_followup[1]["message_id"],
+        author_contact_id="coordinator-1",
+        text="模拟反馈：正在核查经营资料，尚未提交结果",
+    )
+    assert simulated[0] == 200, simulated
+    after = tasks(page)[1]
+    followup = next(
+        row for row in after["linked_messages"] if row["type"] == "FOLLOWUP_MESSAGE"
+    )
+    assert followup["reply_state"] == "RECEIVED_SIMULATED"
+    assert after["tasks"][0]["status"] == "IN_PROGRESS"
+    assert any(
+        feedback["kind"] == "PROGRESS" for feedback in after["feedback"]
+    )
+    # No simulated message or reply can make the owner mark a task as done.
+    assert all(task["status"] != "COMPLETED_CONFIRMED" for task in after["tasks"])
