@@ -74,6 +74,13 @@ class BossCommandAPI:
         "boss.assignment.extend": "BOSS",
         "boss.assignment.cancel": "BOSS",
         "boss.simulation.feedback": "MAINTAINER",
+        "boss.simulation.event.seed": "MAINTAINER",
+        "boss.simulation.clock.advance": "MAINTAINER",
+        "boss.memory.confirm": "BOSS",
+        "boss.memory.delete": "BOSS",
+        "boss.reminder.ack": "BOSS",
+        "boss.reminder.snooze": "BOSS",
+        "boss.reminder.close": "BOSS",
     }
 
     def __init__(self, store):
@@ -183,6 +190,16 @@ class BossCommandAPI:
                 result = self._cancel(db, payload)
             elif action == "boss.simulation.feedback":
                 result = self._feedback(db, payload)
+            elif action == "boss.simulation.event.seed":
+                result = self._seed_event(db, data, payload)
+            elif action == "boss.simulation.clock.advance":
+                result = self._advance_clock(db, data, payload)
+            elif action == "boss.memory.confirm":
+                result = self._memory_confirm(db, payload)
+            elif action == "boss.memory.delete":
+                result = self._memory_delete(db, payload)
+            elif action.startswith("boss.reminder."):
+                result = self._reminder(db, payload, action)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)
@@ -347,3 +364,153 @@ class BossCommandAPI:
                 "status": "CANCELED", "version": task["version"],
                 "authorization_id": auth_id,
                 "previous_message_ids": task.get("message_ids", [])}
+
+
+    def _memory_confirm(self, db, payload):
+        self._exact(payload, {"client_request_id", "expected_version", "text"})
+        require(_is_text(payload["text"], 4000),
+                "个人要求须为 1—4000 字", web.HTTPBadRequest)
+        current = self.store.get(db, NAMESPACE, "memory", "current")
+        require(current["version"] == payload["expected_version"],
+                "记忆版本已变化，须重新读取后确认")
+        fingerprint = checksum({"text": payload["text"]})
+        auth_id = self._authorize(
+            db, "memory.confirm",
+            {"expected_version": current["version"], "text_sha256": fingerprint},
+            current["memory_id"], current["version"],
+        )
+        current.update(
+            text=payload["text"].strip(),
+            confirmation_state="CONFIRMED",
+            version=str(int(current["version"]) + 1),
+        )
+        current["memory_version"] = current["version"]
+        # No raw text in the authorization, idempotency receipt or audit log.
+        self.store.put(db, NAMESPACE, "memory", "current", current)
+        return {
+            "source_type": "SIMULATED", "memory_id": current["memory_id"],
+            "version": current["version"], "confirmation_state": "CONFIRMED",
+            "adoption_policy": "FUTURE_TURNS_ONLY",
+            "authorization_id": auth_id,
+        }
+
+    def _memory_delete(self, db, payload):
+        self._exact(payload, {"client_request_id", "expected_version"})
+        current = self.store.get(db, NAMESPACE, "memory", "current")
+        require(current["version"] == payload["expected_version"],
+                "记忆版本已变化，须重新读取后确认")
+        require(current["confirmation_state"] != "DELETED",
+                "此前记忆已删除，禁止重复操作")
+        auth_id = self._authorize(
+            db, "memory.delete",
+            {"expected_version": current["version"]},
+            current["memory_id"], current["version"],
+        )
+        current.update(
+            text="", confirmation_state="DELETED",
+            version=str(int(current["version"]) + 1),
+        )
+        current["memory_version"] = current["version"]
+        self.store.put(db, NAMESPACE, "memory", "current", current)
+        return {
+            "source_type": "SIMULATED", "memory_id": current["memory_id"],
+            "version": current["version"], "confirmation_state": "DELETED",
+            "future_adoption_stopped": True,
+            "physical_secure_erasure_verified": False,
+            "authorization_id": auth_id,
+        }
+
+    def _seed_event(self, db, data, payload):
+        self._exact(payload, {"client_request_id", "event_id"})
+        event = data["event"]
+        require(payload["event_id"] == event["event_id"],
+                "事件不属于当前获准模拟数据集", web.HTTPBadRequest)
+        exists = db.execute(
+            "SELECT 1 FROM objects WHERE namespace=? AND kind='event' AND id=?",
+            (NAMESPACE, event["event_id"]),
+        ).fetchone()
+        require(exists is None, "模拟事件已经注入，先读取原事件版本")
+        registered = {
+            "event_id": event["event_id"], "version": event["version"],
+            "state": event["status"], "impact": "NORMAL",
+            "due_at": event["due_at"], "source_type": "SIMULATED",
+        }
+        self.store.put(db, NAMESPACE, "event", registered["event_id"], registered)
+        # Rules are explicitly created by the maintainer's event-seed action.
+        # Do not silently start notifications for an unconfigured dataset.
+        existing_rules = db.execute(
+            "SELECT 1 FROM objects WHERE namespace=? AND kind='rules' AND id='current'",
+            (NAMESPACE,),
+        ).fetchone()
+        if not existing_rules:
+            self.store.put(db, NAMESPACE, "rules", "current", {
+                "version": "1", "cooldown_seconds": 3600,
+                "quiet_start": 22, "quiet_end": 7,
+                "timezone": "Asia/Shanghai",
+                "important_escalation": False,
+            })
+        return {"source_type": "SIMULATED", "event_id": registered["event_id"],
+                "state": registered["state"], "version": registered["version"],
+                "due_at": registered["due_at"], "rules_installed": not bool(existing_rules)}
+
+    def _advance_clock(self, db, data, payload):
+        self._exact(payload, {"client_request_id", "at"})
+        requested = _aware_due(payload["at"], "Asia/Shanghai")
+        old = self.store.get(db, NAMESPACE, "clock", "current")
+        original = datetime.fromisoformat(old["at"])
+        require(requested >= original, "业务时钟只能前进", web.HTTPBadRequest)
+        require((requested - original).total_seconds() <= 366 * 86400,
+                "单次模拟时间推进不能超过366天", web.HTTPBadRequest)
+        current = self.store.control_clock(db, NAMESPACE, {"at": payload["at"]})
+        # The actual CronService owns eventual notification dispatch.
+        return {"source_type": "SIMULATED", "at": current["at"],
+                "version": current["version"], "dispatch_owner": "CronService",
+                "notification_delivery_claimed": False}
+
+    def _reminder(self, db, payload, action):
+        kind = action.rsplit(".", 1)[-1]
+        keys = {"client_request_id", "event_id", "event_version", "reminder_version"}
+        if kind == "snooze":
+            keys.add("until")
+        self._exact(payload, keys)
+        event = self.store.get(db, NAMESPACE, "event", payload["event_id"])
+        require(event["version"] == payload["event_version"],
+                "事件版本变化，须重新核查")
+        require(event["state"] != "CANCELED",
+                "源事件已取消，不能再改变提醒")
+        previous_row = db.execute(
+            "SELECT body FROM objects WHERE namespace=? AND kind='reminder' AND id=?",
+            (NAMESPACE, event["event_id"]),
+        ).fetchone()
+        previous = json.loads(previous_row[0]) if previous_row else None
+        previous_version = previous.get("version", "0") if previous else "0"
+        require(previous_version == payload["reminder_version"],
+                "提醒版本冲突，须先重新读取")
+        require(not previous or previous["state"] != "CLOSED",
+                "已关闭提醒不可重新开启")
+        state = {"ack": "ACKNOWLEDGED", "snooze": "SNOOZED", "close": "CLOSED"}[kind]
+        bound = {"event_id": event["event_id"], "state": state}
+        if kind == "snooze":
+            until = _aware_due(payload["until"], "Asia/Shanghai")
+            clock = self.store.get(db, NAMESPACE, "clock", "current")
+            before = datetime.fromisoformat(clock["at"])
+            require(until > before, "暂缓期限必须晚于当前业务时钟", web.HTTPBadRequest)
+            require((until - before).total_seconds() <= 31 * 86400,
+                    "单次暂缓不能超过31天", web.HTTPBadRequest)
+            bound["until"] = payload["until"]
+        auth_id = self._authorize(
+            db, "reminder." + kind,
+            {"event_id": event["event_id"], "event_version": event["version"],
+             "reminder_version": previous_version,
+             **({"until": bound["until"]} if kind == "snooze" else {})},
+            event["event_id"], event["version"],
+        )
+        current = self.store.control_reminder(db, NAMESPACE, bound)
+        current["version"] = str(int(previous_version) + 1)
+        self.store.put(db, NAMESPACE, "reminder", event["event_id"], current)
+        return {
+            "source_type": "SIMULATED", "event_id": event["event_id"],
+            "state": state, "version": current["version"],
+            "until": current.get("until"),
+            "event_version": event["version"], "authorization_id": auth_id,
+        }
