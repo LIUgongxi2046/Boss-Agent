@@ -56,7 +56,8 @@ function required(value: string, field: string): string {
 function displayTime(value?: string) { return value ? value.replace("T", " ") : "待核查"; }
 
 function useTransaction(onReload: () => void, onCreated?: (id: string) => void) {
-  const { client } = useClient();
+  const { client, getToken } = useClient();
+  const [lookupBusy,setLookupBusy] = useState(false);
   const dialogRef = useRef<HTMLElement | null>(null);
   const busyRef = useRef(false);
   const [pending, setPending] = useState<Pending | null>(null);
@@ -116,6 +117,37 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
         "。结果可能待核查，请先重读正式状态；本弹窗重试使用同一幂等标识。");
     } finally { setBusy(false); }
   }, [approved, busy, client, onCreated, onReload, pending]);
+  const reconcile = useCallback(async () => {
+    if (!pending || busy || lookupBusy) return;
+    const token = getToken();
+    if (!token) { setError("当前身份已失效，无法核查业务回执"); return; }
+    setLookupBusy(true);setError("");
+    try {
+      const qs = new URLSearchParams({
+        action: pending.action, client_request_id: pending.id,
+      });
+      const res = await fetch("/api/boss/ui/operation-status?" + qs.toString(), {
+        headers: {Authorization:"Bearer "+token}, cache:"no-store",
+      });
+      if (!res.ok) throw new Error("幂等回执查询失败（HTTP " + res.status + "）");
+      const body = await res.json() as {
+        action:string;client_request_id:string;outcome:string;result?:Result;
+      };
+      if(body.action!==pending.action||body.client_request_id!==pending.id)
+        throw new Error("操作回执身份与本次动作不匹配");
+      if(body.outcome==="RECORDED"&&body.result){
+        if(pending.action==="boss.assignment.create"&&body.result.task_id)
+          onCreated?.(body.result.task_id);
+        setNotice("已从实际 SQLite 幂等回执核实该交办动作已保存，任务状态正在重读。");
+        setPending(null);setApproved(false);onReload();
+      }else if(body.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
+        setError("当前没有该请求回执，但不能据此推定未执行。请先重读交办正式状态，再使用原请求编号重试。");
+        onReload();
+      }else throw new Error("服务端回执格式无效，不能假定已执行");
+    } catch(e) {
+      setError(e instanceof Error?e.message:String(e));
+    }finally{setLookupBusy(false);}
+  },[pending,busy,lookupBusy,getToken,onCreated,onReload]);
   const dialog = pending ? <div className="boss-confirm-backdrop">
     <section ref={dialogRef} tabIndex={-1} className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-confirm-title">
       <h3 id="boss-confirm-title"><ShieldCheck size={19}/> {pending.title}</h3>
@@ -127,9 +159,12 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
       </label>
       {error && <p role="alert" className="boss-validation-error">{error}</p>}
       <footer className="boss-actions">
-        <button type="button" className="boss-btn" disabled={busy}
+        <button type="button" className="boss-btn" disabled={busy||lookupBusy}
           onClick={() => {setPending(null);setApproved(false);}}>取消（不执行）</button>
-        <button type="button" className="boss-btn boss-btn-primary" disabled={!approved||busy}
+        <button type="button" className="boss-btn" disabled={busy||lookupBusy}
+          onClick={() => void reconcile()}>
+          {lookupBusy && <Loader2 size={15} className="boss-spin"/>} 核查原请求结果</button>
+        <button type="button" className="boss-btn boss-btn-primary" disabled={!approved||busy||lookupBusy}
           onClick={() => void submit()}>{busy && <Loader2 size={15} className="boss-spin"/>} 确认并提交</button>
       </footer>
     </section>
