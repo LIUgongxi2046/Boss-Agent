@@ -70,7 +70,10 @@ def test_confirmed_memory_is_owner_only_and_not_a_maintainer_configuration(api):
     assert body["memory"]["confirmation_state"] == "CONFIRMED"
     assert "简报优先展示现金" in body["memory"]["text"]
     assert request(api, "MAINTAINER", "memory")[0] == 403
-    assert "memory" not in json.dumps(request(api, "MAINTAINER", "system")[1])
+    maintenance = request(api, "MAINTAINER", "system")[1]
+    assert maintenance["record_counts"].get("memory") == 1  # metadata count only
+    assert "简报优先展示现金" not in json.dumps(maintenance)
+    assert "text" not in maintenance
 
 
 def test_knowledge_search_filters_withdrawn_and_reads_actual_document_versions(api):
