@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime
-from decimal import Decimal
+from datetime import datetime, timedelta
 
 from aiohttp import web
 
@@ -54,13 +53,18 @@ def _contact(data, contact_id):
 
 
 def _source_refs(api, db, data, refs):
-    require(isinstance(refs, list) and len(refs) <= 5
-            and len(refs) == len(set(map(str, refs))),
-            "附件引用数量或标识不合法", web.HTTPBadRequest)
+    require(isinstance(refs, list) and len(refs) <= 5,
+            "附件引用数量不合法", web.HTTPBadRequest)
     sources = []
+    seen = set()
     for row in refs:
         require(isinstance(row, dict) and set(row) == {"source_id", "version"},
                 "附件必须明确来源和版本", web.HTTPBadRequest)
+        require(isinstance(row["source_id"], str) and isinstance(row["version"], str),
+                "附件引用类型无效", web.HTTPBadRequest)
+        require(row["source_id"] not in seen,
+                "重复的来源标识不得以不同版本重复授权", web.HTTPBadRequest)
+        seen.add(row["source_id"])
         doc = api._require_current_source(db, data, row["source_id"])
         require(doc["version"] == row["version"],
                 "附件版本已变化，须重新授权")
@@ -334,9 +338,11 @@ def calendar_share(api, db, data, payload):
     purpose = _text(payload["purpose"], "分享用途", 240)
     end = _time(api, payload["expires_at"], current["timezone"])
     start = datetime.fromisoformat(current["starts_at"])
+    clock = datetime.fromisoformat(api.store.get(db, NS, "clock", "current")["at"])
+    require(end > clock, "分享授权必须在当前模拟业务时钟之后到期", web.HTTPBadRequest)
     require(end > start, "分享过期时间必须晚于开始时间", web.HTTPBadRequest)
-    require(end <= start.replace(year=start.year+2),
-            "分享授权有效期过长", web.HTTPBadRequest)
+    require(end <= clock + timedelta(days=366),
+            "分享授权超过最长366天", web.HTTPBadRequest)
     require(payload["fields"] == ["busy","starts_at","ends_at","timezone"],
             "仅允许分享占用状态与时段，禁止标题或正文", web.HTTPForbidden)
     share_id = "busy-share-" + str(uuid.uuid4())
