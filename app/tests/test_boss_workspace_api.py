@@ -41,7 +41,7 @@ def test_boss_read_projections_are_role_scoped(api, page):
 
 @pytest.mark.parametrize("page", [
     "dataset", "source-index", "tool-catalog", "metric-definitions",
-    "relationships", "scheduler", "audit", "system",
+    "relationships", "scheduler", "audit", "system", "evaluation",
 ])
 def test_technical_projections_reject_business_owner(api, page):
     status, body = request(api, "MAINTAINER", page)
@@ -131,3 +131,15 @@ def test_unknown_and_trailing_paths_fail_closed(api):
     assert api.serve("BOSS", "/api/boss/ui/workspace/calendar/children")[0] == 404
     assert request(api, "BOSS", "does-not-exist")[0] == 403
     assert api.serve("MAINTAINER", "/api/boss/ui/workspace/calendar")[0] == 403
+
+
+def test_evaluation_definition_is_real_but_no_product_score_is_invented(api):
+    status, result = request(api, "MAINTAINER", "evaluation")
+    assert status == 200
+    assert result["defined_step_count"] == 15
+    assert result["defined_assertion_count"] == 37
+    assert result["independent_product_evaluation_completed"] is False
+    assert result["actual_score"] is None
+    assert result["can_start_run_from_ui"] is False
+    assert result["source_file"] == "specs/selection-probe.json"
+    assert request(api, "BOSS", "evaluation")[0] == 403
