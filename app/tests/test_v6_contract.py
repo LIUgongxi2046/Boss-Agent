@@ -90,8 +90,8 @@ def test_page_service_map_is_explicit_about_partial_runtime():
     service_map = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
     assert service_map["page_count"] == 72
     assert len(service_map["pages"]) == 72
-    assert service_map["implemented_page_count"] == 65
-    assert service_map["placeholder_page_count"] == 7
+    assert service_map["implemented_page_count"] == 70
+    assert service_map["placeholder_page_count"] == 2
     assert all(page["actual_e2e_verified"] is False for page in service_map["pages"])
     assert all(page["visual_pixel_verified"] is False for page in service_map["pages"])
     by_id = {item["page_id"]: item for item in service_map["pages"]}
@@ -146,7 +146,7 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
         assert by_id[page_id]["render_status"] == "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA"
         assert by_id[page_id]["metrics_are_real"] is False
         assert by_id[page_id]["actual_e2e_verified"] is False
-    assert len(mapping["not_yet_built_page_ids"]) == 7
+    assert len(mapping["not_yet_built_page_ids"]) == 2
     assert set(mapping["not_yet_built_page_ids"]) == {
         id for id, row in by_id.items() if row["render_status"] == "DESIGN_PLACEHOLDER_ONLY"
     }
@@ -166,3 +166,24 @@ def test_memory_and_notification_commands_are_owner_bound():
     assert by_id["D08"]["render_status"] == "DESIGN_PLACEHOLDER_ONLY"  # original native expired session
     assert by_id["F31"]["verified_http_read_routes"] == ["GET /api/boss/ui/workspace/evaluation"]
     assert by_id["A06"]["render_status"] == "PARTIAL_NATIVE_SKILLS_HANDOFF"
+
+
+
+def test_f27_voice_capture_requires_real_upstream_transcription_and_owner_review():
+    voice = (ROOT / "app/webui/BossVoiceAssignment.tsx").read_text(encoding="utf-8")
+    mapping = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
+    by_id = {row["page_id"]: row for row in mapping["pages"]}
+    assert by_id["F27"]["render_status"].startswith("PARTIAL_")
+    assert by_id["F27"]["actual_e2e_verified"] is False
+    assert "client.transcribeAudio" in voice
+    assert "getUserMedia({ audio: true })" in voice
+    assert 'action: "request_microphone"' in voice
+    assert "onSubmit(draft.trim())" in voice
+    assert "MAX_AUDIO_BYTES" in voice and "MAX_DURATION_MS" in voice
+    assert "URL.revokeObjectURL" in voice
+    assert "MediaRecorder" in voice
+    assert "transcription" not in voice or "尚未启用" in voice or "当前固定开发配置默认关闭" in voice
+    assert "BossVoiceAssignment.tsx" in PREPARE
+    assert set(mapping["not_yet_built_page_ids"]) == {"N01", "D08"}
+    for page_id in ("D04", "D05", "D06", "D07"):
+        assert by_id[page_id]["render_status"].startswith("PARTIAL_")
