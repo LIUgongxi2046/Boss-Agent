@@ -27,6 +27,7 @@ from boss_message_calendar import (
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
 from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
+from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
 from boss_research import prepare as research_prepare
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_meeting_approval import (
@@ -101,6 +102,10 @@ class BossCommandAPI:
         "boss.knowledge.source.create": "MAINTAINER",
         "boss.knowledge.source.revise": "MAINTAINER",
         "boss.knowledge.source.withdraw": "MAINTAINER",
+        "boss.prompt.save": "MAINTAINER",
+        "boss.prompt.validate": "MAINTAINER",
+        "boss.prompt.activate": "MAINTAINER",
+        "boss.prompt.deactivate": "MAINTAINER",
         "boss.approval.decide": "BOSS",
         "boss.simulation.application.seed": "MAINTAINER",
         "boss.simulation.application.revise": "MAINTAINER",
@@ -268,6 +273,14 @@ class BossCommandAPI:
                 result = source_revise(self, db, data, payload)
             elif action == "boss.knowledge.source.withdraw":
                 result = source_withdraw(self, db, data, payload)
+            elif action == "boss.prompt.save":
+                result = prompt_save(self, db, data, payload)
+            elif action == "boss.prompt.validate":
+                result = prompt_validate(self, db, data, payload)
+            elif action == "boss.prompt.activate":
+                result = prompt_activate(self, db, data, payload)
+            elif action == "boss.prompt.deactivate":
+                result = prompt_deactivate(self, db, data, payload)
             elif action == "boss.simulation.application.seed":
                 result = application_seed(self, db, data, payload)
             elif action == "boss.simulation.application.revise":
