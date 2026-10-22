@@ -5,9 +5,25 @@
 ## 当前状态
 
 - **架构**：T04 / A04 静态设计通过；`docs/HLD.md` 与 `specs/hld-72-page-map.json` 固定 72 页架构映射。
-- **第一批前端与数据接入**：`app/webui/BossDesktop.tsx`、`app/webui/boss-v6.css`、`validation/boss_page_api.py` 已入库；实际业务指标由原有 Tool/SQLite 返回；提供身份受控的 72 页导航。尚未实现的页面不显示伪造操作成功。
+- **第一批前端与数据接入**：`app/webui/BossDesktop.tsx`、`app/webui/boss-v6.css`、`validation/boss_page_api.py` 已入库；实际业务指标由原有 Tool/SQLite 返回；提供身份受控的 72 页导航。当前 13 页部分接入代码，59 页仍待正式业务实现；尚未实现的页面不显示伪造操作成功。
 - **开源源码不复制入库**：`scripts/prepare_boss_webui.py` 固定拉取上游 commit 并在本地私有目录叠加增量代码，保证上游可追溯且复用原生会话/设置功能。
 - **开发和验收**：T11 正在进行，T05—T10 与 T18—T26 的完整专业设计/功能开发和产品验收仍有待办。没有声称已经在目标 Mac 安装/运行或通过视觉像素验收。
+
+## 本机 DeepSeek 凭据配置（已支持用户提供的文件）
+
+**不要把 API Key 写进终端命令、代码、截图或 GitHub。** 本次上传的凭据仅核验了格式；本机的软件通过服务端文件引用读取，不在 GitHub Actions 中使用真实 Key。
+
+请将已提供的 `boss agent.md` 保留在本机项目根目录（如果原先就在这个位置，无须重复复制）。首次在本机运行：
+
+```bash
+python3 scripts/configure_local_deepseek.py
+# 文件保存在其他本机目录时可用 --source 指定文件路径，不要传 Key 本身
+# 需先安装 validation/.venv，才能进行真实 API 检查
+cd validation && uv sync --locked && cd ..
+validation/.venv/bin/python scripts/check_local_deepseek.py
+```
+
+`scripts/configure_local_deepseek.py` 只创建 Git 忽略、权限 0600 的本地密钥文件和无密钥的连接引用。真实连通性检测可能有少量模型费用；成功回执只含模型标识、响应 ID 与 Token，不保存 Key 和正文。启动桌面研发版后，可运行 `validation/.venv/bin/python scripts/check_local_boss_agent.py` 做本机真实 DeepSeek 会话与模拟经营查询联调。
 
 ## 本地开发（macOS Intel）
 
@@ -46,3 +62,10 @@ python3 scripts/visual_diff.py --role boss
 ```
 
 这些命令要求本地研发版服务已运行；Pillow 仅在差异分析阶段额外安装。截图存于忽略的 `.work/visual-qa/`，绝不表示目前已经完成 72 页像素验收。
+
+
+## 第三批：真实模型运行可观测（待 Mac 联调）
+
+F24 老板运行详情与 A15 维护记录可读取本机 DeepSeek 实际响应 ID、请求次数、Tool 事件、Token 用量及未覆盖费用范围，模型没响应过就明确展示“未观察到”，不会将配置状态冒充实际运行。真实模型测试、真实 Electron 交互和最终 v6 像素比对仍待目标 Mac 运行。
+
+[DeepSeek 接入开发记录](docs/development/T16.md) · [72 页现有组件与 API 接入状态](specs/page-service-map.json) · [GitHub Actions](https://github.com/LIUgongxi2046/Boss-Agent/actions)

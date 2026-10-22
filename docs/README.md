@@ -10,6 +10,7 @@
 | DOC-VALUE | G01—G04、H01—H37、M01—M17、协议、未知阈值与桌面资源条件 | [价值验证定义](../specs/value-validation.json) | S001；S009 采集结果 | CURRENT | 2026-10-22 |
 | DOC-PRD | 32 项 FR/BR/AC、48 个功能与管理线框、六类 Agent 组件、两端开源复用；第 10.5 节桌面窗口、权限与生命周期 | [PRD](PRD.md) | S002 | IN_REVIEW | 2026-10-22 |
 | DOC-PROBE | T02 的 15 步骤、37 断言；DeepSeek、记忆、调度、权限、两端复用及桌面安装恢复 | [共同验证定义](../specs/selection-probe.json) | S002；T02 执行 | DEFINITION_ONLY | 2026-10-22 |
+| DOC-MODEL-LOCAL | 用户本机 DeepSeek 文件配置、最小真实模型调用、私有脱敏日志、F24/A15 和未完成联调 | [T16开发记录](development/T16.md)、[本机配置脚本](../scripts/configure_local_deepseek.py) | T11/T16/T18/T19 | PARTIAL_CODE；MODEL_RUN_NOT_VERIFIED_ON_TARGET_MAC | 2026-10-22 |
 | DOC-DEV-FIRST | 固定开源 v0.3.5、Desktop v6 React 首批实现、可复现构建、权限测试、剩余阻塞 | [首批开发记录](development/T11.md)、[运行脚本](../scripts/run_boss_local.sh) | S008 / T11，后续 T18 接收 | IN_PROGRESS（不等于 T11/T18 验收通过） | 2026-10-22 |
 | DOC-PAGE-SVC | 72 页真实代码绑定/未实现区分、F06/A04事务动作、视觉像素检查入口 | [当前页面服务映射](../specs/page-service-map.json)、[T18开发记录](development/T18.md)、[T19开发记录](development/T19.md) | T08/T18/T19 | DRAFT_PARTIAL_CODE（非产品验收） | 2026-10-22 |
 | DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
