@@ -13,6 +13,7 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import now
+from boss_workspace_api import BossWorkspaceAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -31,6 +32,7 @@ class BossPageAPI:
     def __init__(self, store, namespace: str = DEMO_NAMESPACE):
         self.store = store
         self.namespace = namespace
+        self.workspace = BossWorkspaceAPI(store, namespace)
 
     @staticmethod
     def _items(db, namespace, kind):
@@ -304,6 +306,8 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path.startswith("/api/boss/ui/workspace/"):
+                return self.workspace.serve(role, path, query_string)
             if path == "/api/boss/ui/maintenance":
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}
