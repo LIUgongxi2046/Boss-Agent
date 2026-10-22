@@ -10,6 +10,7 @@ from websockets.http11 import Request
 
 from business import now
 from boss_page_api import BossPageAPI
+from boss_command_api import BossCommandAPI
 
 
 class RoleChannel(WebSocketChannel):
@@ -20,6 +21,7 @@ class RoleChannel(WebSocketChannel):
         self.token_roles = {}
         self.connection_roles = {}
         self.boss_pages = BossPageAPI(business_store) if business_store is not None else None
+        self.boss_commands = BossCommandAPI(business_store) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
@@ -83,6 +85,27 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        # Boss business commands reuse the authenticated WebUI mutation protocol.
+        # Scope is the WebSocket's server-authenticated role, not payload.role.
+        # Each domain command creates a transactional idempotency receipt and
+        # survives the upstream client's same-request reconnect/replay behavior.
+        if kind == "webui_request" and isinstance(action, str) and action.startswith("boss."):
+            request_id = envelope.get("request_id")
+            if not isinstance(request_id, str) or len(request_id) > 128:
+                return
+            if self.boss_commands is None:
+                status, result = 503, {"error": "BOSS_SERVICE_NOT_READY"}
+            else:
+                status, result = self.boss_commands.execute(role, action, envelope.get("payload"))
+            self.record(role, action, status)
+            await connection.send(json.dumps({
+                "event": "webui_response", "request_id": request_id,
+                "ok": status == 200,
+                **({"result": result} if status == 200 else {
+                    "error": {"status": status, "message": result.get("error", "BUSINESS_REJECTED")}
+                })
+            }, ensure_ascii=False))
+            return
         permitted = role == "BOSS" and kind != "webui_request"
         permitted = permitted or role == "BOSS" and action in {"sidebar.update", "session.rename", "session.delete"}
         permitted = permitted or role == "MAINTAINER" and kind == "webui_request" and action in {"settings.runtime_config.update", "settings.model_configuration.update", "settings.provider.update", "automation.enable", "automation.disable", "automation.delete", "automation.run", "automation.update"}
