@@ -19,7 +19,7 @@ from business import OPERATIONS, ROOT, now
 NS = "ui-check"
 BOSS_PAGES = {
     "memory", "calendar", "notifications", "authorizations", "decisions",
-    "outbox", "sources", "knowledge", "organization", "plans",
+    "outbox", "sources", "knowledge", "organization", "plans", "voice",
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
@@ -81,6 +81,29 @@ class BossWorkspaceAPI:
         return 200, output
 
     def _read(self, db, data, key, role, query_string):
+        if key == "voice":
+            # Fixed local runtime configuration, never client-selected paths
+            # or the raw Provider secret/transport state.
+            runtime_config = ROOT / ".work" / "application" / "config.json"
+            enabled = False
+            max_duration = 120
+            provider = "NOT_CONFIGURED"
+            if runtime_config.is_file() and runtime_config.stat().st_size < 65536:
+                settings = json.loads(runtime_config.read_text(encoding="utf-8"))
+                transcription = settings.get("transcription", {})
+                if isinstance(transcription, dict):
+                    enabled = transcription.get("enabled") is True
+                    max_duration = transcription.get("maxDurationSec", 120)
+                    provider = transcription.get("provider") or "DEFAULT_NOT_VERIFIED"
+            return {
+                "transcription_enabled_in_saved_config": enabled,
+                "transcription_provider_label": provider,
+                "max_duration_seconds": max_duration,
+                "connection_or_credentials_verified": False,
+                "recording_is_local_until_explicit_send": True,
+                "transcription_result_status": "NOT_EXECUTED",
+                "transcription_input_mime": "audio/webm",
+            }
         if key == "memory":
             current = self.store.get(db, self.namespace, "memory", "current")
             return {
