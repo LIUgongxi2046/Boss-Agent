@@ -437,13 +437,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             </div>
           </header>
           <section className="boss-stage">
-            <div className="boss-hero">
+            <div className={"boss-hero " + (page === "F01" ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
                 <div className="boss-eyebrow">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
                 <h1>{page === "F01" ? "早上好，张总 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{metadata?.summary || "按照 PRD 查看真实执行过程和资料来源。"}</p>
               </div>
-              <img src="/boss-brand/dapeng-front.png" className="boss-hero-mascot" alt="大鹏吉祥物" />
+              <img src={["F05","F13","F24","F29"].includes(page) ? "/boss-brand/dapeng-think.png" : ["F06","F07","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"].includes(page) ? "/boss-brand/dapeng-execute.png" : "/boss-brand/dapeng-front.png"} className="boss-hero-mascot" alt="大鹏吉祥物" />
             </div>
             <div className="boss-content" key={page}>
               <div className="boss-meta-strip">
