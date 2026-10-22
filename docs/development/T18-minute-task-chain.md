@@ -20,7 +20,8 @@
 3. `boss.minutes.assignment.create` 是 BOSS-only 命令，复用原有 `BossCommandAPI._create`、`Store.create_assignment`，在同一个 `BEGIN IMMEDIATE` 事务中保存任务、授权、纪要-条目版本关联、幂等回执和脱敏审计。每个**已确认纪要版本 + 条目**最多创建一个任务。同一请求重复/并发回放只有一个真实任务；不同请求无法重复创建同一版本条目的任务。已确认的新纪要版本可以独立授权新任务，但旧任务和旧关联保持历史可读。
 4. F05 的 `GET /api/boss/ui/workspace/minutes` 通过实际任务回读关联任务 ID、状态、版本、模拟发送计数及来源版本。任务表和纪要保持独立持久化；**不会修改已确认的纪要正文**。F06 的 `GET /api/boss/ui/tasks` 返回该任务的 `origin_minute_id`、`origin_minute_version`、`origin_entry_id`、`origin_source_id` 和 `origin_source_version`，便于双向回查。
 5. 新任务固定为 `OPEN`，没有自动外部发送。老板必须在 F06 **再一次明确确认** `boss.assignment.send`；此后 F05 才显示 `WAITING_FEEDBACK / SENT_SIMULATED`。真实外部送达仍未实现。后续模拟进展、延期和完成仍遵守原 FR-06。
-6. 网络超时或结果不确定时可查 `GET /api/boss/ui/operation-status` 的**原幂等请求 ID**，命中只返回获准的任务/纪要版本和状态，不返回会议正文。未命中不能当作未执行而换编号盲目创建。
+6. F06 任务详情按实际任务 ID 同时读取原始 F06 交办发件和 F08 后续模拟消息。各条消息的 `SENT_SIMULATED`、`NOT_VERIFIED` 和模拟回复状态分别保存、分别展示，老板可以进入 F08 核对原消息与回复。真实外部投递依然没有成功凭证；模拟回复可以进入任务 PROGRESS，但不会绕过老板完成确认。
+7. 网络超时或结果不确定时可查 `GET /api/boss/ui/operation-status` 的**原幂等请求 ID**，命中只返回获准的任务/纪要版本和状态，不返回会议正文。未命中不能当作未执行而换编号盲目创建。
 
 ## 失效源的读取边界
 
