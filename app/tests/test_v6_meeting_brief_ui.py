@@ -28,7 +28,7 @@ def test_f04_uses_authenticated_mutation_and_source_version_ui():
     for required in [
         "boss.meeting.brief.prepare","boss.message.draft.save",
         "client.requestMutation","/api/boss/ui/operation-status",
-        "NEEDS_REVIEW","source_changed","business_changed",
+        "needs_review","source_changed","business_changed",
         "finance-note","F05","F06","F08","READY_FOR_REVIEW",
     ]:
         if required=="READY_FOR_REVIEW":
