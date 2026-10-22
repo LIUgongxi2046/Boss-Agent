@@ -51,6 +51,7 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
   const [error,setError]=useState("");
   const [notice,setNotice]=useState("");
   const [selectedContact,setSelectedContact]=useState("");
+  const [tab,setTab]=useState<"议题"|"历史承诺"|"待决定"|"材料缺口">("议题");
   const [pending,setPending]=useState<Pending|null>(null);
   const [approved,setApproved]=useState(false);
   const [busy,setBusy]=useState(false);
@@ -198,8 +199,34 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
     {loading&&<div className="boss-status"><Loader2 size={16} className="boss-spin"/>正在校验参会人、承诺与来源…</div>}
     {error&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error}</div>}
     {notice&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={16}/>{notice}</div>}
+    <section className="boss-panel boss-meeting-filters">
+      <div className="boss-form-grid">
+        <label>会议对象<select value={b?.meeting.meeting_id||""} onChange={()=>reload()}>
+          <option value={b?.meeting.meeting_id||""}>{b?.meeting.meeting_id||"等待选择会议"}</option>
+        </select></label>
+        <label>日期时间<input readOnly value={b?.meeting.starts_at?textTime(b.meeting.starts_at):"待查询"}/></label>
+        <label>时区<input readOnly value={b?.meeting.timezone||"待查询"}/></label>
+        <label>参会联系人<input readOnly value={b?.participants.map(x=>x.contact_id).join("、")||"待查询"}/></label>
+      </div>
+      <div className="boss-actions">
+        <button type="button" className="boss-btn boss-btn-primary" onClick={reload} disabled={loading}>
+          <RefreshCw size={15}/> 查询 / 应用当前会议
+        </button>
+      </div>
+    </section>
+    <nav className="boss-minutes-tabs" aria-label="F04会前材料分类">
+      {(["议题","历史承诺","待决定","材料缺口"] as const).map(item=>
+        <button type="button" key={item} aria-current={tab===item?"page":undefined}
+          className={tab===item?"selected":""} onClick={()=>setTab(item)}>
+          {item}
+          <span>{item==="历史承诺"?b?.commitments.length??0:
+            item==="材料缺口"?b?.missing_items.length??0:
+            item==="议题"?b?.sources.length??0:"—"}</span>
+        </button>)}
+    </nav>
     <div className="boss-columns">
       <div className="boss-column">
+        <div className="boss-tab-view" hidden={tab!=="议题"}>
         <Panel title="会议资料与准备状态" note="会议标识、时间、参会联系人">
           <Fact label="会议 ID" value={b?.meeting.meeting_id}/>
           <Fact label="会议版本" value={b?.meeting.version}/>
@@ -221,6 +248,8 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
               <ArrowLeft size={15}/> 进入会后纪要</button>
           </div>
         </Panel>
+        </div>
+        <div className="boss-tab-view" hidden={tab!=="议题"&&tab!=="材料缺口"}>
         <Panel title="议题资料与原始证据" note="只能引用本会议当前获准的来源">
           {(b?.sources||[]).map(source=><div key={source.source_id} className="boss-workspace-item">
             <div className="boss-workspace-item-top">
@@ -240,6 +269,8 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
             <div><strong>当前无获准会议资料</strong><p>不能将无来源的数字和建议标为 READY。</p></div>
           </div>}
         </Panel>
+        </div>
+        <div className="boss-tab-view" hidden={tab!=="历史承诺"}>
         <Panel title="历史承诺、事件与状态" note="不得将材料准备完成等同于会议已召开">
           <Fact label="当前事件" value={b?.event.event_id}/>
           <Fact label="事件状态" value={b?.event.status}/>
@@ -254,6 +285,8 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
               <ClipboardList size={15}/> 交办、延期和完成核查</button>
           </div>
         </Panel>
+        </div>
+        <div className="boss-tab-view" hidden={tab!=="议题"}>
         <Panel title="当前可复算经营指标" note="同一已核验模拟数据集 · 原因缺少时不推测">
           {b?.metrics.available?
             b.metrics.values.map(period=><div className="boss-workspace-item" key={period.period_scope}>
@@ -269,12 +302,33 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
             </div>}
           <p className="boss-helper">{b?.metrics.unexplained_causes.join("；")||"待实际来源核实"}</p>
         </Panel>
+        </div>
+        <div className="boss-tab-view" hidden={tab!=="待决定"}>
+          <Panel title="当前需要本人决定的事项" note="只核对实际记录和已知资料关系">
+            <Fact label="本人历史承诺" value={b?.commitments.length}/>
+            <Fact label="关联事件" value={b?.event.event_id}/>
+            <Fact label="当前是否已有明确会议决策" value="未提供确认依据"/>
+            <div className="boss-status boss-status-warn">
+              <AlertCircle size={16}/> 当前演示会议资料没有经过核查的申请关联或新决策记录。
+              不能把建议、缺少依据的原因或草稿直接当作老板已决定事项。
+            </div>
+            <div className="boss-actions">
+              <button type="button" className="boss-btn" onClick={()=>onNavigate("F07")}>
+                查看独立审批记录
+              </button>
+              <button type="button" className="boss-btn" onClick={()=>onNavigate("F05")}>
+                打开会后纪要分类
+              </button>
+            </div>
+          </Panel>
+        </div>
       </div>
       <div className="boss-column">
         <Panel title="资料完整度与准备期限">
           <Fact label="有效材料" value={b?.sources.filter(x=>x.status==="CURRENT").length}/>
           <Fact label="待补清单" value={b?.missing_items.length}/>
           <Fact label="当前需复核" value={data?.needs_review?"是":"否"}/>
+          <Fact label="材料准备期限" value="尚无获准的具体准备期限"/>
           <Fact label="会议已举行" value="未知（本页不操作会议）"/>
           <Fact label="资料请求已发送" value="否（仅草稿）"/>
           {(b?.missing_items||[]).map(x=><div className="boss-workspace-item" key={x}>{x}</div>)}
