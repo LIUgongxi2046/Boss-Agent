@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import pageMeta from "./page-meta.json";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
+import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -699,6 +700,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
+                WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
+                  key={page} role={role} pageId={page}
+                  onNavigate={id=>navigate(id)} onViewSource={goSource}
+                /> :
                 <div className="boss-columns">
                   <div className="boss-column"><Panel title={metadata?.title || "页面"} note="v6 设计源已固定">
                     <StatusLine variant="warn" text="此页面已纳入 72 页实现映射，但业务组件及接口尚未接入。以下只展示来自真实设计元数据的字段要求。" />
@@ -737,7 +742,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   </Panel>
                 </div>
               </div>
-              : page === "A04" ? <div className="boss-columns">
+              : page === "A04" ? <>
+              <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>
                 </div>
@@ -749,7 +755,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <GlassButton onClick={refresh}>重读任务元数据</GlassButton>
                   </Panel>
                 </div>
-              </div> : <div className="boss-columns">
+              </div>
+              <div className="boss-workspace-extra">
+                <BossWorkspaceView key="A04" role={role} pageId="A04"
+                  onNavigate={id=>navigate(id)} onViewSource={goSource}/>
+              </div>
+              </> : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
+                key={page} role={role} pageId={page}
+                onNavigate={id=>navigate(id)} onViewSource={goSource}
+              /> : <div className="boss-columns">
                 <div className="boss-column">
                   <Panel title={metadata?.title || "维护工作"} note="独立维护身份 · 仅获准元信息">
                     {maintenance ? <>
