@@ -15,6 +15,7 @@ from aiohttp import web
 from business import now
 from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
+from boss_recovery_api import BossRecoveryAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -35,6 +36,7 @@ class BossPageAPI:
         self.namespace = namespace
         self.workspace = BossWorkspaceAPI(store, namespace)
         self.sectors = BossSectorAPI(store, namespace)
+        self.recovery = BossRecoveryAPI(store, namespace)
 
     @staticmethod
     def _items(db, namespace, kind):
@@ -314,6 +316,8 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview"):
+                return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
                 return self.workspace.serve(role, path, query_string)
             if path == "/api/boss/ui/sector":
