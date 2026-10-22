@@ -781,3 +781,51 @@
 @media(max-width:690px){
   .boss-v6 .boss-meeting-filters .boss-form-grid{grid-template-columns:1fr}
 }
+
+
+/* F09 · Desktop v6 grounded research workspace.
+   Original four-scope filters, quiet document reading, source cards and
+   fixed 278px right information rail. Missing citations are NOT a chart. */
+.boss-v6 .boss-research-filters{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:11px;row-gap:12px;margin:9px 0 15px;
+}
+.boss-v6 .boss-research-filters label{
+  display:flex;flex-direction:column;gap:7px;
+  font-size:12px;font-weight:700;color:#4e6d8c;min-width:0;
+}
+.boss-v6 .boss-research-filters input{
+  width:100%;min-width:0;min-height:44px;
+  border:1px solid #d6e5f4;border-radius:9px;
+  padding:9px 12px;background:#fbfdff;color:#213f61;
+  font-size:12.5px;font-weight:500;
+}
+.boss-v6 .boss-research-filters label:first-child{
+  grid-column:span 2;
+}
+.boss-v6 .boss-research-tabs{
+  padding:5px;gap:5px;display:flex;flex-wrap:wrap;
+}
+.boss-v6 .boss-research-tabs button{
+  flex:1 1 auto;min-width:104px;
+  font-size:12px;min-height:40px;
+}
+.boss-v6 .boss-research-quote{
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  font-size:13px;line-height:1.8;color:#2c4d70;
+  padding:13px 15px;margin:9px 0;
+  border-left:3px solid #0968ea;border-radius:0 9px 9px 0;
+  background:#f5faff;
+}
+.boss-v6 .boss-research-filters input:focus-visible{
+  outline:2px solid #0A64E8;outline-offset:2px;
+}
+@media(max-width:1250px){
+ .boss-v6 .boss-research-filters{
+   grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+}
+@media(max-width:690px){
+ .boss-v6 .boss-research-filters{grid-template-columns:minmax(0,1fr)}
+ .boss-v6 .boss-research-filters label:first-child{grid-column:span 1}
+}
