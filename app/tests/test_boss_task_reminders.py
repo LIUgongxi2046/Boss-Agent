@@ -413,3 +413,50 @@ def test_legacy_task_without_pinned_versions_is_not_sent_as_verified(context):
     assert send(
         api, created["task_id"], key="legacy-unpinned-cannot-send"
     )[0] == 409
+
+
+
+def test_cancel_after_simulated_due_delivery_preserves_history_but_blocks_new_event(context):
+    api, pages = context
+    created = create(api)[1]
+    task_id = created["task_id"]
+    assert send(api, task_id)[0] == 200
+    assert register_rules(api)[0] == 200
+    assert act(
+        api, "MAINTAINER", "boss.simulation.clock.advance",
+        "clock-beyond-original-due", at="2026-10-25T09:00:00+08:00",
+    )[0] == 200
+    first = api.store.dispatch_due("ui-check")
+    delivered = next(
+        row for row in first if row["event_id"] == "task-due:" + task_id
+    )
+    assert delivered["state"] == "DELIVERED"
+    assert delivered["reason"] is None
+    with api.store.connect() as db:
+        before = db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='notification' AND id LIKE 'task-due:%'"
+        ).fetchone()[0]
+        assert before == 1
+
+    canceled = act(
+        api, "BOSS", "boss.assignment.cancel", "cancel-after-first-due",
+        task_id=task_id, task_version="2",
+        reason="本交办已经终止，不能再继续派发催办",
+    )
+    assert canceled[0] == 200, canceled
+    assert due(api, task_id)["state"] == "CANCELED"
+    second = api.store.dispatch_due("ui-check")
+    stopped = next(row for row in second if row["event_id"] == "task-due:" + task_id)
+    assert stopped["state"] == "SUPPRESSED"
+    assert stopped["reason"] in ("SOURCE_CANCELED", "TASK_ENDED")
+    with api.store.connect() as db:
+        after = db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind='notification' AND id LIKE 'task-due:%'"
+        ).fetchone()[0]
+        assert after == 1  # Immutable simulated previous delivery, no second send
+    _, view = pages.serve("BOSS", "/api/boss/ui/tasks")
+    reminder = next(row for row in view["task_due_events"] if row["task_id"] == task_id)
+    assert reminder["event_state"] == "CANCELED"
+    assert reminder["dispatch_state"] == "SUPPRESSED"
+    assert reminder["dispatch_reason"] in ("SOURCE_CANCELED", "TASK_ENDED")
+    assert reminder["external_delivery_verified"] is False
