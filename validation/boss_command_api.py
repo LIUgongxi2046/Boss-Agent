@@ -22,7 +22,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from business import checksum, encode, now, require, validate
 from controls import FIELDS
 from boss_meeting_approval import (
-    minutes_save, minutes_confirm, application_seed, approval_decide,
+    minutes_save, minutes_confirm, application_seed, application_revise, approval_decide,
 )
 
 NAMESPACE = "ui-check"
@@ -88,6 +88,7 @@ class BossCommandAPI:
         "boss.minutes.confirm": "BOSS",
         "boss.approval.decide": "BOSS",
         "boss.simulation.application.seed": "MAINTAINER",
+        "boss.simulation.application.revise": "MAINTAINER",
     }
 
     def __init__(self, store):
@@ -219,6 +220,8 @@ class BossCommandAPI:
                 result = minutes_confirm(self, db, data, payload)
             elif action == "boss.simulation.application.seed":
                 result = application_seed(self, db, data, payload)
+            elif action == "boss.simulation.application.revise":
+                result = application_revise(self, db, data, payload)
             elif action == "boss.approval.decide":
                 result = approval_decide(self, db, data, payload)
             else:
