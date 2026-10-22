@@ -478,15 +478,19 @@
       "component_file": "app/webui/BossResearchView.tsx",
       "component_name": "BossResearchView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/knowledge",
         "GET /api/boss/ui/workspace/research",
-        "GET /api/boss/ui/operation-status"
+        "GET /api/boss/ui/operation-status",
+        "GET /api/boss/ui/evidence"
       ],
       "code_wired_write_actions": [
         "boss.research.prepare",
         "boss.message.draft.save"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "Source citation opens D01 with exact character offset and live document version check",
+        "F09 confirmed missing-source request saves owner-only F08 DRAFT; separate send approval",
+        "Native nanobot chat continuation can ask about source IDs without claiming model research succeeded"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -506,7 +510,9 @@
         "T24"
       ],
       "research_source_status": "RUNTIME_VERSIONED_QUOTE_AND_OFFSET",
-      "fact_review": "UNVERIFIED_NOT_AUTOMATICALLY_PROMOTED"
+      "fact_review": "UNVERIFIED_NOT_AUTOMATICALLY_PROMOTED",
+      "metrics_are_real": null,
+      "current_source_scope": "APPROVED_SIMULATED_ONLY"
     },
     {
       "page_id": "F10",
