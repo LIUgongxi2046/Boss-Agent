@@ -203,9 +203,15 @@ class BossCommandAPI:
         return doc
 
     def _require_current_task_sources(self, db, data, task):
-        """Task contents are not safe to send/close on withdrawn provenance."""
-        for source_id in task.get("source_refs", []):
-            self._require_current_source(db, data, source_id)
+        """Task contents are not safe to send/close on unpinned provenance."""
+        sources = task.get("source_refs", [])
+        pinned = task.get("source_versions")
+        require(isinstance(pinned, dict) and set(pinned) == set(sources),
+                "当前任务没有完整的创建时来源版本；须重新核查后再执行")
+        for source_id in sources:
+            doc = self._require_current_source(db, data, source_id)
+            require(doc.get("version") == pinned[source_id],
+                    "任务原始来源已经换版，旧授权不能用于新的材料")
         origin_source = task.get("origin_source_id")
         if origin_source:
             source = self._require_current_source(db, data, origin_source)
@@ -310,7 +316,15 @@ class BossCommandAPI:
         validate("assignment_input", tool_input)
         result = self.store.create_assignment(db, NAMESPACE, data, tool_input)
         validate("assignment_output", result)
-        return {**result, "source_type": "SIMULATED", "authorization_scope": "BOSS_CONFIRMED"}
+        pinned_versions = {
+            source_id: self._require_current_source(db, data, source_id)["version"]
+            for source_id in refs
+        }
+        persisted = self.store.get(db, NAMESPACE, "task", result["task_id"])
+        persisted["source_versions"] = pinned_versions
+        self.store.put(db, NAMESPACE, "task", result["task_id"], persisted)
+        return {**result, "source_type": "SIMULATED",
+                "authorization_scope": "BOSS_CONFIRMED"}
 
     def _send(self, db, data, payload, key):
         self._exact(payload, {
