@@ -37,7 +37,8 @@ type Pending={
   id:string;title:string;fields:Record<string,unknown>;details:string[];
 };
 type Props={
-  onNavigate:(page:string)=>void;onViewSource:(source:string)=>void;
+  onNavigate:(page:string)=>void;
+  onViewSource:(source:string,anchor?:{version:string;start:number;end:number})=>void;
   onStartChat:(question:string)=>Promise<void|boolean>;
 };
 
@@ -290,7 +291,7 @@ export function BossResearchView({onNavigate,onViewSource,onStartChat}:Props){
             <Fact label="作者 ID">{row.author_contact_id}</Fact>
             <Fact label="发布日期">{row.published_at.replace("T"," ")}</Fact>
             <div className="boss-actions"><button type="button" className="boss-btn"
-              onClick={()=>onViewSource(row.source_id)}>
+              onClick={()=>onViewSource(row.source_id,{version:row.version,start:row.quote_start,end:row.quote_end})}>
               <FileSearch size={15}/> 打开当前有效原文
             </button></div>
           </div>):<div className="boss-empty"><FolderOpen size={20}/>
