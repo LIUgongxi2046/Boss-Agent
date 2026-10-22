@@ -139,12 +139,18 @@ class BossCommandAPI:
         audit_in = {
             "client_request_id": key,
             "task_id": payload.get("task_id"),
+            "meeting_id": payload.get("meeting_id"),
+            "application_id": payload.get("application_id"),
             "action": action,
             "source_type": "SIMULATED",
         }
         audit_out = {
             "task_id": result.get("task_id") or result.get("task", {}).get("task_id"),
-            "status": result.get("status") or result.get("task", {}).get("status"),
+            "meeting_id": result.get("meeting_id"),
+            "application_id": result.get("application_id"),
+            "decision_id": result.get("decision_id"),
+            "status": result.get("status") or result.get("state") or result.get("task", {}).get("status"),
+            "version": result.get("version") or result.get("task", {}).get("version"),
             "authorization_id": result.get("authorization_id"),
         }
         db.execute(
