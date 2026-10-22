@@ -113,10 +113,41 @@ class BossPageAPI:
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
             data = self.store.get(db, self.namespace, "initial", "snapshot")
+            task_messages = [{
+                "message_id": row["message_id"],
+                "task_id": row["task_id"],
+                "type": "ASSIGNMENT_SEND",
+                "recipient_id": row["recipient_id"],
+                "sent_at": row["sent_at"],
+                "send_state": "SENT_SIMULATED",
+                "delivery_state": "NOT_VERIFIED",
+                "reply_state": "NOT_VERIFIED",
+                "external_channel_invoked": False,
+                "source_type": "SIMULATED",
+            } for row in self._items(db, self.namespace, "outbox")
+              if row.get("task_id") and row.get("message_id")]
+            followup_messages = [{
+                "message_id": row["message_id"],
+                "task_id": row["related_task_id"],
+                "type": "FOLLOWUP_MESSAGE",
+                "recipient_id": row["recipient_id"],
+                "sent_at": row["sent_at"],
+                "send_state": row["send_state"],
+                "delivery_state": row["delivery_state"],
+                "reply_state": row["reply_state"],
+                "external_channel_invoked": False,
+                "source_type": "SIMULATED",
+            } for row in self._items(db, self.namespace, "message_outbox")
+              if row.get("related_task_id") and row.get("message_id")]
+            linked_messages = sorted(
+                [*task_messages, *followup_messages],
+                key=lambda row: (row["sent_at"], row["message_id"]),
+            )
             return {
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
                 "tasks": [self._public_task(v) for v in self._items(db, self.namespace, "task")],
+                "linked_messages": linked_messages,
                 "feedback": [
                     {key: item[key] for key in (
                         "feedback_id", "task_id", "kind", "content",
