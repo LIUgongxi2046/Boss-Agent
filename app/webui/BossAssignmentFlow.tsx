@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle, ArrowRight, CheckCircle2, Clock3, ClipboardCheck,
   Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
@@ -56,11 +56,43 @@ function displayTime(value?: string) { return value ? value.replace("T", " ") : 
 
 function useTransaction(onReload: () => void, onCreated?: (id: string) => void) {
   const { client } = useClient();
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const busyRef = useRef(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const [approved, setApproved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  busyRef.current = busy;
+  useEffect(() => {
+    if (!pending) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const modal = dialogRef.current;
+    modal?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      const current = dialogRef.current;
+      if (!current) return;
+      if (event.key === "Escape" && !busyRef.current) {
+        event.preventDefault();
+        setPending(null);
+        setApproved(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const nodes = Array.from(current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]),input:not([disabled]),[tabindex="0"]',
+      )).filter(node => node.getClientRects().length > 0);
+      if (!nodes.length) { event.preventDefault(); current.focus(); return; }
+      const first = nodes[0], last = nodes[nodes.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === current)) {
+        event.preventDefault();last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.removeEventListener("keydown", onKeyDown); previous?.focus(); };
+  }, [pending?.id]);
   const propose = useCallback((action: Action, payload: Record<string, unknown>, title: string, preview: string[]) => {
     setPending({ action, payload, id: "boss-" + crypto.randomUUID(), title, preview });
     setApproved(false); setError(""); setNotice("");
@@ -84,7 +116,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
     } finally { setBusy(false); }
   }, [approved, busy, client, onCreated, onReload, pending]);
   const dialog = pending ? <div className="boss-confirm-backdrop">
-    <section className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-confirm-title">
+    <section ref={dialogRef} tabIndex={-1} className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-confirm-title">
       <h3 id="boss-confirm-title"><ShieldCheck size={19}/> {pending.title}</h3>
       <p>仅当前已认证身份能发起此项模拟业务操作。下面的字段将与授权、对象版本及唯一请求编号一同保存。</p>
       <dl>{pending.preview.map((line, index) => <div key={index}><dd>{line}</dd></div>)}</dl>
