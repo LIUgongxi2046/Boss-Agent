@@ -104,7 +104,8 @@ class BossPageAPI:
             "task_id", "status", "version", "purpose", "coordinator_id",
             "due_at", "timezone", "evidence_requirements", "related_meeting_id",
             "related_event_ids", "source_refs", "feedback_ids", "message_ids",
-            "execution_namespace",
+            "execution_namespace", "origin_minute_id", "origin_minute_version",
+            "origin_entry_id", "origin_source_id", "origin_source_version",
         )
         return {key: item[key] for key in keys if key in item}
 
