@@ -65,7 +65,41 @@ class RecordedProvider(OpenAICompatProvider):
         self.redact_payload = redact_payload
         super().__init__(api_key=os.environ["DEEPSEEK_API_KEY"], api_base=config["base_url"], default_model=config["model_id"], spec=find_by_name("deepseek"), extra_body={"thinking": {"type": config["thinking"]}}, provider_name="deepseek")
         self.output = Path(output)
-        self.requests = json.loads(self.output.read_text()) if self.output.exists() else []
+        loaded = json.loads(self.output.read_text()) if self.output.exists() else []
+        self.requests = ([self._sanitize_history(row) for row in loaded]
+                         if self.redact_payload else loaded)
+        if self.redact_payload and self.output.exists():
+            self.save()
+
+    @staticmethod
+    def _sanitize_history(record):
+        if not isinstance(record, dict):
+            return {"type": "invalid_event", "private_contents_recorded": False}
+        allowed = {
+            "type", "at", "method", "url", "model", "stream", "max_tokens",
+            "status", "request_id", "content_type", "response_id", "created",
+            "request_sha256", "request_bytes", "message_count", "tool_count",
+        }
+        result = {
+            key: value for key, value in record.items()
+            if key in allowed and isinstance(value, (int, float, str, bool, type(None)))
+        }
+        thinking = record.get("thinking")
+        if isinstance(thinking, dict):
+            result["thinking"] = {"type": thinking.get("type")} if thinking.get("type") in ("enabled", "disabled") else None
+        usage = record.get("usage")
+        if isinstance(usage, dict):
+            result["usage"] = {
+                k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens")
+                if isinstance(usage.get(k), (int, float))
+            }
+        reasons = record.get("finish_reasons")
+        if isinstance(reasons, list):
+            result["finish_reasons"] = [str(x)[:50] for x in reasons[:8]]
+        if record.get("error"):
+            result["error_present"] = True
+        result["private_contents_recorded"] = False
+        return result
 
     def save(self):
         payload = json.dumps(self.requests, ensure_ascii=False, indent=2)
