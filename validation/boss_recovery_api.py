@@ -27,7 +27,9 @@ SAFE_RECEIPT_FIELDS = {
     "external_delivery_created", "external_recall_verified",
     "future_visibility_stopped", "task_id", "task_status_after_reply",
     "task_feedback_id", "task_completion_confirmed", "confirmation_state",
-    "minute_id", "meeting_id", "application_id", "decision_id",
+    "minute_id", "minute_version", "entry_id", "meeting_id",
+    "independent_send_required", "message_sent",
+    "application_id", "decision_id",
     "authorization_id",
 }
 
