@@ -5,8 +5,8 @@
   "source_locked": "Boss-Agent Desktop v6.0",
   "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
   "original_v6_status": "DESIGN_ONLY",
-  "implemented_page_count": 11,
-  "placeholder_page_count": 61,
+  "implemented_page_count": 13,
+  "placeholder_page_count": 59,
   "page_count": 72,
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
@@ -16,10 +16,11 @@
   "notes": [
     "72 pages are navigable by already-authenticated role; this does not mean 72 completed React business pages.",
     "Back-end HTTP GET /api/boss/ui/* routes return actual persisted selection data through BossPageAPI. Mutation actions use authenticated nanobot requestMutation, not browser-side SQLite or direct unauthenticated HTTP POST.",
-    "The only newly wired role-scoped commands are boss.assignment.{create,send,complete,extend,cancel} and boss.simulation.feedback; each has its own server-side command whitelist, transaction, audit, version and idempotency receipt.",
+    "The role-scoped commands are boss.assignment.{create,send,complete,extend,cancel} and boss.simulation.feedback; each has its own server-side command whitelist, transaction, audit, version and idempotency receipt.",
     "Task completion requires result submitted with currently valid evidence and a separate authenticated BOSS decision. Simulated feedback never marks completed.",
     "Real Mac visual snapshots, actual DeepSeek+UI complete walkthrough and end-to-end E01-E06 remain not verified in this development slice.",
-    "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance."
+    "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance.",
+    "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration."
   ],
   "pages": [
     {
@@ -899,10 +900,12 @@
       "logical_architecture_route": "/app/boss/F24",
       "actual_webui_navigation": "?bossPage=F24",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_MODEL_RESPONSE_METADATA",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/model-health"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2658,10 +2661,12 @@
       "logical_architecture_route": "/app/maintain/A15",
       "actual_webui_navigation": "?bossPage=A15",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_MAINTENANCE_USAGE",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/model-usage"
+      ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
