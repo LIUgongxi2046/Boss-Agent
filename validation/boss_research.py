@@ -171,6 +171,13 @@ def project(db,data):
     if not saved:
         return {
             "saved":False,"report":None,
+            "contacts":[{
+                "contact_id":person["contact_id"],"name":person["name"],
+                "organization":person["organization"],
+                "responsibility":person["responsibility"],
+                "valid_from":person["valid_from"],"valid_until":person["valid_until"],
+            } for person in data["contacts"]],
+            "preferred_timezone":data["boss_profile"]["timezone"],
             "current_reference_state":"NOT_PREPARED",
             "read_only":True,"source_type":"SIMULATED",
             "revisions":[],
@@ -203,8 +210,16 @@ def project(db,data):
             (NS,),
         ).fetchall()
     )]
+    clock=data.get("boss_profile",{}).get("timezone","Asia/Shanghai")
     return {
         "saved":True,"report":safe,
+        "contacts":[{
+            "contact_id":person["contact_id"],"name":person["name"],
+            "organization":person["organization"],
+            "responsibility":person["responsibility"],
+            "valid_from":person["valid_from"],"valid_until":person["valid_until"],
+        } for person in data["contacts"]],
+        "preferred_timezone":clock,
         "current_reference_state":status,
         "source_changed":status=="NEEDS_REVIEW",
         "current_source_count":len(latest["matched_sources"]),
