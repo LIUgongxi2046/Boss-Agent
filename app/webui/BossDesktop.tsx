@@ -115,7 +115,7 @@ const MAINT_NAV = [
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
 const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F06", "D01", "F24", "D03", "A04", "A06", "A08", "A15", "F30", "N12",
+  "F01", "N02", "N03", "F03", "N04", "N05", "F05", "F06", "F07", "D01", "F24", "D03", "A04", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 const ANIMATIONS: Record<Animation, string> = {
@@ -705,7 +705,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   <div className="boss-column">
                     <Panel title="业务连续性">
                       <StatusLine text="纪要核查、意见/决定分类与分项交办属于后续开发任务；已连接会议与原文读取，未接入写入 API。" />
-                      <div className="boss-actions"><GlassButton onClick={() => navigate("N02")}>让 Agent 准备会议</GlassButton></div>
+                      <div className="boss-actions"><GlassButton onClick={() => navigate("N02")}>让 Agent 准备会议</GlassButton>
+                      <GlassButton onClick={() => navigate("F05")}>纪要分类核查</GlassButton>
+                      <GlassButton onClick={() => navigate("F07")}>查看申请审阅</GlassButton></div>
                     </Panel>
                   </div>
                 </div> :
