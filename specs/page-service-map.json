@@ -1,0 +1,2822 @@
+{
+  "schema_version": "0.2.0",
+  "lifecycle": "DRAFT_IMPLEMENTATION_MAP_PENDING_T08_ACCEPTANCE",
+  "generated_from": "specs/hld-72-page-map.json",
+  "source_locked": "Boss-Agent Desktop v6.0",
+  "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
+  "original_v6_status": "DESIGN_ONLY",
+  "implemented_page_count": 11,
+  "placeholder_page_count": 61,
+  "page_count": 72,
+  "role_boundaries": {
+    "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
+    "MAINTAINER": "same gateway; maintenance metadata and one simulation feedback action only",
+    "ANONYMOUS": "nanobot original login, no business access"
+  },
+  "notes": [
+    "72 pages are navigable by already-authenticated role; this does not mean 72 completed React business pages.",
+    "Back-end HTTP GET /api/boss/ui/* routes return actual persisted selection data through BossPageAPI. Mutation actions use authenticated nanobot requestMutation, not browser-side SQLite or direct unauthenticated HTTP POST.",
+    "The only newly wired role-scoped commands are boss.assignment.{create,send,complete,extend,cancel} and boss.simulation.feedback; each has its own server-side command whitelist, transaction, audit, version and idempotency receipt.",
+    "Task completion requires result submitted with currently valid evidence and a separate authenticated BOSS decision. Simulated feedback never marks completed.",
+    "Real Mac visual snapshots, actual DeepSeek+UI complete walkthrough and end-to-end E01-E06 remain not verified in this development slice.",
+    "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance."
+  ],
+  "pages": [
+    {
+      "page_id": "F01",
+      "design_title": "今日工作",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F01-今日工作.html",
+      "requirement_ids": [
+        "FR-01",
+        "FR-11",
+        "FR-06"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-11-S",
+        "AC-11-E",
+        "AC-06-S",
+        "AC-06-E"
+      ],
+      "logical_architecture_route": "/app/boss/F01",
+      "actual_webui_navigation": "?bossPage=F01",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_READ_UI",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/dashboard"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "today.reorder",
+        "conversation.start"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F02",
+      "design_title": "经营提醒",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F02-经营提醒.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F02",
+      "actual_webui_navigation": "?bossPage=F02",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "alerts.ack",
+        "alerts.defer",
+        "alerts.close",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F03",
+      "design_title": "经营查询与追问",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F03-经营查询与追问.html",
+      "requirement_ids": [
+        "FR-03"
+      ],
+      "acceptance_refs": [
+        "AC-03-S",
+        "AC-03-E"
+      ],
+      "logical_architecture_route": "/app/boss/F03",
+      "actual_webui_navigation": "?bossPage=F03",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_METRIC_UI",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/metrics"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.followup"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F04",
+      "design_title": "会前材料",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F04-会前材料.html",
+      "requirement_ids": [
+        "FR-04",
+        "FR-06"
+      ],
+      "acceptance_refs": [
+        "AC-04-S",
+        "AC-04-E",
+        "AC-06-S",
+        "AC-06-E"
+      ],
+      "logical_architecture_route": "/app/boss/F04",
+      "actual_webui_navigation": "?bossPage=F04",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "meeting_brief.prepare",
+        "message_draft.save"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F05",
+      "design_title": "纪要核查",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F05-纪要核查.html",
+      "requirement_ids": [
+        "FR-05",
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-05-S",
+        "AC-05-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F05",
+      "actual_webui_navigation": "?bossPage=F05",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "minutes.save",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F06",
+      "design_title": "交办详情",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F06-交办详情.html",
+      "requirement_ids": [
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F06",
+      "actual_webui_navigation": "?bossPage=F06",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
+      "component_file": "app/webui/BossAssignmentFlow.tsx",
+      "component_name": "BossAssignmentFlow (nested in BossDesktop)",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/dashboard",
+        "GET /api/boss/ui/tasks"
+      ],
+      "code_wired_write_actions": [
+        "boss.assignment.create",
+        "boss.assignment.send",
+        "boss.assignment.complete",
+        "boss.assignment.extend",
+        "boss.assignment.cancel"
+      ],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignments.create",
+        "assignments.send",
+        "assignments.defer",
+        "assignments.complete",
+        "assignments.cancel"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_command_api.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F07",
+      "design_title": "申请审阅",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F07-申请审阅.html",
+      "requirement_ids": [
+        "FR-07",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-07-S",
+        "AC-07-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F07",
+      "actual_webui_navigation": "?bossPage=F07",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "approval.decide"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F08",
+      "design_title": "消息编辑",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F08-消息编辑.html",
+      "requirement_ids": [
+        "FR-08",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-08-S",
+        "AC-08-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F08",
+      "actual_webui_navigation": "?bossPage=F08",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "message_drafts.save",
+        "messages.send"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F09",
+      "design_title": "专题研究",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F09-专题研究.html",
+      "requirement_ids": [
+        "FR-09"
+      ],
+      "acceptance_refs": [
+        "AC-09-S",
+        "AC-09-E"
+      ],
+      "logical_architecture_route": "/app/boss/F09",
+      "actual_webui_navigation": "?bossPage=F09",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "research.run",
+        "message_drafts.save"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F10",
+      "design_title": "人员会面",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F10-人员会面.html",
+      "requirement_ids": [
+        "FR-10"
+      ],
+      "acceptance_refs": [
+        "AC-10-S",
+        "AC-10-E"
+      ],
+      "logical_architecture_route": "/app/boss/F10",
+      "actual_webui_navigation": "?bossPage=F10",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "meeting_brief.prepare",
+        "meeting_schedule.propose"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F11",
+      "design_title": "行程安排",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F11-行程安排.html",
+      "requirement_ids": [
+        "FR-11",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-11-S",
+        "AC-11-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F11",
+      "actual_webui_navigation": "?bossPage=F11",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "travel.propose",
+        "travel.confirm"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F12",
+      "design_title": "本人私人安排",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F12-本人私人安排.html",
+      "requirement_ids": [
+        "FR-12",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-12-S",
+        "AC-12-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F12",
+      "actual_webui_navigation": "?bossPage=F12",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "private_calendar.save",
+        "private_calendar.share",
+        "private_calendar.revoke"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F13",
+      "design_title": "个人记忆",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F13-个人记忆.html",
+      "requirement_ids": [
+        "FR-13",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F13",
+      "actual_webui_navigation": "?bossPage=F13",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_memory.confirm",
+        "owner_memory.update",
+        "owner_memory.delete"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F14",
+      "design_title": "原料与饲料",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F14-原料与饲料.html",
+      "requirement_ids": [
+        "FR-14"
+      ],
+      "acceptance_refs": [
+        "AC-14-S",
+        "AC-14-E"
+      ],
+      "logical_architecture_route": "/app/boss/F14",
+      "actual_webui_navigation": "?bossPage=F14",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F15",
+      "design_title": "水产季节",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F15-水产季节.html",
+      "requirement_ids": [
+        "FR-15"
+      ],
+      "acceptance_refs": [
+        "AC-15-S",
+        "AC-15-E"
+      ],
+      "logical_architecture_route": "/app/boss/F15",
+      "actual_webui_navigation": "?bossPage=F15",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F16",
+      "design_title": "苗种批次",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F16-苗种批次.html",
+      "requirement_ids": [
+        "FR-16"
+      ],
+      "acceptance_refs": [
+        "AC-16-S",
+        "AC-16-E"
+      ],
+      "logical_architecture_route": "/app/boss/F16",
+      "actual_webui_navigation": "?bossPage=F16",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F17",
+      "design_title": "动保与技服",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F17-动保与技服.html",
+      "requirement_ids": [
+        "FR-17"
+      ],
+      "acceptance_refs": [
+        "AC-17-S",
+        "AC-17-E"
+      ],
+      "logical_architecture_route": "/app/boss/F17",
+      "actual_webui_navigation": "?bossPage=F17",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F18",
+      "design_title": "生猪合作",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F18-生猪合作.html",
+      "requirement_ids": [
+        "FR-18"
+      ],
+      "acceptance_refs": [
+        "AC-18-S",
+        "AC-18-E"
+      ],
+      "logical_architecture_route": "/app/boss/F18",
+      "actual_webui_navigation": "?bossPage=F18",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare",
+        "review.schedule"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F19",
+      "design_title": "禽类与反刍",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F19-禽类与反刍.html",
+      "requirement_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_architecture_route": "/app/boss/F19",
+      "actual_webui_navigation": "?bossPage=F19",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F20",
+      "design_title": "公司水产养殖",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F20-公司水产养殖.html",
+      "requirement_ids": [
+        "FR-20"
+      ],
+      "acceptance_refs": [
+        "AC-20-S",
+        "AC-20-E"
+      ],
+      "logical_architecture_route": "/app/boss/F20",
+      "actual_webui_navigation": "?bossPage=F20",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F21",
+      "design_title": "食品与品质",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F21-食品与品质.html",
+      "requirement_ids": [
+        "FR-21"
+      ],
+      "acceptance_refs": [
+        "AC-21-S",
+        "AC-21-E"
+      ],
+      "logical_architecture_route": "/app/boss/F21",
+      "actual_webui_navigation": "?bossPage=F21",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F22",
+      "design_title": "海外业务",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F22-海外业务.html",
+      "requirement_ids": [
+        "FR-22"
+      ],
+      "acceptance_refs": [
+        "AC-22-S",
+        "AC-22-E"
+      ],
+      "logical_architecture_route": "/app/boss/F22",
+      "actual_webui_navigation": "?bossPage=F22",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "meeting_schedule.propose",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F23",
+      "design_title": "研发应用",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F23-研发应用.html",
+      "requirement_ids": [
+        "FR-23"
+      ],
+      "acceptance_refs": [
+        "AC-23-S",
+        "AC-23-E"
+      ],
+      "logical_architecture_route": "/app/boss/F23",
+      "actual_webui_navigation": "?bossPage=F23",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "review.schedule",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F24",
+      "design_title": "运行详情",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F24-运行详情.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_architecture_route": "/app/boss/F24",
+      "actual_webui_navigation": "?bossPage=F24",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "runs.cancel_pending",
+        "runs.reconcile"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F25",
+      "design_title": "模拟中心",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F25-模拟中心.html",
+      "requirement_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/F25",
+      "actual_webui_navigation": "?bossPage=F25",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "simulation.execute",
+        "simulation.reset",
+        "simulation.inject"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F26",
+      "design_title": "应用入口与本人设置",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F26-应用入口与本人设置.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F26",
+      "actual_webui_navigation": "?bossPage=F26",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_settings.save",
+        "auth.logout"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F27",
+      "design_title": "语音交办",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F27-语音交办.html",
+      "requirement_ids": [
+        "FR-27",
+        "FR-08",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-27-S",
+        "AC-27-E",
+        "AC-08-S",
+        "AC-08-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F27",
+      "actual_webui_navigation": "?bossPage=F27",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "voice.record",
+        "voice.stop",
+        "voice.transcribe",
+        "voice.confirm_text",
+        "conversation.submit_text"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T20",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F28",
+      "design_title": "动作授权详情",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F28-动作授权详情.html",
+      "requirement_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/F28",
+      "actual_webui_navigation": "?bossPage=F28",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_authorizations.grant",
+        "owner_authorizations.revoke"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F29",
+      "design_title": "任务异常详情",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F29-任务异常详情.html",
+      "requirement_ids": [
+        "FR-29",
+        "FR-24"
+      ],
+      "acceptance_refs": [
+        "AC-29-S",
+        "AC-29-E",
+        "AC-24-S",
+        "AC-24-E"
+      ],
+      "logical_architecture_route": "/app/boss/F29",
+      "actual_webui_navigation": "?bossPage=F29",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "runs.reconcile",
+        "runs.cancel_pending"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F30",
+      "design_title": "运行与用量详情",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F30-运行与用量详情.html",
+      "requirement_ids": [
+        "FR-30",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-30-S",
+        "AC-30-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/F30",
+      "actual_webui_navigation": "?bossPage=F30",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "usage.recalculate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F31",
+      "design_title": "演示评测",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F31-演示评测.html",
+      "requirement_ids": [
+        "FR-31",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-31-S",
+        "AC-31-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/F31",
+      "actual_webui_navigation": "?bossPage=F31",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "evaluation.run",
+        "evaluation.reset"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "F32",
+      "design_title": "本地运行与交接",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F32-本地运行与交接.html",
+      "requirement_ids": [
+        "FR-32",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-32-S",
+        "AC-32-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/F32",
+      "actual_webui_navigation": "?bossPage=F32",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "maintenance.check_health"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T25"
+      ]
+    },
+    {
+      "page_id": "N01",
+      "design_title": "身份登录",
+      "role_gate": "ANONYMOUS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N01-身份登录.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/auth/N01",
+      "actual_webui_navigation": "?bossPage=N01",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "auth.login"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N02",
+      "design_title": "聊天交办",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N02-聊天交办.html",
+      "requirement_ids": [
+        "FR-08",
+        "FR-24",
+        "FR-27",
+        "FR-28",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-08-S",
+        "AC-08-E",
+        "AC-24-S",
+        "AC-24-E",
+        "AC-27-S",
+        "AC-27-E",
+        "AC-28-S",
+        "AC-28-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_architecture_route": "/app/boss/N02",
+      "actual_webui_navigation": "?bossPage=N02",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_NATIVE_CONVERSATION",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop + native ThreadShell",
+      "verified_http_read_routes": [
+        "GET /api/boss/identity"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [
+        "native nanobot WebSocket conversation"
+      ],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.submit",
+        "conversation.cancel_pending"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N03",
+      "design_title": "经营关注",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N03-经营关注.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-03",
+        "FR-14",
+        "FR-15",
+        "FR-16",
+        "FR-17",
+        "FR-18",
+        "FR-19",
+        "FR-20",
+        "FR-21",
+        "FR-22",
+        "FR-23"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-03-S",
+        "AC-03-E",
+        "AC-14-S",
+        "AC-14-E",
+        "AC-15-S",
+        "AC-15-E",
+        "AC-16-S",
+        "AC-16-E",
+        "AC-17-S",
+        "AC-17-E",
+        "AC-18-S",
+        "AC-18-E",
+        "AC-19-S",
+        "AC-19-E",
+        "AC-20-S",
+        "AC-20-E",
+        "AC-21-S",
+        "AC-21-E",
+        "AC-22-S",
+        "AC-22-E",
+        "AC-23-S",
+        "AC-23-E"
+      ],
+      "logical_architecture_route": "/app/boss/N03",
+      "actual_webui_navigation": "?bossPage=N03",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_METRIC_UI",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/dashboard",
+        "GET /api/boss/ui/metrics"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "metrics.query",
+        "conversation.start"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N04",
+      "design_title": "会议与资料",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N04-会议与资料.html",
+      "requirement_ids": [
+        "FR-04",
+        "FR-05",
+        "FR-07",
+        "FR-09",
+        "FR-10"
+      ],
+      "acceptance_refs": [
+        "AC-04-S",
+        "AC-04-E",
+        "AC-05-S",
+        "AC-05-E",
+        "AC-07-S",
+        "AC-07-E",
+        "AC-09-S",
+        "AC-09-E",
+        "AC-10-S",
+        "AC-10-E"
+      ],
+      "logical_architecture_route": "/app/boss/N04",
+      "actual_webui_navigation": "?bossPage=N04",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_READ_UI",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/meetings"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "meeting_brief.prepare",
+        "meeting_minutes.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N05",
+      "design_title": "任务与承诺",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N05-任务与承诺.html",
+      "requirement_ids": [
+        "FR-06",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/N05",
+      "actual_webui_navigation": "?bossPage=N05",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_TASK_LIST",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/tasks"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "assignment.prepare",
+        "assignment.followup"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N06",
+      "design_title": "通知中心",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N06-通知中心.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/boss/N06",
+      "actual_webui_navigation": "?bossPage=N06",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "notifications.ack",
+        "notifications.defer",
+        "notifications.close"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N07",
+      "design_title": "本人目标与关注要求",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N07-本人目标与关注要求.html",
+      "requirement_ids": [
+        "FR-01",
+        "FR-13",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-13-S",
+        "AC-13-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/boss/N07",
+      "actual_webui_navigation": "?bossPage=N07",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_goals.save"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N08",
+      "design_title": "通知要求与可见范围",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N08-通知要求与可见范围.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-12",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-12-S",
+        "AC-12-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/boss/N08",
+      "actual_webui_navigation": "?bossPage=N08",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "notification_preferences.save"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N09",
+      "design_title": "本人计划",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N09-本人计划.html",
+      "requirement_ids": [
+        "FR-01",
+        "FR-02",
+        "FR-11",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-01-S",
+        "AC-01-E",
+        "AC-02-S",
+        "AC-02-E",
+        "AC-11-S",
+        "AC-11-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/boss/N09",
+      "actual_webui_navigation": "?bossPage=N09",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_plans.save",
+        "owner_plans.pause",
+        "owner_plans.cancel"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N10",
+      "design_title": "本人授权",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N10-本人授权.html",
+      "requirement_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/N10",
+      "actual_webui_navigation": "?bossPage=N10",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_authorizations.revoke"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N11",
+      "design_title": "历史决定",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N11-历史决定.html",
+      "requirement_ids": [
+        "FR-13",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/N11",
+      "actual_webui_navigation": "?bossPage=N11",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "N12",
+      "design_title": "运行概况",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N12-运行概况.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_architecture_route": "/app/maintain/N12",
+      "actual_webui_navigation": "?bossPage=N12",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_MAINTENANCE_READ",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/maintenance"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D01",
+      "design_title": "来源原文与支持关系",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D01-来源原文与支持关系.html",
+      "requirement_ids": [
+        "FR-03",
+        "FR-09"
+      ],
+      "acceptance_refs": [
+        "AC-03-S",
+        "AC-03-E",
+        "AC-09-S",
+        "AC-09-E"
+      ],
+      "logical_architecture_route": "/app/boss/D01",
+      "actual_webui_navigation": "?bossPage=D01",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_EVIDENCE_READ",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/evidence"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D02",
+      "design_title": "当前动作必要决定",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D02-当前动作必要决定.html",
+      "requirement_ids": [
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/boss/D02",
+      "actual_webui_navigation": "?bossPage=D02",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "owner_decision.submit"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D03",
+      "design_title": "执行结果核查",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D03-执行结果核查.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-29"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-29-S",
+        "AC-29-E"
+      ],
+      "logical_architecture_route": "/app/boss/D03",
+      "actual_webui_navigation": "?bossPage=D03",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "runs.reconcile"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D04",
+      "design_title": "选择负责人",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D04-选择负责人.html",
+      "requirement_ids": [
+        "FR-06",
+        "FR-08"
+      ],
+      "acceptance_refs": [
+        "AC-06-S",
+        "AC-06-E",
+        "AC-08-S",
+        "AC-08-E"
+      ],
+      "logical_architecture_route": "/app/boss/D04",
+      "actual_webui_navigation": "?bossPage=D04",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D05",
+      "design_title": "选择时间与时区",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D05-选择时间与时区.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-06",
+        "FR-11"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-06-S",
+        "AC-06-E",
+        "AC-11-S",
+        "AC-11-E"
+      ],
+      "logical_architecture_route": "/app/boss/D05",
+      "actual_webui_navigation": "?bossPage=D05",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D06",
+      "design_title": "未保存修改提醒",
+      "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D06-未保存修改提醒.html",
+      "requirement_ids": [
+        "FR-05",
+        "FR-08",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-05-S",
+        "AC-05-E",
+        "AC-08-S",
+        "AC-08-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/shared/D06",
+      "actual_webui_navigation": "?bossPage=D06",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T19"
+      ]
+    },
+    {
+      "page_id": "D07",
+      "design_title": "访问权限限制",
+      "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D07-访问权限限制.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/shared/D07",
+      "actual_webui_navigation": "?bossPage=D07",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D08",
+      "design_title": "登录状态已过期",
+      "role_gate": "ANONYMOUS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D08-登录状态已过期.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/auth/D08",
+      "actual_webui_navigation": "?bossPage=D08",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "auth.reauthenticate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "D09",
+      "design_title": "历史通知只读详情",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D09-历史通知只读详情.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/boss/D09",
+      "actual_webui_navigation": "?bossPage=D09",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A01",
+      "design_title": "档案与访问",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A01-档案与访问.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A01",
+      "actual_webui_navigation": "?bossPage=A01",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "maintenance.access.save",
+        "maintenance.access.validate",
+        "maintenance.access.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A02",
+      "design_title": "接口目录",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A02-接口目录.html",
+      "requirement_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A02",
+      "actual_webui_navigation": "?bossPage=A02",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "simulation.invoke",
+        "simulation.test"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A03",
+      "design_title": "数据集",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A03-数据集.html",
+      "requirement_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A03",
+      "actual_webui_navigation": "?bossPage=A03",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "simulation.datasets.generate",
+        "simulation.reset"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A04",
+      "design_title": "场景与事件",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A04-场景与事件.html",
+      "requirement_ids": [
+        "FR-25",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A04",
+      "actual_webui_navigation": "?bossPage=A04",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
+      "component_file": "app/webui/BossAssignmentFlow.tsx",
+      "component_name": "MaintainerFeedback (nested in BossDesktop)",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/maintenance"
+      ],
+      "code_wired_write_actions": [
+        "boss.simulation.feedback"
+      ],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "simulation.events.inject",
+        "simulation.clock.advance"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_command_api.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A05",
+      "design_title": "Prompt版本",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A05-Prompt版本.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A05",
+      "actual_webui_navigation": "?bossPage=A05",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "prompt_versions.save",
+        "prompt_versions.validate",
+        "prompt_versions.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A06",
+      "design_title": "SOP与Skills",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A06-SOP与Skills.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A06",
+      "actual_webui_navigation": "?bossPage=A06",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "sop.save",
+        "sop.validate",
+        "sop.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A07",
+      "design_title": "Knowledge Base",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A07-Knowledge Base.html",
+      "requirement_ids": [
+        "FR-09",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-09-S",
+        "AC-09-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A07",
+      "actual_webui_navigation": "?bossPage=A07",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "knowledge.ingest",
+        "knowledge.verify",
+        "knowledge.withdraw"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A08",
+      "design_title": "模型连接",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A08-模型连接.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A08",
+      "actual_webui_navigation": "?bossPage=A08",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "PARTIAL_MAINTENANCE_READ",
+      "component_file": "app/webui/BossDesktop.tsx",
+      "component_name": "BossDesktop + native Settings",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/maintenance"
+      ],
+      "code_wired_write_actions": [],
+      "other_integration_points": [
+        "native settings mutation"
+      ],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "model_config.save",
+        "model_config.validate",
+        "model_config.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A09",
+      "design_title": "Tools与连接",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A09-Tools与连接.html",
+      "requirement_ids": [
+        "FR-24",
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A09",
+      "actual_webui_navigation": "?bossPage=A09",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "tools.save",
+        "tools.validate",
+        "tools.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A10",
+      "design_title": "指标与规则",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A10-指标与规则.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-03",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-03-S",
+        "AC-03-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A10",
+      "actual_webui_navigation": "?bossPage=A10",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "metric_definitions.save",
+        "alert_rules.save",
+        "configuration.activate"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A11",
+      "design_title": "关联对象",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A11-关联对象.html",
+      "requirement_ids": [
+        "FR-25",
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-25-S",
+        "AC-25-E",
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A11",
+      "actual_webui_navigation": "?bossPage=A11",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "simulation.relationships.save",
+        "simulation.feedback.inject"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A12",
+      "design_title": "记忆技术维护",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A12-记忆技术维护.html",
+      "requirement_ids": [
+        "FR-13",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-13-S",
+        "AC-13-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A12",
+      "actual_webui_navigation": "?bossPage=A12",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "memory_index.verify",
+        "memory_index.repair"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A13",
+      "design_title": "调度计划",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A13-调度计划.html",
+      "requirement_ids": [
+        "FR-02",
+        "FR-24",
+        "FR-26"
+      ],
+      "acceptance_refs": [
+        "AC-02-S",
+        "AC-02-E",
+        "AC-24-S",
+        "AC-24-E",
+        "AC-26-S",
+        "AC-26-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A13",
+      "actual_webui_navigation": "?bossPage=A13",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "scheduler.jobs.save",
+        "scheduler.jobs.pause",
+        "scheduler.jobs.cancel"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A14",
+      "design_title": "动作授权记录",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A14-动作授权记录.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-28"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-28-S",
+        "AC-28-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A14",
+      "actual_webui_navigation": "?bossPage=A14",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A15",
+      "design_title": "运行记录",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A15-运行记录.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-30"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-30-S",
+        "AC-30-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A15",
+      "actual_webui_navigation": "?bossPage=A15",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "A16",
+      "design_title": "评测管理",
+      "role_gate": "MAINTAINER",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/A16-评测管理.html",
+      "requirement_ids": [
+        "FR-26",
+        "FR-31"
+      ],
+      "acceptance_refs": [
+        "AC-26-S",
+        "AC-26-E",
+        "AC-31-S",
+        "AC-31-E"
+      ],
+      "logical_architecture_route": "/app/maintain/A16",
+      "actual_webui_navigation": "?bossPage=A16",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "evaluation.run",
+        "evaluation.reset"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T19",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "V19-BEEF",
+      "design_title": "禽类与反刍",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-BEEF-禽类与反刍.html",
+      "requirement_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_architecture_route": "/app/boss/V19-BEEF",
+      "actual_webui_navigation": "?bossPage=V19-BEEF",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "V19-EGG",
+      "design_title": "禽类与反刍",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-EGG-禽类与反刍.html",
+      "requirement_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_architecture_route": "/app/boss/V19-EGG",
+      "actual_webui_navigation": "?bossPage=V19-EGG",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    },
+    {
+      "page_id": "V19-MILK",
+      "design_title": "禽类与反刍",
+      "role_gate": "BOSS",
+      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-MILK-禽类与反刍.html",
+      "requirement_ids": [
+        "FR-19"
+      ],
+      "acceptance_refs": [
+        "AC-19-S",
+        "AC-19-E"
+      ],
+      "logical_architecture_route": "/app/boss/V19-MILK",
+      "actual_webui_navigation": "?bossPage=V19-MILK",
+      "webui_navigation_is_server_access_control": false,
+      "render_status": "DESIGN_PLACEHOLDER_ONLY",
+      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
+      "component_name": "BossDesktop placeholder metadata",
+      "verified_http_read_routes": [],
+      "code_wired_write_actions": [],
+      "other_integration_points": [],
+      "actual_e2e_verified": false,
+      "visual_pixel_verified": false,
+      "operations_not_yet_implemented": [
+        "conversation.followup",
+        "assignment.prepare"
+      ],
+      "tests": [
+        "app/tests/test_v6_contract.py"
+      ],
+      "source_task_ids": [
+        "T18",
+        "T24"
+      ]
+    }
+  ]
+}
