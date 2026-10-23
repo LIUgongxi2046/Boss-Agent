@@ -1,0 +1,222 @@
+{
+  "status": "PASS_PUBLIC_NATURAL_ACCOUNT_EXPIRY_D08_AND_REAUTHENTICATION",
+  "run_id": "account-upgrade-expiry-f671a344-7a60-4a8d-95bb-36aaa95aa7a8",
+  "at": "2026-10-23T12:53:13.581Z",
+  "application_directory": "validation/.work/account-upgrade-expiry-f671a344-7a60-4a8d-95bb-36aaa95aa7a8",
+  "inputs": [
+    {
+      "path": "validation/prepare_account_upgrade.py",
+      "sha256": "c112e75133b58d6d712669045a2c81ca666e37291f45b568729699abdd208cfd"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "e33b76d8791810c0493607e6c79fe8ed28674de1c605b0df618d18cca0243e6c"
+    },
+    {
+      "path": "validation/boss_account_auth.py",
+      "sha256": "a8e4f0851ecfa82bd99abdf7ba08694af231fd25a3e8868898bc77e994d84d6d"
+    },
+    {
+      "path": "validation/desktop/main.cjs",
+      "sha256": "199c56bfc5b33460cb04985931ea1fce918c0c10ca90f668e7eb57d543bcda90"
+    },
+    {
+      "path": "validation/desktop/check-account-expiry.cjs",
+      "sha256": "d9e63989f52776677eb09950e8f16240cdb0ed6296a3bfa06fcad2123287f172"
+    },
+    {
+      "path": "app/webui/BossLogin.tsx",
+      "sha256": "7bd7ed92859ed291252f777b7a3a0d678072601c2012044af3659a9ea5e00b8e"
+    },
+    {
+      "path": "app/webui/boss-login.css",
+      "sha256": "c2572f06a2d14dea2c6edf87a25ec3bb18171196fa827ab2c0a18549ccb1bbef"
+    },
+    {
+      "path": "scripts/boss_auth_overlay.py",
+      "sha256": "1d1b402d818e689efbcae6c1aec690eae075a7b9345623faef4b38c289572dc0"
+    },
+    {
+      "path": "evidence/T11/w3-local-20261023/memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef.json",
+      "sha256": "389ba6c7567687d93819d6dd854bf61eef3bdf44d6310fd04807250bf6aa290c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "199824707145d41aaba4d6e9226fcbffe9d41af5299f0027ce0c9bdc580416a3"
+    }
+  ],
+  "records": [
+    {
+      "check": "actual_stored_native_api_token_expires_without_clock_override",
+      "prepared": {
+        "status": "ACTUAL_PREACCOUNT_APPLICATION_NATIVE_BACKUP",
+        "reference": "evidence/T11/w3-local-20261023/memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef.json",
+        "reference_sha256": "389ba6c7567687d93819d6dd854bf61eef3bdf44d6310fd04807250bf6aa290c",
+        "source_directory": "validation/.work/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1",
+        "target_directory": "validation/.work/account-upgrade-expiry-f671a344-7a60-4a8d-95bb-36aaa95aa7a8",
+        "source_database_sha256": "da7154bd3b41b31d9966de9b54d8a55b0d1f199265fbfcb9b53365f99911bbe0",
+        "copied_database_sha256": "a9eb3366aa54930d386f07169ba8289a8deccc35a8ed7e531f876f34b7a29e65",
+        "source_configuration_sha256": "89f08327eb57e7b750e036b409ebffe636f4355b2b78f52de6f280aba27e3b92",
+        "workspace_manifest_sha256": "0582661db54e79ce655d0dccaf7942cfb83979495b6f6a0a36a6cc4a67715a48",
+        "workspace_files": 1,
+        "historical_run_ids": [
+          "run-928f34d3-c296-4ac0-b14e-29b65f5282e4",
+          "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "run-d03d3382-a763-465f-a32f-b57420e37515"
+        ],
+        "configuration_version": "3",
+        "memory_version": "2",
+        "memory_confirmation_state": "DELETED",
+        "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "token_ttl_seconds": 30,
+        "database_logical_copy_identical": true,
+        "workspace_copy_identical": true,
+        "source_database_configuration_and_workspace_unchanged": true,
+        "new_model_calls": false,
+        "private_body_recorded": false
+      },
+      "expires_in": 30,
+      "elapsed_after_document_departure_ms": 23896,
+      "token_value_recorded": false,
+      "expired_status": 401
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1024,
+        "bottom": 768,
+        "width": 1024,
+        "height": 768,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1280,
+        "bottom": 800,
+        "width": 1280,
+        "height": 800,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1440,
+        "bottom": 1024,
+        "width": 1440,
+        "height": 1024,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 512,
+        "bottom": 384,
+        "width": 512,
+        "height": 384,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 640,
+        "bottom": 400,
+        "width": 640,
+        "height": 400,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_native_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 512,
+        "width": 720,
+        "height": 512,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_d08_reauthentication_keyboard_motion_preference_and_existing_records",
+      "role": "MAINTAINER",
+      "current_page": "A15",
+      "historical_run_ids": [
+        "run-928f34d3-c296-4ac0-b14e-29b65f5282e4",
+        "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+        "run-d03d3382-a763-465f-a32f-b57420e37515"
+      ],
+      "old_token": 401,
+      "keyboard_tab_and_password_control": true,
+      "browser_reduced_motion_condition_verified": true,
+      "full_motion_visual_acceptance": false,
+      "renderer_errors": [],
+      "business_tables_sha256": {
+        "objects": "385970f1b48dbb3ec4419ca27e661c112ba41f3316819d216bcd0a06150b53d6",
+        "idempotency": "f6d5d109c5ce94497b589a176c6491f939a13a9eb3d310ab510bad2eee98f5bb",
+        "audit": "614217c0a75aa7cc3d4367ee111a9e8e7c53f9bb3920c96d67b18cc5077e5084",
+        "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+        "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+      },
+      "source_database_and_configuration_unchanged": true
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "token_ttl_seconds": 30,
+  "external_api_mode": "SIMULATED_FIRST",
+  "new_model_calls": false,
+  "new_business_actions": false,
+  "natural_time_used": true,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A27_accepted": false
+}

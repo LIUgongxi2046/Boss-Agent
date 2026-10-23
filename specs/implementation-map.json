@@ -15,6 +15,9 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"validation/desktop/check-account-expiry.cjs","owner":"W3","task_id":"T11","scope":"真实已有数据副本的30秒原生会话自然过期、D08重新认证、浏览器减少动态效果、键盘及六种原生视口检查；不修改系统时钟"},
+    {"path":"validation/prepare_account_upgrade.py","owner":"W3","task_id":"T11","scope":"已停止的本工程真实应用原生备份、workspace副本和原生Config重设本机目录；只准备当前账号升级检查，不修改源数据"},
+    {"path":"validation/desktop/check-account-upgrade.cjs","owner":"W3","task_id":"T11","scope":"实际既有SQLite与workspace副本的公共账号、历史运行、关联交办、配置和记忆删除连续性检查；不调用模型"},
     {"path":"specs/product-auth.openapi.yaml","owner":"W3","task_id":"T11","scope":"公共账号、原生会话、身份和退出的0.1.0独立扩展，等待T06正式接收"},
     {"path":"validation/boss_account_auth.py","owner":"W3","task_id":"T11","scope":"公共认证包装只保证单一Cache-Control响应；账号密码及摘要领域规则继续归T27"},
     {"path":"app/tests/test_boss_account_auth.py","owner":"W3","task_id":"T11","scope":"独立HTTP会话检查选择本工程隔离验证目录，不使用默认应用账号"},
