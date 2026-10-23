@@ -160,8 +160,9 @@ def prepare(api, db, data, payload):
     require((previous is not None) if identifier else payload["expected_version"] == "0",
             "材料不存在或创建版本错误", web.HTTPConflict)
     if previous:
-        require(previous["version"] == payload["expected_version"],
-                "会面材料版本变化", web.HTTPConflict)
+        require(previous["version"] == payload["expected_version"]
+                and previous["linked_meeting_version"] is None,
+                "会面材料已关联会议或版本变化，须先解除关联", web.HTTPConflict)
     compiled = _compile(api, db, data,
                         payload["contact_id"], payload["source_refs"],
                         payload["purpose"], payload["meeting_id"])
@@ -234,15 +235,58 @@ def attach(api, db, data, payload):
     }
 
 
+def detach(api, db, data, payload):
+    api._exact(payload, {
+        "client_request_id", "brief_id", "expected_version", "reason",
+    })
+    reason = payload["reason"]
+    require(isinstance(reason, str) and 0 < len(reason.strip()) <= 400,
+            "必须说明从会议议题移除的原因", web.HTTPBadRequest)
+    record = api.store.get(db, NS, "person_brief", payload["brief_id"])
+    require(record["version"] == payload["expected_version"]
+            and record["state"] == "ATTACHED_TO_MEETING_AGENDA"
+            and record["linked_meeting_version"] is not None,
+            "材料版本已变化或并未关联会议", web.HTTPConflict)
+    auth_id = api._authorize(db, "people.detach_meeting", {
+        "brief_id": record["brief_id"], "version": record["version"],
+        "reason_sha256": checksum(reason.strip()),
+    }, record["brief_id"], record["version"])
+    api.store.put(db, NS, "person_brief_revision",
+                  record["brief_id"] + ":v" + record["version"], record)
+    record["linked_meeting_version"] = None
+    record["version"] = str(int(record["version"]) + 1)
+    record["state"] = "UNLINKED_FROM_MEETING_AGENDA"
+    record["updated_at"] = now()
+    record["authorization_id"] = auth_id
+    record["unlink_reason"] = reason.strip()
+    api.store.put(db, NS, "person_brief", record["brief_id"], record)
+    return {
+        "brief_id": record["brief_id"], "version": record["version"],
+        "state": record["state"], "authorization_id": auth_id,
+        "meeting_agenda_linked": False, "external_calendar_updated": False,
+    }
+
+
 def meeting_impacts(db, meeting):
     result = []
     for row in _list(db, "person_brief"):
         if row["linked_meeting_version"] is None or row["compiled"]["meeting"]["meeting_id"] != meeting["meeting_id"]:
             continue
+        pins = [
+            {"source_id": item["source_id"], "version": item["version"]}
+            for item in row["compiled"]["sources"]
+        ]
+        valid = True
+        for pin in pins:
+            source = _get(db, "document", pin["source_id"])
+            if not source or source.get("withdrawn") or source.get("version") != pin["version"] or source.get("access_scope") != "boss-1":
+                valid = False
         result.append({
             "brief_id": row["brief_id"], "version": row["version"],
             "contact_id": row["compiled"]["contact"]["contact_id"],
             "meeting_version": row["linked_meeting_version"],
+            "pinned_source_versions": pins,
+            "source_state": "CURRENT" if valid else "NEEDS_REVIEW",
         })
     return sorted(result, key=lambda p: p["brief_id"])
 
