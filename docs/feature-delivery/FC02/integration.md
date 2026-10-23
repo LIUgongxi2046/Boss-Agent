@@ -1,6 +1,6 @@
 # FC02 公共界面与集成
 
-任务 FC02-N3，状态 IN_PROGRESS。当前功能与准确候选来源为原始项目 specs/feature-delivery.json，二十项检查点见 docs/FC02经营查询工单.md。当前公共组合已经具备独立验收入口，完整功能判定等待 N4；旧28项父任务、192点和FC01限定18/18分别保留。
+任务FC02-N3，完整功能PASS/GO，准确候选4d55773baad5aad218771146b98c399041983b5e、实现d9b5b45467a56671ca6c212a292a25af1850d050。N4独立20/20，N3核查版本、317份依赖、41份构建输入与准确制品一致；范围和限制见acceptance.json、independent-4d55773.json。当前唯一活动功能为FC03，旧父任务与分母保持。
 
 ## 接收与实现
 
@@ -36,7 +36,7 @@ specs/product-bi.openapi.yaml 0.3.0 登记全部公开输入、输出和 WebSock
 
 同一制品的来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、十二组历史尺寸和键盘PASS，见fc02-history-3984d0c8-83cb-4c2e-bc37-0307b28ab841.json。实际响应延迟检查PASS，见fc02-n3-timing-719b2fd4-0c29-4963-bdb8-95fe8532894e.json；较早回执不覆盖已编辑条件，较早原始依据不覆盖新查询，响应字节摘要在延迟前后相同。历史与异步主记录继续引用history-recovery.md、async-recovery.md，当前制品验证补充于boundary-adoption.md。
 
-N4对983b7287cf0e4c7050a109bc458f603308045f2d独立确认17/20、85%、FAIL/NO_GO，准确快照见independent-983b728.json；C05/C08/C11已经通过。当前领域修复候选的九项领域及相关回归PASS，真实公共SDK/WebSocket与界面恢复PASS；证据为followup-integration.xml及fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485.json。2查询、3运行、3公共请求，子来源失效保留FAILED，父来源失效返回410，业务写入和renderer错误均零。前端及原生Client摘要相同，复用既有制品；新候选分子等待N4核查，17/20仅属于983b728。没有重复72/74项或FC01全量。
+N4对4d55773完整独立20/20、PASS/GO；当前12项必要检查、公共SDK/原生Client恢复与18值独立复算，以及317份依赖/41份前端适用性均核查通过。准确证据见independent-4d55773.json及acceptance.json。N3已确认领域、原生Client、前端与制品摘要一致，未重复72/74项或FC01全量、构建或整套DOM；原生20秒超时与同页面FAILED只读恢复有证据，即时错误帧未验证。
 
 标准 OpenAPI3.1 与 YAML 重复字段检查通过：.work/openapi-venv/bin/python validation/check_bi_public_spec.py。git diff --check 通过。没有复验无变化FC01业务全量或启用暂停的STT。
 
@@ -48,4 +48,4 @@ N4对983b7287cf0e4c7050a109bc458f603308045f2d独立确认17/20、85%、FAIL/NO_G
 
 ## 独立接收
 
-N4从原始 specs/feature-delivery.json 的 candidate_commit 检出准确提交，按完整工单二十项验证。公共组合已经接收全部领域/Agent接口；完整独立重启、异常路径及各项业务验收由N4提供对应候选证据。发现功能失败时记录准确入口、参数、预期、实际和版本，再执行必要修复及受影响复验。FC02继续IN_PROGRESS，当前没有启用FC03。
+N4已对4d55773完整二十项给出PASS/GO；N3验收一致性记录为evidence/feature-delivery/FC02/n3-acceptance-consistency-4d55773.json，已保存acceptance.json与independent-4d55773.json并启用FC03工单。失败恢复仅声明实际原生Client 20000ms超时提示、同页面同编号只读恢复FAILED和未重发，即时错误帧NOT_VERIFIED。没有关闭旧28项父任务，视觉/真实模型质量/外部投递/设备未验收，STT暂停。

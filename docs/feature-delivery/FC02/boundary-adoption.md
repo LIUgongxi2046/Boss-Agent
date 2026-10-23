@@ -4,7 +4,7 @@
 
 task_id：FC02-N3-BOUNDARY-ADOPTION。需求为FC02.C05/C08/C11，以及受影响的C01/C02/C03/C10/C12—C19。唯一功能状态来源为原始项目specs/feature-delivery.json。文档CURRENT，last_verified为2026-10-24，依据当前源码、实际接口、SDK、桌面行为及同一构建制品。
 
-当前公共实现与必要本地验证已完成，完整FC02保持IN_PROGRESS。N4对983b7287cf0e4c7050a109bc458f603308045f2d独立确认17/20、FAIL/NO_GO，C05/C08/C11已通过，准确记录保存为independent-983b728.json。C03/C16的父查询切换场景修复及公共验证见followup-recovery.md，新候选等待N4核查；本地用例数量不作为功能分数。
+完整FC02在4d55773取得N4独立20/20、PASS/GO，N3确认317份依赖、41份前端输入、准确领域/Client和制品一致；见acceptance.json、independent-4d55773.json及followup-recovery.md。FC03已按既定队列启用；用例数量不作为功能分数，旧父任务未验收范围保持。
 
 ## 检索与输入依据
 
@@ -68,4 +68,4 @@ N4可以核查上述准确制品及源码摘要后使用独立副本；新的构
 
 当前场景输入已由N1正式提供并由公开消费者接收，N2实际两项工具可直接消费，未修改N2专有文件。当前24项与新增Schema六项仅覆盖实际变化；FC01及无变化业务全量没有重复执行。已有74项证据适用9026c8a，N4曾在301项依赖核对后用于faf66bf；当前正式Schema、领域输入及公开消费者已有变化，必须由N4核查新候选适用依赖，不能直接将旧16/20登记为新候选分数。
 
-独立功能判定保持PENDING_CURRENT_CANDIDATE。N4在准确提交独立确认20/20 PASS，N3核实提交与制品一致后自动启用FC03；此前保持FC02活动。
+独立功能判定PASS/GO，准确候选4d55773，完整20/20；N3版本/制品确认已保存acceptance.json。当前活动功能为FC03。失败恢复限定为实际原生20秒超时与同编号FAILED只读恢复，即时错误帧NOT_VERIFIED；全部外部SIMULATED_FIRST及其余未验收限制保持。

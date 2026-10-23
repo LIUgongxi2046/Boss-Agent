@@ -1,7 +1,7 @@
 {
   "feature_id": "FC02",
   "role": "N3",
-  "status": "FOLLOWUP_DOMAIN_REPAIR_READY_FOR_N4",
+  "status": "ACCEPTED_SIMULATED_FIRST",
   "implementation_commit": "d9b5b45467a56671ca6c212a292a25af1850d050",
   "base_candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
   "candidate_authority": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
@@ -125,10 +125,10 @@
   "real_model_quality": "NOT_RUN",
   "device_installation": "NOT_RUN",
   "third_party_delivery": "NOT_RUN",
-  "independent_feature_verdict": "PENDING_N4_FOR_CURRENT_CANDIDATE",
-  "verified_feature_checkpoints": null,
+  "independent_feature_verdict": "PASS",
+  "verified_feature_checkpoints": 20,
   "total_feature_checkpoints": 20,
-  "fc03_started": false,
+  "fc03_started": true,
   "received_domain_fixes": [
     {
       "commit": "c707df80260c5181fd86861f284eaa8e63e567f7",
@@ -181,5 +181,24 @@
     "sha256": "ee033971f54b929c90e35c25b3a8f7ea131342a63a6f17ec05e3f77f6749a135",
     "scope": "默认父查询切换场景、同场景继承、模型来源替换拒绝；没有声明N3重跑；当前公共SDK另行执行"
   },
-  "current_record": "docs/feature-delivery/FC02/followup-recovery.md"
+  "current_record": "docs/feature-delivery/FC02/followup-recovery.md",
+  "accepted_candidate_commit": "4d55773baad5aad218771146b98c399041983b5e",
+  "n3_version_confirmation": "PASS",
+  "acceptance_record": "docs/feature-delivery/FC02/acceptance.json",
+  "independent_verdict_snapshot": "docs/feature-delivery/FC02/independent-4d55773.json",
+  "next_feature_id": "FC03",
+  "failure_response_evidence": {
+    "child_source_failed_runtime": "FAILED",
+    "child_source_tool_error": "query_metrics/HTTPGone",
+    "child_source_websocket_response": null,
+    "immediate_error_response_verified": false,
+    "native_client_timeout_ms": 20000,
+    "observed_submission_and_dom_ms": 21022,
+    "observed_duration_is_sla": false,
+    "native_same_page_error_and_original_id_displayed": true,
+    "same_page_read_only_receipt": "FAILED/NOT_FOUND_IN_CURRENT_STORE",
+    "failed_request_replayed": false,
+    "query_count_before_and_after_recovery": 2,
+    "criterion": "E01—E06要求真实终态、失败位置、依赖终止、不伪报成功和原请求恢复；当前通过原生超时/错误提示及只读恢复实际验证，没有即时错误帧通过声明"
+  }
 }

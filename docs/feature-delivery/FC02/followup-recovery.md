@@ -2,9 +2,9 @@
 
 ## 任务身份
 
-task_id为FC02-N3-FOLLOWUP-RECOVERY，关联FC02-N4-DOMAIN-FOLLOWUP-01及C03/C16、受影响的C12—C17/C19。唯一功能状态来源为原始项目specs/feature-delivery.json，完整FC02保持IN_PROGRESS。文档CURRENT，last_verified为2026-10-24，依据当前领域差异、实际公共SDK/WebSocket、SQLite、同库重启和界面重读。
+task_id为FC02-N3-FOLLOWUP-RECOVERY，关联FC02-N4-DOMAIN-FOLLOWUP-01及C03/C16、受影响的C12—C17/C19。完整FC02在准确候选4d55773取得N4独立20/20 PASS/GO，N3版本与制品确认PASS。文档CURRENT，last_verified为2026-10-24，验收与限制见acceptance.json；全局当前功能来源为原始项目specs/feature-delivery.json。
 
-N4对983b7287cf0e4c7050a109bc458f603308045f2d独立判定17/20、85%、FAIL/NO_GO，C05/C08/C11已通过；准确快照见independent-983b728.json。当前修复候选需要独立核查，不能直接继承原候选17项分数，FC03尚未启用。
+N4当前完整判定保存为independent-4d55773.json，12项当前必要检查及真实公共/原生Client恢复独立通过。N3核查317份依赖、41份前端输入、领域/原生Client及制品摘要一致；FC03已启用。原983b728的独立事实保持其固定快照。
 
 ## 检索与输入依据
 
@@ -58,4 +58,4 @@ N4对983b728已验证的17项作为原版本事实保存；C05/C08/C11的正式�
 
 ## 未完成与继续条件
 
-当前必要本地验证完成，完整FC02仍等待N4对准确新候选复验C03/C16和必要受影响范围。全部二十项PASS且N3确认提交、依赖及制品一致后，自动启用FC03并建立工单；此前不登记完整功能PASS。
+完整FC02的N4二十项及N3准确版本/制品确认已完成，acceptance.json保存PASS/GO与限定范围。当前活动功能已推进FC03。原生Client实际20秒超时反馈及同编号FAILED只读恢复已验证，即时错误帧NOT_VERIFIED；旧父任务及视觉/真实模型质量/外部投递/设备未验收条件保持。
