@@ -76,7 +76,7 @@ def seed(api):
                role="MAINTAINER", event_id="event-1")
 
 
-def clock(api, at="2026-10-24T09:00:00+08:00"):
+def clock(api, at="2026-10-24T18:00:00+08:00"):
     return act(api, "boss.simulation.clock.advance", "owner-notice-clock-advance",
                role="MAINTAINER", at=at)
 
@@ -256,7 +256,7 @@ def test_confirmed_notice_quiet_in_iana_timezone_and_tech_only_stricter(app):
     assert act(api, "boss.owner.notice.confirm", "notice-shanghai-confirm",
                **confirm_input(draft))[0] == 200
     assert seed(api)[0] == 200
-    assert clock(api)[0] == 200
+    assert clock(api, at="2026-10-25T09:00:00+08:00")[0] == 200
     result = api.store.dispatch_due("ui-check")[0]
     assert result["state"] == "SUPPRESSED"
     assert result["reason"] == "OWNER_QUIET_HOURS"
