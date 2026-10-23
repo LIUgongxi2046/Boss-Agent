@@ -7,16 +7,19 @@ process.env.TMPDIR = path.join(root, 'validation/.work/t27/tmp');
 async function main() {
   const application = await _electron.launch({ args: [path.join(__dirname, 'desktop-host.cjs')],
     executablePath: '/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/desktop/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron',
-    env: { ...process.env }, cwd: root });
+    env: { ...process.env, BOSS_T27_PROFILE: 't27-native-check' }, cwd: root });
   try {
     const page = await application.firstWindow();
+    await page.waitForURL(/^file:/);
+    await page.waitForLoadState('domcontentloaded');
     await page.evaluate(() => { document.title = '页面内容'; });
     const result = await application.evaluate(({ app, BrowserWindow, nativeImage }, image) => {
       const window = BrowserWindow.getAllWindows()[0];
-      return { name: app.getName(), title: window.getTitle(), image: !nativeImage.createFromPath(image).isEmpty(),
+      return { name: app.getName(), title: window.getTitle(), image: !nativeImage.createFromPath(image).isEmpty(), imageSize: nativeImage.createFromPath(image).getSize(),
         profile: app.getPath('userData'), versions: process.versions };
     }, path.join(root, 'validation/desktop/branding/boss-agent.png'));
     assert.equal(result.name, 'Boss Agent'); assert.equal(result.title, 'Boss Agent'); assert.equal(result.image, true);
+    assert.ok(result.imageSize.width >= 1024 && result.imageSize.height >= 1024);
     assert.ok(result.profile.startsWith(path.join(root, 'validation/.work/t27-native')));
     fs.writeFileSync(path.join(root, 'evidence/T27/native-brand.json'), JSON.stringify({ status: 'PASS_NATIVE_HOST_ONLY', result, installed_application: 'NOT_RUN', visual: 'NOT_RUN' }, null, 2));
   } finally { await application.close(); }

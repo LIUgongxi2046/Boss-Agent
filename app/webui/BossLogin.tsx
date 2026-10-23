@@ -42,7 +42,8 @@ type Props = {
   onSecret: (secret: string, expectedRole: Role) => void;
 };
 
-export function BossLogin({ mode = "auth", failed = false, expired = false, message = "", onSecret }: Props) {
+export function BossLogin({ mode = "auth", failed = false, expired: expiredProp = false, message = "", onSecret }: Props) {
+  const expired = expiredProp || failed;
   const [role, setRole] = useState<Role>("BOSS");
   const [username, setUsername] = useState("");
   const [value, setValue] = useState("");
@@ -52,9 +53,11 @@ export function BossLogin({ mode = "auth", failed = false, expired = false, mess
   const [pending, setPending] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const input = useRef<HTMLInputElement>(null);
+  const surface = useRef<HTMLElement>(null);
+  const mascot = useRef<HTMLImageElement>(null);
   const submitted = useRef(false);
   const busy = mode === "loading" || pending;
-  const error = validation || (failed ? "账号或密码无效，请重新输入。" :
+  const error = validation || (failed ? "登录状态已失效，请重新认证。" :
     mode === "error" ? message.includes("身份范围") ? "账号身份与当前入口不符。" : "无法完成认证连接，请检查本机服务后重新尝试。" : "");
 
   useEffect(() => {
@@ -63,6 +66,53 @@ export function BossLogin({ mode = "auth", failed = false, expired = false, mess
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
+
+  useEffect(() => {
+    const page = surface.current;
+    const image = mascot.current;
+    if (reducedMotion || !page || !image) return;
+    let animation: Animation | null = null;
+    let stopped = false;
+    let completed = 0;
+    const random = (minimum: number, maximum: number) => minimum + Math.random() * (maximum - minimum);
+    function fly() {
+      if (stopped || !page || !image) return;
+      const bounds = page.getBoundingClientRect();
+      const current = image.getBoundingClientRect();
+      const scale = bounds.width / page.clientWidth;
+      const marginX = image.offsetWidth / 2 + 24;
+      const marginY = image.offsetHeight / 2 + 24;
+      const maximumX = Math.max(marginX, page.clientWidth - marginX);
+      const maximumY = Math.max(marginY, page.clientHeight - marginY);
+      const clamp = (value: number, minimum: number, maximum: number) => Math.max(minimum, Math.min(maximum, value));
+      const startX = completed ? clamp((current.left + current.width / 2 - bounds.left) / scale, marginX, maximumX) : marginX;
+      const startY = completed ? clamp((current.top + current.height / 2 - bounds.top) / scale, marginY, maximumY) : (marginY + maximumY) / 2;
+      if (animation) { animation.onfinish = null; animation.cancel(); }
+      const targetX = random(marginX, maximumX);
+      const targetY = random(marginY, maximumY);
+      image.style.offsetPath = `path("M ${startX} ${startY} C ${random(marginX, maximumX)} ${random(marginY, maximumY)}, ${random(marginX, maximumX)} ${random(marginY, maximumY)}, ${targetX} ${targetY}")`;
+      animation = image.animate([{ offsetDistance: "0%" }, { offsetDistance: "100%" }], {
+        duration: random(8000, 14000), easing: "ease-in-out", fill: "forwards",
+      });
+      image.dataset.flight = "active";
+      image.dataset.flightLeg = String(++completed);
+      animation.onfinish = fly;
+      if (document.hidden) animation.pause();
+    }
+    function visibility() {
+      if (document.hidden) animation?.pause();
+      else animation?.play();
+    }
+    const observer = new ResizeObserver(fly);
+    observer.observe(page);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      stopped = true;
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
+      if (animation) { animation.onfinish = null; animation.cancel(); }
+    };
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (!busy) {
@@ -100,7 +150,10 @@ export function BossLogin({ mode = "auth", failed = false, expired = false, mess
     onSecret(boot.api_token, role);
   }
 
-  return <main className="boss-v6 boss-login" aria-busy={busy}>
+  return <main ref={surface} className="boss-v6 boss-login" aria-busy={busy}>
+    {!reducedMotion && <div className="boss-login-flight" aria-hidden="true">
+      <img ref={mascot} src="/boss-brand/boss-idle.webp" data-motion="animated" alt="" onError={() => setAssetError(true)}/>
+    </div>}
     <div className="boss-login-content">
     <header className="boss-login-brand">
       <img src="/boss-brand/boss-logo-from-reference.png" alt="Boss Agent 标识" onError={() => setAssetError(true)}/>
@@ -109,9 +162,10 @@ export function BossLogin({ mode = "auth", failed = false, expired = false, mess
     <div className="boss-login-layout">
       <section className="boss-login-welcome" aria-labelledby="boss-login-brand-title">
         <span className="boss-login-accent"/>
-        <h1 id="boss-login-brand-title">公司信息了如指掌，<br/>工作推进有条不紊</h1>
-        <img src={reducedMotion ? "/boss-brand/dapeng-front.png" : "/boss-brand/boss-idle.webp"}
-          data-motion={reducedMotion ? "reduced" : "animated"} alt="大鹏吉祥物" onError={() => setAssetError(true)}/>
+        <h1 id="boss-login-brand-title">公司信息了如指掌，<br/>工作推进有条不紊。</h1>
+        <div className="boss-login-mascot-space">
+          {reducedMotion && <img src="/boss-brand/dapeng-front.png" data-motion="reduced" alt="大鹏吉祥物" onError={() => setAssetError(true)}/>}
+        </div>
         <span className="boss-login-local"><ShieldCheck size={18} aria-hidden="true"/>本机桌面 · 身份分别核验</span>
       </section>
       <section className="boss-login-card" aria-labelledby="boss-login-title">

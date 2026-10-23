@@ -34,13 +34,16 @@ async function main() {
     const context = await browser.newContext();
     const page = await context.newPage();
     const errors = [];
-    page.on('pageerror', error => errors.push(error.name));
+    page.on('pageerror', error => errors.push({ name: error.name, message: error.message }));
+    const waitForConnection = () => page.waitForEvent('websocket').then(socket => socket.waitForEvent('framereceived', {
+      predicate: event => typeof event.payload === 'string' && JSON.parse(event.payload).event === 'ready',
+    }));
     await page.goto(`http://127.0.0.1:${port}`);
     await page.getByLabel('账号', { exact: true }).waitFor();
     assert.equal(await page.getByRole('radio').count(), 0);
     assert.equal(await page.getByText('老板的AI助理', { exact: true }).count(), 1);
     assert.equal(await page.getByText('内测版本', { exact: true }).count(), 1);
-    assert.equal((await page.locator('#boss-login-brand-title').textContent()), '公司信息了如指掌，工作推进有条不紊');
+    assert.equal((await page.locator('#boss-login-brand-title').textContent()), '公司信息了如指掌，工作推进有条不紊。');
     save('copy-beta-default-boss');
     await page.getByRole('button', { name: '登录', exact: true }).click();
     await page.getByRole('alert').filter({ hasText: '请输入账号' }).waitFor();
@@ -63,6 +66,18 @@ async function main() {
       });
       assert.ok(Math.abs(bounds.left) <= 1 && Math.abs(bounds.top) <= 1 && Math.abs(bounds.right - bounds.width) <= 1 && Math.abs(bounds.bottom - bounds.height) <= 1);
       assert.equal(bounds.overflow, false); save(`content-bounds-${width}-${height}-${zoom}`);
+      await page.waitForFunction(() => document.querySelector('[data-flight="active"]')?.getAnimations().some(animation => animation.playState === 'running'));
+      const flight = await page.locator('[data-flight="active"]').evaluate(async image => {
+        const initial = image.getBoundingClientRect();
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const current = image.getBoundingClientRect();
+        const container = image.closest('main').getBoundingClientRect();
+        return { moved: Math.hypot(initial.x - current.x, initial.y - current.y),
+          contained: current.left >= container.left && current.top >= container.top && current.right <= container.right && current.bottom <= container.bottom,
+          interaction: getComputedStyle(image.parentElement).pointerEvents };
+      });
+      assert.ok(flight.moved > 0); assert.equal(flight.contained, true); assert.equal(flight.interaction, 'none');
+      save(`random-flight-${width}-${height}-${zoom}`);
     }
     await page.locator('#root').evaluate(element => { element.style.zoom = '1'; });
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -87,34 +102,44 @@ async function main() {
       let accountRequests = 0;
       const observe = request => { if (request.headers()['x-boss-password']) accountRequests += 1; };
       page.on('request', observe);
+      const connected = waitForConnection();
       await page.getByRole('button', { name: '登录', exact: true }).click({ clickCount: 2 });
       await page.locator(`[data-role="${account.role}"]`).waitFor();
+      await connected;
       page.off('request', observe);
       assert.equal(accountRequests, 1); save(`login-double-submit-${account.role}`);
       const storage = await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }));
       for (const value of accounts) assert.equal(storage.includes(value.password), false);
+      const refreshedConnection = waitForConnection();
       await page.reload();
       await page.locator(`[data-role="${account.role}"]`).waitFor(); save(`refresh-${account.role}`);
+      await refreshedConnection;
       if (account.role === 'MAINTAINER') {
-        await page.waitForTimeout(31000);
-        await page.reload();
-        await page.getByRole('heading', { name: '登录状态已过期' }).waitFor();
+        await page.getByRole('heading', { name: '登录状态已过期' }).waitFor({ timeout: 45000 });
         save('natural-token-expiry');
         await page.getByRole('button', { name: '技术维护', exact: true }).click();
         await page.getByLabel('账号', { exact: true }).fill(account.username);
         await page.getByLabel('密码', { exact: true }).fill(account.password);
+        const reconnected = waitForConnection();
         await page.getByRole('button', { name: '重新认证', exact: true }).click();
         await page.locator(`[data-role="${account.role}"]`).waitFor(); save('reauthentication');
+        await reconnected;
       }
-      await page.getByRole('button', { name: '退出登录', exact: true }).click();
+      if (account.role === 'BOSS') {
+        await page.getByRole('heading', { name: '早上好，张总 · 今天想推进什么？', exact: true }).waitFor();
+        await page.getByRole('button', { name: '更新当前事项', exact: true }).click();
+        await page.getByRole('heading', { name: '业务日期与资料范围', exact: true }).waitFor();
+        save('authenticated-homepage-real-data');
+      }
+      await page.locator('button[title="退出当前身份"]').click();
       await page.getByLabel('账号', { exact: true }).waitFor(); save(`logout-${account.role}`);
     }
     assert.deepEqual(errors, []); save('renderer-errors-zero');
     assert.equal(branding.windowOptions().title, 'Boss Agent');
     assert.equal(branding.packageOptions().name, 'Boss Agent');
-    assert.equal(createHash('sha256').update(fs.readFileSync(branding.png)).digest('hex'), createHash('sha256').update(fs.readFileSync(path.join(root, 'Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png'))).digest('hex'));
+    assert.equal(createHash('sha256').update(fs.readFileSync(branding.png)).digest('hex'), createHash('sha256').update(fs.readFileSync(path.join(root, 'validation/desktop/branding/boss-agent-hd.png'))).digest('hex'));
     save('brand-config-project-resource');
-    fs.writeFileSync(path.join(root, 'evidence/T27/login-dom.json'), JSON.stringify({ status: 'PASS_INDEPENDENT_LOGIN_ONLY', at: new Date().toISOString(), records, visual: 'NOT_RUN', public_integration: 'NOT_RUN' }, null, 2));
+    fs.writeFileSync(path.join(root, 'evidence/T27/login-dom.json'), JSON.stringify({ status: 'PASS_INDEPENDENT_LOGIN_AND_HOME', at: new Date().toISOString(), records, visual: 'NOT_RUN', public_integration: 'NOT_RUN' }, null, 2));
   } finally {
     if (browser) await browser.close();
     service.kill('SIGTERM'); await once(service, 'exit');

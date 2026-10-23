@@ -1,0 +1,2 @@
+asset_id,generation_tool,prompt_summary,source_image_path,output_file_path
+boss-app-icon,imagegen内置工具,蓝绿白大鹏高清macOS图标且保留透明背景与平滑轮廓,../../validation/desktop/branding/boss-agent-hd.png,../../validation/desktop/branding/boss-agent.png

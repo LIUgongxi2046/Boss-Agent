@@ -1,6 +1,6 @@
 {
-  "status": "PASS_INDEPENDENT_LOGIN_ONLY",
-  "at": "2026-10-23T07:32:20.003Z",
+  "status": "PASS_INDEPENDENT_LOGIN_AND_HOME",
+  "at": "2026-10-23T08:01:12.401Z",
   "records": [
     {
       "check": "copy-beta-default-boss",
@@ -19,7 +19,15 @@
       "status": "PASS"
     },
     {
+      "check": "random-flight-1440-1024-1",
+      "status": "PASS"
+    },
+    {
       "check": "content-bounds-1280-800-1",
+      "status": "PASS"
+    },
+    {
+      "check": "random-flight-1280-800-1",
       "status": "PASS"
     },
     {
@@ -27,7 +35,15 @@
       "status": "PASS"
     },
     {
+      "check": "random-flight-1024-768-1",
+      "status": "PASS"
+    },
+    {
       "check": "content-bounds-1024-768-2",
+      "status": "PASS"
+    },
+    {
+      "check": "random-flight-1024-768-2",
       "status": "PASS"
     },
     {
@@ -44,6 +60,10 @@
     },
     {
       "check": "refresh-BOSS",
+      "status": "PASS"
+    },
+    {
+      "check": "authenticated-homepage-real-data",
       "status": "PASS"
     },
     {

@@ -3,7 +3,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '../../..');
-const source = path.join(root, 'Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png');
+const source = path.join(__dirname, 'boss-agent-hd.png');
 const output = path.join(root, '.work/t27-branding/boss-agent.iconset');
 fs.mkdirSync(output, { recursive: true });
 fs.copyFileSync(source, path.join(__dirname, 'boss-agent.png'));

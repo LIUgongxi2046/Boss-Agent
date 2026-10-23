@@ -4,7 +4,11 @@
     "name": "Boss Agent",
     "title": "Boss Agent",
     "image": true,
-    "profile": "/Users/liuhaoxian/.codex/worktrees/boss-login-polish/Boss-Agent/validation/.work/t27-native/profile",
+    "imageSize": {
+      "width": 1254,
+      "height": 1254
+    },
+    "profile": "/Users/liuhaoxian/.codex/worktrees/boss-login-polish/Boss-Agent/validation/.work/t27-native-check/profile",
     "versions": {
       "node": "24.22.0",
       "acorn": "8.18.0",
