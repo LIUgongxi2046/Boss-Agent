@@ -472,6 +472,7 @@ class BossWorkspaceAPI:
             }
         if key == "prompt-versions":
             drafts = _object_list(db, self.namespace, "prompt_draft")
+            revisions = _object_list(db, self.namespace, "prompt_revision")
             context_records = _object_list(db, self.namespace, "prompt_context_use")
             context_index = {
                 (item["prompt_id"],item["prompt_version"]):item
@@ -515,6 +516,13 @@ class BossWorkspaceAPI:
                     ) if k in entry
                 } for entry in drafts],
                 "active": active,
+                "revisions": [{
+                    k: entry[k] for k in (
+                        "prompt_id", "kind", "title", "instruction_text", "version",
+                        "content_sha256", "source_refs", "change_note",
+                        "validation_status", "validated_at", "updated_at",
+                    ) if k in entry
+                } for entry in revisions],
                 "adoptable_current_ids": sorted(valid_runtime_ids),
                 "model_evaluation_completed": False,
                 "full_security_evaluation_completed": False,
