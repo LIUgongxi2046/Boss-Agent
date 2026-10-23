@@ -18,7 +18,7 @@ export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
   A01: "system", A02: "tool-catalog", A03: "dataset",
   A09: "tool-catalog",
   A10: "metric-definitions", A11: "relationships",
-  A12: "source-index", A13: "scheduler", A14: "audit",
+  A12: "source-index", A14: "audit",
   A16: "system", A04: "relationships", F31: "evaluation",
 };
 
