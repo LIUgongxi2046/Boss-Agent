@@ -1,7 +1,7 @@
 # FC01 公共集成开发记录
 
 task_id：FC01-N3；需求：FR-14/21/06/28/29；验收：FC01.C01—C18。
-状态来源：原始项目 specs/feature-delivery.json；当前 IN_PROGRESS，十八项尚待同一候选独立验收，视觉 NOT_RUN。
+状态来源：原始项目 specs/feature-delivery.json；当前 IN_PROGRESS。N4对06d5c30已确认十六项PASS；当前C15正文修复通过N3定向验证，等待准确修复候选的独立复验及C18判定，视觉NOT_RUN。
 
 ## 当前代码与依据
 
@@ -19,8 +19,8 @@ BossResearchSourcesTool 在准备阶段限定 research，执行阶段独立拒�
 
 ## 独立构建及运行入口
 
-现有依赖完成最终 TypeScript/Vite 构建，13.64 秒；命令在 .work/product/nanobot/webui 执行 npm run build -- --outDir ../../../../fc01-n3-runtime-dist。制品位于本工程 fc01-n3-runtime-dist，未替换默认预览；日志 .work/fc01-n3-runtime-build.log。五项当前组件及CSS已经核查产品源码与构建输入摘要相同。固定上游保持 nanobot 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9、nanobot-ai 0.3.5；本次没有安装或更新依赖。
-当前 index.html SHA256 为 850b4c71e29047a440850d4eee97ebdcd14a14d7acc3a1c3c6b04fba144efae0；asset-manifest.json SHA256 为 2ed4feb29e03162f3ff2c5580d3379c55d71284933c8afaaab1b0df6442b665e。所有本批桌面证据绑定实际 runtime-dist；历史 filter-dist 证据仅用于其原版本。
+当前C15修复制品完成TypeScript/Vite构建，16.13秒；命令在.work/product/nanobot/webui执行npm run build -- --outDir ../../../../fc01-n3-c15-runtime-dist。制品位于本工程fc01-n3-c15-runtime-dist，原runtime-dist和默认预览保留；日志.work/fc01-c15-build.log。产品与构建输入CSS摘要均为3078c4dc678513f488050dae3c9b15dec07dbc57cce97fe69c7237f4ff7609da。固定上游保持nanobot 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9、nanobot-ai 0.3.5；没有安装或更新依赖。
+当前index.html SHA256为06918aeef643bc4fef211bf3143709fdf4d44ec8d71113a5816a225eff6d46a7；asset-manifest.json SHA256为b35ffd1880cfc1ad42d1626b6e3c6bd5115977ef741b726b725e52905b258d8c。C15定向记录见[正文Token](body-tokens.md)。原06d5c30的业务证据绑定其原runtime-dist摘要2ed4feb29e03162f3ff2c5580d3379c55d71284933c8afaaab1b0df6442b665e，按不变业务依赖保留，不能将旧制品摘要用于新CSS候选。
 运行时 BOSS_PRODUCT_UI=1，BOSS_PRODUCT_FRONTEND_DIR 使用候选检出下独立构建绝对路径；BOSS_APPLICATION_WORK_DIR 使用候选检出下 validation/.work/fc01-qa 的绝对路径；BOSS_APPLICATION_PORTS 使用 business=9371、webui=9372、gateway=19371。实际启动入口 validation/application.py；本机账号通过 scripts/provision_boss_accounts.py --directory <独立数据目录>/accounts 建立。新增独立数据配置包含 maxToolResultChars=200000；已有配置不会被自动改写，准备准入会检查完整投影实际长度和当前容量。不得使用默认预览数据。产品模式实际采用 Fc01SimulatedProvider，没有外部网络客户端；STT继续暂停。
 
 ## 接收与后续条件
@@ -45,4 +45,4 @@ RuntimeRecorder公共扩展保留配置、工具Schema/实现摘要、模拟模�
 
 ## 独立验收继续条件
 
-上述最终制品与当前代码供N4核查全部十八项。N3本地检查不登记完整功能PASS；N4必须对准确新候选给出范围完整判定，源码变化后仅复验受影响点。当前没有N4对本批候选的独立PASS，active_feature_id保持FC01。视觉、真实外部模型质量、外部送达及设备安装均NOT_RUN；旧28项父任务与192点保持原语义。read-scope的A08模式选择及完整维护恢复范围保持原独立验收责任，不扩大当前工作为全部维护后台。
+N4对06d5c30已给出C01—C14、C16/C17共16/18 PASS，原始判定位于N4目录docs/feature-delivery/FC01/verdict.json。当前修复的产品改动仅为.boss-workspace-item p采用16px/24px；合法标签及业务实现保持原有规则。N3已通过真实报告段落、共享正文、相关页面、尺寸及FC01键盘的定向检查，证据evidence/feature-delivery/FC01/fc01-c15-dd398d4e-a4d9-4e15-8e11-7ae6cd80c25d.json。N4需要对准确修复候选复验C15并按不变业务依赖保留其余十六项，完成C18后才可给出十八项完整PASS；本次没有重跑无变化业务全量检查。active_feature_id保持FC01。视觉、真实外部模型质量、外部送达及设备安装均NOT_RUN；旧28项父任务与192点保持原语义。read-scope的A08模式选择及完整维护恢复范围保持原独立验收责任，不扩大当前工作为全部维护后台。

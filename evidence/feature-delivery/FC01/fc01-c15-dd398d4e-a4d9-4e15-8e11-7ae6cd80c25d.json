@@ -1,0 +1,508 @@
+{
+  "status": "PASS",
+  "run_id": "fc01-c15-dd398d4e-a4d9-4e15-8e11-7ae6cd80c25d",
+  "ports": {
+    "business": 9571,
+    "webui": 9572,
+    "gateway": 19571
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc01-c15-dd398d4e-a4d9-4e15-8e11-7ae6cd80c25d",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc01-n3-c15-runtime-dist",
+  "css_sha256": "3078c4dc678513f488050dae3c9b15dec07dbc57cce97fe69c7237f4ff7609da",
+  "manifest_sha256": "b35ffd1880cfc1ad42d1626b6e3c6bd5115977ef741b726b725e52905b258d8c",
+  "index_sha256": "06918aeef643bc4fef211bf3143709fdf4d44ec8d71113a5816a225eff6d46a7",
+  "expected": {
+    "body": {
+      "font_size": "16px",
+      "line_height": "24px"
+    },
+    "field": {
+      "font_size": "14px",
+      "line_height": "22px"
+    }
+  },
+  "records": [
+    {
+      "check": "actual_body",
+      "label": "已报告入库成本",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 82
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 49
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 109
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 107
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 59
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 79
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "已报告实际领用成本",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 82
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 49
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 107
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 105
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 58
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 79
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "F14",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 35
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 56
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 53
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 82
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 49
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 107
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 105
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 58
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 79
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 82
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 49
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 109
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 107
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 59
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 79
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 70
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "F21",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F06",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "N05",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 35
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "F01",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 20
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 23
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 14
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 34
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 15
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 32
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "F04",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 52
+        },
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 83
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "F08",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F09",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F10",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F11",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F13",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "F28",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "N06",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "N09",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "N10",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "N11",
+      "paragraphs": []
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F14",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F21",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "page_bounds",
+      "page_id": "F06",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "keyboard_and_field_tokens",
+      "tab": true,
+      "enter_query": true,
+      "escape_d06": true,
+      "field": {
+        "font": "14px",
+        "line": "22px",
+        "input": "16px"
+      }
+    },
+    {
+      "check": "actual_body",
+      "label": "A05",
+      "paragraphs": [
+        {
+          "font_size": "16px",
+          "line_height": "24px",
+          "text_length": 59
+        }
+      ]
+    },
+    {
+      "check": "actual_body",
+      "label": "A07",
+      "paragraphs": []
+    },
+    {
+      "check": "actual_body",
+      "label": "A15",
+      "paragraphs": []
+    },
+    {
+      "check": "renderer_errors",
+      "count": 0
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requests": 0,
+  "visual": "NOT_RUN"
+}

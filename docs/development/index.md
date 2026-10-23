@@ -5,6 +5,7 @@
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
 | FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
+| FC01-N4-001 | [实际正文Token](../feature-delivery/FC01/body-tokens.md) | C15共享正文、实际段落、尺寸及键盘；状态引用同一功能来源 |
 | FC01-N1 | [采购成本品质领域接收](../feature-delivery/FC01/backend.md) | 领域1.8.0及期间归属筛选，完整功能状态引用同一功能来源 |
 | FC01-N2 | [采购成本品质Agent接收](../feature-delivery/FC01/agent.md) | 明确模拟Provider、实际Runtime与工具，独立结果保持限定范围 |
 | T02 | [选型验证开发记录](T02.md) | ACCEPTED；A02 PASS（选型可行性）；后续产品验证见交接 |
