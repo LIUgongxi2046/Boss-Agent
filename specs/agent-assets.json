@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "0.6.2-draft",
+  "version": "0.6.3-draft",
   "task_id": "T07",
   "status": "PENDING_A06_A07_ACCEPTANCE",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
@@ -8,11 +8,15 @@
   "formal_backend_version": "1.5.0",
   "formal_event_version": "1.5.0",
   "received_backend_design": {"version":"1.5.0","source_commit":"f854b07a66a153fc4a92c95c86cce788d009cffe","working_tree_changes_included":false,"full_acceptance":"NOT_RUN","remaining":"独立语义审阅、公开接入、资料不足与完整业务验收"},
+  "received_page_read_contract": {"version":"1.6.0","source_commit":"7aab4405b77887b3a2f242dde8c256247c0926f1","operationIds":["bossDashboardRead","bossMeetingsRead","bossEvidenceRead"],"working_tree_changes_included":false,"scope":"THREE_READ_OPERATIONS_ONLY","full_backend_design_receipt":"NOT_RUN","full_acceptance":"NOT_RUN"},
   "pending_public_read_tools": [
     {"operationId":"ownerPlansRead","role":"BOSS","input":"无查询参数","output":["plans","events","results","dispatches","technical_schedule","execution_owner"],"source":"OpenAPI /api/boss/ui/owner-plans GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_owner_read_tools.BossOwnerPlansReadTool","sop_ids":["SOP01","SOP02","SOP06"]},
     {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_owner_read_tools.BossTodayReadTool","sop_ids":["SOP01"]},
     {"operationId":"meetingArrangementRead","role":"BOSS","input":"无查询参数","output":["source_type","meeting","draft","contacts","sources","revisions","business_at","invitation_sent"],"source":"OpenAPI /api/boss/ui/meeting-arrangement GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_meeting_tool.BossCurrentMeetingTool","sop_ids":["SOP04","SOP05","SOP10","SOP11"]},
-    {"operationId":"assignmentSourcesRead","role":"BOSS","input":"仅task_id，1至128字符","output":["task","binding_state","sources","can_confirm","review_sha256","result_evidence_current","result_evidence_requires_resubmission","history"],"source":"OpenAPI /api/boss/ui/assignment-source-review GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_assignment_source_tool.BossAssignmentSourcesReadTool","source_confirmation_allowed":false,"sop_ids":["SOP06"]}
+    {"operationId":"assignmentSourcesRead","role":"BOSS","input":"仅task_id，1至128字符","output":["task","binding_state","sources","can_confirm","review_sha256","result_evidence_current","result_evidence_requires_resubmission","history"],"source":"OpenAPI /api/boss/ui/assignment-source-review GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_assignment_source_tool.BossAssignmentSourcesReadTool","source_confirmation_allowed":false,"sop_ids":["SOP06"]},
+    {"operationId":"bossDashboardRead","role":"BOSS","input":"无查询参数","output":["source_type","namespace","dataset_id","dataset_version","business_clock","profile","tasks","meeting","notifications"],"source":"OpenAPI 1.6.0 /api/boss/ui/dashboard GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_page_read_tools.BossDashboardReadTool","read_only":true,"sop_ids":["SOP01"]},
+    {"operationId":"bossMeetingsRead","role":"BOSS","input":"无查询参数","output":["source_type","meeting","documents","read_at"],"source":"OpenAPI 1.6.0 /api/boss/ui/meetings GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_page_read_tools.BossMeetingsReadTool","read_only":true,"documents_are_current_body":false,"sop_ids":["SOP04","SOP05","SOP10"]},
+    {"operationId":"bossEvidenceRead","role":"BOSS","input":"仅source，1至100字符，保持原始字符串类型","output":["source_type","source_id","version","published_at","author_contact_id","original_locator","content","read_at"],"source":"OpenAPI 1.6.0 /api/boss/ui/evidence GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_page_read_tools.BossEvidenceReadTool","read_only":true,"source_confirmation_allowed":false,"sop_ids":["SOP04","SOP07"]}
   ],
   "current_tool_schema_version": "selection-probe 1.3.0",
   "agent": {

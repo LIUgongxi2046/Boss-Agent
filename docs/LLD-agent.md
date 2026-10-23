@@ -1,6 +1,6 @@
 # 老板 Agent 运行设计
 
-版本：0.6.2-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_A06_A07_ACCEPTANCE。代码基线2812813及本轮方法草稿与历史管理修改，正式规范引用W1提交f854b07a66a153fc4a92c95c86cce788d009cffe的T05/T06 1.5.0。输入SHA256由T07检查报告保存。五项业务Tool、会议、事件及来源读取独立检查已使用当前确定版本；公共应用接收、独立审查者签署及完整设计验收保持未完成。
+版本：0.6.3-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_A06_A07_ACCEPTANCE。代码基线78b87c6及本轮三个只读Adapter修改，完整正式规范引用W1提交f854b07a66a153fc4a92c95c86cce788d009cffe的T05/T06 1.5.0；本次三项读取定义单独接收W3提交7aab4405b77887b3a2f242dde8c256247c0926f1的OpenAPI 1.6.0。输入SHA256由T07检查报告保存。五项业务Tool、会议、事件及来源读取独立检查已使用各自确定版本；公共应用接收、独立审查者签署及完整设计验收保持未完成。
 
 ## 主体与治理
 
@@ -48,6 +48,10 @@ BusinessTool.parameters从成熟JSON Schema读取定义，模型不能填写enve
 具备RuntimeBinding时，BusinessTool将服务端请求及会话ID关联到业务envelope，保持原有owner、namespace和授权检查。经营查询和原文结果释放给模型前重新核查当前来源。W3需同时接收W1 f854b07的业务模块、W2实际Tool与Runtime模块，并在同一集成版本复验；本目录独立组合检查不表示现有公共Runtime已经使用1.5.0。当前UI mutation与模型Tool的覆盖不同，其余SOP操作仍需Runtime注册、服务端授权绑定及实际业务验证。
 
 十三项 SOP 的后端操作引用维护在 `sop_backend_bindings`。每项包含读取和命令 operationId，结构检查同时查询 T06 的 HTTP、WebSocket 与 Tool 定义。DESIGN_ONLY 表示存在接口定义，尚未注册为模型 Tool。十四类模拟接口当前为 DESIGN_NOT_MOUNTED，各自资料缺口由 T06 记录；SI09/SI10 没有可用的获准业务资料，不能返回完整业务结果。
+
+设计0.6.3-draft接收W3确定提交7aab4405b77887b3a2f242dde8c256247c0926f1的三项OpenAPI 1.6.0读取定义。`runtime_page_read_tools`提供bossDashboardRead、bossMeetingsRead、bossEvidenceRead，实例绑定服务端BossPageAPI、BOSS及owner_id，执行空间限定当前正式ui-check；模型仅为原文读取提供source字符串，长度1—100，其余两项输入为空对象。原始参数类型保持不变，额外范围或授权字段被拒绝。读取完整保留实际投影，前后核查当前资料及业务时间，原文输出前再次核查同一来源访问政策与版本。
+
+概览中未确认目标保持NOT_CONFIRMED；会议视图返回当前会议及该视图列出的来源元信息，独立会议草稿继续由meetingArrangementRead提供。会议视图的documents来自初始资料列表，原文当前版本与采用资格由bossEvidenceRead独立核查。工具不执行目标确认、会议确认、来源确认或任务写入。三项Adapter已具备独立本地检查，公共配置范围、Runtime注册与完整SOP采用由W3在集成版本验证；本次接收不扩展为完整1.6.0后端设计验收。
 
 ```mermaid
 sequenceDiagram
