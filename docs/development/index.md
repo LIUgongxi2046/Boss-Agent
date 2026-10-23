@@ -14,3 +14,4 @@
 | T18 | [F05已确认纪要逐项关联F06任务](T18-minute-task-chain.md) | 分项授权+SQLite版本链路已开发；实际Mac/E2E/视觉仍待验收 |
 | T18 | [F09 专题研究与 F04—F09 跨页面功能链路](T18-research.md) | 已有版本化研究、撤销失效检查与 CI 集成测试；模型、Mac 及像素验收仍待执行 |
 | T19 | [A05 Prompt版本保存/校验/启停/上下文采纳](T19-prompt-lifecycle.md) | 真实配置及React已接入；DeepSeek质量、Mac实机/高保真验收待执行 |
+| T17 | [调度、提醒及F06独立催办](T17.md) | IN_PROGRESS，SQLite和v6组件在建；真实macOS Cron/系统通知与A17仍待验收 |

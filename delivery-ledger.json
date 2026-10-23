@@ -1418,7 +1418,7 @@
       "depends_on": [
         "T16"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "src/",
         "tests/",
@@ -1426,9 +1426,16 @@
         "docs/development/",
         "docs/README.md",
         "evidence/",
-        "delivery-ledger.json"
+        "delivery-ledger.json",
+        "app/",
+        "validation/",
+        "scripts/",
+        "specs/page-service-map.json",
+        ".github/workflows/boss-agent-desktop.yml"
       ],
-      "blockers": []
+      "blockers": [
+        "F06独立催办、A13技术调度草稿/校验/启停及单事件模拟手动执行已接入SQLite和原始Desktop v6组件；但T16真实运行依赖、macOS Intel系统通知/休眠重启/Cron故障恢复、外部投递与A17终验仍需完成。本批不新增农业经营模拟数据。"
+      ]
     },
     {
       "id": "T18",
