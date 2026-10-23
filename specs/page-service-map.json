@@ -45,7 +45,8 @@
     "F04/F06 newly persisted material and follow-up draft IDs are carried only in authenticated React state to F08 for review; this does not send automatically, disclose to MAINTAINER, or bypass source/version/owner validations.",
     "FR06 owner-confirmed task nudge is a separate write after initial authorized send, with stable contact, current source pins, 24h simulated business-clock cooldown, and a metadata-only linked message in F06/N05. No external delivery or task completion is inferred.",
     "N05 owner-only self commitments now have real CAS/idempotent create, evidence-confirmed completion, extension, cancellation and persisted due events, separate from F06 assignment to contacts. Source/current evidence withdrawal yields NEEDS_REVIEW; no real external notifications.",
-    "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable."
+    "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable.",
+    "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified."
   ],
   "pages": [
     {
@@ -3032,13 +3033,21 @@
       "logical_architecture_route": "/app/maintain/A13",
       "actual_webui_navigation": "?bossPage=A13",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_TECHNICAL_SCHEDULER_DRAFT_VALIDATE_ACTIVATE_PAUSE_RESUME_CANCEL",
+      "component_file": "app/webui/MaintainerScheduler.tsx",
+      "component_name": "MaintainerScheduler",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/scheduler"
+        "GET /api/boss/ui/workspace/scheduler",
+        "GET /api/boss/ui/operation-status"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.scheduler.draft.save",
+        "boss.scheduler.draft.validate",
+        "boss.scheduler.activate",
+        "boss.scheduler.pause",
+        "boss.scheduler.resume",
+        "boss.scheduler.cancel"
+      ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -3050,12 +3059,15 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_scheduler_config.py"
       ],
       "source_task_ids": [
         "T19",
         "T24"
-      ]
+      ],
+      "manual_dispatch_verified": false,
+      "real_cron_runtime_verified": false
     },
     {
       "page_id": "A14",
