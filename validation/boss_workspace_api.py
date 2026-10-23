@@ -584,7 +584,19 @@ class BossWorkspaceAPI:
                 "rules": rules,
                 "simulated_business_time": clock["at"],
                 "cron_runtime_verified_here": False,
-                "manual_dispatch_supported_here": False,
+                "manual_dispatch_supported_here": bool(
+                    schedule["enabled"] and not schedule["canceled"]
+                    and schedule.get("active_draft_version")
+                ),
+                "available_manual_events": [{
+                    k: event[k] for k in ("event_id","version","due_at","state")
+                    if k in event
+                } for event in _object_list(db, self.namespace, "event")
+                  if event.get("source_type") == "SIMULATED"
+                  and (event.get("event_id") == data["event"]["event_id"]
+                       or event.get("generated_by") in (
+                           "BOSS_AUTHORIZED_TASK", "BOSS_OWN_COMMITMENT"
+                       ))],
                 "next_run_time": None,
                 "recent_dispatches": [{
                     k: row[k] for k in (
