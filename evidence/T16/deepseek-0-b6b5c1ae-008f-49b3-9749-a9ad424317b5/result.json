@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "scope": "SDK 共同任务；完整 A16 仍需其他断言",
+  "provider": "deepseek",
+  "model_id": "deepseek-flash",
+  "observed_api_type": "chat_completions",
+  "transport_evidence": "http-requests.json",
+  "baseline": {
+    "namespace": "deepseek-0-b6b5c1ae-008f-49b3-9749-a9ad424317b5",
+    "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+  },
+  "state": {
+    "task_id": "14800cc0-a451-4961-858d-63a8e06fd1f5",
+    "status": "WAITING_FEEDBACK",
+    "version": "2",
+    "purpose": "提交当前会议关联的毛利变化解释、措施和证据",
+    "coordinator_id": "coordinator-1",
+    "due_at": "2026-10-25T17:00:00+08:00",
+    "timezone": "Asia/Shanghai",
+    "evidence_requirements": [
+      "原因明细",
+      "措施及证据"
+    ],
+    "authorization_id": "b5cf3a56-8e02-4603-80b5-00c3131b9cd0",
+    "related_meeting_id": "meeting-1",
+    "related_event_ids": [
+      "event-1"
+    ],
+    "source_refs": [
+      "finance-note"
+    ],
+    "message_ids": [
+      "b65ce77b-a03f-4a51-8289-4c96715bc6b6"
+    ],
+    "feedback_ids": [],
+    "completion_authorization_id": null,
+    "execution_namespace": "deepseek-0-b6b5c1ae-008f-49b3-9749-a9ad424317b5"
+  },
+  "cost": null,
+  "at": "2026-10-23T08:15:35.676545+00:00"
+}

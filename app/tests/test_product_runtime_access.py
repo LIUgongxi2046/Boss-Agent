@@ -1,5 +1,8 @@
+import json
 import sys
 from pathlib import Path
+
+from jsonschema import Draft202012Validator, FormatChecker
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
 
@@ -19,6 +22,8 @@ def test_public_runtime_records_use_authenticated_technical_scope(tmp_path):
         assert result["runs"] == [] and result["matched_count"] == 0
         assert result["private_body_available_here"] is False
         assert result["business_mutation_performed"] is False
+        schema = json.loads((Path(__file__).resolve().parents[2] / "specs/runtime-records.schema.json").read_text())
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(result)
     assert pages.serve(None, "/api/boss/ui/runtime-records")[0] == 401
     assert pages.serve("contact-2", "/api/boss/ui/runtime-records")[0] == 401
 

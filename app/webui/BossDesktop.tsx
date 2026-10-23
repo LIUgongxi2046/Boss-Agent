@@ -2,6 +2,7 @@ import {
   useCallback, useEffect, useMemo, useRef, useState,
   type FormEvent, type ReactNode,
 } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Activity, AlertCircle, ArrowLeft, ArrowRight, Bell, CalendarDays,
   ChartNoAxesCombined, CheckCircle2, ChevronRight, ClipboardCheck,
@@ -286,6 +287,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [requestVersion, setRequestVersion] = useState(0);
   const [metricsRequest, setMetricsRequest] = useState(0);
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const navigationFocus = useRef<HTMLElement | null>(null);
   const [originFocus, setOriginFocus] = useState("");
 
   useEffect(() => {
@@ -308,6 +311,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         !["D04","D05","D01"].includes(id)) ||
         (["N07","N08"].includes(page) && settingsDirty) ||
         (["F01","F04","N09"].includes(page) && workDirty)) && id !== page) {
+      navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setPendingNavigation({id,focus});
       return;
     }
@@ -322,15 +326,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setError("");
     setDirectoryOpen(false);
   }, [page, role, assignmentDirty, settingsDirty, workDirty]);
-
-  useEffect(() => {
-    if (!pendingNavigation) return;
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPendingNavigation(null);
-    };
-    window.addEventListener("keydown", onEscape);
-    return () => window.removeEventListener("keydown", onEscape);
-  }, [pendingNavigation]);
 
   useEffect(() => {
     const onBack = () => {
@@ -472,7 +467,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     <div className="boss-native-content">{children}</div>
   </div>;
 
-  return <div className="boss-v6" data-role={role}>
+  return <div className="boss-v6" data-role={role} ref={shellRef}>
     <div className="boss-frame">
       <div className={"boss-layout " + (!sidebarOpen ? "boss-layout-slim" : "")}>
         <aside className="boss-sidebar" aria-label={role === "BOSS" ? "老板工作区" : "技术维护工作区"}>
@@ -1082,18 +1077,24 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         </main>
       </div>
     </div>
-    {pendingNavigation && <div className="boss-confirm-backdrop">
-      <section className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-unsaved-title">
-        <h3 id="boss-unsaved-title"><AlertCircle size={19}/> 未保存修改（D06）</h3>
-        <p>{["N07","N08"].includes(page)?
+    <DialogPrimitive.Root open={pendingNavigation !== null} onOpenChange={(open) => {if (!open) setPendingNavigation(null);}}>
+      <DialogPrimitive.Portal container={shellRef.current}>
+        <DialogPrimitive.Overlay className="boss-confirm-backdrop"/>
+        <DialogPrimitive.Content className="boss-confirm boss-navigation-confirm" onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          if (navigationFocus.current?.isConnected) navigationFocus.current.focus();
+        }}>
+        <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 未保存修改（D06）</h3></DialogPrimitive.Title>
+        <DialogPrimitive.Description asChild><p>{["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
           page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
-          "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p>
+          "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p></DialogPrimitive.Description>
         <div className="boss-actions">
-          <button type="button" className="boss-btn" onClick={()=>setPendingNavigation(null)}>返回继续编辑</button>
+          <DialogPrimitive.Close asChild><button type="button" className="boss-btn">返回继续编辑</button></DialogPrimitive.Close>
           <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
             const destination=pendingNavigation;
+            if (!destination) throw new Error("离开页面缺少目标");
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
             setSettingsDirty(false);
@@ -1102,8 +1103,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             navigate(destination.id,destination.focus,true);
           }}>放弃草稿并离开</button>
         </div>
-      </section>
-    </div>}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
     {directoryOpen && <div className="boss-directory-backdrop" role="presentation" onMouseDown={(e) => {
       if(e.target === e.currentTarget) setDirectoryOpen(false);
     }}>

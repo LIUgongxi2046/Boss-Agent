@@ -1,0 +1,125 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "navigation-focus-02535dc0-1471-4f6d-bfd8-7aae89c7d05e",
+  "at": "2026-10-23T08:20:30.497Z",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "359c561c93be6df73e3104d519375934c091e880288284e13770ea689649e13f"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "99405b72d834014e7c5d6efa29abd1d8377e71875cf570ebed29b1451b478b29"
+    },
+    {
+      "path": "validation/desktop/check-navigation-focus.cjs",
+      "sha256": "8258ef34110ac225175bc87319b640de4c235b91cbedac2ded268f894e96eebe"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "f6e1625916c5314bd97703f702b6c5dca2a77aeff91bd01b886d68999041531e"
+    }
+  ],
+  "records": [
+    {
+      "check": "dialog_open_focus",
+      "focused_inside": true
+    },
+    {
+      "check": "tab_and_programmatic_focus_remain_in_dialog",
+      "passed": true
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "AssertionError"
+    }
+  ],
+  "business_write_requested": false,
+  "model_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A08_A11_accepted": false
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-OPENAPI-141",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-api-141-637a23c",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "evidence/T06/validate_openapi.py"
+  ],
+  "started_at": "2026-10-23T08:23:13.308276+00:00",
+  "ended_at": "2026-10-23T08:23:33.135066+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/openapi.yaml",
+      "sha256": "109fc76ab599480a641150df791d93e75c8caf9bb60339c78d267be60b9760e9"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-events.schema.json",
+      "sha256": "8d29e99168f6d3cee3c5196c6563f77a9f15f1ffc757ea6b8a77e9f833bf868f"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-records.schema.json",
+      "sha256": "b83ff531f0502c763baf4f0d0618fc87054a7e50d22bd6411a051426af04b58a"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T06/validate_openapi.py",
+      "sha256": "a3d46a414bfd954fdacd4fd282037d0c7b78312d5a0915571939dbede82dff06"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/运行环境.md",
+      "sha256": "8324f2f151124c61c20f40e77aae143878834aa500f05d403fe9b3a4fb689dd8"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/openapi-venv/pyvenv.cfg",
+      "sha256": "81a590a61fb44c9bea84fbf03bc541ed4676aff7eb91417158357bd62bb52ca9"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-openapi-1.4.1/output.log",
+      "sha256": "de916c7aa510bd59bc0e706c50517ee2e6f4a57c13bb04edbde7fe5345949089"
+    }
+  ]
+}

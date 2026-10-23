@@ -1,0 +1,130 @@
+{
+  "status": "PASS_D06_FOCUS_AND_VIEWPORT_ONLY",
+  "run_id": "navigation-focus-aeb865ef-890a-4401-8c5c-c447bd7569ff",
+  "at": "2026-10-23T08:29:39.820Z",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "359c561c93be6df73e3104d519375934c091e880288284e13770ea689649e13f"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "99405b72d834014e7c5d6efa29abd1d8377e71875cf570ebed29b1451b478b29"
+    },
+    {
+      "path": "validation/desktop/check-navigation-focus.cjs",
+      "sha256": "56c03061a5fdb7c6608c7df25d231b5e7bac5a08dd327bec72eb149d1cbb230c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "f6e1625916c5314bd97703f702b6c5dca2a77aeff91bd01b886d68999041531e"
+    }
+  ],
+  "records": [
+    {
+      "check": "dialog_open_focus",
+      "focused_inside": true
+    },
+    {
+      "check": "tab_and_programmatic_focus_remain_in_dialog",
+      "passed": true
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "left": 227,
+        "top": 299.375,
+        "right": 227,
+        "bottom": 299.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "left": 355,
+        "top": 315.375,
+        "right": 355,
+        "bottom": 315.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "left": 435,
+        "top": 427.375,
+        "right": 435,
+        "bottom": 427.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "left": 20,
+        "top": 113.375,
+        "right": 20,
+        "bottom": 113.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "left": 35,
+        "top": 121.375,
+        "right": 35,
+        "bottom": 121.375
+      }
+    },
+    {
+      "check": "dialog_content_bounds",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "left": 75,
+        "top": 171.375,
+        "right": 75,
+        "bottom": 171.375
+      }
+    },
+    {
+      "check": "escape_restores_trigger_and_preserves_editing",
+      "passed": true
+    },
+    {
+      "check": "explicit_discard_navigates_without_saving_meeting",
+      "passed": true,
+      "renderer_errors": []
+    }
+  ],
+  "business_write_requested": false,
+  "model_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A08_A11_accepted": false
+}

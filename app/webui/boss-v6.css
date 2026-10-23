@@ -378,6 +378,10 @@
   color:#134c83;font-size:19px;line-height:1.5;
   font-weight:760;margin:0 0 10px;
 }
+.boss-navigation-confirm {
+  position:fixed;left:50%;top:50%;z-index:1101;
+  transform:translate(-50%,-50%);width:calc(100% - 40px);
+}
 .boss-confirm>p {
   color:#59758f;font-size:13px;line-height:1.75;
   margin-bottom:16px;

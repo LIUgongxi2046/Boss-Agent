@@ -14,6 +14,10 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"validation/design-checks/","owner":"W3","task_id":"T10","scope":"独立且固定版本的Markdown和Mermaid语法检查依赖"},
+    {"path":"evidence/T01/check_mermaid.mjs","owner":"W3","task_id":"T10","scope":"原设计检查的独立依赖路径；检查数量和语义保持"},
+    {"path":"evidence/T01/run_design_checks.py","owner":"W3","task_id":"T10","scope":"新检查回执绑定独立依赖清单与锁文件"},
+    {"path":"validation/check_historical_receipts.py","owner":"W3","task_id":"T10","scope":"历史执行回执、原始文件摘要及当前环境绑定的只读清查；不改变验收状态"},
     {"path":"app/tests/test_product_runtime_access.py","owner":"W3","task_id":"T11","scope":"公共运行记录的真实SQLite角色、查询、拒绝与零写入检查"},
     {"path":"app/webui/RuntimeTaskTechnicalView.tsx","owner":"W3","task_id":"T11","scope":"按真实run_id核查交办关联，仅展示维护身份获准元信息"},
     {"path":"app/tests/test_product_source_access.py","owner":"W3","task_id":"T11","scope":"1.3.0公共原文、知识、来源索引、当前写入与历史反馈"},
@@ -60,7 +64,8 @@
     {"task_id":"T23","owner":"W2","acceptance_ids":["A23a","A23b","A23c","A23d"],"depends_on":["T18","T19"],"development_record":"docs/development/T23.md","write_paths":["validation/boss_sector_api.py","app/webui/BossSectorView.tsx","app/tests/test_boss_sector_api.py","data/agriculture/farming-food-overseas-research/","skills/agriculture/"],"profile":"runtime"},
     {"task_id":"T24","owner":"W3","acceptance_ids":["A24"],"depends_on":["T20","T21","T22","T23"],"development_record":"docs/development/T24.md","write_paths":["docs/验收报告.md","app/tests/test_boss_integration.py","evidence/T24/"],"profile":"integration"},
     {"task_id":"T25","owner":"W3","acceptance_ids":["A25"],"depends_on":["T24"],"development_record":"docs/development/T25.md","write_paths":["validation/desktop/","scripts/","docs/运行与交接.md","docs/面试演示.md","docs/运行环境.md","docs/knowledge/index.md"],"profile":"integration"},
-    {"task_id":"T26","owner":"W3","acceptance_ids":["A26"],"depends_on":["T25"],"development_record":"docs/development/T26.md","write_paths":["docs/交付审查.md","docs/README.md","docs/development/index.md","delivery-ledger.json"],"profile":"integration"}
+    {"task_id":"T26","owner":"W3","acceptance_ids":["A26"],"depends_on":["T25"],"development_record":"docs/development/T26.md","write_paths":["docs/交付审查.md","docs/README.md","docs/development/index.md","delivery-ledger.json"],"profile":"integration"},
+    {"task_id":"T27","owner":"W4","acceptance_ids":["A27"],"depends_on":["T11"],"development_record":"docs/development/T27.md","write_paths":["app/webui/BossLogin.tsx","app/webui/boss-login.css","validation/boss_account_auth.py","validation/desktop/branding.cjs","validation/desktop/branding/","scripts/provision_boss_accounts.py","app/tests/test_boss_account_auth.py","validation/desktop/check-login-polish.cjs","design/T27/","docs/development/T27.md","evidence/T27/"],"profile":"integration","public_integration_owner":"W3","monitoring":"NOT_TRACKED"}
   ],
   "path_policy": "新文件路径属于规划，实施前核查现有职责并由 W3 更新台账。各任务可维护同一窗口所属的相关测试及自己的主记录和证据目录；跨窗口路径变更通过 W3 更新本映射。",
   "handoff_required": ["代码提交及工作目录修改", "输入与接口版本", "公共入口接入要求", "实际验证命令及原始结果", "开发记录及索引条目", "全部未完成项与阻塞条件"],

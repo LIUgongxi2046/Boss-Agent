@@ -267,6 +267,7 @@ class BossCommandAPI:
 
     def _require_current_task_sources(self, db, data, task):
         """Task contents are not safe to send/close on unpinned provenance."""
+        self.store.require_current_assignment_sources(db, NAMESPACE, data, task)
         sources = task.get("source_refs", [])
         pinned = task.get("source_versions")
         require(isinstance(pinned, dict) and set(pinned) == set(sources),

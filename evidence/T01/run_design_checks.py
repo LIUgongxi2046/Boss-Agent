@@ -16,7 +16,7 @@ shared = [
 ]
 checks = [
     ("K00", "prerequisite", "evidence/T00/check_strategy.py", ["evidence/T00/run_design_check.py"]),
-    ("K01", "prd", "evidence/T01/check_prd.py", ["docs/PRD.md", "specs/selection-probe.json", "evidence/T01/check_mermaid.mjs", ".planning-checks/package.json", ".planning-checks/package-lock.json"]),
+    ("K01", "prd", "evidence/T01/check_prd.py", ["docs/PRD.md", "specs/selection-probe.json", "evidence/T01/check_mermaid.mjs", "validation/design-checks/package.json", "validation/design-checks/package-lock.json"]),
 ]
 for check_id, directory, script, additional in checks:
     command = [

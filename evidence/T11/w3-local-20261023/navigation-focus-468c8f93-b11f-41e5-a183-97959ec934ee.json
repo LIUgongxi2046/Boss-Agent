@@ -1,0 +1,37 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "navigation-focus-468c8f93-b11f-41e5-a183-97959ec934ee",
+  "at": "2026-10-23T08:07:59.338Z",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "5e3b0cb1e7edc4bdf734d8ddf46facc9d761d96a04e790afd26cfa2465525cf0"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "edfbad2b27a94ea9419dfc373e67779d9ad8d13b202fff0253743237a79ccf09"
+    },
+    {
+      "path": "validation/desktop/check-navigation-focus.cjs",
+      "sha256": "8258ef34110ac225175bc87319b640de4c235b91cbedac2ded268f894e96eebe"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "5b2e9c7697f23024df0d51852222df6b4e135e415d52d51e84e794ae89a6d67b"
+    }
+  ],
+  "records": [
+    {
+      "check": "dialog_open_focus",
+      "focused_inside": false
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "AssertionError"
+    }
+  ],
+  "business_write_requested": false,
+  "model_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A08_A11_accepted": false
+}
