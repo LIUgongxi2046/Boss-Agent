@@ -1,0 +1,10 @@
+async(page)=>{
+  const selector=page.getByRole("combobox",{name:"专题页面",exact:true});
+  await selector.selectOption("F15");
+  await page.getByText("正在核对已授权的行业资料范围…",{exact:true}).waitFor();
+  await selector.selectOption("F17");
+  await page.getByText("正在核对已授权的行业资料范围…",{exact:true}).waitFor();
+  if(await page.locator(".boss-sector-filter-row").getByRole("textbox").count())throw Error("新请求待处理时仍显示上一专题的筛选字段");
+  return {status:"PASS_PENDING",check_id:"SECTOR-ACTUAL-PENDING-PAGE-CHANGE",selected_page:await selector.inputValue(),
+    previous_fields_hidden:true,source_type:"SIMULATED",model_requests:0};
+}

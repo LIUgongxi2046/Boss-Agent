@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertCircle, ArrowRight, ChartNoAxesCombined, Clock3,
   FileSearch, FolderOpen, Loader2, RefreshCw, Search, Sparkles } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
@@ -28,26 +28,52 @@ type Props = {
 };
 
 export function BossSectorView({pageId,onNavigate,onViewSource,onStartChat}:Props) {
-  const {getToken}=useClient();
-  const [data,setData]=useState<Sector|null>(null);
-  const [fields,setFields]=useState<Record<string,string>>({});
-  const [applied,setApplied]=useState<Record<string,string>>({});
+  const {client,getToken,token}=useClient();
+  const [loadedData,setData]=useState<Sector|null>(null);
+  const [fieldValues,setFields]=useState<Record<string,string>>({});
+  const [appliedValues,setApplied]=useState<Record<string,string>>({});
   const [revision,setRevision]=useState(0);
-  const [error,setError]=useState("");
-  const [notice,setNotice]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [sending,setSending]=useState(false);
+  const [errorText,setError]=useState("");
+  const [noticeText,setNotice]=useState("");
+  const [loadingState,setLoading]=useState(false);
+  const [sendingState,setSending]=useState(false);
+  const identity=useRef({client,token,pageId});
+  const displayed=useRef(identity.current);
+  if(identity.current.client!==client||identity.current.token!==token||identity.current.pageId!==pageId)
+    identity.current={client,token,pageId};
+  const sameScope=displayed.current===identity.current;
+  const data=sameScope?loadedData:null;
+  const fields=sameScope?fieldValues:{};
+  const applied=sameScope?appliedValues:{};
+  const error=sameScope?errorText:"";
+  const notice=sameScope?noticeText:"";
+  const loading=sameScope&&loadingState;
+  const sending=sameScope&&sendingState;
+  const clearScope=useCallback(()=>{
+    identity.current={...identity.current};displayed.current=identity.current;
+    setData(null);setFields({});setApplied({});setError("");setNotice("");setSending(false);setLoading(false);
+  },[]);
+
+  useEffect(()=>{
+    clearScope();
+    return()=>{identity.current={...identity.current};};
+  },[client,token,pageId,clearScope]);
 
   useEffect(()=>{
     if(!(SECTOR_PAGE_IDS as readonly string[]).includes(pageId))return;
     const abort=new AbortController();
-    const token=getToken();
-    if(!token){setError("身份令牌失效");return;}
+    const current=identity.current;
+    const currentToken=getToken();
+    if(!currentToken){setError("身份令牌失效");return;}
     setLoading(true);setError("");setData(null);
     void fetch("/api/boss/ui/sector?page="+encodeURIComponent(pageId),{
-      headers:{"Authorization":"Bearer "+token},
+      headers:{"Authorization":"Bearer "+currentToken},
       cache:"no-store",signal:abort.signal,
     }).then(async res=>{
+      if(abort.signal.aborted||current!==identity.current)return null;
+      if(res.status===401||res.status===403){
+        clearScope();setError("当前专题范围校验失败（HTTP "+res.status+"）");return null;
+      }
       if(!res.ok)throw new Error("当前专题范围校验失败（HTTP "+res.status+"）");
       const value=await res.json() as Sector;
       if(value.page_id!==pageId||value.source_type!=="SIMULATED"||
@@ -55,22 +81,23 @@ export function BossSectorView({pageId,onNavigate,onViewSource,onStartChat}:Prop
         throw new Error("当前专题资料状态与接口预期不一致");
       return value;
     }).then(value=>{
-      if(abort.signal.aborted)return;
+      if(abort.signal.aborted||current!==identity.current||value===null)return;
       setData(value);setLoading(false);
     }).catch(e=>{
-      if(abort.signal.aborted)return;
+      if(abort.signal.aborted||current!==identity.current)return;
       setError(e instanceof Error?e.message:String(e));setLoading(false);
     });
     return ()=>abort.abort();
-  },[pageId,revision,getToken]);
+  },[pageId,revision,getToken,client,token,clearScope]);
 
   function checkScope(){
-    if(!data){setError("专题来源尚未载入");return;}
+    if(!data||data.page_id!==pageId){setError("专题来源尚未载入");return;}
     setApplied({...fields});
     setNotice("已记录当前页面的查询条件；后端尚无可计算本专题指标的授权明细，所有数值继续保持未知。");
   }
   async function askAgent(){
-    if(!data||sending)return;
+    if(!data||data.page_id!==pageId||!getToken()||sending)return;
+    const current=identity.current;
     setError("");setSending(true);
     try{
       const conditions=Object.entries(applied).filter(([,value])=>value.trim()).map(
@@ -85,9 +112,11 @@ export function BossSectorView({pageId,onNavigate,onViewSource,onStartChat}:Prop
         "只引用当前已有的有权材料；缺少资料时明确待提供，不猜测或生成虚构的经营数字。",
       ].join("\n");
       const result=await onStartChat(prompt);
+      if(current!==identity.current)return;
       if(result===false)throw new Error("原生 Agent 会话创建失败，未提交业务请求");
       onNavigate("NATIVE");
-    }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setSending(false);}
+    }catch(e){if(current===identity.current)setError(e instanceof Error?e.message:String(e));}
+    finally{if(current===identity.current)setSending(false);}
   }
   return <>
     <div className="boss-workspace-toolbar">

@@ -1,0 +1,4 @@
+{
+  "extends":"../../T19/prompt-ui/tsconfig.json",
+  "include":["main.tsx","../../../app/webui/BossSectorView.tsx","../../../.work/w2-checks/runtime-ui/node_modules/vite/client.d.ts"]
+}
