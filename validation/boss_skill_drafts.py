@@ -172,10 +172,13 @@ class BossSkillDrafts:
                        for row in rows if (item := json.loads(row[0]))["sop_id"] == sop_id]
             pending = [{key: item[key] for key in ("client_request_id", "sop_id", "draft_version", "state", "prepared_at")}
                        for item in self._pending(db, sop_id)]
+            global_pending = [{key: item[key] for key in ("client_request_id", "sop_id", "draft_version", "state", "prepared_at")}
+                              for item in self._pending(db)]
             draft = self._get(db, "sop_draft", sop_id)
             return {"projection": "sop-method-editor", "source_type": "RUNTIME_RECORD", "external_api_mode": "SIMULATED",
                     "namespace": self.namespace, "sop_id": sop_id, "active": active, "draft": draft, "history": history,
-                    "pending_activations": pending, "read_operations": binding["read_operations"], "command_operations": binding["command_operations"],
+                    "pending_activations": pending, "global_pending_activations": global_pending,
+                    "read_operations": binding["read_operations"], "command_operations": binding["command_operations"],
                     "sections": self._sections(draft["body"] if draft else active["body"]),
                     "active_assessment": self._assessment(content, binding), "model_adoption_verified": False,
                     "business_authorization_granted": False}

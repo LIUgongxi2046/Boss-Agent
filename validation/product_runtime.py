@@ -31,6 +31,8 @@ class ProductRuntime:
         self.store, self.loop, self.registry, self.provider = store, loop, registry, provider
         self.config = WebUISettingsConfig(config_path)
         self.available = {tool.name: tool for tool in available_tools}
+        self.skill_readiness = None
+        self.skill_pending = None
         require(len(self.available) == len(available_tools), "工具目录包含重复标识")
         with store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -96,6 +98,7 @@ class ProductRuntime:
             "max_tool_rounds": self.loop.max_iterations, "max_output_tokens": generation.max_tokens,
             "timeout": 120, "config_sha256": native_sha,
         }
+        self.native_configuration = config.model_dump(mode="json")
 
     def snapshot(self):
         require(self._native_sha() == self.effective["config_sha256"],
@@ -113,6 +116,8 @@ class ProductRuntime:
                     and existing.recorder.namespace == NS and existing.session_id == request.session_key,
                     "进行中请求的运行归属不一致")
             return None
+        if self.skill_readiness is not None:
+            self.skill_readiness()
         effective = self.snapshot()
         with self.store.connect() as db:
             db.execute("BEGIN")
@@ -139,8 +144,9 @@ class ProductRuntime:
             draft = obj(db, "configuration_draft", "current")
             active_runs = sum(json.loads(item[0])["status"] in {"QUEUED", "RUNNING", "WAITING_INPUT"}
                               for item in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='runtime_run'", (NS,)))
+            skill_pending = bool(self.skill_pending(db)) if self.skill_pending is not None else False
         fields = ("config_id", "version", "provider", "model_id", "api_type", "tool_scope", "max_tool_rounds", "timeout", "enabled")
-        ready = (current["enabled"] and self._native_sha() == self.effective["config_sha256"]
+        ready = (current["enabled"] and not skill_pending and self._native_sha() == self.effective["config_sha256"]
                  and set(current["tool_scope"]) == set(self.registry.tool_names)
                  and all(current[key] == self.effective[key] for key in
                          ("provider", "model_id", "api_type", "max_tool_rounds", "timeout")))
@@ -151,12 +157,19 @@ class ProductRuntime:
                 "business_authority_granted": False, "model_validation_performed": False}
 
     def execute(self, api, action, payload):
+        def operation(path):
+            return self._execute_locked(api, action, payload)
+        return self.config.run_serialized(operation)
+
+    def _execute_locked(self, api, action, payload):
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             self.store.active(db, NS)
             key, digest, previous = api._check_existing(db, action, payload)
             if previous is not None:
                 return previous
+            if action == "boss.runtime.activate" and self.skill_readiness is not None:
+                self.skill_readiness()
             current = self.store.get(db, NS, "configuration", "current")
             draft = obj(db, "configuration_draft", "current")
             if action == "boss.runtime.save":

@@ -1,0 +1,210 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "sop-versions-c49359bd-a9bb-40c1-ab9e-d79a797fc94e",
+  "at": "2026-10-23T11:43:53.604Z",
+  "application_directory": "validation/.work/sop-versions-c49359bd-a9bb-40c1-ab9e-d79a797fc94e",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "cbfe2f5f25b392ce98729d567c22ad9b3bb9ebcfa10f44709d92c6ca5b414602"
+    },
+    {
+      "path": "validation/product_skills.py",
+      "sha256": "72912bb9ecd705ce00aa6e86c191462bd3863004d99c2e2e54c35ddeb85c414b"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "74f3574b78fb82ca4453e256e89bda80cc34ba259fe062a4cfb348b747f6f344"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "0284cd1c76fd5a88153990a9051b2764fa6c2794cc8766c67aa5b32b8c174ba9"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "193d809d7a42a547141ddb99dbeb1b4a40ccde604b8981649469ad30d22382ed"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ed9384e25f7e3411cfdf1c00df12b69d88a43fdb776018b35f9d3b0f01cd286f"
+    },
+    {
+      "path": "validation/boss_skill_drafts.py",
+      "sha256": "cb1a9bc8bc8d7e65aaf7c707aae2096e38afe946b91ee2c4a925d05cdd9f43c8"
+    },
+    {
+      "path": "validation/boss_native_skills.py",
+      "sha256": "5802c2fd2de192bbc57176a9de4e3640942f3b25d88781eba5d4cf6517c81b14"
+    },
+    {
+      "path": "validation/sop_recovery_check.py",
+      "sha256": "e4d86c75ee024bfc726675b8e1a3b452a550077559cfd8418c172d58ce4a11ca"
+    },
+    {
+      "path": "specs/product-skills.openapi.yaml",
+      "sha256": "dd5092433f05c441e36b8f7b5754a325420ef12869a983dfc8fdd521c7eb7405"
+    },
+    {
+      "path": "app/webui/MaintainerSkillVersions.tsx",
+      "sha256": "c9cbf3f2eb855e5d39d89e5a21d82ff3afc33344fac6f924c11c4d01b717cd4c"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "d2a0d2c8516140e82daf5d8e4255515a82ad3d0dfd409966f85ddaad244f4639"
+    },
+    {
+      "path": "app/webui/BossSectorView.tsx",
+      "sha256": "5b7602740cbf88f88a6666e0c12794c8e371544f4619d21a6780cc664f16e072"
+    },
+    {
+      "path": "validation/desktop/check-sop-versions.cjs",
+      "sha256": "ecfa2cb01207bed664585ac8a31c32235c7d801ba5d015a3d700803aeb174dfa"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "6f60625993b456b277e744c2bb79d91698b06e63815415268324a46d0da00b11"
+    }
+  ],
+  "records": [
+    {
+      "check": "public_editor_native_save_validate_activate_restore_enable_and_receipts",
+      "initial": {
+        "sop_id": "SOP03",
+        "active": {
+          "version": "0.1.0",
+          "enabled": true,
+          "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b"
+        },
+        "draft": null,
+        "history": [],
+        "pending_activations": [],
+        "global_pending_activations": []
+      },
+      "current": {
+        "sop_id": "SOP03",
+        "active": {
+          "version": "0.1.2",
+          "enabled": true,
+          "content_sha256": "e7d691a2eb8e9ec9aa10a11ace3da3ef69470e833e40559580bf34318c0716b2"
+        },
+        "draft": {
+          "draft_version": "2",
+          "method_version": "0.1.2",
+          "state": "ACTIVE",
+          "validation_status": "VALIDATED_STATIC_ONLY",
+          "content_sha256": "e7d691a2eb8e9ec9aa10a11ace3da3ef69470e833e40559580bf34318c0716b2"
+        },
+        "history": [
+          {
+            "history_id": "SOP03:51aba23acbc09918adf1f33482e7119e8a05444a5dfe287c0f2a912bace1b771",
+            "method_version": "0.1.1",
+            "content_sha256": "51aba23acbc09918adf1f33482e7119e8a05444a5dfe287c0f2a912bace1b771",
+            "recorded_at": "2026-10-23T11:43:06.786352+00:00",
+            "origin": "ACTIVATED_DRAFT"
+          },
+          {
+            "history_id": "SOP03:dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+            "method_version": "0.1.0",
+            "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+            "recorded_at": "2026-10-23T11:43:05.610932+00:00",
+            "origin": "NATIVE_CURRENT"
+          },
+          {
+            "history_id": "SOP03:e7d691a2eb8e9ec9aa10a11ace3da3ef69470e833e40559580bf34318c0716b2",
+            "method_version": "0.1.2",
+            "content_sha256": "e7d691a2eb8e9ec9aa10a11ace3da3ef69470e833e40559580bf34318c0716b2",
+            "recorded_at": "2026-10-23T11:43:08.379826+00:00",
+            "origin": "ACTIVATED_DRAFT"
+          },
+          {
+            "history_id": "draft:SOP03:1",
+            "method_version": "0.1.1",
+            "content_sha256": "51aba23acbc09918adf1f33482e7119e8a05444a5dfe287c0f2a912bace1b771",
+            "recorded_at": "2026-10-23T11:43:05.611366+00:00",
+            "origin": "DRAFT_REVISION"
+          }
+        ],
+        "pending_activations": [],
+        "global_pending_activations": []
+      },
+      "original_save_receipt": {
+        "action": "save",
+        "client_request_id": "sop-8b2e7f06-9438-4edc-b880-c3f85d3ae638",
+        "outcome": "RECORDED"
+      },
+      "canceled_unsubmitted_preserved": true,
+      "dirty_navigation_return_preserved": true,
+      "method_switch_return_preserved": true
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "model_quality_verified": false,
+  "method_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A06_A11_A19_accepted": false
+}

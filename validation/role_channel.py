@@ -23,7 +23,7 @@ class RoleChannel(WebSocketChannel):
         self.connection_roles = {}
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
-        self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control) if business_store is not None else None
+        self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
@@ -147,8 +147,15 @@ class RoleChannel(WebSocketChannel):
                 return
             if self.boss_commands is None:
                 status, result = 503, {"error": "BOSS_SERVICE_NOT_READY"}
+            elif action in {"boss.sop.activate", "boss.sop.enable", "boss.sop.disable", "boss.sop.recover", "boss.sop.cancel"} and self.gateway.http.skill_state_action is None:
+                status, result = 503, {"error": "SKILL_ADOPTION_SERVICE_NOT_READY"}
             else:
                 status, result = self.boss_commands.execute(role, action, envelope.get("payload"))
+                if status == 200 and action in {"boss.sop.activate", "boss.sop.enable", "boss.sop.disable", "boss.sop.recover", "boss.sop.cancel"}:
+                    disabled = set(self.skills.catalog.loader.disabled_skills)
+                    self.gateway.http.disabled_skills.clear()
+                    self.gateway.http.disabled_skills.update(disabled)
+                    self.gateway.http._apply_skill_state()
             self.record(role, action, status)
             await connection.send(json.dumps({
                 "event": "webui_response", "request_id": request_id,

@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.4.5；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.6.0，T07现有设计为0.6.1-draft；公共Runtime扩展0.2.0及原生方法扩展0.1.0等待正式接收，源码版本`aa946e1`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
+版本：0.4.6；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.6.0，T07现有设计为0.6.2-draft；公共Runtime扩展0.2.0及方法版本扩展0.2.0等待正式接收，源码版本`7aab440`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -89,7 +89,7 @@ graph TD
 | ProductRuntimeConfiguration | getToken、onCommand、onDirtyChange、onReload | A08当前配置与独立草稿，保存、静态校验、启用和停止新任务；原请求回执、CAS与D06 |
 | BossAssignmentSourceReview | 当前task_id、Projection、onCommand、onReceipt、onOpenSource、onDirty | F06本人独立确认当前来源，业务状态保持；来源与交办切换受D06保护 |
 | MaintainerMemoryStatus | getToken、onNavigate(page,run_id) | A12当前确认、删除传播及实际上下文选择，只读取技术元信息；关联记录进入A15筛选 |
-| MaintainerSkills | 原生ClientProvider、token、当前Projection | A06十三项方法、版本、摘要与实际工具引用；原生配置启停、独立确认和身份清理 |
+| MaintainerSkillVersions / MaintainerSkills | 原生ClientProvider、token、当前方法、草稿与历史、原回执、全局待恢复状态 | A06正文保存、校验、启用、历史恢复与原操作恢复；技术目录采用同一原生方法、配置锁及Runtime；D06、身份和异步范围保护 |
 | MaintainerSimulationInspect | 原生ClientProvider、当前simulation-query Schema、接口及参数 | A02十四类技术检查、实际响应、取消和离线恢复；不读取本人正文，不执行业务动作 |
 | BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
 | BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
@@ -125,6 +125,8 @@ F06通过`GET /api/boss/ui/assignment-source-review?task_id=...`读取唯一来�
 A12手动读取维护专用`admin/memory-status`，展示当前版本、本人确认、未来采用资格、最近实际运行的memory_reference及删除各项范围。读取失败清除旧投影，取消终止当前读取，退出卸载组件。页面不提供正文或本人修改能力。本人F13删除后，A12保留历史选择的原版本，新的真实任务记录当前DELETED版本和eligible=false；模型完成观察与模型遵从验证分别展示。历史会话、备份及物理擦除保持NOT_VERIFIED。
 
 A06通过维护专用`GET /api/boss/ui/admin/skills`读取本应用workspace/skills中的十三项原生方法。`skill.update`只允许技术维护身份、准确方法名、明确布尔状态和当前正文摘要；原生HTTP修改入口被拒绝。用户独立确认后在同一原生配置文件锁内保存disabled_skills，执行原生skill_state_action并采用同一Runtime快照。其他模型设置保持不变，启停不签发业务授权。参数、依赖或摘要无效时明确拒绝；结果未知时读取当前状态，不使用业务回执接口推断原生操作结果。
+
+MaintainerSkillVersions是A06主要编辑组件，使用维护专用sop-method、sop-history及sop-operation-status读取，以及八项boss.sop命令。保存、校验、启用分开确认；草稿保存保持当前原生文件，历史恢复形成新草稿。待恢复操作在全部方法页面显示，并暂停全部新上下文采用；维护明确继续或取消。当前公开接口没有prepare写入动作。未保存内容接入D06，bossSop记录当前方法选择；A15只显示核查上下文，正式运行记录没有sop_id筛选，方法与模型运行关联保持未验证。
 
 A02通过`GET /api/boss/ui/simulation-inspect`人工检查SI01—SI14的当前对象、类别、版本、状态及缺少范围。接口选择来自当前Schema；对象编号使用重复object_ids，JSON筛选通过成熟JSON.parse读取，字段和类型按当前定义检查，完整期间、维度、权限及数量由服务端核查。Input/Output Schema和实际请求、响应及耗时可读取，没有调用结果时显示接口未调用。维护响应的data始终null，正文不进入状态或界面；本人通过独立`simulation-query`角色读取获准范围。参数编辑、身份改变和读取取消使旧异步结果失效，读取错误不保留旧结果。工具映射进入A09的实际目录。
 

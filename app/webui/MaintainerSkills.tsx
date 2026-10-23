@@ -10,6 +10,7 @@ type Method = {
 type Projection = {
   projection: "sop-technical-status"; items: Method[]; native_configuration_sha256: string;
   runtime_admission_ready: boolean; private_body_available_here: false; business_authorization_granted: false;
+  pending_activations: {sop_id: string; client_request_id: string}[];
 };
 
 export function MaintainerSkills() {
@@ -85,6 +86,7 @@ export function MaintainerSkills() {
       <button type="button" className="boss-btn" disabled={loading || busy} onClick={() => {void read();}}>读取当前方法状态</button>
       <div className="boss-kv"><span>当前 Runtime 可接收任务</span><strong>{data ? data.runtime_admission_ready ? "可以接收" : "需要检查当前运行配置" : "尚未读取"}</strong></div>
       <p>方法正文编辑、草稿及历史恢复继续由版本管理功能负责。当前状态读取和本地上下文检查没有验证模型质量。</p>
+      {!!data?.pending_activations.length && <p role="status">存在待恢复的方法启用操作，请在方法版本页面明确继续或取消。</p>}
     </section>
     {loading && <div role="status" className="boss-status">正在读取当前方法</div>}
     {error && <div role="alert" className="boss-status boss-status-error">{error}</div>}
@@ -99,7 +101,7 @@ export function MaintainerSkills() {
         <div className="boss-kv"><span>动作工具</span><strong>{item.command_operations.join("、") || "没有动作工具"}</strong></div>
         <div className="boss-kv"><span>需要本人独立确认</span><strong>{item.human_only_operations.join("、") || "根据对应业务动作核查"}</strong></div>
         <div className="boss-kv"><span>尚未注册的工具</span><strong>{item.missing_tools.join("、") || "当前引用已经注册"}</strong></div>
-        <button type="button" className="boss-btn" disabled={busy || (!item.enabled && item.missing_tools.length > 0)}
+        <button type="button" className="boss-btn" disabled={busy || data.pending_activations.length > 0 || (!item.enabled && item.missing_tools.length > 0)}
           aria-label={(item.enabled ? "停用方法 " : "启用方法 ") + item.sop_id}
           onClick={() => {setPending(item); setConfirmed(false); setError("");}}>{item.enabled ? "停用方法" : "启用方法"}</button>
       </section>)}

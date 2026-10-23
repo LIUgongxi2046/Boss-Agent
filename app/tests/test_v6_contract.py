@@ -174,8 +174,16 @@ def test_memory_and_notification_commands_are_owner_bound():
     assert by_id["N01"]["component_file"] == "app/webui/BossLogin.tsx"
     assert by_id["D08"]["component_file"] == "app/webui/BossLogin.tsx"
     assert by_id["F31"]["verified_http_read_routes"] == ["GET /api/boss/ui/workspace/evaluation"]
-    assert by_id["A06"]["render_status"] == "PARTIAL_NATIVE_SOP_FILES_STATE_AND_CONTEXT"
-    assert by_id["A06"]["code_wired_write_actions"] == ["skill.update"]
+    assert by_id["A06"]["render_status"] == "PARTIAL_NATIVE_SOP_VERSIONS_HISTORY_AND_RECOVERY"
+    assert by_id["A06"]["component_name"] == "MaintainerSkillVersions"
+    assert set(by_id["A06"]["code_wired_write_actions"]) == {
+        "boss.sop.save", "boss.sop.validate", "boss.sop.activate", "boss.sop.enable",
+        "boss.sop.disable", "boss.sop.restore", "boss.sop.recover", "boss.sop.cancel", "skill.update",
+    }
+    assert set(by_id["A06"]["verified_http_read_routes"]) == {
+        "GET /api/boss/ui/admin/sop-method", "GET /api/boss/ui/admin/sop-history",
+        "GET /api/boss/ui/admin/sop-operation-status", "GET /api/boss/ui/admin/skills",
+    }
 
 
 

@@ -24,6 +24,7 @@ import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
 import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
 import { MaintainerMemoryStatus } from "./MaintainerMemoryStatus";
 import { MaintainerSkills } from "./MaintainerSkills";
+import { MaintainerSkillVersions } from "./MaintainerSkillVersions";
 import { MaintainerSimulationInspect } from "./MaintainerSimulationInspect";
 import { BossAssignmentSourceReview, type AssignmentSourceReviewProjection } from "./BossAssignmentSourceReview";
 import { BossTravelView } from "./BossTravelView";
@@ -235,7 +236,7 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
 }
 
 export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props) {
-  const { client } = useClient();
+  const { client, token } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [authError, setAuthError] = useState("");
   const [authAttempt, setAuthAttempt] = useState(0);
@@ -250,7 +251,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string}|null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -276,6 +277,17 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
   const [runtimeTask, setRuntimeTask] = useState<{taskId: string; runId: string} | null>(null);
   const [runtimeRunId, setRuntimeRunId] = useState("");
+  const [selectedSop, setSelectedSop] = useState(() => {
+    const value = new URLSearchParams(window.location.search).get("bossSop") ?? "";
+    return /^SOP(?:0[1-9]|1[0-3])$/.test(value) ? value : "SOP03";
+  });
+  const [runtimeSopReference, setRuntimeSopReference] = useState(() => new URLSearchParams(window.location.search).get("bossSop") ?? "");
+  const [sopStatusVersion, setSopStatusVersion] = useState(0);
+  const mutateSop = useCallback(async (action: string, payload: Record<string, unknown>) => {
+    const result = await client.requestMutation<Record<string, unknown>>("boss.sop." + action, payload);
+    setSopStatusVersion(value => value + 1);
+    return result;
+  }, [client]);
   const [sourceReview, setSourceReview] = useState<AssignmentSourceReviewProjection | null>(null);
   const [sourceReviewLoading, setSourceReviewLoading] = useState(false);
   const [sourceReviewError, setSourceReviewError] = useState("");
@@ -306,15 +318,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     return () => abort.abort();
   }, [getToken, authAttempt]);
 
-  const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string) => {
+  const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string, sopId?: string) => {
     if (!role || !allowed(id, role)) return;
     const changingTask = taskId !== undefined && taskId !== selectedTaskId;
     if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) ||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
           (["N07","N08"].includes(page) && settingsDirty) ||
-          (["F01","F04","N09","A08"].includes(page) && workDirty))))) {
+          (["F01","F04","N09","A08","A06"].includes(page) && workDirty))))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      setPendingNavigation({id,focus,taskId});
+      setPendingNavigation({id,focus,taskId,sopId});
       return;
     }
     if (id !== page) setPreviousPage(page);
@@ -325,18 +337,33 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     url.searchParams.set("bossPage", id);
     if (id === "F06" && (taskId ?? selectedTaskId)) url.searchParams.set("bossTask", taskId ?? selectedTaskId);
     else url.searchParams.delete("bossTask");
+    const sopReference = id === "A06" ? selectedSop : id === "A15" ? sopId ?? "" : "";
+    if (sopReference) url.searchParams.set("bossSop", sopReference);
+    else url.searchParams.delete("bossSop");
+    setRuntimeSopReference(id === "A15" ? sopReference : "");
     window.history.pushState({}, "", url);
     if (taskId !== undefined) setSelectedTaskId(taskId);
     if (id !== page || changingTask) setSourceReviewDirty(false);
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, settingsDirty, workDirty]);
+  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty]);
+
+  const sopChanged = useCallback((sopId: string) => {
+    setSelectedSop(sopId);
+    if (page === "A06") {
+      const url = new URL(window.location.href); url.searchParams.set("bossSop", sopId);
+      window.history.replaceState({}, "", url);
+    }
+  }, [page]);
 
   useEffect(() => {
     const onBack = () => {
       if (!role) return;
       const selected = initialPage(role);
+      const reference = new URLSearchParams(window.location.search).get("bossSop") ?? "";
+      if (selected === "A06" && /^SOP(?:0[1-9]|1[0-3])$/.test(reference)) setSelectedSop(reference);
+      setRuntimeSopReference(selected === "A15" ? reference : "");
       setPage(selected);
     };
     window.addEventListener("popstate", onBack);
@@ -940,7 +967,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <GlassButton onClick={()=>navigate("A08")}>返回技术工作台</GlassButton>
                   </Panel>
                 </div>
-              </div> : page === "A06" ? <MaintainerSkills/> : ["A15","F30"].includes(page) ? <>
+              </div> : page === "A06" ? <>
+                <MaintainerSkillVersions getToken={getToken} identityKey={token ?? ""} mutate={mutateSop}
+                  initialSopId={selectedSop} onSopChange={sopChanged} onDirtyChange={setWorkDirty}
+                  onNavigate={(id, reference) => navigate(id, "", false, undefined, reference?.sop_id)}/>
+                <details><summary>查看全部方法技术状态</summary><MaintainerSkills key={sopStatusVersion}/></details>
+              </> : ["A15","F30"].includes(page) ? <>
+                {page === "A15" && runtimeSopReference && <StatusLine text={"方法上下文：" + runtimeSopReference + "。当前正式记录没有方法编号筛选，请按实际 run_id 核查；当前未验证本方法与记录的关联。"}/>}
                 {page === "A15" && <MaintainerRuntimeRecords getToken={getToken}
                   key={runtimeRunId} initialRunId={runtimeRunId}
                   onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>}
@@ -1081,6 +1114,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 未保存修改（D06）</h3></DialogPrimitive.Title>
         <DialogPrimitive.Description asChild><p>{page === "A08" ? "当前运行配置有未保存内容。离开不会修改已经启用的配置。" : ["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
+          page === "A06" ? "当前方法有未保存内容。离开不会修改已经保存的草稿或当前原生方法。" :
           page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
           "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p></DialogPrimitive.Description>
@@ -1095,7 +1129,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             setSettingsDirty(false);
             setWorkDirty(false);
             setPendingNavigation(null);
-            navigate(destination.id,destination.focus,true,destination.taskId);
+            navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
           }}>放弃草稿并离开</button>
         </div>
         </DialogPrimitive.Content>

@@ -449,6 +449,23 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path in {"/api/boss/ui/admin/sop-method", "/api/boss/ui/admin/sop-history", "/api/boss/ui/admin/sop-operation-status"}:
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if self.skills is None:
+                    return 503, {"error": "SKILL_SERVICE_NOT_READY"}
+                fields = {"sop_id"} if path.endswith("sop-method") else {"sop_id", "history_id"} if path.endswith("sop-history") else {"action", "client_request_id"}
+                parameters = parse_qs(query_string, keep_blank_values=True)
+                if set(parameters) != fields or any(len(value) != 1 or not value[0] for value in parameters.values()):
+                    return 400, {"error": "INVALID_QUERY_PARAMETERS"}
+                values = {key: value[0] for key, value in parameters.items()}
+                self.skills.validate_query(path, values)
+                service = self.skills.drafts
+                if path.endswith("sop-method"):
+                    return 200, service.read(role, **values)
+                if path.endswith("sop-history"):
+                    return 200, service.read_history(role, **values)
+                return 200, service.operation_status(role, **values)
             if path == "/api/boss/ui/simulation-query":
                 return 200, SimulationAPI(self.store).query_http(role, query_string)
             if path == "/api/boss/ui/simulation-inspect":

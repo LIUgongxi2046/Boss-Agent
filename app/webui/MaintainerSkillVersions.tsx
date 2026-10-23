@@ -7,15 +7,17 @@ type Draft={draft_version:string;method_version:string;description:string;body:s
 type Data={projection:"sop-method-editor";source_type:"RUNTIME_RECORD";external_api_mode:"SIMULATED";sop_id:string;
   active:{name:string;version:string;description:string;body:string;content_sha256:string;enabled:boolean};
   draft:Draft|null;history:HistoryVersion[];sections:{heading:string;body:string}[];read_operations:string[];command_operations:string[];
-  active_assessment:{missing_tools:string[]};pending_activations:{client_request_id:string;state:string;draft_version:string;prepared_at:string}[]};
+  active_assessment:{missing_tools:string[]};pending_activations:{client_request_id:string;state:string;draft_version:string;prepared_at:string}[];
+  global_pending_activations:{client_request_id:string;sop_id:string;state:string;draft_version:string;prepared_at:string}[]};
 type HistoryBody=HistoryVersion&{description:string;body:string};
 type Pending={action:string;payload:Record<string,unknown>;clientRequestId:string;label:string;submitted:boolean};
 type Props={getToken:()=>string|null;identityKey:string;mutate:(action:string,payload:Record<string,unknown>)=>Promise<Record<string,unknown>>;
-  onNavigate?:(page:"A15",reference?:{sop_id:string})=>void};
+  onNavigate?:(page:"A15",reference?:{sop_id:string})=>void;initialSopId?:string;
+  onSopChange?:(sopId:string)=>void;onDirtyChange?:(dirty:boolean)=>void};
 const METHODS=["今日工作","经营提醒","经营查询","会前准备","会议纪要","交办跟进","待审材料","沟通","战略研究","人员会面","出行接待","私人安排","历史与记忆"];
 
-export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate}:Props){
-  const [sop,setSop]=useState("SOP03");
+export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,initialSopId,onSopChange,onDirtyChange}:Props){
+  const [sop,setSop]=useState(()=>METHODS.some((_,index)=>initialSopId==="SOP"+String(index+1).padStart(2,"0"))?initialSopId!:"SOP03");
   const [data,setData]=useState<Data|null>(null);
   const [methodVersion,setMethodVersion]=useState("");
   const [description,setDescription]=useState("");
@@ -46,6 +48,9 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate}
   }
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;abort.current?.abort();};},[]);
   useEffect(()=>{clear();setError("");},[identityKey,getToken,mutate]);
+  useEffect(()=>{onDirtyChange?.(dirty);},[dirty,onDirtyChange]);
+  useEffect(()=>()=>onDirtyChange?.(false),[onDirtyChange]);
+  useEffect(()=>{onSopChange?.(sop);},[sop,onSopChange]);
   useEffect(()=>{
     if(!pending&&!discard)return;
     const origin=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -205,7 +210,7 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate}
       <div className="boss-kv"><span>草稿状态</span><strong>{data?.draft?.state??"尚未读取"}</strong></div>
       <div className="boss-kv"><span>静态校验</span><strong>{data?.draft?.validation_status??"尚未读取"}</strong></div>
       <div className="boss-kv"><span>真实模型采用</span><strong>未验证</strong></div>
-      <div className="boss-kv"><span>下一上下文采用条件</span><strong>{!data?"尚未读取":data.pending_activations.length?"待恢复，当前不可采用":data.active.enabled&&data.active_assessment.missing_tools.length===0?"可供下一上下文读取":"停用或工具引用缺少"}</strong></div>
+      <div className="boss-kv"><span>下一上下文采用条件</span><strong>{!data?"尚未读取":data.global_pending_activations.length?"待恢复，当前不可采用":data.active.enabled&&data.active_assessment.missing_tools.length===0?"可供下一上下文读取":"停用或工具引用缺少"}</strong></div>
       {data&&<><p>当前正文摘要：{data.active.content_sha256}</p><p>草稿摘要：{data.draft?.content_sha256??"尚无草稿"}</p>
         <h3>工具引用与权限</h3><p>读取：{data.read_operations.join("、")}</p><p>命令：{data.command_operations.join("、")||"无业务写入命令"}</p>
         <p>缺少工具：{(data.draft?.missing_tools??data.active_assessment.missing_tools).join("、")||"当前引用已经注册"}</p>
@@ -215,6 +220,9 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate}
     </section>{lastOperation&&!pending&&<section className="boss-panel"><h2>原操作查询</h2><p>操作：{lastOperation.action}</p><p>原操作编号：{lastOperation.clientRequestId}</p>
       <button type="button" className="boss-btn" onClick={()=>{setPending(lastOperation);setApproved(false);setError("");}}>查询尚待核查的原操作</button></section>}
       <section className="boss-panel"><div className="boss-panel-head"><h2>待恢复的启用操作</h2></div>
+      {data?.global_pending_activations.filter(item=>item.sop_id!==sop).map(item=><div key={item.client_request_id}>
+        <p>{item.sop_id} 存在待恢复操作，当前全部新上下文暂停采用。</p>
+        <button className="boss-btn" type="button" disabled={disabled} onClick={()=>select(item.sop_id,true)}>查看 {item.sop_id} 待恢复操作</button></div>)}
       {!data?<p>尚未读取</p>:data.pending_activations.length===0?<p>当前没有待恢复操作。</p>:data.pending_activations.map(item=><article key={item.client_request_id}>
         <p>原操作编号：{item.client_request_id}</p><p>草稿版本：{item.draft_version} · {item.state}</p>
         <div className="boss-actions"><button className="boss-btn" type="button" disabled={disabled} onClick={()=>prepare("recover",{activation_request_id:item.client_request_id},"继续原启用操作")}>继续原启用操作</button>

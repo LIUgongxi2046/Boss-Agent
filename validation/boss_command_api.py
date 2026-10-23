@@ -97,6 +97,7 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        **{"boss.sop." + action: "MAINTAINER" for action in ("save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel")},
         "boss.assignment.create": "BOSS",
         "boss.assignment.send": "BOSS",
         "boss.assignment.nudge": "BOSS",
@@ -171,9 +172,10 @@ class BossCommandAPI:
         "boss.runtime.deactivate": "MAINTAINER",
     }
 
-    def __init__(self, store, runtime_control=None):
+    def __init__(self, store, runtime_control=None, skills=None):
         self.store = store
         self.runtime_control = runtime_control
+        self.skills = skills
 
     def execute(self, role, action, payload):
         if role not in ("BOSS", "MAINTAINER"):
@@ -186,7 +188,10 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action == "boss.assignment.sources.confirm":
+            if action.startswith("boss.sop."):
+                require(self.skills is not None, "当前方法服务尚未准备", web.HTTPServiceUnavailable)
+                result = self.skills.execute(role, action.removeprefix("boss.sop."), payload)
+            elif action == "boss.assignment.sources.confirm":
                 from boss_assignment_sources import AssignmentSourcesAPI
                 result = AssignmentSourcesAPI(self.store).execute(role, payload)
             elif action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
