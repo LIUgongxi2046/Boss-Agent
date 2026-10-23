@@ -27,6 +27,10 @@ from boss_message_calendar import (
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
 from boss_assignment_nudge import nudge as assignment_nudge
+from boss_scheduler_config import (
+    save as scheduler_save, validate as scheduler_validate,
+    activate as scheduler_activate, set_status as scheduler_set_status,
+)
 from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
 from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
 from boss_research import prepare as research_prepare
@@ -99,6 +103,12 @@ class BossCommandAPI:
         "boss.simulation.feedback": "MAINTAINER",
         "boss.simulation.event.seed": "MAINTAINER",
         "boss.simulation.clock.advance": "MAINTAINER",
+        "boss.scheduler.draft.save": "MAINTAINER",
+        "boss.scheduler.draft.validate": "MAINTAINER",
+        "boss.scheduler.activate": "MAINTAINER",
+        "boss.scheduler.pause": "MAINTAINER",
+        "boss.scheduler.resume": "MAINTAINER",
+        "boss.scheduler.cancel": "MAINTAINER",
         "boss.memory.confirm": "BOSS",
         "boss.memory.delete": "BOSS",
         "boss.reminder.ack": "BOSS",
@@ -271,6 +281,14 @@ class BossCommandAPI:
                 result = self._seed_event(db, data, payload)
             elif action == "boss.simulation.clock.advance":
                 result = self._advance_clock(db, data, payload)
+            elif action == "boss.scheduler.draft.save":
+                result = scheduler_save(self, db, data, payload)
+            elif action == "boss.scheduler.draft.validate":
+                result = scheduler_validate(self, db, data, payload)
+            elif action == "boss.scheduler.activate":
+                result = scheduler_activate(self, db, data, payload)
+            elif action.startswith("boss.scheduler."):
+                result = scheduler_set_status(self, db, data, payload, action.rsplit(".", 1)[-1])
             elif action == "boss.memory.confirm":
                 result = self._memory_confirm(db, payload)
             elif action == "boss.memory.delete":
