@@ -106,7 +106,7 @@ def test_activation_is_cas_and_updates_actual_rule_version(services):
     assert observed["rules"]["cooldown_seconds"]==3600
     assert observed["draft"]["validation_state"]=="ACTIVE"
     assert observed["cron_runtime_verified_here"] is False
-    assert observed["manual_dispatch_supported_here"] is False
+    assert observed["manual_dispatch_supported_here"] is True  # simulated only
     assert observed["next_run_time"] is None
     with api.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0]==0
@@ -221,3 +221,101 @@ def test_paused_scheduler_suppresses_real_due_event_dispatch(services):
             "SELECT COUNT(*) FROM objects WHERE kind='delivery'"
         ).fetchone()[0]==0
     assert read(pages)[1]["schedule"]["enabled"] is False
+
+
+
+def activate_fixture(api):
+    seeded = cmd(api, "MAINTAINER", "boss.simulation.event.seed",
+                 "scheduler-manual-event", event_id="event-1")
+    assert seeded[0] == 200, seeded
+    saved = cmd(api, "MAINTAINER", "boss.scheduler.draft.save",
+                "scheduler-manual-draft", **config(expected_version="0"))
+    assert saved[0] == 200, saved
+    checked = cmd(api, "MAINTAINER", "boss.scheduler.draft.validate",
+                  "scheduler-manual-validate", expected_version="1")
+    assert checked[0] == 200, checked
+    activated = cmd(api, "MAINTAINER", "boss.scheduler.activate",
+                    "scheduler-manual-activate",
+                    expected_draft_version="2", expected_schedule_version="1",
+                    expected_rules_version="1")
+    assert activated[0] == 200, activated
+    return activated[1]
+
+
+def manual_args(version):
+    return {
+        "event_id": "event-1", "event_version": "1",
+        "expected_schedule_version": version,
+        "expected_rules_version": "2",
+    }
+
+
+def test_manual_simulated_run_reuses_cron_business_rules_and_has_no_external_effect(services):
+    api, pages = services
+    activated = activate_fixture(api)
+    pending = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+                  "manual-not-due-001", **manual_args(activated["version"]))
+    assert pending[0] == 200, pending
+    assert pending[1]["dispatch_state"] == "NOT_DUE"
+    assert pending[1]["dispatch_reason"] == "EVENT_NOT_YET_DUE"
+    assert pending[1]["manual_dispatch_executed"] is True
+    assert pending[1]["external_delivery_verified"] is False
+    with api.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='delivery'").fetchone()[0] == 0
+    advanced = cmd(api, "MAINTAINER", "boss.simulation.clock.advance",
+                   "scheduler-manual-time", at="2026-10-30T09:00:00+08:00")
+    assert advanced[0] == 200, advanced
+    actual = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+                 "manual-after-due-001", **manual_args(activated["version"]))
+    assert actual[0] == 200, actual
+    assert actual[1]["dispatch_state"] == "DELIVERED"
+    assert actual[1]["dispatch_reason"] is None
+    assert actual[1]["external_message_sent"] is False
+    assert actual[1]["owner_business_authorization_granted"] is False
+    _, workspace = read(pages)
+    assert any(row["event_id"] == "event-1"
+               for row in workspace["recent_dispatches"])
+    with api.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='delivery'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='notification'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0] == 0
+
+
+def test_manual_dispatch_concurrent_intent_has_one_persisted_delivery(services):
+    api, pages = services
+    activated = activate_fixture(api)
+    assert cmd(api, "MAINTAINER", "boss.simulation.clock.advance",
+               "scheduler-manual-repeat-time", at="2026-10-30T09:00:00+08:00")[0] == 200
+    a = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+            "scheduler-manual-first", **manual_args(activated["version"]))
+    assert a[0] == 200 and a[1]["dispatch_state"] == "DELIVERED"
+    replay = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+                 "scheduler-manual-first", **manual_args(activated["version"]))
+    assert replay == a
+    new_key = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+                  "scheduler-manual-second", **manual_args(activated["version"]))
+    assert new_key[0] == 200
+    assert new_key[1]["dispatch_state"] == "SUPPRESSED"
+    assert new_key[1]["dispatch_reason"] == "DUPLICATE_EVENT"
+    with api.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='delivery'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='notification'").fetchone()[0] == 1
+
+
+def test_manual_run_requires_validated_active_plan_and_correct_event_scope(services):
+    api, pages = services
+    planted = cmd(api, "MAINTAINER", "boss.simulation.event.seed",
+                  "manual-scope-event", event_id="event-1")
+    assert planted[0] == 200
+    no_active = {
+        "event_id": "event-1", "event_version": "1",
+        "expected_schedule_version": "1", "expected_rules_version": "1",
+    }
+    assert cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+               "not-activated-manual", **no_active)[0] == 409
+    assert cmd(api, "BOSS", "boss.scheduler.manual_run",
+               "owner-not-technical", **no_active)[0] == 403
+    # Event ID must be in the actual approved dataset, not supplied scope.
+    invalid = cmd(api, "MAINTAINER", "boss.scheduler.manual_run",
+                  "bad-event-manual", **{**no_active, "event_id": "../other-space"})
+    assert invalid[0] in (404,409)
