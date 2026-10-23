@@ -18,9 +18,11 @@ from boss_command_api import BossCommandAPI
 dictionary = json.loads((ROOT / "specs/data-dictionary.json").read_text())
 events = json.loads((ROOT / "specs/runtime-events.schema.json").read_text())
 runtime_records = json.loads((ROOT / "specs/runtime-records.schema.json").read_text())
+assignment_review = json.loads((ROOT / "specs/assignment-source-review.schema.json").read_text())
 api = yaml.safe_load((ROOT / "specs/openapi.yaml").read_text())
 Draft202012Validator.check_schema(events)
 Draft202012Validator.check_schema(runtime_records)
+Draft202012Validator.check_schema(assignment_review)
 for name, schema in api["components"]["schemas"].items():
     Draft202012Validator.check_schema(schema)
 for operation in api["x-websocket-operations"]:
@@ -31,6 +33,7 @@ assert len({o["operationId"] for o in api["x-websocket-operations"]}) == len(api
 assert dictionary["version"] == api["info"]["version"]
 assert events["$id"].endswith(":" + dictionary["version"])
 assert runtime_records["$id"].endswith(":" + dictionary["version"])
+assert assignment_review["$id"].endswith(":" + dictionary["version"])
 assert set(dictionary["requirement_entities"]) == {f"R{number:02d}" for number in range(1, 33)}
 assert all(entity in dictionary["entities"] for entities in dictionary["requirement_entities"].values() for entity in entities)
 assert {operation["interface_id"] for operation in api["x-simulation-operations"]} == {f"SI{number:02d}" for number in range(1, 15)}

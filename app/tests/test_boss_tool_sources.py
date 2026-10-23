@@ -570,3 +570,16 @@ def test_new_result_evidence_submission_preserves_old_binding_and_can_be_confirm
     assert status == 200
     with reopened.connect() as db:
         assert reopened.get(db, "ui-check", "task", created["task_id"])["status"] == "COMPLETED_CONFIRMED"
+
+
+def test_direct_send_keeps_task_version_increasing_after_a_prior_owner_update(tmp_path):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    created = store.invoke("create_assignment", direct_creation(store))
+    with store.connect() as db:
+        task = store.get(db, "ui-check", "task", created["task_id"])
+        task["version"] = str(int(task["version"]) + 1)
+        store.put(db, "ui-check", "task", task["task_id"], task)
+    content = {key: value for key, value in send_input({**created, "version": task["version"]}).items() if key != "client_request_id"}
+    result = store.invoke("send_assignment", authorized_tool(store, "send_assignment", content, "owner-updated-task-send"))
+    assert result["task_version"] == str(int(task["version"]) + 1)

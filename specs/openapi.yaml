@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.4.1
-  description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；当前版本的公开集成、来源不足和未运行验收分别标记。
+  version: 1.5.0
+  description: 当前HTTP读取、58项基线命令、10项W1领域动作、5项工具与14类模拟资料接口；当前版本的公开集成、来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.4.1
+  version: 1.5.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -39,9 +39,9 @@ x-source-policy:
   evidence_read: metadata or version change requires a new query; no silent use of a later document through an earlier query
   legacy_queries: missing query_source_binding returns 409 and requires explicit requery
   receipt_compatibility: committed business receipts remain readable; no business action replay
-  assignment_binding: assignment_source_binding pins creation-time source versions and full SHA256; confirmed minute tasks also pin their original minute source
+  assignment_binding: initial assignment_source_binding pins creation-time source versions and full SHA256; explicit owner review archives the known binding and confirms current source adoption without changing business status
   assignment_execution: Store.create_assignment and Store.send_assignment check current source and coordinator validity; completion rechecks the binding in the same transaction
-  legacy_assignments: missing creation-time binding returns 409 before new send or completion; no inferred historical binding
+  legacy_assignments: missing binding returns 409 before new send or completion; AssignmentSourcesAPI provides explicit owner confirmation of current materials without inferring historical bindings
   feedback_binding: new feedback pins submitted evidence versions, full SHA256 and source states; completion rechecks the submitted evidence independently of task creation sources
   legacy_feedback: missing complete evidence binding returns 409 before completion and requires a fresh explicit result submission
   historical_feedback: canceled tasks keep late evidence as historical only, including expired evidence metadata; source identity, owner and type remain mandatory
@@ -52,6 +52,18 @@ x-tool-authorization-policy:
   committed_receipts: original request and content remain readable after revocation without performing another action
   tool_read_projection: read_assignment returns declared read_output fields while preserving additional server-side task metadata
 paths:
+  /api/boss/ui/assignment-source-review:
+    get:
+      operationId: assignmentSourcesRead
+      x-role: BOSS
+      x-implementation: boss_assignment_sources.AssignmentSourcesAPI.read
+      x-integration: PENDING_W3
+      x-scope-policy: 仅接受task_id单项查询；拒绝额外或重复参数，namespace及owner由服务端确定。
+      parameters:
+        - {name: task_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 当前交办、当前来源与实际已知绑定历史；无权或失效来源没有原文片段。, content: {application/json: {schema: {$ref: './assignment-source-review.schema.json#/$defs/Projection'}}}}
+        default: {$ref: '#/components/responses/Error'}
   /api/boss/ui/runtime-records:
     get:
       operationId: runtimeRecordsRead
@@ -591,6 +603,9 @@ components:
         meeting_agenda_linked: {type: boolean}
         content_sha256: {type: string}
         active_unchanged: {type: boolean}
+        sources_reconfirmed: {type: boolean}
+        business_status_unchanged: {type: boolean}
+        result_evidence_requires_resubmission: {type: boolean}
         authorization_created: {type: boolean}
         source_draft_version: {$ref: '#/components/schemas/Version'}
         active_adoptable: {type: boolean}
@@ -673,6 +688,8 @@ components:
           else: {not: {required: [proposed_due_at]}}
         - if: {properties: {kind: {const: RESULT_SUBMITTED}}}
           then: {properties: {evidence_refs: {minItems: 1}}}
+    AssignmentSourceConfirmation:
+      $ref: './assignment-source-review.schema.json#/$defs/ConfirmationInput'
     CommitmentCreate:
       allOf:
         - {$ref: '#/components/schemas/CommandFields'}
@@ -1115,6 +1132,7 @@ x-websocket-operations:
   - {operationId: boss.scheduler.resume, action: boss.scheduler.resume, role: MAINTAINER, input: '#/components/schemas/VersionCommand', output: '#/components/schemas/BusinessReceipt', implementation: 'boss_scheduler_config.set_status', result_required: [schedule_id, version, schedule_version, enabled, canceled, external_message_sent, manual_dispatch_executed, owner_authorization_granted]}
   - {operationId: boss.scheduler.cancel, action: boss.scheduler.cancel, role: MAINTAINER, input: '#/components/schemas/VersionCommand', output: '#/components/schemas/BusinessReceipt', implementation: 'boss_scheduler_config.set_status', result_required: [schedule_id, version, schedule_version, enabled, canceled, external_message_sent, manual_dispatch_executed, owner_authorization_granted]}
   - {operationId: boss.scheduler.manual_run, action: boss.scheduler.manual_run, role: MAINTAINER, input: '#/components/schemas/SchedulerManualRun', output: '#/components/schemas/BusinessReceipt', implementation: 'boss_scheduler_config.manual_run', result_required: [event_id, event_version, schedule_version, rules_version, dispatch_state, dispatch_reason, business_at, manual_dispatch_executed, external_message_sent, external_delivery_verified, owner_business_authorization_granted]}
+  - {operationId: assignmentSourcesConfirm, action: boss.assignment.sources.confirm, role: BOSS, input: '#/components/schemas/AssignmentSourceConfirmation', output: '#/components/schemas/BusinessReceipt', implementation: 'AssignmentSourcesAPI.execute', result_required: [source_type, task_id, version, task_version, status, authorization_id, sources_reconfirmed, business_status_unchanged, message_sent, review_sha256, result_evidence_requires_resubmission], integration: PENDING_W3}
 x-tool-operations:
   - {operationId: query_metrics, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/query_input', output: './selection-probe.json#/io_schema/$defs/query_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.query_metrics', side_effect: QUERY_RECORD, source_entity: metric_detail}
   - {operationId: read_evidence, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/evidence_input', output: './selection-probe.json#/io_schema/$defs/evidence_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.read_evidence', side_effect: AUDIT_ONLY, source_entity: document}

@@ -1,12 +1,12 @@
 {
-  "version": "1.4.1",
+  "version": "1.5.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.3.1保留既有命令与五项Tool的输入/结果字段，新增交办创建时assignment_source_binding；缺少绑定的旧交办在发送或完成前返回409要求本人重新核查，不推测历史来源。旧查询缺少query_source_binding时返回409要求重新查询；历史业务动作、原回执和原始snapshot保持。",
+    "compatibility": "1.5.0保留既有命令与五项Tool的输入/结果字段，增加本人来源复核读取与独立确认。旧交办通过当前资料复核产生当前绑定，已知旧绑定保留，未知历史不补造；旧查询需要重新查询，旧结果证据需要重新提交。历史业务状态、消息、原回执和原始snapshot保持。",
     "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
@@ -85,12 +85,12 @@
         "status": {"type": "string", "enum": ["OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED", "COMPLETED_CONFIRMED"]},
         "evidence_requirements": {"type": "array", "items": "string"}, "authorization_id": {"type_ref": "identifier"},
         "related_meeting_id": {"type_ref": "identifier"}, "related_event_ids": {"type": "array", "items": "event.event_id"},
-        "source_refs": {"type": "array", "items": "document.source_id"}, "source_versions": {"type": "object", "values": "version"},
+        "source_refs": {"type": "array", "items": "document.source_id"}, "source_versions": {"type": "object", "values": "version", "meaning": "当前本人确认采用的来源版本；原始创建绑定及后续复核分别保存历史"},
         "message_ids": {"type": "array", "items": "outbox.message_id"}, "feedback_ids": {"type": "array", "items": "feedback.feedback_id"},
         "completion_authorization_id": {"type": ["string", "null"]}, "execution_namespace": {"type_ref": "identifier"},
         "accepted_extension_feedback_ids": {"type": "array", "items": "feedback.feedback_id", "optional": true},
         "origin_minute_id": {"type_ref": "identifier", "optional": true}, "origin_minute_version": {"type_ref": "version", "optional": true},
-        "origin_entry_id": {"type_ref": "identifier", "optional": true}, "origin_source_id": {"type_ref": "identifier", "optional": true}, "origin_source_version": {"type_ref": "version", "optional": true},
+        "origin_entry_id": {"type_ref": "identifier", "optional": true}, "origin_source_id": {"type_ref": "identifier", "optional": true}, "origin_source_version": {"type_ref": "version", "optional": true, "meaning": "原始纪要创建交办时的历史版本；当前采用读取assignment_source_binding.origin_source"},
         "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason": {"type_ref": "private_text", "optional": true}, "canceled_at": {"type_ref": "instant", "clock": "WALL", "optional": true}
       }
     },
@@ -98,8 +98,16 @@
       "storage": "objects/assignment_source_binding; id=task_id", "access": "SERVER_ONLY", "version": "1",
       "fields": {"task_id": {"type_ref": "identifier", "relation": "task.task_id"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
         "source_versions": {"type": "object", "values": "version"}, "source_fingerprints": {"type": "object", "values": "SHA256"},
-        "origin_source": {"type": "object", "optional": true, "properties": {"source_id": "identifier", "version": "version", "sha256": "SHA256"}, "meaning": "由确认纪要创建的交办保存其原始来源；与task和关联记录同一事务保存"}},
-      "policy": "发送或完成决定在当前事务校验本人、数据集、来源版本及完整摘要。旧对象缺少绑定时409要求本人重新核查；原始回执继续可读。"
+        "origin_source": {"type": "object", "optional": true, "properties": {"source_id": "identifier", "version": "version", "sha256": "SHA256"}, "meaning": "当前本人确认采用的原始纪要来源；task.origin_source_version保留创建时历史"},
+        "confirmation_authorization_id": {"type_ref": "identifier", "optional": true}, "confirmed_task_version": {"type_ref": "version", "optional": true},
+        "confirmed_at": {"type_ref": "instant", "clock": "WALL", "optional": true}, "review_sha256": {"type": "string", "optional": true},
+        "review_reason": {"type_ref": "private_text", "optional": true}, "previous_binding_sha256": {"type": ["string", "null"], "optional": true}},
+      "policy": "初始绑定与创建同一事务保存；本人重新确认时保存已知旧绑定并更新当前采用范围，不改变业务状态。发送或完成决定校验当前本人、数据集、来源版本及完整摘要；原始回执继续可读。旧对象缺少绑定时通过AssignmentSourcesAPI独立核查当前来源，不推测历史。"
+    },
+    "assignment_source_binding_revision": {
+      "storage": "objects/assignment_source_binding_revision; id=task_id:v<before_task_version>", "access": "SERVER_ONLY_WITH_BOSS_HISTORY_METADATA", "version": "1",
+      "fields": {"task_id": {"type_ref": "identifier"}, "before_task_version": {"type_ref": "version"}, "binding": {"type": "object", "inherits": "assignment_source_binding"}, "archived_at": {"type_ref": "instant", "clock": "WALL"}},
+      "policy": "仅归档确认前实际存在的绑定；没有旧绑定时不生成历史版本。before_task_version表示归档时读取的任务版本，不推测原始创建时间。"
     },
     "self_commitment": {
       "storage": "objects/self_commitment", "access": "BOSS_ONLY", "version": "1",
@@ -464,7 +472,7 @@
     "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification"],
     "R03": ["query", "query_source_binding", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
     "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
-    "R06": ["task", "assignment_source_binding", "self_commitment", "feedback", "outbox", "event"],
+    "R06": ["task", "assignment_source_binding", "assignment_source_binding_revision", "self_commitment", "feedback", "outbox", "event"],
     "R07": ["application", "application_decision", "document", "authorization"],
     "R08": ["contact", "message_draft", "message", "message_reply", "authorization"],
     "R09": ["document", "research"], "R10": ["contact", "person_brief", "task", "feedback"],

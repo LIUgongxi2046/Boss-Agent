@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:assignment-source-review:1.5.0",
+  "title": "本人重新核查交办来源",
+  "$ref": "#/$defs/Projection",
+  "$defs": {
+    "ConfirmationInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "task_id", "task_version", "review_sha256", "reason"],
+      "properties": {
+        "client_request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{7,127}$"},
+        "task_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "task_version": {"type": "string", "pattern": "^[0-9]+$"},
+        "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "Source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "pinned_version", "current_version", "source_status", "excerpt", "published_at", "valid_from", "valid_until", "is_minute_origin"],
+      "properties": {
+        "source_id": {"type": "string"}, "pinned_version": {"type": ["string", "null"]}, "current_version": {"type": ["string", "null"]},
+        "source_status": {"enum": ["VALID", "RECEIVED", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED", "MISSING", "FORBIDDEN"]},
+        "excerpt": {"type": ["string", "null"]}, "published_at": {"type": ["string", "null"]},
+        "valid_from": {"type": ["string", "null"]}, "valid_until": {"type": ["string", "null"]}, "is_minute_origin": {"type": "boolean"}
+      }
+    },
+    "Projection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_type", "task", "binding_state", "sources", "can_confirm", "review_sha256", "business_at", "result_evidence_current", "result_evidence_requires_resubmission", "history", "confirmed_reason", "read_at"],
+      "properties": {
+        "source_type": {"const": "SIMULATED"},
+        "task": {"type": "object", "additionalProperties": false, "required": ["task_id", "version", "status", "purpose"],
+          "properties": {"task_id": {"type": "string"}, "version": {"type": "string"}, "status": {"type": "string"}, "purpose": {"type": "string"}}},
+        "binding_state": {"enum": ["MISSING", "CURRENT", "NEEDS_REVIEW"]}, "sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}},
+        "can_confirm": {"type": "boolean"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "business_at": {"type": "string", "format": "date-time"}, "read_at": {"type": "string", "format": "date-time"},
+        "result_evidence_current": {"type": ["boolean", "null"]}, "result_evidence_requires_resubmission": {"type": "boolean"},
+        "confirmed_reason": {"type": ["string", "null"]},
+        "history": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["before_task_version", "source_versions", "archived_at", "origin_source", "review_reason"],
+          "properties": {"before_task_version": {"type": "string"}, "source_versions": {"type": "object", "additionalProperties": {"type": "string"}}, "archived_at": {"type": "string", "format": "date-time"},
+            "review_reason": {"type": ["string", "null"]}, "origin_source": {"type": ["object", "null"], "additionalProperties": false, "required": ["source_id", "version"],
+              "properties": {"source_id": {"type": "string"}, "version": {"type": "string"}}}}}}
+      }
+    }
+  }
+}

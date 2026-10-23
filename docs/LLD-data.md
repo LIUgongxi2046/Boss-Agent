@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.4.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
+版本 `1.5.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -27,6 +27,7 @@ erDiagram
   TASK ||--o{ FEEDBACK : receives
   TASK ||--o{ MESSAGE : sends
   TASK ||--|| ASSIGNMENT_SOURCE_BINDING : pins
+  TASK ||--o{ ASSIGNMENT_SOURCE_BINDING_REVISION : preserves
   SOURCE ||--o{ CITATION : supports
   QUERY ||--|| QUERY_SOURCE_BINDING : pins
   SOURCE ||--o{ QUERY_SOURCE_BINDING : bounds
@@ -77,7 +78,7 @@ status来自实际Hook；SUCCEEDED只表示SDK正常结束，独立业务完成�
 
 当前五项Tool保持原输入与结果字段。query_metrics将来源实际版本、定位和当前版本声明的发布时间写入来源结果，business_as_of由获准CURRENT期间终点与初始档案的时区计算；read_at始终为实际读取时间。source_updated_at对应该当前版本声明的published_at，不把读取时间作为来源更新时间。query_source_binding保存完整document和实际明细的SHA256；read_evidence在当前事务中重验访问范围、有效性、版本和摘要，来源或明细改变后要求重新查询。旧库查询缺少绑定时明确返回409；不会根据当前内容为旧查询补造历史绑定。
 
-assignment_source_binding与新交办在同一事务保存；确认纪要产生的交办还保存origin_source的标识、版本和完整摘要。发送和完成决定读取当前来源后比对原绑定，资料变化时停止新动作；旧交办缺少绑定时409要求本人重新核查，不用当前资料推测创建时的版本。备份恢复逐对象保留绑定及撤销状态。read_assignment仅输出既有Tool Schema声明字段，服务端task的来源版本和纪要关联保持原记录。
+assignment_source_binding与新交办在同一事务保存；确认纪要产生的交办还保存origin_source的标识、版本和完整摘要。本人通过AssignmentSourcesAPI独立复核后，以当前完整来源更新采用绑定，并把实际存在的旧绑定保存在assignment_source_binding_revision；缺少旧绑定时不生成历史版本。复核绑定保存本次授权、确认时间、递增后的任务版本、核查摘要、本人依据及已知前版摘要。当前task.source_versions表示本人当前确认采用范围；task.origin_source_version继续表示原始纪要创建任务时的历史版本，当前纪要来源采用binding.origin_source。复核不修改纪要、目的、期限、负责人、业务状态、反馈证据及已发消息。备份恢复逐对象保留绑定及撤销状态；旧结果证据仍需独立重新提交。read_assignment只输出原始Tool声明字段，服务端扩展记录继续保存。
 
 反馈在提交时另存evidence_versions、evidence_fingerprints和evidence_states，覆盖每项evidence_refs；新增反馈在当前事务检查来源，普通反馈只能采用当前有效资料。取消后的迟到反馈可保留失效证据的实际标识与当时状态，类型、source_id和owner范围仍需相符，historical_only保持true。完成决定同时核查交办创建时来源及结果提交时证据，不能用较新的同名资料代替旧证据。旧结果缺少完整证据绑定时409，重新提交产生独立feedback_id并保留原记录。
 

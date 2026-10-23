@@ -187,8 +187,8 @@ class Store:
         if task.get("origin_source_id"):
             source_id = task["origin_source_id"]
             origin = self.assignment_sources(db, ns, data, [source_id])[source_id]
-            require(binding.get("origin_source") == {"source_id": source_id, "version": origin["version"], "sha256": checksum(origin)}
-                    and origin["version"] == task["origin_source_version"], "交办原始纪要的来源已经变化，需要重新核查")
+            require(binding.get("origin_source") == {"source_id": source_id, "version": origin["version"], "sha256": checksum(origin)},
+                    "交办原始纪要的来源已经变化，需要重新核查")
 
     def require_current_coordinator(self, db, ns, data, coordinator_id):
         contacts = [contact for contact in data["contacts"] if contact["contact_id"] == coordinator_id]
@@ -285,9 +285,10 @@ class Store:
         require(task["coordinator_id"] == p["recipient_id"], "收件人不符", web.HTTPForbidden)
         self.require_current_coordinator(db, ns, data, p["recipient_id"])
         self.require_current_assignment_sources(db, ns, data, task)
-        result = {"message_id": str(uuid.uuid4()), "task_id": p["task_id"], "message_status": "SENT", "task_status": "WAITING_FEEDBACK", "task_version": "2", "source_type": "SIMULATED", "sent_at": now()}
+        new_version = str(int(task["version"]) + 1)
+        result = {"message_id": str(uuid.uuid4()), "task_id": p["task_id"], "message_status": "SENT", "task_status": "WAITING_FEEDBACK", "task_version": new_version, "source_type": "SIMULATED", "sent_at": now()}
         self.put(db, ns, "outbox", result["message_id"], {**p, **result})
-        task.update(status="WAITING_FEEDBACK", version="2", message_ids=[result["message_id"]])
+        task.update(status="WAITING_FEEDBACK", version=new_version, message_ids=[result["message_id"]])
         self.put(db, ns, "task", p["task_id"], task)
         return result
 

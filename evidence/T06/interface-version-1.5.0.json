@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.5.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "source_base": "fc4b2b5",
+  "source_scope": "W1 commit containing this evidence",
+  "work_item_id": "T14-ASSIGNMENT-SOURCE-REVIEW",
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v15-verified -p no:cacheprovider --junitxml=.work/w1-v15-verified.xml", "status": "PASS", "result": "502 passed in 28.60s", "raw_result": ".work/w1-v15-verified.xml"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v15-verified", "status": "PASS", "actual_sqlite_receipts": 729, "declared_actions_observed": 68, "baseline_role_mappings": 58},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v15", "status": "PASS", "result": "16 passed in 6.95s; each of 58 baseline public actions has at least one valid declared input and actual result"},
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation including source-review schemas; duplicate YAML key validation"},
+    {"command": "node .work/ui-typecheck/node_modules/typescript/bin/tsc --project .work/ui-typecheck/tsconfig-integrated.json", "status": "PASS", "components": ["BossToday", "BossOwnerPlans", "BossMeetingArrangement", "BossMeetingBrief", "BossAssignmentSourceReview"], "scope": "strict/noEmit using actual nanobot types and installed dependencies; public mount and production build pending W3"},
+    {"command": "evidence/T05/check_runtime_bindings.py with explicit W2 records/provider/memory paths", "status": "PASS", "actual_runs": 9, "current_producer_records": 4, "query_schema_matches_implementation": true, "schema_sha256": "a13753ddf8c30dbc98499bacc616a1449c3928587f5f0333132e2d07617f13ff", "runtime_producer_sha256": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe", "current_query_implementation_sha256": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502", "original_record_files_manifest": "evidence/T05/runtime-binding-1.4.0.json actual_record_files"}
+  ],
+  "source_review_cases": 24,
+  "tool_source_authorization_cases": 71,
+  "files_sha256": {"validation/boss_assignment_sources.py": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752", "app/webui/BossAssignmentSourceReview.tsx": "7cfedb28d6416d72041e87141ecc1e7f75a1e8743a8cc09db2f3dabd6525aa19", "specs/assignment-source-review.schema.json": "0b0ea12378cb359e955aeb88048a59677f76082d3a4097930751f10bb966c0b0"},
+  "verified": ["legacy assignment receives a current binding only after explicit owner review without inventing historical binding", "known prior binding is preserved with archive metadata", "task/source/clock changes invalidate the previous review snapshot", "role, scope, source validity and terminal-state checks precede confirmation", "concurrent different request keys create one review authorization and receipt", "committed receipt survives later source withdrawal and rejects different same-key content", "original minute provenance stays historical while explicit current adoption uses the reviewed binding", "source review preserves purpose, deadline, status, existing messages and submitted evidence", "source review uses an existing caller transaction without nesting", "subsequent independently authorized send increments from the current task version", "input and populated history projection match the declared schema"],
+  "public_reception": {"read": "GET /api/boss/ui/assignment-source-review?task_id=... -> AssignmentSourcesAPI.read(role,task_id)", "action": "boss.assignment.sources.confirm BOSS -> AssignmentSourcesAPI.execute(role,payload) before the generic public transaction", "current_source_check": "Store.require_current_assignment_sources; current minute source is binding.origin_source and original task.origin_source_version remains historical", "read_projection": "AssignmentSourcesAPI.project_in_transaction(role,db,task_id)", "component": "BossAssignmentSourceReview in F06 keyed by selected task ID; D06 and original receipt recovery", "details": "docs/development/T14.md", "status": "PENDING_W3"},
+  "new_external_requests": false,
+  "new_agricultural_facts": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": ["W3 public action/read/projection/F06 integration and current version tests", "full production build and actual F06 interactions", "full migration and backup recovery including all domains", "complete fourteen simulated interfaces", "all authorization consumers, cache/session propagation and E01-E06", "complete runtime/voice and independent semantics", "morning/recurring tasks, device behavior and full parent acceptance"]
+}

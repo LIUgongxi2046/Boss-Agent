@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.4.1；T06/A06；2026-10-23；引用LLD-data1.4.1、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.5.0；T06/A06；2026-10-23；引用LLD-data1.5.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -35,6 +35,8 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 | meetingDraftSave | BOSS，meeting_id、meeting_version、expected_version（草稿）、purpose、完整时间/时区、preparation_due_at、participant_ids、source_refs及client_request_id | `execute(role,"draft.save",payload)`；保存草稿和影响摘要，当前安排保持 | F04、W3 |
 | meetingConfirm | BOSS，meeting_id、meeting_version、draft_version、review_sha256、acknowledge_conflict及client_request_id | `execute(role,"confirm",payload)`；核查完整上下文与来源后产生当前SCHEDULED版本 | F04、W3 |
 | meetingCancel / meetingHeld | BOSS，meeting_id、expected_version（会议）、reason及client_request_id | `execute(role,"cancel"或"held",payload)`；独立本人确认；终态不恢复，举行需开始时间已经到达 | F04、W3 |
+| assignmentSourcesRead | BOSS，task_id | `AssignmentSourcesAPI.read(role,task_id)`；当前交办、许可来源、已知绑定历史及结果证据复核状态 | F06、W3 |
+| assignmentSourcesConfirm | BOSS，client_request_id、task_id、task_version、review_sha256、reason | `AssignmentSourcesAPI.execute(role,payload)`；独立确认当前来源与递增任务版本，业务状态和发送结果保持 | F06、W3 |
 
 四项会议动作与读取路径在`specs/openapi.yaml`标记PENDING_W3。F01/N09此前版本已由W3接入，记录见W3的T11；本目录当前1.2.0增量仍需相同集成版本复验。不得把领域检查当作公共入口或设备验收。
 
@@ -53,6 +55,10 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 Store.invoke的新写入检查授权的owner、namespace、BOSS身份及签发者、action、target_id、content_version、完整参数、revoked及valid_from/valid_until。一次创建授权只产生一个task，一次发送授权只产生一个outbox；不同请求编号并发执行时在BEGIN IMMEDIATE内检查既有结果。相同编号及内容始终读取原回执，授权撤销后继续可读。独立完成/延期控制复用相同身份与时间检查，决定的content_version对应task_version。read_assignment按原始read_output字段投影，服务端来源和纪要扩展字段继续保存。
 
 control_feedback在同一事务保存每项结果证据的实际版本、完整摘要及当前有效状态。普通反馈拒绝非当前资料；CANCELED的历史反馈允许失效资料但继续检查来源类型、标识和本人范围，历史标记不变。control_decide的完成动作逐项核对提交时证据，包含不属于原始交办来源的额外证据；变化或旧记录缺少绑定时409，不提交新授权和完成状态。重新提交结果保存独立反馈与当前绑定，原反馈保持。W3公共反馈入口需允许已发送且RESULT_SUBMITTED任务按当前CAS提交新的结果，原请求幂等、取消历史和COMPLETED_CONFIRMED拒绝继续有效。
+
+来源复核仅允许BOSS，当前产品空间为ui-check，当前采用状态由AssignmentSourcesAPI统一读取。read自行开启只读事务，project_in_transaction(role,db,task_id)用于公共页面已持有的同一事务。绑定缺少或资料变化时，界面提供当前获准片段及原文入口；未获准、撤销、过期等资料不返回片段。执行来源确认前重新检查角色、当前任务版本、全部资料权限/状态与完整核查摘要，摘要包含任务、当前绑定、当前原文、业务时钟及数据集。BEGIN IMMEDIATE内归档已知绑定、保存独立assignment.sources.confirm授权、更新当前绑定和任务版本、保存回执及最小审计。来源或并发数据变化409，未认证401、越权403、未知对象404，撤销/到期资料410，输入400。终态不重新确认，原请求在后续来源撤销后继续可读；同键不同内容拒绝。
+
+公共boss.assignment.sources.confirm须在通用事务之前委派，当前Tool范围保持。公共任务的当前来源校验使用Store.require_current_assignment_sources；任务表保留原始纪要版本，当前采用版本由binding.origin_source提供。F06来源状态可使用project_in_transaction避免重复定义。来源复核不改变旧反馈的提交时证据；result_evidence_requires_resubmission为true时仍需要负责人独立提交。发送继续独立本人授权，发送后的任务版本从当前版本递增。
 
 当前计划未包含晨间模型生成和周期重复定义；需要 W2 提供真实 Runtime 任务能力和 W3 接入后继续完成，不登记 A17 完成。已有事件更新时保留 owner_plan_id 并检查 event_versions，不自动扩大本人范围。
 
