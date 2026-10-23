@@ -1,5 +1,5 @@
 {
-  "version": "1.3.1",
+  "version": "1.4.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
@@ -290,7 +290,7 @@
     "configuration": {
       "storage": "objects/configuration/current", "access": "SERVER_ONLY_WITH_REDACTED_MAINTAINER_STATUS", "version": "1",
       "fields": {"config_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "provider": {"type": "string", "const": "deepseek"}, "api_type": {"type": "string", "const": "chat_completions"}, "model_id": {"type": "string"}, "credential_ref": {"type": "string", "access": "SERVER_ONLY"}, "tool_scope": {"type": "array", "items": "operationId"}, "max_tool_rounds": {"type": "integer"}, "timeout": {"type": "integer", "unit": "second"}, "enabled": {"type": "boolean"}},
-      "runtime_policy": "真实有效模型配置仍需 W2 验证，模拟配置记录不能证明 Runtime 已采用"
+      "runtime_policy": "RuntimeRecorder逐项核查当前SQLite配置和实际启用参数并记录版本；完整请求覆盖与模型行为另行验收，配置记录本身不证明业务完成。"
     },
     "scheduler_draft": {
       "storage": "objects/scheduler_draft/current", "access": "MAINTAINER_ONLY", "version": "1",
@@ -321,8 +321,30 @@
       "pending_product_fields": ["owner-reviewed text version", "confirmation authorization", "related business request ID", "cancellation and recording retention state"]
     },
     "runtime_run": {
-      "storage": "nanobot SessionManager and protected runtime records", "access": "ROLE_SCOPED_METADATA_WITH_BOSS_BODY", "version": "1", "design_status": "REQUIRES_W2_BINDING",
-      "fields": {"run_id": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "request_id": {"type_ref": "identifier"}, "configuration_version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["QUEUED", "RUNNING", "WAITING_INPUT", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"]}, "stop_reason": {"type": ["string", "null"]}, "started_at": {"type_ref": "instant", "clock": "WALL"}, "finished_at": {"type": ["string", "null"], "clock": "WALL"}, "tool_results": {"type": "array", "items": "persisted_business_result_reference"}, "usage": {"type": ["object", "null"]}, "cost_total": {"type_ref": "decimal", "nullable": true}, "price_version": {"type": ["string", "null"]}, "usage_coverage": {"type": "string"}}
+      "storage": "objects/runtime_run; id=run_id", "access": "BOSS_AND_MAINTAINER_TECHNICAL_METADATA_ONLY", "version": "1", "design_status": "W2_PRODUCER_BOUND_PUBLIC_INTEGRATION_RECHECK_PENDING",
+      "schema_ref": "runtime-records.schema.json#/$defs/RuntimeRun", "current_producer_schema_ref": "runtime-records.schema.json#/$defs/CurrentRuntimeRun",
+      "producer": "W2 boss_runtime_records.RuntimeRecorder and RuntimeRecordHook; commit 1d13d77",
+      "fields": {
+        "run_id": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "request_id": {"type_ref": "identifier"},
+        "request_id_source": {"type": "string", "enum": ["MESSAGE", "TURN", "SERVER_GENERATED"]},
+        "chat_id": {"type": ["string", "null"]}, "turn_id": {"type": ["string", "null"]}, "namespace": {"type_ref": "identifier", "relation": "objects.namespace"},
+        "dataset_id": {"type_ref": "identifier", "optional": true, "meaning": "当前生产者必需；旧记录未保存时保持缺少"},
+        "dataset_version": {"type_ref": "version", "optional": true}, "configuration_id": {"type_ref": "identifier"}, "configuration_version": {"type_ref": "version"},
+        "runtime": {"type": "object", "schema_ref": "runtime-records.schema.json#/$defs/RuntimeSnapshot", "meaning": "实际Provider、模型、API类型、轮数、输出Token限制、请求timeout及配置摘要"},
+        "prompt_versions": {"type": "array", "items": "runtime-records.schema.json#/$defs/PromptVersion"},
+        "memory_reference": {"type": ["object", "null"], "optional": true, "schema_ref": "runtime-records.schema.json#/$defs/MemoryReference", "meaning": "当前生产者必需且可空；只有记忆ID、版本、确认状态及采用资格，无正文"},
+        "tool_config_sha256": {"type": "string"}, "tool_configuration": {"type": "array", "items": "runtime-records.schema.json#/$defs/ToolConfiguration"},
+        "model_requests": {"type": "array", "items": "runtime-records.schema.json#/$defs/ModelRequest"}, "tool_results": {"type": "array", "items": "runtime-records.schema.json#/$defs/ToolResultReference"},
+        "status": {"type": "string", "enum": ["QUEUED", "RUNNING", "WAITING_INPUT", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"]}, "stop_reason": {"type": ["string", "null"]},
+        "started_at": {"type_ref": "instant", "clock": "WALL"}, "finished_at": {"type": ["string", "null"], "clock": "WALL"},
+        "termination_source": {"type": "string", "optional": true, "enum": ["CALLER_DEADLINE_EXPIRED"]},
+        "usage": {"type": ["object", "null"], "schema_ref": "runtime-records.schema.json#/$defs/Usage"}, "cost_total": {"type_ref": "decimal"}, "price_version": {"type": ["string", "null"]},
+        "usage_coverage": {"type": "string", "enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]}, "model_attempts_coverage": {"type": "string", "const": "HTTP_REQUESTS_OBSERVED_ONLY"},
+        "private_body_recorded": {"type": "boolean", "const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"}
+      },
+      "legacy_policy": "旧记录缺少dataset绑定或memory_reference时保留当时原记录，不根据当前资料或配置补充。当前新记录使用CurrentRuntimeRun，数据集两字段同时提供。",
+      "state_policy": "SDK完成不代表业务完成；WAITING_INPUT需要明确服务端事件，当前不从模型文字推断。",
+      "usage_policy": "实际HTTP已报告用量求和；缓存Token缺少时保持未知；COMPLETE_OBSERVED_REQUESTS仅覆盖已观察请求。未核查价格及全部尝试时cost_total与price_version为null。"
     },
     "agriculture_batch": {
       "storage": "objects/agriculture_batch, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
@@ -461,5 +483,5 @@
     "R28": ["authorization", "document", "private_calendar", "calendar_share"], "R29": ["authorization", "runtime_run", "task"],
     "R30": ["runtime_run", "configuration", "query"], "R31": ["runtime_run", "query", "metric_detail"], "R32": ["runtime_run", "configuration", "schedule"]
   },
-  "pending_validation": ["migration and restore", "source deletion propagation", "independent semantic review", "W2 runtime and voice record binding"]
+  "pending_validation": ["migration and restore", "source deletion propagation", "independent semantic review", "public runtime record integration and voice review binding"]
 }

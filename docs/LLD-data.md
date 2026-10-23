@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.3.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
+版本 `1.4.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -61,7 +61,13 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 查询来源绑定 | query_source_binding，以query_id为ID | 与query同一事务保存owner/dataset、来源版本/完整JSON摘要及每项明细摘要；读取当前原文前逐项验证 |
 | 交办来源绑定 | assignment_source_binding，以task_id为ID | 与交办同一事务保存owner/dataset、来源版本和完整摘要；纪要产生的交办另保存原始纪要来源摘要，发送或完成前重验 |
 
-字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录需W2绑定当前真实记录；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
+字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录接收W2的RuntimeRecorder实际生产字段，规范为runtime-records.schema.json；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
+
+运行观察保存在objects/runtime_run，以run_id为ID、namespace为执行范围。SessionManager继续独立维护获准会话正文；Runtime记录及BOSS/MAINTAINER读取投影只含技术元信息。request_id_source区分MESSAGE、TURN及SERVER_GENERATED，chat_id/turn_id保持真实可空状态，不把运行UUID当作传输编号。configuration_id/version、实际runtime参数、Prompt版本/摘要、Tool Schema及实现摘要在创建时记录；model_requests保存真实请求摘要、HTTP状态、服务响应ID、用量和结束原因；tool_results保存已重读确认存在的query/task/outbox引用。
+
+memory_reference由当前OwnerMemoryContext提供记忆ID、版本、确认状态及采用资格，没有提供器时显式为null；不保存正文。当前生产者使用CurrentRuntimeRun并保存dataset_id/version及memory_reference；读取既有记录使用RuntimeRun，旧记录缺少这些字段时保持缺少，不能从当前配置推测历史采用。数据集字段成对出现。source_type=RUNTIME_RECORD属于读取投影，objects中的原始运行对象没有此字段。
+
+status来自实际Hook；SUCCEEDED只表示SDK正常结束，独立业务完成继续查询业务对象。WAITING_INPUT需要明确服务端等待事件，当前没有基于回答文字的自动状态。finished_at为终态实际时间，外部deadline确实到期时termination_source为CALLER_DEADLINE_EXPIRED。usage按实际已观察请求汇总，缓存Token缺少时保持未知；COMPLETE_OBSERVED_REQUESTS只说明已观察请求的覆盖，model_attempts_coverage明确为HTTP_REQUESTS_OBSERVED_ONLY。未核查价格和全部尝试时cost_total/price_version为null。上述字段与原始证据对应，不能推定完整费用、模型质量或企业收益。
 
 会议采用当前对象覆盖读取，`meeting_materials(db,data)`保留原始snapshot并校验当前meeting的owner_id和meeting_id。既有数据库没有meeting对象时使用原始会议，投影标记DRAFT和未知结束时间；首次确认安排才写入当前对象及meeting_revision。meeting_draft具有独立版本，保存和修改不改变当前会议。确认时绑定会议/草稿版本、联系人、来源内容与版本、私人占用、已确认行程及缓冲、业务时钟；变化后停止采用旧核查结果。HELD/CANCELED保持终态；取消不改变独立交办和历史消息。全部新增对象继续受namespace隔离和SQLite同一事务约束。
 

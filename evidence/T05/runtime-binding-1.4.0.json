@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.4.0",
+  "status": "PASS_EXISTING_RUNTIME_FIELDS_ONLY",
+  "producer_commit": "1d13d77",
+  "producer_workspace": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent",
+  "command": "validation/.venv/bin/python evidence/T05/check_runtime_bindings.py --records-root /Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/evidence/T16 --provider-root /Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent --memory-records /Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/evidence/T19/w2-20261023-memory-confirmation/memory-confirmation-adoption.json",
+  "runtime_runs": 9,
+  "current_runtime_runs": 4,
+  "status_counts": {"CANCELED": 1, "FAILED": 2, "TIMED_OUT": 1, "SUCCEEDED": 5},
+  "query_schema_matches_implementation": true,
+  "legacy_runs_missing_dataset_binding": 5,
+  "legacy_runs_missing_memory_reference": 2,
+  "schema_sha256": "e56e7b7ee5fdd4a2c4df3614c406729bfeace86159c7235a6848004e4fcaa970",
+  "actual_record_files": [
+    {"path": "evidence/T16/runtime-record-faults/w2-explicit-cancel/runtime-records.json", "sha256": "0f88f58164e288e8a646c2c85a9302eb1a9136888a7db777922e9198514f47a8"},
+    {"path": "evidence/T16/runtime-record-faults/w2-iteration-budget/runtime-records.json", "sha256": "cc7f17bb3b77f1ff6f21de685ff91df625a354c3a61f91f5f5d46171c44c992d"},
+    {"path": "evidence/T16/runtime-record-faults/w2-request-timeout/runtime-records.json", "sha256": "3336431208588bb23d1b59e7530603d56078771545a62043f0e54042a5f0880c"},
+    {"path": "evidence/T16/runtime-record-faults/w2-written-client-closed/runtime-records.json", "sha256": "800c762a16a804aaaeefd05b3bb1f787c2e0f7f000a82e6c78efbf9ec4943dfd"},
+    {"path": "evidence/T16/runtime-version-final/runtime-version-adoption.json", "sha256": "57c897c854440439ccf019ef5c945ff5a39af2ffdaf5848d6c5aaafbf1de492a"},
+    {"path": "evidence/T19/w2-20261023-memory-confirmation/memory-confirmation-adoption.json", "sha256": "12e8317f5a1b67b7bb77a7c06962e1ebdc2135c5de9a0e7abf78357c21bd49a7"}
+  ],
+  "provider_files_sha256": {
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "validation/runtime_records_query.py": "84c8b11508c4e5692364866a7aaa9a027e86d25e600553930f08204f51e4dd7a"
+  },
+  "verified": ["nine actual records match the documented stored/output fields", "four actual records satisfy current producer requirements", "source namespace is consistent within each saved projection", "reported usage sums equal observed model-request usage", "Tool definitions match each recorded request", "unknown costs and unobserved historical fields remain unknown"],
+  "new_model_calls": false,
+  "business_mutation_performed": false,
+  "private_body_copied": false,
+  "pending": ["same-version public API and A15 UI schema validation", "full runtime cancellation and persistence acceptance", "all attempts, prices and total cost", "independent model behavior evaluation", "complete migration and parent A05/A06 acceptance"]
+}

@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.3.1；T06/A06；2026-10-23；引用LLD-data1.3.1、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.4.0；T06/A06；2026-10-23；引用LLD-data1.4.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -100,6 +100,10 @@ Runtime保持单一nanobot AgentLoop。取消停止尚未执行步骤，已提�
 DeepSeek 适配当前使用120秒超时、max_retries=0；没有备用模型。语音和检索的真实服务/权限、限制与费用由 W2 核查，缺少条件保持 BLOCKED。当前本机领域调用使用10秒 SQLite 锁等待；没有已测吞吐和限流阈值。发生故障保留准确错误、已执行结果及未知费用；业务服务不返回替代成功内容。
 
 配置草稿、校验、启用、下一任务实际采用分别留证。模型/Prompt/知识由 W2 维护；本人目标和通知只能 BOSS 确认。运行关联 run_id/session_id/request_id/tool_id、namespace、数据/配置/来源/授权版本、真实时间、usage 与价格来源；缺少计费覆盖时总额 null。
+
+运行读取接口为GET /api/boss/ui/runtime-records，operationId=runtimeRecordsRead；W2维护RuntimeRecorder和runtime_records_query，W3维护公共认证路由及A15挂载。BOSS与MAINTAINER读取相同技术元信息，正文不在该接口中。参数限provider/run_id/dataset_id/status/stop_reason、started_from/started_until、limit及成对cursor_started_at/cursor_run_id；单独run_id读取单项，组合参数执行列表。拒绝重复、未知、空参数及不合法时间范围，limit为1—100的十进制字符串，缺少时50。客户端不能指定namespace/owner或正文范围。完整输入和输出分别引用runtime-records.schema.json的RuntimeRecordsQuery和RuntimeRecordsProjection。
+
+查询在当前空间同一只读事务中按全部记录筛选后分页，按started_at/run_id倒序；matched_count为过滤总数，next_cursor沿用相同筛选条件。单项不存在404，失效空间409，未认证401、无权限身份403，输入400。没有新业务幂等键和外部超时，因为读取不执行模型或工具；SQLite仍采用已有10秒连接期限。重读只查询已保存状态，不重发业务动作。W3当前已接入公共路由，版本化Schema与实际页面读取仍需相同集成版本复验；记录存在或配置版本相同不能替代模型行为质量验收。
 
 ## 验证与剩余交付
 
