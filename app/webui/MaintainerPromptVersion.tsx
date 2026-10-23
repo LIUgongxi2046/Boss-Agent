@@ -27,7 +27,7 @@ type Active = {
 };
 type Data = {
   source_type:"SIMULATED";projection:"prompt-versions";data_version:string;
-  kinds:Kind[];drafts:Prompt[];active:Active[];adoptable_current_ids:string[];
+  kinds:Kind[];drafts:Prompt[];revisions:Prompt[];active:Active[];adoptable_current_ids:string[];
   model_evaluation_completed:false;full_security_evaluation_completed:false;
 };
 type Receipt = {action:string;client_request_id:string;outcome:string;result?:Record<string,unknown>};
@@ -109,6 +109,12 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
   },[pending?.key,busy,lookupBusy]);
 
   const prompt=data?.drafts.find(p=>p.prompt_id===chosen);
+  const previous=data?.revisions.filter(p=>p.prompt_id===chosen)
+    .sort((a,b)=>Number(b.version)-Number(a.version))[0];
+  const oldLines=previous?.instruction_text.split("\n")||[];
+  const currentLines=prompt?.instruction_text.split("\n")||[];
+  const removedLines=oldLines.filter(l=>!currentLines.includes(l));
+  const addedLines=currentLines.filter(l=>!oldLines.includes(l));
   const active=data?.active.find(a=>a.kind===kind);
   const candidates=data?.drafts.filter(p=>p.kind===kind)||[];
   function selectPrompt(id:string) {
@@ -307,6 +313,33 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
           <div className="boss-status"><Clock3 size={16}/>
             载入次数来自真实 nanobot 运行时上下文 Provider 调用，不是 API 请求完成、模型答案正确或任务成功的证明。
           </div>
+        </section>
+        <section className="boss-panel">
+          <div className="boss-panel-head"><h2>内容版本差异</h2>
+            <small>实际 SQLite 历史快照 · A05</small></div>
+          <Detail label="当前版本" value={prompt?.version}/>
+          <Detail label="最近一个历史版本" value={previous?.version}/>
+          {prompt&&previous?<>
+            <div className="boss-workspace-item">
+              <strong>上一个版本已移除或修改的行（{removedLines.length}）</strong>
+              {removedLines.length?removedLines.map((row,i)=><p key={i}>− {row}</p>):
+                <p>没有观察到被删除或修改的行。</p>}
+            </div>
+            <div className="boss-workspace-item">
+              <strong>当前版本新增或修改的行（{addedLines.length}）</strong>
+              {addedLines.length?addedLines.map((row,i)=><p key={i}>+ {row}</p>):
+                <p>没有观察到新增或修改的行。</p>}
+            </div>
+            <Detail label="历史内容校验摘要" value={previous.content_sha256.slice(0,18)+"…"}/>
+            <Detail label="当前内容校验摘要" value={prompt.content_sha256.slice(0,18)+"…"}/>
+            <div className="boss-status"><Clock3 size={16}/> 行级差异只描述已保存的文本，
+              不代表 Prompt 已通过模型质量评估。</div>
+          </>:<div className="boss-empty">
+            <FileSearch size={19}/>
+            <div><strong>尚无可比较的历史版本</strong>
+              <p>保存同一 Prompt 的后续版本后，才能查看真实历史修订差异。</p>
+            </div>
+          </div>}
         </section>
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>工具授权及采用边界</h2></div>
