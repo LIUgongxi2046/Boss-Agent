@@ -61,3 +61,71 @@ N2 在空闲状态已收到 fe30105 和正式接口，继续接收其独立 BI R
 公共 authenticated envelope 生产者、F03/N03/D01 全部字段/继承显示、原请求管理、账号与连接恢复、Client/Provider 和 Runtime 采用由 N2/N3 接收。现有字段、来源、明细和定义均来自真实本地服务，外部输入明确 SIMULATED；完整专业业务数据、真实外部模型、视觉及设备不在本记录声明通过。
 
 当前状态为领域 IMPLEMENTED、已提供可接收提交，完整 FC02 仍 IN_PROGRESS。不能将155项测试数量计为二十项功能检查点，也不关闭旧父任务或启用FC03。
+
+## 正式边界输入接管
+
+2026-10-24，依据 N1-FC02-BOUNDARY-INPUTS-20261024-0407，读取 N4 的 boundary-inputs-9026c8a.json、最新 FC02 工单及候选 faf66bf 的适用差异。当前分支基线4bcb0a9，原五项未提交保留。C05/C08/C11需要正式可复现的模拟经营资料和双方来源；本次补充范围为固定版本的经营场景生成/载入、当前查询选择、来源绑定及相关本地验证。默认 selection/1 八条明细和快照保持；维护载入仅创建模拟资料，不产生本人业务授权。公共注册、配置和页面由 N3 接收，运行期间不发送追加消息。
+
+### 当前可接收交付
+
+领域提交 `9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3`，基于4bcb0a9。接收九文件：validation/boss_bi_scenarios.py、boss_bi_queries.py、boss_simulation_api.py；specs/bi-scenarios.json、bi-scenario-input.schema.json、bi-query.schema.json、openapi.yaml；app/tests/test_fc02_bi_scenarios.py；docs/LLD-data.md。本记录随后独立提交。原五项未提交内容保持，不进入接收。
+
+生成版本 FC02-BI-1、seed=20261024、allowed_use=FC02_BEHAVIOR_VALIDATION，规范JSON参数摘要da40102d4d942b8d6c5cbf80a9e81d197df810eec8f1ee5edd1b6585293ea136。seed标识固定可复现参数，生成器不执行随机采样。specs/bi-scenarios.json保存明确数值与状态参数，没有预设查询答案。记录由成熟JSON读取、JSON Schema校验、现有SQLite对象与来源机制保存；未直接修改检查数据库或初始快照。
+
+### 六类正式场景
+
+| scenario_id | 输入与用途 | 正式查询可观察结果 |
+|---|---|---|
+| weighted-ratios | 同期间两产品数量1/9、收入100/900、成本50/810 | 原始明细重算毛利率及单吨毛利均为14；两产品比率的简单平均为30，不能作为聚合结果 |
+| zero-denominators | 明确数量/收入/成本均为0 | 毛利率及单吨毛利为null，保留ZERO_DENOMINATOR_UNDEFINED；零基期变化为null |
+| missing-numbers | 数量null、收入100、成本null | 已知收入保留，数量、毛利及相关比例为null，缺少字段明确列出 |
+| delayed-records | 明确DELAYED，数量2、收入100、成本80 | 已观察局部数值可查；delayed_regions包含region-1，整体变化不计算 |
+| unsynchronized-records | 明确UNSYNCHRONIZED，数量/收入/成本均为null | unsynchronized_regions包含region-1；数值未知，不能填零或推断完整范围 |
+| basis-conflict | 同期间/指标/单位，两种独立模拟口径各有来源 | FINANCIAL_REPORTED收入100、成本70；BUSINESS_REPORTED收入120、成本72。两者均数量10；分别查询、分别取证，不根据职位或来源名称选取数值 |
+
+每类均使用BASE/CURRENT两个获准期间、region-1、entity-1、product-1或product-2、CNY、tonne、EXTERNAL_SALES、SETTLED、definition_version=1。普通五类business_basis=SIMULATED_BOUNDARY；双方口径场景使用表内两个business_basis。资料仅为用户授权的FC02程序行为验证，不能宣称实际企业经营情况或第三方授权。
+
+### 维护载入与原回执
+
+- `BIScenarioAPI(store).catalog("MAINTAINER")`：读取固定生成版本、参数、用途及场景定义。
+- `BIScenarioAPI(store).execute(role, "boss.simulation.bi_scenario.load", payload)`，或直接`load(role,payload)`：仅实际已认证MAINTAINER可以载入，BOSS/匿名拒绝。公共层必须提供真实role，模型不得提供或选择该动作。
+- Load必填 client_request_id、mode=SIMULATED、scenario_id、generator_version=FC02-BI-1、seed=20261024、expected_version；初次版本为"0"，后续使用当前实际版本。未知字段、任意records替换、owner/namespace注入、REAL模式或不符参数400；未知未载入场景查询404，CAS/同键异内容409，来源撤销或过期410，越权403/未认证401。
+- `BIScenarioAPI(store).receipt("MAINTAINER", client_request_id)`：当前空间原载入回执；没有查到保持NOT_FOUND_IN_CURRENT_STORE，不执行载入。
+- 同一事务保存bi_scenario、document、历史、FTS、原回执及只含元信息的审计；并发同编号只保存一个版本。旧空间原编号不能在新空间重新载入；撤销的来源不能重新启用。
+
+载入示例：
+
+```json
+{"client_request_id":"fc02-load-weighted-1","mode":"SIMULATED","scenario_id":"weighted-ratios","generator_version":"FC02-BI-1","seed":20261024,"expected_version":"0"}
+```
+
+结果按LoadResult Schema返回action、原请求编号、scenario_id/version、source_ids/source_versions、record_count、生成版本、seed、manifest_sha256、用途及external_service_invoked=false。manifest_sha256为解析后参数对象的规范JSON摘要；source published_at/received_at使用实际时间，valid_from使用明确业务时钟，valid_until为该业务时钟之后30天。可复现性指相同版本、参数、期间下的记录，不伪造物理接收时间。
+
+### 来源与查询绑定
+
+普通场景来源ID为`sim-bi:<scenario_id>:SIMULATED_BOUNDARY`。双方场景的准确来源为`sim-bi:basis-conflict:FINANCIAL_REPORTED`及`sim-bi:basis-conflict:BUSINESS_REPORTED`，初次version均为"1"，修订通过CAS递增；每一方拥有各自原文、数值及定义快照。
+
+source保留SIMULATED、author_kind=SIMULATED_GENERATOR、author_display_name=FC02本地确定性模拟资料生成器、generator_author_id=code:validation/boss_bi_scenarios.py@FC02-BI-1、author_contact_id=sim-bi-generator:<business_basis>，以及实际维护创建身份、owner/dataset/namespace、business_basis与说明、参数摘要、访问范围、有效期、用途、位置和时间。author_contact_id明确标识自动生成器，没有创建人物账号或借用真实人员署名。real_enterprise_data=false、third_party_authorization=false、business_authorization_granted=false；权限来自当前真实服务端身份与范围，原文不授予业务动作权限。
+
+正式SCOPED输入新增可选scenario_id与source_ids。没有scenario_id时继续使用原selection/1八条明细及finance-note；有scenario_id时仅读取已经正式载入的场景，不替换默认数据。`BIQueryAPI.dimensions("BOSS", scenario_id)`给出该场景实际维度与来源。source_ids需要属于所选场景，可明确选择所需一方；不能借此读取其他来源。
+
+两方并列需要对相同当前及比较期间、metric_ids、产品/地区/法人、单位/币种分别执行两个正式查询。第一方设置scenario_id=basis-conflict、business_basis=FINANCIAL_REPORTED、source_ids=[sim-bi:basis-conflict:FINANCIAL_REPORTED]；第二方设置business_basis=BUSINESS_REPORTED及其准确source_ids。查询使用各自新request_id，不能以新内容复用旧请求编号。
+
+result.sources、detail_refs与context_snapshot采用实际当前输入；`read_evidence`只接受本次query_id内匹配的明细和准确source_ids，按实际来源返回原文，拒绝明细与来源不符。绑定同时保存scenario_id、document_snapshots、全部来源版本与摘要、明细及定义摘要。更换源版本、撤销、到期后拒绝当前采用，历史投影保留当时结果、来源及原请求。失效的财务来源不会阻止另一个当前有效业务来源的独立查询。SimulationAPI的SI07/SI08查询也使用同一场景明细与来源绑定。
+
+### 本次必要验证
+
+- Red：`.work/fc02-boundary-behavior-red.xml`，正式query_metrics拒绝scenario_id，业务断言失败1项；作为输入缺口证据。开发环境收集结果不计为业务Red。
+- 受影响验证：`validation/.venv/bin/python -m pytest -q app/tests/test_fc02_bi_scenarios.py app/tests/test_fc02_bi_queries.py app/tests/test_boss_metrics.py app/tests/test_boss_tool_sources.py app/tests/test_boss_simulation_api.py --basetemp=.work/pytest-fc02-input-delivery -p no:cacheprovider --junitxml=.work/fc02-input-delivery.xml --tb=short`，172 passed，18.87秒。
+- 最终来源权限修订及实际Registry：`.work/fc02-input-final.xml`，19 passed，3.67秒；包括18项正式场景检查及已有实际nanobot Registry对当前Schema的消费。
+- 最终owner/dataset/namespace元信息修订：`validation/.venv/bin/python -m pytest -q app/tests/test_fc02_bi_scenarios.py --basetemp=.work/pytest-fc02-input-scope-final -p no:cacheprovider --junitxml=.work/fc02-input-scope-final.xml --tb=short`，18 passed，0.93秒。其他证据按其准确版本和受影响范围复用，不将这些数量相加为功能分数。
+- 实际验证涵盖正式载入、不同权重的两类比例、零分母、缺少值、DELAYED/UNSYNCHRONIZED、双方当前原文与生成作者、角色及注入拒绝、并发单次写入、CAS与历史版本、同库服务重建、原回执重读、撤销与过期、重置空间及原编号拒绝、独立数据库可复现、默认快照摘要保持和真实查询投影。
+- OpenAPI3.1及YAML重复字段检查通过，git diff --check通过。全部中间数据位于本目录已忽略.work，未访问外部API、未操作其他服务或预览、未执行视觉。
+
+### 公共接收条件
+
+N3在当前候选逐项接收9f44a1d，保留其已有历史、异步恢复和bi_follow_up.overrides扩展。本次没有修改其公共文件；接收时在该已扩展overrides中补充scenario_id/source_ids，不能整份覆盖公共Schema。
+
+公共维护入口负责注册catalog、正式load动作及原载入回执；老板入口负责明确场景选择、将scenario_id/source_ids绑定真实请求与继承快照，读取当前场景dimensions，展示双方同期间查询及各自原文。Runtime仍仅使用已批准query_metrics/read_evidence，不能注册维护载入为模型工具，也不能将模拟来源当作本人授权。
+
+业务输入和本地领域验证已就绪。C05/C08/C11需要N3接入公开操作和准确候选后由N4独立复验；本地输入通过不代表二十项完整PASS，不启用FC03。
