@@ -48,7 +48,8 @@
     "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable.",
     "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified.",
     "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified.",
-    "F11 Travel now has owner-only SQLite review/confirm/cancel, deterministic IANA offset/time checks, version-pinned conflict confirmation, and F04 live meeting-impact invalidation; no real transport/calendar booking or target Mac pixel acceptance."
+    "F11 Travel now has owner-only SQLite review/confirm/cancel, deterministic IANA offset/time checks, version-pinned conflict confirmation, and F04 live meeting-impact invalidation; no real transport/calendar booking or target Mac pixel acceptance.",
+    "F10 People meeting has stable-ID verified owner preparation, current role, task/feedback provenance, source-version redaction, confirmed attach/detach to current simulated meeting agenda and F04 freshness invalidation; no real employee account, invitation or calendar update."
   ],
   "pages": [
     {
@@ -543,24 +544,34 @@
       "logical_architecture_route": "/app/boss/F10",
       "actual_webui_navigation": "?bossPage=F10",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_VERSIONED_OWNER_PEOPLE_BRIEF_AND_MEETING_AGENDA_LINK",
+      "component_file": "app/webui/BossPeopleMeeting.tsx",
+      "component_name": "BossPeopleMeeting",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/organization"
+        "GET /api/boss/ui/workspace/people",
+        "GET /api/boss/ui/operation-status",
+        "GET /api/boss/ui/evidence"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": [
+        "boss.people.prepare",
+        "boss.people.attach",
+        "boss.people.detach"
+      ],
+      "other_integration_points": [
+        "F04 current briefing includes source-version-aware attached agenda item metadata; historical brief read-redacts invalid excerpts",
+        "Stable contact IDs with current valid role; owner-only BOSS transactions and minimum audit"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "meeting_brief.prepare",
-        "meeting_schedule.propose"
+        "people.external_meeting_participant_invite",
+        "people.real_calendar_event_update",
+        "people.multi_meeting_connector",
+        "people.mac_e2e_and_visual_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_people.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
