@@ -1,0 +1,58 @@
+{
+  "feature_id": "FC03",
+  "role": "N3",
+  "status": "IN_PROGRESS",
+  "complete_feature_candidate": false,
+  "implementation_commit": "8769fbe0b9e62dd131f6aef4c6ede390af5d2fbe",
+  "task_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/FC03晨间事项工单.md",
+  "development_record": "docs/feature-delivery/FC03/integration.md",
+  "local_scope": "本人排序原请求只读恢复、刷新保留编号、身份/异步保护及原生Client连接恢复不重发排序；不包含完整日期/晨间Runtime/清单版本/冲突/来源详情",
+  "verified_feature_checkpoints": null,
+  "total_feature_checkpoints": 22,
+  "candidate_commit": null,
+  "frontend_directory": "fc03-n3-order-dist",
+  "manifest_sha256": "e60089dfdb81777241d7615a92ab3a12e1580271513a4819cbd8828345098fcd",
+  "index_sha256": "8f2054bf88be7a6e1434836065f0007cf1bd164077fe030716ddbb1e95d58ede",
+  "source_sha256": {
+    "app/webui/BossToday.tsx": "f02f96a68320b57c899bf405f86c3d442a997aff1af1024e422d84da70ea1f15",
+    "app/webui/BossDesktop.tsx": "7cd4411843f5b45892f7a2b0c674abfbc76e9ce38fe9113fbf46e22e2b0d9cce",
+    "app/webui/nanobot-today-order.patch": "1c4c6dfe94250ebcc35335e7f3b3f272e37dc71a3bed99e432725eb92406a9ce"
+  },
+  "native_client_sha256": "dd5a98697609ac316d41889387a71d3f4898a51e1a409cc25bb1ef30a259f3f0",
+  "native_patch_order": [
+    "app/webui/nanobot-one-shot.patch",
+    "app/webui/nanobot-today-order.patch"
+  ],
+  "build": {
+    "result": "PASS",
+    "seconds": 15.01,
+    "command": "npm run build -- --outDir ../../../../fc03-n3-order-dist"
+  },
+  "checks": [
+    {
+      "result": "PASS",
+      "scope": "真实排序成功响应中断后仅一次转发、原编号只读恢复及刷新；未知回执保持未知；维护403和匿名401",
+      "evidence": "evidence/feature-delivery/FC03/fc03-order-e9244282-e72d-4a7e-9d59-1fdbe2fbb55b.json"
+    },
+    {
+      "result": "PASS",
+      "cases": 3,
+      "scope": "当前排序CAS/幂等/同库读取、身份及关联事件合并",
+      "evidence": "evidence/feature-delivery/FC03/today-existing.xml"
+    },
+    {
+      "result": "PASS",
+      "scope": "严格TypeScript/Vite构建及git diff --check"
+    }
+  ],
+  "required_inputs": [
+    "N1当前正式日期/时区、完整事项/来源/冲突/版本详情及排序兼容Schema",
+    "N2使用该正式版本的晨间可信请求、受限工具、实际SIMULATED事件和持久运行/结果/原回执"
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "real_model_quality": "NOT_RUN",
+  "third_party_delivery": "NOT_RUN",
+  "device_installation": "NOT_RUN",
+  "STT": "PAUSED"
+}
