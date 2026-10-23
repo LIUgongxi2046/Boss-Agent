@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-23",
+  "workspace": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+  "branch": "codex/business",
+  "source_base": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
+  "source_scope": "W1 changes committed with this evidence",
+  "data": {"source_type": "SIMULATED", "generator_version": "T02-3", "seed": 20261022, "dataset_id": "selection", "dataset_version": "1", "new_agricultural_materials": false},
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-final -p no:cacheprovider --junitxml=.work/w1-tests-final.xml", "status": "PASS", "result": "355 passed in 89.45s", "raw": ".work/w1-tests-final.xml"},
+    {"command": "node .work/ui-typecheck/node_modules/typescript/bin/tsc --project .work/ui-typecheck/tsconfig.json", "status": "PASS", "result": "exit 0", "scope": "BossToday.tsx and BossOwnerPlans.tsx; strict noEmit; TypeScript 5.8.3 React 18 types"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py", "status": "PASS", "scope": "JSON/YAML read, component and receipt schema structure, references and version consistency"},
+    {"command": "validation/.venv/bin/python scripts/check_git_secrets.py", "status": "PASS", "scope": "tracked files before staging new W1 files"},
+    {"command": "git diff --check", "status": "PASS"}
+  ],
+  "not_run": ["public HTTP and WebSocket integration", "full application build with new components", "real DeepSeek task adoption", "periodic morning plans", "system notifications and sleep recovery", "visual acceptance", "all A05/A06 field and API semantic coverage"],
+  "formal_acceptances_changed": false
+}

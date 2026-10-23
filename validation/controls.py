@@ -181,8 +181,12 @@ class ControlStore(Store):
             reminder = json.loads(reminder_row[0]) if reminder_row else None
             reason = None
             owner_notice_version = None
+            from boss_owner_plans import suppression
+            plan_reason = suppression(self, db, ns, event, clock)
             if not schedule["enabled"] or schedule["canceled"]:
                 reason = "PLAN_PAUSED_OR_CANCELED"
+            elif plan_reason:
+                reason = plan_reason
             elif event["state"] == "CANCELED":
                 reason = "SOURCE_CANCELED"
             elif reminder and reminder["state"] == "CLOSED":
@@ -208,6 +212,8 @@ class ControlStore(Store):
                     elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
                         reason = "COOLDOWN"
             result = {"event_id": event["event_id"], "event_version": event["version"], "state": "SUPPRESSED" if reason else "DELIVERED", "reason": reason, "rule_version": rules["version"], "schedule_version": schedule["version"], "business_at": clock.isoformat()}
+            if event.get("owner_plan_id"):
+                result["owner_plan_id"] = event["owner_plan_id"]
             if owner_notice_version is not None:
                 result["owner_notice_version"] = owner_notice_version
             self.put(db, ns, "dispatch", event["event_id"], result)

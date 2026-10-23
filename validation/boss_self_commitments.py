@@ -72,6 +72,8 @@ def _event(api,db,row,reason):
         "commitment_version":row["version"],"transition_reason":reason,
         "external_delivery_created":False,
     }
+    if previous and previous.get("owner_plan_id"):
+        record["owner_plan_id"] = previous["owner_plan_id"]
     api.store.put(db,NS,"event",event_id,record)
     return {"event_id":event_id,"event_version":version,
             "state":state,"due_at":row["due_at"],

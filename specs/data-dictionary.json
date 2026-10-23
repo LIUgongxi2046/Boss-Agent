@@ -1,0 +1,89 @@
+{
+  "version": "1.0.0-draft",
+  "task_id": "T05",
+  "acceptance_state": "NOT_RUN",
+  "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
+  "authority": "docs/LLD-data.md",
+  "types": {
+    "identifier": {"type": "string", "nullable": false, "meaning": "当前空间内稳定对象编号"},
+    "version": {"type": "string", "pattern": "^[0-9]+$", "nullable": false, "meaning": "提交后递增版本"},
+    "decimal": {"type": ["string", "null"], "meaning": "Decimal 原始精度；缺少保持 null"},
+    "instant": {"type": "string", "format": "date-time", "meaning": "含时区 ISO8601"},
+    "private_text": {"type": "string", "access": "BOSS_ONLY", "audit": "HASH_OR_IDENTIFIER_ONLY"}
+  },
+  "scope": {
+    "owner_id": {"type_ref": "identifier", "source": "initial/snapshot.owner_id", "client_writable": false},
+    "execution_namespace": {"type_ref": "identifier", "source": "spaces.namespace", "client_writable": false},
+    "dataset_id": {"type_ref": "identifier", "source": "initial/snapshot.dataset_id"},
+    "dataset_version": {"type_ref": "version", "source": "initial/snapshot.dataset_version"},
+    "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}
+  },
+  "entities": {
+    "owner_plan": {
+      "storage": "objects/owner_plan", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "plan_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "owner_id": {"type_ref": "identifier", "source": "server"},
+        "purpose": {"type_ref": "private_text", "maxLength": 400},
+        "event_ids": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "relation": "event.event_id"},
+        "event_versions": {"type": "object", "meaning": "保存时各 event_id 的获准版本"},
+        "not_before": {"type_ref": "instant", "clock": "BUSINESS", "meaning": "最早允许执行时间，实际仍需满足事件期限与规则"},
+        "timezone": {"type": "string", "enum": ["Asia/Shanghai"]},
+        "state": {"type": "string", "enum": ["ACTIVE", "PAUSED", "CANCELED"]},
+        "authorization_id": {"type_ref": "identifier", "relation": "authorization.authorization_id"},
+        "updated_at": {"type_ref": "instant", "clock": "WALL"},
+        "execution_owner": {"type": "string", "const": "CronService"}
+      }
+    },
+    "today_order": {
+      "storage": "objects/today_order", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "date": {"type": "string", "format": "date", "meaning": "本人时区的业务日期"},
+        "version": {"type_ref": "version"},
+        "item_ids": {"type": "array", "uniqueItems": true, "meaning": "当前完整事项集合的本人次序"},
+        "authorization_id": {"type_ref": "identifier", "relation": "authorization.authorization_id"}
+      },
+      "write_preconditions": ["snapshot_sha256 matches current projection", "expected_version matches current order", "exact item set"]
+    },
+    "authorization": {
+      "storage": "objects/authorization", "access": "BOSS_BODY_MAINTAINER_METADATA", "version": "1",
+      "fields": {
+        "authorization_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "owner_id": {"type_ref": "identifier"}, "issuer_identity": {"type": "string", "const": "BOSS"},
+        "action": {"type_ref": "identifier"}, "target_id": {"type_ref": "identifier"},
+        "content_version": {"type_ref": "version"}, "scope": {"type_ref": "identifier", "relation": "spaces.namespace"},
+        "payload": {"type": "object", "meaning": "已获准动作参数；敏感正文使用摘要"},
+        "valid_from": {"type_ref": "instant", "clock": "WALL"}, "valid_until": {"type_ref": "instant", "clock": "WALL"},
+        "revoked": {"type": "boolean"}, "revoked_at": {"type": ["string", "null"], "clock": "WALL"}
+      }
+    },
+    "metric_detail": {
+      "storage": "initial/snapshot.details", "access": "BOSS", "version": "1",
+      "fields": {
+        "record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "region_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"},
+        "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type_ref": "identifier"},
+        "factory_id": {"type_ref": "identifier"}, "period": {"type": "string", "enum": ["BASE", "CURRENT"]},
+        "quantity_tonnes": {"type_ref": "decimal", "unit": "tonne"},
+        "revenue_cny": {"type_ref": "decimal", "unit": "CNY"}, "cost_cny": {"type_ref": "decimal", "unit": "CNY"},
+        "trade_type": {"type": "string", "enum": ["EXTERNAL_SALES"]}
+      },
+      "source": "既有获准 initial_materials T02-3 / seed 20261022"
+    }
+  },
+  "metrics": {
+    "sales_quantity": {"formula": "SUM(quantity_tonnes)", "unit": "tonne", "definition_version": "1"},
+    "revenue": {"formula": "SUM(revenue_cny)", "unit": "CNY", "definition_version": "1"},
+    "cost": {"formula": "SUM(cost_cny)", "unit": "CNY", "definition_version": "1"},
+    "gross_profit": {"formula": "revenue-cost", "unit": "CNY", "definition_version": "1"},
+    "gross_margin": {"formula": "gross_profit/revenue*100", "unit": "%", "definition_version": "1", "zero_denominator": null},
+    "gross_profit_per_tonne": {"formula": "gross_profit/sales_quantity", "unit": "CNY/tonne", "definition_version": "1", "zero_denominator": null}
+  },
+  "time_semantics": {
+    "observed_at": "来源观察时间", "received_at": "服务收到资料的真实时间",
+    "valid_from": "允许采用起始时间", "valid_until": "允许采用终止时间",
+    "business_at": "模拟业务时间", "created_at": "真实创建时间", "read_at": "真实查询时间"
+  },
+  "pending_entities": ["contact", "task", "self_commitment", "feedback", "message", "message_draft", "application", "application_decision", "meeting", "meeting_minutes", "meeting_brief", "private_calendar", "calendar_share", "research", "people", "travel", "document", "memory", "schedule", "rules", "event", "notification", "runtime_run", "agriculture_batch", "agriculture_transfer", "agriculture_observation", "exchange_rate", "experiment"],
+  "pending_validation": ["complete field enumeration", "all R01-R32 field coverage", "migration and restore", "source deletion propagation", "independent semantic review"]
+}

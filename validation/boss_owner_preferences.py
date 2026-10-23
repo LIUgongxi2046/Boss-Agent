@@ -227,6 +227,10 @@ def _effective(db, data, domain):
     active = _get(db, domain + "_active")
     if active is None or active.get("state") != "CONFIRMED":
         return None
+    authorization = _get(db, "authorization", active["authorization_id"])
+    require(authorization is not None, "本人设置缺少确认授权", web.HTTPConflict)
+    if authorization["revoked"]:
+        return None
     expiry = active["content"].get("valid_until")
     if expiry is not None:
         clock = _get(db, "clock")

@@ -71,6 +71,20 @@ def draft(commands, key="draft-recovery-create", refs=None):
     )
 
 
+def test_revoked_share_authorization_blocks_future_preview(context):
+    commands, pages = context
+    assert save_private(commands)[0] == 200
+    code, share = share_busy(commands)
+    assert code == 200, share
+    route = "/api/boss/ui/calendar-share-preview"
+    query = urlencode({"share_id": share["share_id"]})
+    assert pages.serve("BOSS", route, query)[0] == 200
+    code, result = act(commands, "BOSS", "boss.authorization.revoke", "revoke-busy-share-auth",
+                       authorization_id=share["authorization_id"], expected_version="1", reason="停止后续分享")
+    assert code == 200, result
+    assert pages.serve("BOSS", route, query) == (410, {"error": "SHARE_INACTIVE", "share_status": "AUTHORIZATION_REVOKED"})
+
+
 def test_uncertain_mutation_can_check_original_receipt_without_side_effect(context):
     commands, pages = context
     _, absent = receipt(pages, "BOSS", "boss.message.draft.save", "draft-recovery-create")

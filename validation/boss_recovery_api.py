@@ -156,6 +156,9 @@ class BossRecoveryAPI:
                     **data["private_calendar"], "version": "1", "status": "ACTIVE",
                 }
                 clock = self.store.get(db, self.namespace, "clock", "current")
+                authorization = self.store.get(db, self.namespace, "authorization", share["authorization_id"])
+                if authorization["revoked"]:
+                    return 410, {"error": "SHARE_INACTIVE", "share_status": "AUTHORIZATION_REVOKED"}
                 status = calendar_share_state(share, calendar, clock)
                 if status != "ACTIVE_SIMULATED":
                     return 410, {"error": "SHARE_INACTIVE", "share_status": status}

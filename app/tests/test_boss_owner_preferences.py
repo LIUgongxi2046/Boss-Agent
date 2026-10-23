@@ -81,6 +81,25 @@ def clock(api, at="2026-10-24T18:00:00+08:00"):
                role="MAINTAINER", at=at)
 
 
+@pytest.mark.parametrize("domain,fields", [("goals", goals()), ("notice", notice())])
+def test_revoked_confirmation_stops_future_setting_adoption(app, domain, fields):
+    api, pages = app
+    code, prepared = act(api, "boss.owner." + domain + ".save", "revocation-setting-save", **fields)
+    assert code == 200, prepared
+    code, confirmed = act(api, "boss.owner." + domain + ".confirm", "revocation-setting-confirm", **confirm_input(prepared))
+    assert code == 200, confirmed
+    route = "owner-goals" if domain == "goals" else "owner-notice"
+    assert view(pages, route)[1]["active_is_effective"]
+    code, result = act(api, "boss.authorization.revoke", "revoke-setting-confirmation",
+                       authorization_id=confirmed["authorization_id"], expected_version="1", reason="停止后续采用")
+    assert code == 200, result
+    observed = view(BossPageAPI(ControlStore(api.store.path)), route)[1]
+    assert observed["active"]["state"] == "CONFIRMED"
+    assert not observed["active_is_effective"]
+    if domain == "goals":
+        assert record_runtime_goal_context_load(api.store) is None
+
+
 def test_goal_draft_does_not_override_current_context_or_f01(app):
     api, pages = app
     status, initial = view(pages, "owner-goals")

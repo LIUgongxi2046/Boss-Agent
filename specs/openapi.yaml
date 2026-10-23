@@ -1,0 +1,145 @@
+openapi: 3.1.0
+info:
+  title: Boss-Agent W1 领域接口接收规范
+  version: 1.0.0-draft
+  description: 当前展开 N09/F01 领域接口；公共路径等待 W3 接入，完整现有动作和十四类模拟接口继续补充。
+security:
+  - bearerAuth: []
+x-acceptance: NOT_RUN
+x-integration: PENDING_W3
+x-command-transport: authenticated nanobot WebSocket webui_request
+paths:
+  /api/boss/ui/owner-plans:
+    get:
+      operationId: ownerPlansRead
+      x-role: BOSS
+      responses:
+        '200':
+          description: 当前本人计划、事件、内部通知与技术执行责任
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [plans, events, results, dispatches, technical_schedule, execution_owner]
+                properties:
+                  plans: {type: array, items: {$ref: '#/components/schemas/OwnerPlan'}}
+                  events: {type: array, items: {type: object}}
+                  results: {type: array, items: {type: object}}
+                  dispatches: {type: array, items: {type: object}}
+                  technical_schedule: {type: object}
+                  execution_owner: {const: CronService}
+        default: {$ref: '#/components/responses/Error'}
+  /api/boss/ui/today:
+    get:
+      operationId: todayRead
+      x-role: BOSS
+      responses:
+        '200':
+          description: 当前事项及来源版本、分类理由、覆盖缺口与本人次序
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, snapshot_sha256, order_version, coverage_state]
+                properties:
+                  items: {type: array, items: {type: object}}
+                  snapshot_sha256: {type: string}
+                  order_version: {$ref: '#/components/schemas/Version'}
+                  coverage_state: {const: PARTIAL}
+        default: {$ref: '#/components/responses/Error'}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer}
+  responses:
+    Error:
+      description: 400 输入无效；401 未认证；403 越权；404 对象不存在；409 版本或幂等冲突；410 来源或分享失效
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties:
+              error: {type: string}
+              status: {type: integer}
+  schemas:
+    Version: {type: string, pattern: '^[0-9]+$'}
+    RequestID: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+    PlanSave:
+      type: object
+      required: [client_request_id, plan_id, expected_version, purpose, event_ids, timezone, not_before]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        plan_id: {type: string, maxLength: 128, description: 新建使用空字符串}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        purpose: {type: string, minLength: 1, maxLength: 400}
+        event_ids: {type: array, minItems: 1, maxItems: 32, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 128}}
+        timezone: {const: Asia/Shanghai}
+        not_before: {type: string, format: date-time}
+    PlanStatus:
+      type: object
+      required: [client_request_id, plan_id, expected_version]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        plan_id: {type: string, minLength: 1, maxLength: 128}
+        expected_version: {$ref: '#/components/schemas/Version'}
+    OwnerPlan:
+      type: object
+      required: [plan_id, version, state, purpose, event_ids, event_versions, timezone, not_before, authorization_id]
+      properties:
+        plan_id: {type: string}
+        version: {$ref: '#/components/schemas/Version'}
+        state: {enum: [ACTIVE, PAUSED, CANCELED]}
+        purpose: {type: string}
+        event_ids: {type: array, items: {type: string}}
+        event_versions: {type: object, additionalProperties: {$ref: '#/components/schemas/Version'}}
+        timezone: {const: Asia/Shanghai}
+        not_before: {type: string, format: date-time}
+        authorization_id: {type: string}
+    TodayReorder:
+      type: object
+      required: [client_request_id, expected_version, snapshot_sha256, item_ids]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        snapshot_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        item_ids: {type: array, uniqueItems: true, items: {type: string}}
+x-websocket-operations:
+  - operationId: ownerPlanSave
+    action: boss.owner.plan.save
+    role: BOSS
+    input: '#/components/schemas/PlanSave'
+    output: '#/components/schemas/OwnerPlan'
+    caller: BossOwnerPlans
+    idempotency: namespace/action/client_request_id
+    timeout: SQLite connection 10 seconds; no automatic retry
+    implementation: OwnerPlansAPI.execute(role, save, payload)
+  - operationId: ownerPlanPause
+    action: boss.owner.plan.pause
+    role: BOSS
+    input: '#/components/schemas/PlanStatus'
+    output: '#/components/schemas/OwnerPlan'
+  - operationId: ownerPlanResume
+    action: boss.owner.plan.resume
+    role: BOSS
+    input: '#/components/schemas/PlanStatus'
+    output: '#/components/schemas/OwnerPlan'
+  - operationId: ownerPlanCancel
+    action: boss.owner.plan.cancel
+    role: BOSS
+    input: '#/components/schemas/PlanStatus'
+    output: '#/components/schemas/OwnerPlan'
+  - operationId: todayReorder
+    action: boss.today.reorder
+    role: BOSS
+    input: '#/components/schemas/TodayReorder'
+    implementation: TodayAPI.reorder(role, payload)
+    caller: BossToday
+    idempotency: namespace/action/client_request_id
+x-pending:
+  - complete existing command request and response schemas
+  - all fourteen simulation interfaces
+  - runtime events and cancellation
+  - independent semantic review and integration verification

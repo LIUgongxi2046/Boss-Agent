@@ -147,6 +147,7 @@ class Store:
         return {"source_id": "finance-note", "source_type": "SIMULATED", "version": "1", "locator": "sqlite:documents/finance-note", "business_as_of": "2026-10-10T23:59:59+08:00", "source_updated_at": "2026-10-11T08:00:00+08:00", "read_at": now(), "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": "COMPLETE"}
 
     def query_metrics(self, db, ns, data, p):
+        from boss_metrics import aggregate_metrics
         document = self.get(db, ns, "document", "finance-note")
         require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
@@ -154,14 +155,16 @@ class Store:
         require(set(p["product_ids"]) <= {"product-1", "product-2"}, "产品资料缺少", web.HTTPBadRequest)
         records = [r for r in data["details"] if r["product_id"] in p["product_ids"]]
         values = []
+        missing = []
         for period in ("BASE", "CURRENT"):
             group = [r for r in records if r["period"] == period]
-            q, r, c = [sum(Decimal(row[key]) for row in group) for key in ("quantity_tonnes", "revenue_cny", "cost_cny")]
-            metrics = {"sales_quantity": (q, "吨", "SUM(quantity_tonnes)"), "revenue": (r, "CNY", "SUM(revenue_cny)"), "cost": (c, "CNY", "SUM(cost_cny)"), "gross_profit": (r-c, "CNY", "revenue-cost"), "gross_margin": ((r-c)/r*100 if r else None, "%", "gross_profit/revenue*100"), "gross_profit_per_tonne": ((r-c)/q if q else None, "CNY/吨", "gross_profit/quantity")}
+            computed = aggregate_metrics(group)
+            metrics = computed["metrics"]
+            missing.extend(period + ":" + field for field in computed["missing_fields"])
             for metric in p["metric_ids"]:
                 value, unit, formula = metrics[metric]
                 values.append({"metric_id": metric, "period_scope": period, "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
-        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": [], "unexplained_causes": ["原因贡献明细尚未提供"]}
+        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": missing, "unexplained_causes": ["原因贡献明细尚未提供"]}
         self.put(db, ns, "query", result["query_id"], result)
         return result
 

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:runtime-events:1.0.0-draft",
+  "title": "已核查的 Boss WebSocket 请求回执",
+  "description": "对应 RoleChannel.webui_response；模型流和工具事件仍需接收固定上游实现后补充。",
+  "type": "object",
+  "required": ["event", "request_id", "ok"],
+  "properties": {
+    "event": {"const": "webui_response"},
+    "request_id": {"type": "string", "maxLength": 128},
+    "ok": {"type": "boolean"},
+    "result": {"type": "object"},
+    "error": {
+      "type": "object", "required": ["status", "message"],
+      "properties": {"status": {"type": "integer", "minimum": 400, "maximum": 599}, "message": {"type": "string"}},
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {"properties": {"ok": {"const": true}}, "required": ["result"], "not": {"required": ["error"]}},
+    {"properties": {"ok": {"const": false}}, "required": ["error"], "not": {"required": ["result"]}}
+  ],
+  "additionalProperties": false,
+  "x-ordering": "request_id 关联当次响应；业务终态通过原 client_request_id 回执和正式对象重新查询",
+  "x-terminal": "单个请求回执终止；不代表模型运行或关联业务任务完成",
+  "x-pending": ["model stream events", "tool events", "run lifecycle", "usage events", "resume ordering"]
+}
