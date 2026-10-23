@@ -564,12 +564,37 @@ class BossWorkspaceAPI:
         if key == "scheduler":
             schedule = self.store.get(db, self.namespace, "schedule", "current")
             clock = self.store.get(db, self.namespace, "clock", "current")
-            return {"schedule": {k: schedule.get(k) for k in (
+            draft_row = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='scheduler_draft' AND id='current'",
+                (self.namespace,),
+            ).fetchone()
+            rules_row = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'",
+                (self.namespace,),
+            ).fetchone()
+            draft = json.loads(draft_row[0]) if draft_row else None
+            rules = json.loads(rules_row[0]) if rules_row else None
+            dispatches = _object_list(db, self.namespace, "dispatch")
+            return {
+                "schedule": {k: schedule.get(k) for k in (
                     "schedule_id", "version", "schedule_version", "timezone",
-                    "trigger", "enabled", "canceled"
+                    "trigger", "enabled", "canceled", "active_draft_version",
                 )},
+                "draft": draft,
+                "rules": rules,
                 "simulated_business_time": clock["at"],
-                "cron_runtime_verified_here": False}
+                "cron_runtime_verified_here": False,
+                "manual_dispatch_supported_here": False,
+                "next_run_time": None,
+                "recent_dispatches": [{
+                    k: row[k] for k in (
+                        "event_id", "event_version", "state", "reason",
+                        "rule_version", "schedule_version", "business_at",
+                    ) if k in row
+                } for row in dispatches[-20:]],
+                "external_delivery_verified": False,
+                "owner_business_authorization_granted": False,
+            }
         if key == "audit":
             rows = db.execute(
                 "SELECT id,operation,created_at FROM audit WHERE namespace=? "
