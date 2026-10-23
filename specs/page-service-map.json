@@ -50,7 +50,8 @@
     "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified.",
     "F11 Travel now has owner-only SQLite review/confirm/cancel, deterministic IANA offset/time checks, version-pinned conflict confirmation, and F04 live meeting-impact invalidation; no real transport/calendar booking or target Mac pixel acceptance.",
     "F10 People meeting has stable-ID verified owner preparation, current role, task/feedback provenance, source-version redaction, confirmed attach/detach to current simulated meeting agenda and F04 freshness invalidation; no real employee account, invitation or calendar update.",
-    "N07 owner goals, N08 notification preferences and F26 settings hub are now separate v6 React components. Drafts cannot take effect without BOSS-only second CAS confirmation. Runtime context load observations are not model compliance, and confirmed owner notification policy only adds suppressions to existing CronService rules. Real Mac/visual acceptance remains NOT_RUN."
+    "N07 owner goals, N08 notification preferences and F26 settings hub are now separate v6 React components. Drafts cannot take effect without BOSS-only second CAS confirmation. Runtime context load observations are not model compliance, and confirmed owner notification policy only adds suppressions to existing CronService rules. Real Mac/visual acceptance remains NOT_RUN.",
+    "N10 now performs BOSS-only future authorization revocation with CAS/idempotent transaction, explicit reason digest, original authorization version, and owner-scoped metadata. Historical actions cannot be recalled; target Mac E2E/visual remains unverified."
   ],
   "pages": [
     {
@@ -2040,23 +2041,30 @@
       "logical_architecture_route": "/app/boss/N10",
       "actual_webui_navigation": "?bossPage=N10",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
+      "render_status": "PARTIAL_BOSS_ONLY_AUTHORIZATION_REVOKE_VERSIONED",
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/authorizations"
+        "GET /api/boss/ui/workspace/authorizations",
+        "GET /api/boss/ui/operation-status"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": [
+        "boss.authorization.revoke"
+      ],
+      "other_integration_points": [
+        "Authorization revoke is BOSS-only, CAS-versioned, written with SQLite idempotency and a separate revocation authorization; previously performed actions remain immutable",
+        "Read returns owner-scoped metadata and can_revoke, never the raw payload or private revocation reason"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "owner_authorizations.revoke"
+        "owner_authorizations.grant_independent_lifecycle_for_future_actions",
+        "owner_authorizations.change_scope_without_revoking",
+        "owner_authorizations.actual_mac_e2e_and_visual_pixel_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_owner_authorizations.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
