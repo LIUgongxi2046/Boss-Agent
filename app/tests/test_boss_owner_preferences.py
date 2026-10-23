@@ -302,3 +302,50 @@ def test_owner_version_race_is_rejected_and_no_private_text_is_shared(app):
     assert pages.serve("MAINTAINER", "/api/boss/ui/dashboard")[0] == 403
     with api.store.connect() as db:
         assert db.execute("SELECT count(*) FROM objects WHERE kind='authorization'").fetchone()[0] == 0
+
+
+def test_scoped_goals_are_not_silently_injected_into_unrelated_chat(app):
+    api, pages = app
+    draft = act(api, "boss.owner.goals.save", "goals-meeting-scope-draft",
+                **goals(scope="MEETING_PREP"))[1]
+    assert act(api, "boss.owner.goals.confirm", "goals-meeting-scope-confirm",
+               **confirm_input(draft))[0] == 200
+    assert record_runtime_goal_context_load(api.store) is None
+    assert pages.serve("BOSS", "/api/boss/ui/dashboard")[1]["profile"]["goals"] == []
+    _, f04 = view(pages, "briefing")
+    assert f04["current"]["owner_goal_reference"]["active_version"] == "1"
+    assert f04["current"]["owner_goal_reference"]["scope"] == "MEETING_PREP"
+    assert view(pages, "owner-goals")[1]["runtime_context_observation"]["context_load_count"] == 0
+
+
+def test_daily_brief_goals_do_not_inject_unrelated_runtime_context_or_meeting(app):
+    api, pages = app
+    draft = act(api, "boss.owner.goals.save", "goals-daily-scope-draft",
+                **goals(scope="DAILY_BRIEF"))[1]
+    assert act(api, "boss.owner.goals.confirm", "goals-daily-scope-confirm",
+               **confirm_input(draft))[0] == 200
+    assert record_runtime_goal_context_load(api.store) is None
+    assert pages.serve("BOSS", "/api/boss/ui/dashboard")[1]["profile"]["goals"] == goals()["goals"]
+    assert view(pages, "briefing")[1]["current"]["owner_goal_reference"]["active_version"] is None
+
+
+def test_notification_projection_discloses_applied_policy_version_not_owner_goal_text(app):
+    api, pages = app
+    g = act(api, "boss.owner.goals.save", "goal-for-notice-projection", **goals())[1]
+    assert act(api, "boss.owner.goals.confirm", "goal-notice-projection-confirm",
+               **confirm_input(g))[0] == 200
+    n = act(api, "boss.owner.notice.save", "notice-projection-save",
+            **notice(notifications_enabled=False))[1]
+    assert act(api, "boss.owner.notice.confirm", "notice-projection-confirm",
+               **confirm_input(n))[0] == 200
+    assert seed(api)[0] == 200
+    assert clock(api)[0] == 200
+    api.store.dispatch_due("ui-check")
+    body = view(pages, "notifications")[1]
+    prefs = body["owner_notification_preferences"]
+    assert prefs["version"] == "1"
+    assert prefs["notifications_enabled"] is False
+    assert prefs["reading_format"] == "ACTIONS_FIRST"
+    assert body["dispatches"][0]["reason"] == "OWNER_NOTIFICATIONS_PAUSED"
+    assert body["dispatches"][0]["owner_notice_version"] == "1"
+    assert SECRET not in json.dumps(body, ensure_ascii=False)
