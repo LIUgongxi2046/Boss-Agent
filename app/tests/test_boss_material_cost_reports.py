@@ -36,6 +36,37 @@ def cost_row(api, kind):
     return next(row for row in api.read("BOSS", "SI09")["supply"][0]["cost_reports"] if row["cost_type"] == kind)
 
 
+def test_fc01_report_period_and_cost_owner_filters_survive_service_reopen(services):
+    store, api = services
+    api.execute("MAINTAINER", IMPORT_ACTION, reports_input())
+    reader = SimulationAPI(ControlStore(store.path))
+    query = {"interface_id": "SI09", "object_ids": [], "filters": {
+        "period_start": "2026-10-20", "period_end": "2026-10-21", "cost_owner_id": "entity-1"}}
+    result = reader.query("BOSS", query)
+    assert {record["object_id"] for record in result["records"]} == {
+        "sim-cost-inbound_receipt-1", "sim-cost-actual_consumption-1"}
+    assert all(record["data"]["data"]["cost_owner_id"] == "entity-1" for record in result["records"])
+    technical = reader.inspect("MAINTAINER", query)
+    assert {record["record_id"] for record in technical["records"]} == {record["record_id"] for record in result["records"]}
+    assert all(record["data"] is None for record in technical["records"])
+    assert reader.query("BOSS", {**query, "filters": {**query["filters"], "cost_owner_id": "customer-1"}})["records"] == []
+    assert len(reader.query_http("BOSS", "interface_id=SI09&period_start=2026-10-20&period_end=2026-10-21&cost_owner_id=entity-1")["records"]) == 2
+
+
+@pytest.mark.parametrize("filters", [
+    {"period_start": "2026-10-20"},
+    {"period_start": "2026-10-22", "period_end": "2026-10-20"},
+    {"period_start": "invalid", "period_end": "2026-10-21"},
+    {"cost_owner_id": ""},
+    {"owner_id": "another-owner"},
+    {"namespace": "another-space"},
+])
+def test_fc01_report_filters_reject_invalid_periods_and_client_scope(services, filters):
+    store, _ = services
+    with pytest.raises(web.HTTPBadRequest):
+        SimulationAPI(store).query("BOSS", {"interface_id": "SI09", "object_ids": [], "filters": filters})
+
+
 def test_reported_inbound_and_actual_consumption_costs_have_independent_basis_and_changes(services):
     _, api = services
     result = api.execute("MAINTAINER", IMPORT_ACTION, reports_input())

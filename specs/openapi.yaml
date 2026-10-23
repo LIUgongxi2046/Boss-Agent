@@ -98,6 +98,7 @@ paths:
         - {name: customer_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: material_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: asset_owner_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: cost_owner_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: ownership_type, in: query, schema: {enum: [COMPANY, CUSTOMER, COOPERATION]}}
         - {name: batch_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: purpose, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}

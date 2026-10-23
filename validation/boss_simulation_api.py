@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, time
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs
 from zoneinfo import ZoneInfo
@@ -46,7 +46,7 @@ MISSING = {
     "SI14": ["SYSTEM_NOTIFICATION_DELIVERY_NOT_VERIFIED", "FULL_RECURRING_PLANS_NOT_IMPLEMENTED"],
 }
 DETAIL_FILTERS = {"period_start", "period_end", "region_id", "product_ids", "legal_entity_id", "customer_id", "currency", "source_version"}
-SUPPLY_QUALITY_FILTERS = {"material_id", "asset_owner_id", "ownership_type", "product_ids", "legal_entity_id", "customer_id", "batch_id", "currency", "source_version"}
+SUPPLY_QUALITY_FILTERS = {"material_id", "asset_owner_id", "cost_owner_id", "ownership_type", "product_ids", "legal_entity_id", "customer_id", "batch_id", "currency", "source_version", "period_start", "period_end"}
 MAX_RECORDS = 1000
 ID_FIELDS = {
     "profile": "owner_id", "contact": "contact_id", "metric_detail": "record_id",
@@ -88,9 +88,12 @@ def _filters(payload, context):
     filters = payload["filters"]
     require(set(filters) <= supported, "当前接口不支持所提交的筛选字段", web.HTTPBadRequest)
     if "period_start" in filters or "period_end" in filters:
-        require("period_start" in filters and "period_end" in filters
-                and [filters["period_start"], filters["period_end"]] in context["periods"].values(),
-                "期间必须完整匹配获准明细的一个期间", web.HTTPBadRequest)
+        require("period_start" in filters and "period_end" in filters, "期间需要完整起止日期", web.HTTPBadRequest)
+        if interface in ("SI07", "SI08"):
+            require([filters["period_start"], filters["period_end"]] in context["periods"].values(),
+                    "期间必须完整匹配获准明细的一个期间", web.HTTPBadRequest)
+        else:
+            require(filters["period_start"] <= filters["period_end"] < "9999-12-31", "报告查询期间无效", web.HTTPBadRequest)
     if interface in ("SI07", "SI08"):
         require("currency" not in filters or filters["currency"] == "CNY", "当前资料只有CNY，不能换算其他币种", web.HTTPBadRequest)
 
@@ -203,10 +206,17 @@ class SimulationAPI:
                     parameters.append(payload["filters"]["source_version"])
             if interface in ("SI09", "SI10"):
                 filters = payload["filters"]
-                for field in SUPPLY_QUALITY_FILTERS - {"product_ids", "source_version", "batch_id"}:
+                for field in SUPPLY_QUALITY_FILTERS - {"product_ids", "source_version", "batch_id", "period_start", "period_end"}:
                     if field in filters:
                         statement += " AND json_extract(body,'$.data." + field + "')=?"
                         parameters.append(filters[field])
+                if "period_start" in filters:
+                    # 日期范围采用本人业务时区，仅返回完整包含的报告，不能分摊未知期间金额。
+                    zone = ZoneInfo(context["timezone"])
+                    start = datetime.combine(date.fromisoformat(filters["period_start"]), time.min, zone)
+                    end = datetime.combine(date.fromisoformat(filters["period_end"]) + timedelta(days=1), time.min, zone)
+                    statement += " AND julianday(json_extract(body,'$.data.period_start'))>=julianday(?) AND julianday(json_extract(body,'$.data.period_end'))<=julianday(?)"
+                    parameters.extend((start.isoformat(), end.isoformat()))
                 if "batch_id" in filters:
                     statement += " AND (json_extract(body,'$.data.batch_id')=? OR json_extract(body,'$.data.input_batch_id')=? OR json_extract(body,'$.data.output_batch_id')=? OR EXISTS(SELECT 1 FROM json_each(objects.body,'$.data.batch_ids') WHERE value=?))"
                     parameters.extend([filters["batch_id"]] * 4)

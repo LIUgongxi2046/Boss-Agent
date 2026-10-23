@@ -191,6 +191,8 @@ flowchart LR
 
 当前1.8.0的material_cost_report按成本种类、明确报告范围、成本口径及同归属/单位/币种区分入库与实际领用。asset_owner_id与cost_owner_id分别保存，成本归属须符合明确库存批次；未知成本归属保留null并停止跨期比较。所有权沿用COMPANY/CUSTOMER/COOPERATION。quantity与total_cost保存原报告，单价由确定性计算得到。期间必须完整、已报告且不晚于来源观察时间，相同范围的有效期间不得重复或重叠；冲销报告不参与计算。报告属于外部事实输入，不执行采购、财务记账或库存扣减。完整原料成本和因果贡献不根据局部报告推断。
 
+FC01.C05 当前查询扩展：SI09/SI10 支持 cost_owner_id 及完整 period_start/period_end 日期。期间采用本人业务时区，从起始日期零时至结束日期次日零时，只选择期间完整包含的报告；缺少期间的记录不进入该期间结果，不分摊跨界报告金额。维护使用相同 SQL 条件选择独立元信息，正文保持不可见。SI07/SI08 继续要求获准明细的完整期间。SupplyQualityAPI 的完整计算投影仍仅接受 interface_id，筛选记录通过 SimulationAPI.query/query_http 读取，不得将完整投影标注为已筛选。
+
 依据原始项目计划13.18，外部资料采用SIMULATED输入完成内部功能，当前确定接收版本为1.8.0。原initial_materials与已批准初始校验和保持，新增资料写入当前空间独立objects记录及document来源。输入定义、用途和模拟标识保存在data/simulation/supply-quality-v1.yaml，由已有PyYAML解析，随后使用JSON Schema验证实际请求；数据仅用于当前业务功能，不代表真实企业、报价、生产或专业结论。
 
 外部记录采用record_id/entity_type/version、owner/dataset/execution_namespace、source_type、simulation_definition、record_state、observed_at/received_at、valid_from/valid_until、author_contact_id、source_id/source_version及data。data按对应实体Schema校验，禁止客户端指定权限、服务端版本和来源绑定。来源ID由实体类别与稳定业务ID确定，每次成功更新保存新document版本、完整原文摘要和实际存在的旧版本。external_record_binding另存自身及明确引用对象的来源版本与完整摘要；引用变化后当前投影要求复核，不自动采用新版本。

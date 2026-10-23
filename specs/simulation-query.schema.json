@@ -17,7 +17,7 @@
             "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"},
             "region_id": {"$ref": "#/$defs/Identifier"}, "product_ids": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"$ref": "#/$defs/Identifier"}},
             "legal_entity_id": {"$ref": "#/$defs/Identifier"}, "customer_id": {"$ref": "#/$defs/Identifier"},
-            "material_id": {"$ref": "#/$defs/Identifier"}, "asset_owner_id": {"$ref": "#/$defs/Identifier"},
+            "material_id": {"$ref": "#/$defs/Identifier"}, "asset_owner_id": {"$ref": "#/$defs/Identifier"}, "cost_owner_id": {"$ref": "#/$defs/Identifier"},
             "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "COOPERATION"]},
             "batch_id": {"$ref": "#/$defs/Identifier"}, "purpose": {"$ref": "#/$defs/Identifier"}, "stage": {"$ref": "#/$defs/Identifier"},
             "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "source_version": {"type": "string", "pattern": "^[0-9]+$"}
