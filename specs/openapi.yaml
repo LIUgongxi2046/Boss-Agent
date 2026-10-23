@@ -8,6 +8,19 @@ security:
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
+x-fc02-bi-query:
+  schema_extension: bi-query.schema.json
+  assembled_schema: business.SPEC.io_schema
+  query: Store.invoke(query_metrics, scoped_query_input) / BIQueryAPI.query(BOSS, payload)
+  follow_up: BIQueryAPI.follow_up(BOSS, bi_follow_up)
+  current: BIQueryAPI.read(BOSS, query_id, historical=false) -> bi_read
+  history: BIQueryAPI.read(BOSS, query_id, historical=true) -> bi_read
+  receipt: BIQueryAPI.receipt(BOSS, session_id, request_id) -> bi_receipt
+  dimensions: BIQueryAPI.dimensions(BOSS)
+  public_integration: PENDING_N3
+  context: authenticated server supplies envelope; follow-up inherits persisted parent context and overrides only explicit scope fields
+  idempotency: namespace/session_id/request_id plus exact payload digest; concurrent requests persist one query
+  stale_history: historical values and original source version remain; no stale source body returned; current adoption requires requery
 x-operation-defaults:
   version: 1.8.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest

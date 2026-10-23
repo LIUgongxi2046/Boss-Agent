@@ -12,8 +12,10 @@ from jsonschema import Draft202012Validator, FormatChecker
 ROOT = Path(__file__).resolve().parent
 SPEC = json.loads((ROOT.parent / "specs/selection-probe.json").read_text())
 TOOL_SCHEMA_EXTENSION = json.loads((ROOT.parent / "specs/business-tools.schema.json").read_text())
+BI_SCHEMA = json.loads((ROOT.parent / "specs/bi-query.schema.json").read_text())
+LEGACY_BI_DEFS = {"legacy_query_input": SPEC["io_schema"]["$defs"]["query_input"], "legacy_query_output": SPEC["io_schema"]["$defs"]["query_output"]}
 SPEC["io_schema"] = {**SPEC["io_schema"], "$id": TOOL_SCHEMA_EXTENSION["$id"],
-                     "$defs": {**SPEC["io_schema"]["$defs"], **TOOL_SCHEMA_EXTENSION["$defs"]}}
+                     "$defs": {**SPEC["io_schema"]["$defs"], **TOOL_SCHEMA_EXTENSION["$defs"], **LEGACY_BI_DEFS, **BI_SCHEMA["$defs"]}}
 OPERATIONS = {item["operation_id"]: item for item in SPEC["operations"]}
 
 
@@ -225,6 +227,9 @@ class Store:
                 "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": quality_state}
 
     def query_metrics(self, db, ns, data, p):
+        if p.get("query_mode") == "SCOPED":
+            from boss_bi_queries import query_metrics
+            return query_metrics(self, db, ns, data, p)
         from boss_metrics import aggregate_metrics, compare_metrics
         document = self._metric_source(db, ns, data)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
@@ -257,6 +262,9 @@ class Store:
 
     def read_evidence(self, db, ns, data, p):
         query = self.get(db, ns, "query", p["query_id"])
+        if "context_snapshot" in query:
+            from boss_bi_queries import read_evidence
+            return read_evidence(self, db, ns, data, p, query)
         require(set(p["detail_refs"]) <= set(query["detail_refs"]) and p["source_ids"] == ["finance-note"], "依据范围不符", web.HTTPForbidden)
         document = self._metric_source(db, ns, data)
         row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='query_source_binding' AND id=?", (ns, p["query_id"])).fetchone()

@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 from aiohttp import web
 
@@ -6,6 +6,12 @@ from business import require
 
 
 def aggregate_metrics(records):
+    with localcontext() as context:
+        context.prec = 80
+        return _aggregate_metrics(records)
+
+
+def _aggregate_metrics(records):
     require(isinstance(records, list), "指标明细必须为列表", web.HTTPBadRequest)
     identifiers = [row["record_id"] for row in records]
     require(len(identifiers) == len(set(identifiers)), "重复明细不能重复计入经营指标", web.HTTPBadRequest)
@@ -37,6 +43,12 @@ def aggregate_metrics(records):
 
 
 def compare_metrics(base, current):
+    with localcontext() as context:
+        context.prec = 80
+        return _compare_metrics(base, current)
+
+
+def _compare_metrics(base, current):
     result = {}
     require(set(base) == set(current), "比较指标集合不一致", web.HTTPBadRequest)
     for metric, (before, unit, _) in base.items():

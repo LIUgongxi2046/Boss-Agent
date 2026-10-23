@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:boss-agent:business-tools:1.8.0",
   "x-base-schema": "selection-probe.json#/io_schema",
+  "x-bi-extension": "bi-query.schema.json；由business.SPEC组合legacy_query_input/output与正式SCOPED定义",
   "description": "当前业务工具Schema；继承获准原定义，明确覆盖协调交办的输入与重读字段。由business.SPEC组合为完整Schema并提供给现有ToolRegistry。",
   "$defs": {
     "identifier": {"type": "string", "minLength": 1},
