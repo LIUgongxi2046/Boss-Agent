@@ -58,5 +58,6 @@ for path in receipt_root.rglob("*.sqlite"):
 assert count > 0, "没有读取到已执行的业务回执"
 print("PASS: JSON/YAML读取、事件Schema、组件Schema、动作引用、operationId唯一性和版本一致性")
 print(f"PASS: 当前{len(BossCommandAPI.ACTION_ROLES)}项命令全部有角色和输入映射；实际{count}份SQLite回执覆盖{len(observed)}项动作")
+print("UNOBSERVED_RECEIPTS: " + ", ".join(sorted(set(operations) - observed)))
 print("PASS: R01—R32实体引用、SI01—SI14全集与五个现有Tool原始Schema引用")
-print("NOT_RUN: 独立语义审查、完整合法输入匹配、公共入口与真实Runtime集成；OpenAPI标准检查使用validate_openapi.py独立执行")
+print("NOT_RUN: 独立语义审查、全部参数边界与业务变体、公共入口与真实Runtime集成；OpenAPI标准检查使用validate_openapi.py独立执行")

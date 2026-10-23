@@ -199,6 +199,8 @@ def test_calendar_preflight_uses_confirmed_meeting_end_and_cancellation(tmp_path
     assert status == 200
     assert no_overlap["status"] == "MEETING_INACTIVE"
     assert no_overlap["requires_owner_acknowledgement"] is False
+    status, saved = commands.execute("BOSS", "boss.calendar.save", {"client_request_id": "meeting-calendar-after-cancel", **calendar_input()})
+    assert status == 200 and saved["calendar_conflict_proven_absent"] is True
 
 
 def test_cancel_is_terminal_without_canceling_independent_task(tmp_path):

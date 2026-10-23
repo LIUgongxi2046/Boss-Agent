@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.2.0
+  version: 1.2.1
   description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；四项会议动作等待W3接入，来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: EXISTING_COMMANDS_AND_READS_WITH_NEW_W1_DOMAINS_PENDING_W3
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.2.0
+  version: 1.2.1
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -19,6 +19,13 @@ x-operation-defaults:
   scope: server-injected owner/dataset/version/namespace; contact IDs never authenticate
   rate_limit: NOT_MEASURED; no invented production threshold
   receipt_policy: 已提交业务结果在模型或界面后续失败后保持；取消只停止尚未执行动作。
+x-revocation-policy:
+  implementation: boss_owner_authorizations.authorization_can_revoke
+  continuing_use_actions: [memory.confirm, owner_goals.confirm, owner_notice.confirm, owner_plan.save, owner_plan.resume, calendar.share]
+  confirmation_window: 原确认窗口到期后仍允许本人停止持续采用；当前对象状态、业务期限和已撤销状态继续有效。
+  single_action_policy: 一次性授权到期后不再接受新提交，不以撤销改写已执行结果。
+  projection_adoption: W3在授权列表can_revoke采用同一服务规则；维护身份不能撤销本人确认。
+  memory_adoption: Store.context通过当前记忆及前置确认版本识别唯一授权；已撤销确认不进入新上下文。
 paths:
   /api/boss/identity:
     get:

@@ -209,10 +209,13 @@ class Store:
         return self.get(db, ns, "task", p["task_id"])
 
     def context(self, ns):
+        from boss_memory import confirmed_memory
         with self.connect() as db:
+            db.execute("BEGIN")
             self.active(db, ns)
             memory = self.get(db, ns, "memory", "current")
-            return {"memory": memory if memory["confirmation_state"] == "CONFIRMED" else None, "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
+            data = self.get(db, ns, "initial", "snapshot")
+            return {"memory": confirmed_memory(db, ns, memory, data["owner_id"]), "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
 
     def notify(self, ns, event_id):
         with self.connect() as db:

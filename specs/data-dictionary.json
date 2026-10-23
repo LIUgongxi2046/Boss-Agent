@@ -1,12 +1,13 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.2.0保留既有命令输入，增加meeting当前版本、独立草稿与四项本人动作；旧库没有meeting对象时使用原始snapshot，首次确认才保存当前会议，不修改原始资料。",
+    "compatibility": "1.2.1保留1.2.0全部输入和结果字段，明确持续确认的撤销及记忆采用检查；旧库没有meeting对象时使用原始snapshot，首次确认才保存当前会议，不修改原始资料。",
+    "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
     "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
@@ -185,7 +186,7 @@
     "private_calendar": {
       "storage": "objects/private_calendar or initial/snapshot.private_calendar", "access": "BOSS_ONLY", "version": "1",
       "fields": {"calendar_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "ends_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "private_body": {"type_ref": "private_text", "maxLength": 2000}, "title": {"type_ref": "private_text", "maxLength": 160}, "location": {"type_ref": "private_text", "maxLength": 240},
-        "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "PRIVATE"}, "status": {"type": "string", "enum": ["ACTIVE", "DELETED"]}, "updated_at": {"type_ref": "instant", "optional": true}, "calendar_conflict_proven_absent": {"type": "boolean", "const": false, "optional": true}, "meeting_end_unknown": {"type": "boolean", "const": true, "optional": true}}
+        "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "PRIVATE"}, "status": {"type": "string", "enum": ["ACTIVE", "DELETED"]}, "updated_at": {"type_ref": "instant", "optional": true}, "calendar_conflict_proven_absent": {"type": "boolean", "optional": true, "meaning": "仅在当前获准会议覆盖范围内判定"}, "meeting_end_unknown": {"type": "boolean", "optional": true}}
     },
     "calendar_share": {
       "storage": "objects/calendar_share", "access": "BOSS_ONLY_WITH_SCOPED_BUSY_PREVIEW", "version": "1",
@@ -201,8 +202,9 @@
     "memory": {
       "storage": "objects/memory/current", "access": "BOSS_ONLY", "version": "1",
       "prd_state_enum": ["PROPOSED", "CONFIRMED", "SUPERSEDED", "DELETED"],
-      "fields": {"memory_id": {"type_ref": "identifier"}, "memory_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "confirmation_state": {"type": "string", "enum": ["CONFIRMED", "DELETED"]}, "text": {"type_ref": "private_text", "maxLength": 4000}},
-      "pending_fields": {"authorization_id": "W3/W2 需绑定确认授权，检查将来采用时的撤销状态"}
+      "fields": {"memory_id": {"type_ref": "identifier"}, "memory_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "confirmation_state": {"type": "string", "enum": ["CONFIRMED", "DELETED"]}, "text": {"type_ref": "private_text", "maxLength": 4000}, "authorization_id": {"type_ref": "identifier", "optional": true}},
+      "adoption": "Store.context在同一只读事务内调用confirmed_memory。现有确认按memory_id、owner、scope、BOSS身份及授权content_version/expected_version与当前版本的递增关系识别唯一授权；撤销停止后续采用，历史状态和正文保持。显式authorization_id存在时必须一致；初始获准记忆保留来源确认。",
+      "pending_validation": "公共确认可显式保存authorization_id；W2/W3还需核查全部直接读取、已有会话和缓存传播。"
     },
     "schedule": {
       "storage": "objects/schedule/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",

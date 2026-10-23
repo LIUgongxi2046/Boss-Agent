@@ -17,6 +17,8 @@ sys.path.insert(0,str(ROOT/"validation"))
 from boss_command_api import BossCommandAPI
 from boss_page_api import BossPageAPI
 from controls import ControlStore
+from business import initial_materials
+from test_boss_command_api import create_input
 
 
 @pytest.fixture
@@ -107,9 +109,11 @@ def test_owner_only_and_no_foreign_or_unverified_permissions(app):
         assert current["revoked"] is False
 
 
-def test_expired_auth_cannot_be_revoked_with_false_success(app):
+def test_expired_single_action_authorization_cannot_be_revoked_with_false_success(app):
     cmd,pages=app
-    identifier=create_authorization(cmd)
+    status, task = cmd.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    identifier = task["authorization_id"]
     with cmd.store.connect() as db:
         current=cmd.store.get(db,"ui-check","authorization",identifier)
         current["valid_until"]=(datetime.now(timezone.utc)-timedelta(minutes=1)).isoformat()
@@ -119,6 +123,44 @@ def test_expired_auth_cannot_be_revoked_with_false_success(app):
     assert not record["can_revoke"]
     assert call(cmd,"BOSS","boss.authorization.revoke","expired-revocation",
                 **revoke_payload(identifier))[0]==409
+
+
+@pytest.mark.parametrize("kind", ["memory", "goals", "notice", "plan", "plan_resume", "share"])
+def test_continuing_use_can_be_revoked_after_confirmation_window(app, kind):
+    from test_boss_owner_preferences import goals, notice, confirm_input
+    from test_boss_owner_plans import create
+    from boss_owner_plans import OwnerPlansAPI
+    cmd, _ = app
+    if kind == "memory":
+        status, authorized = call(cmd, "BOSS", "boss.memory.confirm", "continuing-memory-confirm", expected_version="1", text=initial_materials()["memory"]["text"])
+        assert status == 200
+    elif kind in ("goals", "notice"):
+        status, draft = call(cmd, "BOSS", "boss.owner." + kind + ".save", "continuing-setting-save", **(goals() if kind == "goals" else notice()))
+        assert status == 200
+        status, authorized = call(cmd, "BOSS", "boss.owner." + kind + ".confirm", "continuing-setting-confirm", **confirm_input(draft))
+        assert status == 200
+    elif kind in ("plan", "plan_resume"):
+        assert call(cmd, "MAINTAINER", "boss.simulation.event.seed", "continuing-plan-event", event_id="event-1")[0] == 200
+        plans = OwnerPlansAPI(cmd.store)
+        authorized = create(plans)
+        if kind == "plan_resume":
+            paused = plans.execute("BOSS", "pause", {"client_request_id": "continuing-plan-pause", "plan_id": authorized["plan_id"], "expected_version": authorized["version"]})
+            authorized = plans.execute("BOSS", "resume", {"client_request_id": "continuing-plan-resume", "plan_id": authorized["plan_id"], "expected_version": paused["version"]})
+    else:
+        assert kind == "share"
+        status, authorized = call(cmd, "BOSS", "boss.calendar.share", "continuing-share-confirm", expected_version="1", recipient_id="coordinator-1",
+            purpose=initial_materials()["memory"]["text"], expires_at=initial_materials()["private_calendar"]["ends_at"], fields=["busy", "starts_at", "ends_at", "timezone"])
+        assert status == 200
+    identifier = authorized["authorization_id"]
+    with cmd.store.connect() as db:
+        current = cmd.store.get(db, "ui-check", "authorization", identifier)
+        current["valid_until"] = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat()
+        cmd.store.put(db, "ui-check", "authorization", identifier, current)
+    status, result = call(cmd, "BOSS", "boss.authorization.revoke", "continuing-use-revoke", **revoke_payload(identifier))
+    assert status == 200, result
+    assert result["revoked"] is True
+    if kind == "memory":
+        assert ControlStore(cmd.store.path).context("ui-check")["memory"] is None
 
 
 def test_cross_owner_and_maintainer_issued_grants_cannot_be_revoked(app):

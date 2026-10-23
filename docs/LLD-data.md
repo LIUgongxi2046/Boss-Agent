@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.2.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T14/T17/T18检查为依据。
+版本 `1.2.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -60,6 +60,8 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 
 会议采用当前对象覆盖读取，`meeting_materials(db,data)`保留原始snapshot并校验当前meeting的owner_id和meeting_id。既有数据库没有meeting对象时使用原始会议，投影标记DRAFT和未知结束时间；首次确认安排才写入当前对象及meeting_revision。meeting_draft具有独立版本，保存和修改不改变当前会议。确认时绑定会议/草稿版本、联系人、来源内容与版本、私人占用、已确认行程及缓冲、业务时钟；变化后停止采用旧核查结果。HELD/CANCELED保持终态；取消不改变独立交办和历史消息。全部新增对象继续受namespace隔离和SQLite同一事务约束。
 
+个人记忆采用读取在同一SQLite只读事务中检查当前版本及对应确认授权。既有确认事务把memory_id作为target_id，授权content_version/expected_version保存前置版本，当前记忆保存递增版本；这些字段与owner、scope和BOSS身份共同确定唯一对应确认。撤销后停止新上下文采用，原CONFIRMED状态、正文和历史决定保留。新确认递增版本，只采用新版本对应的确认；显式authorization_id存在时还需相同标识。初始获准记忆继续保留原始来源确认，独立验证入口的直接维护与产品新增确认分别管理。
+
 ## 数值、单位、期间与农业关系
 
 金额和数量以十进制字符串传输，计算使用 Decimal；JSON number 不承载财务原始精度。CNY 金额、吨数量与 CNY/吨分开；零值有明确来源时保留，缺少值为 null。比率通过汇总分子分母计算，分母为零返回未定义，禁止平均分组比率。展示舍入不能覆盖原始结果。百分点变化为两个百分数直接相减，增长率为 `(current-base)/base*100`，零基期返回 null。
@@ -77,7 +79,7 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | observed_at | 原始观察发生时间 |
 | received_at | 本服务收到资料的真实时间 |
 | published_at | 作者发布时间 |
-| valid_from / valid_until | 资料或授权可采用区间 |
+| valid_from / valid_until | 资料有效区间与授权提交窗口；持续设置另以当前对象的业务期限、状态和撤销控制 |
 | business_at / clock.at | 获准模拟业务时间 |
 | created_at / updated_at / read_at | 实际运行时间，含时区 ISO8601 |
 | due_at / not_before | 业务期限或本人计划最早执行时间，保留 IANA timezone |

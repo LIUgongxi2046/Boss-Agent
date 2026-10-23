@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-events:1.2.0",
+  "$id": "urn:boss-agent:runtime-events:1.2.1",
   "title": "Boss-Agent WebSocket 回执与 Runtime 事件",
   "description": "RoleChannel 回执和锁定 nanobot0.3.5 的 outbound_wire/runtime 源码字段。固定commit一致性与实际流验收由 W2/W3 完成。",
   "oneOf": [
