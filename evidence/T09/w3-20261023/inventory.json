@@ -1,0 +1,15 @@
+{
+  "status": "PASS_INVENTORY_ONLY",
+  "source_sha256": "5279922fde350b214d983c2bb8f1387800463582909afdaba73102cbfaa306d4",
+  "inventory_sha256": "0aa5bd2add4f88e349071e31c38c8eba6f8e913860eb3890d0c1d506ed0dab15",
+  "functions": 32,
+  "acceptance_ids": 64,
+  "inherited_error_scenarios": 192,
+  "administration": 16,
+  "administration_states": 64,
+  "nonfunctional": 12,
+  "planned_scenarios": 332,
+  "business_execution": "NOT_RUN",
+  "semantic_review": "PENDING",
+  "full_A09_accepted": false
+}

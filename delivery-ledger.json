@@ -1227,7 +1227,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": ["T03视觉及正式素材交付、T05/T06确定接口和T07完整接收待完成；当前工程映射与构建检查不代表A08通过。"]
+      "blockers": ["已接收T05/T06版本1.0.0和T07版本0.2.0-draft；T03视觉、全量字段/事件/页面状态语义与实际行为仍需核查，A08保持NOT_RUN。"]
     },
     {
       "id": "T09",
@@ -1237,12 +1237,17 @@
       "depends_on": [
         "T08"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/设计评审.md",
         "docs/测试与验收计划.md",
         "docs/安全检查计划.md",
         "specs/acceptance-cases.json",
+        "scripts/check_acceptance_inventory.py",
+        "validation/check_runtime_events.py",
+        "validation/check_product_log.py",
+        "validation/check_evidence_privacy.py",
+        "docs/development/T09.md",
         "docs/PRD.md",
         "docs/HLD.md",
         "docs/LLD-data.md",
@@ -1253,7 +1258,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["REV01：真实stream_end的turn_phase/turn_seq尚未通过当前事件Schema；完整语义审查、全量用例和安全执行未完成。"]
     },
     {
       "id": "T10",

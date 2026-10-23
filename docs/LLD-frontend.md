@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.1.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。本文件记录已核查工程与设计要求。T03视觉、T05/T06正式数据接口及T07输入尚未完成接收，A08保持NOT_RUN。
+版本：0.2.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收 T05/T06 1.0.0 和 T07 0.2.0-draft，集成源码版本 `ce2bd3c`。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和 T03 视觉仍未完成，A08 保持 NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -8,7 +8,7 @@ PRD V1.2.0维护FR-01—32、AD01—16及AC。HLD 1.0.0维护唯一身份、Runt
 
 固定前端为nanobot commit `1bb712d3488915ca4ed9ccc1a93067ff722f5ab9`的React 18、TypeScript、Vite工程。`scripts/prepare_boss_webui.py`把`app/webui/`加入同一认证Shell。构建目录为本worktree的`.work/product/nanobot`，正式dist位于其`nanobot/web/dist`。构建manifest记录上游和页面元数据摘要。静态HTML承担设计预览，产品使用React业务组件。
 
-实际导航使用`?bossPage=<page_id>`与浏览器history；`NATIVE`用于上游会话。N01/D08由上游认证页面承接。页面ID与角色必须同时通过`allowed`及服务端身份检查；客户端路径不授予权限。技术页面由MAINTAINER访问，业务页面由BOSS访问，D06/D07使用认证后的公共状态。
+实际导航使用`?bossPage=<page_id>`与浏览器history；`NATIVE`用于上游会话。N01/D08 通过版本化认证修改接入 `BossLogin`。页面ID与角色必须同时通过`allowed`及服务端身份检查；客户端路径不授予权限。技术页面由MAINTAINER访问，业务页面由BOSS访问，D06/D07使用认证后的公共状态。
 
 ## 2. 身份、数据与副作用
 
@@ -79,6 +79,9 @@ graph TD
 | 组件 | 输入/输出与责任 | 副作用及检查 |
 |---|---|---|
 | BossDesktop | getToken、onLogout、onStartChat、children；导航与对象选择 | 身份查询、页面读取、未保存提示 |
+| BossLogin | mode、failed、expired、message、onSecret | 真实 bootstrap 与 identity、提交限制、过期认证与退出 |
+| BossToday | TodayProjection、onCommand、onNavigate、onDirtyChange | 当前事项与本人次序、快照 CAS、保存后重读 |
+| BossOwnerPlans | OwnerPlanProjection、onCommand、onDirtyChange | 本人范围与时间、暂停恢复取消、原请求回执查询 |
 | BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
 | BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
 | MaintainerPromptVersion、Scheduler等 | 服务端维护配置和当前版本 | 保存/校验/启用/采用分别核查 |
@@ -106,6 +109,17 @@ graph TD
 
 ## 7. 验收与接收条件
 
-T08正式接收必须包含：72页面各自组件、真实读写与事件、角色、对象/版本、全部状态、返回上下文、焦点恢复及源码位置；完整561状态与公共状态责任保留。T03提供视觉和素材结果，T05/T06提供字段及operationId，T07提供工具/事件和上下文采用；目前相关设计仍待接收。
+T08正式接收必须包含：72页面各自组件、真实读写与事件、角色、对象/版本、全部状态、返回上下文、焦点恢复及源码位置；完整561状态与公共状态责任保留。T03提供视觉和素材结果，T05/T06提供字段及operationId，T07提供工具/事件和上下文采用；完整设计验收仍未完成。
 
-工程构建已在本机完成；业务、IME、全部页面DOM、认证恢复、200%缩放、来源撤销、断流、跨身份、系统权限与视觉验收仍待执行。T09据完整FR/AC建立独立断言；T24在相同集成版本验证持久化及后续采用。构建通过不修改A08状态。
+已接收的局部接口与字段如下；正式设计验收继续独立执行。
+
+| 接口/字段 | 序列化与消费 | 实际检查 |
+|---|---|---|
+| todayRead：items、item_id、order_version、snapshot_sha256 | TodayAPI → BossPageAPI → TodayProjection → BossToday | 原始顺序、本人调整、保存及重读 |
+| todayReorder：expected_version、snapshot_sha256、item_ids | scopedCommand → BossCommandAPI → TodayAPI.reorder | 当前完整集合与 CAS，原请求编号保持 |
+| ownerPlansRead：plans、events、results、dispatches、technical_schedule | OwnerPlansAPI → BossPageAPI → OwnerPlanProjection | 事件范围、计划状态及唯一执行责任 |
+| ownerPlanSave/Pause/Resume/Cancel：plan_id、expected_version、client_request_id | BossOwnerPlans → scopedCommand → OwnerPlansAPI | 创建 ACTIVE、PAUSED、ACTIVE、CANCELED，版本与重启连续性 |
+| identity.role 与 bootstrap.api_token | BossLogin 核验服务端身份 → 原生 App 保存当前认证 | 入口范围错误拒绝、401/403、过期及退出 |
+| memory technical status | MAINTAINER-only 读取 → BossDesktop A12 | 无正文、无外部范围参数，身份拒绝与技术重读 |
+
+本机工程构建、367项接收前回归和372项接收后回归已通过；后者10项条件检查跳过。真实 Electron 57项技术记录覆盖 N01/D08、角色、三个尺寸及200%缩放、F01次序、N09计划、A12、刷新及重启；四项真实 DeepSeek 异常检查通过。结果见 T11 主记录。全部页面/状态、IME、跨页焦点和滚动、完整来源撤销、系统权限与视觉验收仍待执行。T09据完整FR/AC建立独立断言；T24在相同集成版本验证持久化及后续采用。构建通过不修改A08状态。

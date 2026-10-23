@@ -37,6 +37,13 @@ from service import application as business_application
 WORK = ROOT / ".work/application"
 
 
+def product_log_filter(record):
+    exception = record["exception"]
+    record["extra"]["exception_type"] = exception.type.__name__ if exception else "NONE"
+    record["exception"] = None
+    return True
+
+
 class ApplicationTool(BusinessTool):
     async def execute(self, **kwargs):
         if self.operation in {"create_assignment", "send_assignment"}:
@@ -65,7 +72,12 @@ def prepare():
 
 async def serve():
     logger.remove()
-    logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False)
+    if os.environ.get("BOSS_PRODUCT_UI") == "1":
+        logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False,
+                   format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level} | {name}:{function}:{line} | {extra[exception_type]}",
+                   filter=product_log_filter)
+    else:
+        logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False)
     connection = settings()
     roles, config_path = prepare()
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()

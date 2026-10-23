@@ -1,0 +1,9 @@
+{
+  "status": "PASS_PRODUCT_SERVICE_LOG_FORMAT_ONLY",
+  "lines_checked": 482,
+  "log_sha256": "63387382de7657585e4eecb0939e49a0e433c2d171e93f150f03e3ceb8f87a66",
+  "source_sha256": "a4f89230e13e0ce0f3fc705bf4a618b81718a90a2b719d097a693bca366d6f30",
+  "actual_model_output_assembly_observed": true,
+  "message_body_and_traceback_formatted": false,
+  "scope": "当前W3独立产品服务日志；其他诊断和安装包分别核查"
+}

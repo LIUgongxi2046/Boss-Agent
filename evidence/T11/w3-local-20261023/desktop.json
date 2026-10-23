@@ -2,7 +2,7 @@
   {
     "check": "source_version",
     "result": {
-      "commit": "42370838b8aac1a8c943329615c1a3bf3658d806",
+      "commit": "ce2bd3cf27abcf90f246aba04edb7f29d20924b9",
       "source_hashes": {
         "app/webui/BossLogin.tsx": "d24df39f1d1be706dabf499a63ff4bb7f98ddef0515d49c1331ac41a6087a3a2",
         "app/webui/BossDesktop.tsx": "eb9d91e6bfa3a8cecf96f7d7d9f50ed95ac1478adb101d25d022d0f045584670",
@@ -11,7 +11,7 @@
         "validation/application.py": "6c736deb7365c0877e180e0e68ab538919d779c7d7c12384b6ffe107bb8744a7"
       }
     },
-    "at": "2026-10-23T04:33:59.869Z"
+    "at": "2026-10-23T04:49:38.220Z"
   },
   {
     "check": "public_auth_controls",
@@ -53,7 +53,7 @@
         "visibility": "visible"
       }
     ],
-    "at": "2026-10-23T04:34:04.175Z"
+    "at": "2026-10-23T04:50:03.431Z"
   },
   {
     "check": "content_bounds",
@@ -88,7 +88,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.247Z"
+    "at": "2026-10-23T04:50:03.729Z"
   },
   {
     "check": "content_bounds",
@@ -123,7 +123,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.268Z"
+    "at": "2026-10-23T04:50:03.775Z"
   },
   {
     "check": "content_bounds",
@@ -158,7 +158,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.302Z"
+    "at": "2026-10-23T04:50:04.331Z"
   },
   {
     "check": "content_bounds",
@@ -193,7 +193,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.357Z"
+    "at": "2026-10-23T04:50:04.421Z"
   },
   {
     "check": "content_bounds",
@@ -228,7 +228,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.389Z"
+    "at": "2026-10-23T04:50:04.493Z"
   },
   {
     "check": "content_bounds",
@@ -263,7 +263,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:04.419Z"
+    "at": "2026-10-23T04:50:04.683Z"
   },
   {
     "check": "empty_credential_validation",
@@ -271,42 +271,49 @@
       "private_shell_present": false,
       "focus_on_credential": true
     },
-    "at": "2026-10-23T04:34:04.527Z"
+    "at": "2026-10-23T04:50:05.396Z"
   },
   {
     "check": "contact_credential_rejected",
     "result": {
       "private_shell_present": false
     },
-    "at": "2026-10-23T04:34:04.728Z"
+    "at": "2026-10-23T04:50:06.347Z"
   },
   {
     "check": "entry_scope_mismatch_rejected",
     "result": {
       "private_shell_present": false
     },
-    "at": "2026-10-23T04:34:04.869Z"
+    "at": "2026-10-23T04:50:06.785Z"
   },
   {
     "check": "request_failed",
     "result": {
       "path": "/webui/bootstrap"
     },
-    "at": "2026-10-23T04:34:04.944Z"
+    "at": "2026-10-23T04:50:06.893Z"
   },
   {
     "check": "actual_network_unavailable",
     "result": {
       "private_shell_present": false
     },
-    "at": "2026-10-23T04:34:04.987Z"
+    "at": "2026-10-23T04:50:07.100Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/boss-brand/01-%E5%BE%85%E6%9C%BA%E6%82%AC%E6%B5%AE.webp"
+    },
+    "at": "2026-10-23T04:50:07.866Z"
   },
   {
     "check": "authenticated_shell",
     "result": {
       "role": "BOSS"
     },
-    "at": "2026-10-23T04:34:05.458Z"
+    "at": "2026-10-23T04:50:07.883Z"
   },
   {
     "check": "content_bounds",
@@ -354,7 +361,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.508Z"
+    "at": "2026-10-23T04:50:08.219Z"
   },
   {
     "check": "content_bounds",
@@ -402,7 +409,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.542Z"
+    "at": "2026-10-23T04:50:08.274Z"
   },
   {
     "check": "content_bounds",
@@ -450,7 +457,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.641Z"
+    "at": "2026-10-23T04:50:08.512Z"
   },
   {
     "check": "content_bounds",
@@ -498,7 +505,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.755Z"
+    "at": "2026-10-23T04:50:08.730Z"
   },
   {
     "check": "content_bounds",
@@ -546,7 +553,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.819Z"
+    "at": "2026-10-23T04:50:08.783Z"
   },
   {
     "check": "content_bounds",
@@ -594,16 +601,16 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:05.953Z"
+    "at": "2026-10-23T04:50:08.948Z"
   },
   {
     "check": "host_isolation",
     "result": {
       "electron": "45.0.0",
       "architecture": "x64",
-      "service_pid": 35715
+      "service_pid": 37808
     },
-    "at": "2026-10-23T04:34:06.216Z"
+    "at": "2026-10-23T04:50:09.164Z"
   },
   {
     "check": "approved_selection_event_registered",
@@ -611,58 +618,65 @@
       "event_id": "event-1",
       "source_type": "SIMULATED"
     },
-    "at": "2026-10-23T04:34:06.439Z"
-  },
-  {
-    "check": "today_owner_order_persisted",
-    "result": {
-      "version": "4",
-      "item_count": 4
-    },
-    "at": "2026-10-23T04:34:06.984Z"
-  },
-  {
-    "check": "owner_plan_saved",
-    "result": {
-      "plan_id": "07e67d14-a859-4089-bb4d-496cf645d6ae",
-      "state": "ACTIVE",
-      "version": "1"
-    },
-    "at": "2026-10-23T04:34:07.609Z"
-  },
-  {
-    "check": "owner_plan_transition",
-    "result": {
-      "plan_id": "07e67d14-a859-4089-bb4d-496cf645d6ae",
-      "state": "PAUSED",
-      "version": "2"
-    },
-    "at": "2026-10-23T04:34:07.793Z"
-  },
-  {
-    "check": "owner_plan_transition",
-    "result": {
-      "plan_id": "07e67d14-a859-4089-bb4d-496cf645d6ae",
-      "state": "ACTIVE",
-      "version": "3"
-    },
-    "at": "2026-10-23T04:34:07.970Z"
-  },
-  {
-    "check": "owner_plan_transition",
-    "result": {
-      "plan_id": "07e67d14-a859-4089-bb4d-496cf645d6ae",
-      "state": "CANCELED",
-      "version": "4"
-    },
-    "at": "2026-10-23T04:34:08.169Z"
+    "at": "2026-10-23T04:50:09.238Z"
   },
   {
     "check": "request_failed",
     "result": {
       "path": "/boss-brand/01-%E5%BE%85%E6%9C%BA%E6%82%AC%E6%B5%AE.webp"
     },
-    "at": "2026-10-23T04:34:08.394Z"
+    "at": "2026-10-23T04:50:09.955Z"
+  },
+  {
+    "check": "today_owner_order_persisted",
+    "result": {
+      "version": "6",
+      "item_count": 4
+    },
+    "at": "2026-10-23T04:50:10.915Z"
+  },
+  {
+    "check": "owner_plan_saved",
+    "result": {
+      "plan_id": "45f2a639-c198-4d2d-89a4-f09afef2718a",
+      "state": "ACTIVE",
+      "version": "1"
+    },
+    "at": "2026-10-23T04:50:12.407Z"
+  },
+  {
+    "check": "owner_plan_transition",
+    "result": {
+      "plan_id": "45f2a639-c198-4d2d-89a4-f09afef2718a",
+      "state": "PAUSED",
+      "version": "2"
+    },
+    "at": "2026-10-23T04:50:12.792Z"
+  },
+  {
+    "check": "owner_plan_transition",
+    "result": {
+      "plan_id": "45f2a639-c198-4d2d-89a4-f09afef2718a",
+      "state": "ACTIVE",
+      "version": "3"
+    },
+    "at": "2026-10-23T04:50:13.138Z"
+  },
+  {
+    "check": "owner_plan_transition",
+    "result": {
+      "plan_id": "45f2a639-c198-4d2d-89a4-f09afef2718a",
+      "state": "CANCELED",
+      "version": "4"
+    },
+    "at": "2026-10-23T04:50:13.498Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/boss-brand/01-%E5%BE%85%E6%9C%BA%E6%82%AC%E6%B5%AE.webp"
+    },
+    "at": "2026-10-23T04:50:13.964Z"
   },
   {
     "check": "navigation_dom",
@@ -670,7 +684,7 @@
       "width": 1024,
       "height": 768
     },
-    "at": "2026-10-23T04:34:08.560Z"
+    "at": "2026-10-23T04:50:14.492Z"
   },
   {
     "check": "navigation_dom",
@@ -678,7 +692,7 @@
       "width": 1280,
       "height": 800
     },
-    "at": "2026-10-23T04:34:08.598Z"
+    "at": "2026-10-23T04:50:14.551Z"
   },
   {
     "check": "navigation_dom",
@@ -686,21 +700,21 @@
       "width": 1440,
       "height": 1024
     },
-    "at": "2026-10-23T04:34:08.630Z"
+    "at": "2026-10-23T04:50:14.618Z"
   },
   {
     "check": "zoom_dom",
     "result": {
       "factor": 2
     },
-    "at": "2026-10-23T04:34:08.659Z"
+    "at": "2026-10-23T04:50:14.655Z"
   },
   {
     "check": "page_reload_context",
     "result": {
       "page_id": "N03"
     },
-    "at": "2026-10-23T04:34:08.991Z"
+    "at": "2026-10-23T04:50:15.400Z"
   },
   {
     "check": "content_bounds",
@@ -748,7 +762,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.038Z"
+    "at": "2026-10-23T04:50:15.563Z"
   },
   {
     "check": "content_bounds",
@@ -783,7 +797,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.174Z"
+    "at": "2026-10-23T04:50:15.899Z"
   },
   {
     "check": "content_bounds",
@@ -818,7 +832,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.196Z"
+    "at": "2026-10-23T04:50:15.936Z"
   },
   {
     "check": "content_bounds",
@@ -853,7 +867,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.229Z"
+    "at": "2026-10-23T04:50:15.969Z"
   },
   {
     "check": "content_bounds",
@@ -888,7 +902,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.260Z"
+    "at": "2026-10-23T04:50:16.070Z"
   },
   {
     "check": "content_bounds",
@@ -923,7 +937,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.289Z"
+    "at": "2026-10-23T04:50:16.109Z"
   },
   {
     "check": "content_bounds",
@@ -958,31 +972,31 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.311Z"
+    "at": "2026-10-23T04:50:16.142Z"
   },
   {
     "check": "expired_identity_hides_private_shell",
     "result": true,
-    "at": "2026-10-23T04:34:09.329Z"
+    "at": "2026-10-23T04:50:16.182Z"
   },
   {
     "check": "authenticated_shell",
     "result": {
       "role": "BOSS"
     },
-    "at": "2026-10-23T04:34:09.552Z"
+    "at": "2026-10-23T04:50:16.478Z"
   },
   {
     "check": "reauthentication_does_not_replay_business",
     "result": true,
-    "at": "2026-10-23T04:34:09.625Z"
+    "at": "2026-10-23T04:50:16.667Z"
   },
   {
     "check": "authenticated_shell",
     "result": {
       "role": "MAINTAINER"
     },
-    "at": "2026-10-23T04:34:09.853Z"
+    "at": "2026-10-23T04:50:16.982Z"
   },
   {
     "check": "content_bounds",
@@ -1030,7 +1044,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.908Z"
+    "at": "2026-10-23T04:50:17.025Z"
   },
   {
     "check": "content_bounds",
@@ -1078,7 +1092,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.949Z"
+    "at": "2026-10-23T04:50:17.175Z"
   },
   {
     "check": "content_bounds",
@@ -1126,7 +1140,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:09.977Z"
+    "at": "2026-10-23T04:50:17.210Z"
   },
   {
     "check": "content_bounds",
@@ -1174,7 +1188,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:10.040Z"
+    "at": "2026-10-23T04:50:17.257Z"
   },
   {
     "check": "content_bounds",
@@ -1222,7 +1236,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:10.088Z"
+    "at": "2026-10-23T04:50:17.335Z"
   },
   {
     "check": "content_bounds",
@@ -1270,7 +1284,7 @@
         }
       ]
     },
-    "at": "2026-10-23T04:34:10.129Z"
+    "at": "2026-10-23T04:50:17.405Z"
   },
   {
     "check": "role_switch_dom",
@@ -1278,7 +1292,7 @@
       "role": "MAINTAINER",
       "boss_navigation_present": false
     },
-    "at": "2026-10-23T04:34:10.158Z"
+    "at": "2026-10-23T04:50:17.429Z"
   },
   {
     "check": "memory_technical_dom",
@@ -1286,36 +1300,43 @@
       "role": "MAINTAINER",
       "read_only": true
     },
-    "at": "2026-10-23T04:34:10.343Z"
+    "at": "2026-10-23T04:50:18.604Z"
   },
   {
     "check": "request_failed",
     "result": {
       "path": "/webui/bootstrap"
     },
-    "at": "2026-10-23T04:34:10.913Z"
+    "at": "2026-10-23T04:50:19.179Z"
   },
   {
     "check": "desktop_quit",
     "result": {
-      "service_pid": 35715
+      "service_pid": 37808
     },
-    "at": "2026-10-23T04:34:11.797Z"
+    "at": "2026-10-23T04:50:20.520Z"
   },
   {
     "check": "restart_rejects_previous_token",
     "result": {
       "status": 401
     },
-    "at": "2026-10-23T04:34:15.750Z"
+    "at": "2026-10-23T04:50:30.592Z"
   },
   {
     "check": "desktop_restart",
     "result": {
-      "service_pid": 35740,
+      "service_pid": 37924,
       "task_and_outbox_unchanged": true
     },
-    "at": "2026-10-23T04:34:15.751Z"
+    "at": "2026-10-23T04:50:30.592Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/webui/bootstrap"
+    },
+    "at": "2026-10-23T04:50:30.902Z"
   },
   {
     "check": "scope",
@@ -1324,6 +1345,6 @@
       "model_tools": "NOT_RUN",
       "os_permissions": "NOT_RUN"
     },
-    "at": "2026-10-23T04:34:16.776Z"
+    "at": "2026-10-23T04:50:31.513Z"
   }
 ]
