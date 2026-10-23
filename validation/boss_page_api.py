@@ -248,7 +248,7 @@ class BossPageAPI:
                             and not available[ref["source_id"]].get("withdrawn")
                             and available[ref["source_id"]].get("access_scope") == data["owner_id"]
                             and available[ref["source_id"]].get("source_type") == "SIMULATED"
-                            for ref in item.get("source_refs", [])
+                            for ref in (item.get("source_refs", []) + item.get("completion_evidence", []))
                         ) else "NEEDS_REVIEW"
                     ),
                 } for item in self._items(db, self.namespace, "self_commitment")],
