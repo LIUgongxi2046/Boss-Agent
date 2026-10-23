@@ -298,6 +298,7 @@ class Store:
                 "交办期限必须晚于当前业务时间", web.HTTPBadRequest)
         task_id = str(uuid.uuid4())
         task = {k: p[k] for k in ("purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements", "authorization_id", "related_meeting_id", "related_event_ids", "source_refs")}
+        task["source_versions"] = {identifier: document["version"] for identifier, document in documents.items()}
         task.update(task_id=task_id, status="OPEN", version="1", message_ids=[], feedback_ids=[], completion_authorization_id=None, execution_namespace=ns)
         self.put(db, ns, "task", task_id, task)
         self.put(db, ns, "assignment_source_binding", task_id, {

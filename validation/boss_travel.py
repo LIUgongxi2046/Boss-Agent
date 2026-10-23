@@ -15,7 +15,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 from boss_meetings import meeting_materials
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
 
 NS = "ui-check"
 FINAL_STATES = ("CONFIRMED", "CANCELED")
@@ -105,7 +105,7 @@ def _details(api, db, data, payload):
                 and source.get("access_scope") == data["owner_id"]
                 and source.get("source_type") == "SIMULATED",
                 "交通资料已撤销或不在本人当前获准范围", web.HTTPForbidden)
-        require_current_simulated_source(source, data["owner_id"], api.store.get(db, NS, "clock", "current")["at"])
+        require_current_business_source(api.store, db, NS, data["owner_id"], ref["source_id"])
         require(source["version"] == ref["version"],
                 "交通来源已换版，须重新核查", web.HTTPConflict)
         checked.append({"source_id": ref["source_id"], "version": source["version"]})

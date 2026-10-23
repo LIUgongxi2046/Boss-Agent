@@ -1,0 +1,64 @@
+{
+  "work_item_id": "T14-EXTERNAL-ADOPTION-CONSUMERS",
+  "application_base": "f4ab453",
+  "interface_version": "1.7.0",
+  "source_type": "SIMULATED",
+  "external_services_invoked": false,
+  "parent_acceptance": "NOT_RUN",
+  "behavior": [
+    "会议、会面、行程、纪要、消息和私人日历附件核查当前外部记录及传递来源",
+    "会前材料不返回需要重新导入的当前或历史片段",
+    "会议草稿核查摘要随外部采用变化；普通来源摘要保持",
+    "明确重新导入后可以采用新来源版本继续准备",
+    "所有新Tool或界面交办统一保存source_versions",
+    "催办核查任务完整来源绑定及当前外部采用",
+    "既有来源版本缺少时通过本人来源复核继续处理"
+  ],
+  "regression": {
+    "command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-external-adoption-final -p no:cacheprovider --junitxml=.work/w1-external-adoption-final.xml --tb=short",
+    "passed": 627,
+    "seconds": 35.47,
+    "report": ".work/w1-external-adoption-final.xml",
+    "report_sha256": "0d44246b2370837cc6b7d67ca0861877536b4de939cd3f45e2c88e7d02fd40cb",
+    "new_cases": 13
+  },
+  "receipts": {
+    "command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-external-adoption-final",
+    "result": "PASS",
+    "actual_receipts": 882,
+    "declared_actions": 71,
+    "observed_actions": 71
+  },
+  "actual_legacy_database": {
+    "command": "validation/.venv/bin/python evidence/T14/check_legacy_task_sources.py --source .work/pytest-w1-v16-delivery/test_new_request_key_cannot_re0/tool-sources.sqlite --source-report .work/w1-v16-delivery.xml --output-dir .work/legacy-tool-sources-verified",
+    "source_report_tests": 577,
+    "source_report_result": "PASS",
+    "producer_commit_in_database": null,
+    "copy_method": "SQLite native backup from read-only source",
+    "source_unchanged": true,
+    "result": "PASS",
+    "report": ".work/legacy-tool-sources-verified/result.json",
+    "report_sha256": "44cca585e60a541691297397598294850853aabab0252468f18c736765ead948",
+    "checks": ["缺少task.source_versions的实际既有交办", "已知创建绑定保留", "本人来源复核", "公共发送及任务版本递增", "原创建回执保持", "原确认请求重查不重复写入", "五表源摘要保持", "integrity_check通过"]
+  },
+  "source_sha256": {
+    "validation/boss_source_access.py": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44",
+    "validation/business.py": "3c24a40c5fefd3f23f00a6f95256c8bd88491f7d96891d14e5c9b1b3fa13a39e",
+    "validation/boss_meeting_brief.py": "122aa25d8b3dae6744ece0f421b2aa6c89996a0c5a8f37d43888fd9145eb608b",
+    "validation/boss_meetings.py": "cdb177f59d2d0eee6417bf960743142e4bcb4de033d3eb8c3bc4562ec6fa58cc",
+    "validation/boss_people.py": "609e2298c532de17d303de294f0f6353d6366f491fd5cf242129e9ec22ea7473",
+    "validation/boss_travel.py": "b87986fe5a6bd28d235eb2d9b90dc205edac3634999389403dd62f7e8b8f3bb6",
+    "validation/boss_meeting_approval.py": "796f14b2dafc38d427c8ad6c2280d54c6b1f94eb03afd87211d4b202af3f7b85",
+    "validation/boss_message_calendar.py": "7724380bba62896985690785911485bf52d490b75e0113fe3fb631b41af02905",
+    "validation/boss_assignment_nudge.py": "02e5ae4ce08833a3e17ad9fdf39d15b5e1ba16ca7d373120f49306d445c84dc2",
+    "validation/boss_assignment_sources.py": "6b803c2ef621a01bfce75e3f30897bf6e3e5c9b6c99e3ed09e986c286571d686"
+  },
+  "handoff": {
+    "helper": "require_current_business_source(store,db,namespace,owner_id,source_id)",
+    "read_state": "external_adoption(db,namespace,initial,clock,document)",
+    "namespace_and_owner": "injected from actual authenticated business scope",
+    "remaining": ["W2/W3公共原文和研究消费者", "相同集成版本的完整应用流程", "完整历史迁移与设备恢复", "独立语义和父任务正式验收"],
+    "record": "docs/development/T14.md",
+    "index_entry": "T14 / 外部资料当前采用与跨页交办 / require_current_business_source、会议/消息/附件、source_versions / A14 / docs/development/T14.md"
+  }
+}

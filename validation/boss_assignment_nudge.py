@@ -30,6 +30,7 @@ def nudge(api, db, data, payload, key):
             "催办正文须为1—2400字", web.HTTPBadRequest)
     # Re-check both source pins and any referenced original minute before send.
     api._require_current_task_sources(db, data, task)
+    api.store.require_current_assignment_sources(db, NS, data, task)
     clock = api.store.get(db, NS, "clock", "current")
     now_at = datetime.fromisoformat(clock["at"])
     contact = next((c for c in data["contacts"]

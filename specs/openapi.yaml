@@ -31,6 +31,8 @@ x-source-policy:
   policy_source_commit: 224fbe00b03df312791856f3e76850cd55baa848
   policy_sha256: 6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896
   current_access_validator: boss_source_access.require_current_simulated_source
+  current_business_access_validator: boss_source_access.require_current_business_source
+  external_adoption: 原文有效性与外部记录采用分别核查；传递来源变化后需要明确重新导入当前记录，来源确认不直接恢复采用资格。
   effective_clock: objects/clock/current.at
   usable_state: VALID
   states: [RECEIVED, VALID, INCOMPLETE, CONFLICTED, SUPERSEDED, WITHDRAWN, EXPIRED]
@@ -41,7 +43,7 @@ x-source-policy:
   receipt_compatibility: committed business receipts remain readable; no business action replay
   assignment_binding: initial assignment_source_binding pins creation-time source versions and full SHA256; explicit owner review archives the known binding and confirms current source adoption without changing business status
   assignment_execution: Store.create_assignment and Store.send_assignment check current source and coordinator validity; completion rechecks the binding in the same transaction
-  legacy_assignments: missing binding returns 409 before new send or completion; AssignmentSourcesAPI provides explicit owner confirmation of current materials without inferring historical bindings
+  legacy_assignments: missing complete binding or task source_versions requires explicit owner review; AssignmentSourcesAPI preserves known bindings and confirms current materials without inferring unknown history
   feedback_binding: new feedback pins submitted evidence versions, full SHA256 and source states; completion rechecks the submitted evidence independently of task creation sources
   legacy_feedback: missing complete evidence binding returns 409 before completion and requires a fresh explicit result submission
   historical_feedback: canceled tasks keep late evidence as historical only, including expired evidence metadata; source identity, owner and type remain mandatory

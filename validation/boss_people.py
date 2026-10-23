@@ -15,7 +15,8 @@ from aiohttp import web
 from business import checksum, now, require
 from boss_owner_preferences import effective_owner_goals
 from boss_meetings import meeting_materials
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
+from boss_supply_quality import external_adoption
 from boss_source_policy import source_validity
 
 NS = "ui-check"
@@ -76,7 +77,7 @@ def _sources(api, db, data, refs):
                 and doc.get("access_scope") == data["owner_id"]
                 and doc.get("source_type") == "SIMULATED",
                 "来源不在当前获准范围或已经撤销", web.HTTPForbidden)
-        require_current_simulated_source(doc, data["owner_id"], api.store.get(db, NS, "clock", "current")["at"])
+        require_current_business_source(api.store, db, NS, data["owner_id"], identifier)
         require(doc["version"] == version, "资料版本已变化", web.HTTPConflict)
         sources.append({
             "source_id": identifier, "version": version,
@@ -295,6 +296,8 @@ def meeting_impacts(db, meeting):
         for pin in pins:
             source = _get(db, "document", pin["source_id"])
             if not source or source.get("withdrawn") or source.get("version") != pin["version"] or source.get("access_scope") != "boss-1" or source_validity(source, _get(db, "clock", "current")["at"]) != "VALID":
+                valid = False
+            elif external_adoption(db, NS, _get(db, "initial", "snapshot"), _get(db, "clock", "current")["at"], source)["state"] == "NEEDS_REIMPORT":
                 valid = False
         result.append({
             "brief_id": row["brief_id"], "version": row["version"],

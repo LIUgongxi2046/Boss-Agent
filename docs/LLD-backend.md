@@ -96,6 +96,8 @@ GET /api/boss/ui/supply-quality调用SupplyQualityAPI.read_http(role,query_strin
 
 读取复用SI09/SI10及SI13当前来源入口，提供来源、版本、业务观察时间、失败状态、可用量/覆盖计算及批次追溯范围。维护只获得独立技术元信息。服务沿用10秒SQLite连接期限；当前模拟模式不产生网络等待，TIMED_OUT为显式模拟的外部结果，自动重试次数为零。真实外部超时、额度、调用质量和第三方投递另行验证。未知输入400、未认证401、越权403、对象不存在404、版本/摘要冲突409、失效来源410，拒绝时不产生部分业务写入。
 
+当前业务消费者使用require_current_business_source(store,db,namespace,owner_id,source_id)，核查原文身份与有效性，以及明确外部记录的完整采用依据；状态读取使用external_adoption。会议准备、会面、行程、纪要、消息和私人日历附件已接入；催办同时检查任务完整来源绑定。Store创建的所有新交办均保存source_versions，既有交办缺少该字段时通过本人来源复核建立当前采用版本。公共原文、研究及其模型消费者需要W2/W3在相同集成版本接入，不能仅检查原文VALID。
+
 `GET /api/boss/ui/simulation-query`为BOSS-only，调用`SimulationAPI(store).query_http(role,query_string)`；`GET /api/boss/ui/simulation-inspect`为MAINTAINER-only，调用`inspect_http`。使用当前nanobot GET读取通道，不新增业务写入动作。interface_id必需；object_ids、product_ids以重复参数组成数组，其余参数仅允许一个值。直接领域读取为query(role,payload)、inspect(role,payload)，payload为interface_id/object_ids/filters；已有事务可使用project_in_transaction。身份由RoleChannel注入，owner/namespace/dataset参数拒绝。URI查询部分最多4096字节，超过414；候选或结果超过1000项返回413，要求缩小对象范围，不截断候选后返回不完整结果。对象选择支持业务ID、存储ID或entity_type:ID；object_id保存真实业务ID，storage_id保留资源键，record_id为entity_type:业务ID。初始嵌套记录的资源键采用获准原资料ID。
 
 当前SI07/SI08接受period_start/period_end、region_id、product_ids、legal_entity_id、customer_id、currency=CNY及source_version；期间必须完整等于已提供的BASE或CURRENT之一。SI09/SI10接受material_id、asset_owner_id、ownership_type、product_ids、legal_entity_id、customer_id、batch_id、currency及记录自身source_version，不进行单位或币种换算；技术投影在SQL内独立筛选。SI13另外接受source_version，其余接口只接受对象选择，不支持的筛选400。来源类型、访问范围、有效状态、版本、已有完整摘要逐次核查；缺少真实绑定的旧查询和交办需要复核。会议材料、会面、行程和会议草稿使用现有领域规则核查缓存上下文，当前领域核查只支持ui-check；其他空间的既有缓存正文保持不可采用并要求复核。所有Record的business_authorization_granted=false，资料正文属于不可信来源内容，不能作为系统指令或新增授权。

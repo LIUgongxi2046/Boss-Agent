@@ -17,6 +17,7 @@ from boss_owner_preferences import owner_goal_reference
 from boss_metrics import aggregate_metrics
 from boss_meetings import meeting_materials
 from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS="ui-check"
 
@@ -38,8 +39,10 @@ def _documents(db, data):
                             "source_type":"SIMULATED","excerpt":None})
             continue
         authorized=document.get("access_scope")==data["owner_id"] and document.get("source_type")=="SIMULATED"
-        validity=source_validity(document,_get(db,"clock","current")["at"]) if authorized else "FORBIDDEN"
-        status="CURRENT" if validity=="VALID" else validity
+        clock=_get(db,"clock","current")["at"]
+        validity=source_validity(document,clock) if authorized else "FORBIDDEN"
+        adoption=external_adoption(db,NS,data,clock,document) if authorized else {"state":"NOT_APPLICABLE"}
+        status="NEEDS_REVIEW" if validity=="VALID" and adoption["state"]=="NEEDS_REIMPORT" else "CURRENT" if validity=="VALID" else validity
         results.append({
             "source_id":source_id,"status":status,
             "version":document.get("version"),

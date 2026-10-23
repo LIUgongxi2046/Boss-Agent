@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from aiohttp import web
 
 from business import checksum, now, require
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
+from boss_supply_quality import DEFINITION, external_adoption
 
 NS = "ui-check"
 
@@ -62,9 +63,12 @@ class MeetingAPI:
         sources = []
         for ref in details["source_refs"]:
             document = _object(db, "document", ref["source_id"])
-            sources.append({"source_id": ref["source_id"], "version": document["version"] if document else None,
-                            "withdrawn": document.get("withdrawn", False) if document else True,
-                            "content_sha256": checksum(document) if document else None})
+            current = {"source_id": ref["source_id"], "version": document["version"] if document else None,
+                       "withdrawn": document.get("withdrawn", False) if document else True,
+                       "content_sha256": checksum(document) if document else None}
+            if document is not None and document.get("simulation_definition") == DEFINITION:
+                current["adoption"] = external_adoption(db, NS, data, self.store.get(db, NS, "clock", "current")["at"], document)
+            sources.append(current)
         impact = {"private_calendar": {"version": private["version"], "conflict": private_conflict, "private_body_exposed": False},
                   "overlapping_travel_ids": overlapping, "preparation_deadline_known": details["preparation_due_at"] is not None,
                   "requires_owner_acknowledgement": private_conflict or bool(overlapping), "external_attendance_verified": False}
@@ -138,7 +142,7 @@ class MeetingAPI:
                     and ref["source_id"] not in seen, "会议材料引用格式错误或重复", web.HTTPBadRequest)
             seen.add(ref["source_id"])
             document = self.commands._require_current_source(db, data, ref["source_id"])
-            require_current_simulated_source(document, data["owner_id"], self.store.get(db, NS, "clock", "current")["at"])
+            require_current_business_source(self.store, db, NS, data["owner_id"], ref["source_id"])
             require(document["version"] == ref["version"], "会议材料版本已经变化")
         return {key: payload[key] for key in ("purpose", "starts_at", "ends_at", "timezone", "preparation_due_at", "participant_ids", "source_refs")}
 

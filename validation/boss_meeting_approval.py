@@ -18,7 +18,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 from boss_meetings import meeting_materials
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
 
 NS = "ui-check"
 ENTRY_KINDS = frozenset({"OPINION", "SUGGESTION", "DECISION", "ASSIGNMENT_DRAFT"})
@@ -43,7 +43,7 @@ def valid_source(api, db, owner_id, source_id, version):
     require(isinstance(source_id, str) and isinstance(version, str),
             "来源和版本缺少", web.HTTPBadRequest)
     doc = api._require_current_source(db, {"owner_id": owner_id}, source_id)
-    require_current_simulated_source(doc, owner_id, api.store.get(db, NS, "clock", "current")["at"])
+    require_current_business_source(api.store, db, NS, owner_id, source_id)
     require(doc["version"] == version, "来源版本已经变化")
     return doc
 

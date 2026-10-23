@@ -86,7 +86,7 @@ class AssignmentSourcesAPI:
         current = binding is not None
         versions = binding.get("source_versions", {}) if binding is not None else {}
         fingerprints = binding.get("source_fingerprints", {}) if binding is not None else {}
-        current = current and set(versions) == set(fingerprints) == set(task["source_refs"])
+        current = current and set(versions) == set(fingerprints) == set(task["source_refs"]) and task.get("source_versions") == versions
         for identifier, document in documents.items():
             state = self._state(identifier, document, data, clock)
             origin = identifier == task.get("origin_source_id")
