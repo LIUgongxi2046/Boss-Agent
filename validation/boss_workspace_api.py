@@ -420,7 +420,10 @@ class BossWorkspaceAPI:
                 "count": len(sent), "notification_draft_only": len(sent) == 0,
             }
         if key == "authorizations":
-            rows = _object_list(db, self.namespace, "authorization")
+            rows = [row for row in _object_list(db, self.namespace, "authorization")
+                    if row.get("owner_id") == data["owner_id"]
+                    and row.get("scope") == self.namespace
+                    and row.get("issuer_identity") == "BOSS"]
             return {"authorizations": [{
                 **{k: row[k] for k in (
                     "authorization_id", "issuer_identity", "action", "target_id",
