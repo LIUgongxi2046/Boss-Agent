@@ -21,4 +21,5 @@ node_modules/
 *.key
 .work/
 fc01-n3-dist/
+fc01-n3-filter-dist/
 validation/connection.json
