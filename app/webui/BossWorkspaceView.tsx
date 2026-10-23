@@ -57,7 +57,8 @@ type Workspace = {
   calendar?: RecordItem;
   sources?: Source[]; results?: DocHit[]; query?: string;
   events?: Event[]; notifications?: Notification[]; reminders?: Reminder[];
-  deliveries?: RecordItem[]; rules?: RecordItem[];
+  deliveries?: RecordItem[]; rules?: RecordItem[]; dispatches?: RecordItem[];
+  owner_notification_preferences?: RecordItem|null;
   authorizations?: Auth[]; history?: RecordItem[]; messages?: RecordItem[];
   contacts?: RecordItem[]; meeting?: RecordItem | null;
   schedule?: RecordItem; business_clock?: string;
@@ -558,6 +559,29 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
             </button>
           </div>
         </Layer>
+        {route==="notifications"&&<Layer title="本人通知要求与抑制记录"
+          description="N08 有效版本 · 仍受 A13 技术调度约束">
+          <Fact label="本人有效策略版本">{v(w.owner_notification_preferences?.version)}</Fact>
+          <Fact label="通知状态">{w.owner_notification_preferences?
+            (w.owner_notification_preferences.notifications_enabled?"按技术规则允许":"本人暂停"):
+            "未确认本人偏好（沿用已有技术规则）"}</Fact>
+          <Fact label="阅读格式">{v(w.owner_notification_preferences?.reading_format)}</Fact>
+          <Fact label="本人免打扰">{w.owner_notification_preferences?
+            String(w.owner_notification_preferences.quiet_start)+":00 — "+
+            String(w.owner_notification_preferences.quiet_end)+":00 / "+
+            v(w.owner_notification_preferences.timezone):"尚未设置"}</Fact>
+          {(w.dispatches||[]).map((row,i)=><div className="boss-workspace-item" key={String(i)}>
+            <strong>{v(row.event_id)} · {v(row.state)}</strong>
+            <small>模拟调度原因：{v(row.reason)} · 源版本 {v(row.event_version)}</small>
+            <small>技术规则 v{v(row.rule_version)} · 本人规则 v{v(row.owner_notice_version)}</small>
+          </div>)}
+          {!(w.dispatches||[]).length&&<Empty message="当前尚无来自原 CronService 的模拟事件调度结果。"/>}
+          <div className="boss-actions">
+            <button className="boss-btn" type="button" onClick={()=>onNavigate("N08")}>
+              查看或修改本人通知要求
+            </button>
+          </div>
+        </Layer>}
         {route==="notifications"&&<Layer title="通知状态摘要">
           <Fact label="模拟事件">{(w.events||[]).length}</Fact>
           <Fact label="已生成通知">{(w.notifications||[]).length}</Fact>
