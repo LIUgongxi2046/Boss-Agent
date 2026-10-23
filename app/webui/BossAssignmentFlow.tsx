@@ -25,7 +25,7 @@ export interface TaskFeedback {
 }
 export interface TaskLinkedMessage {
   message_id: string; task_id: string;
-  type: "ASSIGNMENT_SEND" | "FOLLOWUP_MESSAGE";
+  type: "ASSIGNMENT_SEND" | "FOLLOWUP_MESSAGE" | "ASSIGNMENT_NUDGE";
   recipient_id: string; sent_at: string; send_state: string;
   delivery_state: string; reply_state: string;
   external_channel_invoked: false;
@@ -54,7 +54,7 @@ export interface MaintenanceTaskRef {
 type Action =
   | "boss.assignment.create" | "boss.assignment.send"
   | "boss.assignment.complete" | "boss.assignment.extend"
-  | "boss.assignment.cancel" | "boss.simulation.feedback"
+  | "boss.assignment.cancel" | "boss.assignment.nudge" | "boss.simulation.feedback"
   | "boss.message.draft.save";
 type Result = {
   task_id?: string; task?: { task_id: string; status: string; version: string };
@@ -260,6 +260,22 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       "正文："+message,"仅写入模拟发件箱，不会真正发送至外部人员。",
     ]);
   });
+  const prepareNudge=()=>safe(()=>{
+    if(!current?.version||!current.coordinator_id||
+       !["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status))
+      throw new Error("仅已经单独发送并处于等待反馈或进行中的任务能够催办。");
+    if(current.source_reference_state!=="CURRENT")
+      throw new Error("任务引用的资料已经变化，无法直接催办。");
+    const message=required(body,"催办正文");
+    propose("boss.assignment.nudge",{
+      task_id:current.task_id,task_version:current.version,
+      recipient_id:current.coordinator_id,body:message,
+    },"本人授权独立催办",[
+      "交办："+current.task_id+" · 当前版本 "+current.version,
+      "收件人："+current.coordinator_id,"催办正文："+message,
+      "只记录本地模拟发件，真正送达仍待核查；24小时模拟时钟内禁止重复催办。",
+    ]);
+  });
   const prepareFollowup=()=>safe(()=>{
     if(!current||!current.version||!current.coordinator_id)
       throw new Error("请先选择已保存的交办任务");
@@ -406,6 +422,11 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
                 disabled={busy||current.source_reference_state!=="CURRENT"}
                 onClick={prepareFollowup}>
                 <MessageSquareText size={15}/> 保存关联催办草稿（F08）
+              </button>
+              <button type="button" className="boss-btn boss-btn-primary"
+                disabled={busy||current.source_reference_state!=="CURRENT"}
+                onClick={prepareNudge}>
+                <MessageSquareText size={15}/> 本人核对并模拟催办
               </button>
               <button type="button" className="boss-btn" onClick={onViewMessages}>
                 打开 F08 草稿与模拟发件箱
