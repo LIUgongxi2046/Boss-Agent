@@ -2,7 +2,7 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -11,6 +11,9 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parent
 SPEC = json.loads((ROOT.parent / "specs/selection-probe.json").read_text())
+TOOL_SCHEMA_EXTENSION = json.loads((ROOT.parent / "specs/business-tools.schema.json").read_text())
+SPEC["io_schema"] = {**SPEC["io_schema"], "$id": TOOL_SCHEMA_EXTENSION["$id"],
+                     "$defs": {**SPEC["io_schema"]["$defs"], **TOOL_SCHEMA_EXTENSION["$defs"]}}
 OPERATIONS = {item["operation_id"]: item for item in SPEC["operations"]}
 
 
@@ -108,12 +111,18 @@ class Store:
         require(row is not None and row[0] == 1, "执行空间已失效")
 
     def authorize(self, ns, action, payload):
-        require(action in ("create_assignment", "send_assignment", "extend_assignment", "complete_assignment"), "动作无效", web.HTTPBadRequest)
-        auth_id = str(uuid.uuid4())
         with self.connect() as db:
-            self.active(db, ns)
-            self.put(db, ns, "authorization", auth_id, {"authorization_id": auth_id, "owner_id": "boss-1", "issuer_identity": "BOSS", "issuer": "boss-1", "source_instruction_id": str(uuid.uuid4()), "source_instruction": encode(payload), "action": action, "target_id": payload.get("task_id", "new-assignment"), "content_version": payload.get("content_version", payload.get("task_version", "1")), "scope": ns, "payload": payload, "version": "1", "revoked": False, "revoked_at": None, "valid_from": now(), "valid_until": "2027-01-01T00:00:00+08:00"})
-            self.put(db, ns, "authorization_binding", action, {"authorization_id": auth_id, "idempotency_key": checksum({"action": action, "payload": payload})})
+            db.execute("BEGIN IMMEDIATE")
+            return self.authorize_in_transaction(db, ns, action, payload)
+
+    def authorize_in_transaction(self, db, ns, action, payload):
+        require(action in ("create_assignment", "send_assignment", "extend_assignment", "complete_assignment"), "动作无效", web.HTTPBadRequest)
+        self.active(db, ns)
+        data = self.get(db, ns, "initial", "snapshot")
+        auth_id = str(uuid.uuid4())
+        issued = datetime.now(timezone.utc)
+        self.put(db, ns, "authorization", auth_id, {"authorization_id": auth_id, "owner_id": data["owner_id"], "issuer_identity": "BOSS", "issuer": data["owner_id"], "source_instruction_id": str(uuid.uuid4()), "source_instruction": encode(payload), "action": action, "target_id": payload.get("task_id", "new-assignment"), "content_version": payload.get("content_version", payload.get("task_version", "1")), "scope": ns, "payload": payload, "version": "1", "revoked": False, "revoked_at": None, "valid_from": issued.isoformat(), "valid_until": (issued + timedelta(minutes=15)).isoformat()})
+        self.put(db, ns, "authorization_binding", action, {"authorization_id": auth_id, "idempotency_key": checksum({"action": action, "payload": payload})})
         return auth_id
 
     def invoke(self, operation, payload):
@@ -170,8 +179,13 @@ class Store:
         from boss_source_access import require_current_simulated_source
         require(source_ids and len(set(source_ids)) == len(source_ids), "交办来源缺少或重复", web.HTTPBadRequest)
         clock = self.get(db, ns, "clock", "current")["at"]
-        return {source_id: require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
-                for source_id in source_ids}
+        documents = {source_id: require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
+                     for source_id in source_ids}
+        from boss_supply_quality import DEFINITION, require_external_source_dependencies
+        for document in documents.values():
+            if document.get("simulation_definition") == DEFINITION:
+                require_external_source_dependencies(self, db, ns, data, document)
+        return documents
 
     def require_current_assignment_sources(self, db, ns, data, task):
         documents = self.assignment_sources(db, ns, data, task["source_refs"])
@@ -261,11 +275,25 @@ class Store:
                 "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
 
     def create_assignment(self, db, ns, data, p):
-        require(p["coordinator_id"] == "coordinator-1" and p["related_meeting_id"] == "meeting-1" and p["related_event_ids"] == ["event-1"], "关联对象不符", web.HTTPBadRequest)
-        require(p["timezone"] == "Asia/Shanghai" and set(p["source_refs"]) == {"finance-note"}, "时区或来源不符", web.HTTPBadRequest)
+        from boss_supply_quality import DEFINITION
+        require(p["coordinator_id"] == "coordinator-1", "负责人不属于当前业务范围", web.HTTPBadRequest)
+        if p["related_meeting_id"] is not None:
+            row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='meeting' AND id=?", (ns, p["related_meeting_id"])).fetchone()
+            meeting = json.loads(row[0]) if row else data["meeting"]
+            require(meeting["meeting_id"] == p["related_meeting_id"] and meeting["owner_id"] == data["owner_id"], "关联会议不属于当前本人范围", web.HTTPForbidden)
+        require(len(set(p["related_event_ids"])) == len(p["related_event_ids"]), "关联事件重复", web.HTTPBadRequest)
+        for identifier in p["related_event_ids"]:
+            row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event' AND id=?", (ns, identifier)).fetchone()
+            event = json.loads(row[0]) if row else data["event"]
+            require(event["event_id"] == identifier and event["owner_id"] == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
         documents = self.assignment_sources(db, ns, data, p["source_refs"])
+        require(all(identifier == "finance-note" or document.get("simulation_definition") == DEFINITION for identifier, document in documents.items()),
+                "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
         self.require_current_coordinator(db, ns, data, p["coordinator_id"])
         due = datetime.fromisoformat(p["due_at"])
+        from zoneinfo import available_timezones
+        require(p["timezone"] in available_timezones(), "交办时区无效", web.HTTPBadRequest)
+        require(due.astimezone(ZoneInfo(p["timezone"])).utcoffset() == due.utcoffset(), "交办期限与时区不符", web.HTTPBadRequest)
         require(due.tzinfo is not None and due > datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]),
                 "交办期限必须晚于当前业务时间", web.HTTPBadRequest)
         task_id = str(uuid.uuid4())

@@ -6,6 +6,7 @@ from jsonschema import Draft202012Validator
 from business import ROOT, checksum, now, require
 from boss_source_access import require_current_simulated_source
 from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS = "ui-check"
 ACTION = "boss.assignment.sources.confirm"
@@ -74,7 +75,8 @@ class AssignmentSourcesAPI:
         for identifier in feedback["evidence_refs"]:
             document = _optional(db, "document", identifier)
             if (self._state(identifier, document, data, clock) != "VALID" or versions[identifier] != document["version"]
-                    or fingerprints[identifier] != checksum(document)):
+                    or fingerprints[identifier] != checksum(document)
+                    or external_adoption(db, NS, data, clock["at"], document)["state"] == "NEEDS_REIMPORT"):
                 return False
         return True
 
@@ -98,18 +100,22 @@ class AssignmentSourcesAPI:
                 if document is None or origin_pin != {"source_id": identifier, "version": document["version"], "sha256": checksum(document)}:
                     current = False
             visible = state not in {"MISSING", "FORBIDDEN"}
+            adoption = external_adoption(db, NS, data, clock["at"], document) if visible else {"state": "NOT_APPLICABLE", "dependencies": []}
+            if adoption["state"] == "NEEDS_REIMPORT":
+                current = False
             source_rows.append({"source_id": identifier, "pinned_version": pinned, "current_version": document["version"] if visible else None,
-                "source_status": state, "excerpt": document.get("content", "")[:500] if state == "VALID" else None,
+                "source_status": state, "adoption_state": adoption["state"], "adoption_dependencies": adoption["dependencies"],
+                "excerpt": document.get("content", "")[:500] if state == "VALID" and adoption["state"] != "NEEDS_REIMPORT" else None,
                 **{field: document.get(field) if visible else None for field in ("published_at", "valid_from", "valid_until")},
                 "is_minute_origin": origin})
         binding_state = "MISSING" if binding is None else "CURRENT" if current else "NEEDS_REVIEW"
         result_current = self._result_evidence(db, task, data, clock)
         history = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='assignment_source_binding_revision' AND json_extract(body,'$.task_id')=? ORDER BY json_extract(body,'$.archived_at') DESC,id DESC", (NS, task["task_id"])).fetchall()]
-        digest = checksum({"task": task, "binding": binding, "documents": documents, "clock": clock,
+        digest = checksum({"task": task, "binding": binding, "documents": documents, "clock": clock, "source_rows": source_rows,
                            "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"]})
         return {"source_type": "SIMULATED", "task": {field: task[field] for field in ("task_id", "version", "status", "purpose")},
             "binding_state": binding_state, "sources": source_rows, "review_sha256": digest, "business_at": clock["at"],
-            "can_confirm": binding_state != "CURRENT" and task["status"] in REVIEW_STATES and all(row["source_status"] == "VALID" for row in source_rows),
+            "can_confirm": binding_state != "CURRENT" and task["status"] in REVIEW_STATES and all(row["source_status"] == "VALID" and row["adoption_state"] != "NEEDS_REIMPORT" for row in source_rows),
             "result_evidence_current": result_current, "result_evidence_requires_resubmission": result_current is False,
             "history": [{field: revision[field] for field in ("before_task_version", "archived_at")}
                         | {"source_versions": revision["binding"]["source_versions"], "review_reason": revision["binding"].get("review_reason"),

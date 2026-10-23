@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:simulated-supply-quality:1.7.0",
+  "title": "采购库存与生产质量的显式模拟外部资料",
+  "$ref": "#/$defs/ImportInput",
+  "x-entity-config": {
+    "contact": {"interface": "SI02", "id": "contact_id", "state": null},
+    "material_quote": {"interface": "SI09", "id": "quote_id", "state": "state"},
+    "material_contract": {"interface": "SI09", "id": "contract_id", "state": "contract_state"},
+    "inventory_lot": {"interface": "SI09", "id": "inventory_id", "state": "quality_state"},
+    "material_consumption": {"interface": "SI09", "id": "consumption_id", "state": "state"},
+    "production_batch": {"interface": "SI10", "id": "batch_id", "state": "state"},
+    "quality_trace": {"interface": "SI10", "id": "trace_id", "state": "trace_state"},
+    "professional_record": {"interface": "SI10", "id": "professional_record_id", "state": "state"},
+    "customer_feedback": {"interface": "SI10", "id": "feedback_id", "state": null},
+    "production_event": {"interface": "SI10", "id": "event_id", "state": "state"},
+    "agriculture_observation": {"interface": "SI10", "id": "observation_id", "state": "professional_state"},
+    "feed_formula": {"interface": "SI09", "id": "formula_id", "state": "professional_state"},
+    "production_capacity": {"interface": "SI10", "id": "capacity_id", "state": null},
+    "business_order": {"interface": "SI09", "id": "order_id", "state": "status"}
+  },
+  "$defs": {
+    "Id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"},
+    "OptionalId": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+    "Version": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,8})$"},
+    "ClientId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{7,127}$"},
+    "Text": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "ShortText": {"type": "string", "minLength": 1, "maxLength": 160},
+    "Amount": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,6})?$"},
+    "Value": {"anyOf": [{"$ref": "#/$defs/Amount"}, {"type": "null"}]},
+    "Time": {"type": "string", "format": "date-time"},
+    "OptionalTime": {"type": ["string", "null"], "format": "date-time"},
+    "Ids": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"$ref": "#/$defs/Id"}},
+    "Unit": {"type": "string", "minLength": 1, "maxLength": 32},
+    "Currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "Source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observed_at", "valid_from", "valid_until", "author_contact_id"],
+      "properties": {"observed_at": {"$ref": "#/$defs/Time"}, "valid_from": {"$ref": "#/$defs/Time"}, "valid_until": {"$ref": "#/$defs/OptionalTime"}, "author_contact_id": {"$ref": "#/$defs/Id"}}
+    },
+    "contact": {
+      "type": "object", "additionalProperties": false, "required": ["contact_id", "name", "organization", "responsibility", "record_authority", "valid_from", "valid_until"],
+      "properties": {"contact_id": {"$ref": "#/$defs/Id"}, "name": {"$ref": "#/$defs/ShortText"}, "organization": {"$ref": "#/$defs/ShortText"}, "responsibility": {"$ref": "#/$defs/ShortText"}, "record_authority": {"enum": ["SIMULATED_GENERAL", "SIMULATED_PROFESSIONAL"]}, "valid_from": {"type": "string", "format": "date"}, "valid_until": {"type": "string", "format": "date"}}
+    },
+    "material_quote": {
+      "type": "object", "additionalProperties": false,
+      "required": ["quote_id", "material_id", "origin", "quoted_at", "price", "price_unit", "currency", "coverage", "state"],
+      "properties": {"quote_id": {"$ref": "#/$defs/Id"}, "material_id": {"$ref": "#/$defs/Id"}, "origin": {"$ref": "#/$defs/ShortText"}, "quoted_at": {"$ref": "#/$defs/Time"}, "price": {"$ref": "#/$defs/Value"}, "price_unit": {"$ref": "#/$defs/Unit"}, "currency": {"$ref": "#/$defs/Currency"}, "coverage": {"$ref": "#/$defs/ShortText"}, "state": {"enum": ["QUOTED", "SUPERSEDED"]}}
+    },
+    "material_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_id", "legal_entity_id", "supplier_id", "material_id", "quantity", "quantity_unit", "unit_price", "currency", "delivery_window", "settlement_state", "contract_state", "quality_requirements"],
+      "properties": {
+        "contract_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "supplier_id": {"$ref": "#/$defs/Id"}, "material_id": {"$ref": "#/$defs/Id"},
+        "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "unit_price": {"$ref": "#/$defs/Value"}, "currency": {"$ref": "#/$defs/Currency"},
+        "delivery_window": {"type": "object", "additionalProperties": false, "required": ["starts_at", "ends_at"], "properties": {"starts_at": {"$ref": "#/$defs/Time"}, "ends_at": {"$ref": "#/$defs/Time"}}},
+        "settlement_state": {"enum": ["PLANNED", "ACTIVE", "PARTIALLY_SETTLED", "SETTLED"]},
+        "contract_state": {"enum": ["DRAFT_REPORTED", "CONFIRMED_REPORTED", "RECEIVING_REPORTED", "FULFILLED_REPORTED", "CANCELED_REPORTED"]},
+        "quality_requirements": {"type": ["object", "null"], "maxProperties": 16, "additionalProperties": {"type": ["string", "null"], "maxLength": 160}}
+      }
+    },
+    "inventory_lot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inventory_id", "batch_id", "material_id", "product_id", "warehouse_id", "legal_entity_id", "asset_owner_id", "ownership_type", "customer_id", "quantity", "quantity_unit", "available_quantity", "quality_state", "expires_at", "in_transit", "contract_id", "unit_cost", "currency"],
+      "properties": {
+        "inventory_id": {"$ref": "#/$defs/Id"}, "batch_id": {"$ref": "#/$defs/Id"}, "material_id": {"$ref": "#/$defs/OptionalId"}, "product_id": {"$ref": "#/$defs/OptionalId"}, "warehouse_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "asset_owner_id": {"$ref": "#/$defs/Id"}, "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "COOPERATION"]}, "customer_id": {"$ref": "#/$defs/OptionalId"},
+        "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "available_quantity": {"$ref": "#/$defs/Value"}, "quality_state": {"enum": ["PENDING_TEST", "RELEASED", "HOLD", "RESTRICTED", "REJECTED"]},
+        "expires_at": {"$ref": "#/$defs/OptionalTime"}, "in_transit": {"type": "boolean"}, "contract_id": {"$ref": "#/$defs/OptionalId"}, "unit_cost": {"$ref": "#/$defs/Value"}, "currency": {"$ref": "#/$defs/Currency"}
+      }
+    },
+    "material_consumption": {
+      "type": "object", "additionalProperties": false,
+      "required": ["consumption_id", "material_id", "legal_entity_id", "inventory_id", "period_start", "period_end", "quantity", "daily_quantity", "quantity_unit", "unit_cost", "currency", "assumption", "state"],
+      "properties": {
+        "consumption_id": {"$ref": "#/$defs/Id"}, "material_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "inventory_id": {"$ref": "#/$defs/OptionalId"}, "period_start": {"$ref": "#/$defs/Time"}, "period_end": {"$ref": "#/$defs/Time"},
+        "quantity": {"$ref": "#/$defs/Value"}, "daily_quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "unit_cost": {"$ref": "#/$defs/Value"}, "currency": {"$ref": "#/$defs/Currency"}, "assumption": {"$ref": "#/$defs/Text"}, "state": {"enum": ["REPORTED", "CORRECTED", "CANCELED"]}
+      }
+    },
+    "production_batch": {
+      "type": "object", "additionalProperties": false,
+      "required": ["batch_id", "batch_type", "material_id", "product_id", "legal_entity_id", "customer_id", "ownership_type", "asset_owner_id", "cost_owner_id", "unit_id", "cycle_id", "quantity", "quantity_unit", "state"],
+      "properties": {"batch_id": {"$ref": "#/$defs/Id"}, "batch_type": {"enum": ["RAW_MATERIAL", "FINISHED_PRODUCT"]}, "material_id": {"$ref": "#/$defs/OptionalId"}, "product_id": {"$ref": "#/$defs/OptionalId"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "customer_id": {"$ref": "#/$defs/OptionalId"}, "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "COOPERATION"]}, "asset_owner_id": {"$ref": "#/$defs/Id"}, "cost_owner_id": {"$ref": "#/$defs/OptionalId"}, "unit_id": {"$ref": "#/$defs/Id"}, "cycle_id": {"$ref": "#/$defs/Id"}, "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "state": {"enum": ["PLANNED", "ACTIVE", "COMPLETED", "CANCELED"]}}
+    },
+    "quality_trace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["trace_id", "complaint_id", "input_batch_id", "output_batch_id", "processing_id", "inventory_id", "customer_id", "destination_quantity", "input_quantity", "output_quantity", "loss_quantity", "quantity_unit", "trace_state", "inspection_state", "professional_record_id"],
+      "properties": {"trace_id": {"$ref": "#/$defs/Id"}, "complaint_id": {"$ref": "#/$defs/OptionalId"}, "input_batch_id": {"$ref": "#/$defs/OptionalId"}, "output_batch_id": {"$ref": "#/$defs/OptionalId"}, "processing_id": {"$ref": "#/$defs/OptionalId"}, "inventory_id": {"$ref": "#/$defs/OptionalId"}, "customer_id": {"$ref": "#/$defs/OptionalId"}, "destination_quantity": {"$ref": "#/$defs/Value"}, "input_quantity": {"$ref": "#/$defs/Value"}, "output_quantity": {"$ref": "#/$defs/Value"}, "loss_quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "trace_state": {"enum": ["CONFIRMED", "POSSIBLE", "MISSING", "CONFLICTED"]}, "inspection_state": {"enum": ["PENDING_TEST", "PASS_REPORTED", "FAIL_REPORTED", "INCONCLUSIVE"]}, "professional_record_id": {"$ref": "#/$defs/OptionalId"}}
+    },
+    "professional_record": {
+      "type": "object", "additionalProperties": false,
+      "required": ["professional_record_id", "author_contact_id", "batch_id", "event_id", "observation_ids", "state", "applicability", "content", "conclusion", "followup_at"],
+      "properties": {"professional_record_id": {"$ref": "#/$defs/Id"}, "author_contact_id": {"$ref": "#/$defs/Id"}, "batch_id": {"$ref": "#/$defs/OptionalId"}, "event_id": {"$ref": "#/$defs/OptionalId"}, "observation_ids": {"$ref": "#/$defs/Ids"}, "state": {"enum": ["OBSERVED", "PENDING_REVIEW", "PROFESSIONALLY_CONFIRMED", "ACTION_REPORTED", "FOLLOWUP_PENDING", "REVIEW_RESULT_REPORTED"]}, "applicability": {"$ref": "#/$defs/Text"}, "content": {"$ref": "#/$defs/Text"}, "conclusion": {"type": ["string", "null"], "enum": ["PASS_REPORTED", "FAIL_REPORTED", "INCONCLUSIVE", null]}, "followup_at": {"$ref": "#/$defs/OptionalTime"}}
+    },
+    "customer_feedback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["feedback_id", "customer_id", "author_contact_id", "batch_id", "experiment_id", "application_version", "content", "coverage"],
+      "properties": {"feedback_id": {"$ref": "#/$defs/Id"}, "customer_id": {"$ref": "#/$defs/Id"}, "author_contact_id": {"$ref": "#/$defs/Id"}, "batch_id": {"$ref": "#/$defs/OptionalId"}, "experiment_id": {"$ref": "#/$defs/OptionalId"}, "application_version": {"type": ["string", "null"], "maxLength": 40}, "content": {"$ref": "#/$defs/Text"}, "coverage": {"$ref": "#/$defs/ShortText"}}
+    },
+    "production_event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["event_id", "legal_entity_id", "batch_ids", "complaint_id", "professional_record_id", "state", "impact", "description"],
+      "properties": {"event_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "batch_ids": {"$ref": "#/$defs/Ids"}, "complaint_id": {"$ref": "#/$defs/OptionalId"}, "professional_record_id": {"$ref": "#/$defs/OptionalId"}, "state": {"enum": ["OPEN_REPORTED", "PROFESSIONAL_REVIEW_PENDING", "ACTION_REPORTED", "FOLLOWUP_PENDING", "CLOSED_REPORTED"]}, "impact": {"enum": ["NORMAL", "IMPORTANT", "UNKNOWN"]}, "description": {"$ref": "#/$defs/Text"}}
+    },
+    "agriculture_observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_id", "batch_id", "unit_id", "measurement_method", "metric_id", "value", "unit", "coverage", "estimation_status", "error_range", "professional_state", "author_contact_id"],
+      "properties": {"observation_id": {"$ref": "#/$defs/Id"}, "batch_id": {"$ref": "#/$defs/Id"}, "unit_id": {"$ref": "#/$defs/Id"}, "measurement_method": {"$ref": "#/$defs/ShortText"}, "metric_id": {"$ref": "#/$defs/Id"}, "value": {"$ref": "#/$defs/Value"}, "unit": {"$ref": "#/$defs/Unit"}, "coverage": {"$ref": "#/$defs/ShortText"}, "estimation_status": {"enum": ["OBSERVED", "ESTIMATED", "CONFIRMED", "UNKNOWN"]}, "error_range": {"type": ["object", "null"], "additionalProperties": false, "required": ["lower", "upper"], "properties": {"lower": {"$ref": "#/$defs/Value"}, "upper": {"$ref": "#/$defs/Value"}}}, "professional_state": {"enum": ["OBSERVED", "PENDING_REVIEW", "PROFESSIONALLY_CONFIRMED"]}, "author_contact_id": {"$ref": "#/$defs/Id"}}
+    },
+    "feed_formula": {
+      "type": "object", "additionalProperties": false,
+      "required": ["formula_id", "product_id", "species", "purpose", "stage", "professional_state", "professional_record_id", "valid_from", "valid_until", "composition_complete", "ingredients"],
+      "properties": {
+        "formula_id": {"$ref": "#/$defs/Id"}, "product_id": {"$ref": "#/$defs/Id"}, "species": {"$ref": "#/$defs/ShortText"}, "purpose": {"$ref": "#/$defs/ShortText"}, "stage": {"$ref": "#/$defs/ShortText"}, "professional_state": {"enum": ["PENDING_REVIEW", "PROFESSIONALLY_CONFIRMED", "SUPERSEDED"]}, "professional_record_id": {"$ref": "#/$defs/OptionalId"}, "valid_from": {"$ref": "#/$defs/Time"}, "valid_until": {"$ref": "#/$defs/OptionalTime"}, "composition_complete": {"type": "boolean"},
+        "ingredients": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"type": "object", "additionalProperties": false, "required": ["material_id", "ratio", "ratio_unit", "quality_requirement"], "properties": {"material_id": {"$ref": "#/$defs/Id"}, "ratio": {"$ref": "#/$defs/Value"}, "ratio_unit": {"const": "tonne_per_tonne"}, "quality_requirement": {"type": ["string", "null"], "maxLength": 160}}}}
+      }
+    },
+    "production_capacity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["capacity_id", "legal_entity_id", "country", "factory_id", "process_stage_id", "product_id", "period_start", "period_end", "timezone", "capacity_quantity", "planned_quantity", "quantity_unit", "changeover_conditions"],
+      "properties": {"capacity_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "country": {"$ref": "#/$defs/ShortText"}, "factory_id": {"$ref": "#/$defs/Id"}, "process_stage_id": {"$ref": "#/$defs/Id"}, "product_id": {"$ref": "#/$defs/Id"}, "period_start": {"$ref": "#/$defs/Time"}, "period_end": {"$ref": "#/$defs/Time"}, "timezone": {"$ref": "#/$defs/ShortText"}, "capacity_quantity": {"$ref": "#/$defs/Value"}, "planned_quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "changeover_conditions": {"type": ["object", "null"], "maxProperties": 16, "additionalProperties": {"type": ["string", "null"], "maxLength": 160}}}
+    },
+    "business_order": {
+      "type": "object", "additionalProperties": false,
+      "required": ["order_id", "legal_entity_id", "customer_id", "product_id", "region_id", "quantity", "quantity_unit", "trade_type", "due_at", "amount", "currency", "status"],
+      "properties": {"order_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "customer_id": {"$ref": "#/$defs/Id"}, "product_id": {"$ref": "#/$defs/Id"}, "region_id": {"$ref": "#/$defs/Id"}, "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "trade_type": {"enum": ["EXTERNAL_SALES", "INTERNAL_USE"]}, "due_at": {"$ref": "#/$defs/Time"}, "amount": {"$ref": "#/$defs/Value"}, "currency": {"$ref": "#/$defs/Currency"}, "status": {"enum": ["OPEN", "PARTIALLY_DELIVERED", "DELIVERED_REPORTED", "CANCELED"]}}
+    },
+    "InputRecord": {
+      "type": "object", "additionalProperties": false, "required": ["entity_type", "expected_version", "source", "data"],
+      "properties": {"entity_type": {"enum": ["contact", "material_quote", "material_contract", "inventory_lot", "material_consumption", "production_batch", "quality_trace", "professional_record", "customer_feedback", "production_event", "agriculture_observation", "feed_formula", "production_capacity", "business_order"]}, "expected_version": {"$ref": "#/$defs/Version"}, "source": {"$ref": "#/$defs/Source"}, "data": {"type": "object"}},
+      "allOf": [
+        {"if": {"properties": {"entity_type": {"const": "contact"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/contact"}}}},
+        {"if": {"properties": {"entity_type": {"const": "material_quote"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_quote"}}}},
+        {"if": {"properties": {"entity_type": {"const": "material_contract"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_contract"}}}},
+        {"if": {"properties": {"entity_type": {"const": "inventory_lot"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/inventory_lot"}}}},
+        {"if": {"properties": {"entity_type": {"const": "material_consumption"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_consumption"}}}},
+        {"if": {"properties": {"entity_type": {"const": "production_batch"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/production_batch"}}}},
+        {"if": {"properties": {"entity_type": {"const": "quality_trace"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/quality_trace"}}}},
+        {"if": {"properties": {"entity_type": {"const": "professional_record"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/professional_record"}}}},
+        {"if": {"properties": {"entity_type": {"const": "customer_feedback"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/customer_feedback"}}}},
+        {"if": {"properties": {"entity_type": {"const": "production_event"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/production_event"}}}},
+        {"if": {"properties": {"entity_type": {"const": "agriculture_observation"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/agriculture_observation"}}}},
+        {"if": {"properties": {"entity_type": {"const": "feed_formula"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/feed_formula"}}}},
+        {"if": {"properties": {"entity_type": {"const": "production_capacity"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/production_capacity"}}}},
+        {"if": {"properties": {"entity_type": {"const": "business_order"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/business_order"}}}}
+      ]
+    },
+    "ImportInput": {
+      "type": "object", "additionalProperties": false, "required": ["client_request_id", "mode", "simulation_definition", "outcome", "records", "error_code"],
+      "properties": {"client_request_id": {"$ref": "#/$defs/ClientId"}, "mode": {"const": "SIMULATED"}, "simulation_definition": {"const": "si09-si10-business-v1"}, "outcome": {"enum": ["SUCCESS", "EMPTY", "FAILED", "TIMED_OUT"]}, "records": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/InputRecord"}}, "error_code": {"type": ["string", "null"], "enum": [null, "SIMULATED_UPSTREAM_FAILURE", "SIMULATED_UPSTREAM_TIMEOUT"]}},
+      "allOf": [
+        {"if": {"properties": {"outcome": {"const": "SUCCESS"}}}, "then": {"properties": {"records": {"minItems": 1}, "error_code": {"type": "null"}}}},
+        {"if": {"properties": {"outcome": {"const": "EMPTY"}}}, "then": {"properties": {"records": {"maxItems": 0}, "error_code": {"type": "null"}}}},
+        {"if": {"properties": {"outcome": {"const": "FAILED"}}}, "then": {"properties": {"records": {"maxItems": 0}, "error_code": {"const": "SIMULATED_UPSTREAM_FAILURE"}}}},
+        {"if": {"properties": {"outcome": {"const": "TIMED_OUT"}}}, "then": {"properties": {"records": {"maxItems": 0}, "error_code": {"const": "SIMULATED_UPSTREAM_TIMEOUT"}}}}
+      ]
+    },
+    "WithdrawInput": {
+      "type": "object", "additionalProperties": false, "required": ["client_request_id", "entity_type", "record_id", "expected_version", "reason"],
+      "properties": {"client_request_id": {"$ref": "#/$defs/ClientId"}, "entity_type": {"$ref": "#/$defs/InputRecord/properties/entity_type"}, "record_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}, "reason": {"$ref": "#/$defs/Text"}}
+    },
+    "CoordinateInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "interface_id", "origin_entity_type", "origin_record_id", "origin_version", "review_sha256", "purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements"],
+      "properties": {"client_request_id": {"$ref": "#/$defs/ClientId"}, "interface_id": {"enum": ["SI09", "SI10"]}, "origin_entity_type": {"$ref": "#/$defs/InputRecord/properties/entity_type"}, "origin_record_id": {"$ref": "#/$defs/Id"}, "origin_version": {"$ref": "#/$defs/Version"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "purpose": {"$ref": "#/$defs/Text"}, "coordinator_id": {"$ref": "#/$defs/Id"}, "due_at": {"$ref": "#/$defs/Time"}, "timezone": {"$ref": "#/$defs/ShortText"}, "evidence_requirements": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"$ref": "#/$defs/ShortText"}}}
+    }
+  }
+}

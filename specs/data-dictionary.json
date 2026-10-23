@@ -1,12 +1,13 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.6.0保留既有命令与五项Tool输入/结果，新增十四类当前模拟资料的只读查询和独立技术检查，正式Schema为simulation-query.schema.json。查询不新增存储对象或业务授权。旧交办经过本人来源复核建立当前绑定，未知历史不补造；旧查询需要来源及明细绑定，旧结果证据需要重新提交。历史状态、消息、原回执和原始snapshot保持。",
+    "compatibility": "1.7.0保留既有命令与五项Tool名称；当前Tool Schema由business.SPEC提供，business-tools.schema.json兼容允许无关联会议和空关联事件。原selection-probe.json保持。十四类查询继续使用simulation-query.schema.json；采购库存与生产质量使用simulated-supply-quality.schema.json和supply-quality-results.schema.json。已有回执保持原结果，来源、身份与当前采用单独检查。",
+    "external_business_storage": "simulation_definition=si09-si10-business-v1的记录统一使用external_business_record，业务字段位于data，其严格类型由simulated-supply-quality.schema.json的x-entity-config与同名$defs决定。对应同名实体中的planned定义保留完整业务设计范围；当前模拟服务覆盖由该版本化Schema明确。",
     "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
@@ -30,6 +31,24 @@
     "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}
   },
   "entities": {
+    "external_business_record": {
+      "storage": "objects/{entity_type}/{record_id}", "access": "MAINTAINER_EXPLICIT_SIMULATED_IMPORT_BOSS_CURRENT_READ", "version": "1.7.0",
+      "schema_ref": "supply-quality-results.schema.json#/$defs/StoredRecord",
+      "fields": {"record_id": {"type_ref": "identifier"}, "entity_type": {"type": "string"}, "version": {"type_ref": "version"}, "record_state": {"type": "string", "enum": ["ACTIVE", "WITHDRAWN"]}, "state": {"type": "string"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"}, "source_type": {"type": "string", "const": "SIMULATED"}, "simulation_definition": {"type": "string", "const": "si09-si10-business-v1"}, "observed_at": {"type_ref": "instant"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "author_contact_id": {"type_ref": "identifier"}, "received_at": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "data": {"type": "object", "schema_ref": "simulated-supply-quality.schema.json#/$defs/{entity_type}"}}
+    },
+    "external_record_binding": {
+      "storage": "objects/external_record_binding", "access": "SERVER_CURRENT_ADOPTION", "version": "1.7.0",
+      "fields": {"entity_type": {"type": "string"}, "record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"}, "sources": {"type": "array", "meaning": "自身及传递引用的source_id/version/source_sha256；完整摘要参与当前采用检查"}}
+    },
+    "external_import": {
+      "storage": "objects/external_import", "access": "MAINTAINER_RECEIPT_BOSS_CURRENT_STATUS", "version": "1.7.0",
+      "schema_ref": "supply-quality-results.schema.json#/$defs/ImportResult",
+      "fields": {"source_type": {"type": "string", "const": "SIMULATED"}, "simulation_definition": {"type": "string"}, "execution_namespace": {"type_ref": "identifier"}, "import_id": {"type_ref": "identifier"}, "state": {"type": "string", "enum": ["SUCCESS", "EMPTY", "FAILED", "TIMED_OUT"]}, "error_code": {"type": ["string", "null"]}, "record_count": {"type": "integer"}, "external_service_invoked": {"type": "boolean", "const": false}, "received_at": {"type_ref": "instant"}, "records": {"type": "array", "meaning": "仅记录导入对象类别、编号、版本与来源编号"}}
+    },
+    "supply_quality_coordination": {
+      "storage": "objects/supply_quality_coordination", "access": "BOSS", "version": "1.7.0", "schema_ref": "supply-quality-results.schema.json#/$defs/CoordinationLink",
+      "fields": {"link_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "interface_id": {"type": "string"}, "origin_entity_type": {"type": "string"}, "origin_record_id": {"type_ref": "identifier"}, "origin_version": {"type_ref": "version"}, "review_sha256": {"type": "string"}, "created_at": {"type_ref": "instant"}, "source_type": {"type": "string", "const": "SIMULATED"}}
+    },
     "owner_plan": {
       "storage": "objects/owner_plan", "access": "BOSS_ONLY", "version": "1",
       "fields": {

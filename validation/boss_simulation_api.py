@@ -11,17 +11,20 @@ from business import checksum, now, require
 from boss_memory import confirmed_memory
 from boss_owner_preferences import effective_owner_goals, effective_owner_notice, owner_profile
 from boss_source_policy import source_validity
+from boss_supply_quality import DEFINITION, ENTITY_CONFIG, bound_source_references
 
 SCHEMA = json.loads((Path(__file__).resolve().parents[1] / "specs/simulation-query.schema.json").read_text())
 VALIDATOR = Draft202012Validator({**SCHEMA, "$ref": "#/$defs/Query"}, format_checker=FormatChecker())
 KINDS = {
     "SI01": ("owner_goals_draft", "owner_goals_active", "owner_notice_draft", "owner_notice_active"),
-    "SI02": ("person_brief",),
+    "SI02": ("person_brief", "contact"),
     "SI03": ("meeting", "meeting_draft", "private_calendar", "calendar_share", "travel_plan"),
     "SI04": ("message_draft", "message_outbox", "message_reply", "outbox"),
     "SI05": ("meeting", "meeting_brief", "minutes", "minutes_assignment_link"),
     "SI06": ("task", "self_commitment", "feedback"),
-    "SI07": ("query",), "SI08": ("query",), "SI09": (), "SI10": (),
+    "SI07": ("query",), "SI08": ("query",),
+    "SI09": tuple(kind for kind, config in ENTITY_CONFIG.items() if config["interface"] == "SI09"),
+    "SI10": tuple(kind for kind, config in ENTITY_CONFIG.items() if config["interface"] == "SI10"),
     "SI11": ("application", "application_decision"),
     "SI12": ("research",), "SI13": ("document", "memory"),
     "SI14": ("event", "reminder", "dispatch", "delivery", "notification"),
@@ -35,14 +38,15 @@ MISSING = {
     "SI06": ["ONLY_APPROVED_SELECTION_AND_CURRENT_OWNER_ACTIONS"],
     "SI07": ["ONLY_TWO_APPROVED_TEN_DAY_PERIODS", "CAUSE_CONTRIBUTIONS_NOT_PROVIDED"],
     "SI08": ["CASH_NOT_PROVIDED", "RECEIVABLE_AGING_NOT_PROVIDED", "SETTLEMENT_DETAIL_NOT_PROVIDED"],
-    "SI09": ["APPROVED_PROCUREMENT_INVENTORY_SOURCES_NOT_PROVIDED"],
-    "SI10": ["APPROVED_PRODUCTION_QUALITY_SOURCES_NOT_PROVIDED"],
+    "SI09": ["SIMULATED_EXTERNAL_SERVICE_ONLY", "FULL_BUSINESS_COVERAGE_NOT_VERIFIED"],
+    "SI10": ["SIMULATED_EXTERNAL_SERVICE_ONLY", "FULL_BUSINESS_COVERAGE_NOT_VERIFIED"],
     "SI11": ["ONLY_APPROVED_SIMULATED_APPLICATIONS"],
     "SI12": ["PUBLIC_MARKET_WEATHER_POLICY_SOURCES_NOT_PROVIDED", "EXTERNAL_RETRIEVAL_NOT_CONFIGURED"],
     "SI13": ["ONLY_CURRENT_APPROVED_DOCUMENTS_AND_CONFIRMED_MEMORY"],
     "SI14": ["SYSTEM_NOTIFICATION_DELIVERY_NOT_VERIFIED", "FULL_RECURRING_PLANS_NOT_IMPLEMENTED"],
 }
 DETAIL_FILTERS = {"period_start", "period_end", "region_id", "product_ids", "legal_entity_id", "customer_id", "currency", "source_version"}
+SUPPLY_QUALITY_FILTERS = {"material_id", "asset_owner_id", "ownership_type", "product_ids", "legal_entity_id", "customer_id", "batch_id", "currency", "source_version"}
 MAX_RECORDS = 1000
 ID_FIELDS = {
     "profile": "owner_id", "contact": "contact_id", "metric_detail": "record_id",
@@ -80,14 +84,15 @@ def _context(db):
 def _filters(payload, context):
     require(not list(VALIDATOR.iter_errors(payload)), "模拟查询参数不符合Schema", web.HTTPBadRequest)
     interface = payload["interface_id"]
-    supported = DETAIL_FILTERS if interface in ("SI07", "SI08") else {"source_version"} if interface == "SI13" else set()
+    supported = DETAIL_FILTERS if interface in ("SI07", "SI08") else SUPPLY_QUALITY_FILTERS if interface in ("SI09", "SI10") else {"source_version"} if interface == "SI13" else set()
     filters = payload["filters"]
     require(set(filters) <= supported, "当前接口不支持所提交的筛选字段", web.HTTPBadRequest)
     if "period_start" in filters or "period_end" in filters:
         require("period_start" in filters and "period_end" in filters
                 and [filters["period_start"], filters["period_end"]] in context["periods"].values(),
                 "期间必须完整匹配获准明细的一个期间", web.HTTPBadRequest)
-    require("currency" not in filters or filters["currency"] == "CNY", "当前资料只有CNY，不能换算其他币种", web.HTTPBadRequest)
+    if interface in ("SI07", "SI08"):
+        require("currency" not in filters or filters["currency"] == "CNY", "当前资料只有CNY，不能换算其他币种", web.HTTPBadRequest)
 
 
 def _wanted(kind, identifier, ids):
@@ -166,7 +171,9 @@ class SimulationAPI:
             self._protect(db, context, record)
         if "source_version" in payload["filters"]:
             version = payload["filters"]["source_version"]
-            records = [record for record in records if any(ref["version"] == version and ref["status"] == "VALID" for ref in record["source_refs"])]
+            records = [record for record in records if any(ref["version"] == version and ref["status"] == "VALID"
+                       and (record["data"] is None or record["data"].get("simulation_definition") != DEFINITION or ref["source_id"] == record["data"]["source_id"])
+                       for ref in record["source_refs"]) and not (record["data"] is None and payload["interface_id"] in ("SI09", "SI10"))]
         return self._result(context, payload, records, "BOSS_ONLY")
 
     def _records(self, db, context, payload, technical):
@@ -194,6 +201,21 @@ class SimulationAPI:
                 if "source_version" in payload["filters"]:
                     statement += " AND json_extract(body,'$.version')=?"
                     parameters.append(payload["filters"]["source_version"])
+            if interface in ("SI09", "SI10"):
+                filters = payload["filters"]
+                for field in SUPPLY_QUALITY_FILTERS - {"product_ids", "source_version", "batch_id"}:
+                    if field in filters:
+                        statement += " AND json_extract(body,'$.data." + field + "')=?"
+                        parameters.append(filters[field])
+                if "batch_id" in filters:
+                    statement += " AND (json_extract(body,'$.data.batch_id')=? OR json_extract(body,'$.data.input_batch_id')=? OR json_extract(body,'$.data.output_batch_id')=? OR EXISTS(SELECT 1 FROM json_each(objects.body,'$.data.batch_ids') WHERE value=?))"
+                    parameters.extend([filters["batch_id"]] * 4)
+                if "product_ids" in filters:
+                    statement += " AND json_extract(body,'$.data.product_id') IN (" + ",".join("?" for _ in filters["product_ids"]) + ")"
+                    parameters.extend(filters["product_ids"])
+                if "source_version" in filters:
+                    statement += " AND json_extract(body,'$.source_version')=?"
+                    parameters.append(filters["source_version"])
             statement += " ORDER BY id LIMIT ?"
             parameters.append(MAX_RECORDS + 1)
             candidates = db.execute(statement, parameters).fetchall()
@@ -296,6 +318,12 @@ class SimulationAPI:
     def _references(self, db, context, record):
         body, kind = record["data"], record["entity_type"]
         refs = []
+        if body.get("simulation_definition") == DEFINITION and kind in ENTITY_CONFIG:
+            references = bound_source_references(db, context, kind, body)
+            if references is None:
+                record["content_state"] = "NEEDS_REVIEW"
+                return []
+            return references
         if kind == "document":
             refs.append({"source_id": record["object_id"], "version": body["version"]})
         if kind == "metric_detail":
@@ -369,7 +397,21 @@ class SimulationAPI:
             if reader(db, context, namespace) is None:
                 record.update(content_state="INACTIVE", data=None)
                 return
-        for ref in self._references(db, context, record):
+        references = self._references(db, context, record)
+        for reference in list(references):
+            document = _object(db, namespace, "document", reference["source_id"])
+            if document is not None and document.get("simulation_definition") == DEFINITION:
+                external = _object(db, namespace, document["external_entity_type"], document["external_record_id"])
+                if external is None:
+                    record["content_state"] = "NEEDS_REVIEW"
+                    continue
+                dependencies = bound_source_references(db, context, document["external_entity_type"], external)
+                if dependencies is None:
+                    record["content_state"] = "NEEDS_REVIEW"
+                else:
+                    references.extend(dependencies)
+        unique = {checksum(reference): reference for reference in references}
+        for ref in unique.values():
             require(isinstance(ref, dict) and isinstance(ref.get("source_id"), str), "来源引用字段不完整")
             source = self._source(db, context, ref["source_id"])
             status = "MISSING" if source is None else "FORBIDDEN" if source["source_id"] != ref["source_id"] or source["source_type"] != "SIMULATED" or source["access_scope"] != context["owner_id"] else source_validity(source, context["clock"])

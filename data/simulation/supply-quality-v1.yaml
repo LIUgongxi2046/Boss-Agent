@@ -1,0 +1,108 @@
+source_type: SIMULATED
+definition_id: si09-si10-business-v1
+version: '1'
+authorization_source: 原始项目计划13.18及EXTERNAL-API-SIMULATED-FIRST-20261023-W1
+purpose: 仅验证外部资料输入、数量计算、来源、状态、权限、持久重读和协调任务；不代表真实企业、行情、配方、生产或专业结论。
+external_services_invoked: false
+source_metadata: &source
+  observed_at: '2026-10-21T18:00:00+08:00'
+  valid_from: '2026-10-21T18:00:00+08:00'
+  valid_until: '2026-11-30T18:00:00+08:00'
+  author_contact_id: coordinator-1
+professional_source_metadata: &professional_source
+  <<: *source
+  author_contact_id: sim-professional-1
+initial_request:
+  client_request_id: sim-supply-quality-initial-v1
+  mode: SIMULATED
+  simulation_definition: si09-si10-business-v1
+  outcome: SUCCESS
+  error_code: null
+  records:
+    - entity_type: contact
+      expected_version: '0'
+      source: *source
+      data: {contact_id: sim-professional-1, name: 模拟专业记录作者, organization: 模拟外部资料服务, responsibility: 仅提供明确标识的模拟专业资料，无登录账号, record_authority: SIMULATED_PROFESSIONAL, valid_from: '2026-01-01', valid_until: '2026-12-31'}
+    - entity_type: material_quote
+      expected_version: '0'
+      source: *source
+      data: {quote_id: sim-quote-base-1, material_id: sim-material-1, origin: 模拟产地, quoted_at: '2026-10-20T09:00:00+08:00', price: '2000', price_unit: tonne, currency: CNY, coverage: 单项模拟原料报价，仅用于流程验证, state: QUOTED}
+    - entity_type: material_quote
+      expected_version: '0'
+      source: *source
+      data: {quote_id: sim-quote-current-1, material_id: sim-material-1, origin: 模拟产地, quoted_at: '2026-10-21T09:00:00+08:00', price: '2200', price_unit: tonne, currency: CNY, coverage: 单项模拟原料报价，仅用于流程验证, state: QUOTED}
+    - entity_type: material_contract
+      expected_version: '0'
+      source: *source
+      data: {contract_id: sim-contract-1, legal_entity_id: entity-1, supplier_id: sim-supplier-1, material_id: sim-material-1, quantity: '50', quantity_unit: tonne, unit_price: '2050', currency: CNY, delivery_window: {starts_at: '2026-10-20T08:00:00+08:00', ends_at: '2026-10-25T17:00:00+08:00'}, settlement_state: ACTIVE, contract_state: RECEIVING_REPORTED, quality_requirements: {inspection: 模拟外部检验记录，未检库存不得计入可用量}}
+    - entity_type: production_batch
+      expected_version: '0'
+      source: *source
+      data: {batch_id: sim-raw-batch-1, batch_type: RAW_MATERIAL, material_id: sim-material-1, product_id: null, legal_entity_id: entity-1, customer_id: null, ownership_type: COMPANY, asset_owner_id: entity-1, cost_owner_id: entity-1, unit_id: sim-production-unit-1, cycle_id: sim-cycle-1, quantity: '50', quantity_unit: tonne, state: ACTIVE}
+    - entity_type: production_batch
+      expected_version: '0'
+      source: *source
+      data: {batch_id: sim-finished-batch-1, batch_type: FINISHED_PRODUCT, material_id: null, product_id: product-1, legal_entity_id: entity-1, customer_id: null, ownership_type: COMPANY, asset_owner_id: entity-1, cost_owner_id: entity-1, unit_id: sim-production-unit-1, cycle_id: sim-cycle-1, quantity: '9.5', quantity_unit: tonne, state: COMPLETED}
+    - entity_type: inventory_lot
+      expected_version: '0'
+      source: *source
+      data: {inventory_id: sim-stock-available-1, batch_id: sim-raw-batch-1, material_id: sim-material-1, product_id: null, warehouse_id: sim-warehouse-1, legal_entity_id: entity-1, asset_owner_id: entity-1, ownership_type: COMPANY, customer_id: null, quantity: '20', quantity_unit: tonne, available_quantity: '20', quality_state: RELEASED, expires_at: '2026-11-20T18:00:00+08:00', in_transit: false, contract_id: sim-contract-1, unit_cost: null, currency: CNY}
+    - entity_type: inventory_lot
+      expected_version: '0'
+      source: *source
+      data: {inventory_id: sim-stock-pending-1, batch_id: sim-raw-batch-1, material_id: sim-material-1, product_id: null, warehouse_id: sim-warehouse-1, legal_entity_id: entity-1, asset_owner_id: entity-1, ownership_type: COMPANY, customer_id: null, quantity: '5', quantity_unit: tonne, available_quantity: '0', quality_state: PENDING_TEST, expires_at: '2026-11-20T18:00:00+08:00', in_transit: false, contract_id: sim-contract-1, unit_cost: null, currency: CNY}
+    - entity_type: inventory_lot
+      expected_version: '0'
+      source: *source
+      data: {inventory_id: sim-stock-transit-1, batch_id: sim-raw-batch-1, material_id: sim-material-1, product_id: null, warehouse_id: sim-warehouse-1, legal_entity_id: entity-1, asset_owner_id: entity-1, ownership_type: COMPANY, customer_id: null, quantity: '8', quantity_unit: tonne, available_quantity: '0', quality_state: RELEASED, expires_at: '2026-11-20T18:00:00+08:00', in_transit: true, contract_id: sim-contract-1, unit_cost: null, currency: CNY}
+    - entity_type: inventory_lot
+      expected_version: '0'
+      source: *source
+      data: {inventory_id: sim-stock-finished-1, batch_id: sim-finished-batch-1, material_id: null, product_id: product-1, warehouse_id: sim-warehouse-1, legal_entity_id: entity-1, asset_owner_id: entity-1, ownership_type: COMPANY, customer_id: null, quantity: '3.5', quantity_unit: tonne, available_quantity: '0', quality_state: HOLD, expires_at: '2026-11-20T18:00:00+08:00', in_transit: false, contract_id: null, unit_cost: null, currency: CNY}
+    - entity_type: material_consumption
+      expected_version: '0'
+      source: *source
+      data: {consumption_id: sim-consumption-1, material_id: sim-material-1, legal_entity_id: entity-1, inventory_id: sim-stock-available-1, period_start: '2026-10-20T18:00:00+08:00', period_end: '2026-10-21T18:00:00+08:00', quantity: '2', daily_quantity: '2', quantity_unit: tonne, unit_cost: null, currency: CNY, assumption: 'SIMULATED：日耗用2吨仅用于覆盖天数流程检查，不代表真实经营预测。库存为外部报告余额，不重复扣减。', state: REPORTED}
+    - entity_type: agriculture_observation
+      expected_version: '0'
+      source: *professional_source
+      data: {observation_id: sim-observation-1, batch_id: sim-finished-batch-1, unit_id: sim-production-unit-1, measurement_method: SIMULATED_REVIEW_INPUT, metric_id: sim-quality-observation, value: null, unit: score, coverage: 模拟批次核查，数值结果尚未提供, estimation_status: UNKNOWN, error_range: null, professional_state: PENDING_REVIEW, author_contact_id: sim-professional-1}
+    - entity_type: professional_record
+      expected_version: '0'
+      source: *professional_source
+      data: {professional_record_id: sim-quality-review-1, author_contact_id: sim-professional-1, batch_id: sim-finished-batch-1, event_id: sim-production-event-1, observation_ids: [sim-observation-1], state: PENDING_REVIEW, applicability: 'SIMULATED：仅当前模拟批次及客诉流程', content: 'SIMULATED：当前专业核查尚未完成，需要继续提供检验和处置资料。没有真实专业结论或质量放行动作。', conclusion: null, followup_at: '2026-10-24T17:00:00+08:00'}
+    - entity_type: professional_record
+      expected_version: '0'
+      source: *professional_source
+      data: {professional_record_id: sim-formula-review-1, author_contact_id: sim-professional-1, batch_id: null, event_id: null, observation_ids: [], state: PROFESSIONALLY_CONFIRMED, applicability: 'SIMULATED：单项原料比例的程序计算检查', content: 'SIMULATED：确认仅表示模拟服务提供的流程状态，单项原料比例不构成真实饲料配方或专业建议。', conclusion: PASS_REPORTED, followup_at: null}
+    - entity_type: customer_feedback
+      expected_version: '0'
+      source: *source
+      data: {feedback_id: sim-complaint-1, customer_id: customer-1, author_contact_id: coordinator-1, batch_id: sim-finished-batch-1, experiment_id: null, application_version: null, content: 'SIMULATED：客户对当前批次提出品质核查请求，专业原因尚未确认。', coverage: 单个模拟客户与明确批次}
+    - entity_type: production_event
+      expected_version: '0'
+      source: *source
+      data: {event_id: sim-production-event-1, legal_entity_id: entity-1, batch_ids: [sim-finished-batch-1], complaint_id: sim-complaint-1, professional_record_id: sim-quality-review-1, state: PROFESSIONAL_REVIEW_PENDING, impact: IMPORTANT, description: 'SIMULATED：等待专业核查的生产质量事项。老板协调任务与外部事件分别维护。'}
+    - entity_type: quality_trace
+      expected_version: '0'
+      source: *source
+      data: {trace_id: sim-trace-stock-1, complaint_id: sim-complaint-1, input_batch_id: sim-raw-batch-1, output_batch_id: sim-finished-batch-1, processing_id: sim-processing-1, inventory_id: sim-stock-finished-1, customer_id: null, destination_quantity: '3.5', input_quantity: '10', output_quantity: '9.5', loss_quantity: '0.5', quantity_unit: tonne, trace_state: CONFIRMED, inspection_state: PENDING_TEST, professional_record_id: sim-quality-review-1}
+    - entity_type: quality_trace
+      expected_version: '0'
+      source: *source
+      data: {trace_id: sim-trace-customer-1, complaint_id: sim-complaint-1, input_batch_id: sim-raw-batch-1, output_batch_id: sim-finished-batch-1, processing_id: sim-processing-1, inventory_id: null, customer_id: customer-1, destination_quantity: '6', input_quantity: '10', output_quantity: '9.5', loss_quantity: '0.5', quantity_unit: tonne, trace_state: CONFIRMED, inspection_state: PENDING_TEST, professional_record_id: sim-quality-review-1}
+    - entity_type: feed_formula
+      expected_version: '0'
+      source: *professional_source
+      data: {formula_id: sim-formula-1, product_id: product-1, species: 模拟品种, purpose: 仅验证程序计算, stage: 模拟流程, professional_state: PROFESSIONALLY_CONFIRMED, professional_record_id: sim-formula-review-1, valid_from: '2026-10-20T00:00:00+08:00', valid_until: '2026-11-30T18:00:00+08:00', composition_complete: true, ingredients: [{material_id: sim-material-1, ratio: '1', ratio_unit: tonne_per_tonne, quality_requirement: 仅模拟比例，不提供真实配方或发布能力}]}
+    - entity_type: production_capacity
+      expected_version: '0'
+      source: *source
+      data: {capacity_id: sim-capacity-1, legal_entity_id: entity-1, country: SIMULATED, factory_id: factory-1, process_stage_id: sim-stage-1, product_id: product-1, period_start: '2026-10-23T08:00:00+08:00', period_end: '2026-10-24T17:00:00+08:00', timezone: Asia/Shanghai, capacity_quantity: '12', planned_quantity: '10', quantity_unit: tonne, changeover_conditions: null}
+    - entity_type: business_order
+      expected_version: '0'
+      source: *source
+      data: {order_id: sim-order-1, legal_entity_id: entity-1, customer_id: customer-1, product_id: product-1, region_id: region-1, quantity: '10', quantity_unit: tonne, trade_type: EXTERNAL_SALES, due_at: '2026-10-24T17:00:00+08:00', amount: null, currency: CNY, status: OPEN}
+empty_request: {client_request_id: sim-supply-quality-empty-v1, mode: SIMULATED, simulation_definition: si09-si10-business-v1, outcome: EMPTY, records: [], error_code: null}
+failed_request: {client_request_id: sim-supply-quality-failure-v1, mode: SIMULATED, simulation_definition: si09-si10-business-v1, outcome: FAILED, records: [], error_code: SIMULATED_UPSTREAM_FAILURE}
+timeout_request: {client_request_id: sim-supply-quality-timeout-v1, mode: SIMULATED, simulation_definition: si09-si10-business-v1, outcome: TIMED_OUT, records: [], error_code: SIMULATED_UPSTREAM_TIMEOUT}

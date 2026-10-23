@@ -1,0 +1,80 @@
+{
+  "work_item_id": "T12-SI09-SI10-SIMULATED-BUSINESS",
+  "interface_version": "1.7.0",
+  "application_base": "1db1466",
+  "date": "2026-10-23",
+  "source_type": "SIMULATED",
+  "authorization_source": "原始项目计划13.18及EXTERNAL-API-SIMULATED-FIRST-20261023-W1",
+  "external_services_invoked": false,
+  "acceptance_state": "NOT_RUN",
+  "implemented": [
+    "21条明确模拟外部记录及四类导入结果",
+    "维护导入和撤销、当前身份/空间、CAS、幂等和原子持久化",
+    "自身及传递引用的来源版本和完整摘要",
+    "采购库存覆盖及报价/合同/计划假设计算",
+    "明确批次关系和加工数量单次计算",
+    "当前筛选与独立维护元信息投影",
+    "本人协调任务及已有发送/反馈/完成过程",
+    "来源更新后的停止采用和显式重新导入要求",
+    "当前Tool Schema发布与实际ToolRegistry读取",
+    "私有React组件、本人确认控制和真实SQLite交互"
+  ],
+  "full_regression": {
+    "command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-supply-quality-final -p no:cacheprovider --junitxml=.work/w1-supply-quality-final.xml --tb=short",
+    "passed": 613,
+    "seconds": 32.45,
+    "report": ".work/w1-supply-quality-final.xml",
+    "report_sha256": "b99407866505e549c876cc6a4a3653da0c19d54f03743cd6fcbdf8db43df8edc"
+  },
+  "additional_registry_check": {
+    "command": "validation/.venv/bin/python -m pytest -q app/tests/test_boss_supply_quality.py -k actual_nanobot_registry --basetemp=.work/pytest-w1-supply-quality-registry -p no:cacheprovider --junitxml=.work/w1-supply-quality-registry.xml --tb=short",
+    "passed": 1,
+    "deselected": 36,
+    "seconds": 13.79,
+    "report": ".work/w1-supply-quality-registry.xml",
+    "report_sha256": "1acaef0d92b7a6db202a7d1669a4793d704ad87428463b7156a9943f06286344",
+    "provider_request_performed": false
+  },
+  "schema_and_receipts": {
+    "command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-supply-quality-final",
+    "actual_sqlite_receipts": 838,
+    "observed_actions": 71,
+    "declared_actions": 71,
+    "result": "PASS",
+    "openapi_command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py",
+    "openapi_result": "PASS: OpenAPI3.1与YAML重复字段检查"
+  },
+  "component_check": {
+    "command": "NODE_PATH=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/product/nanobot/webui/node_modules node evidence/T12/verify_supply_quality_ui.mjs /Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/product/nanobot/webui .work/supply-quality-ui-current",
+    "environment": "actual React, happy-dom and direct local SupplyQualityAPI with SQLite",
+    "result": "PASS",
+    "report": ".work/supply-quality-ui-current/result.json",
+    "report_sha256": "c39a7370eccc309b5f59835383ffd89d7c2d27d0bf8a0b5f3538e729f5144ec9",
+    "checks": ["读取计算", "填写协调目的与期限", "本人确认", "保存及独立重读", "专业事件和库存状态独立", "失效采用禁止确认"],
+    "public_authenticated_channel": "NOT_RUN",
+    "visual": "NOT_RUN",
+    "typecheck_command": ".work/ui-typecheck/node_modules/.bin/tsc -p .work/ui-typecheck/tsconfig-integrated.json",
+    "typecheck_result": "PASS: strict/noEmit with actual nanobot dependencies"
+  },
+  "source_sha256": {
+    "validation/boss_supply_quality.py": "0de5e5861c836867e6f4dda261ea4e7bd3022d0bdde1adb2b728437b38021edb",
+    "validation/boss_supply_quality_views.py": "878852b2fc92cbd78df46695a46da8889c29bc8903e817a7c2071c4f9560fab9",
+    "specs/simulated-supply-quality.schema.json": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b",
+    "specs/supply-quality-results.schema.json": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494",
+    "specs/business-tools.schema.json": "6fd9235253e39300da85080679e8c109cfd5b70adbcf09f7662385a90d34be8d",
+    "data/simulation/supply-quality-v1.yaml": "3cc09ad2a038b2217a01c986e36c7f70474261d162003298d8b6285cc9f8f3d0"
+  },
+  "handoff": {
+    "W3": "T12主记录中的GET、WebSocket、回执身份、错误及打包清单",
+    "W2": "T12主记录中的F14/F21组件props、当前Tool Schema与领域读取",
+    "index_entry": "T12 / SI09与SI10显式模拟业务 / SupplyQualityAPI、当前来源采用、协调交办 / A12 / docs/development/T12.md"
+  },
+  "remaining": [
+    "新增公共认证分派、完整构建及完整应用操作",
+    "专题入口及公共导航对未确定请求的保护",
+    "全部原文和模型消费者的当前采用检查与相同集成版本复验",
+    "十四类完整业务范围及真实外部服务验证",
+    "完整历史迁移、安装及设备恢复",
+    "独立语义、专业质量和父任务正式验收"
+  ]
+}

@@ -2,7 +2,8 @@ import {useId, useState} from "react";
 
 type SourceStatus="VALID"|"RECEIVED"|"INCOMPLETE"|"CONFLICTED"|"SUPERSEDED"|"WITHDRAWN"|"EXPIRED"|"MISSING"|"FORBIDDEN";
 type Source={source_id:string;pinned_version:string|null;current_version:string|null;source_status:SourceStatus;excerpt:string|null;
-  published_at:string|null;valid_from:string|null;valid_until:string|null;is_minute_origin:boolean};
+  published_at:string|null;valid_from:string|null;valid_until:string|null;is_minute_origin:boolean;
+  adoption_state:"NOT_APPLICABLE"|"CURRENT"|"NEEDS_REIMPORT";adoption_dependencies:{source_id:string;version:string;status:string}[]};
 export type AssignmentSourceReviewProjection={source_type:"SIMULATED";task:{task_id:string;version:string;status:string;purpose:string};
   binding_state:"MISSING"|"CURRENT"|"NEEDS_REVIEW";sources:Source[];can_confirm:boolean;review_sha256:string;business_at:string;
   result_evidence_current:boolean|null;result_evidence_requires_resubmission:boolean;confirmed_reason:string|null;read_at:string;
@@ -69,7 +70,9 @@ export function BossAssignmentSourceReview({data,loading,error,onReload,onComman
         <p><span className="boss-tag boss-tag-amber">{SOURCE_LABELS[source.source_status]}</span> 此前版本 {source.pinned_version??"未知"} · 当前版本 {source.current_version??"未知"}</p>
         <p className="boss-helper">发布 {source.published_at??"未知"} · 有效起点 {source.valid_from??"未知"} · 有效终点 {source.valid_until??"未知"}</p>
         {source.excerpt!==null&&<blockquote>{source.excerpt}</blockquote>}
-        {source.source_status==="VALID"&&<button className="boss-btn" type="button" disabled={busy} onClick={()=>onOpenSource(source.source_id)}>查看当前原始资料</button>}
+        {source.adoption_state==="NEEDS_REIMPORT"&&<p role="status">关联资料已经变化，需要重新导入当前外部记录。</p>}
+        {source.adoption_dependencies.filter(reference=>reference.status!=="VALID").map(reference=><p className="boss-helper" key={reference.source_id}>{reference.source_id} · 采用版本 {reference.version} · 当前状态 {reference.status}</p>)}
+        {source.source_status==="VALID"&&source.adoption_state!=="NEEDS_REIMPORT"&&<button className="boss-btn" type="button" disabled={busy} onClick={()=>onOpenSource(source.source_id)}>查看当前原始资料</button>}
       </article>)}
       {data.result_evidence_requires_resubmission&&<p className="boss-status boss-status-error" role="status">结果证据需要负责人重新提交。来源确认保存后，交办继续保留当前业务状态。</p>}
       <fieldset disabled={busy||Boolean(pending)||loading||!data.can_confirm}>

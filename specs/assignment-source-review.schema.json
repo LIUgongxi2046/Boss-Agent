@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:assignment-source-review:1.6.0",
+  "$id": "urn:boss-agent:assignment-source-review:1.7.0",
   "title": "本人重新核查交办来源",
   "$ref": "#/$defs/Projection",
   "$defs": {
@@ -17,10 +17,12 @@
     },
     "Source": {
       "type": "object", "additionalProperties": false,
-      "required": ["source_id", "pinned_version", "current_version", "source_status", "excerpt", "published_at", "valid_from", "valid_until", "is_minute_origin"],
+      "required": ["source_id", "pinned_version", "current_version", "source_status", "adoption_state", "adoption_dependencies", "excerpt", "published_at", "valid_from", "valid_until", "is_minute_origin"],
       "properties": {
         "source_id": {"type": "string"}, "pinned_version": {"type": ["string", "null"]}, "current_version": {"type": ["string", "null"]},
         "source_status": {"enum": ["VALID", "RECEIVED", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED", "MISSING", "FORBIDDEN"]},
+        "adoption_state": {"enum": ["NOT_APPLICABLE", "CURRENT", "NEEDS_REIMPORT"]},
+        "adoption_dependencies": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source_id", "version", "status"], "properties": {"source_id": {"type": "string"}, "version": {"type": "string"}, "status": {"enum": ["VALID", "RECEIVED", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED", "MISSING", "FORBIDDEN", "CHANGED"]}}}},
         "excerpt": {"type": ["string", "null"]}, "published_at": {"type": ["string", "null"]},
         "valid_from": {"type": ["string", "null"]}, "valid_until": {"type": ["string", "null"]}, "is_minute_origin": {"type": "boolean"}
       }

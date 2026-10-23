@@ -73,6 +73,9 @@ class ControlStore(Store):
                     and document.get("access_scope") == data["owner_id"], "反馈证据不属于当前本人获准范围", web.HTTPForbidden)
             if not historical_only:
                 require_current_simulated_source(document, data["owner_id"], clock)
+                from boss_supply_quality import DEFINITION, require_external_source_dependencies
+                if document.get("simulation_definition") == DEFINITION:
+                    require_external_source_dependencies(self, db, ns, data, document)
             documents[source_id] = document
         feedback_id = str(uuid.uuid4())
         feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now(), "historical_only": historical_only,
@@ -116,7 +119,7 @@ class ControlStore(Store):
                     "结果缺少提交时证据绑定，需要重新提交当前证据")
             clock = self.get(db, ns, "clock", "current")["at"]
             for source_id in set(task["source_refs"]) | set(feedback["evidence_refs"]):
-                document = require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
+                document = self.assignment_sources(db, ns, data, [source_id])[source_id]
                 if source_id in task.get("source_versions", {}):
                     require(document["version"] == task["source_versions"][source_id], "完成依据的来源版本已经变化")
                 if source_id in versions:
@@ -149,10 +152,12 @@ class ControlStore(Store):
         data = self.get(db, ns, "initial", "snapshot")
         clock = self.get(db, ns, "clock", "current")["at"]
         results = []
+        from boss_supply_quality import external_adoption
         for source_id, indexed in rows:
             document = self.get(db, ns, "document", source_id)
             if (document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"]
-                    and source_validity(document, clock) == "VALID"):
+                    and source_validity(document, clock) == "VALID"
+                    and external_adoption(db, ns, data, clock, document)["state"] != "NEEDS_REIMPORT"):
                 require(indexed == document["content"], "资料索引与当前原文不一致，需要重新摄取")
                 results.append({"source_id": source_id, "content": document["content"]})
         return {"results": results}

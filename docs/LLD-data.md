@@ -187,9 +187,21 @@ flowchart LR
 
 ## 事务、重置与恢复
 
+### SI09/SI10 外部资料模拟输入
+
+依据原始项目计划13.18，外部资料采用SIMULATED输入完成内部功能，当前确定接收版本为1.7.0。原initial_materials与已批准初始校验和保持，新增资料写入当前空间独立objects记录及document来源。输入定义、用途和模拟标识保存在data/simulation/supply-quality-v1.yaml，由已有PyYAML解析，随后使用JSON Schema验证实际请求；数据仅用于当前业务功能，不代表真实企业、报价、生产或专业结论。
+
+外部记录采用record_id/entity_type/version、owner/dataset/execution_namespace、source_type、simulation_definition、record_state、observed_at/received_at、valid_from/valid_until、author_contact_id、source_id/source_version及data。data按对应实体Schema校验，禁止客户端指定权限、服务端版本和来源绑定。来源ID由实体类别与稳定业务ID确定，每次成功更新保存新document版本、完整原文摘要和实际存在的旧版本。external_record_binding另存自身及明确引用对象的来源版本与完整摘要；引用变化后当前投影要求复核，不自动采用新版本。
+
+维护身份导入外部记录和失败结果，不能签发本人授权、发送消息或确认协调任务完成。外部专业作者使用明确的模拟联系人资料，属于业务数据，不产生登录账号。采购成交、配方发布、生产排程、专业处置和质量放行只记录外部资料报告的状态，不提供相应执行动作。报价、合同价格、库存余额、耗用及计划分别保存，不相互替代；未知数值保持null，待检/受限/在途/过期库存不能计入当前可用量。覆盖天数由相同材料、法人、单位及明确日耗用假设计算，零分母或假设不足返回未知及缺少项。
+
+批次关系由明确来源、稳定ID和CONFIRMED/POSSIBLE/MISSING/CONFLICTED状态提供。投入、产出和损耗只有完整且同单位时检查数量平衡；同一processing_id的已知数量与批次关系必须一致，明确流向不重复，流向总量不得超过已知产出。查询每个加工编号仅计算一次数量，各流向分别保留。数量、客户或关系未知时不补充零值或推断关联。Decimal计算使用80位上下文，输出十进制字符串，报价变化和计划假设分别提供；缺少实际成本的基期和本期来源时不计算实际成本变化。
+
+关系与传递引用由SQLite递归CTE读取；FTS5采用前检查来源有效性、版本及完整摘要。修改、撤销、重置和重新打开数据库的实际检查已记录于T12；当前接收包括36项领域检查、React/happy-dom与实际SQLite组件交互。外部记录采用状态独立于原文有效状态：关联资料变化返回NEEDS_REIMPORT，来源复核不能恢复该记录的采用资格，需要显式导入当前版本。正式数据、完整业务范围及专业质量验收单独保留。
+
 十四类模拟查询由SimulationAPI在同一只读事务取得唯一active空间，当前获准范围为boss-1及selection/1。统一Record区分对象ID、类别、实际可空版本/状态、正文状态和引用状态；data复用当前实体或已经保存的快照，STORED_RECORD不表示当前业务授权或完整上下文确认，business_authorization_granted始终false。来源失效、绑定或缓存上下文变化使data为null，版本和失效原因仍可查询。私人安排和记忆删除后不返回初始正文，本人档案使用当前适用的已确认目标。维护投影独立选择JSON元信息，不调用本人读取方法，也不加载私人正文或缓存快照。
 
-SI07/SI08直接读取获准明细，并按完整期间、区域、产品、法人、客户、CNY及来源版本筛选。已保存query仅在其全部明细符合筛选范围时返回，并核查真实query_source_binding及明细摘要；不产生新查询或替换历史结果。其余接口按明确对象ID读取，SI13另外支持来源版本；不支持的字段400。SI09/SI10缺少获准资料时返回UNAVAILABLE及具体缺少范围，不能解释为不存在采购、库存或质量事项。Schema和完整读取责任见simulation-query.schema.json与LLD-backend。
+SI07/SI08直接读取获准明细，并按完整期间、区域、产品、法人、客户、CNY及来源版本筛选。已保存query仅在其全部明细符合筛选范围时返回，并核查真实query_source_binding及明细摘要；不产生新查询或替换历史结果。SI09/SI10支持材料、法人、归属、产品、客户、批次、币种与记录自身来源版本；批次同时匹配明确的投入、产出与事件批次关系。维护筛选在独立SQL中完成。SI13另外支持来源版本；不支持的字段400。SI09/SI10没有当前有效导入资料时返回UNAVAILABLE及具体缺少范围。Schema和完整读取责任见simulation-query.schema.json与LLD-backend。
 
 所有写入在 BEGIN IMMEDIATE 内读取空间有效性、幂等回执、当前对象和授权，再保存对象、关联、授权、回执及最小审计。CAS 失败拒绝，不重复执行。原请求回执读取不产生新授权或动作。本人计划与技术调度采用同一数据库和唯一派发函数。
 

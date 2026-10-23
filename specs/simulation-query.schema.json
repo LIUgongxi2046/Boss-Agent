@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:simulation-query:1.6.0",
+  "$id": "urn:boss-agent:simulation-query:1.7.0",
   "title": "当前模拟资料查询与独立技术检查",
   "$ref": "#/$defs/Result",
   "$defs": {
@@ -17,6 +17,8 @@
             "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"},
             "region_id": {"$ref": "#/$defs/Identifier"}, "product_ids": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"$ref": "#/$defs/Identifier"}},
             "legal_entity_id": {"$ref": "#/$defs/Identifier"}, "customer_id": {"$ref": "#/$defs/Identifier"},
+            "material_id": {"$ref": "#/$defs/Identifier"}, "asset_owner_id": {"$ref": "#/$defs/Identifier"},
+            "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "PARTNER"]},
             "batch_id": {"$ref": "#/$defs/Identifier"}, "purpose": {"$ref": "#/$defs/Identifier"}, "stage": {"$ref": "#/$defs/Identifier"},
             "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "source_version": {"type": "string", "pattern": "^[0-9]+$"}
           }

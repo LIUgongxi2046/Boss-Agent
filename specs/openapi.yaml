@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.6.0
-  description: 当前HTTP读取、58项基线命令、10项W1领域动作、5项工具与14类模拟资料接口；当前版本的公开集成、来源不足和未运行验收分别标记。
+  version: 1.7.0
+  description: 当前HTTP读取、58项基线命令、13项W1领域动作、5项工具与14类模拟资料接口；包含明确SIMULATED的采购库存与生产质量导入、查询和本人协调，公开集成与正式验收分别记录。
 security:
   - bearerAuth: []
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.6.0
+  version: 1.7.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -52,6 +52,31 @@ x-tool-authorization-policy:
   committed_receipts: original request and content remain readable after revocation without performing another action
   tool_read_projection: read_assignment returns declared read_output fields while preserving additional server-side task metadata
 paths:
+  /api/boss/ui/supply-quality:
+    get:
+      operationId: supplyQualityRead
+      x-role: BOSS
+      x-implementation: boss_supply_quality.SupplyQualityAPI.read_http
+      x-integration: PENDING_W3
+      description: 当前空间的采购库存计算或批次关系、专业状态与协调任务；SIMULATED来源明确，全部读取在同一事务完成。
+      parameters:
+        - {name: interface_id, in: query, required: true, schema: {enum: [SI09, SI10]}}
+      responses:
+        '200': {description: 当前有效记录、来源采用状态、缺少字段和只读计算。, content: {application/json: {schema: {$ref: './supply-quality-results.schema.json#/$defs/Projection'}}}}
+        default: {$ref: '#/components/responses/Error'}
+  /api/boss/ui/supply-quality-receipt:
+    get:
+      operationId: supplyQualityReceipt
+      x-role: ACTION_ROLE
+      x-implementation: boss_supply_quality.SupplyQualityAPI.receipt_http
+      x-integration: PENDING_W3
+      description: 按原动作身份读取当前空间回执；失败和超时保留原结果，不执行重试。
+      parameters:
+        - {name: action, in: query, required: true, schema: {enum: [boss.simulation.supply_quality.import, boss.simulation.supply_quality.withdraw, boss.supply_quality.coordinate]}}
+        - {name: client_request_id, in: query, required: true, schema: {$ref: './simulated-supply-quality.schema.json#/$defs/ClientId'}}
+      responses:
+        '200': {description: 原请求记录或当前空间没有记录；未知执行结果继续要求核查。, content: {application/json: {schema: {$ref: './supply-quality-results.schema.json#/$defs/Receipt'}}}}
+        default: {$ref: '#/components/responses/Error'}
   /api/boss/ui/simulation-query:
     get:
       operationId: simulationQuery
@@ -69,6 +94,9 @@ paths:
         - {name: product_ids, in: query, style: form, explode: true, schema: {$ref: './simulation-query.schema.json#/$defs/Query/properties/filters/properties/product_ids'}}
         - {name: legal_entity_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: customer_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: material_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: asset_owner_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: ownership_type, in: query, schema: {enum: [COMPANY, CUSTOMER, PARTNER]}}
         - {name: batch_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: purpose, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: stage, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
@@ -693,6 +721,18 @@ components:
           then: {properties: {evidence_refs: {minItems: 1}}}
     AssignmentSourceConfirmation:
       $ref: './assignment-source-review.schema.json#/$defs/ConfirmationInput'
+    SupplyQualityImport:
+      $ref: './simulated-supply-quality.schema.json#/$defs/ImportInput'
+    SupplyQualityWithdraw:
+      $ref: './simulated-supply-quality.schema.json#/$defs/WithdrawInput'
+    SupplyQualityCoordinate:
+      $ref: './simulated-supply-quality.schema.json#/$defs/CoordinateInput'
+    SupplyQualityImportResult:
+      $ref: './supply-quality-results.schema.json#/$defs/ImportResult'
+    SupplyQualityWithdrawResult:
+      $ref: './supply-quality-results.schema.json#/$defs/WithdrawResult'
+    SupplyQualityCoordinateResult:
+      $ref: './supply-quality-results.schema.json#/$defs/CoordinateResult'
     CommitmentCreate:
       allOf:
         - {$ref: '#/components/schemas/CommandFields'}
@@ -1136,12 +1176,15 @@ x-websocket-operations:
   - {operationId: boss.scheduler.cancel, action: boss.scheduler.cancel, role: MAINTAINER, input: '#/components/schemas/VersionCommand', output: '#/components/schemas/BusinessReceipt', implementation: 'boss_scheduler_config.set_status', result_required: [schedule_id, version, schedule_version, enabled, canceled, external_message_sent, manual_dispatch_executed, owner_authorization_granted]}
   - {operationId: boss.scheduler.manual_run, action: boss.scheduler.manual_run, role: MAINTAINER, input: '#/components/schemas/SchedulerManualRun', output: '#/components/schemas/BusinessReceipt', implementation: 'boss_scheduler_config.manual_run', result_required: [event_id, event_version, schedule_version, rules_version, dispatch_state, dispatch_reason, business_at, manual_dispatch_executed, external_message_sent, external_delivery_verified, owner_business_authorization_granted]}
   - {operationId: assignmentSourcesConfirm, action: boss.assignment.sources.confirm, role: BOSS, input: '#/components/schemas/AssignmentSourceConfirmation', output: '#/components/schemas/BusinessReceipt', implementation: 'AssignmentSourcesAPI.execute', result_required: [source_type, task_id, version, task_version, status, authorization_id, sources_reconfirmed, business_status_unchanged, message_sent, review_sha256, result_evidence_requires_resubmission], integration: PENDING_W3}
+  - {operationId: supplyQualityImport, action: boss.simulation.supply_quality.import, role: MAINTAINER, input: '#/components/schemas/SupplyQualityImport', output: '#/components/schemas/SupplyQualityImportResult', implementation: 'SupplyQualityAPI.execute', result_required: [source_type, simulation_definition, execution_namespace, import_id, state, error_code, record_count, external_service_invoked, received_at, records], integration: PENDING_W3}
+  - {operationId: supplyQualityWithdraw, action: boss.simulation.supply_quality.withdraw, role: MAINTAINER, input: '#/components/schemas/SupplyQualityWithdraw', output: '#/components/schemas/SupplyQualityWithdrawResult', implementation: 'SupplyQualityAPI.execute', result_required: [source_type, entity_type, record_id, version, record_state, source_id, external_service_invoked], integration: PENDING_W3}
+  - {operationId: supplyQualityCoordinate, action: boss.supply_quality.coordinate, role: BOSS, input: '#/components/schemas/SupplyQualityCoordinate', output: '#/components/schemas/SupplyQualityCoordinateResult', implementation: 'SupplyQualityAPI.execute', result_required: [task_id, status, version, authorization_id, execution_namespace, persisted_at, source_type, coordination_link, external_service_invoked, purchase_executed, quality_release_executed], integration: PENDING_W3}
 x-tool-operations:
   - {operationId: query_metrics, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/query_input', output: './selection-probe.json#/io_schema/$defs/query_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.query_metrics', side_effect: QUERY_RECORD, source_entity: metric_detail}
   - {operationId: read_evidence, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/evidence_input', output: './selection-probe.json#/io_schema/$defs/evidence_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.read_evidence', side_effect: AUDIT_ONLY, source_entity: document}
-  - {operationId: create_assignment, role: BOSS_AUTHORIZED_TOOL, input: './selection-probe.json#/io_schema/$defs/assignment_input', output: './selection-probe.json#/io_schema/$defs/assignment_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.create_assignment', side_effect: TASK_WRITE, source_entity: task}
+  - {operationId: create_assignment, role: BOSS_AUTHORIZED_TOOL, input: './business-tools.schema.json#/$defs/assignment_input', output: './selection-probe.json#/io_schema/$defs/assignment_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.create_assignment', side_effect: TASK_WRITE, source_entity: task}
   - {operationId: send_assignment, role: BOSS_AUTHORIZED_TOOL, input: './selection-probe.json#/io_schema/$defs/send_input', output: './selection-probe.json#/io_schema/$defs/send_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.send_assignment', side_effect: OUTBOX_WRITE, source_entity: outbox}
-  - {operationId: read_assignment, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/read_input', output: './selection-probe.json#/io_schema/$defs/read_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.read_assignment', side_effect: AUDIT_ONLY, source_entity: task}
+  - {operationId: read_assignment, role: BOSS_INITIATED_TOOL, input: './selection-probe.json#/io_schema/$defs/read_input', output: './business-tools.schema.json#/$defs/read_output', errors: './selection-probe.json#/io_schema/$defs/error_output', implementation: 'Store.read_assignment', side_effect: AUDIT_ONLY, source_entity: task}
 x-simulation-operations:
   - {interface_id: SI01, operationId: simulationProfileRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [owner_goals, owner_notice], current_reader: 'BossPageAPI dashboard / workspace owner-goals and owner-notice', state: PARTIAL, missing: [complete organization]}
   - {interface_id: SI02, operationId: simulationContactsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [contact, person_brief], current_reader: 'BossWorkspaceAPI people', state: PARTIAL, missing: [external relationship sources]}
@@ -1151,8 +1194,8 @@ x-simulation-operations:
   - {interface_id: SI06, operationId: simulationTasksRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [task, self_commitment, feedback], current_reader: 'SimulationAPI / current tasks and historical feedback', state: PARTIAL, missing: [complete approved business source coverage]}
   - {interface_id: SI07, operationId: simulationSalesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics / read_evidence', state: PARTIAL, missing: [new approved agricultural details]}
   - {interface_id: SI08, operationId: simulationFinanceRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics cost/revenue only', state: PARTIAL, missing: [cash, receivables aging, settlement source]}
-  - {interface_id: SI09, operationId: simulationProcurementInventoryRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [agriculture_batch, agriculture_transfer], current_reader: NONE, state: UNAVAILABLE, missing: [approved quote contract inventory quality source]}
-  - {interface_id: SI10, operationId: simulationProductionQualityRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [agriculture_batch, agriculture_transfer, agriculture_observation], current_reader: NONE, state: UNAVAILABLE, missing: [approved production quality traceability professional source]}
+  - {interface_id: SI09, operationId: simulationProcurementInventoryRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [material_quote, material_contract, inventory_lot, material_consumption, feed_formula, business_order], current_reader: 'SimulationAPI / SupplyQualityAPI', state: PARTIAL_AFTER_EXPLICIT_IMPORT, missing: [real external service verification, complete business coverage]}
+  - {interface_id: SI10, operationId: simulationProductionQualityRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [production_batch, quality_trace, professional_record, customer_feedback, production_event, agriculture_observation, production_capacity], current_reader: 'SimulationAPI / SupplyQualityAPI', state: PARTIAL_AFTER_EXPLICIT_IMPORT, missing: [real external service verification, complete business coverage]}
   - {interface_id: SI11, operationId: simulationApprovalsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [application, application_decision], current_reader: 'BossWorkspaceAPI approvals', state: PARTIAL, missing: [new approved applications]}
   - {interface_id: SI12, operationId: simulationExternalSourcesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [document, research, exchange_rate], current_reader: 'BossWorkspaceAPI research', state: PARTIAL, missing: [approved public market weather policy source and retrieval]}
   - {interface_id: SI13, operationId: simulationKnowledgeRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [document, memory], current_reader: 'read_evidence / control_search / BossWorkspaceAPI knowledge', state: PARTIAL, missing: [full ingestion provenance and revocation propagation verification]}
@@ -1164,7 +1207,7 @@ x-simulation-access:
   inspect: GET /api/boss/ui/simulation-inspect -> SimulationAPI.inspect_http(role,query_string)
   schema: simulation-query.schema.json
   current_space: 服务端在同一只读事务要求唯一active空间；owner和数据集来自该空间，客户端不能指定。
-  filters: SI07/SI08支持完整期间、region_id、product_ids、legal_entity_id、customer_id、CNY和source_version；SI13支持source_version；其他接口只支持object_ids，额外筛选400。
+  filters: SI07/SI08支持完整期间、region_id、product_ids、legal_entity_id、customer_id、CNY和source_version；SI09/SI10支持material_id、asset_owner_id、ownership_type、product_ids、legal_entity_id、customer_id、batch_id、currency和自身source_version；SI13支持source_version；其他接口只支持object_ids，额外筛选400。
   http_query: interface_id必需；object_ids与product_ids采用重复参数表示数组，其余字段仅允许一个值；拒绝未知和空参数，超过4096字节返回414。直接领域调用使用Query对象，HTTP使用锁定nanobot现有GET读取通道。
   object_selection: object_ids匹配业务ID、存储ID或entity_type与冒号及相应ID；object_id保存业务ID，storage_id保存资源存储键，record_id为entity_type与冒号及业务ID。空object_ids读取该接口当前获准范围；最多100项ID，候选或结果超过1000项返回413，不截断候选后返回不完整结果。
   read_semantics: STORED_RECORD表示已保存事实或快照；business_authorization_granted始终false，业务确认和当前采用继续由正式领域动作检查。引用失效、版本或摘要变化、删除与撤销使data为null，并返回当前元信息及缺少说明。

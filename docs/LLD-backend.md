@@ -86,9 +86,19 @@ control_feedback在同一事务保存每项结果证据的实际版本、完整�
 
 ## 十四类模拟接口责任
 
+### SI09/SI10 当前实施接口
+
+当前确定接收版本1.7.0，依据原始项目计划13.18；领域行为与结果Schema已验证，当前公共接入由W3接收。SupplyQualityAPI接收显式SIMULATED资料，不连接外部服务。MAINTAINER动作boss.simulation.supply_quality.import接收client_request_id、mode=SIMULATED、simulation_definition、outcome、records和error_code；SUCCESS执行完整Schema、时间、关系、CAS及来源检查后原子保存。EMPTY不删除已有事实；FAILED/TIMED_OUT保存明确的失败尝试及原回执，分别返回502/504。相同编号继续读取原结果，不自动生成新编号重试。普通审计只包含动作、类别、对象ID、版本、来源与结果元信息。
+
+boss.simulation.supply_quality.withdraw核查当前实体版本，保存撤销状态和原文历史，并移除FTS当前条目。BOSS动作boss.supply_quality.coordinate核查当前来源与完整复核摘要，使用已有任务状态、本人授权和SQLite存储创建协调任务；不执行采购或专业业务。当前business.SPEC组合原定义和business-tools.schema.json，兼容无关联会议、空关联事件和明确注册的模拟外部来源，T02原文件保留。当前ToolRegistry继续读取同一business.SPEC。协调授权、交办、关联、原请求回执及审计在同一事务保存，授权有效期为实际时间15分钟；同一核查摘要的并发请求仅产生一个协调任务。
+
+GET /api/boss/ui/supply-quality调用SupplyQualityAPI.read_http(role,query_string)，仅接受单项interface_id=SI09或SI10。GET /api/boss/ui/supply-quality-receipt调用receipt_http，仅接受action与client_request_id，身份必须符合原动作。维护回执读取须在通用BOSS-only限制之前分派，并保持方法内部身份检查。公共写入沿用已认证webui_request通道，命中ACTION_INPUTS时调用execute。新的公开路由、构建、依赖打包和完整页面验收由W3接收，当前领域检查不登记公共入口完成。
+
+读取复用SI09/SI10及SI13当前来源入口，提供来源、版本、业务观察时间、失败状态、可用量/覆盖计算及批次追溯范围。维护只获得独立技术元信息。服务沿用10秒SQLite连接期限；当前模拟模式不产生网络等待，TIMED_OUT为显式模拟的外部结果，自动重试次数为零。真实外部超时、额度、调用质量和第三方投递另行验证。未知输入400、未认证401、越权403、对象不存在404、版本/摘要冲突409、失效来源410，拒绝时不产生部分业务写入。
+
 `GET /api/boss/ui/simulation-query`为BOSS-only，调用`SimulationAPI(store).query_http(role,query_string)`；`GET /api/boss/ui/simulation-inspect`为MAINTAINER-only，调用`inspect_http`。使用当前nanobot GET读取通道，不新增业务写入动作。interface_id必需；object_ids、product_ids以重复参数组成数组，其余参数仅允许一个值。直接领域读取为query(role,payload)、inspect(role,payload)，payload为interface_id/object_ids/filters；已有事务可使用project_in_transaction。身份由RoleChannel注入，owner/namespace/dataset参数拒绝。URI查询部分最多4096字节，超过414；候选或结果超过1000项返回413，要求缩小对象范围，不截断候选后返回不完整结果。对象选择支持业务ID、存储ID或entity_type:ID；object_id保存真实业务ID，storage_id保留资源键，record_id为entity_type:业务ID。初始嵌套记录的资源键采用获准原资料ID。
 
-当前SI07/SI08接受period_start/period_end、region_id、product_ids、legal_entity_id、customer_id、currency=CNY及source_version；期间必须完整等于已提供的BASE或CURRENT之一。SI13只另外接受source_version，其余接口只接受对象选择，不支持的筛选400。来源类型、访问范围、有效状态、版本、已有完整摘要逐次核查；缺少真实绑定的旧查询和交办需要复核。会议材料、会面、行程和会议草稿使用现有领域规则核查缓存上下文，当前领域核查只支持ui-check；其他空间的既有缓存正文保持不可采用并要求复核。所有Record的business_authorization_granted=false，资料正文属于不可信来源内容，不能作为系统指令或新增授权。
+当前SI07/SI08接受period_start/period_end、region_id、product_ids、legal_entity_id、customer_id、currency=CNY及source_version；期间必须完整等于已提供的BASE或CURRENT之一。SI09/SI10接受material_id、asset_owner_id、ownership_type、product_ids、legal_entity_id、customer_id、batch_id、currency及记录自身source_version，不进行单位或币种换算；技术投影在SQL内独立筛选。SI13另外接受source_version，其余接口只接受对象选择，不支持的筛选400。来源类型、访问范围、有效状态、版本、已有完整摘要逐次核查；缺少真实绑定的旧查询和交办需要复核。会议材料、会面、行程和会议草稿使用现有领域规则核查缓存上下文，当前领域核查只支持ui-check；其他空间的既有缓存正文保持不可采用并要求复核。所有Record的business_authorization_granted=false，资料正文属于不可信来源内容，不能作为系统指令或新增授权。
 
 结果保留真实存储版本、状态、原来源时间和顶层实际read_at。data=null时继续提供当前元信息和明确缺少项；技术检查始终data=null、sources/source_refs为空。维护读取独立使用SQLite JSON投影，只选择对象标识、类别、版本与状态，原文/私人正文/缓存快照不进入维护结果。查询不创建对象、授权、审计、回执或Runtime记录，不触发模型、外部检索、消息和Cron；原有写入继续使用正式领域动作。空结果配合PARTIAL/UNAVAILABLE及缺少范围，不能推断完整业务范围没有记录。
 
@@ -104,8 +114,8 @@ control_feedback在同一事务保存每项结果证据的实际版本、完整�
 | SI06 任务承诺 | assignment/commitment/feedback/延期/完成/取消；历史反馈领域已验证，公共接入待完成 |
 | SI07 销售 BI | query_metrics/read_evidence；当前仅获准的两个十日期间明细 |
 | SI08 财务应收 | 成本收入明细；现金、账龄和结算数据不足 |
-| SI09 采购库存 | 原料合同/库存质量等获准数据不足 |
-| SI10 生产品质 | 专业批次/追溯/措施数据不足 |
+| SI09 采购库存 | 显式模拟报价/合同/库存/耗用/比例/订单导入、覆盖和计划假设计算；真实服务与完整业务范围待验收 |
+| SI10 生产品质 | 显式模拟批次/追溯/专业记录/客诉/事件/产能；原事件、专业状态和协调任务分别保存；真实服务与完整业务范围待验收 |
 | SI11 审批 | application/decision，按材料与版本校验 |
 | SI12 外部信息 | 获准原文知识；未配置真实实时检索 |
 | SI13 知识资料 | document/FTS5/撤销；摄取与实际模型采用由 W2 验证 |
