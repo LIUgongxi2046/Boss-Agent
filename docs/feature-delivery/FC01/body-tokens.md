@@ -1,6 +1,6 @@
 # FC01.C15 正文Token
 
-task_id：FC01-N4-001；需求：FC01.C15、Desktop v6 typography、LLD-frontend第3节；状态来源为原始项目specs/feature-delivery.json。当前IMPLEMENTED，N4独立复验待执行。文档核查日期2026-10-24。
+task_id：FC01-N4-001；需求：FC01.C15、Desktop v6 typography、LLD-frontend第3节；状态来源为原始项目specs/feature-delivery.json。当前限定ACCEPTED；N4对准确候选c4bc673的C15独立复验及C18一致性检查通过，FC01十八项全部PASS。文档核查日期2026-10-24。
 
 ## 输入与实现
 
@@ -20,4 +20,4 @@ index.html SHA256为06918aeef643bc4fef211bf3143709fdf4d44ec8d71113a5816a225eff6d
 
 ## 继续条件
 
-本次产品修改仅为一条共享正文CSS规则。其余十六项独立证据按业务实现与依赖摘要接收，不重跑无变化业务全量检查。N4对准确修复候选复验C15、确认受影响范围及C18后，才可登记FC01十八项完整PASS并推进FC02。
+本次产品修改仅为一条共享正文CSS规则；N4已确认其余十六项业务证据适用，并完成C15独立复验及C18一致性判定。N3核实c4bc673与制品摘要一致，FC01限定验收记录保存于acceptance.json，当前继续FC02。未重复业务全量检查，视觉及真实外部能力保持原未执行范围。

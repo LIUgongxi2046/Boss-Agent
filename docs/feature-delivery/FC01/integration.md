@@ -1,7 +1,7 @@
 # FC01 公共集成开发记录
 
 task_id：FC01-N3；需求：FR-14/21/06/28/29；验收：FC01.C01—C18。
-状态来源：原始项目 specs/feature-delivery.json；当前 IN_PROGRESS。N4对06d5c30已确认十六项PASS；当前C15正文修复通过N3定向验证，等待准确修复候选的独立复验及C18判定，视觉NOT_RUN。
+状态来源：原始项目specs/feature-delivery.json；当前FC01限定ACCEPTED。N4对c4bc67355611bc019f3fa1ab5e6fee19e8b2af10判定18/18 PASS/GO，N3已核实集成版本及制品摘要一致，结果保存于acceptance.json。视觉NOT_RUN；当前功能已推进FC02。
 
 ## 当前代码与依据
 
@@ -45,4 +45,4 @@ RuntimeRecorder公共扩展保留配置、工具Schema/实现摘要、模拟模�
 
 ## 独立验收继续条件
 
-N4对06d5c30已给出C01—C14、C16/C17共16/18 PASS，原始判定位于N4目录docs/feature-delivery/FC01/verdict.json。当前修复的产品改动仅为.boss-workspace-item p采用16px/24px；合法标签及业务实现保持原有规则。N3已通过真实报告段落、共享正文、相关页面、尺寸及FC01键盘的定向检查，证据evidence/feature-delivery/FC01/fc01-c15-dd398d4e-a4d9-4e15-8e11-7ae6cd80c25d.json。N4需要对准确修复候选复验C15并按不变业务依赖保留其余十六项，完成C18后才可给出十八项完整PASS；本次没有重跑无变化业务全量检查。active_feature_id保持FC01。视觉、真实外部模型质量、外部送达及设备安装均NOT_RUN；旧28项父任务与192点保持原语义。read-scope的A08模式选择及完整维护恢复范围保持原独立验收责任，不扩大当前工作为全部维护后台。
+N4对准确候选c4bc673已给出C01—C18全部PASS/GO，18/18、100%，没有当前缺陷或阻止限定功能交付的条件；原始判定、preflight-c4bc673.json、body-tokens-c4bc673.json及verdict-consistency-c4bc673.json位于N4目录。N3核实当前集成HEAD、CSS及制品manifest一致，签收记录见[限定验收](acceptance.json)。十六项业务证据按不变依赖复用，C15实际独立复验，未重复业务全量检查。当前工单为原始项目docs/FC02经营查询工单.md，active_feature_id推进FC02。视觉、真实外部模型质量、外部送达及设备安装均NOT_RUN；旧28项父任务与192点保持原语义。read-scope的A08模式选择及完整维护恢复范围保持原独立验收责任。
