@@ -89,6 +89,7 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     const log = fs.openSync(path.join(diagnostics, 'desktop-service.log'), 'a', productMode ? 0o600 : 0o644);
     child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(root, '.work', 'tmp') }, stdio: ['ignore', log, log] });
+    record('service_start_requested', { service_pid: child.pid });
     child.on('error', error => { throw error; });
     const deadline = Date.now() + 20000;
     let ready = false;

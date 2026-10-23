@@ -90,8 +90,8 @@ def test_page_service_map_is_explicit_about_partial_runtime():
     service_map = json.loads((ROOT / "specs/page-service-map.json").read_text(encoding="utf-8"))
     assert service_map["page_count"] == 72
     assert len(service_map["pages"]) == 72
-    assert service_map["implemented_page_count"] == 70
-    assert service_map["placeholder_page_count"] == 2
+    assert service_map["implemented_page_count"] == 72
+    assert service_map["placeholder_page_count"] == 0
     assert all(page["actual_e2e_verified"] is False for page in service_map["pages"])
     assert all(page["visual_pixel_verified"] is False for page in service_map["pages"])
     by_id = {item["page_id"]: item for item in service_map["pages"]}
@@ -134,7 +134,7 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
     workplace_ids = re.findall(r"\b([FAND]\d{2}(?:-[A-Z]+)?):\s*\"", part)
     assert len(workplace_ids) == 23  # F10/F11 and F26/N07/N08 use dedicated v6 components
     for page_id in workplace_ids:
-        assert by_id[page_id]["component_file"] == "app/webui/BossWorkspaceView.tsx"
+        assert by_id[page_id]["component_file"] == ("app/webui/BossOwnerPlans.tsx" if page_id == "N09" else "app/webui/BossWorkspaceView.tsx")
         assert by_id[page_id]["render_status"] != "DESIGN_PLACEHOLDER_ONLY"
         assert any("/api/boss/ui/workspace/" in endpoint
                    for endpoint in by_id[page_id]["verified_http_read_routes"])
@@ -147,7 +147,7 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
         assert by_id[page_id]["render_status"] == "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA"
         assert by_id[page_id]["metrics_are_real"] is False
         assert by_id[page_id]["actual_e2e_verified"] is False
-    assert len(mapping["not_yet_built_page_ids"]) == 2
+    assert len(mapping["not_yet_built_page_ids"]) == 0
     assert set(mapping["not_yet_built_page_ids"]) == {
         id for id, row in by_id.items() if row["render_status"] == "DESIGN_PLACEHOLDER_ONLY"
     }
@@ -163,8 +163,8 @@ def test_memory_and_notification_commands_are_owner_bound():
         by_id["N06"]["code_wired_write_actions"]
     )
     assert by_id["F14"]["metrics_are_real"] is False
-    assert by_id["N01"]["render_status"] == "DESIGN_PLACEHOLDER_ONLY"  # original native AuthForm
-    assert by_id["D08"]["render_status"] == "DESIGN_PLACEHOLDER_ONLY"  # original native expired session
+    assert by_id["N01"]["component_file"] == "app/webui/BossLogin.tsx"
+    assert by_id["D08"]["component_file"] == "app/webui/BossLogin.tsx"
     assert by_id["F31"]["verified_http_read_routes"] == ["GET /api/boss/ui/workspace/evaluation"]
     assert by_id["A06"]["render_status"] == "PARTIAL_NATIVE_SKILLS_HANDOFF"
 
@@ -185,6 +185,6 @@ def test_f27_voice_capture_requires_real_upstream_transcription_and_owner_review
     assert "MediaRecorder" in voice
     assert "transcription" not in voice or "尚未启用" in voice or "当前固定开发配置默认关闭" in voice
     assert "BossVoiceAssignment.tsx" in PREPARE
-    assert set(mapping["not_yet_built_page_ids"]) == {"N01", "D08"}
+    assert set(mapping["not_yet_built_page_ids"]) == set()
     for page_id in ("D04", "D05", "D06", "D07"):
         assert by_id[page_id]["render_status"].startswith("PARTIAL_")

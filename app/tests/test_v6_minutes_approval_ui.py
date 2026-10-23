@@ -23,8 +23,8 @@ def test_real_minute_approval_routes_not_shell_placeholders():
     assert {"boss.simulation.application.seed", "boss.simulation.application.revise"} <= set(
         by_id["A03"]["code_wired_write_actions"]
     )
-    assert mapping["implemented_page_count"] == 70
-    assert mapping["placeholder_page_count"] == 2
+    assert mapping["implemented_page_count"] == 72
+    assert mapping["placeholder_page_count"] == 0
 
 
 def test_workflow_component_respects_source_and_owner_boundaries():

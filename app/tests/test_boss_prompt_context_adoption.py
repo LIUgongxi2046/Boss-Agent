@@ -173,8 +173,7 @@ def test_duplicate_or_stale_context_record_not_exposed_to_business_owner(service
 
 def test_actual_runtime_hook_uses_version_selection_and_records_metadata_only():
     source=(ROOT/"validation/application.py").read_text()
-    assert 'active_runtime_prompts(store, "ui-check")' in source
-    assert 'record_runtime_context_load(store, selected_prompts, "ui-check")' in source
+    assert 'load_runtime_prompts(store, "ui-check")' in source
     assert 'source="boss-confirmed-memory"' in source
     assert "guidance_authority_boundary" in source
     assert "technical prompts do not grant" in source.lower() or "Technical prompts do not grant" in source

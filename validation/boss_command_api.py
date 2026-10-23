@@ -153,6 +153,11 @@ class BossCommandAPI:
         "boss.owner.notice.save": "BOSS",
         "boss.owner.notice.confirm": "BOSS",
         "boss.authorization.revoke": "BOSS",
+        "boss.owner.plan.save": "BOSS",
+        "boss.owner.plan.pause": "BOSS",
+        "boss.owner.plan.resume": "BOSS",
+        "boss.owner.plan.cancel": "BOSS",
+        "boss.today.reorder": "BOSS",
     }
 
     def __init__(self, store):
@@ -169,7 +174,14 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            result = self._transaction(action, payload)
+            if action.startswith("boss.owner.plan."):
+                from boss_owner_plans import OwnerPlansAPI
+                result = OwnerPlansAPI(self.store).execute(role, action.removeprefix("boss.owner.plan."), payload)
+            elif action == "boss.today.reorder":
+                from boss_today import TodayAPI
+                result = TodayAPI(self.store).reorder(role, payload)
+            else:
+                result = self._transaction(action, payload)
             return 200, result
         except web.HTTPException as exc:
             return exc.status, {"error": ERROR_CODE.get(exc.status, "BUSINESS_REJECTED"), "status": exc.status}

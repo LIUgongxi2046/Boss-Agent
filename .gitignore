@@ -1,6 +1,7 @@
 .research-cache/
 .planning-checks/
 validation/.work/
+validation/.work-service.log
 validation/.venv/
 validation/.env
 validation/__pycache__/

@@ -32,6 +32,7 @@ SAFE_RECEIPT_FIELDS = {
     "application_id", "decision_id",
     "commitment_id", "external_message_sent", "due_at",
     "authorization_id",
+    "plan_id", "date", "item_ids",
 }
 
 

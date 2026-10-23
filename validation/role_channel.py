@@ -85,6 +85,27 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action == "boss.auth.logout":
+            request_id = envelope.get("request_id")
+            if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+                raise ValueError("退出请求缺少有效标识")
+            if role not in ("BOSS", "MAINTAINER"):
+                raise PermissionError("退出请求缺少认证身份")
+            # 单桌面内退出当前身份时，撤销该身份的全部本机访问令牌。
+            for token, identity in list(self.token_roles.items()):
+                if identity == role:
+                    self.gateway.tokens.api_tokens.pop(token, None)
+                    self.gateway.tokens.issued_tokens.pop(token, None)
+                    self.gateway.tokens.issued_token_audiences.pop(token, None)
+                    self.token_roles.pop(token, None)
+            peers = [peer for peer, identity in self.connection_roles.items() if identity == role]
+            for peer in peers:
+                self.connection_roles.pop(peer, None)
+            self.record(role, action, 200)
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": True, "result": {"signed_out": True}}))
+            for peer in peers:
+                await peer.close(code=1000, reason="身份已退出")
+            return
         # Boss business commands reuse the authenticated WebUI mutation protocol.
         # Scope is the WebSocket's server-authenticated role, not payload.role.
         # Each domain command creates a transactional idempotency receipt and
@@ -118,7 +139,10 @@ class RoleChannel(WebSocketChannel):
 
     async def _connection_loop(self, connection):
         if self.connection_roles.get(connection) == "BOSS":
-            await super()._connection_loop(connection)
+            try:
+                await super()._connection_loop(connection)
+            finally:
+                self.connection_roles.pop(connection, None)
             return
         await connection.send(json.dumps({"event": "ready", "chat_id": str(uuid.uuid4()), "client_id": "maintainer-1"}))
         try:

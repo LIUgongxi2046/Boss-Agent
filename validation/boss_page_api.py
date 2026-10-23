@@ -17,6 +17,9 @@ from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
 from boss_recovery_api import BossRecoveryAPI
 from boss_owner_preferences import owner_profile
+from boss_admin_config import memory_technical_status
+from boss_owner_plans import OwnerPlansAPI
+from boss_today import TodayAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -448,6 +451,12 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == "/api/boss/ui/admin/memory-status":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                return 200, memory_technical_status(self.store, role, self.namespace)
             if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview", "/api/boss/ui/calendar-conflict"):
                 return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
@@ -464,6 +473,12 @@ class BossPageAPI:
                 return 200, self._model_runtime(role)
             if role != "BOSS":
                 return 403, {"error": "FORBIDDEN"}
+            if path in ("/api/boss/ui/today", "/api/boss/ui/owner-plans"):
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                if path == "/api/boss/ui/today":
+                    return 200, TodayAPI(self.store).read(role)
+                return 200, OwnerPlansAPI(self.store).read(role)
             if path == "/api/boss/ui/dashboard":
                 return 200, self._dashboard()
             if path == "/api/boss/ui/model-health":

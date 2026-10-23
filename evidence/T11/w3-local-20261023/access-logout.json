@@ -1,0 +1,67 @@
+{
+  "checks": [
+    {
+      "route": "/webui/bootstrap",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/identity",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "BOSS",
+      "status": 200
+    },
+    {
+      "route": "/webui/bootstrap",
+      "role": "EXTERNAL_CONTACT",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/admin/memory-status",
+      "role": "BOSS",
+      "status": 403
+    },
+    {
+      "action": "boss.simulation.feedback",
+      "role": "BOSS",
+      "status": 403
+    },
+    {
+      "action": "boss.auth.logout",
+      "role": "BOSS",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "MAINTAINER",
+      "status": 403
+    },
+    {
+      "route": "/api/boss/ui/admin/memory-status",
+      "role": "MAINTAINER",
+      "status": 200
+    },
+    {
+      "action": "boss.assignment.create",
+      "role": "MAINTAINER",
+      "status": 403
+    },
+    {
+      "action": "boss.auth.logout",
+      "role": "MAINTAINER",
+      "status": 401
+    }
+  ],
+  "model_invoked": false,
+  "business_write": false,
+  "visual_acceptance": "NOT_RUN"
+}

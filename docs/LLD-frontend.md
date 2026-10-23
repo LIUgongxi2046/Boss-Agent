@@ -1,0 +1,111 @@
+# Boss-Agent 前端设计
+
+版本：0.1.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。本文件记录已核查工程与设计要求。T03视觉、T05/T06正式数据接口及T07输入尚未完成接收，A08保持NOT_RUN。
+
+## 1. 资产与工程映射
+
+PRD V1.2.0维护FR-01—32、AD01—16及AC。HLD 1.0.0维护唯一身份、Runtime、数据库与Cron责任。`specs/hld-72-page-map.json`维护完整72页面架构；`specs/page-service-map.json`维护当前真实源码、读取路径和写入动作。本文件引用该全量集合，不另设页面数量或缩减功能范围。
+
+固定前端为nanobot commit `1bb712d3488915ca4ed9ccc1a93067ff722f5ab9`的React 18、TypeScript、Vite工程。`scripts/prepare_boss_webui.py`把`app/webui/`加入同一认证Shell。构建目录为本worktree的`.work/product/nanobot`，正式dist位于其`nanobot/web/dist`。构建manifest记录上游和页面元数据摘要。静态HTML承担设计预览，产品使用React业务组件。
+
+实际导航使用`?bossPage=<page_id>`与浏览器history；`NATIVE`用于上游会话。N01/D08由上游认证页面承接。页面ID与角色必须同时通过`allowed`及服务端身份检查；客户端路径不授予权限。技术页面由MAINTAINER访问，业务页面由BOSS访问，D06/D07使用认证后的公共状态。
+
+## 2. 身份、数据与副作用
+
+`RoleChannel`从bootstrap秘密建立API与WebSocket token对应角色；`/api/boss/identity`返回当前服务端角色。渲染入口只能使用该结果。联系人identifier、payload.role、owner_id及URL不能替代认证。维护请求业务正文和本人确认动作必须被服务端拒绝。
+
+领域状态只由SQLite事务维护。读取采用当前认证token、`cache:no-store`和AbortController；组件显示服务器返回的source_type、对象ID、版本与日期。写入通过上游`client.requestMutation`、稳定`client_request_id`及服务端CAS。保存、校验、启用和下一任务采用分别显示。未知结果先查询原回执，不自动生成新动作。
+
+私人正文、录音及Prompt不进入通用遥测、URL或前端持久缓存。浏览器仅保留完成当前交互所需本地状态。登出及身份改变后清除业务投影、草稿和选择；异步回调需确认当前身份、对象与请求版本。服务错误显示当前失败位置和已执行结果；模型输出不更新正式状态。
+
+## 3. Token与可访问性
+
+权威值为`Boss-Agent-Desktop-Complete-v6/design-tokens.json`，公共映射为`app/webui/boss-v6.css`。全部领域组件继承相同字体、颜色、间距与焦点规则。
+
+| Token | 值 | 使用位置 |
+|---|---|---|
+| brandBlue/deepBlue | #005BAC / #073B70 | 品牌与导航 |
+| brandGreen/actionBlue | #5CA63B / #0968EA | 正常状态与操作 |
+| background/surface | #F5F7FA / #FFFFFF | 页面与卡片 |
+| text/secondaryText | #172B4D / #52647A | 正文与说明 |
+| error/focus | #B42318 / #0A64E8 | 错误与键盘焦点 |
+| typography | 16px/24px、14px/22px | 正文与辅助内容 |
+| spacing | 8px单位、18—24px卡片内边距 | 共享布局 |
+| radii | 14px卡片、9px输入框 | 卡片与表单 |
+| accessibility | 44px操作目标、2px焦点 | 键盘和指针 |
+
+字体使用Noto Sans CJK SC / PingFang SC。遵循prefers-reduced-motion。需要在1024×768、1280×800、1440×1024和200%缩放验证内容、长文本、表单错误、弹窗与滚动区域。没有批准的独立深色设计，完整界面遵循v6设计参数。视觉结果NOT_RUN。
+
+## 4. 类型与状态所有权
+
+已有类型以`BossDesktop.tsx`及对应领域组件为当前源码来源；T06 Schema确定后逐项核对序列化。本阶段不新增未经定义的API字段。
+
+```typescript
+type Role = "BOSS" | "MAINTAINER";
+type Identity = { role: Role | null; owner_id: string | null };
+type SourceAnchor = { source_id: string; version: string; start: number; end: number };
+```
+
+| 状态 | 维护者与来源 | 恢复与失效 |
+|---|---|---|
+| role | 服务端identity，Shell读取 | 失效token需要重新认证 |
+| page | URL与BossDesktop | 刷新按当前角色检查page_id |
+| selectedTaskId、sourceAnchor | BossDesktop | 跨页面保留稳定ID和来源版本 |
+| assignmentDraft、settingsDirty | 表单及Shell | 离开前确认；未经确认不发送 |
+| dashboard、tasks、meetings | 服务端投影 | 刷新重新读取，旧请求不得覆盖新对象 |
+| query产品、期间及日期 | 查询组件 | 请求绑定筛选快照，条件变化使旧结果失效 |
+| chat_id、turn_id、events | nanobot客户端 | 使用原生事件关联、恢复和取消 |
+| mutation结果 | 服务器回执 | 重连查询同一client_request_id |
+
+S00—S10适用性继承561条状态关联及N/D公共状态要求。加载、空内容、运行、等待输入、结果、失败、权限、来源变化、恢复核查和取消各自有明确反馈。页面状态不能推导交办完成、外部送达或专业结果。
+
+## 5. 组件与接口职责
+
+```mermaid
+graph TD
+  Auth[上游认证] --> Shell[BossDesktop]
+  Shell --> Read[jsonRequest 认证读取]
+  Shell --> Domain[老板领域组件]
+  Shell --> Admin[维护领域组件]
+  Shell --> Native[nanobot ThreadShell与Settings]
+  Domain --> Mutation[client.requestMutation]
+  Admin --> Mutation
+  Read --> Role[RoleChannel]
+  Mutation --> Role
+  Role --> API[BossPageAPI与BossCommandAPI]
+  API --> Store[唯一SQLite业务状态]
+```
+
+| 组件 | 输入/输出与责任 | 副作用及检查 |
+|---|---|---|
+| BossDesktop | getToken、onLogout、onStartChat、children；导航与对象选择 | 身份查询、页面读取、未保存提示 |
+| BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
+| BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
+| MaintainerPromptVersion、Scheduler等 | 服务端维护配置和当前版本 | 保存/校验/启用/采用分别核查 |
+| BossVoiceAssignment | 麦克风权限、实际转写、核查文本 | 本人确认文本后提交共同流程 |
+| Panel、Tag、Value、StatusLine | 展示数据与语义状态 | 无业务写入 |
+
+每个页面的`component_file`、`role_gate`、`verified_http_read_routes`、`code_wired_write_actions`、未完成动作及验证状态以page-service-map逐项交接。新组件进入构建白名单后才能被当前dist采用。领域props和接口更新必须同时核对调用方与拒绝路径。
+
+## 6. 事件、恢复与性能
+
+实际传输为WebSocket。无需新增SSE传输；事件使用nanobot原生解码与消息存储，成熟Markdown组件呈现模型文本，不渲染未经处理的HTML。事件关联chat_id、turn_id、request_id；工具结果与模型完成分别呈现。取消只停止尚未执行的步骤，已写入回执保留。
+
+| 条件 | 保留内容 | 页面动作与核查 |
+|---|---|---|
+| 401/登录失效 | 当前page_id和安全对象标识 | 重新认证并查询正式状态 |
+| 403 | 无正文的拒绝信息 | 返回当前身份可访问入口 |
+| 409 | 本人输入和旧版本 | 读取当前版本，核查后提交 |
+| 断流/响应未知 | client_request_id、对象ID | 查询原回执，禁止重复发送 |
+| 来源撤销/版本变化 | 历史引用及失效标记 | 停止当前采用，显示NEEDS_REVIEW |
+| 页面/对象切换 | 目标对象上下文 | 取消旧读取，拒绝过期结果 |
+| 未保存离开 | 当前草稿和焦点 | 留在原页面或明确放弃 |
+| 服务重启 | 服务端正式状态 | 新bootstrap，重新读取对象 |
+
+流式文本复用上游增量呈现与批量更新；目录搜索及可产生网络请求的筛选需要防抖。操作反馈和取消不延迟。性能数值阈值引用D05，当前未知；记录实际构建、请求耗时及渲染表现，不宣称达到未知阈值。中文IME组合期间Enter不得提交；必须验证composition与原生会话行为。
+
+## 7. 验收与接收条件
+
+T08正式接收必须包含：72页面各自组件、真实读写与事件、角色、对象/版本、全部状态、返回上下文、焦点恢复及源码位置；完整561状态与公共状态责任保留。T03提供视觉和素材结果，T05/T06提供字段及operationId，T07提供工具/事件和上下文采用；目前相关设计仍待接收。
+
+工程构建已在本机完成；业务、IME、全部页面DOM、认证恢复、200%缩放、来源撤销、断流、跨身份、系统权限与视觉验收仍待执行。T09据完整FR/AC建立独立断言；T24在相同集成版本验证持久化及后续采用。构建通过不修改A08状态。

@@ -1218,15 +1218,16 @@
         "T03",
         "T07"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/LLD-frontend.md",
+        "docs/development/T08.md",
         "specs/page-service-map.json",
         "docs/README.md",
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["T03视觉及正式素材交付、T05/T06确定接口和T07完整接收待完成；当前工程映射与构建检查不代表A08通过。"]
     },
     {
       "id": "T09",
@@ -1295,6 +1296,12 @@
         "delivery-ledger.json",
         "app/",
         "validation/boss_page_api.py",
+        "validation/application.py",
+        "validation/role_channel.py",
+        "validation/check_product_access.py",
+        "validation/desktop/",
+        "app/tests/test_product_admin_access.py",
+        "app/tests/test_boss_prompt_context_adoption.py",
         ".github/workflows/boss-agent-desktop.yml",
         "scripts/prepare_boss_webui.py",
         "scripts/run_boss_local.sh",
@@ -1302,7 +1309,7 @@
       ],
       "blockers": [
         "T05—T10 专业 LLD、OpenAPI、前端服务映射与设计评审尚未 ACCEPTED；本批为用户已授权、可回滚的研发实施切片，不得将 T11 完整验收标为通过。",
-        "开发者目标 macOS Intel 的真实 Electron 启动、DeepSeek 端到端、系统权限与截图像素对照未在本次云工具环境执行；T11/A11 运行证据尚不完整。",
+        "目标 macOS Intel 已完成真实 Electron 登录、角色权限、内容视口、身份过期、退出及重启的局部检查；全部72页面、561状态、E01—E06、系统权限和安装迁移仍需验证，视觉验收 NOT_RUN；T11/A11 证据尚不完整。",
         "上游 npm 锁定版本依赖存在审计告警，需在正式分发前分类评估影响、修复方案与回归验证，不能仅因编译成功视为安全通过。"
       ]
     },

@@ -5,23 +5,23 @@
   "source_locked": "Boss-Agent Desktop v6.0",
   "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
   "original_v6_status": "DESIGN_ONLY",
-  "implemented_page_count": 70,
-  "placeholder_page_count": 2,
+  "implemented_page_count": 72,
+  "placeholder_page_count": 0,
   "page_count": 72,
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
     "MAINTAINER": "same gateway; maintenance metadata and one simulation feedback action only",
-    "ANONYMOUS": "nanobot original login, no business access"
+    "ANONYMOUS": "BossLogin in native nanobot bootstrap and expiry states; server role verification before protected Shell"
   },
   "notes": [
-    "72 pages are navigable by already-authenticated role; this does not mean 72 completed React business pages.",
+    "70 pages use authenticated role navigation; N01 and D08 use native authentication states. All 72 have code bindings; full functionality and acceptance remain separate.",
     "Back-end HTTP GET /api/boss/ui/* routes return actual persisted selection data through BossPageAPI. Mutation actions use authenticated nanobot requestMutation, not browser-side SQLite or direct unauthenticated HTTP POST.",
     "The role-scoped commands are boss.assignment.{create,send,complete,extend,cancel} and boss.simulation.feedback; each has its own server-side command whitelist, transaction, audit, version and idempotency receipt.",
     "Task completion requires result submitted with currently valid evidence and a separate authenticated BOSS decision. Simulated feedback never marks completed.",
     "Real Mac visual snapshots, actual DeepSeek+UI complete walkthrough and end-to-end E01-E06 remain not verified in this development slice.",
     "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance.",
     "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration.",
-    "2026-10-22 implementation slice: 36 modular workplace routes and 13 agriculture coverage routes added; existing A04 counts once. 61/72 pages have at least partial real code/role-scoped read data; none of these 61 is thereby accepted as functionally complete.",
+    "All page bindings remain partial until their independent requirement and business checks complete; source coverage and metadata do not imply agricultural KPI completeness.",
     "Agriculture pages only render verified source coverage and unknown KPIs: the selected water-feed sales note is not evidence for raw-material prices and does not support other sector metrics. All sector numeric KPIs are NULL and require new approved datasets.",
     "Remaining action gaps, 561 visual states, end-to-end Mac/DeepSeek/voice/installation, source/metric completeness and pixel-accurate visual comparison are not accepted. Metadata-only page content does not satisfy PRD write or approval actions.",
     "D03 and F30 are read-only runtime diagnostic views; A06 delegates to upstream Skills catalog; F31 renders the real evaluation definition but no actual score. None is accepted as an end-to-end PRD feature.",
@@ -75,18 +75,18 @@
       "logical_architecture_route": "/app/boss/F01",
       "actual_webui_navigation": "?bossPage=F01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_READ_UI",
+      "render_status": "PARTIAL_TODAY_CLASSIFICATION_AND_OWNER_ORDER",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/dashboard"
+        "GET /api/boss/ui/dashboard",
+        "GET /api/boss/ui/today"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.today.reorder"],
+      "other_integration_points": ["app/webui/BossToday.tsx"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "today.reorder",
         "conversation.start"
       ],
       "tests": [
@@ -1561,18 +1561,18 @@
         "AC-28-E"
       ],
       "logical_architecture_route": "/app/auth/N01",
-      "actual_webui_navigation": "?bossPage=N01",
+      "actual_webui_navigation": "Native bootstrap AUTH_REQUIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_BRANDED_AUTHENTICATION_AND_SERVER_ROLE_CHECK",
+      "component_file": "app/webui/BossLogin.tsx",
+      "component_name": "BossLogin",
+      "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "auth.login"
+        "auth.full_viewport_accessibility_and_visual_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py"
@@ -2001,20 +2001,19 @@
       "logical_architecture_route": "/app/boss/N09",
       "actual_webui_navigation": "?bossPage=N09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_OWNER_PLAN_SAVE_PAUSE_RESUME_CANCEL",
+      "component_file": "app/webui/BossOwnerPlans.tsx",
+      "component_name": "BossOwnerPlans",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/plans"
+        "GET /api/boss/ui/workspace/plans",
+        "GET /api/boss/ui/owner-plans"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.owner.plan.save", "boss.owner.plan.pause", "boss.owner.plan.resume", "boss.owner.plan.cancel"],
+      "other_integration_points": ["app/webui/BossDesktop.tsx: scopedCommand"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "owner_plans.save",
-        "owner_plans.pause",
-        "owner_plans.cancel"
+        "owner_plans.repeated_model_task_and_complete_device_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
@@ -2424,18 +2423,18 @@
         "AC-28-E"
       ],
       "logical_architecture_route": "/app/auth/D08",
-      "actual_webui_navigation": "?bossPage=D08",
+      "actual_webui_navigation": "Native AUTH_EXPIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_BRANDED_REAUTHENTICATION_WITHOUT_BUSINESS_REPLAY",
+      "component_file": "app/webui/BossLogin.tsx",
+      "component_name": "BossLogin",
+      "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "auth.reauthenticate"
+        "auth.expired_session_complete_device_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py"
@@ -3030,14 +3029,15 @@
       "logical_architecture_route": "/app/maintain/A12",
       "actual_webui_navigation": "?bossPage=A12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
+      "render_status": "PARTIAL_MEMORY_TECHNICAL_STATUS_AND_SOURCE_INDEX",
       "component_file": "app/webui/BossWorkspaceView.tsx",
       "component_name": "BossWorkspaceView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/source-index"
+        "GET /api/boss/ui/workspace/source-index",
+        "GET /api/boss/ui/admin/memory-status"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["app/webui/BossDesktop.tsx: MemoryTechnicalStatus"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -3360,8 +3360,5 @@
   ],
   "business_mutation_end_to_end_accepted": false,
   "visual_all_pages_accepted": false,
-  "not_yet_built_page_ids": [
-    "N01",
-    "D08"
-  ]
+  "not_yet_built_page_ids": []
 }

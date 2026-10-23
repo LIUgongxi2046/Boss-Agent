@@ -13,6 +13,7 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
+from boss_auth_overlay import apply_auth_overlay
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_REV = "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
@@ -90,6 +91,9 @@ def copy_overlay() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
+        ("BossLogin.tsx", "BossLogin.tsx"),
+        ("BossToday.tsx", "BossToday.tsx"),
+        ("BossOwnerPlans.tsx", "BossOwnerPlans.tsx"),
         ("BossAssignmentFlow.tsx", "BossAssignmentFlow.tsx"),
         ("BossWorkspaceView.tsx", "BossWorkspaceView.tsx"),
         ("BossSectorView.tsx", "BossSectorView.tsx"),
@@ -148,9 +152,11 @@ def copy_overlay() -> None:
         '      </div>\n      </BossDesktop>\n    </ThemeProvider>\n  );\n}\n',
         "closing Shell boundary",
     )
+    previous_overlay = patched
+    patched = apply_auth_overlay(patched, one_replace)
     app_file = SRC / "App.tsx"
     existing = app_file.read_text(encoding="utf-8")
-    if existing != original and existing != patched:
+    if existing not in (original, previous_overlay, patched):
         raise RuntimeError("上游 App.tsx 存在非本工具改动；已拒绝覆盖。")
     app_file.write_text(patched, encoding="utf-8")
 

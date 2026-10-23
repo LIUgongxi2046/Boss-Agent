@@ -28,6 +28,9 @@ import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
+import { BossToday, type TodayProjection } from "./BossToday";
+import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
+import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -92,6 +95,14 @@ type ModelHealth = {
   observed_error_count?: number;
 };
 type Identity = { role: Role | null; owner_id: string | null };
+type MemoryTechnicalStatus = {
+  projection: "memory-technical-status"; namespace: string; checked_at: string;
+  memory: { memory_id: string; version: string; confirmation_state: string; valid_until: string | null };
+  future_context_eligible: boolean; future_turn_policy: string;
+  deletion_propagation: string; derived_memory_index: string;
+  model_adoption_verified: boolean; physical_secure_erasure_verified: boolean;
+  private_body_available_here: boolean; owner_content_mutation_allowed: boolean;
+};
 type Animation = "idle" | "thinking" | "complete" | "notice";
 
 type Props = {
@@ -166,6 +177,7 @@ async function jsonRequest<T>(path: string, getToken: () => string, signal?: Abo
   let payload: unknown;
   try { payload = JSON.parse(raw); } catch { payload = null; }
   if (!response.ok) {
+    if (response.status === 401) window.dispatchEvent(new Event("boss-auth-expired"));
     const body = payload as { error?: string } | null;
     throw new Error((body && body.error ? body.error : "请求失败") + "（HTTP " + response.status + "）");
   }
@@ -211,6 +223,7 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
 }
 
 export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props) {
+  const { client } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [authError, setAuthError] = useState("");
   const [authAttempt, setAuthAttempt] = useState(0);
@@ -224,6 +237,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
+  const [workDirty, setWorkDirty] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string}|null>(null);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -243,6 +257,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
   const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
+  const [memoryTechnicalStatus, setMemoryTechnicalStatus] = useState<MemoryTechnicalStatus | null>(null);
+  const [today, setToday] = useState<TodayProjection | null>(null);
+  const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [loading, setLoading] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
@@ -272,12 +289,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (!role || !allowed(id, role)) return;
     if (!bypassDirty && ((page === "F06" && assignmentDirty &&
         !["D04","D05","D01"].includes(id)) ||
-        (["N07","N08"].includes(page) && settingsDirty)) && id !== page) {
+        (["N07","N08"].includes(page) && settingsDirty) ||
+        (["F01","N09"].includes(page) && workDirty)) && id !== page) {
       setPendingNavigation({id,focus});
       return;
     }
     if (id !== page) setPreviousPage(page);
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
+    if (id !== page && ["F01","N09"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -285,7 +304,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty, settingsDirty]);
+  }, [page, role, assignmentDirty, settingsDirty, workDirty]);
 
   useEffect(() => {
     if (!pendingNavigation) return;
@@ -317,11 +336,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       }));
     };
     if (role === "BOSS") {
+      if (page === "F01") read<TodayProjection>("/api/boss/ui/today", setToday);
+      if (page === "N09") read<OwnerPlanProjection>("/api/boss/ui/owner-plans", setOwnerPlans);
       if (["F01", "F06", "D04", "D05", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
       if (["F24", "D03"].includes(page)) read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
       if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
+    } else if (page === "A12") {
+      setMemoryTechnicalStatus(null);
+      read<MemoryTechnicalStatus>("/api/boss/ui/admin/memory-status", setMemoryTechnicalStatus);
     } else if (["A04", "A08", "N12", "A01", "A15", "F30"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
       if (["A15", "F30"].includes(page)) read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
@@ -367,6 +391,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
        p.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role]);
   const refresh = () => setRequestVersion((v) => v + 1);
+  const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
+    if (typeof payload.client_request_id !== "string") throw new Error("业务请求缺少原请求编号");
+    const receipt = await jsonRequest<{outcome: string}>(
+      "/api/boss/ui/operation-status?action=" + encodeURIComponent(action) + "&client_request_id=" + encodeURIComponent(payload.client_request_id), getToken);
+    if (receipt.outcome === "RECORDED") return;
+    if (receipt.outcome !== "NOT_FOUND_IN_CURRENT_STORE") throw new Error("原请求结果尚未确定");
+    await client.requestMutation(action, payload);
+  };
   const goSource = (id = "finance-note", anchor?:{
     version:string;start:number;end:number;
   }) => {
@@ -488,7 +520,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
               {loading && <StatusLine text="正在从本机业务服务读取有权数据和当前状态…" />}
               {role === "BOSS" ? (
-                page === "F01" ? <div className="boss-columns">
+                page === "F01" ? <>
+                  <BossToday data={today} loading={loading} error={error} onReload={refresh}
+                    onDirtyChange={setWorkDirty} onReorder={payload => scopedCommand("boss.today.reorder", payload)}
+                    onNavigate={(target, objectId) => target === "F06" ? selectTask(objectId) : navigate(target, objectId)}/>
+                  <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="业务日期与资料范围" note="F01 · 今日工作">
                       <div className="boss-form-grid boss-grid-3">
@@ -500,7 +536,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                       <div className="boss-actions"><GlassButton primary onClick={refresh}><RefreshCw size={15}/> 更新当前事项</GlassButton></div>
                       <StatusLine variant="warn" text="目前仅连接 T02 模拟数据集；业务日期筛选尚未接入正式逐日聚合。资料覆盖和时效以服务返回为准。" />
                     </Panel>
-                    <Panel title="今天需要我参与的事" note="待决定 · 待协调 · 需要知晓">
+                    <Panel title="已创建交办与历史承诺" note="正式状态与历史记录">
                       <div className="boss-tabs"><button className="active">待决定</button><button onClick={() => navigate("N05")}>待协调</button><button onClick={() => navigate("N06")}>需要知晓</button></div>
                       {dashboard?.tasks.length ? dashboard.tasks.map((t) =>
                         <button type="button" className="boss-task-row" key={t.task_id} onClick={() => selectTask(t.task_id)}>
@@ -578,7 +614,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                       </div>
                     </Panel>
                   </div>
-                </div> :
+                </div></> :
                 page === "N02" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="大鹏 · 连续对话" note="连接 nanobot 原生 WebSocket 会话">
@@ -827,6 +863,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onNavigate={id=>navigate(id)}
                   onTaskCreated={id=>{setSelectedTaskId(id);refresh();}}
                 /> :
+                page === "N09" ? <BossOwnerPlans data={ownerPlans} loading={loading} error={error}
+                  onReload={refresh} onDirtyChange={setWorkDirty} onCommand={scopedCommand}/> :
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
                   onNavigate={id=>navigate(id)} onViewSource={goSource}
@@ -920,6 +958,31 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 key="A13" onNavigate={id=>navigate(id)}
               /> : page === "A05" ? <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/> :
                 page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
+                page === "A12" ? <>
+                  <div className="boss-columns">
+                    <div className="boss-column"><Panel title="记忆技术状态" note="仅展示技术元信息">
+                      <Value label="老板范围" value={memoryTechnicalStatus?.namespace}/>
+                      <Value label="记忆标识" value={memoryTechnicalStatus?.memory.memory_id}/>
+                      <Value label="当前版本" value={memoryTechnicalStatus?.memory.version}/>
+                      <Value label="本人确认状态" value={memoryTechnicalStatus?.memory.confirmation_state}/>
+                      <Value label="有效期限" value={memoryTechnicalStatus ? memoryTechnicalStatus.memory.valid_until ?? "没有配置" : undefined}/>
+                      <Value label="后续上下文可采用" value={memoryTechnicalStatus ? memoryTechnicalStatus.future_context_eligible ? "符合当前确认条件" : "停止采用" : undefined}/>
+                      <Value label="当前采用规则" value={memoryTechnicalStatus?.future_turn_policy}/>
+                    </Panel></div>
+                    <div className="boss-column"><Panel title="索引、删除传播与核查">
+                      <Value label="派生记忆索引" value={memoryTechnicalStatus?.derived_memory_index}/>
+                      <Value label="删除传播" value={memoryTechnicalStatus?.deletion_propagation}/>
+                      <Value label="最近读取" value={memoryTechnicalStatus?.checked_at}/>
+                      <StatusLine text="技术状态检查只查询当前保存内容。真实模型采用和物理擦除需要独立验证。"/>
+                      <div className="boss-actions">
+                        <GlassButton onClick={refresh} disabled={loading}>重新核查技术状态</GlassButton>
+                        <GlassButton onClick={() => navigate("A14")}>查看获准动作记录</GlassButton>
+                        <GlassButton onClick={() => navigate("A15")}>查看运行记录</GlassButton>
+                      </div>
+                    </Panel></div>
+                  </div>
+                  <BossWorkspaceView key="A12" role={role} pageId="A12" onNavigate={id=>navigate(id)} onViewSource={goSource}/>
+                </> :
                 page === "A03" ? <>
                 <BossWorkspaceView key="A03" role={role} pageId="A03"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
@@ -972,6 +1035,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         <h3 id="boss-unsaved-title"><AlertCircle size={19}/> 未保存修改（D06）</h3>
         <p>{["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
+          ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
           "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p>
         <div className="boss-actions">
           <button type="button" className="boss-btn" onClick={()=>setPendingNavigation(null)}>返回继续编辑</button>
@@ -980,6 +1044,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
             setSettingsDirty(false);
+            setWorkDirty(false);
             setPendingNavigation(null);
             navigate(destination.id,destination.focus,true);
           }}>放弃草稿并离开</button>

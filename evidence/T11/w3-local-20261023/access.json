@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "route": "/webui/bootstrap",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/identity",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "UNAUTHENTICATED",
+      "status": 401
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "BOSS",
+      "status": 200
+    },
+    {
+      "action": "boss.simulation.feedback",
+      "role": "BOSS",
+      "status": 403
+    },
+    {
+      "route": "/api/boss/ui/dashboard",
+      "role": "MAINTAINER",
+      "status": 403
+    },
+    {
+      "action": "boss.assignment.create",
+      "role": "MAINTAINER",
+      "status": 403
+    }
+  ],
+  "model_invoked": false,
+  "business_write": false,
+  "visual_acceptance": "NOT_RUN"
+}
