@@ -88,7 +88,6 @@ def require_current(store, db, ns, data, query):
 
 def query_metrics(store, db, ns, data, payload):
     from boss_bi_scenarios import query_inputs
-    data, documents = query_inputs(store, db, ns, data, payload)
     env = payload["envelope"]
     digest = checksum(payload)
     receipt_id = checksum({"session_id": env["session_id"], "request_id": env["request_id"]})
@@ -106,6 +105,8 @@ def query_metrics(store, db, ns, data, payload):
         require("context_snapshot" in parent and parent["envelope"]["session_id"] == env["session_id"], "追问不属于当前会话", web.HTTPForbidden)
         require_current(store, db, ns, data, parent)
         overridden = sorted(field for field, value in payload.items() if field not in ("envelope", "question", "parent_query_id") and parent["context_snapshot"].get(field) != value)
+    # 父查询按自身绑定核查通过后，才读取本次明确选择的资料。
+    data, documents = query_inputs(store, db, ns, data, payload)
     start, end = date.fromisoformat(payload["period_start"]), date.fromisoformat(payload["period_end"])
     before, until = date.fromisoformat(payload["comparison_start"]), date.fromisoformat(payload["comparison_end"])
     require(start <= end and before <= until, "查询期间起止顺序无效", web.HTTPBadRequest)

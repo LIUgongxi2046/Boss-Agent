@@ -4,7 +4,7 @@
 
 task_id：FC02-N3-BOUNDARY-ADOPTION。需求为FC02.C05/C08/C11，以及受影响的C01/C02/C03/C10/C12—C19。唯一功能状态来源为原始项目specs/feature-delivery.json。文档CURRENT，last_verified为2026-10-24，依据当前源码、实际接口、SDK、桌面行为及同一构建制品。
 
-当前公共实现与必要本地验证已完成，完整FC02保持IN_PROGRESS。N4对faf66bf6c718b032e20a94231989894367a258c4独立确认16/20、BLOCKED；准确记录保存为independent-faf66bf.json。当前候选需要N4独立验证全部二十项；本地用例数量不作为功能分数。
+当前公共实现与必要本地验证已完成，完整FC02保持IN_PROGRESS。N4对983b7287cf0e4c7050a109bc458f603308045f2d独立确认17/20、FAIL/NO_GO，C05/C08/C11已通过，准确记录保存为independent-983b728.json。C03/C16的父查询切换场景修复及公共验证见followup-recovery.md，新候选等待N4核查；本地用例数量不作为功能分数。
 
 ## 检索与输入依据
 

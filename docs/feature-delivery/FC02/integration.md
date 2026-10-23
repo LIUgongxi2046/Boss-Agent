@@ -8,6 +8,8 @@
 
 接收N1正式场景9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3、2731df3fb9a6f6ffc405846a301505f0141ff1d5，对应当前f515905/4e6b8d6。六项正式生成场景及双方来源通过维护载入、本人维度和明确来源进入同一受限Runtime。A04维护、F03/N03选择和双方口径并列、D01实际作者与用途，以及连接中断后只读回执均已接收；详细依据、实现和复现见boundary-adoption.md。
 
+逐项接收N1 c707df80260c5181fd86861f284eaa8e63e567f7的领域局部差异和六项检查，记录来源31b6313db73bd1b379796f469121dfcb32e0c145。父查询在原始资料中按自身绑定核查后才读取子场景；当前dimensions/source_ids、公开Schema、Agent、历史/异步、前端和原生Client保持。实际公共追问、继承期间、14%结果、原文、同库重启/原回执、幂等及父子来源失效验证PASS，详见followup-recovery.md。
+
 validation/product_bi.py 提供认证请求生产者、独立请求工具范围、共享 Provider/Recorder 分派、原请求与实际 SDK request_id/run_id/session_id 的持久关联，以及维度、当前/历史读取、回执和取消。客户端只能提交问题、明确范围及原请求编号；owner、namespace、dataset 和 envelope 由当前认证与数据提供。query_metrics/read_evidence 使用同一正式组合 Schema，追问支持 comparison_scope 和明确新增可选字段，未指定字段继承持久快照。
 
 application 使用同一实际 Nanobot AgentLoop。BI 请求仅开放 query_metrics/read_evidence，配置启用范围仍由维护身份管理；实际 Registry、模拟事件工具摘要和 Runtime 记录采用相同的两项工具。FC01 请求由原 FC01 Provider 和 Recorder 处理，BI 模块没有业务写入工具。模型参数必须匹配服务端冻结范围；模拟事件逐次消费本次实际工具返回，沿用会话历史时仍执行当前新查询。
@@ -34,7 +36,7 @@ specs/product-bi.openapi.yaml 0.3.0 登记全部公开输入、输出和 WebSock
 
 同一制品的来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、十二组历史尺寸和键盘PASS，见fc02-history-3984d0c8-83cb-4c2e-bc37-0307b28ab841.json。实际响应延迟检查PASS，见fc02-n3-timing-719b2fd4-0c29-4963-bdb8-95fe8532894e.json；较早回执不覆盖已编辑条件，较早原始依据不覆盖新查询，响应字节摘要在延迟前后相同。历史与异步主记录继续引用history-recovery.md、async-recovery.md，当前制品验证补充于boundary-adoption.md。
 
-N4对faf66bf6c718b032e20a94231989894367a258c4独立确认16/20、BLOCKED，准确快照见independent-faf66bf.json。其74项证据运行于9026c8a，按301项依赖核查用于faf66bf；当前正式输入、Schema及公开消费者已有变化，新候选必须重新核查相应依赖，不能直接沿用旧分数。没有重复无变化74项全量或FC01业务全量。
+N4对983b7287cf0e4c7050a109bc458f603308045f2d独立确认17/20、85%、FAIL/NO_GO，准确快照见independent-983b728.json；C05/C08/C11已经通过。当前领域修复候选的九项领域及相关回归PASS，真实公共SDK/WebSocket与界面恢复PASS；证据为followup-integration.xml及fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485.json。2查询、3运行、3公共请求，子来源失效保留FAILED，父来源失效返回410，业务写入和renderer错误均零。前端及原生Client摘要相同，复用既有制品；新候选分子等待N4核查，17/20仅属于983b728。没有重复72/74项或FC01全量。
 
 标准 OpenAPI3.1 与 YAML 重复字段检查通过：.work/openapi-venv/bin/python validation/check_bi_public_spec.py。git diff --check 通过。没有复验无变化FC01业务全量或启用暂停的STT。
 

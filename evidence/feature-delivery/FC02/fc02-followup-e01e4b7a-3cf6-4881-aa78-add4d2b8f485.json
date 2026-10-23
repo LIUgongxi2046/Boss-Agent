@@ -1,0 +1,423 @@
+{
+  "status": "PASS",
+  "run_id": "fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485",
+  "defect_id": "FC02-N4-DOMAIN-FOLLOWUP-01",
+  "ports": {
+    "business": 9921,
+    "webui": 9922,
+    "gateway": 19921
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-boundary-dist",
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "index_sha256": "8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6",
+  "native_client_sha256": "48ae362a2d6ae0a3d817765a4e34459c3b77255e70bebd0205b7403c2fbe5527",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "rebuild_required": false,
+  "records": [
+    {
+      "check": "actual_public_default_parent_to_formal_scenario",
+      "parent_client_request_id": "34bd2115-caa4-4859-a298-2e152151fffe",
+      "parent_query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79",
+      "client_request_id": "n3-cross-scene-5ee83585-1d9e-4c26-af99-87848c317b40",
+      "query_id": "c85d93e3-4297-4934-a6a9-cf2c6e555401",
+      "explicit_overrides": {
+        "scenario_id": "weighted-ratios",
+        "source_ids": [
+          "sim-bi:weighted-ratios:SIMULATED_BOUNDARY"
+        ],
+        "business_basis": "SIMULATED_BOUNDARY"
+      },
+      "overridden_fields": [
+        "business_basis",
+        "scenario_id",
+        "source_ids"
+      ],
+      "inherited_periods": {
+        "period_start": "2026-10-01",
+        "period_end": "2026-10-10",
+        "comparison_start": "2026-09-01",
+        "comparison_end": "2026-09-10"
+      },
+      "gross_margin": "14",
+      "source_ids": [
+        "sim-bi:weighted-ratios:SIMULATED_BOUNDARY"
+      ],
+      "detail_count": 4,
+      "run_id": "run-b9154129-886d-4b3f-a3be-7b03a119ca2e",
+      "parent_adoption_state": "CURRENT"
+    },
+    {
+      "check": "same_store_restart_original_receipt_history_and_idempotence",
+      "query_id": "c85d93e3-4297-4934-a6a9-cf2c6e555401",
+      "parent_query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79",
+      "original_client_request_id": "n3-cross-scene-5ee83585-1d9e-4c26-af99-87848c317b40",
+      "conflicting_payload_status": 409,
+      "counts": {
+        "query": 2,
+        "runtime_run": 2,
+        "bi_public_request": 2,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      }
+    },
+    {
+      "check": "actual_withdrawn_child_failure_and_read_only_receipt",
+      "client_request_id": "n3-withdrawn-child-467833da-9c1a-4b11-8eb8-d9a17f9f16c8",
+      "request_state": "FAILED",
+      "run_id": "run-55ef64d9-d467-4cef-bdb1-0d25626eede7",
+      "tool_errors": [
+        {
+          "error_type": "HTTPGone",
+          "source_type": "SIMULATED",
+          "tool_call_id": "cfe6dcda-60c3-4558-ac5b-8605d4dea737",
+          "tool_id": "query_metrics"
+        }
+      ],
+      "observed_websocket_response": null,
+      "request_replayed": false,
+      "counts": {
+        "query": 2,
+        "runtime_run": 3,
+        "bi_public_request": 3,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      }
+    },
+    {
+      "check": "actual_withdrawn_parent_rejection_and_unchanged_initial",
+      "status": 410,
+      "client_request_id": "n3-withdrawn-parent-8f0427c7-3275-4168-840a-f6e6a550a9e6",
+      "receipt_status": 404,
+      "initial_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+      "counts": {
+        "query": 2,
+        "runtime_run": 3,
+        "bi_public_request": 3,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      },
+      "runs": [
+        {
+          "run_id": "run-55ef64d9-d467-4cef-bdb1-0d25626eede7",
+          "status": "FAILED",
+          "feature_id": "FC02",
+          "request_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2:1792795545590818000",
+          "session_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2",
+          "tool_configuration": [
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "6374891ec428578a1125b86f6babf9a6577723147415d01c8bd398a1b0743187",
+              "tool_id": "query_metrics"
+            },
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "d46db4976105c93163294107de22a297955f6ed47cb99a9c418585cb01cb06d8",
+              "tool_id": "read_evidence"
+            }
+          ],
+          "tool_results": [],
+          "usage": null,
+          "cost_total": null,
+          "tool_errors": [
+            {
+              "error_type": "HTTPGone",
+              "source_type": "SIMULATED",
+              "tool_call_id": "cfe6dcda-60c3-4558-ac5b-8605d4dea737",
+              "tool_id": "query_metrics"
+            }
+          ]
+        },
+        {
+          "run_id": "run-8f2906dd-ddfd-42de-9c4d-ec62bc39519e",
+          "status": "SUCCEEDED",
+          "feature_id": "FC02",
+          "request_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2:1792795522124435000",
+          "session_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2",
+          "tool_configuration": [
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "6374891ec428578a1125b86f6babf9a6577723147415d01c8bd398a1b0743187",
+              "tool_id": "query_metrics"
+            },
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "d46db4976105c93163294107de22a297955f6ed47cb99a9c418585cb01cb06d8",
+              "tool_id": "read_evidence"
+            }
+          ],
+          "tool_results": [
+            {
+              "bi_query_context": {
+                "inherited_fields": [],
+                "overridden_fields": [
+                  "asset_owner_id",
+                  "business_basis",
+                  "comparison_end",
+                  "comparison_start",
+                  "cost_owner_id",
+                  "currency",
+                  "customer_id",
+                  "definition_version",
+                  "legal_entity_id",
+                  "metric_ids",
+                  "ownership_type",
+                  "period_end",
+                  "period_start",
+                  "product_ids",
+                  "quantity_unit",
+                  "region_id",
+                  "region_ids",
+                  "settlement_state",
+                  "source_ids",
+                  "target_version",
+                  "trade_scope"
+                ],
+                "parameters": {
+                  "asset_owner_id": null,
+                  "business_basis": "SELECTION_REPORTED",
+                  "comparison_end": "2026-09-10",
+                  "comparison_start": "2026-09-01",
+                  "cost_owner_id": null,
+                  "currency": "CNY",
+                  "customer_id": null,
+                  "definition_version": "1",
+                  "legal_entity_id": "entity-1",
+                  "metric_ids": [
+                    "sales_quantity",
+                    "revenue",
+                    "cost",
+                    "gross_profit",
+                    "gross_margin",
+                    "gross_profit_per_tonne"
+                  ],
+                  "ownership_type": null,
+                  "period_end": "2026-10-10",
+                  "period_start": "2026-10-01",
+                  "product_ids": [
+                    "product-1",
+                    "product-2"
+                  ],
+                  "quantity_unit": "tonne",
+                  "query_mode": "SCOPED",
+                  "region_id": "region-1",
+                  "region_ids": [
+                    "region-1"
+                  ],
+                  "settlement_state": "SETTLED",
+                  "source_ids": [
+                    "finance-note"
+                  ],
+                  "target_version": null,
+                  "trade_scope": "EXTERNAL_SALES"
+                },
+                "parameters_sha256": "ba3f50aa7a59f5e708804195e0d40459bfcac7a764b473032588f7680e0a16d1",
+                "previous_query_id": null
+              },
+              "definition_versions": [
+                "1"
+              ],
+              "detail_refs": [
+                "BASE-0",
+                "BASE-1",
+                "BASE-2",
+                "BASE-3",
+                "CURRENT-0",
+                "CURRENT-1",
+                "CURRENT-2",
+                "CURRENT-3"
+              ],
+              "iteration": 0,
+              "query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79",
+              "result_sha256": "6c543d6f4e0a2f7fee7ddc3c8478668773da929322720e223f9af914ccb2cfeb",
+              "source_refs": [
+                {
+                  "source_id": "finance-note",
+                  "version": "1"
+                }
+              ],
+              "source_type": "SIMULATED",
+              "tool_call_id": "d87e3cc6-623a-4e97-8ee7-9918ea5b1758",
+              "tool_id": "query_metrics"
+            },
+            {
+              "definition_versions": [],
+              "detail_refs": [
+                "BASE-0",
+                "BASE-1",
+                "BASE-2",
+                "BASE-3",
+                "CURRENT-0",
+                "CURRENT-1",
+                "CURRENT-2",
+                "CURRENT-3",
+                "finance-note"
+              ],
+              "iteration": 1,
+              "query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79",
+              "result_sha256": "ac9fcf90233950fc25450389b2c5bedcbfdc71831e9fc55fa622be28cac9387a",
+              "source_refs": [
+                {
+                  "source_id": "finance-note",
+                  "version": "1"
+                }
+              ],
+              "tool_call_id": "6d655a80-afaa-4f70-8f9c-11ae023bf051",
+              "tool_id": "read_evidence"
+            }
+          ],
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-b9154129-886d-4b3f-a3be-7b03a119ca2e",
+          "status": "SUCCEEDED",
+          "feature_id": "FC02",
+          "request_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2:1792795532172591000",
+          "session_id": "sdk:bi-51529f32-46f6-470e-b5fb-073d20dd96d2",
+          "tool_configuration": [
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "6374891ec428578a1125b86f6babf9a6577723147415d01c8bd398a1b0743187",
+              "tool_id": "query_metrics"
+            },
+            {
+              "implementation": "product_bi.FeatureBusinessTool",
+              "implementation_sha256": "b29a2efab4a65570d31a5377a1893207a92f51c76b71c89ee25c8420dc7d35d9",
+              "schema_sha256": "d46db4976105c93163294107de22a297955f6ed47cb99a9c418585cb01cb06d8",
+              "tool_id": "read_evidence"
+            }
+          ],
+          "tool_results": [
+            {
+              "bi_query_context": {
+                "inherited_fields": [
+                  "asset_owner_id",
+                  "comparison_end",
+                  "comparison_start",
+                  "cost_owner_id",
+                  "currency",
+                  "customer_id",
+                  "definition_version",
+                  "legal_entity_id",
+                  "metric_ids",
+                  "ownership_type",
+                  "period_end",
+                  "period_start",
+                  "product_ids",
+                  "quantity_unit",
+                  "region_id",
+                  "region_ids",
+                  "settlement_state",
+                  "target_version",
+                  "trade_scope"
+                ],
+                "overridden_fields": [
+                  "business_basis",
+                  "scenario_id",
+                  "source_ids"
+                ],
+                "parameters": {
+                  "asset_owner_id": null,
+                  "business_basis": "SIMULATED_BOUNDARY",
+                  "comparison_end": "2026-09-10",
+                  "comparison_start": "2026-09-01",
+                  "cost_owner_id": null,
+                  "currency": "CNY",
+                  "customer_id": null,
+                  "definition_version": "1",
+                  "legal_entity_id": "entity-1",
+                  "metric_ids": [
+                    "sales_quantity",
+                    "revenue",
+                    "cost",
+                    "gross_profit",
+                    "gross_margin",
+                    "gross_profit_per_tonne"
+                  ],
+                  "ownership_type": null,
+                  "parent_query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79",
+                  "period_end": "2026-10-10",
+                  "period_start": "2026-10-01",
+                  "product_ids": [
+                    "product-1",
+                    "product-2"
+                  ],
+                  "quantity_unit": "tonne",
+                  "query_mode": "SCOPED",
+                  "region_id": "region-1",
+                  "region_ids": [
+                    "region-1"
+                  ],
+                  "scenario_id": "weighted-ratios",
+                  "settlement_state": "SETTLED",
+                  "source_ids": [
+                    "sim-bi:weighted-ratios:SIMULATED_BOUNDARY"
+                  ],
+                  "target_version": null,
+                  "trade_scope": "EXTERNAL_SALES"
+                },
+                "parameters_sha256": "a19e91f82e7f26f78bc5eb2053119d180ff91c4753aad7752c56dee1967cdcda",
+                "previous_query_id": "48c0650a-d9e6-4166-be30-11d0998ebc79"
+              },
+              "definition_versions": [
+                "1"
+              ],
+              "detail_refs": [
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:BASE:0",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:BASE:1",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:CURRENT:0",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:CURRENT:1"
+              ],
+              "iteration": 0,
+              "query_id": "c85d93e3-4297-4934-a6a9-cf2c6e555401",
+              "result_sha256": "ae4a2f777979bf642622f3dcd1b37a0feb1bb79869acbdde19f8795a795aa80f",
+              "source_refs": [
+                {
+                  "source_id": "sim-bi:weighted-ratios:SIMULATED_BOUNDARY",
+                  "version": "1"
+                }
+              ],
+              "source_type": "SIMULATED",
+              "tool_call_id": "130c3d9c-ee26-41e8-95ec-904e01caa7bd",
+              "tool_id": "query_metrics"
+            },
+            {
+              "definition_versions": [],
+              "detail_refs": [
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:BASE:0",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:BASE:1",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:CURRENT:0",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY:CURRENT:1",
+                "sim-bi:weighted-ratios:SIMULATED_BOUNDARY"
+              ],
+              "iteration": 1,
+              "query_id": "c85d93e3-4297-4934-a6a9-cf2c6e555401",
+              "result_sha256": "eef5be4707fc086ebe78be1e7ba99a67188f92299eb7350659c7ca00590333eb",
+              "source_refs": [
+                {
+                  "source_id": "sim-bi:weighted-ratios:SIMULATED_BOUNDARY",
+                  "version": "1"
+                }
+              ],
+              "tool_call_id": "25395f9c-fa49-4b52-b1ce-5b2da9fc603c",
+              "tool_id": "read_evidence"
+            }
+          ],
+          "usage": null,
+          "cost_total": null
+        }
+      ],
+      "renderer_errors": 0
+    }
+  ]
+}
