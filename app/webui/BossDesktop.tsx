@@ -19,6 +19,8 @@ import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetin
 import { BossMeetingBrief } from "./BossMeetingBrief";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
+import { BossOwnerPreferences } from "./BossOwnerPreferences";
+import { BossSettingsHub } from "./BossSettingsHub";
 import { BossTaskCenter } from "./BossTaskCenter";
 import { MaintainerPromptVersion } from "./MaintainerPromptVersion";
 import { BossResearchView } from "./BossResearchView";
@@ -125,7 +127,7 @@ const MAINT_NAV = [
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
 const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F11", "F10", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
+  "F01", "N02", "N03", "F03", "N04", "N05", "F11", "F10", "F26", "N07", "N08", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 const ANIMATIONS: Record<Animation, string> = {
@@ -219,6 +221,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [question, setQuestion] = useState("");
   const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
   const [assignmentDirty, setAssignmentDirty] = useState(false);
+  const [settingsDirty, setSettingsDirty] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string}|null>(null);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -265,12 +268,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
 
   const navigate = useCallback((id: string, focus = "", bypassDirty = false) => {
     if (!role || !allowed(id, role)) return;
-    if (!bypassDirty && page === "F06" && assignmentDirty &&
-        id !== page && !["D04","D05","D01"].includes(id)) {
+    if (!bypassDirty && ((page === "F06" && assignmentDirty &&
+        !["D04","D05","D01"].includes(id)) ||
+        (["N07","N08"].includes(page) && settingsDirty)) && id !== page) {
       setPendingNavigation({id,focus});
       return;
     }
     if (id !== page) setPreviousPage(page);
+    if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -278,7 +283,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty]);
+  }, [page, role, assignmentDirty, settingsDirty]);
 
   useEffect(() => {
     if (!pendingNavigation) return;
@@ -772,6 +777,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onNavigate={id=>navigate(id)} focusDraftId={draftToReview}
                   onFocusDraftConsumed={()=>setDraftToReview("")}
                 /> :
+                page === "F26" ? <BossSettingsHub
+                  key={page} onNavigate={id=>navigate(id)} onLogout={onLogout}
+                /> :
+                (page === "N07" || page === "N08") ? <BossOwnerPreferences
+                  key={page} pageId={page} onNavigate={id=>navigate(id)}
+                  onDirtyChange={setSettingsDirty}
+                /> :
                 page === "F09" ? <BossResearchView
                   key={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
@@ -935,13 +947,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     {pendingNavigation && <div className="boss-confirm-backdrop">
       <section className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-unsaved-title">
         <h3 id="boss-unsaved-title"><AlertCircle size={19}/> 未保存修改（D06）</h3>
-        <p>当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。</p>
+        <p>{["N07","N08"].includes(page)?
+          "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
+          "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p>
         <div className="boss-actions">
           <button type="button" className="boss-btn" onClick={()=>setPendingNavigation(null)}>返回继续编辑</button>
           <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
             const destination=pendingNavigation;
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
+            setSettingsDirty(false);
             setPendingNavigation(null);
             navigate(destination.id,destination.focus,true);
           }}>放弃草稿并离开</button>
