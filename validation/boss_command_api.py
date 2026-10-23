@@ -30,6 +30,7 @@ from boss_assignment_nudge import nudge as assignment_nudge
 from boss_scheduler_config import (
     save as scheduler_save, validate as scheduler_validate,
     activate as scheduler_activate, set_status as scheduler_set_status,
+    manual_run as scheduler_manual_run,
 )
 from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
 from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
@@ -109,6 +110,7 @@ class BossCommandAPI:
         "boss.scheduler.pause": "MAINTAINER",
         "boss.scheduler.resume": "MAINTAINER",
         "boss.scheduler.cancel": "MAINTAINER",
+        "boss.scheduler.manual_run": "MAINTAINER",
         "boss.memory.confirm": "BOSS",
         "boss.memory.delete": "BOSS",
         "boss.reminder.ack": "BOSS",
@@ -287,6 +289,8 @@ class BossCommandAPI:
                 result = scheduler_validate(self, db, data, payload)
             elif action == "boss.scheduler.activate":
                 result = scheduler_activate(self, db, data, payload)
+            elif action == "boss.scheduler.manual_run":
+                result = scheduler_manual_run(self, db, data, payload)
             elif action.startswith("boss.scheduler."):
                 result = scheduler_set_status(self, db, data, payload, action.rsplit(".", 1)[-1])
             elif action == "boss.memory.confirm":
