@@ -9,6 +9,7 @@ Endpoints are deliberately under the authenticated RoleChannel gateway.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -42,6 +43,14 @@ def _object_list(db, namespace, kind, limit=100):
         (namespace, kind, limit),
     ).fetchall()
     return [json.loads(row[0]) for row in require]
+
+
+def _future_authorization_expiry(raw):
+    try:
+        value = datetime.fromisoformat(raw)
+        return value.tzinfo is not None and value > datetime.now(timezone.utc)
+    except (TypeError, ValueError):
+        return False
 
 
 def _safe_date(raw):
@@ -413,12 +422,23 @@ class BossWorkspaceAPI:
         if key == "authorizations":
             rows = _object_list(db, self.namespace, "authorization")
             return {"authorizations": [{
-                k: row[k] for k in (
+                **{k: row[k] for k in (
                     "authorization_id", "issuer_identity", "action", "target_id",
                     "content_version", "version", "revoked", "revoked_at",
                     "valid_from", "valid_until", "scope",
-                ) if k in row
-            } for row in rows], "secrets_or_payloads_returned": False}
+                ) if k in row},
+                "can_revoke": bool(
+                    row.get("issuer_identity") == "BOSS"
+                    and row.get("owner_id") == data["owner_id"]
+                    and row.get("scope") == self.namespace
+                    and row.get("action") != "authorization.revoke"
+                    and not row.get("revoked")
+                    and _future_authorization_expiry(row.get("valid_until"))
+                ),
+            } for row in rows],
+            "revocation_only_affects_future_use": True,
+            "historical_actions_reversed": False,
+            "secrets_or_payloads_returned": False}
         if key == "decisions":
             audit = db.execute(
                 "SELECT id,operation,created_at,output FROM audit WHERE namespace=? "
