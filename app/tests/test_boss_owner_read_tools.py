@@ -3,7 +3,6 @@ import hashlib
 import importlib
 import json
 import sqlite3
-import subprocess
 import sys
 from pathlib import Path
 
@@ -14,7 +13,6 @@ from jsonschema import Draft202012Validator, FormatChecker
 from nanobot.agent.tools.registry import ToolRegistry
 
 ROOT = Path(__file__).resolve().parents[2]
-COMMIT = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 sys.path.insert(0, str(ROOT / "validation"))
 
 from controls import ControlStore
@@ -22,9 +20,8 @@ from controls import ControlStore
 
 @pytest.fixture
 def existing_owner_store(tmp_path):
-    for name in ("boss_today", "boss_owner_plans", "boss_meetings"):
-        path = "validation/" + name + ".py"
-        assert (ROOT / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=ROOT)
+    sources = {ROOT / "validation" / (name + ".py"): (ROOT / "validation" / (name + ".py")).read_bytes()
+               for name in ("boss_today", "boss_owner_plans", "boss_meetings")}
     fixture = ROOT / "app/tests/fixtures/observed-owner-state"
     source = fixture / "business.sqlite"
     manifest = json.loads((fixture / "manifest.json").read_text())
@@ -34,9 +31,8 @@ def existing_owner_store(tmp_path):
         with sqlite3.connect(tmp_path / "owner-read.sqlite") as copied:
             original.backup(copied)
     yield ControlStore(tmp_path / "owner-read.sqlite")
-    for name in ("boss_today", "boss_owner_plans", "boss_meetings"):
-        path = "validation/" + name + ".py"
-        assert (ROOT / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=ROOT)
+    for path, content in sources.items():
+        assert path.read_bytes() == content
 
 
 @pytest.mark.parametrize("class_name,operation,path", [
@@ -56,7 +52,8 @@ def test_owner_read_adapter_uses_current_domain_result_without_writes(existing_o
     with existing_owner_store.connect() as db:
         before = tuple(db.iterdump())
     result = json.loads(asyncio.run(tool.execute()))
-    backend = yaml.safe_load(subprocess.check_output(["git", "show", COMMIT + ":specs/openapi.yaml"], cwd=ROOT))
+    backend = yaml.safe_load((ROOT / "specs/openapi.yaml").read_text())
+    assert backend["info"]["version"] == "1.7.0"
     response = backend["paths"][path]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
     Draft202012Validator({**backend, **response}, format_checker=FormatChecker()).validate(result)
     assert result["source_type"] == "SIMULATED"

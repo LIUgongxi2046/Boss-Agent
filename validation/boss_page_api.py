@@ -21,12 +21,13 @@ from boss_admin_config import memory_technical_status, prompt_technical_status
 from boss_owner_plans import OwnerPlansAPI
 from boss_today import TodayAPI
 from boss_meetings import MeetingAPI, meeting_materials
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
 from boss_source_policy import source_validity
 from boss_runtime_records import runtime_records
 from runtime_records_query import read_runtime_task_reference
 from boss_assignment_sources import AssignmentSourcesAPI
 from boss_simulation_api import SimulationAPI
+from boss_supply_quality import SupplyQualityAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -294,8 +295,7 @@ class BossPageAPI:
             if row is None:
                 return 404, {"error": "SOURCE_NOT_FOUND"}
             doc = json.loads(row[0])
-            business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
-            require_current_simulated_source(doc, data["owner_id"], business_at)
+            require_current_business_source(self.store, db, self.namespace, data["owner_id"], source_id)
             return 200, {
                 "source_type": doc["source_type"],
                 "source_id": doc["source_id"],
@@ -462,10 +462,14 @@ class BossPageAPI:
                 self.skills.validate_query(path, values)
                 service = self.skills.drafts
                 if path.endswith("sop-method"):
-                    return 200, service.read(role, **values)
+                    return 200, self.skills.method(role, **values)
                 if path.endswith("sop-history"):
                     return 200, service.read_history(role, **values)
                 return 200, service.operation_status(role, **values)
+            if path == "/api/boss/ui/supply-quality":
+                return 200, SupplyQualityAPI(self.store).read_http(role, query_string)
+            if path == "/api/boss/ui/supply-quality-receipt":
+                return 200, SupplyQualityAPI(self.store).receipt_http(role, query_string)
             if path == "/api/boss/ui/simulation-query":
                 return 200, SimulationAPI(self.store).query_http(role, query_string)
             if path == "/api/boss/ui/simulation-inspect":

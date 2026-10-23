@@ -5,6 +5,7 @@ type HistoryVersion={history_id:string;method_version:string;content_sha256:stri
 type Draft={draft_version:string;method_version:string;description:string;body:string;content_sha256:string;
   state:string;validation_status:string;change_note:string;missing_tools?:string[];errors?:{code:string;missing?:string[];unknown?:string[];sections?:string[]}[];restored_from:string|null};
 type Data={projection:"sop-method-editor";source_type:"RUNTIME_RECORD";external_api_mode:"SIMULATED";sop_id:string;
+  current_dependencies:{missing_tools:string[];missing_projections:string[];context_eligible:boolean};
   active:{name:string;version:string;description:string;body:string;content_sha256:string;enabled:boolean};
   draft:Draft|null;history:HistoryVersion[];sections:{heading:string;body:string}[];read_operations:string[];command_operations:string[];
   active_assessment:{missing_tools:string[]};pending_activations:{client_request_id:string;state:string;draft_version:string;prepared_at:string}[];
@@ -210,10 +211,11 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
       <div className="boss-kv"><span>草稿状态</span><strong>{data?.draft?.state??"尚未读取"}</strong></div>
       <div className="boss-kv"><span>静态校验</span><strong>{data?.draft?.validation_status??"尚未读取"}</strong></div>
       <div className="boss-kv"><span>真实模型采用</span><strong>未验证</strong></div>
-      <div className="boss-kv"><span>下一上下文采用条件</span><strong>{!data?"尚未读取":data.global_pending_activations.length?"待恢复，当前不可采用":data.active.enabled&&data.active_assessment.missing_tools.length===0?"可供下一上下文读取":"停用或工具引用缺少"}</strong></div>
+      <div className="boss-kv"><span>下一上下文采用条件</span><strong>{!data?"尚未读取":data.global_pending_activations.length?"待恢复，当前不可采用":data.current_dependencies.context_eligible?"可供下一上下文读取":"停用或当前引用缺少"}</strong></div>
       {data&&<><p>当前正文摘要：{data.active.content_sha256}</p><p>草稿摘要：{data.draft?.content_sha256??"尚无草稿"}</p>
         <h3>工具引用与权限</h3><p>读取：{data.read_operations.join("、")}</p><p>命令：{data.command_operations.join("、")||"无业务写入命令"}</p>
         <p>缺少工具：{(data.draft?.missing_tools??data.active_assessment.missing_tools).join("、")||"当前引用已经注册"}</p>
+        <p>当前缺少工作投影：{data.current_dependencies.missing_projections.join("、")||"当前投影引用完整"}</p>
         {data.draft?.errors?.map((item,index)=><p role="alert" key={index}>{item.code}：{[...(item.missing??[]),...(item.unknown??[]),...(item.sections??[])].join("、")}</p>)}</>}
       <p>保存、静态校验、启用和模型采用分别记录。启用作用于下一次上下文读取，已有会话与业务结果保持各自状态。</p>
       {onNavigate&&<button className="boss-btn" type="button" onClick={()=>onNavigate("A15",{sop_id:sop})}>查看实际步骤记录</button>}

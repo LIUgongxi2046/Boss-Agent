@@ -1,0 +1,16 @@
+{
+  "source_type": "SIMULATED",
+  "external_services_invoked": false,
+  "environment": "happy-dom and actual React; direct local SupplyQualityAPI and SQLite",
+  "checks": [
+    "真实库存计算读取",
+    "填写协调目的与期限",
+    "本人确认控制",
+    "实际SQLite保存与重读",
+    "原事件和库存状态独立",
+    "关联资料变化阻止来源确认"
+  ],
+  "public_authenticated_channel": "NOT_RUN",
+  "visual": "NOT_RUN",
+  "task_id": "479e0013-59a6-4d46-8e2e-8cb654477489"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS_ACTUAL_PUBLIC_RUNTIME_SCHEMA_AND_TRANSPORT",
+  "reference": "evidence/T11/w3-local-20261023/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1.json",
+  "reference_sha256": "a5b8a3153697cb4dc56fc1af06345eb234b0ca31d650f3a57dcc3d97394871ee",
+  "schema_sha256": "8a044505168c705c27c13648111a5350e932668fe770373e41e9972c2c257c3c",
+  "database_sha256": "da7154bd3b41b31d9966de9b54d8a55b0d1f199265fbfcb9b53365f99911bbe0",
+  "transport_sha256": "be706d2795195da4f502a35c51d1b390d733dc69cb5f33c17c406e75a2780162",
+  "runs": [
+    {
+      "run_id": "run-928f34d3-c296-4ac0-b14e-29b65f5282e4",
+      "configuration_version": "2",
+      "max_tool_rounds": 8,
+      "model_requests": 3,
+      "total_tokens": 14737
+    },
+    {
+      "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+      "configuration_version": "3",
+      "max_tool_rounds": 6,
+      "model_requests": 2,
+      "total_tokens": 7393
+    }
+  ],
+  "new_model_calls": false,
+  "private_body_recorded": false,
+  "cost_total": null,
+  "full_A11_A16_accepted": false
+}

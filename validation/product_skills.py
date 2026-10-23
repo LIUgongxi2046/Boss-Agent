@@ -77,6 +77,15 @@ class ProductSkills:
             role, self.identifiers[name], enabled=payload["enabled"],
             expected_content_sha256=payload["expected_content_sha256"], config_path=config_path)))
 
+    def method(self, role, sop_id):
+        def operation(path):
+            view = self.drafts.read(role, sop_id)
+            item = next(item for item in self.catalog.technical_status(role)["items"] if item["sop_id"] == sop_id)
+            dependencies = {key: item[key] for key in ("missing_tools", "missing_projections", "tool_references_resolved", "projection_references_resolved")}
+            dependencies["context_eligible"] = item["context_eligible"] and not view["global_pending_activations"]
+            return {**view, "current_dependencies": dependencies}
+        return self.runtime.config.run_serialized(operation)
+
     @staticmethod
     def _without_skills(configuration):
         value = deepcopy(configuration)
@@ -115,6 +124,9 @@ class ProductSkills:
                 view = self.drafts.read(role, payload["sop_id"])
                 require(view["draft"] is not None and view["draft"].get("tool_config_sha256") == checksum(self.runtime.registry.get_definitions()),
                         "当前工具定义已变化，请重新校验方法草稿")
+            if action in {"activate", "enable", "recover"}:
+                item = next(item for item in self.catalog.technical_status(role)["items"] if item["sop_id"] == payload["sop_id"])
+                require(not item["missing_tools"] and not item["missing_projections"], "当前方法引用的工具或工作投影尚未获准")
             execute = lambda: self.drafts.execute(role, action, payload)
             if action in NATIVE_ACTIONS:
                 return self._native_operation(execute, recovery=action in {"recover", "cancel"})

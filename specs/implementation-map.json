@@ -15,6 +15,13 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"app/webui/MaintainerSupplyQuality.tsx","owner":"W3","task_id":"T11","scope":"A03显式SIMULATED资料载入、完整输入检查、导入撤销确认与原请求核查；不调用外部服务"},
+    {"path":"app/webui/BossSupplyQualityPanel.tsx","owner":"W3","task_id":"T11","scope":"接收W1组件后的协调表单状态由公共Shell保存，D06保护及未知原请求独立核查；业务字段和计算继续使用W1规范"},
+    {"path":"app/webui/BossSupplyQualityView.tsx","owner":"W3","task_id":"T11","scope":"公共认证读取、client及token清理、协调编辑状态和F06选择导航；领域投影归W1"},
+    {"path":"validation/boss_research.py","owner":"W3","task_id":"T11","scope":"接入1.7.0当前传递来源采用检查；保留研究领域规则与原历史记录，领域维护归W2"},
+    {"path":"validation/runtime_page_read_tools.py","owner":"W3","task_id":"T11","scope":"原文读取采用当前业务来源及传递依赖检查；其余只读适配规则由W2维护，当前公共模型注册另行验收"},
+    {"path":"validation/check_supply_quality_state.py","owner":"W3","task_id":"T11","scope":"只读核查本工程独立SQLite的原selection摘要、协调任务和专业状态"},
+    {"path":"validation/desktop/check-supply-quality.cjs","owner":"W3","task_id":"T11","scope":"隐藏桌面的公共模拟资料、协调、原回执、权限、来源采用和重启实际检查；不调用模型或视觉功能"},
     {"path":"validation/desktop/check-account-expiry.cjs","owner":"W3","task_id":"T11","scope":"真实已有数据副本的30秒原生会话自然过期、D08重新认证、浏览器减少动态效果、键盘及六种原生视口检查；不修改系统时钟"},
     {"path":"validation/prepare_account_upgrade.py","owner":"W3","task_id":"T11","scope":"已停止的本工程真实应用原生备份、workspace副本和原生Config重设本机目录；只准备当前账号升级检查，不修改源数据"},
     {"path":"validation/desktop/check-account-upgrade.cjs","owner":"W3","task_id":"T11","scope":"实际既有SQLite与workspace副本的公共账号、历史运行、关联交办、配置和记忆删除连续性检查；不调用模型"},
@@ -85,7 +92,8 @@
     {"task_id":"T10","owner":"W3","acceptance_ids":["A10"],"depends_on":["T09"],"development_record":"docs/development/T10.md","write_paths":["docs/Boss-Agent项目计划.md","specs/implementation-map.json","delivery-ledger.json"],"profile":"design"},
     {"task_id":"T11","owner":"W3","acceptance_ids":["A11"],"depends_on":["T10"],"development_record":"docs/development/T11.md","write_paths":["validation/role_channel.py","validation/application.py","validation/boss_page_api.py","validation/check_product_access.py","validation/check_research_runtime.py","validation/export_runtime_transport.py","validation/desktop/","scripts/run_boss_local.sh","scripts/prepare_boss_webui.py","scripts/boss_auth_overlay.py","docs/运行环境.md","app/tests/test_product_privacy.py","app/tests/test_product_admin_access.py","app/tests/test_boss_prompt_context_adoption.py","app/webui/BossLogin.tsx","app/webui/BossDesktop.tsx","app/webui/boss-v6.css","app/tests/test_boss_authentication.py","design/T03/login/"],"profile":"integration","work_items":[
       {"work_item_id":"T11-LOGIN-N01-D08","requirement_ids":["FR-26","FR-28"],"acceptance_refs":["AC-26-S","AC-26-E","AC-28-S","AC-28-E"],"page_ids":["N01","D08"],"specification_ref":"docs/Boss-Agent项目计划.md 第13.9节","design_basis":"Desktop v6 design-tokens.json、N01/D08、当前 nanobot 真实认证","verification":"真实身份登录、401/403、错误与过期、重新认证、退出、重复提交、DOM/可访问性及构建；视觉未执行"},
-      {"work_item_id":"T11-DESKTOP-CONTENT-BOUNDS","requirement_ids":["FR-26","FR-32"],"acceptance_refs":["AC-26-S","AC-26-E","AC-32-S","AC-32-E"],"scope":"登录、重新认证、老板及维护工作区的公共外层容器","specification_ref":"docs/Boss-Agent项目计划.md 第13.11节","verification":"四个边缘相对内容视口误差不超过1个CSS px；三个桌面尺寸及200%缩放，刷新/调整窗口/身份切换，DOM与计算样式、内部滚动和窗口操作；视觉未执行"}
+      {"work_item_id":"T11-DESKTOP-CONTENT-BOUNDS","requirement_ids":["FR-26","FR-32"],"acceptance_refs":["AC-26-S","AC-26-E","AC-32-S","AC-32-E"],"scope":"登录、重新认证、老板及维护工作区的公共外层容器","specification_ref":"docs/Boss-Agent项目计划.md 第13.11节","verification":"四个边缘相对内容视口误差不超过1个CSS px；三个桌面尺寸及200%缩放，刷新/调整窗口/身份切换，DOM与计算样式、内部滚动和窗口操作；视觉未执行"},
+      {"work_item_id":"T11-SUPPLY-QUALITY-170","requirement_ids":["FR-14","FR-21"],"acceptance_refs":["AC-14-S","AC-14-E","AC-21-S","AC-21-E"],"page_ids":["F14","F21","A03"],"specification_ref":"docs/Boss-Agent项目计划.md 第13.18节及T12 1.7.0接收","verification":"显式模拟导入、空结果、失败、超时、撤销、当前来源及传递依赖、协调任务、原回执、D06、角色、持久重读及重启；全部外部API保持SIMULATED_FIRST"}
     ]},
     {"task_id":"T12","owner":"W1","acceptance_ids":["A12"],"depends_on":["T11"],"development_record":"docs/development/T12.md","write_paths":["validation/business.py","validation/controls.py","app/tests/test_boss_simulation.py"],"profile":"domain"},
     {"task_id":"T13","owner":"W1","acceptance_ids":["A13"],"depends_on":["T12"],"development_record":"docs/development/T13.md","write_paths":["validation/business.py","validation/boss_metrics.py","app/tests/test_boss_metrics.py"],"profile":"domain"},

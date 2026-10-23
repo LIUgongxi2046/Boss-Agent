@@ -4,7 +4,7 @@ from aiohttp import web
 from nanobot.agent.tools.base import Tool
 
 from business import encode, require
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
 
 
 HTTP_ERRORS={400:web.HTTPBadRequest,401:web.HTTPUnauthorized,403:web.HTTPForbidden,
@@ -105,8 +105,7 @@ class BossEvidenceReadTool(_BossPageReadTool):
             db.execute("BEGIN")
             self._api.store.active(db,self._api.namespace)
             document=self._api.store.get(db,self._api.namespace,"document",source)
-            clock=self._api.store.get(db,self._api.namespace,"clock","current")["at"]
-            require_current_simulated_source(document,self._owner_id,clock)
+            require_current_business_source(self._api.store,db,self._api.namespace,self._owner_id,source)
             require(all(result.get(key)==document.get(key) for key in (
                 "source_type","source_id","version","published_at","author_contact_id","original_locator","content")),
                 "原文读取后来源已经变化，需要重新读取",web.HTTPConflict)

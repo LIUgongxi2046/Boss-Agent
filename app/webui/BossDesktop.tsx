@@ -14,6 +14,9 @@ import pageMeta from "./page-meta.json";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
+import { BossSupplyQualityView } from "./BossSupplyQualityView";
+import { EMPTY_SUPPLY_EDITOR, type SupplyQualityEditor } from "./BossSupplyQualityPanel";
+import { MaintainerSupplyQuality, EMPTY_IMPORT_EDITOR, type SupplyImportEditor } from "./MaintainerSupplyQuality";
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
@@ -251,6 +254,22 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
+  const [supplyEditors, setSupplyEditors] = useState({client,token,SI09:{...EMPTY_SUPPLY_EDITOR},SI10:{...EMPTY_SUPPLY_EDITOR},import:{...EMPTY_IMPORT_EDITOR}});
+  useEffect(()=>{
+    setSupplyEditors({client,token,SI09:{...EMPTY_SUPPLY_EDITOR},SI10:{...EMPTY_SUPPLY_EDITOR},import:{...EMPTY_IMPORT_EDITOR}});
+  },[client,token]);
+  const updateSupplyEditor=useCallback((interfaceId:"SI09"|"SI10",changes:Partial<SupplyQualityEditor>)=>{
+    setSupplyEditors(current=>current.client===client&&current.token===token?{...current,[interfaceId]:{...current[interfaceId],...changes}}:current);
+  },[client,token]);
+  const updateImportEditor=useCallback((changes:Partial<SupplyImportEditor>)=>{
+    setSupplyEditors(current=>current.client===client&&current.token===token?{...current,import:{...current.import,...changes}}:current);
+  },[client,token]);
+  const currentSupply=supplyEditors.client===client&&supplyEditors.token===token?supplyEditors:null;
+  const supplyInterface=page==="F14"?"SI09":"SI10";
+  const supplyEditor=currentSupply?.[supplyInterface]??EMPTY_SUPPLY_EDITOR;
+  const importEditor=currentSupply?.import??EMPTY_IMPORT_EDITOR;
+  const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
+  const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
@@ -324,8 +343,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) ||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
           (["N07","N08"].includes(page) && settingsDirty) ||
-          (["F01","F04","N09","A08","A06"].includes(page) && workDirty))))) {
+          (["F01","F04","N09","A08","A06"].includes(page) && workDirty)||supplyDirty||importDirty)))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      if(directoryOpen){
+        const trigger=shellRef.current?.querySelector<HTMLButtonElement>('button.boss-search');
+        if(!trigger)throw new Error("页面目录缺少返回焦点入口");
+        navigationFocus.current=trigger;
+      }
+      setDirectoryOpen(false);
       setPendingNavigation({id,focus,taskId,sopId});
       return;
     }
@@ -347,7 +372,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty]);
+  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,supplyDirty,importDirty,directoryOpen]);
 
   const sopChanged = useCallback((sopId: string) => {
     setSelectedSop(sopId);
@@ -901,6 +926,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
+                (page==="F14"||page==="F21") ? <BossSupplyQualityView key={page} interfaceId={supplyInterface}
+                  editor={supplyEditor} onEditorChange={changes=>updateSupplyEditor(supplyInterface,changes)}
+                  onOpenSource={goSource} onOpenTask={taskId=>navigate("F06","",false,taskId)}/> :
                 (SECTOR_PAGE_IDS as readonly string[]).includes(page) ? <BossSectorView
                   key={page} pageId={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
@@ -1059,6 +1087,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 <BossWorkspaceView key="A03" role={role} pageId="A03"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
                 <div className="boss-workspace-extra">
+                  <MaintainerSupplyQuality editor={importEditor} onEditorChange={updateImportEditor}/>
                   <MaintainerApplicationSeed/>
                 </div>
               </> : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
@@ -1112,7 +1141,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           if (navigationFocus.current?.isConnected) navigationFocus.current.focus();
         }}>
         <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 未保存修改（D06）</h3></DialogPrimitive.Title>
-        <DialogPrimitive.Description asChild><p>{page === "A08" ? "当前运行配置有未保存内容。离开不会修改已经启用的配置。" : ["N07","N08"].includes(page)?
+        <DialogPrimitive.Description asChild><p>{["F14","F21","A03"].includes(page)?"当前模拟资料或协调表单存在编辑内容。离开将放弃尚未提交的编辑；已经提交但结果未确定的原请求会保留，返回后继续核查。":page === "A08" ? "当前运行配置有未保存内容。离开不会修改已经启用的配置。" : ["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
           page === "A06" ? "当前方法有未保存内容。离开不会修改已经保存的草稿或当前原生方法。" :
           page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
@@ -1128,6 +1157,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             setSourceReviewDirty(false);
             setSettingsDirty(false);
             setWorkDirty(false);
+            if(["F14","F21"].includes(page)&&!supplyEditor.pending)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
+            if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);
             navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
           }}>放弃草稿并离开</button>

@@ -1,0 +1,422 @@
+{
+  "status": "PASS_PUBLIC_ELEVEN_SECTOR_SCOPES_AND_A06_PENDING_READ_CANCELLATION",
+  "run_id": "sector-scope-fc1e6566-87e0-441c-ab93-951d0a17cd47",
+  "at": "2026-10-23T14:04:13.353Z",
+  "application_directory": "validation/.work/sector-scope-fc1e6566-87e0-441c-ab93-951d0a17cd47",
+  "inputs": [
+    {
+      "path": "app/webui/BossSectorView.tsx",
+      "sha256": "5b7602740cbf88f88a6666e0c12794c8e371544f4619d21a6780cc664f16e072"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "a9fcea563fb0adfdf33a85d77b1226c52a849ff8b76475ea2ecb195c19cf0e77"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "0284cd1c76fd5a88153990a9051b2764fa6c2794cc8766c67aa5b32b8c174ba9"
+    },
+    {
+      "path": "validation/desktop/check-sector-scope.cjs",
+      "sha256": "d4bf5833e5f1d038fcdafb47358cc0528dca67bc806f745111bd43e63516b3da"
+    },
+    {
+      "path": "evidence/T12/check_simulation_reads.py",
+      "sha256": "c9f8ce2252863dd3ccf27524c4bfe31cb4ac9970350ad0f9f45f5ead1d9e5afe"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "cbd16be0cdb67a19a10b82036fca4580a2c4669419e5a6ca0117965ee937a3eb"
+    }
+  ],
+  "records": [
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F15",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "区域",
+        "品种",
+        "阶段",
+        "比较周期"
+      ],
+      "metric_labels": [
+        "订单",
+        "渠道库存",
+        "投苗投喂",
+        "回访分子分母"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "78d63d5028a84e1ab87f6cfdec5aeed51873c91f44c2b5bd849d377368077847"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F16",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "养户反馈",
+        "苗种批次",
+        "养殖批次"
+      ],
+      "metric_labels": [
+        "批次来源",
+        "投苗依据",
+        "专业反馈"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "a30a1f2f5fd6ee6f2d397c1469fe77d237b330a3c9be0f1f512cfd68fe05d8fe"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F17",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "区域",
+        "批次",
+        "专业责任人"
+      ],
+      "metric_labels": [
+        "现场问题",
+        "用药依据",
+        "回访证据"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "ef4d59eb200889f9aecb949dc84402e6159aaa41f1745e6695995fb029e8c7ab"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F18",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "合作主体",
+        "批次",
+        "周期",
+        "结算状态"
+      ],
+      "metric_labels": [
+        "存栏",
+        "转群",
+        "出栏重量",
+        "出栏价格"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "4cacc63294570e28ab74690d51848098f449aefc36bed40ff7e62721c1341f4a"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F19",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "用途",
+        "阶段",
+        "客户",
+        "观察期"
+      ],
+      "metric_labels": [
+        "供料数量",
+        "体重",
+        "出栏",
+        "适用单位"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "0b99cfcf6aac0f80fa3f02ef254dc373a4da4f93a9d2d8ba9f3c8bad7337c7f2"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F20",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "自营法人",
+        "养殖单元",
+        "设备",
+        "批次"
+      ],
+      "metric_labels": [
+        "养殖单元",
+        "设备记录",
+        "批次证据"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "c1c681517f0c9ee012fa9c3e17d1e4ded26a2ff9757a81a8ca676890ee72738f"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F22",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "国别",
+        "法人",
+        "本地期间",
+        "集团期间",
+        "币种",
+        "时区"
+      ],
+      "metric_labels": [
+        "订单",
+        "工段能力",
+        "交付缺口",
+        "回款范围"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "dd0c164e175c591b6989b06e9f3f239f1bdfd9f7025de00fa20ddf81cdc8afe5"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "F23",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "研发项目",
+        "试验版本",
+        "专业评审",
+        "决定问题"
+      ],
+      "metric_labels": [
+        "试验依据",
+        "版本状态",
+        "专业评审"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "d6739273296bc7111b3dc09602d526729a72f30ce5ac24cf36626743b422566a"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "V19-BEEF",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "牛或羊",
+        "用途",
+        "生长阶段",
+        "客户",
+        "观察期"
+      ],
+      "metric_labels": [
+        "供料量",
+        "生长表现",
+        "出栏",
+        "适用单位"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "1c92f05aab53c48c663089dee9b3da2dfc7125b7226c1db6ab5cb10b809b9206"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "V19-EGG",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "蛋禽阶段",
+        "客户",
+        "日龄",
+        "观察期"
+      ],
+      "metric_labels": [
+        "供料",
+        "产蛋量",
+        "合格蛋重",
+        "适用单位"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "10bb867dd2a6d8d46115be1ef03f6cb09039adbefccc81c86560077d4d4ded50"
+    },
+    {
+      "check": "public_current_sector_scope_and_unknown_metrics",
+      "page_id": "V19-MILK",
+      "source_type": "SIMULATED",
+      "design_filters": [
+        "动物",
+        "客户",
+        "泌乳阶段",
+        "观察期"
+      ],
+      "metric_labels": [
+        "供料量",
+        "产奶表现",
+        "计量单位",
+        "观察期"
+      ],
+      "numeric_values": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "source_ids": [],
+      "page_fields_initialized_empty": true,
+      "actual_scope_input_sha256": "f0293385f7e810026db0759f9292e041476372abeaf9971be1e639642b97b947",
+      "response_sha256": "c785d3221d884b5ca7118851b08b8e4276a9a201d74b0ee2d5c96885f05c20fc"
+    },
+    {
+      "check": "public_sector_tab_and_actual_offline_recovery",
+      "current_page": "V19-EGG",
+      "previous_fields_absent": true,
+      "offline_current_data_removed": true,
+      "recovered": true
+    },
+    {
+      "check": "public_logout_roles_a06_pending_http_cancellation_and_zero_mutation",
+      "old_token": 401,
+      "cross_role": 403,
+      "page_reads": [
+        {
+          "page_id": "F15",
+          "status": 200
+        },
+        {
+          "page_id": "F16",
+          "status": 200
+        },
+        {
+          "page_id": "F17",
+          "status": 200
+        },
+        {
+          "page_id": "F18",
+          "status": 200
+        },
+        {
+          "page_id": "F19",
+          "status": 200
+        },
+        {
+          "page_id": "F20",
+          "status": 200
+        },
+        {
+          "page_id": "F22",
+          "status": 200
+        },
+        {
+          "page_id": "F23",
+          "status": 200
+        },
+        {
+          "page_id": "V19-BEEF",
+          "status": 200
+        },
+        {
+          "page_id": "V19-EGG",
+          "status": 200
+        },
+        {
+          "page_id": "V19-MILK",
+          "status": 200
+        },
+        {
+          "page_id": "F19",
+          "status": 200
+        },
+        {
+          "page_id": "V19-EGG",
+          "status": 200
+        },
+        {
+          "page_id": "V19-EGG",
+          "status": 200
+        }
+      ],
+      "actual_websocket_actions": [
+        "boss.auth.logout"
+      ],
+      "renderer_errors": [],
+      "pending_http_canceled_and_reread": true,
+      "business_tables_sha256": {
+        "objects": "2ed8651de633df5e1643eb98d9a03baa17706d3fac1607423cedbd255838acdc",
+        "idempotency": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "audit": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+        "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+      },
+      "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "sector_kpi_calculations_verified": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_sector_business_accepted": false
+}

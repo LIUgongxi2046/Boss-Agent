@@ -16,35 +16,42 @@ export type SupplyQualityProjection={source_type:"SIMULATED";interface_id:"SI09"
   supply:Supply[];trace:Trace|null;events:SupplyQualityRecord[];coordination_links:{task_id:string;origin_record_id:string;origin_version:string}[];
   review_sha256:string;business_at:string;read_at:string;external_service_invoked:false;purchase_executed:false;quality_release_executed:false};
 export type SupplyQualityReceipt={action:string;client_request_id:string;outcome:"RECORDED"|"NOT_FOUND_IN_CURRENT_STORE";result:unknown};
+export type SupplyQualityEditor={originId:string;purpose:string;due:string;evidence:string;approvedFor:string|null;pending:Record<string,unknown>|null};
+export const EMPTY_SUPPLY_EDITOR:SupplyQualityEditor={originId:"",purpose:"",due:"",evidence:"",approvedFor:null,pending:null};
 type Props={data:SupplyQualityProjection|null;loading:boolean;error:string;onReload:()=>void;onOpenSource:(sourceId:string)=>void;
   onOpenTask:(taskId:string)=>void;onCommand:(action:string,payload:Record<string,unknown>)=>Promise<unknown>;
-  onReceipt:(action:string,key:string)=>Promise<SupplyQualityReceipt>};
+  onReceipt:(action:string,key:string)=>Promise<SupplyQualityReceipt>;editor:SupplyQualityEditor;onEditorChange:(changes:Partial<SupplyQualityEditor>)=>void};
 const ACTION="boss.supply_quality.coordinate";
 const value=(quantity:string|null,unit="")=>quantity===null?"未知":quantity+(unit?" "+unit:"");
 
-export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource,onOpenTask,onCommand,onReceipt}:Props){
+export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource,onOpenTask,onCommand,onReceipt,editor,onEditorChange}:Props){
   const heading=useId();
   const [search,setSearch]=useState("");
-  const [originId,setOriginId]=useState("");
-  const [purpose,setPurpose]=useState("");
-  const [due,setDue]=useState("");
-  const [evidence,setEvidence]=useState("");
-  const [approvedFor,setApprovedFor]=useState<string|null>(null);
-  const [pending,setPending]=useState<Record<string,unknown>|null>(null);
+  const {originId,purpose,due,evidence,approvedFor,pending}=editor;
+  const setOriginId=(originId:string)=>onEditorChange({originId});
+  const setPurpose=(purpose:string)=>onEditorChange({purpose});
+  const setDue=(due:string)=>onEditorChange({due});
+  const setEvidence=(evidence:string)=>onEditorChange({evidence});
+  const setApprovedFor=(approvedFor:string|null)=>onEditorChange({approvedFor});
+  const setPending=(pending:Record<string,unknown>|null)=>onEditorChange({pending});
   const [busy,setBusy]=useState(false);
   const [failure,setFailure]=useState("");
   const [notice,setNotice]=useState("");
   const selected=data?.records.find(record=>record.entity_type+":"+record.record_id===originId);
   const changed=()=>setApprovedFor(null);
-  function saved(){setPending(null);setApprovedFor(null);setBusy(false);setNotice("协调任务已经保存，请打开交办查看发送与后续状态。");onReload();}
+  function saved(){onEditorChange({...EMPTY_SUPPLY_EDITOR});setBusy(false);setNotice("协调任务已经保存，请打开交办查看发送与后续状态。");onReload();}
   async function submit(){
-    if(busy||loading||!data||(!pending&&(!selected||approvedFor!==data.review_sha256||!purpose.trim()||!due||!evidence.trim())))return;
-    const payload=pending||{client_request_id:"supply-coordinate-"+crypto.randomUUID(),interface_id:data.interface_id,
+    if(busy||(!pending&&(loading||!data||!selected||approvedFor!==data.review_sha256||!purpose.trim()||!due||!evidence.trim())))return;
+    const payload=pending||{client_request_id:"supply-coordinate-"+crypto.randomUUID(),interface_id:data!.interface_id,
       origin_entity_type:selected!.entity_type,origin_record_id:selected!.record_id,origin_version:selected!.version,
-      review_sha256:data.review_sha256,purpose:purpose.trim(),coordinator_id:"coordinator-1",due_at:due+":00+08:00",timezone:"Asia/Shanghai",
+      review_sha256:data!.review_sha256,purpose:purpose.trim(),coordinator_id:"coordinator-1",due_at:due+":00+08:00",timezone:"Asia/Shanghai",
       evidence_requirements:evidence.split("\n").map(text=>text.trim()).filter(Boolean)};
     setPending(payload);setBusy(true);setFailure("");setNotice("");
-    await onCommand(ACTION,payload).then(saved,(error:unknown)=>{
+    await onCommand(ACTION,payload).then(result=>{
+      const savedResult=result as {task_id?:unknown;coordination_link?:{origin_record_id?:unknown};external_service_invoked?:unknown;quality_release_executed?:unknown;purchase_executed?:unknown};
+      if(typeof savedResult?.task_id!=="string"||savedResult.coordination_link?.origin_record_id!==payload.origin_record_id||savedResult.external_service_invoked!==false||savedResult.quality_release_executed!==false||savedResult.purchase_executed!==false){setBusy(false);setFailure("协调回执与当前请求不符，请核查原请求。");return;}
+      saved();
+    },(error:unknown)=>{
       setBusy(false);setFailure(error instanceof Error?error.message:String(error));
       if(error instanceof Error&&error.name==="WebUIMutationError"&&"status" in error&&typeof error.status==="number"&&[400,401,403,404,409,410,413,422].includes(error.status)){
         setPending(null);setApprovedFor(null);onReload();
@@ -57,7 +64,11 @@ export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource
     await onReceipt(ACTION,String(pending.client_request_id)).then(receipt=>{
       setBusy(false);
       if(receipt.action!==ACTION||receipt.client_request_id!==pending.client_request_id){setFailure("回执与当前请求编号不符，需要继续核查。");return;}
-      if(receipt.outcome==="RECORDED"){saved();return;}
+      if(receipt.outcome==="RECORDED"){
+        const result=receipt.result as {task_id?:unknown;coordination_link?:{origin_record_id?:unknown}};
+        if(typeof result?.task_id!=="string"||result.coordination_link?.origin_record_id!==pending.origin_record_id){setFailure("协调原回执内容不符，需要继续核查。");return;}
+        saved();return;
+      }
       setFailure("当前没有查到原请求回执，执行结果仍未确定。请保留原请求编号继续核查。");onReload();
     },(error:unknown)=>{setBusy(false);setFailure(error instanceof Error?error.message:String(error));});
   }
@@ -68,6 +79,9 @@ export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource
     {loading&&<p role="status">正在读取当前来源与业务资料</p>}
     {(error||failure)&&<p className="boss-status boss-status-error" role="alert">{error||failure}</p>}
     {notice&&<p className="boss-status" role="status">{notice}</p>}
+    {pending&&<section aria-label="协调原请求核查"><p className="boss-helper" role="status">请求编号：{String(pending.client_request_id)}；执行结果通过原请求核查。</p>
+      <div className="boss-actions"><button type="button" className="boss-btn" disabled={busy} onClick={()=>void reconcile()}>核查原请求回执</button>
+        <button type="button" className="boss-btn" disabled={busy} onClick={()=>void submit()}>使用原请求编号继续提交</button></div></section>}
     {data&&<>
       <p>资料版本 {data.dataset_version} · 业务时间 {data.business_at} · 读取时间 {data.read_at}</p>
       <p>最近导入：{data.last_import?data.last_import.state+" · "+data.last_import.record_count+" 条记录 · "+data.last_import.received_at:"尚无导入记录"}</p>
@@ -103,16 +117,14 @@ export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource
       <details><summary>资料缺少范围（{data.missing_fields.length}）</summary>{data.missing_fields.map(field=><p key={field}>{field}</p>)}</details>
       <section aria-label="本人协调交办"><h3>授权统筹交办</h3>
         <fieldset disabled={busy||loading||Boolean(pending)||data.records.length===0}>
-          <label className="boss-field">协调依据<select value={originId} onChange={event=>{setOriginId(event.target.value);changed();}}><option value="">请选择当前记录</option>{data.records.map(record=><option key={record.entity_type+":"+record.record_id} value={record.entity_type+":"+record.record_id}>{record.entity_type} · {record.record_id} · v{record.version}</option>)}</select></label>
-          <label className="boss-field">协调目的<textarea maxLength={2000} value={purpose} onChange={event=>{setPurpose(event.target.value);changed();}}/></label>
+          <label className="boss-field">协调依据<select aria-label="协调依据" value={originId} onChange={event=>{setOriginId(event.target.value);changed();}}><option value="">请选择当前记录</option>{data.records.map(record=><option key={record.entity_type+":"+record.record_id} value={record.entity_type+":"+record.record_id}>{record.entity_type} · {record.record_id} · v{record.version}</option>)}</select></label>
+          <label className="boss-field">协调目的<textarea aria-label="协调目的" maxLength={2000} value={purpose} onChange={event=>{setPurpose(event.target.value);changed();}}/></label>
           <p>统筹负责人：coordinator-1 · 由服务核查当前职责</p>
-          <label className="boss-field">截止时间（Asia/Shanghai）<input type="datetime-local" value={due} onChange={event=>{setDue(event.target.value);changed();}}/></label>
-          <label className="boss-field">证据要求（每行一项，最多八项）<textarea value={evidence} onChange={event=>{setEvidence(event.target.value);changed();}}/></label>
+          <label className="boss-field">截止时间（Asia/Shanghai）<input aria-label="截止时间（Asia/Shanghai）" type="datetime-local" value={due} onChange={event=>{setDue(event.target.value);changed();}}/></label>
+          <label className="boss-field">证据要求（每行一项，最多八项）<textarea aria-label="证据要求（每行一项，最多八项）" value={evidence} onChange={event=>{setEvidence(event.target.value);changed();}}/></label>
           <label className="boss-confirm-check"><input type="checkbox" checked={approvedFor===data.review_sha256} onChange={event=>setApprovedFor(event.target.checked?data.review_sha256:null)}/>本人确认当前依据、负责人、期限与证据要求</label>
         </fieldset>
-        <div className="boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={busy||loading||(!pending&&(!selected||approvedFor!==data.review_sha256||!purpose.trim()||!due||!evidence.trim()))} onClick={()=>void submit()}>{busy?"正在核查":pending?"使用原请求编号继续提交":"本人确认创建协调任务"}</button>
-          {pending&&<button type="button" className="boss-btn" disabled={busy} onClick={()=>void reconcile()}>核查原请求回执</button>}</div>
-        {pending&&<p className="boss-helper" role="status">请求编号：{String(pending.client_request_id)}；执行结果通过原请求核查。</p>}
+        {!pending&&<div className="boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={busy||loading||!selected||approvedFor!==data.review_sha256||!purpose.trim()||!due||!evidence.trim()} onClick={()=>void submit()}>{busy?"正在核查":"本人确认创建协调任务"}</button></div>}
         {data.coordination_links.map(link=><p key={link.task_id}>{link.origin_record_id} v{link.origin_version} · 交办 {link.task_id} · <button type="button" className="boss-btn" disabled={busy||Boolean(pending)} onClick={()=>onOpenTask(link.task_id)}>查看交办列表</button></p>)}
       </section>
     </>}

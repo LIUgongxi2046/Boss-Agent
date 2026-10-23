@@ -5,7 +5,7 @@ info:
   description: 当前公共实现；完整T06正式接收待完成。配置启用不授予业务授权。
 x-reception:
   state: IN_REVIEW
-  core_version: 1.6.0
+  core_version: 1.7.0
   owner: W3
   receiver: W1/T06
   authority: configuration/current

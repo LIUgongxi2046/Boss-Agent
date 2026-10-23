@@ -13,6 +13,7 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
+import yaml
 from boss_auth_overlay import apply_auth_overlay
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -119,6 +120,9 @@ def copy_overlay() -> None:
         ("MaintainerSkillVersions.tsx", "MaintainerSkillVersions.tsx"),
         ("MaintainerSimulationInspect.tsx", "MaintainerSimulationInspect.tsx"),
         ("BossAssignmentSourceReview.tsx", "BossAssignmentSourceReview.tsx"),
+        ("BossSupplyQualityPanel.tsx", "BossSupplyQualityPanel.tsx"),
+        ("BossSupplyQualityView.tsx", "BossSupplyQualityView.tsx"),
+        ("MaintainerSupplyQuality.tsx", "MaintainerSupplyQuality.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
         ("MaintainerKnowledgeEditor.tsx", "MaintainerKnowledgeEditor.tsx"),
@@ -132,6 +136,9 @@ def copy_overlay() -> None:
         encoding="utf-8",
     )
     shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")
+    (BOSS_DIR / "supply-quality-v1.json").write_text(
+        json.dumps(yaml.safe_load((ROOT / "data/simulation/supply-quality-v1.yaml").read_text()), ensure_ascii=False) + "\n", encoding="utf-8",
+    )
     for filename in ASSETS:
         shutil.copy2(DESIGN / "assets" / filename, ASSET_DIR / filename)
     for filename in ANIMATIONS:

@@ -151,8 +151,14 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
     sector_ids = re.findall(r'\"(F\d{2}|V19-[A-Z]+)\"', sector_part)
     assert len(sector_ids) == 13
     for page_id in sector_ids:
-        assert by_id[page_id]["component_file"] == "app/webui/BossSectorView.tsx"
-        assert by_id[page_id]["render_status"] == "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA"
+        if page_id in {"F14", "F21"}:
+            assert by_id[page_id]["component_file"] == "app/webui/BossSupplyQualityView.tsx"
+            interface = "SI09" if page_id == "F14" else "SI10"
+            assert "GET /api/boss/ui/supply-quality?interface_id=" + interface in by_id[page_id]["verified_http_read_routes"]
+            assert by_id[page_id]["code_wired_write_actions"] == ["boss.supply_quality.coordinate"]
+        else:
+            assert by_id[page_id]["component_file"] == "app/webui/BossSectorView.tsx"
+            assert by_id[page_id]["render_status"] == "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA"
         assert by_id[page_id]["metrics_are_real"] is False
         assert by_id[page_id]["actual_e2e_verified"] is False
     assert len(mapping["not_yet_built_page_ids"]) == 0

@@ -40,7 +40,8 @@ from boss_people import prepare as people_prepare, attach as people_attach, deta
 from boss_owner_preferences import (goals_save, goals_confirm, notice_save, notice_confirm)
 from boss_owner_authorizations import revoke as owner_authorization_revoke
 from boss_meetings import MeetingAPI, meeting_materials
-from boss_source_access import require_current_simulated_source
+from boss_source_access import require_current_business_source
+from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQualityAPI
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -97,6 +98,7 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        **{action: definition[0] for action, definition in SUPPLY_QUALITY_ACTIONS.items()},
         **{"boss.sop." + action: "MAINTAINER" for action in ("save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel")},
         "boss.assignment.create": "BOSS",
         "boss.assignment.send": "BOSS",
@@ -188,7 +190,9 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action.startswith("boss.sop."):
+            if action in SUPPLY_QUALITY_ACTIONS:
+                result = SupplyQualityAPI(self.store).execute(role, action, payload)
+            elif action.startswith("boss.sop."):
                 require(self.skills is not None, "当前方法服务尚未准备", web.HTTPServiceUnavailable)
                 result = self.skills.execute(role, action.removeprefix("boss.sop."), payload)
             elif action == "boss.assignment.sources.confirm":
@@ -278,9 +282,7 @@ class BossCommandAPI:
 
     def _require_current_source(self, db, data, source_id):
         require(_is_text(source_id, 128), "来源标识无效", web.HTTPBadRequest)
-        doc = self.store.get(db, NAMESPACE, "document", source_id)
-        business_at = self.store.get(db, NAMESPACE, "clock", "current")["at"]
-        return require_current_simulated_source(doc, data["owner_id"], business_at)
+        return require_current_business_source(self.store, db, NAMESPACE, data["owner_id"], source_id)
 
     def _require_current_task_sources(self, db, data, task):
         self.store.require_current_assignment_sources(db, NAMESPACE, data, task)

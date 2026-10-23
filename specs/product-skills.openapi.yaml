@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent 公共原生方法扩展
-  version: 0.2.0
+  version: 0.3.0
   description: 当前实际本地文件、配置与上下文接口，完整T06正式接收待完成；没有外部模型请求。
 x-reception:
   state: IN_REVIEW
-  core_version: 1.6.0
+  core_version: 1.7.0
   owner: W3
   receiver: W1/T06
   authority: native workspace/skills files and agents.defaults.disabled_skills
@@ -145,7 +145,7 @@ components:
     MethodEditor:
       type: object
       additionalProperties: false
-      required: [projection, source_type, external_api_mode, namespace, sop_id, active, draft, history, pending_activations, global_pending_activations, read_operations, command_operations, sections, active_assessment, model_adoption_verified, business_authorization_granted]
+      required: [projection, source_type, external_api_mode, namespace, sop_id, active, draft, history, pending_activations, global_pending_activations, read_operations, command_operations, sections, active_assessment, current_dependencies, model_adoption_verified, business_authorization_granted]
       properties:
         projection: {const: sop-method-editor}
         source_type: {const: RUNTIME_RECORD}
@@ -177,6 +177,16 @@ components:
             required: [heading, body]
             properties: {heading: {type: string}, body: {type: string}}
         active_assessment: {$ref: '#/components/schemas/Assessment'}
+        current_dependencies:
+          type: object
+          additionalProperties: false
+          required: [missing_tools, missing_projections, tool_references_resolved, projection_references_resolved, context_eligible]
+          properties:
+            missing_tools: {$ref: '#/components/schemas/Operations'}
+            missing_projections: {$ref: '#/components/schemas/Operations'}
+            tool_references_resolved: {type: boolean}
+            projection_references_resolved: {type: boolean}
+            context_eligible: {type: boolean}
         model_adoption_verified: {const: false}
         business_authorization_granted: {const: false}
     Save:
@@ -289,7 +299,7 @@ components:
     Item:
       type: object
       additionalProperties: false
-      required: [sop_id, name, requirement_id, version, content_sha256, enabled, native_available, read_operations, command_operations, human_only_operations, missing_tools, tool_references_resolved, context_eligible, business_authorization_granted, model_adoption_verified]
+      required: [sop_id, name, requirement_id, version, content_sha256, enabled, native_available, read_operations, command_operations, human_only_operations, missing_tools, missing_projections, tool_references_resolved, projection_references_resolved, context_eligible, business_authorization_granted, model_adoption_verified]
       properties:
         sop_id: {$ref: '#/components/schemas/SopID'}
         name: {$ref: '#/components/schemas/Name'}
@@ -303,6 +313,8 @@ components:
         human_only_operations: {$ref: '#/components/schemas/Operations'}
         missing_tools: {$ref: '#/components/schemas/Operations'}
         tool_references_resolved: {type: boolean}
+        missing_projections: {$ref: '#/components/schemas/Operations'}
+        projection_references_resolved: {type: boolean}
         context_eligible: {type: boolean}
         business_authorization_granted: {const: false}
         model_adoption_verified: {const: false}

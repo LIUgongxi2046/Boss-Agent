@@ -1,0 +1,188 @@
+{
+  "status": "FAIL",
+  "run_id": "supply-quality-1e6d2239-5ec9-44a2-bcd8-98f31aa19fdc",
+  "at": "2026-10-23T13:53:31.094Z",
+  "application_directory": "validation/.work/supply-quality-1e6d2239-5ec9-44a2-bcd8-98f31aa19fdc",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ba611f463f17f70fb0ac166b99ea1f41cf2658af9f4a8a8d45b3d2c9e7da4606"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b510465c929ade247e4b50c40d5dd4b50764d1be14698352ee0a7028b560c34c"
+    },
+    {
+      "path": "validation/boss_supply_quality.py",
+      "sha256": "0de5e5861c836867e6f4dda261ea4e7bd3022d0bdde1adb2b728437b38021edb"
+    },
+    {
+      "path": "validation/boss_supply_quality_views.py",
+      "sha256": "878852b2fc92cbd78df46695a46da8889c29bc8903e817a7c2071c4f9560fab9"
+    },
+    {
+      "path": "validation/boss_source_access.py",
+      "sha256": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44"
+    },
+    {
+      "path": "validation/check_supply_quality_state.py",
+      "sha256": "8fd0fe465ddd9afcf1986ebef7b6377671b75bb419bd6408c661dae576c93e92"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityView.tsx",
+      "sha256": "f871568773b30af160624e4b92d49e20d8b9008cb062536e779931dc22314c1e"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "7c73fe0d1155947ed3dccc69468361957709605ae1a5227b46b50ca1461b9ff9"
+    },
+    {
+      "path": "app/webui/MaintainerSupplyQuality.tsx",
+      "sha256": "5ee7e579882bc3c0511da5a6f1d47251cf843d1bb87508e281e4396fa4d24eab"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "1fb450bbff961eb76274956e263fc0431b2333a9d28bef0375977ead1c9c5c45"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "ca2df8e87002f1c4bc0ec1b1ce0a98ee1f50926bc6aba3defe322f41ab9a8d3f"
+    },
+    {
+      "path": "specs/simulated-supply-quality.schema.json",
+      "sha256": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b"
+    },
+    {
+      "path": "specs/supply-quality-results.schema.json",
+      "sha256": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494"
+    },
+    {
+      "path": "validation/desktop/check-supply-quality.cjs",
+      "sha256": "b8d4bbadb87ca805dc16c5a6144d3ac69b5b59645b8ca2d4a674ae104a730d8e"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "0b9a58105e05df51b6628a29d09b8d40cb0eade412d9095f5023d35217c35a1a"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "EMPTY",
+      "http_status": 200,
+      "client_request_id": "supply-import-a96b0402-581a-4b5e-9b23-995282cf762d",
+      "record_count": 0,
+      "receipt_sha256": "ca87482310b24fe132820b45c3d183c0a1da635a90445af6653009b9bf4df624",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "FAILED",
+      "http_status": 502,
+      "client_request_id": "supply-import-caf04b96-18f4-4eeb-9c94-b16c3b8f43d1",
+      "record_count": 0,
+      "receipt_sha256": "6133e88ffdeda43489cdfeb690adb4f801bfd7bd2ee5a684513a1bc70846177c",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "TIMED_OUT",
+      "http_status": 504,
+      "client_request_id": "supply-import-00b2c4e1-2f27-4b4d-85d1-376586d39b44",
+      "record_count": 0,
+      "receipt_sha256": "49fcdb4fbdb9d6e0b0331700e0d4aa2cd030891b078e1be1dc8d24ff6616c2a6",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "SUCCESS",
+      "http_status": 200,
+      "client_request_id": "supply-import-55ff1e50-5366-46f0-b5ed-ee1cfd94fcf8",
+      "record_count": 21,
+      "receipt_sha256": "3dce9eb126d33dd6385befabda29a53371e8195fb2293eed7c7a61f8945b157b",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_coordination_original_request_and_actual_task_lifecycle",
+      "task_id": "6f2c602a-cb6a-4808-9cc6-2841b94cf8c6",
+      "client_request_id": "supply-coordinate-00015d7c-a53b-4141-b679-764fe0c3b812",
+      "unknown_request_retained_across_pages": true,
+      "task_selected_by_navigation": true,
+      "final_task_state": "COMPLETED_CONFIRMED",
+      "external_delivery": false
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720,
+      "role": "BOSS"
+    },
+    {
+      "check": "failure",
+      "name": "TimeoutError",
+      "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTitle('全部设计页面', { exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" title=\"全部设计页面\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A21_A23_accepted": false
+}

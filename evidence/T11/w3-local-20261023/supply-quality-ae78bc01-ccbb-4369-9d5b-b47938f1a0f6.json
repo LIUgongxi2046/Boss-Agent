@@ -1,0 +1,150 @@
+{
+  "status": "FAIL",
+  "run_id": "supply-quality-ae78bc01-ccbb-4369-9d5b-b47938f1a0f6",
+  "at": "2026-10-23T13:49:38.674Z",
+  "application_directory": "validation/.work/supply-quality-ae78bc01-ccbb-4369-9d5b-b47938f1a0f6",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ba611f463f17f70fb0ac166b99ea1f41cf2658af9f4a8a8d45b3d2c9e7da4606"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b510465c929ade247e4b50c40d5dd4b50764d1be14698352ee0a7028b560c34c"
+    },
+    {
+      "path": "validation/boss_supply_quality.py",
+      "sha256": "0de5e5861c836867e6f4dda261ea4e7bd3022d0bdde1adb2b728437b38021edb"
+    },
+    {
+      "path": "validation/boss_supply_quality_views.py",
+      "sha256": "878852b2fc92cbd78df46695a46da8889c29bc8903e817a7c2071c4f9560fab9"
+    },
+    {
+      "path": "validation/boss_source_access.py",
+      "sha256": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44"
+    },
+    {
+      "path": "validation/check_supply_quality_state.py",
+      "sha256": "8fd0fe465ddd9afcf1986ebef7b6377671b75bb419bd6408c661dae576c93e92"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityView.tsx",
+      "sha256": "f871568773b30af160624e4b92d49e20d8b9008cb062536e779931dc22314c1e"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "7c73fe0d1155947ed3dccc69468361957709605ae1a5227b46b50ca1461b9ff9"
+    },
+    {
+      "path": "app/webui/MaintainerSupplyQuality.tsx",
+      "sha256": "5ee7e579882bc3c0511da5a6f1d47251cf843d1bb87508e281e4396fa4d24eab"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "1fb450bbff961eb76274956e263fc0431b2333a9d28bef0375977ead1c9c5c45"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "ca2df8e87002f1c4bc0ec1b1ce0a98ee1f50926bc6aba3defe322f41ab9a8d3f"
+    },
+    {
+      "path": "specs/simulated-supply-quality.schema.json",
+      "sha256": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b"
+    },
+    {
+      "path": "specs/supply-quality-results.schema.json",
+      "sha256": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494"
+    },
+    {
+      "path": "validation/desktop/check-supply-quality.cjs",
+      "sha256": "c6f4d89ce26dce589e70724766ec098c41f0d20da008e8919e6e7317cf2779c1"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "0b9a58105e05df51b6628a29d09b8d40cb0eade412d9095f5023d35217c35a1a"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "EMPTY",
+      "http_status": 200,
+      "client_request_id": "supply-import-2bc2dfc4-7eb8-4a5f-8eb6-0b338254a325",
+      "record_count": 0,
+      "receipt_sha256": "bfb04ec1956c8df5abebd269dba7746d1dd010155789200ae89272117be6b4a1",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "FAILED",
+      "http_status": 502,
+      "client_request_id": "supply-import-f0e0a3d2-c2e0-404b-afd2-e36b98ea118b",
+      "record_count": 0,
+      "receipt_sha256": "14b59fb2285081c70de24f855314e12f9ac5c7291c776f6e3bbc2ff9971ae47e",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "TIMED_OUT",
+      "http_status": 504,
+      "client_request_id": "supply-import-0cd9e804-b13b-4fae-8f84-6fdc458f2865",
+      "record_count": 0,
+      "receipt_sha256": "a9641f5e8403180d6026d4b1fa2e0a843d0867d3f108f0424e76793559082d39",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "SUCCESS",
+      "http_status": 200,
+      "client_request_id": "supply-import-dfd04687-5995-4f9c-ad5f-df4fce8a75dd",
+      "record_count": 21,
+      "receipt_sha256": "86da9341a826c6f6cd4e3ca1e7f1f491f7140ccc541d06d2464fc00562bb84ba",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_coordination_original_request_and_actual_task_lifecycle",
+      "task_id": "42aecc55-84b1-4db8-b967-00c5229aac16",
+      "client_request_id": "supply-coordinate-de1e15d1-68c1-453d-b7a7-169c0c5219b6",
+      "unknown_request_retained_across_pages": true,
+      "task_selected_by_navigation": true,
+      "final_task_state": "COMPLETED_CONFIRMED",
+      "external_delivery": false
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "width": 1024,
+      "height": 768,
+      "zoom": 1,
+      "scroll": 1024,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "width": 512,
+      "height": 768,
+      "zoom": 2,
+      "scroll": 512,
+      "role": "BOSS"
+    },
+    {
+      "check": "failure",
+      "name": "AssertionError",
+      "message": "The expression evaluated to a falsy value:\n\n  assert.ok(dimensions.scroll<=dimensions.width+1)\n"
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A21_A23_accepted": false
+}

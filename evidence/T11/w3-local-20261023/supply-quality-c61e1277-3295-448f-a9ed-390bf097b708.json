@@ -1,0 +1,89 @@
+{
+  "status": "FAIL",
+  "run_id": "supply-quality-c61e1277-3295-448f-a9ed-390bf097b708",
+  "at": "2026-10-23T13:33:15.401Z",
+  "application_directory": "validation/.work/supply-quality-c61e1277-3295-448f-a9ed-390bf097b708",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ba611f463f17f70fb0ac166b99ea1f41cf2658af9f4a8a8d45b3d2c9e7da4606"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b510465c929ade247e4b50c40d5dd4b50764d1be14698352ee0a7028b560c34c"
+    },
+    {
+      "path": "validation/boss_supply_quality.py",
+      "sha256": "0de5e5861c836867e6f4dda261ea4e7bd3022d0bdde1adb2b728437b38021edb"
+    },
+    {
+      "path": "validation/boss_supply_quality_views.py",
+      "sha256": "878852b2fc92cbd78df46695a46da8889c29bc8903e817a7c2071c4f9560fab9"
+    },
+    {
+      "path": "validation/boss_source_access.py",
+      "sha256": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44"
+    },
+    {
+      "path": "validation/check_supply_quality_state.py",
+      "sha256": "8fd0fe465ddd9afcf1986ebef7b6377671b75bb419bd6408c661dae576c93e92"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityView.tsx",
+      "sha256": "f871568773b30af160624e4b92d49e20d8b9008cb062536e779931dc22314c1e"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "3516dc38ac9c1b688b0afbfa3214405e9630b74000cf47dcdf5f2a36f40c2268"
+    },
+    {
+      "path": "app/webui/MaintainerSupplyQuality.tsx",
+      "sha256": "1773d03e72f1dad59b611ada930cea08ebedcfc56afa9ca97b33bfc5007b0a0c"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "1511560178e9f59afc449096f4fe8e7aa9a45728f97654a826a2af5637bc0bea"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "ca2df8e87002f1c4bc0ec1b1ce0a98ee1f50926bc6aba3defe322f41ab9a8d3f"
+    },
+    {
+      "path": "specs/simulated-supply-quality.schema.json",
+      "sha256": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b"
+    },
+    {
+      "path": "specs/supply-quality-results.schema.json",
+      "sha256": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494"
+    },
+    {
+      "path": "validation/desktop/check-supply-quality.cjs",
+      "sha256": "f1a680e413c7f411a49303adbbed477e70a558c80f96c90e0d198b62e94fb99c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "f53402d9b61692b2404f58a1f4cf2eede37a9bb393a52921656daedeab7be0f2"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "failure",
+      "name": "TimeoutError",
+      "message": "locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('region', { name: '采购与品质模拟资料维护', exact: true }).getByLabel('输入种类', { exact: true })\u001b[22m\n"
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A21_A23_accepted": false
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-SKILLS-030",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-sop-030-8292824",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "-m",
+    "openapi_spec_validator",
+    "specs/product-skills.openapi.yaml"
+  ],
+  "started_at": "2026-10-23T13:37:23.720331+00:00",
+  "ended_at": "2026-10-23T13:37:26.328245+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/product-skills.openapi.yaml",
+      "sha256": "64dccaacd34cd858d09240c20f85595109fd363d453903b5d4e2588f60d5573a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-skills-extension-0.3.0/output.log",
+      "sha256": "c1d770b2a1d26234771dbf10385af37bfd154ab96974bf4397e3caa25b84fee0"
+    }
+  ]
+}

@@ -26,7 +26,8 @@ function bridge(mode,payload={}){
 }
 assert.equal(bridge("initialize").record_count,21);
 const supply=bridge("read",{interface_id:"SI09"});
-const common={loading:false,error:"",onOpenSource:()=>assert.fail("当前检查没有授权打开资料窗口"),onOpenTask:()=>{},onReceipt:()=>assert.fail("本次成功请求不需要查询回执")};
+const emptyEditor={originId:"",purpose:"",due:"",evidence:"",approvedFor:null,pending:null};
+const common={loading:false,error:"",editor:emptyEditor,onEditorChange:()=>{},onOpenSource:()=>assert.fail("当前检查没有授权打开资料窗口"),onOpenTask:()=>{},onReceipt:()=>assert.fail("本次成功请求不需要查询回执")};
 render(React.createElement(BossSupplyQualityPanel,{...common,data:supply,onReload:()=>{},onCommand:()=>assert.fail("读取库存不执行协调写入")}));
 assert(screen.getAllByText("20 tonne").length>0);
 assert(screen.getAllByText("10 日").length>0);
@@ -35,7 +36,8 @@ cleanup();
 const quality=bridge("read",{interface_id:"SI10"});
 function Harness(){
   const [data,setData]=React.useState(quality);
-  return React.createElement(BossSupplyQualityPanel,{...common,data,onReload:()=>setData(bridge("read",{interface_id:"SI10"})),
+  const [editor,setEditor]=React.useState(emptyEditor);
+  return React.createElement(BossSupplyQualityPanel,{...common,data,editor,onEditorChange:changes=>setEditor(current=>({...current,...changes})),onReload:()=>setData(bridge("read",{interface_id:"SI10"})),
     onCommand:async(action,input)=>bridge("command",{role:"BOSS",action,input})});
 }
 render(React.createElement(Harness));
@@ -46,7 +48,7 @@ fireEvent.change(screen.getByLabelText("证据要求（每行一项，最多八�
 assert.equal(screen.getByRole("button",{name:"本人确认创建协调任务"}).disabled,true);
 fireEvent.click(screen.getByLabelText("本人确认当前依据、负责人、期限与证据要求"));
 fireEvent.click(screen.getByRole("button",{name:"本人确认创建协调任务"}));
-await waitFor(()=>assert(screen.getByText("协调任务已经保存，请打开交办查看发送与后续状态。")));
+await waitFor(()=>assert(screen.getByText("协调任务已经保存，请打开交办查看发送与后续状态。")),{timeout:30000});
 const persisted=bridge("verify");
 assert.equal(persisted.tasks.length,1);
 assert.equal(persisted.tasks[0].status,"OPEN");

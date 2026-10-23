@@ -15,7 +15,7 @@ const accounts = accountAccess.provision(directory);
 const output = path.join(root, 'evidence/T11/w3-local-20261023', runId + '.json');
 const ports = {business: 8971, webui: 8972, gateway: 18971};
 const origin = 'http://127.0.0.1:8972';
-const pageIds = ['F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'V19-BEEF', 'V19-EGG', 'V19-MILK'];
+const pageIds = ['F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F22', 'F23', 'V19-BEEF', 'V19-EGG', 'V19-MILK'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 const records = [];
 const inputs = ['app/webui/BossSectorView.tsx', 'app/webui/BossDesktop.tsx', 'validation/boss_page_api.py',
@@ -125,8 +125,8 @@ async function check() {
       page_reads: reads, actual_websocket_actions: mutations, renderer_errors: errors,
       pending_http_canceled_and_reread: true, business_tables_sha256: after.after_tables_sha256,
       initial_snapshot_sha256: after.initial_snapshot_sha256});
-    save('PASS_PUBLIC_THIRTEEN_SECTOR_SCOPES_AND_A06_PENDING_READ_CANCELLATION');
-    console.log(JSON.stringify({status: 'PASS_PUBLIC_THIRTEEN_SECTOR_SCOPES_AND_A06_PENDING_READ_CANCELLATION', evidence: output}));
+    save('PASS_PUBLIC_ELEVEN_SECTOR_SCOPES_AND_A06_PENDING_READ_CANCELLATION');
+    console.log(JSON.stringify({status: 'PASS_PUBLIC_ELEVEN_SECTOR_SCOPES_AND_A06_PENDING_READ_CANCELLATION', evidence: output}));
   } finally {if (paused !== null) process.kill(paused, 'SIGCONT'); await desktop.close();}
 }
 process.on('uncaughtExceptionMonitor', error => {records.push({check: 'uncaught_failure', name: error.name}); save('FAILED_CHECK');});

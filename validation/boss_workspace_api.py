@@ -26,6 +26,7 @@ from boss_meetings import meeting_materials
 from boss_memory import confirmed_memory
 from boss_owner_authorizations import authorization_can_revoke
 from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -157,6 +158,7 @@ class BossWorkspaceAPI:
                     and source.get("access_scope") == data["owner_id"]
                     and source.get("source_type") == "SIMULATED"
                     and source.get("version") == minute["source_version"]
+                    and external_adoption(db, self.namespace, data, business_at, source)["state"] != "NEEDS_REIMPORT"
                 )
                 minute = dict(minute)
                 minute["source_reference_state"] = "CURRENT" if current else "NEEDS_REVIEW"
@@ -347,7 +349,8 @@ class BossWorkspaceAPI:
             for document in documents:
                 if (source_validity(document, business_at) != "VALID"
                         or document.get("access_scope") != data["owner_id"]
-                        or document.get("source_type") != "SIMULATED"):
+                        or document.get("source_type") != "SIMULATED"
+                        or external_adoption(db, self.namespace, data, business_at, document)["state"] == "NEEDS_REIMPORT"):
                     continue
                 if phrase and phrase.casefold() not in document.get("content", "").casefold():
                     continue

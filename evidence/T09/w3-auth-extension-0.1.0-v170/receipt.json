@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-AUTH-010-170",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-auth-170-8292824",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "-m",
+    "openapi_spec_validator",
+    "specs/product-auth.openapi.yaml"
+  ],
+  "started_at": "2026-10-23T14:08:06.468898+00:00",
+  "ended_at": "2026-10-23T14:08:08.849115+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/product-auth.openapi.yaml",
+      "sha256": "6b23cb5a28773a8ef15579891ca5892f3463203d25eeb9497a9ca0a6f43ef1a2"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-auth-extension-0.1.0-v170/output.log",
+      "sha256": "b8cbfb199fe820afdd52a8aa3618ef4afe719e56f2ed5dafc316ba59ae25f57f"
+    }
+  ]
+}

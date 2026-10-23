@@ -3,7 +3,7 @@ info:
   title: Boss Agent 公共本机账号认证扩展
   version: 0.1.0
   description: 本机账号核验与固定nanobot0.3.5会话机制，T06正式接收待完成。
-x-reception: {state: IN_REVIEW, owner: W3, receiver: W1/T06, core_version: 1.6.0}
+x-reception: {state: IN_REVIEW, owner: W3, receiver: W1/T06, core_version: 1.7.0}
 paths:
   /webui/bootstrap:
     get:

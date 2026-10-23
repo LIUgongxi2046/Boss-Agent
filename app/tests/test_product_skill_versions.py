@@ -82,6 +82,7 @@ def activation(current, key):
 def test_public_lifecycle_schema_original_receipts_and_history(methods):
     skills, api, pages = methods
     original = view(methods)
+    assert original["current_dependencies"]["context_eligible"] is True
     payload, result = saved(methods)
     assert view(methods)["active"] == original["active"]
     assert api.execute("MAINTAINER", "boss.sop.save", payload) == (200, result)

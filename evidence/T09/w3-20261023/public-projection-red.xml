@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="5.281" timestamp="2026-10-23T21:26:26.574235+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_skills" name="test_public_catalog_uses_live_loader_registry_and_native_current_files" time="1.213"><failure message="jsonschema.exceptions.ValidationError: Additional properties are not allowed ('missing_projections', 'projection_references_resolved' were unexpected)&#10;&#10;Failed validating 'additionalProperties' in schema['properties']['items']['items']:&#10;    {'type': 'object',&#10;     'additionalProperties': False,&#10;     'required': ['sop_id',&#10;                  'name',&#10;                  'requirement_id',&#10;                  'version',&#10;                  'content_sha256',&#10;                  'enabled',&#10;                  'native_available',&#10;                  'read_operations',&#10;                  'command_operations',&#10;                  'human_only_operations',&#10;                  'missing_tools',&#10;                  'tool_references_resolved',&#10;                  'context_eligible',&#10;                  'business_authorization_granted',&#10;                  'model_adoption_verified'],&#10;     'properties': {'sop_id': {'$ref': '#/components/schemas/SopID'},&#10;                    'name': {'$ref': '#/components/schemas/Name'},&#10;                    'requirement_id': {'type': 'string',&#10;                                       'pattern': '^FR-[0-9]{2}$'},&#10;                    'version': {'type': 'string', 'minLength': 1},&#10;                    'content_sha256': {'$ref': '#/components/schemas/Sha256'},&#10;                    'enabled': {'type': 'boolean'},&#10;                    'native_available': {'type': 'boolean'},&#10;                    'read_operations': {'$ref': '#/components/schemas/Operations'},&#10;                    'command_operations': {'$ref': '#/components/schemas/Operations'},&#10;                    'human_only_operations': {'$ref': '#/components/schemas/Operations'},&#10;                    'missing_tools': {'$ref': '#/components/schemas/Operations'},&#10;                    'tool_references_resolved': {'type': 'boolean'},&#10;                    'context_eligible': {'type': 'boolean'},&#10;                    'business_authorization_granted': {'const': False},&#10;                    'model_adoption_verified': {'const': False}}}&#10;&#10;On instance['items'][0]:&#10;    {'sop_id': 'SOP01',&#10;     'name': 'boss-sop01',&#10;     'requirement_id': 'FR-01',&#10;     'version': '0.1.0',&#10;     'content_sha256': '882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e',&#10;     'enabled': True,&#10;     'native_available': True,&#10;     'read_operations': ['todayRead',&#10;                         'ownerPlansRead',&#10;                         'bossDashboardRead'],&#10;     'command_operations': ['todayReorder'],&#10;     'human_only_operations': [],&#10;     'missing_tools': ['bossDashboardRead',&#10;                       'ownerPlansRead',&#10;                       'todayRead',&#10;                       'todayReorder'],&#10;     'missing_projections': [],&#10;     'tool_references_resolved': False,&#10;     'projection_references_resolved': True,&#10;     'context_eligible': False,&#10;     'business_authorization_granted': False,&#10;     'model_adoption_verified': False}">app/tests/test_product_skills.py:51: in test_public_catalog_uses_live_loader_registry_and_native_current_files
+    validate("Projection", result)
+app/tests/test_product_skills.py:24: in validate
+    Draft202012Validator({**document, "$ref": "#/components/schemas/" + kind}).validate(value)
+validation/.venv/lib/python3.12/site-packages/jsonschema/validators.py:451: in validate
+    raise error
+E   jsonschema.exceptions.ValidationError: Additional properties are not allowed ('missing_projections', 'projection_references_resolved' were unexpected)
+E   
+E   Failed validating 'additionalProperties' in schema['properties']['items']['items']:
+E       {'type': 'object',
+E        'additionalProperties': False,
+E        'required': ['sop_id',
+E                     'name',
+E                     'requirement_id',
+E                     'version',
+E                     'content_sha256',
+E                     'enabled',
+E                     'native_available',
+E                     'read_operations',
+E                     'command_operations',
+E                     'human_only_operations',
+E                     'missing_tools',
+E                     'tool_references_resolved',
+E                     'context_eligible',
+E                     'business_authorization_granted',
+E                     'model_adoption_verified'],
+E        'properties': {'sop_id': {'$ref': '#/components/schemas/SopID'},
+E                       'name': {'$ref': '#/components/schemas/Name'},
+E                       'requirement_id': {'type': 'string',
+E                                          'pattern': '^FR-[0-9]{2}$'},
+E                       'version': {'type': 'string', 'minLength': 1},
+E                       'content_sha256': {'$ref': '#/components/schemas/Sha256'},
+E                       'enabled': {'type': 'boolean'},
+E                       'native_available': {'type': 'boolean'},
+E                       'read_operations': {'$ref': '#/components/schemas/Operations'},
+E                       'command_operations': {'$ref': '#/components/schemas/Operations'},
+E                       'human_only_operations': {'$ref': '#/components/schemas/Operations'},
+E                       'missing_tools': {'$ref': '#/components/schemas/Operations'},
+E                       'tool_references_resolved': {'type': 'boolean'},
+E                       'context_eligible': {'type': 'boolean'},
+E                       'business_authorization_granted': {'const': False},
+E                       'model_adoption_verified': {'const': False}}}
+E   
+E   On instance['items'][0]:
+E       {'sop_id': 'SOP01',
+E        'name': 'boss-sop01',
+E        'requirement_id': 'FR-01',
+E        'version': '0.1.0',
+E        'content_sha256': '882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e',
+E        'enabled': True,
+E        'native_available': True,
+E        'read_operations': ['todayRead',
+E                            'ownerPlansRead',
+E                            'bossDashboardRead'],
+E        'command_operations': ['todayReorder'],
+E        'human_only_operations': [],
+E        'missing_tools': ['bossDashboardRead',
+E                          'ownerPlansRead',
+E                          'todayRead',
+E                          'todayReorder'],
+E        'missing_projections': [],
+E        'tool_references_resolved': False,
+E        'projection_references_resolved': True,
+E        'context_eligible': False,
+E        'business_authorization_granted': False,
+E        'model_adoption_verified': False}</failure></testcase></testsuite></testsuites>

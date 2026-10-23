@@ -1,11 +1,12 @@
 import {useEffect, useState} from "react";
 import {useClient} from "@/providers/ClientProvider";
-import {BossSupplyQualityPanel, type SupplyQualityProjection, type SupplyQualityReceipt} from "./BossSupplyQualityPanel";
+import {BossSupplyQualityPanel, type SupplyQualityEditor, type SupplyQualityProjection, type SupplyQualityReceipt} from "./BossSupplyQualityPanel";
 
-type Props={interfaceId:"SI09"|"SI10";onOpenSource:(sourceId:string)=>void;onOpenTask:(taskId:string)=>void};
+type Props={interfaceId:"SI09"|"SI10";onOpenSource:(sourceId:string)=>void;onOpenTask:(taskId:string)=>void;
+  editor:SupplyQualityEditor;onEditorChange:(changes:Partial<SupplyQualityEditor>)=>void};
 
-export function BossSupplyQualityView({interfaceId,onOpenSource,onOpenTask}:Props){
-  const {client,getToken}=useClient();
+export function BossSupplyQualityView({interfaceId,onOpenSource,onOpenTask,editor,onEditorChange}:Props){
+  const {client,getToken,token}=useClient();
   const [data,setData]=useState<SupplyQualityProjection|null>(null);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
@@ -26,7 +27,7 @@ export function BossSupplyQualityView({interfaceId,onOpenSource,onOpenTask}:Prop
       if(abort.signal.aborted)return;setError(error instanceof Error?error.message:String(error));setLoading(false);
     });
     return ()=>abort.abort();
-  },[interfaceId,getToken,revision]);
+  },[interfaceId,getToken,revision,client,token]);
   async function command(action:string,payload:Record<string,unknown>){
     if(!client)throw new Error("当前认证通道尚未连接。");
     return client.requestMutation<unknown>(action,payload);
@@ -39,5 +40,5 @@ export function BossSupplyQualityView({interfaceId,onOpenSource,onOpenTask}:Prop
     if(!response.ok)throw new Error("原请求回执读取失败（HTTP "+response.status+"）");
     return response.json() as Promise<SupplyQualityReceipt>;
   }
-  return <BossSupplyQualityPanel key={interfaceId} data={data} loading={loading} error={error} onReload={reload} onOpenSource={onOpenSource} onOpenTask={onOpenTask} onCommand={command} onReceipt={receipt}/>;
+  return <BossSupplyQualityPanel key={interfaceId} data={data} loading={loading} error={error} onReload={reload} onOpenSource={onOpenSource} onOpenTask={onOpenTask} onCommand={command} onReceipt={receipt} editor={editor} onEditorChange={onEditorChange}/>;
 }

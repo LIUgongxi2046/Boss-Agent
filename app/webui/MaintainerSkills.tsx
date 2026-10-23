@@ -5,6 +5,7 @@ import { useClient } from "@/providers/ClientProvider";
 type Method = {
   sop_id: string; name: string; requirement_id: string; version: string; content_sha256: string;
   enabled: boolean; native_available: boolean; missing_tools: string[]; context_eligible: boolean;
+  missing_projections:string[];projection_references_resolved:boolean;
   read_operations: string[]; command_operations: string[]; human_only_operations: string[];
 };
 type Projection = {
@@ -101,7 +102,8 @@ export function MaintainerSkills() {
         <div className="boss-kv"><span>动作工具</span><strong>{item.command_operations.join("、") || "没有动作工具"}</strong></div>
         <div className="boss-kv"><span>需要本人独立确认</span><strong>{item.human_only_operations.join("、") || "根据对应业务动作核查"}</strong></div>
         <div className="boss-kv"><span>尚未注册的工具</span><strong>{item.missing_tools.join("、") || "当前引用已经注册"}</strong></div>
-        <button type="button" className="boss-btn" disabled={busy || data.pending_activations.length > 0 || (!item.enabled && item.missing_tools.length > 0)}
+        <div className="boss-kv"><span>尚未获准的工作投影</span><strong>{item.missing_projections.join("、") || "当前投影引用完整"}</strong></div>
+        <button type="button" className="boss-btn" disabled={busy || data.pending_activations.length > 0 || (!item.enabled && (item.missing_tools.length > 0||item.missing_projections.length>0))}
           aria-label={(item.enabled ? "停用方法 " : "启用方法 ") + item.sop_id}
           onClick={() => {setPending(item); setConfirmed(false); setError("");}}>{item.enabled ? "停用方法" : "启用方法"}</button>
       </section>)}

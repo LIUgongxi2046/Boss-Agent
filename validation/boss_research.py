@@ -13,6 +13,7 @@ from datetime import date, datetime
 from aiohttp import web
 from business import now, require
 from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS="ui-check"
 REPORT_ID="research-current"
@@ -84,7 +85,8 @@ def _source_quotes(db, data, scope):
             rejected["after_cutoff"]+=1
             continue
         validity=source_validity(doc,clock)
-        if validity=="VALID":
+        adoption=external_adoption(db,NS,data,clock,doc)
+        if validity=="VALID" and adoption["state"]!="NEEDS_REIMPORT":
             covered+=1
         else:
             rejected["not_current"]+=1
@@ -95,6 +97,14 @@ def _source_quotes(db, data, scope):
         begin=content.casefold().find(token)
         if begin<0:
             rejected["no_match"]+=1
+            continue
+        if adoption["state"]=="NEEDS_REIMPORT":
+            source_issues.append({
+                "source_id":doc["source_id"],"version":doc["version"],
+                "validity_state":validity,"eligible_as_current_evidence":False,
+                "adoption_state":adoption["state"],"adoption_dependencies":adoption["dependencies"],
+                "valid_from":doc.get("valid_from"),"valid_until":doc.get("valid_until"),
+            })
             continue
         if validity!="VALID":
             source_issues.append({

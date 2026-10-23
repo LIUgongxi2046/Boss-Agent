@@ -775,15 +775,16 @@
       "logical_architecture_route": "/app/boss/F14",
       "actual_webui_navigation": "?bossPage=F14",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
-      "component_file": "app/webui/BossSectorView.tsx",
-      "component_name": "BossSectorView",
+      "render_status": "PARTIAL_EXPLICIT_SIMULATED_SUPPLY_COORDINATION",
+      "component_file": "app/webui/BossSupplyQualityView.tsx",
+      "component_name": "BossSupplyQualityView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/sector?page=F14"
+        "GET /api/boss/ui/supply-quality?interface_id=SI09",
+        "GET /api/boss/ui/supply-quality-receipt"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.supply_quality.coordinate"],
       "other_integration_points": [
-        "authenticated native Agent conversation for identifying missing evidence"
+        "owner-confirmed coordination links to selected F06 task; source dependencies checked before current adoption"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1066,15 +1067,16 @@
       "logical_architecture_route": "/app/boss/F21",
       "actual_webui_navigation": "?bossPage=F21",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
-      "component_file": "app/webui/BossSectorView.tsx",
-      "component_name": "BossSectorView",
+      "render_status": "PARTIAL_EXPLICIT_SIMULATED_QUALITY_COORDINATION",
+      "component_file": "app/webui/BossSupplyQualityView.tsx",
+      "component_name": "BossSupplyQualityView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/sector?page=F21"
+        "GET /api/boss/ui/supply-quality?interface_id=SI10",
+        "GET /api/boss/ui/supply-quality-receipt"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.supply_quality.coordinate"],
       "other_integration_points": [
-        "authenticated native Agent conversation for identifying missing evidence"
+        "batch processing quantities and professional records stay separate from owner-confirmed coordination task status"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -2610,16 +2612,18 @@
       "logical_architecture_route": "/app/maintain/A03",
       "actual_webui_navigation": "?bossPage=A03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_SIMULATED_DATASET_APPLICATION_CREATE_AND_REVISION",
+      "render_status": "PARTIAL_SIMULATED_DATASET_APPLICATION_AND_SUPPLY_QUALITY",
       "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView + MaintainerApplicationSeed",
+      "component_name": "BossWorkspaceView + MaintainerApplicationSeed + MaintainerSupplyQuality",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/dataset",
         "GET /api/boss/ui/workspace/approval-admin"
       ],
       "code_wired_write_actions": [
         "boss.simulation.application.seed",
-        "boss.simulation.application.revise"
+        "boss.simulation.application.revise",
+        "boss.simulation.supply_quality.import",
+        "boss.simulation.supply_quality.withdraw"
       ],
       "other_integration_points": [],
       "actual_e2e_verified": false,

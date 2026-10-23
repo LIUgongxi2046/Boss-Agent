@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.057" timestamp="2026-10-23T22:00:22.315650+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_supply_quality" name="test_unrelated_external_dependency_does_not_invalidate_current_research_quotes" time="0.213"><failure message="AssertionError: assert (200 == 200 and 'NEEDS_REVIEW' == 'CURRENT_SOURCE_EXCERPTS'&#10;  &#10;  - CURRENT_SOURCE_EXCERPTS&#10;  + NEEDS_REVIEW)">app/tests/test_product_supply_quality.py:118: in test_unrelated_external_dependency_does_not_invalidate_current_research_quotes
+    assert code == 200 and current["current_reference_state"] == "CURRENT_SOURCE_EXCERPTS"
+E   AssertionError: assert (200 == 200 and 'NEEDS_REVIEW' == 'CURRENT_SOURCE_EXCERPTS'
+E     
+E     - CURRENT_SOURCE_EXCERPTS
+E     + NEEDS_REVIEW)</failure></testcase></testsuite></testsuites>

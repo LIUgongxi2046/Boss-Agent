@@ -1,0 +1,725 @@
+{
+  "status": "PASS_RENDER_NO_PAGEERROR_ONLY",
+  "started_at": "2026-10-23T14:01:23.531Z",
+  "finished_at": "2026-10-23T14:02:44.502Z",
+  "commit": "8292824de09a2ce6b243325717c0c451f3424702",
+  "inputs": [
+    {
+      "path": "specs/page-service-map.json",
+      "sha256": "1aadd98c774eed14a1dc6d8a849ae5c6f25891677152950ceb18b12c6189f79f"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "a9fcea563fb0adfdf33a85d77b1226c52a849ff8b76475ea2ecb195c19cf0e77"
+    },
+    {
+      "path": "app/webui/MaintainerSkillVersions.tsx",
+      "sha256": "aa58155e059d5e34cc03338bf1638003fc1cfff6674f5b64d38e0bb45ce2e6f6"
+    },
+    {
+      "path": "app/webui/MaintainerSkills.tsx",
+      "sha256": "0a2d9584d20a2bef5d1c5e3f18cd423b9332b78687bd97448a2debb7e5fa7e14"
+    },
+    {
+      "path": "app/webui/BossSectorView.tsx",
+      "sha256": "5b7602740cbf88f88a6666e0c12794c8e371544f4619d21a6780cc664f16e072"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/product_skills.py",
+      "sha256": "f301b136f28565cf4c832133fd406a1e8b097619087a9d54199104a984d3af10"
+    },
+    {
+      "path": "validation/desktop/check-pages.cjs",
+      "sha256": "25ef1a48a89a5f831fb054b56f1ea52fc721e1598abd552a3552cb4de3958546"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "cbd16be0cdb67a19a10b82036fca4580a2c4669419e5a6ca0117965ee937a3eb"
+    }
+  ],
+  "application_directory": "validation/.work/page-dom-95f9ff24-44ca-450b-ad12-1f56fa81b155",
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "model_requested": false,
+  "external_api_mode": "SIMULATED_FIRST",
+  "business_tables_sha256": {
+    "objects": "2ed8651de633df5e1643eb98d9a03baa17706d3fac1607423cedbd255838acdc",
+    "idempotency": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "audit": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+    "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+  },
+  "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+  "component_sha256": "a9fcea563fb0adfdf33a85d77b1226c52a849ff8b76475ea2ecb195c19cf0e77",
+  "visited_pages": 70,
+  "role_page_observations": 72,
+  "anonymous_pages": {
+    "page_ids": [
+      "N01",
+      "D08"
+    ],
+    "evidence": "evidence/T11/w3-local-20261023/desktop.json"
+  },
+  "renderer_errors": [],
+  "records": [
+    {
+      "page_id": "F01",
+      "role": "BOSS",
+      "headings": 13,
+      "buttons": 27,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F02",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 8,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F03",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F04",
+      "role": "BOSS",
+      "headings": 11,
+      "buttons": 29,
+      "fields": 15,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F05",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 15,
+      "fields": 7,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F06",
+      "role": "BOSS",
+      "headings": 7,
+      "buttons": 14,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F07",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F08",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 12,
+      "fields": 5,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F09",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 16,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F10",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 11,
+      "fields": 7,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F11",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 11,
+      "fields": 12,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F12",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 11,
+      "fields": 11,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F13",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 9,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F14",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F15",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F16",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 3,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F17",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 3,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F18",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F19",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 13,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F20",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F21",
+      "role": "BOSS",
+      "headings": 7,
+      "buttons": 7,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F22",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F23",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F24",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F26",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 15,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F27",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 9,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F28",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F29",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N02",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N03",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 9,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N04",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 10,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N05",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 15,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N06",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 8,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N07",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 12,
+      "fields": 5,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N08",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 12,
+      "fields": 7,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N09",
+      "role": "BOSS",
+      "headings": 4,
+      "buttons": 8,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N10",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N11",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D01",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D02",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D03",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D04",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 8,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D05",
+      "role": "BOSS",
+      "headings": 3,
+      "buttons": 8,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D06",
+      "role": "BOSS",
+      "headings": 2,
+      "buttons": 6,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D07",
+      "role": "BOSS",
+      "headings": 2,
+      "buttons": 6,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D09",
+      "role": "BOSS",
+      "headings": 5,
+      "buttons": 8,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "V19-BEEF",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 13,
+      "fields": 5,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "V19-EGG",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 13,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "V19-MILK",
+      "role": "BOSS",
+      "headings": 6,
+      "buttons": 13,
+      "fields": 4,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F25",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 8,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F30",
+      "role": "MAINTAINER",
+      "headings": 3,
+      "buttons": 6,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F31",
+      "role": "MAINTAINER",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "F32",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "N12",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D06",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "D07",
+      "role": "MAINTAINER",
+      "headings": 2,
+      "buttons": 6,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A01",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A02",
+      "role": "MAINTAINER",
+      "headings": 6,
+      "buttons": 11,
+      "fields": 3,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A03",
+      "role": "MAINTAINER",
+      "headings": 6,
+      "buttons": 12,
+      "fields": 8,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A04",
+      "role": "MAINTAINER",
+      "headings": 7,
+      "buttons": 14,
+      "fields": 7,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A05",
+      "role": "MAINTAINER",
+      "headings": 6,
+      "buttons": 16,
+      "fields": 5,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A06",
+      "role": "MAINTAINER",
+      "headings": 19,
+      "buttons": 28,
+      "fields": 6,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A07",
+      "role": "MAINTAINER",
+      "headings": 3,
+      "buttons": 11,
+      "fields": 5,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A08",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 12,
+      "fields": 11,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A09",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A10",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A11",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 9,
+      "fields": 1,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A12",
+      "role": "MAINTAINER",
+      "headings": 8,
+      "buttons": 11,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A13",
+      "role": "MAINTAINER",
+      "headings": 6,
+      "buttons": 15,
+      "fields": 9,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A14",
+      "role": "MAINTAINER",
+      "headings": 3,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A15",
+      "role": "MAINTAINER",
+      "headings": 6,
+      "buttons": 8,
+      "fields": 8,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    },
+    {
+      "page_id": "A16",
+      "role": "MAINTAINER",
+      "headings": 4,
+      "buttons": 7,
+      "fields": 0,
+      "horizontal_overflow": false,
+      "non_success_reads": []
+    }
+  ],
+  "business_actions_verified": false,
+  "state_561_coverage_verified": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A08_A09_accepted": false
+}

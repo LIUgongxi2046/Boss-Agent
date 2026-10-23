@@ -1,0 +1,301 @@
+{
+  "status": "PASS_PUBLIC_SIMULATED_SUPPLY_QUALITY_COORDINATION_RECEIPTS_SOURCE_ADOPTION_AND_RESTART",
+  "run_id": "supply-quality-7e4f4319-17f5-4038-91f3-8efd878ac41d",
+  "at": "2026-10-23T13:59:35.003Z",
+  "application_directory": "validation/.work/supply-quality-7e4f4319-17f5-4038-91f3-8efd878ac41d",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ba611f463f17f70fb0ac166b99ea1f41cf2658af9f4a8a8d45b3d2c9e7da4606"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b510465c929ade247e4b50c40d5dd4b50764d1be14698352ee0a7028b560c34c"
+    },
+    {
+      "path": "validation/boss_supply_quality.py",
+      "sha256": "0de5e5861c836867e6f4dda261ea4e7bd3022d0bdde1adb2b728437b38021edb"
+    },
+    {
+      "path": "validation/boss_supply_quality_views.py",
+      "sha256": "878852b2fc92cbd78df46695a46da8889c29bc8903e817a7c2071c4f9560fab9"
+    },
+    {
+      "path": "validation/boss_source_access.py",
+      "sha256": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44"
+    },
+    {
+      "path": "validation/check_supply_quality_state.py",
+      "sha256": "8fd0fe465ddd9afcf1986ebef7b6377671b75bb419bd6408c661dae576c93e92"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityView.tsx",
+      "sha256": "f871568773b30af160624e4b92d49e20d8b9008cb062536e779931dc22314c1e"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "7c73fe0d1155947ed3dccc69468361957709605ae1a5227b46b50ca1461b9ff9"
+    },
+    {
+      "path": "app/webui/MaintainerSupplyQuality.tsx",
+      "sha256": "5ee7e579882bc3c0511da5a6f1d47251cf843d1bb87508e281e4396fa4d24eab"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "a9fcea563fb0adfdf33a85d77b1226c52a849ff8b76475ea2ecb195c19cf0e77"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "ca2df8e87002f1c4bc0ec1b1ce0a98ee1f50926bc6aba3defe322f41ab9a8d3f"
+    },
+    {
+      "path": "specs/simulated-supply-quality.schema.json",
+      "sha256": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b"
+    },
+    {
+      "path": "specs/supply-quality-results.schema.json",
+      "sha256": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494"
+    },
+    {
+      "path": "validation/desktop/check-supply-quality.cjs",
+      "sha256": "c027cdb1ecd83414ad4e6a92e79a785b5539965ed9048462fd003b891ac4657d"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "cbd16be0cdb67a19a10b82036fca4580a2c4669419e5a6ca0117965ee937a3eb"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "EMPTY",
+      "http_status": 200,
+      "client_request_id": "supply-import-44b42bb2-a82f-476e-93f8-7344f83513ed",
+      "record_count": 0,
+      "receipt_sha256": "7fa36eb0c3985abde375eb0825e84c637335cfe4c228e604b1e17b18b4d2ce6a",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "FAILED",
+      "http_status": 502,
+      "client_request_id": "supply-import-ec31a0c7-6a91-421f-b059-a75a183a8585",
+      "record_count": 0,
+      "receipt_sha256": "027936f6808d26f1ead15c837dacfcefab393b55a08a84c30f29e7911d7575d9",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "TIMED_OUT",
+      "http_status": 504,
+      "client_request_id": "supply-import-08de5492-5eeb-4a0f-8a79-3cff721f7ec6",
+      "record_count": 0,
+      "receipt_sha256": "8dfa45a03295ee5ca37f629e2f35495bfa7fe6206b2191474367531a69778689",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "SUCCESS",
+      "http_status": 200,
+      "client_request_id": "supply-import-2933157c-7264-47f3-b2ea-0f3f731152ad",
+      "record_count": 21,
+      "receipt_sha256": "6c56be0e84bda78f3a11f3a4204c6eb38427c6ca88ee455929cf81c9635ecb02",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_current_source_viewer",
+      "source_id": "sim-business:inventory_lot:sim-stock-available-1",
+      "http_status": 200,
+      "body_sha256": "df7366f227f298a1c3629ae2ecfb8b302268af96503e2a3b6be28bc4f761f274"
+    },
+    {
+      "check": "public_gui_coordination_original_request_and_actual_task_lifecycle",
+      "task_id": "571d0295-921e-43e1-a3bb-53b9c272bbb9",
+      "client_request_id": "supply-coordinate-37423000-72e5-4d82-ae7c-b31bd9d18128",
+      "unknown_request_retained_across_pages": true,
+      "task_selected_by_navigation": true,
+      "final_task_state": "COMPLETED_CONFIRMED",
+      "external_delivery": false
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720,
+      "role": "BOSS"
+    },
+    {
+      "check": "actual_restart_preserves_business_and_professional_states",
+      "state": {
+        "initial_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "task_count": 1,
+        "tasks": [
+          {
+            "task_id": "571d0295-921e-43e1-a3bb-53b9c272bbb9",
+            "version": "4",
+            "status": "COMPLETED_CONFIRMED",
+            "related_meeting_id": null,
+            "related_event_ids": []
+          }
+        ],
+        "production_events": [
+          {
+            "id": "sim-production-event-1",
+            "state": "PROFESSIONAL_REVIEW_PENDING"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "sim-stock-available-1",
+            "quality_state": "RELEASED"
+          },
+          {
+            "id": "sim-stock-finished-1",
+            "quality_state": "HOLD"
+          },
+          {
+            "id": "sim-stock-pending-1",
+            "quality_state": "PENDING_TEST"
+          },
+          {
+            "id": "sim-stock-transit-1",
+            "quality_state": "RELEASED"
+          }
+        ],
+        "counts": {
+          "outbox": 1,
+          "feedback": 1,
+          "authorization": 3,
+          "external_import": 4,
+          "runtime_run": 0
+        },
+        "account_sha256": "c63ba04119a058566ca313527d3dbe843b864867d1c9b0f253b740004c718d44",
+        "business_sha256": "431af378207ba3d0b877e99d7f53f9329e89b0c9ab8f7d9e34cc69c5b3608d44"
+      },
+      "source_type": "SIMULATED",
+      "external_service_invoked": false
+    },
+    {
+      "check": "public_current_dependency_and_gui_withdrawal",
+      "dependency_changed_source": "sim-business:production_event:sim-production-event-1",
+      "body_http_status": 409,
+      "withdrawn_source": "sim-business:inventory_lot:sim-stock-available-1",
+      "withdrawn_body_http_status": 410,
+      "current_body_reused": false,
+      "withdrawal_via_authenticated_gui": true
+    },
+    {
+      "check": "public_roles_logout_and_renderer",
+      "renderer_errors": 0,
+      "coordination_request_count": 1,
+      "model_requests": 0,
+      "final_state": {
+        "initial_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "task_count": 1,
+        "tasks": [
+          {
+            "task_id": "571d0295-921e-43e1-a3bb-53b9c272bbb9",
+            "version": "4",
+            "status": "COMPLETED_CONFIRMED",
+            "related_meeting_id": null,
+            "related_event_ids": []
+          }
+        ],
+        "production_events": [
+          {
+            "id": "sim-production-event-1",
+            "state": "PROFESSIONAL_REVIEW_PENDING"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "sim-stock-available-1",
+            "quality_state": "RELEASED"
+          },
+          {
+            "id": "sim-stock-finished-1",
+            "quality_state": "HOLD"
+          },
+          {
+            "id": "sim-stock-pending-1",
+            "quality_state": "PENDING_TEST"
+          },
+          {
+            "id": "sim-stock-transit-1",
+            "quality_state": "RELEASED"
+          }
+        ],
+        "counts": {
+          "outbox": 1,
+          "feedback": 1,
+          "authorization": 3,
+          "external_import": 5,
+          "runtime_run": 0
+        },
+        "account_sha256": "c63ba04119a058566ca313527d3dbe843b864867d1c9b0f253b740004c718d44",
+        "business_sha256": "dcbd67922a1557e9286e772f724d5ca6a5a37fc6c5ef1e20cf65393ebd4b3068"
+      }
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A21_A23_accepted": false
+}

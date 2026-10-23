@@ -53,6 +53,7 @@ def test_public_catalog_uses_live_loader_registry_and_native_current_files(skill
     assert service.catalog.registry is service.runtime.registry
     assert result["runtime_admission_ready"] is True
     assert result["private_body_available_here"] is False
+    assert all("missing_projections" in item and "projection_references_resolved" in item for item in result["items"])
     assert [item["sop_id"] for item in result["items"] if item["context_eligible"]] == ["SOP03"]
     assert pages.serve("MAINTAINER", "/api/boss/ui/admin/skills", "namespace=ui-check")[0] == 400
     with service.runtime.store.connect() as db:
