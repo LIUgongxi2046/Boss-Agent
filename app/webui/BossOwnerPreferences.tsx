@@ -2,7 +2,7 @@ import {
   useEffect, useRef, useState, type ReactNode,
 } from "react";
 import {
-  AlertCircle, BellRing, CheckCircle2, Clock3, FileClock,
+  AlertCircle, BellRing, CheckCircle2, FileClock,
   History, Loader2, RefreshCw, ShieldCheck, SlidersHorizontal,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
