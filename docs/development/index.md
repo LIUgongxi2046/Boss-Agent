@@ -16,3 +16,4 @@
 | T19 | [A05 Prompt版本保存/校验/启停/上下文采纳](T19-prompt-lifecycle.md) | 真实配置及React已接入；DeepSeek质量、Mac实机/高保真验收待执行 |
 | T17 | [调度、提醒及F06独立催办](T17.md) | IN_PROGRESS，SQLite和v6组件在建；真实macOS Cron/系统通知与A17仍待验收 |
 | T18 | [F10 人员会面与 F11 行程安排 · F04跨页失效复核](T18-people-travel.md) | 老板受权 SQLite 动作与 v6 页面已接入并通过 CI；真实外部服务、Mac 实机/像素验收仍待完成 |
+| T18 | [本人设置 N07/N08/F26、授权撤销 N10](T18-owner-preferences.md) | BOSS 草稿/独立确认、真实 Runtime 引用与技术调度更严格抑制、原授权撤销已开发；整体实机/视觉/真实模型验收仍待完成 |
