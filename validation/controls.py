@@ -283,7 +283,7 @@ class ControlStore(Store):
                 reason = "DUPLICATE_EVENT"
             else:
                 owner_reason, owner_notice_version = owner_notification_suppression(
-                    db, data, clock, event, rules,
+                    db, data, clock, event, rules, namespace=ns,
                 )
                 if owner_reason:
                     reason = owner_reason

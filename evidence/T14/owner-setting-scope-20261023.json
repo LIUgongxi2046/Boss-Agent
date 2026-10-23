@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.5.0",
+  "work_item_id": "T14-OWNER-SETTING-SCOPE",
+  "source_base": "8270ea2",
+  "source_scope": "W1 commit containing this evidence",
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests/test_boss_owner_preferences.py app/tests/test_boss_simulation.py app/tests/test_boss_owner_plans.py app/tests/test_boss_scheduler_config.py --basetemp=.work/pytest-w1-owner-space-green -p no:cacheprovider --junitxml=.work/w1-owner-space-green.xml --tb=short", "status": "PASS", "result": "61 passed in 2.81s"},
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-owner-scope-verified -p no:cacheprovider --junitxml=.work/w1-owner-scope-verified.xml --tb=short", "status": "PASS", "result": "517 passed in 14.02s"}
+  ],
+  "verified": ["new namespace does not adopt previous namespace goals or notification preferences", "inactive namespace rejects context adoption without recording a new observation", "current goal adoption checks authorization owner, scope, issuer identity, issuer, action, target and content version", "confirmed content is checked against its stored and authorized digest", "valid continuing settings retain their existing expiry and revocation behavior", "historical confirmed setting remains in its original namespace"],
+  "new_external_requests": false,
+  "new_agricultural_facts": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": ["actual runtime and existing session adoption", "all cached consumers", "current integrated public reset flow", "complete fourteen simulation interfaces"]
+}

@@ -66,6 +66,8 @@ control_feedback在同一事务保存每项结果证据的实际版本、完整�
 
 ## 状态和拒绝条件
 
+本人目标及通知设置读取由`effective_owner_goals(db,data,namespace)`和`effective_owner_notice(db,data,namespace)`在当前事务检查有效空间和完整确认绑定；namespace由服务端提供，默认值保留既有ui-check使用方。`record_runtime_goal_context_load(store,namespace)`拒绝失效空间，读取与记录采用次数均使用同一空间。唯一调度通过`owner_notification_suppression(...,namespace=ns)`读取对应本人通知规则。失效空间返回409，确认归属、签发者、动作、对象、前置版本或内容摘要不符返回403，不新增采用记录。新空间尚无确认设置时保持未确认，历史设置继续保留原空间。
+
 交办、消息、审批、会议、资料、提醒、运行与记忆状态完整继承 PRD 第5节。现有领域方法必须区分草稿、模拟发送、外部送达、反馈提交和本人完成；没有外部通道回执时 delivery_state 不得宣称已验证。
 
 本人计划暂停和取消不删除已经保存的任务、通知或消息。取消后迟到反馈保存为historical_only，保持任务CANCELED和已取消事件；当前领域接收已验证，公共反馈入口的状态检查与回执仍需W3接入。资料撤销、更新和申请变更使对应旧确认失效。已确定结果需查询原回执和正式对象，无自动新编号重发。
