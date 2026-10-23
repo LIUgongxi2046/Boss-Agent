@@ -14,7 +14,7 @@ from nanobot.agent.tools.registry import ToolRegistry
 
 ROOT = Path(__file__).resolve().parents[2]
 W1 = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent")
-COMMIT = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
+COMMIT = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 sys.path.insert(0, str(ROOT / "validation"))
 
 from controls import ControlStore

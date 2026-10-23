@@ -1,8 +1,8 @@
 {
   "status": "PASS_OWNER_READ_ADAPTER_COMPOSITION",
-  "backend_schema_version": "1.4.1",
-  "backend_read_module_commit": "fc4b2b5e88f9178312f6a7116e160ceeb03e160b",
-  "backend_schema_sha256": "109fc76ab599480a641150df791d93e75c8caf9bb60339c78d267be60b9760e9",
+  "backend_schema_version": "1.5.0",
+  "backend_read_module_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
+  "backend_schema_sha256": "f8ad3608fc0d5fde292b5c6d51198a836f6e3ee682dc8fd4c772508b462ff6f0",
   "full_W1_backend_version_verified": false,
   "base_store_source": "W2_CURRENT_WORKTREE",
   "read_modules_source": "W1_COMMITTED_BYTES",
@@ -789,7 +789,7 @@
     "failures": "0",
     "errors": "0",
     "skipped": "0",
-    "time": "8.487"
+    "time": "32.855"
   },
   "new_external_requests": 0,
   "new_business_samples": 0,

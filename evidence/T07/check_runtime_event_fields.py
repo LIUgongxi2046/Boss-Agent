@@ -8,7 +8,7 @@ from typing import NotRequired, get_args, get_origin, get_type_hints
 from nanobot.webui import outbound_wire
 
 schema_path = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/runtime-events.schema.json")
-received_commit = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
+received_commit = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 schema_bytes = subprocess.check_output(["git", "show", received_commit + ":specs/runtime-events.schema.json"], cwd=schema_path.parents[1])
 schema = json.loads(schema_bytes)
 source_path = Path(outbound_wire.__file__)

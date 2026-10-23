@@ -2,9 +2,9 @@
   "status": "PASS_TYPED_EVENT_FIELDS_ONLY",
   "full_A07_accepted": false,
   "nanobot_distribution_version": "0.3.5",
-  "schema_id": "urn:boss-agent:runtime-events:1.4.1",
-  "schema_sha256": "8d29e99168f6d3cee3c5196c6563f77a9f15f1ffc757ea6b8a77e9f833bf868f",
-  "received_commit": "fc4b2b5e88f9178312f6a7116e160ceeb03e160b",
+  "schema_id": "urn:boss-agent:runtime-events:1.5.0",
+  "schema_sha256": "ab6f912b3ff72b9887bc9225b345774343f738b6f54b3e62246909e600585f93",
+  "received_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
   "installed_outbound_wire_sha256": "671834aa5a0dba2dec353fdeb42e8109b14ef8d29f6b0c2b74ec52063b6d41a5",
   "results": [
     {

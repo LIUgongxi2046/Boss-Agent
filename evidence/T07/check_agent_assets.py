@@ -15,7 +15,7 @@ current_schema_path = project / "specs" / "selection-probe.json"
 backend_path = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/openapi.yaml")
 events_path = backend_path.with_name("runtime-events.schema.json")
 dictionary_path = backend_path.with_name("data-dictionary.json")
-received_commit = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
+received_commit = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 
 
 def received_source(path):
@@ -38,6 +38,7 @@ runtime_query_path = project / "validation" / "runtime_records_query.py"
 runtime_ui_path = project / "app" / "webui" / "MaintainerRuntimeRecords.tsx"
 meeting_tool_path = project / "validation" / "runtime_meeting_tool.py"
 owner_read_tools_path = project / "validation" / "runtime_owner_read_tools.py"
+assignment_read_tool_path = project / "validation" / "runtime_assignment_source_tool.py"
 inputs = {
     "agent_assets": hashlib.sha256(assets_path.read_bytes()).hexdigest(),
     "selection_probe": hashlib.sha256(current_schema_path.read_bytes()).hexdigest(),
@@ -53,6 +54,7 @@ inputs = {
     "runtime_ui_source": hashlib.sha256(runtime_ui_path.read_bytes()).hexdigest(),
     "current_meeting_tool_source": hashlib.sha256(meeting_tool_path.read_bytes()).hexdigest(),
     "owner_read_tools_source": hashlib.sha256(owner_read_tools_path.read_bytes()).hexdigest(),
+    "assignment_source_read_tool_source": hashlib.sha256(assignment_read_tool_path.read_bytes()).hexdigest(),
 }
 assets = json.loads(assets_path.read_text())
 schema = json.loads(current_schema_path.read_text())
@@ -126,6 +128,13 @@ assert len(assets["agriculture"]["requirements"]) == 10
 owner_reads = json.loads((project / "evidence/T07/w2-20261023-owner-read-adapters.json").read_text())
 assert owner_reads["status"] == "PASS_OWNER_READ_ADAPTER_COMPOSITION"
 assert set(owner_reads["registry_tool_names"]) == {"todayRead", "ownerPlansRead"}
+assignment_read = json.loads((project / "evidence/T07/w2-20261023-assignment-source-read.json").read_text())
+assert assignment_read["status"] == "PASS_ASSIGNMENT_SOURCE_READ_ADAPTER"
+assert assignment_read["received_commit"] == received_commit
+assert assignment_read["adapter_sha256"] == inputs["assignment_source_read_tool_source"]
+assert not assignment_read["source_confirmation_performed"]
+assert assets["tool_policy"]["assignment_source_review_read_operation"] in operations
+assert assets["tool_policy"]["assignment_source_review_command_operation"] in command_operations
 for binding in assets["pending_public_read_tools"]:
     assert binding["adapter"]
 assert set(assets["agriculture"]["FR-19_uses"]) == {"BROILER", "EGG", "MILK", "BEEF"}
@@ -195,6 +204,7 @@ report = {
     "simulation_interfaces_mounted": False,
     "research_read_adapter_implemented": True,
     "owner_read_adapters_domain_verified": len(owner_reads["registry_tool_names"]),
+    "assignment_source_read_adapter_verified": True,
     "research_read_public_runtime_registered": False,
     "voice_provider_fields_matched": len(transcription_fields),
     "backend_version": backend["info"]["version"],

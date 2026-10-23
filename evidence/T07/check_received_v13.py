@@ -15,7 +15,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 W1 = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent")
-COMMIT = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
+COMMIT = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 inputs = {}
 for relative in ("specs/openapi.yaml", "specs/data-dictionary.json", "specs/runtime-events.schema.json",
                  "validation/business.py", "validation/controls.py", "validation/boss_meetings.py",
@@ -123,7 +123,7 @@ readback = store.invoke("read_evidence", {
 source_version = next(item["content"]["version"] for item in readback["original_records"] if item["record_id"] == "finance-note")
 assert next(item["content"]["content"] for item in readback["original_records"] if item["record_id"] == "finance-note") == source["content"]
 dictionary = json.loads(subprocess.check_output(["git", "show", COMMIT + ":specs/data-dictionary.json"], cwd=W1))
-assert backend["info"]["version"] == dictionary["version"] == "1.4.1"
+assert backend["info"]["version"] == dictionary["version"] == "1.5.0"
 assert fresh_query["query_id"] != queried["query_id"]
 assert readback["sources"][0]["version"] == source_version == "2"
 assert backend["paths"]["/api/boss/ui/meeting-arrangement"]["get"]["operationId"] == tool.name
@@ -133,7 +133,7 @@ for projection in (before, pending, scheduled, reopened, held_read):
     Draft202012Validator(read_schema, format_checker=FormatChecker()).validate(projection)
 report = {
     "status": "PASS_CURRENT_MEETING_AND_SOURCE_VERSION_BINDING", "received_commit": COMMIT,
-    "backend_version": "1.4.1", "input_sha256": inputs,
+    "backend_version": backend["info"]["version"], "input_sha256": inputs,
     "runtime_meeting_tool_sha256": hashlib.sha256((ROOT / "validation/runtime_meeting_tool.py").read_bytes()).hexdigest(),
     "meeting_read": {"initial_version": "1", "draft_does_not_replace_current": True,
                      "confirmed_version": scheduled["meeting"]["version"], "canceled_version": reopened["meeting"]["version"],

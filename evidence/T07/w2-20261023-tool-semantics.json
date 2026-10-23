@@ -1,15 +1,15 @@
 {
   "status": "PASS_RECEIVED_SOURCE_BINDING_AND_BASELINE_SCHEMA",
   "full_A07_accepted": false,
-  "backend_version": "1.3.1",
-  "received_commit": "5b34dcf77963351f249686375a76f07ac4486d03",
+  "backend_version": "1.5.0",
+  "received_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
   "received_source_sha256": {
-    "specs/openapi.yaml": "4ba84c8200fc203fe9755269fd1dbb3ef03400ca8c985753d6ad33d5fec08a9c",
-    "specs/data-dictionary.json": "d2eaa4961fd2b950ce9521bc8948e93838b29a4f7c791d203b6d84a8d1eeeee8",
-    "specs/runtime-events.schema.json": "6e2e6117fbee5b93088f8ba80f3c472dfbf44a613953a2a24ffae0b7b5472ca5",
+    "specs/openapi.yaml": "f8ad3608fc0d5fde292b5c6d51198a836f6e3ee682dc8fd4c772508b462ff6f0",
+    "specs/data-dictionary.json": "331dc3b0bd440b12e260daf5cbb3474243080aeb8be7b2955c81c44c57036c2f",
+    "specs/runtime-events.schema.json": "ab6f912b3ff72b9887bc9225b345774343f738b6f54b3e62246909e600585f93",
     "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
-    "validation/business.py": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738",
-    "validation/controls.py": "cb84b3885092f9cbb4b07b46ebaf45c43a9bd5c3bd0b8b758a6dc5a693cec917",
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/controls.py": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d",
     "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
     "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
   },
@@ -54,7 +54,7 @@
     "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/events.json": "fed31dfbfeef56f2d101a7e9483856a93f2cd9afbac93b971168638754ab2aef"
   },
   "source_code_sha256": {
-    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/business.py": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738",
+    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
     "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/model_probe.py": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873"
   },
   "source_revision_check": {
@@ -102,7 +102,8 @@
     ],
     "withdrawn_query_status": 410,
     "failed_tool_results_released": false,
-    "tool_adapter": "W2 BusinessTool with W1 1.3.1 ControlStore"
+    "source_scope_rejection_status": 403,
+    "tool_adapter": "W2 BusinessTool with W1 1.5.0 ControlStore"
   },
   "assignment_adapter_checks": [
     {
@@ -112,7 +113,7 @@
       "new_send_status": 200,
       "duplicate_creation_rejected": true,
       "original_creation_replayed_without_new_write": true,
-      "task_id": "e7a5d261-98da-4ab6-a7a3-3713a6002d80"
+      "task_id": "d9951dab-3ff3-4a8b-9575-b41a207d826c"
     },
     {
       "source_changed_after_create": true,
@@ -121,7 +122,7 @@
       "new_send_status": 409,
       "duplicate_creation_rejected": true,
       "original_creation_replayed_without_new_write": true,
-      "task_id": "ed7480c1-c2f7-41c1-ac8b-6b42adde47ea"
+      "task_id": "f9af53c5-d039-448a-a7c6-8901e455875e"
     }
   ],
   "new_external_model_requests": 0,

@@ -16,7 +16,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[2]
 W1 = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent")
-COMMIT = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
+COMMIT = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 
 received = {}
 for relative in ("specs/openapi.yaml", "specs/data-dictionary.json", "specs/runtime-events.schema.json", "specs/selection-probe.json",
@@ -249,7 +249,7 @@ report = {
         "same_version_metadata_change_status": 409, "state_checks": state_checks,
         "withdrawn_query_status": 410, "failed_tool_results_released": False,
         "source_scope_rejection_status": 403,
-        "tool_adapter": "W2 BusinessTool with W1 1.4.1 ControlStore",
+        "tool_adapter": "W2 BusinessTool with W1 1.5.0 ControlStore",
     }, "assignment_adapter_checks": assignment_checks,
     "new_external_model_requests": 0, "new_task_count": 2, "new_outbox_count": 1,
 }
