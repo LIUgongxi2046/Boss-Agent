@@ -121,8 +121,8 @@ def test_new_id_cannot_nudge_same_task_within_24h(services):
     created = create(api)
     sent = send(api, created)
     args = nudge_input(created, sent["task_version"])
-    assert command(api, "BOSS", "boss.assignment.nudge", "nudge-1", **args)[0] == 200
-    assert command(api, "BOSS", "boss.assignment.nudge", "nudge-2", **args)[0] == 409
+    assert command(api, "BOSS", "boss.assignment.nudge", "nudge-first", **args)[0] == 200
+    assert command(api, "BOSS", "boss.assignment.nudge", "nudge-second", **args)[0] == 409
 
 
 def test_nudge_after_advancing_simulated_clock_is_distinct(services):
