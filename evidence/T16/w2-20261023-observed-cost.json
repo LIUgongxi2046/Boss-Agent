@@ -4,8 +4,8 @@
   "price_version": "official-page-verified-2026-10-23",
   "price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
   "price_sha256": "fc361c5ab5e13d5a17af811a26d3c690a944801f3973eaf89acd695af58a9ff8",
-  "scope": "四次五工具多轮任务和两次获准样本记忆请求",
-  "request_count": 46,
+  "scope": "四次五工具多轮任务、两次获准样本记忆请求及研究引用四阶段请求",
+  "request_count": 54,
   "rows": [
     {
       "source": "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/http-requests.json",
@@ -90,11 +90,67 @@
         "minimum_cny": "0.00085928",
         "maximum_cny": "0.00171856"
       }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/original-transport.json",
+      "sha256": "2d7b49c390d436db0eaafa385bd06f96f1b1a7f5d34d0bd325f1e1dd12a763e0",
+      "request_count": 2,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 689,
+        "completion_tokens": 97
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00115892",
+        "maximum_cny": "0.00231784"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/revised-transport.json",
+      "sha256": "316095c01024ac9f5110f67632ba2619fa02be4b790e3744b8f15d76c14c8cdf",
+      "request_count": 2,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 557,
+        "completion_tokens": 97
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00102948",
+        "maximum_cny": "0.00205896"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/conflicted-transport.json",
+      "sha256": "479affcbc43209841e106868606e6652f7a0d63eb74a871d6a71f0f21e8268fc",
+      "request_count": 2,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 650,
+        "completion_tokens": 65
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00099448",
+        "maximum_cny": "0.00198896"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/withdrawn-transport.json",
+      "sha256": "63c20a81796ba84fb0b02f7900bfbafeba9ede2a08bfdf970506b4c478774fdb",
+      "request_count": 2,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 415,
+        "completion_tokens": 65
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00075948",
+        "maximum_cny": "0.00151896"
+      }
     }
   ],
   "observed_scope_estimate_cny": {
-    "minimum_cny": "0.06648124",
-    "maximum_cny": "0.13296248"
+    "minimum_cny": "0.07042360",
+    "maximum_cny": "0.14084720"
   },
   "all_attempts_total_cost": null,
   "billing_statement_verified": false,

@@ -1,6 +1,7 @@
 """FR-09 owner-scoped research persistence, citations, revocation, and E02-E04."""
 import json
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -97,6 +98,54 @@ def test_research_source_withdrawal_redacts_saved_excerpt_but_keeps_metadata(run
     assert after["current_source_count"] == 0
     assert old["quote"] not in json.dumps(after)
     assert after["revisions"]==[]
+
+
+@pytest.mark.parametrize("condition", ["future", "expired", "conflicted", "superseded"])
+def test_research_source_validity_controls_current_citations(runtime, condition):
+    ops, api = runtime
+    assert request(ops)[0] == 200
+    with ops.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        original = ops.store.get(db, "ui-check", "document", "finance-note")
+        clock = datetime.fromisoformat(ops.store.get(db, "ui-check", "clock", "current")["at"])
+        if condition == "future":
+            original["valid_from"] = (clock + timedelta(seconds=1)).isoformat()
+        elif condition == "expired":
+            original["valid_until"] = clock.isoformat()
+        else:
+            original["validity_state"] = "CONFLICTED" if condition == "conflicted" else "SUPERSEDED"
+        ops.store.put(db, "ui-check", "document", "finance-note", original)
+    status, result = query(api)
+    assert status == 200
+    assert result["current_reference_state"] == "NEEDS_REVIEW"
+    assert result["report"]["matched_sources"] == []
+    issue = result["report"]["source_issues"][0]
+    assert issue["source_id"] == "finance-note"
+    assert issue["eligible_as_current_evidence"] is False
+    if condition == "conflicted":
+        conflict = result["report"]["conflicted_sources"][0]
+        assert conflict["validity_state"] == "CONFLICTED"
+        assert conflict["quote"] in original["content"]
+    else:
+        assert original["content"] not in json.dumps(result, ensure_ascii=False)
+
+
+def test_source_validity_uses_business_clock_and_exclusive_expiration(runtime):
+    ops, api = runtime
+    assert request(ops)[0] == 200
+    with ops.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        source = ops.store.get(db, "ui-check", "document", "finance-note")
+        clock = datetime.fromisoformat(ops.store.get(db, "ui-check", "clock", "current")["at"])
+        start, end = clock + timedelta(seconds=1), clock + timedelta(seconds=2)
+        source.update(valid_from=start.isoformat(), valid_until=end.isoformat())
+        ops.store.put(db, "ui-check", "document", "finance-note", source)
+    assert query(api)[1]["report"]["matched_sources"] == []
+    ops.store.control("ui-check", "clock", {"at": start.isoformat()})
+    assert query(api)[1]["report"]["matched_sources"][0]["source_id"] == "finance-note"
+    ops.store.control("ui-check", "clock", {"at": end.isoformat()})
+    assert query(api)[1]["report"]["matched_sources"] == []
+    assert query(api)[1]["report"]["source_issues"][0]["validity_state"] == "EXPIRED"
 
 
 def test_research_cas_and_owner_authorization(runtime):

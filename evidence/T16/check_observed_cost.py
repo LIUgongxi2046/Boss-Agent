@@ -11,6 +11,8 @@ assert price["model"] == "deepseek-flash" and price["currency"] == "CNY"
 files = sorted(directory.glob("deepseek-*/http-requests.json"))
 files.extend(ROOT / "evidence" / "T15" / "w2-20261023" / name for name in (
     "before-sample-deletion.json", "after-sample-deletion.json",
+    "original-transport.json", "revised-transport.json",
+    "conflicted-transport.json", "withdrawn-transport.json",
 ))
 rows = []
 observed_response_ids = set()
@@ -45,7 +47,7 @@ report = {
     "status": "PASS_OBSERVED_USAGE_CALCULATION_ONLY", "currency": price["currency"],
     "price_version": price["price_version"], "price_source": price["source_url"],
     "price_sha256": hashlib.sha256(price_path.read_bytes()).hexdigest(),
-    "scope": "四次五工具多轮任务和两次获准样本记忆请求",
+    "scope": "四次五工具多轮任务、两次获准样本记忆请求及研究引用四阶段请求",
     "request_count": sum(row["request_count"] for row in rows), "rows": rows,
     "observed_scope_estimate_cny": {
         name: str(sum(Decimal(row["current_price_estimate"][name]) for row in rows))

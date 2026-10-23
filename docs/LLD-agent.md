@@ -1,6 +1,6 @@
 # 老板 Agent 运行设计
 
-版本：0.2.0-draft。日期：2026-10-23。任务 T07 / A07。状态 PENDING_T06。本文件依据当前 PRD V1.2.0、HLD 1.0.0、selection-probe、基线63e6295的源码，以及 W1 提交3f5b806的 T05/T06 1.0.0，记录当前可以核实的运行设计。输入 SHA256 由 T07 检查报告保存。A05/A06 尚未验收，独立语义审阅、公开接入和完整设计验收保持未完成。
+版本：0.3.0-draft。日期：2026-10-23。任务 T07 / A07。状态 PENDING_T06，表示完整 A06 及相关修复待验收。当前实现为 W2 提交7f67aa6及来源有效性修改，引用 W1 提交3f5b806的 T05/T06 1.0.0。输入 SHA256 由 T07 检查报告保存。独立审查者签署、公开接入和完整设计验收保持未完成。
 
 ## 主体与治理
 
@@ -92,6 +92,14 @@ SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自�
 ## 检索、摄取与语音
 
 当前来源为已有获准 SIMULATED 资料；知识摄取维护作者、原文位置、版本和索引，FTS5 为当前检索基础。Markdown 文件使用 markdown-it-py；其他格式的成熟解析依赖与获准文件需要在实际接入时确定。Embedding 和 Reranker 尚未采用，不声明相关能力。公开原文摄取需保存来源许可、获取日期、有效范围与原文定位。
+
+`boss_source_policy.source_validity(document, business_at)` 使用当前执行空间的业务时钟检查来源。`valid_from` 未提供时，发布日期作为可采用时间下界；`valid_until` 为排除结束边界。日期使用当前业务时区零点，时间必须包含时区。未来来源为 RECEIVED，到期来源为 EXPIRED，明确的 INCOMPLETE/CONFLICTED/SUPERSEDED/WITHDRAWN 不参与当前事实依据；未知状态和非法时间明确报错。该政策只处理来源有效性，身份、owner、来源类型与版本仍由调用处验证。
+
+当前研究输出将 VALID 原文放入 matched_sources，冲突原文放入仅供本人核查的 conflicted_sources，失效元信息放入 source_issues；冲突原文的 eligible_as_current_evidence=false。事实确认仍为空值。Prompt 的保存、校验、启用和下一任务选择采用相同有效性政策；技术诊断只返回版本及排除原因，不返回正文或增加采用计数。W1/W3 需要在公共来源检查、受控检索、会前材料和会面资料中采用相同规则，并维护新增有效期/状态字段与研究投影规范。
+
+`boss_agent_read_tools.BossResearchSourcesTool` 将已准备研究的当前引用提供给模型，operationId为bossWorkspaceRead，projection仅允许research，角色仅允许BOSS。工具从实际页面服务重新读取，输出不包含联系人、个人记忆或其他投影。获准finance-note的DeepSeek真实检查覆盖原始版本、更新版本、明确冲突及撤销后四个独立Runtime和新会话，全部通过；原始证据见T15。公共Runtime注册和应用重启验收由W3完成，不能根据独立检查登记公共入口已启用。
+
+五项 Tool 与十三项 SOP 的语义核对见 `evidence/T07/w2-20261023-semantic-review.md`。四次既有真实运行的28项 Tool 结果通过字段校验和对象关联核对；来源文档换为版本2后，现有 read_evidence.sources.version仍返回1，完整来源语义等待 W1 修复。四种有 TypedDict 的 Runtime 事件已匹配安装版本的字段与必需属性，实际公共事件流、内部推理过滤与持久运行关联继续由 W3 验证。
 
 录音使用明确本人操作和系统权限。用户已提供 Doubao 凭据引用，`boss_transcription.DoubaoTranscriptionProvider` 使用已核查的官方极速版 HTTP 接口及 `volc.bigasr.auc_turbo`，音频通过 base64 直接提交。FFmpeg 解码和重采样，标准 wave 库封装 WAV；服务端核查源文件3MB、解码时长60秒、15秒解码超时及90秒请求超时，没有自动重试。凭据与文字不进入对象展示，未知费用保持 null。用户授权选择公开真实语音样本验证服务，实际转写与公开应用接入继续分别验证。
 

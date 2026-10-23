@@ -1,0 +1,59 @@
+{
+  "status": "PASS_BASELINE_SCHEMA_WITH_SOURCE_VERSION_REVIEW_REQUIRED",
+  "full_A07_accepted": false,
+  "backend_version": "1.1.0",
+  "recorded_tool_counts": {
+    "query_metrics": 4,
+    "read_evidence": 4,
+    "create_assignment": 4,
+    "send_assignment": 4,
+    "read_assignment": 12
+  },
+  "runs": [
+    {
+      "run_id": "deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-0-648b1933-2c71-46ac-991e-398043220d43",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-1-02b44774-b245-4771-b533-9c2e251979eb",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    }
+  ],
+  "input_evidence_sha256": {
+    "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/events.json": "af0c272953df0a0e9d3ea3a9c2fef4b0212a25e79fb44a3af24ff85dda3bd976",
+    "evidence/T16/deepseek-0-648b1933-2c71-46ac-991e-398043220d43/events.json": "980b6b468b4c837c64ca94e20df15ff7bf4c8c0ed44f19df679ae9f8b20acdb5",
+    "evidence/T16/deepseek-1-02b44774-b245-4771-b533-9c2e251979eb/events.json": "c55a78ebac2b8d682f4466f8e52c8cbc08d31b5944136a2ccf31729c90458f4f",
+    "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/events.json": "fed31dfbfeef56f2d101a7e9483856a93f2cd9afbac93b971168638754ab2aef"
+  },
+  "source_code_sha256": {
+    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/business.py": "f96822557b6b2e24a68ab0511c311d91f30dae17871b5d1f2d9293f98870b8cd",
+    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/model_probe.py": "08382243f7214d15dfb0f8e62b28a4d8f623fc5b7fb511f06bbe9f2163f57814",
+    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/openapi.yaml": "638bf03fab74a1f0254734e13aad1e4fca42ff4484bc4a413451cb670fa9a48d"
+  },
+  "source_revision_check": {
+    "source_id": "finance-note",
+    "current_document_version": "2",
+    "reported_source_version": "1",
+    "source_version_matches": false,
+    "body_changed": false,
+    "external_request_sent": false,
+    "owner": "W1 business.Store.source and Store.read_evidence",
+    "required_behavior": "来源变更后当前引用返回正确版本，或明确拒绝旧查询并要求重读"
+  }
+}

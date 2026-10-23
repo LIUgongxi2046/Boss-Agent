@@ -1,0 +1,65 @@
+{
+  "status": "PASS_TYPED_EVENT_FIELDS_ONLY",
+  "full_A07_accepted": false,
+  "nanobot_distribution_version": "0.3.5",
+  "schema_id": "urn:boss-agent:runtime-events:1.1.0",
+  "schema_sha256": "f221d52270140b1031e3a18d223f05ef6e27686c1d3344e56403bb098e81f943",
+  "installed_outbound_wire_sha256": "671834aa5a0dba2dec353fdeb42e8109b14ef8d29f6b0c2b74ec52063b6d41a5",
+  "results": [
+    {
+      "schema_definition": "RecoveryState",
+      "wire_event": "recovery_state",
+      "field_count": 8,
+      "required_fields": [
+        "attempts",
+        "chat_id",
+        "event",
+        "recovery_id",
+        "status"
+      ],
+      "field_names_and_requiredness_match": true
+    },
+    {
+      "schema_definition": "RetryStatus",
+      "wire_event": "retry_status",
+      "field_count": 8,
+      "required_fields": [
+        "attempt",
+        "chat_id",
+        "error_kind",
+        "event",
+        "state"
+      ],
+      "field_names_and_requiredness_match": true
+    },
+    {
+      "schema_definition": "TurnEnd",
+      "wire_event": "turn_end",
+      "field_count": 13,
+      "required_fields": [
+        "chat_id",
+        "event"
+      ],
+      "field_names_and_requiredness_match": true
+    },
+    {
+      "schema_definition": "ContextCompaction",
+      "wire_event": "context_compaction",
+      "field_count": 5,
+      "required_fields": [
+        "chat_id",
+        "compaction_id",
+        "event",
+        "phase"
+      ],
+      "field_names_and_requiredness_match": true
+    }
+  ],
+  "unverified": [
+    "实际公共WebSocket流",
+    "内部推理过滤",
+    "持久运行关联",
+    "断线续接次序",
+    "动态Tool事件字段"
+  ]
+}

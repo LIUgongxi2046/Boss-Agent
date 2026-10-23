@@ -1,6 +1,7 @@
 import ast
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -11,22 +12,38 @@ current_schema_path = project / "specs" / "selection-probe.json"
 backend_path = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/openapi.yaml")
 events_path = backend_path.with_name("runtime-events.schema.json")
 dictionary_path = backend_path.with_name("data-dictionary.json")
+received_commit = "3f5b806"
+
+
+def received_source(path):
+    repository = backend_path.parents[1]
+    return subprocess.check_output(
+        ["git", "show", received_commit + ":" + str(path.relative_to(repository))],
+        cwd=repository,
+    )
+
+
+backend_bytes = received_source(backend_path)
+events_bytes = received_source(events_path)
+dictionary_bytes = received_source(dictionary_path)
 workspace_path = project / "validation" / "boss_workspace_api.py"
 transcription_path = project / "validation" / "boss_transcription.py"
+research_tool_path = project / "validation" / "boss_agent_read_tools.py"
 inputs = {
     "agent_assets": hashlib.sha256(assets_path.read_bytes()).hexdigest(),
     "selection_probe": hashlib.sha256(current_schema_path.read_bytes()).hexdigest(),
-    "backend_design": hashlib.sha256(backend_path.read_bytes()).hexdigest(),
-    "runtime_events": hashlib.sha256(events_path.read_bytes()).hexdigest(),
-    "data_dictionary": hashlib.sha256(dictionary_path.read_bytes()).hexdigest(),
+    "backend_design": hashlib.sha256(backend_bytes).hexdigest(),
+    "runtime_events": hashlib.sha256(events_bytes).hexdigest(),
+    "data_dictionary": hashlib.sha256(dictionary_bytes).hexdigest(),
     "workspace_projection_source": hashlib.sha256(workspace_path.read_bytes()).hexdigest(),
     "transcription_adapter_source": hashlib.sha256(transcription_path.read_bytes()).hexdigest(),
+    "research_tool_source": hashlib.sha256(research_tool_path.read_bytes()).hexdigest(),
 }
 assets = json.loads(assets_path.read_text())
 schema = json.loads(current_schema_path.read_text())
-backend = yaml.safe_load(backend_path.read_text())
-events = json.loads(events_path.read_text())
-dictionary = json.loads(dictionary_path.read_text())
+backend = yaml.safe_load(backend_bytes)
+events = json.loads(events_bytes)
+dictionary = json.loads(dictionary_bytes)
 boss_projections = next(
     ast.literal_eval(node.value) for node in ast.parse(workspace_path.read_text()).body
     if isinstance(node, ast.Assign) and any(
@@ -92,7 +109,10 @@ assert len(assets["agriculture"]["requirements"]) == 10
 assert set(assets["agriculture"]["FR-19_uses"]) == {"BROILER", "EGG", "MILK", "BEEF"}
 assert not assets["agent"]["evaluation_answers_allowed_in_context"]
 assert not assets["prompts"]["grants_owner_authority"]
-assert hashlib.sha256(backend_path.read_bytes()).hexdigest() == inputs["backend_design"]
+assert assets["knowledge"]["model_read_allowed_projections"] == ["research"]
+assert assets["knowledge"]["model_read_permission"] == "BOSS"
+assert assets["knowledge"]["model_read_requires_prepared_research"]
+assert assets["knowledge"]["model_read_operation"] in operations
 report = {
     "status": "PASS_DESIGN_STRUCTURE_ONLY", "full_A07_accepted": False,
     "input_sha256": inputs, "current_tool_count": len(assets["tools"]),
@@ -103,8 +123,11 @@ report = {
     "documented_command_operations": len(command_operations),
     "documented_simulation_interfaces": len(simulation_operations),
     "simulation_interfaces_mounted": False,
+    "research_read_adapter_implemented": True,
+    "research_read_public_runtime_registered": False,
     "voice_provider_fields_matched": len(transcription_fields),
     "backend_version": backend["info"]["version"],
+    "backend_source_commit": received_commit,
     "remaining_backend_items": backend["x-pending"],
 }
 output = Path(__file__).parent / "w2-20261023-design-check.json"

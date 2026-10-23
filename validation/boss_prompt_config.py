@@ -5,6 +5,7 @@ import re
 import uuid
 from aiohttp import web
 from business import now, checksum, require
+from boss_source_policy import source_validity
 
 NS="ui-check"
 KINDS=("SECRETARY_ROLE","EXPRESSION","TASK_HINTS")
@@ -29,9 +30,17 @@ def refs(api,db,data,values):
             and len(set(values))==len(values),"Prompt资料引用不合法",web.HTTPBadRequest)
     items=[]
     for sid in values:
-        source=api._require_current_source(db,data,sid)
+        source=_require_adoptable_source(api,db,data,sid)
         items.append({"source_id":sid,"version":source["version"]})
     return items
+
+
+def _require_adoptable_source(api,db,data,source_id):
+    source=api._require_current_source(db,data,source_id)
+    clock=api.store.get(db,NS,"clock","current")["at"]
+    state=source_validity(source,clock)
+    require(state=="VALID","引用资料当前无法采用："+state)
+    return source
 
 
 def save(api,db,data,p):
@@ -75,7 +84,7 @@ def validate(api,db,data,p):
             doc["content_sha256"]==p["expected_content_sha256"],"版本或内容摘要冲突")
     require(doc["validation_status"]=="DRAFT_UNVALIDATED","当前版本已经校验")
     for ref in doc["source_refs"]:
-        d=api._require_current_source(db,data,ref["source_id"])
+        d=_require_adoptable_source(api,db,data,ref["source_id"])
         require(d["version"]==ref["version"],"引用资料版本变化")
     api.store.put(db,NS,"prompt_revision",doc["prompt_id"]+":v"+doc["version"],doc)
     doc["version"]=str(int(doc["version"])+1)
@@ -97,7 +106,7 @@ def activate(api,db,data,p):
     require(doc["validation_status"]=="VALIDATED_STATIC_ONLY" and
             doc["validated_content_sha256"]==doc["content_sha256"],"必须先校验当前内容")
     for ref in doc["source_refs"]:
-        d=api._require_current_source(db,data,ref["source_id"])
+        d=_require_adoptable_source(api,db,data,ref["source_id"])
         require(d["version"]==ref["version"],"知识来源已经失效")
     old=obj(db,"prompt_active",doc["kind"])
     ver=old["active_version"] if old else "0"
@@ -141,6 +150,7 @@ def active_runtime_prompts(store,namespace=NS):
 def _select_runtime_prompts(store, db, namespace):
     output = []
     data = store.get(db, namespace, "initial", "snapshot")
+    clock = store.get(db, namespace, "clock", "current")["at"]
     for kind in KINDS:
         active = obj(db, "prompt_active", kind, namespace)
         if not active or not active["enabled"]:
@@ -155,7 +165,7 @@ def _select_runtime_prompts(store, db, namespace):
             document = obj(db, "document", ref["source_id"], namespace)
             if not document or document.get("withdrawn") or (
                 document.get("access_scope") != data["owner_id"]
-            ) or document["version"] != ref["version"]:
+            ) or document.get("source_type") != "SIMULATED" or document["version"] != ref["version"] or source_validity(document, clock) != "VALID":
                 healthy = False
                 break
         if healthy:
