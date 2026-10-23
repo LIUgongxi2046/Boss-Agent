@@ -47,7 +47,8 @@
     "N05 owner-only self commitments now have real CAS/idempotent create, evidence-confirmed completion, extension, cancellation and persisted due events, separate from F06 assignment to contacts. Source/current evidence withdrawal yields NEEDS_REVIEW; no real external notifications.",
     "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable.",
     "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified.",
-    "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified."
+    "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified.",
+    "F11 Travel now has owner-only SQLite review/confirm/cancel, deterministic IANA offset/time checks, version-pinned conflict confirmation, and F04 live meeting-impact invalidation; no real transport/calendar booking or target Mac pixel acceptance."
   ],
   "pages": [
     {
@@ -584,24 +585,34 @@
       "logical_architecture_route": "/app/boss/F11",
       "actual_webui_navigation": "?bossPage=F11",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_OWNER_VERSIONED_TRAVEL_REVIEW_CONFIRM_CANCEL_NO_EXTERNAL_BOOKING",
+      "component_file": "app/webui/BossTravelView.tsx",
+      "component_name": "BossTravelView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/calendar"
+        "GET /api/boss/ui/workspace/travel",
+        "GET /api/boss/ui/operation-status"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": [
+        "boss.travel.review",
+        "boss.travel.confirm",
+        "boss.travel.cancel"
+      ],
+      "other_integration_points": [
+        "FR-11 travel conflict dependency invalidates F04 stored briefing on confirmed meeting-impact changes",
+        "BossCommandAPI BEGIN IMMEDIATE + owner-only idempotent review/confirm/cancel"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "travel.propose",
-        "travel.confirm"
+        "travel.real_transport_ticketing_and_booking",
+        "travel.real_weather_and_flight_source",
+        "travel.external_calendar_mutation",
+        "travel.actual_mac_e2e",
+        "travel.visual_pixel_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_travel.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
