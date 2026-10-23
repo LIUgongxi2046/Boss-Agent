@@ -23,6 +23,7 @@ import { BossResearchView } from "./BossResearchView";
 import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
+import { MaintainerScheduler } from "./MaintainerScheduler";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
@@ -872,7 +873,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 <BossWorkspaceView key="A04" role={role} pageId="A04"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
               </div>
-              </> : page === "A05" ? <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/> :
+              </> : page === "A13" ? <MaintainerScheduler
+                key="A13" onNavigate={id=>navigate(id)}
+              /> : page === "A05" ? <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/> :
                 page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
                 page === "A03" ? <>
                 <BossWorkspaceView key="A03" role={role} pageId="A03"
