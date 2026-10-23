@@ -4,12 +4,12 @@ import { ArrowRight, ClipboardCheck, Clock3, FileSearch,
 import type { AssignmentTask, TaskFeedback, TaskListResponse } from "./BossAssignmentFlow";
 type CenterTask = AssignmentTask & { related_meeting_id?: string };
 
-type Historical = {task_id:string;status:string;due_at:string;purpose?:string};
+type Historical = {task_id:string;status:string;due_at?:string;purpose?:string};
 type Response = TaskListResponse & {
   historical_commitment?:Historical|null;
   business_clock?:string;
   read_at?:string;
-  source_type?:"SIMULATED";
+  source_type?:string;
 };
 type Tab = "本人承诺"|"他人交办"|"等待反馈"|"待核查结果";
 type Props = {
