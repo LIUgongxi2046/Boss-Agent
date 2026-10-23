@@ -9,16 +9,20 @@ import uuid
 from pathlib import Path
 
 from loguru import logger
+from aiohttp import web
 
 from nanobot import Nanobot, RuntimeContextBlock
 from nanobot.agent.hook import AgentHook
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.base import Tool
+from nanobot.agent.tools.context import current_request_context
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.loader import load_config, resolve_config_env_vars
 
-from business import OPERATIONS, ROOT, SPEC, Store, encode, now
+from business import OPERATIONS, ROOT, SPEC, Store, encode, now, require
 from connection import RecordedProvider, settings
+from boss_runtime_records import ATTRIBUTE, RuntimeBinding
+from boss_source_policy import source_validity
 
 
 class BusinessTool(Tool):
@@ -45,8 +49,32 @@ class BusinessTool(Tool):
         return schema
 
     async def execute(self, **kwargs):
-        payload = {**kwargs, "envelope": self.envelope, **self.bindings.get(self.operation, {})}
+        envelope = self.envelope
+        request = current_request_context()
+        binding = request.attributes.get(ATTRIBUTE) if request is not None else None
+        if binding is not None:
+            if not isinstance(binding, RuntimeBinding) or binding.recorder.namespace != envelope["execution_namespace"] or binding.recorder.store.path.resolve() != self.store.path.resolve():
+                raise ValueError("工具与当前运行的执行空间不符")
+            envelope = {**envelope, "request_id": binding.request_id, "session_id": binding.session_id}
+        payload = {**kwargs, "envelope": envelope, **self.bindings.get(self.operation, {})}
         result = self.store.invoke(self.operation, payload)
+        if self.operation in {"query_metrics", "read_evidence"}:
+            with self.store.connect() as db:
+                db.execute("BEGIN")
+                namespace = envelope["execution_namespace"]
+                self.store.active(db, namespace)
+                owner = self.store.get(db, namespace, "initial", "snapshot")["owner_id"]
+                clock = self.store.get(db, namespace, "clock", "current")["at"]
+                for source in result["sources"]:
+                    document = self.store.get(db, namespace, "document", source["source_id"])
+                    require(document.get("access_scope") == owner and document.get("source_type") == source["source_type"] == "SIMULATED",
+                            "模型来源超出当前访问范围", web.HTTPForbidden)
+                    require(document["version"] == source["version"], "返回来源版本与当前资料不符，需要重读")
+                    require(source_validity(document, clock) == "VALID", "当前来源不能作为模型依据")
+                for original in result.get("original_records", []):
+                    content = original["content"]
+                    if isinstance(content, dict) and "source_id" in content:
+                        require(original["version"] == content["version"], "原文记录与引用版本不符")
         self.records.append({"type": "tool", "name": self.operation, "input": payload, "output": result, "at": now()})
         return encode(result)
 

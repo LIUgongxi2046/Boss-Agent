@@ -43,7 +43,8 @@ class BossResearchSourcesTool(Tool):
         require(view["report"] is not None, "需要本人明确研究范围并准备当前研究", web.HTTPConflict)
         report = view["report"]
         result = {
-            "source_type": "SIMULATED", "current_reference_state": view["current_reference_state"],
+            **{key: view[key] for key in ("read_at", "source_type", "namespace", "data_version", "projection")},
+            "current_reference_state": view["current_reference_state"],
             "matched_sources": report["matched_sources"],
             "conflicted_sources": report["conflicted_sources"],
             "source_issues": report["source_issues"], "missing_items": report["missing_items"],

@@ -4,13 +4,15 @@
   "price_version": "official-page-verified-2026-10-23",
   "price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
   "price_sha256": "fc361c5ab5e13d5a17af811a26d3c690a944801f3973eaf89acd695af58a9ff8",
-  "scope": "四次五工具多轮任务、两次获准样本记忆请求及研究引用四阶段请求",
-  "request_count": 54,
+  "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认及四项异常运行记录请求",
+  "request_count": 77,
   "rows": [
     {
       "source": "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/http-requests.json",
       "sha256": "c0d405898dd12a642addded4e325827a8708c271d69bb8d8300fdf27eb80cfd8",
       "request_count": 11,
+      "observed_usage_request_count": 11,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 65152,
         "prompt_cache_miss_tokens": 4866,
@@ -25,6 +27,8 @@
       "source": "evidence/T16/deepseek-0-648b1933-2c71-46ac-991e-398043220d43/http-requests.json",
       "sha256": "5157f02702b78adaf9cd9d7397563cba2d0d0eda20dc45a07d4ab93bad825272",
       "request_count": 11,
+      "observed_usage_request_count": 11,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 64640,
         "prompt_cache_miss_tokens": 4895,
@@ -39,6 +43,8 @@
       "source": "evidence/T16/deepseek-1-02b44774-b245-4771-b533-9c2e251979eb/http-requests.json",
       "sha256": "fd825f48b1fddfab6a65fc8ca7b0d67633d090c1194ee7702f681d2634729250",
       "request_count": 11,
+      "observed_usage_request_count": 11,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 64512,
         "prompt_cache_miss_tokens": 4932,
@@ -53,6 +59,8 @@
       "source": "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/http-requests.json",
       "sha256": "497b23a23b6d97c89ebed9381d5e06240c76ddb440eeec0f69f180aa482e7d1c",
       "request_count": 11,
+      "observed_usage_request_count": 11,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 65280,
         "prompt_cache_miss_tokens": 4868,
@@ -64,9 +72,171 @@
       }
     },
     {
+      "source": "evidence/T16/runtime-version-final/first-transport.json",
+      "sha256": "8b5a1bfe3353c0e599173ca14efe1b4a885c9b3ed379f0892689af73a2a0945a",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 2432,
+        "prompt_cache_miss_tokens": 223,
+        "completion_tokens": 63
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00052364",
+        "maximum_cny": "0.00104728"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-version-final/second-transport.json",
+      "sha256": "e017b0d82df74379c258ac6a53126fd7c4f391245d5d35f4a19b2198389e27fa",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 2176,
+        "prompt_cache_miss_tokens": 287,
+        "completion_tokens": 62
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00057852",
+        "maximum_cny": "0.00115704"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-version-initial/first-transport.json",
+      "sha256": "22ef9dfe6f100cdfe1e3695c8cc6a24cb53730d3f21cce9a6980fd282c2bd2c5",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1920,
+        "prompt_cache_miss_tokens": 741,
+        "completion_tokens": 66
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.0010434",
+        "maximum_cny": "0.0020868"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-version-initial/second-transport.json",
+      "sha256": "fdce07f8bd32eab2e077de7d3a0ed223f4972760b445cafbcb0222dd4feb0016",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1920,
+        "prompt_cache_miss_tokens": 547,
+        "completion_tokens": 66
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.0008494",
+        "maximum_cny": "0.0016988"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-version-ui/first-transport.json",
+      "sha256": "4c09dad123e41559f810f75aa5946e6bea80128b9987a31ad6768e9da50b4874",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 2432,
+        "prompt_cache_miss_tokens": 229,
+        "completion_tokens": 67
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00054564",
+        "maximum_cny": "0.00109128"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-version-ui/second-transport.json",
+      "sha256": "0ee97cd35f09d9f00f05ee20b63fe7ded35ce869bca0c2563434d0c084d5f82b",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 2176,
+        "prompt_cache_miss_tokens": 294,
+        "completion_tokens": 67
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00060552",
+        "maximum_cny": "0.00121104"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-record-faults/w2-explicit-cancel/http-requests.json",
+      "sha256": "ea072398269a3f20f3ed654f9114f827abd0a9149da3643e9c75737af783042d",
+      "request_count": 3,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 1,
+      "tokens": {
+        "prompt_cache_hit_tokens": 6912,
+        "prompt_cache_miss_tokens": 1410,
+        "completion_tokens": 454
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00336424",
+        "maximum_cny": "0.00672848"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-record-faults/w2-iteration-budget/http-requests.json",
+      "sha256": "0c244532fac1e3d2262ef9586aceb6a7a98e0bd5e26e2f396efe64f4e3c01a98",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 3072,
+        "prompt_cache_miss_tokens": 372,
+        "completion_tokens": 332
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00176144",
+        "maximum_cny": "0.00352288"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-record-faults/w2-request-timeout/http-requests.json",
+      "sha256": "918722f3ac3164a7552a0cfed125a40008e00057dde6bf5bd64f2bc2deec0508",
+      "request_count": 1,
+      "observed_usage_request_count": 0,
+      "missing_usage_request_count": 1,
+      "tokens": {
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 0,
+        "completion_tokens": 0
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00",
+        "maximum_cny": "0.00"
+      }
+    },
+    {
+      "source": "evidence/T16/runtime-record-faults/w2-written-client-closed/http-requests.json",
+      "sha256": "611acd52a53e554f97af43f85eaecd3ef18b3e0196996a8484253f62faa27fc4",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 3200,
+        "prompt_cache_miss_tokens": 257,
+        "completion_tokens": 233
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.001253",
+        "maximum_cny": "0.002506"
+      }
+    },
+    {
       "source": "evidence/T15/w2-20261023/before-sample-deletion.json",
       "sha256": "c9e730faf10d9d9538da5c0dadf97fa85e39b245d5b9da73f17a6265993d8231",
       "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 1664,
         "prompt_cache_miss_tokens": 288,
@@ -81,6 +251,8 @@
       "source": "evidence/T15/w2-20261023/after-sample-deletion.json",
       "sha256": "6179ce71782fa6ef285e8caaa706edfeee8bf14df26ccadb5b41670725302fa0",
       "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 1664,
         "prompt_cache_miss_tokens": 254,
@@ -93,36 +265,74 @@
     },
     {
       "source": "evidence/T15/w2-20261023/original-transport.json",
-      "sha256": "2d7b49c390d436db0eaafa385bd06f96f1b1a7f5d34d0bd325f1e1dd12a763e0",
+      "sha256": "544085e7b5ac4019c94e040050b281a40ccda2301c119d520e5c133efb926589",
       "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
       "tokens": {
-        "prompt_cache_hit_tokens": 4096,
-        "prompt_cache_miss_tokens": 689,
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 599,
         "completion_tokens": 97
       },
       "current_price_estimate": {
-        "minimum_cny": "0.00115892",
-        "maximum_cny": "0.00231784"
+        "minimum_cny": "0.00107148",
+        "maximum_cny": "0.00214296"
       }
     },
     {
       "source": "evidence/T15/w2-20261023/revised-transport.json",
-      "sha256": "316095c01024ac9f5110f67632ba2619fa02be4b790e3744b8f15d76c14c8cdf",
+      "sha256": "83e884629a022396970be7b73c9260d106b4c6a12b5f80c7217642b5b279e55c",
       "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 4224,
-        "prompt_cache_miss_tokens": 557,
+        "prompt_cache_miss_tokens": 595,
         "completion_tokens": 97
       },
       "current_price_estimate": {
-        "minimum_cny": "0.00102948",
-        "maximum_cny": "0.00205896"
+        "minimum_cny": "0.00106748",
+        "maximum_cny": "0.00213496"
       }
     },
     {
       "source": "evidence/T15/w2-20261023/conflicted-transport.json",
+      "sha256": "1892c189c7b7412233a49eb6603137fc6eee05face31c82140986aefb7aab42f",
+      "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4352,
+        "prompt_cache_miss_tokens": 560,
+        "completion_tokens": 65
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00090704",
+        "maximum_cny": "0.00181408"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/withdrawn-transport.json",
+      "sha256": "e41d97f1ccb0ab3f4800ac21be417c97690497a3ac00309e4a70cca7b91afb07",
+      "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 453,
+        "completion_tokens": 65
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00079748",
+        "maximum_cny": "0.00159496"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/source-citation-initial/conflicted-transport.json",
       "sha256": "479affcbc43209841e106868606e6652f7a0d63eb74a871d6a71f0f21e8268fc",
       "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 4224,
         "prompt_cache_miss_tokens": 650,
@@ -134,9 +344,43 @@
       }
     },
     {
-      "source": "evidence/T15/w2-20261023/withdrawn-transport.json",
+      "source": "evidence/T15/w2-20261023/source-citation-initial/original-transport.json",
+      "sha256": "2d7b49c390d436db0eaafa385bd06f96f1b1a7f5d34d0bd325f1e1dd12a763e0",
+      "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 689,
+        "completion_tokens": 97
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00115892",
+        "maximum_cny": "0.00231784"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/source-citation-initial/revised-transport.json",
+      "sha256": "316095c01024ac9f5110f67632ba2619fa02be4b790e3744b8f15d76c14c8cdf",
+      "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 557,
+        "completion_tokens": 97
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00102948",
+        "maximum_cny": "0.00205896"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/source-citation-initial/withdrawn-transport.json",
       "sha256": "63c20a81796ba84fb0b02f7900bfbafeba9ede2a08bfdf970506b4c478774fdb",
       "request_count": 2,
+      "observed_usage_request_count": 2,
+      "missing_usage_request_count": 0,
       "tokens": {
         "prompt_cache_hit_tokens": 4224,
         "prompt_cache_miss_tokens": 415,
@@ -146,11 +390,61 @@
         "minimum_cny": "0.00075948",
         "maximum_cny": "0.00151896"
       }
+    },
+    {
+      "source": "evidence/T19/w2-20261023-memory-confirmation/after-confirmation-revocation-transport.json",
+      "sha256": "cb9ac03fc4ead7f8bb543bdfd81d33904a985e77a0e49f249f5a8490ba007e62",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 310,
+        "completion_tokens": 65
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00060328",
+        "maximum_cny": "0.00120656"
+      }
+    },
+    {
+      "source": "evidence/T19/w2-20261023-memory-confirmation/after-new-owner-confirmation-transport.json",
+      "sha256": "ba6c1a7b57e02acca05fdcb1c15de6af315fecb6cf0d279c591b0793b30cdc41",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1792,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 77
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00055384",
+        "maximum_cny": "0.00110768"
+      }
+    },
+    {
+      "source": "evidence/T19/w2-20261023-memory-confirmation/before-confirmation-revocation-transport.json",
+      "sha256": "41ccd2f1c6358faa99deb68c735ab4097bc254b0d2bd097c1de90b8b3763a641",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 338,
+        "completion_tokens": 80
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00069128",
+        "maximum_cny": "0.00138256"
+      }
     }
   ],
+  "observed_usage_request_count": 75,
+  "missing_usage_request_count": 2,
   "observed_scope_estimate_cny": {
-    "minimum_cny": "0.07042360",
-    "maximum_cny": "0.14084720"
+    "minimum_cny": "0.08664028",
+    "maximum_cny": "0.17328056"
   },
   "all_attempts_total_cost": null,
   "billing_statement_verified": false,

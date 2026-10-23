@@ -47,6 +47,8 @@ def test_research_tool_reads_current_source_and_withdrawal_without_business_writ
     observations = []
     tool = BossResearchSourcesTool(store, "BOSS", observation_sink=observations.append)
     before = json.loads(asyncio.run(tool.execute(projection="research")))
+    assert {"read_at", "source_type", "namespace", "data_version", "projection"} <= set(before)
+    assert before["projection"] == "research" and before["namespace"] == "ui-check"
     assert before["matched_sources"][0]["source_id"] == original["source_id"]
     assert before["matched_sources"][0]["quote"] in original["content"]
     assert "contacts" not in before

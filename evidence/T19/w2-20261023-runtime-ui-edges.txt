@@ -1,0 +1,56 @@
+### Result
+{"status":"PASS","check_id":"A15-TIME-ID-EMPTY-AUTH","denied_http_status":401,"dom":"- main:\n  - region \"运行记录查询\":\n    - heading \"运行记录\" [level=2]\n    - text: RUNTIME_RECORD · 获准技术元信息 Provider\n    - textbox \"Provider\": deepseek\n    - text: run_id\n    - textbox \"run_id\"\n    - text: 数据集\n    - textbox \"数据集\": selection\n    - text: 错误类型或终止原因\n    - textbox \"错误类型或终止原因\": completed\n    - text: 运行状态\n    - combobox \"运行状态\":\n      - option \"全部状态\"\n      - option \"QUEUED\"\n      - option \"RUNNING\"\n      - option \"WAITING_INPUT\"\n      - option \"SUCCEEDED\" [selected]\n      - option \"FAILED\"\n      - option \"CANCELED\"\n      - option \"TIMED_OUT\"\n    - text: 每页数量\n    - combobox \"每页数量\":\n      - option \"1\" [selected]\n      - option \"20\"\n      - option \"50\"\n      - option \"100\"\n    - text: 真实开始时间从\n    - textbox \"真实开始时间从\"\n    - text: 真实开始时间至\n    - textbox \"真实开始时间至\"\n    - button \"查询记录\":\n      - img\n      - text: 查询记录\n    - button \"取消读取\" [disabled]:\n      - img\n      - text: 取消读取\n  - alert:\n    - img\n    - text: 运行记录读取失败（HTTP 401）\n  - region \"运行记录列表\":\n    - heading \"已记录的运行\" [level=2]\n    - text: 记录待查询\n  - complementary \"运行记录详情\":\n    - heading \"获准记录详情\" [level=2]\n    - text: 私人正文、凭据和内部推理不在读取范围\n    - paragraph: 选择已有运行记录查看详情"}
+### Ran Playwright code
+```js
+await (async (page) => {
+  const older = "run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae";
+  const local = async iso => page.evaluate(input => new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
+  }).format(new Date(input)).replace(" ", "T"), iso);
+  await page.getByLabel("run_id", {exact: true}).fill(older);
+  await page.getByLabel("真实开始时间从", {exact: true}).fill(await local("2026-10-23T06:19:00Z"));
+  await page.getByLabel("真实开始时间至", {exact: true}).fill(await local("2026-10-23T06:20:00Z"));
+  const [response] = await Promise.all([
+    page.waitForResponse(item => item.url().includes("started_from=")),
+    page.getByRole("button", {name: "查询记录", exact: true}).click(),
+  ]);
+  const parameters = new URL(response.url()).searchParams;
+  if (response.status() !== 200 || parameters.get("started_from") !== "2026-10-23T06:19:00.000Z" ||
+    parameters.get("started_until") !== "2026-10-23T06:20:00.000Z") throw Error("真实时间筛选转换不符");
+  await page.getByText("已读取 1 / 匹配 1", {exact: true}).waitFor();
+  if (!(await page.locator("tbody").innerText()).includes(older)) throw Error("运行编号和时间筛选结果不符");
+  await page.getByRole("combobox", {name: "运行状态", exact: true}).selectOption("FAILED");
+  await page.getByRole("button", {name: "查询记录", exact: true}).click();
+  await page.getByText("没有符合当前条件的运行记录", {exact: true}).waitFor();
+  if (await page.locator("tbody tr").count()) throw Error("空状态保留了旧记录");
+  await page.getByLabel("真实开始时间从", {exact: true}).fill(await local("2026-10-24T06:19:00Z"));
+  await page.getByRole("button", {name: "查询记录", exact: true}).click();
+  await page.getByRole("alert").getByText("真实时间范围无效", {exact: true}).waitFor();
+  await page.getByLabel("真实开始时间从", {exact: true}).fill("");
+  await page.getByLabel("真实开始时间至", {exact: true}).fill("");
+  await page.getByLabel("run_id", {exact: true}).fill("");
+  await page.getByRole("combobox", {name: "运行状态", exact: true}).selectOption("SUCCEEDED");
+  const denied = await page.evaluate(async () => {
+    const response = await fetch("/api/boss/ui/runtime-records");
+    return response.status;
+  });
+  if (denied !== 401) throw Error("实际未认证请求未返回401");
+  await page.evaluate(() => {
+    const meta = document.querySelector('meta[name="maintainer-token"]');
+    if (!meta) throw Error("缺少当前会话配置");
+    meta.setAttribute("content", "expired-session");
+  });
+  await page.getByRole("button", {name: "查询记录", exact: true}).click();
+  await page.getByRole("alert").getByText("运行记录读取失败（HTTP 401）", {exact: true}).waitFor();
+  if (await page.locator("tbody tr").count()) throw Error("身份失效后保留旧记录");
+  return {status: "PASS", check_id: "A15-TIME-ID-EMPTY-AUTH", denied_http_status: denied,
+    dom: await page.locator("main").ariaSnapshot()};
+}
+)(page);
+```
+### Page
+- Page URL: http://127.0.0.1:62531/
+- Page Title: 运行记录组件检查
+- Console: 2 errors, 0 warnings
+### Events
+- New console entries: .playwright-cli/console-2026-10-23T06-41-52-700Z.log#L24-L25

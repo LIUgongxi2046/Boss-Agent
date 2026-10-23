@@ -9,22 +9,26 @@ price_path = directory / "deepseek-price-20261023.json"
 price = json.loads(price_path.read_text())
 assert price["model"] == "deepseek-flash" and price["currency"] == "CNY"
 files = sorted(directory.glob("deepseek-*/http-requests.json"))
+files.extend(sorted(directory.glob("runtime-version-*/*-transport.json")))
+files.extend(sorted(directory.glob("runtime-record-faults/*/http-requests.json")))
 files.extend(ROOT / "evidence" / "T15" / "w2-20261023" / name for name in (
     "before-sample-deletion.json", "after-sample-deletion.json",
     "original-transport.json", "revised-transport.json",
     "conflicted-transport.json", "withdrawn-transport.json",
 ))
+files.extend(sorted((ROOT / "evidence/T15/w2-20261023/source-citation-initial").glob("*-transport.json")))
+files.extend(sorted((ROOT / "evidence/T19/w2-20261023-memory-confirmation").glob("*-transport.json")))
 rows = []
 observed_response_ids = set()
 for path in files:
     events = json.loads(path.read_text())
     observed = {}
     for event in events:
-        if event["type"] == "stream_metadata" and event.get("usage") is not None:
+        if event["type"] in {"stream_metadata", "response"} and event.get("usage") is not None:
             assert event["model"] == price["model"]
             observed[event["response_id"]] = event["usage"]
     request_count = sum(event["type"] == "request" for event in events)
-    assert request_count == len(observed)
+    assert request_count >= len(observed)
     tokens = {name: 0 for name in price["off_peak"]}
     for response_id, usage in observed.items():
         assert response_id not in observed_response_ids
@@ -41,14 +45,18 @@ for path in files:
     }
     rows.append({
         "source": str(path.relative_to(ROOT)), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "request_count": request_count, "tokens": tokens, "current_price_estimate": costs,
+        "request_count": request_count, "observed_usage_request_count": len(observed),
+        "missing_usage_request_count": request_count - len(observed),
+        "tokens": tokens, "current_price_estimate": costs,
     })
 report = {
     "status": "PASS_OBSERVED_USAGE_CALCULATION_ONLY", "currency": price["currency"],
     "price_version": price["price_version"], "price_source": price["source_url"],
     "price_sha256": hashlib.sha256(price_path.read_bytes()).hexdigest(),
-    "scope": "四次五工具多轮任务、两次获准样本记忆请求及研究引用四阶段请求",
+    "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认及四项异常运行记录请求",
     "request_count": sum(row["request_count"] for row in rows), "rows": rows,
+    "observed_usage_request_count": sum(row["observed_usage_request_count"] for row in rows),
+    "missing_usage_request_count": sum(row["missing_usage_request_count"] for row in rows),
     "observed_scope_estimate_cny": {
         name: str(sum(Decimal(row["current_price_estimate"][name]) for row in rows))
         for name in ("minimum_cny", "maximum_cny")
@@ -60,5 +68,6 @@ report = {
 output = directory / "w2-20261023-observed-cost.json"
 output.write_text(json.dumps(report, ensure_ascii=False, indent=2))
 print(json.dumps({key: report[key] for key in (
-    "status", "request_count", "observed_scope_estimate_cny", "all_attempts_total_cost", "coverage",
+    "status", "request_count", "observed_usage_request_count", "missing_usage_request_count",
+    "observed_scope_estimate_cny", "all_attempts_total_cost", "coverage",
 )}, ensure_ascii=False))

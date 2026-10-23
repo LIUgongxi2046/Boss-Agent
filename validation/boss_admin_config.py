@@ -3,6 +3,7 @@ from aiohttp import web
 from business import now, require
 from boss_prompt_config import KINDS, _select_runtime_prompts, obj
 from boss_source_policy import source_validity
+from boss_memory import confirmed_memory
 
 
 def prompt_technical_status(store, role, namespace="ui-check"):
@@ -69,6 +70,8 @@ def memory_technical_status(store, role, namespace="ui-check"):
         db.execute("BEGIN")
         store.active(db, namespace)
         current = store.get(db, namespace, "memory", "current")
+        owner = store.get(db, namespace, "initial", "snapshot")["owner_id"]
+        eligible = confirmed_memory(db, namespace, current, owner) is not None
         state = current["confirmation_state"]
         # 字段白名单只包含技术元信息，正文不进入接口结果。
         deleted = state == "DELETED"
@@ -82,8 +85,8 @@ def memory_technical_status(store, role, namespace="ui-check"):
                 "confirmation_state": state,
                 "valid_until": current.get("valid_until"),
             },
-            "future_context_eligible": state == "CONFIRMED",
-            "future_turn_policy": "CONFIRMED_ONLY",
+            "future_context_eligible": eligible,
+            "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
             "deletion_propagation": (
                 "CURRENT_CONTEXT_CLEARED" if deleted and not current.get("text")
                 else "CURRENT_CONTEXT_REQUIRES_REVIEW" if deleted

@@ -1,0 +1,236 @@
+{
+  "status": "PASS",
+  "source_type": "SIMULATED",
+  "stages": [
+    {
+      "stage": "before-confirmation-revocation",
+      "eligible": true,
+      "runtime_record": {
+        "chat_id": "direct",
+        "configuration_id": "runtime-1",
+        "configuration_version": "1",
+        "cost_total": null,
+        "finished_at": "2026-10-23T06:04:01.894029+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "CONFIRMED",
+          "eligible": true,
+          "memory_id": "memory-1",
+          "version": "2"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-4d714241-a307-49ff-a847-775bdccfe5df",
+            "request_sha256": "e7fa953014528d0c3bc861ae3ade6bf75863bf45399a9f6621407097e4498ee3",
+            "response_ids": [
+              "bce16cbd-4e1f-4d57-98ce-8d70b4d17322"
+            ],
+            "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "usage": {
+              "completion_tokens": 80,
+              "prompt_tokens": 2002,
+              "total_tokens": 2082
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "before-confirmation-revocation:1792735438065788000",
+        "request_id_source": "TURN",
+        "run_id": "run-9bfea191-d5ec-475f-bcc0-edc41da73e5c",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "20dbc98d5addd3ddb3b117c732e33db9bd6b667c69dd4d5c25d0b9e65684e193",
+          "max_output_tokens": 512,
+          "max_tool_rounds": 12,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "before-confirmation-revocation",
+        "started_at": "2026-10-23T06:03:58.078755+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "tool_configuration": [],
+        "tool_results": [],
+        "turn_id": "before-confirmation-revocation:1792735438065788000",
+        "usage": {
+          "completion_tokens": 80,
+          "prompt_tokens": 2002,
+          "total_tokens": 2082
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "approved_memory_adoption_verified": true,
+      "answer_sha256": "d3a1d7065231016a54968848f6898abad86eaecbbde387fc7cd2add3403ddbb3"
+    },
+    {
+      "stage": "after-confirmation-revocation",
+      "eligible": false,
+      "runtime_record": {
+        "chat_id": "direct",
+        "configuration_id": "runtime-1",
+        "configuration_version": "1",
+        "cost_total": null,
+        "finished_at": "2026-10-23T06:04:04.061186+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "CONFIRMED",
+          "eligible": false,
+          "memory_id": "memory-1",
+          "version": "2"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-414237a2-7f34-4f59-b019-5687fa78b272",
+            "request_sha256": "0ee31c5c8dca8e0cb839ec4da9198e71d4e0d0a0cfd761498c1543b9691c698d",
+            "response_ids": [
+              "d406844c-15c6-401a-8238-88045c84744c"
+            ],
+            "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "usage": {
+              "completion_tokens": 65,
+              "prompt_tokens": 1974,
+              "total_tokens": 2039
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "after-confirmation-revocation:1792735442001708000",
+        "request_id_source": "TURN",
+        "run_id": "run-8343f38b-cc37-4272-884a-5620c3ec07bc",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "20dbc98d5addd3ddb3b117c732e33db9bd6b667c69dd4d5c25d0b9e65684e193",
+          "max_output_tokens": 512,
+          "max_tool_rounds": 12,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "after-confirmation-revocation",
+        "started_at": "2026-10-23T06:04:02.011030+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "tool_configuration": [],
+        "tool_results": [],
+        "turn_id": "after-confirmation-revocation:1792735442001708000",
+        "usage": {
+          "completion_tokens": 65,
+          "prompt_tokens": 1974,
+          "total_tokens": 2039
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "approved_memory_adoption_verified": true,
+      "answer_sha256": "7ebc5206ee7e8c73b39857c47abed7c908e60ab9924098dfd9954915be01766e"
+    },
+    {
+      "stage": "after-new-owner-confirmation",
+      "eligible": true,
+      "runtime_record": {
+        "chat_id": "direct",
+        "configuration_id": "runtime-1",
+        "configuration_version": "1",
+        "cost_total": null,
+        "finished_at": "2026-10-23T06:04:06.680489+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "CONFIRMED",
+          "eligible": true,
+          "memory_id": "memory-1",
+          "version": "3"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-04f1c2ef-69fd-43a1-8bfe-184a13508492",
+            "request_sha256": "4d216a91adb1b106318333ab55272e85788e16e33dc07afaa6154a078124e9ba",
+            "response_ids": [
+              "fa666bba-7488-433d-b917-9ca5dc02ba70"
+            ],
+            "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "usage": {
+              "completion_tokens": 77,
+              "prompt_tokens": 2002,
+              "total_tokens": 2079
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "after-new-owner-confirmation:1792735444120265000",
+        "request_id_source": "TURN",
+        "run_id": "run-3219b732-37f2-449f-aa13-a7a67460e653",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "20dbc98d5addd3ddb3b117c732e33db9bd6b667c69dd4d5c25d0b9e65684e193",
+          "max_output_tokens": 512,
+          "max_tool_rounds": 12,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "after-new-owner-confirmation",
+        "started_at": "2026-10-23T06:04:04.130452+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "tool_configuration": [],
+        "tool_results": [],
+        "turn_id": "after-new-owner-confirmation:1792735444120265000",
+        "usage": {
+          "completion_tokens": 77,
+          "prompt_tokens": 2002,
+          "total_tokens": 2079
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "approved_memory_adoption_verified": true,
+      "answer_sha256": "8ce81e6de275240a280238f74bf7c9dfb80d6946e4c6c95a6e170a0f4d5d8358"
+    }
+  ],
+  "new_runtime_and_session_per_stage": true,
+  "business_task_created": false,
+  "original_memory_body_preserved": true,
+  "private_body_recorded": false,
+  "w1_confirmed_memory_sha256": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631",
+  "source_code_sha256": {
+    "validation/boss_memory_runtime.py": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64",
+    "validation/boss_runtime_records.py": "66161f7a14753cea96cca4e0edafa85897827b785fca25410d872e88fe6d6d8c",
+    "validation/boss_admin_config.py": "4563b769f2ac097671706ffe2a8ac783bfd754176913af320c50c45120402466",
+    "validation/connection.py": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89",
+    "app/tests/test_boss_live_memory_confirmation.py": "09925d7accaa4e5108064e2efd49c6c60dc59b62fb4cfb40f966699ec182dacf"
+  },
+  "full_A15_accepted": false,
+  "full_A19_accepted": false
+}

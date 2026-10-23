@@ -1,6 +1,6 @@
 # 老板 Agent 运行设计
 
-版本：0.3.0-draft。日期：2026-10-23。任务 T07 / A07。状态 PENDING_T06，表示完整 A06 及相关修复待验收。当前实现为 W2 提交7f67aa6及来源有效性修改，引用 W1 提交3f5b806的 T05/T06 1.0.0。输入 SHA256 由 T07 检查报告保存。独立审查者签署、公开接入和完整设计验收保持未完成。
+版本：0.4.0-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_T06，表示完整A06及相关修复待验收。当前实现为W2提交4d1c079及本次Runtime和当前会议读取修改，引用W1提交d1abaaa的T05/T06 1.2.1。输入SHA256由T07检查报告保存。独立审查者签署、公开接入和完整设计验收保持未完成。
 
 ## 主体与治理
 
@@ -37,7 +37,7 @@ Prompt 当前生命周期为草稿、静态校验、启用、停用。Runtime �
 | send_assignment | 同上 | 当前内容、收件人及任务版本获准后写入模拟发件箱；不表示外部送达 |
 | read_assignment | 同上 | 查询已保存任务与 message_ids；反馈和本人确认完成分别表达 |
 
-BusinessTool.parameters 从成熟 JSON Schema 读取定义，模型不能填写 envelope、authorization_id、idempotency_key。Tool 执行结果来自业务 Store.invoke。T06 1.0.0的 `x-tool-operations` 已确定这五项 operationId 及其输入、输出、错误 Schema 和 Store 方法；`agent-assets.json` 对应字段逐项匹配。query_metrics 保存查询记录，read_evidence/read_assignment 保存审计，创建和发送分别保存 task/outbox。当前 UI 业务 mutation 与模型 Tool 的覆盖不同，新增操作仍需 Runtime 注册、服务端授权绑定及实际业务验证。
+BusinessTool.parameters从成熟JSON Schema读取定义，模型不能填写envelope、authorization_id、idempotency_key。Tool执行结果来自业务Store.invoke。T06 1.2.1的x-tool-operations已确定五项operationId及输入、输出、错误Schema和Store方法；agent-assets.json逐项匹配。query_metrics保存查询记录，read_evidence/read_assignment保存审计，创建和发送分别保存task/outbox。具备RuntimeBinding时，BusinessTool将服务端请求及会话ID关联到业务envelope，保持原有owner、namespace和授权检查。经营查询和原文结果释放给模型前重新核查来源owner、类型、版本及source_validity；版本不一致或失效时明确拒绝。当前UI mutation与模型Tool的覆盖不同，新增操作仍需Runtime注册、服务端授权绑定及实际业务验证。
 
 十三项 SOP 的后端操作引用维护在 `sop_backend_bindings`。每项包含读取和命令 operationId，结构检查同时查询 T06 的 HTTP、WebSocket 与 Tool 定义。DESIGN_ONLY 表示存在接口定义，尚未注册为模型 Tool。十四类模拟接口当前为 DESIGN_NOT_MOUNTED，各自资料缺口由 T06 记录；SI09/SI10 没有可用的获准业务资料，不能返回完整业务结果。
 
@@ -85,9 +85,19 @@ sequenceDiagram
 
 当前应用默认 maxToolIterations=12、maxTokens=4096；实际启用配置及 Runtime 快照为运行依据。RecordedProvider HTTP timeout=120 秒，max_retries=0。SDK 检查具有独立任务超时；正式产品总运行超时、Token 总预算、费用预算及无进展检测等待 T06/T16 明确定义与实现。未知预算不能被登记为已强制执行。
 
-运行状态引用 PRD 的 QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT。T06 事件1.0.0描述 webui_response、message、delta、stream_end、turn_end、recovery_state、retry_status、context_compaction；request_id 关联传输回执，chat_id/turn_id/stream_id 关联上游会话与回答片段，client_request_id 关联业务幂等。没有全域 sequence，断线后通过持久会话及原请求回执查询，不能直接重放写入。
+运行状态引用PRD的QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT。T06事件1.2.1描述webui_response、message、delta、stream_end、turn_end、recovery_state、retry_status、context_compaction；request_id关联传输回执，chat_id/turn_id/stream_id关联上游会话与回答片段，client_request_id关联业务幂等。没有全域sequence，断线后通过持久会话及原请求回执查询，不能直接重放写入。
 
 SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自保存原因；显式取消表现为 CancelledError，外部任务超时表现为 TimeoutError。当前真实检查覆盖这些行为，见 T16。runtime_run 的 run_id、配置版本、用量及业务结果引用仍需 W3 与实际持久运行记录关联；不能根据 UI 文本生成正式状态。缺少必要输入停止依赖该输入的动作；参数或授权拒绝停止对应工具调用；模型错误保存真实失败；取消和超时停止后续调用。模型失败不能清除已经保存的业务结果，不得再次发送同一意图；不确定结果查询原请求回执及业务对象。
+
+`boss_runtime_records.RuntimeRecorder` 使用当前SQLite的objects/runtime_run保存技术观察。context在同一事务核查当前配置、实际模型参数、已注册工具范围及有效Prompt版本，再提供当前任务上下文。hook_factory只读取服务端RequestContext.attributes中的RuntimeBinding；observe_transport将每次真实HTTP请求、服务响应ID、完整已观察用量和工具定义摘要关联到该运行。模型请求ID与业务request_id分别保存，服务响应头request_id保留原意。工具实现使用实际源码SHA256标识，不保存指令正文、原始参数或模型回答。
+
+每个新任务重新核查配置；未实际采用的新配置导致拒绝。进行中任务保留启动时Prompt快照；工具定义在执行中变化时明确拒绝。真正的外部deadline由调用方提供deadline_expired回调，保留SDK的cancelled原因并标记TIMED_OUT；没有该实际条件时记为CANCELED。产品总预算仍未定义，不根据这项能力声明已经强制执行。失败和取消的全部计费用量未知时cost_total保持null；用量范围明确为HTTP_REQUESTS_OBSERVED_ONLY。WAITING_INPUT需明确服务端输入等待事件，当前不能从模型文字推断。
+
+获准原文的新Runtime已实际确认当前Prompt、配置版本和工具定义进入请求；领域检查确认真实业务query_id及请求身份关联。当前新增运行记录的四项真实异常均已通过，覆盖写入后模型失败保留OPEN任务、CANCELED、TIMED_OUT及max_iterations，并重开数据库验证。取消和超时请求缺少完整用量时保持PARTIAL及费用null。公共application、RoleChannel、运行页面投影及扩展数据字段由W3/W1接收，具体接口、身份与验证入口见T16/T19。
+
+`runtime_records_query.read_runtime_records`提供技术元信息的受控查询，校验角色、执行空间、参数及RFC3339范围，在全部记录内筛选后使用真实started_at/run_id游标分页。`MaintainerRuntimeRecords`提供A15独立内容组件，包含实际筛选、列表、记录详情、配置和工具版本、业务对象引用、用量及覆盖范围；取消仅中止读取。五组真实DOM与只读API检查通过，输入来自实际DeepSeek运行SQLite，没有新增模型请求或业务对象。完整桌面入口、RoleChannel、关联任务操作与视觉验收继续待W3接入验证。
+
+`boss_memory_runtime.OwnerMemoryContext` 在一致读取事务中复用W1 1.2.1的confirmed_memory，核查当前记忆与确认授权。记忆原记录及历史仍保留，已撤销确认不进入新任务；新的本人确认采用新的版本。Provider只向本人上下文提供有效正文，并将不含正文的boss_memory_reference放入服务端RequestContext.attributes供RuntimeRecorder关联。MAINTAINER只读取同一判断产生的future_context_eligible。获准样本的确认有效、撤销后停止采用及新确认后三个独立Runtime均已通过真实DeepSeek检查，见T19；不能扩大为历史会话清理或物理擦除通过。
 
 ## 检索、摄取与语音
 

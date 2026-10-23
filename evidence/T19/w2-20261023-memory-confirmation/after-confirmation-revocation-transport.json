@@ -1,0 +1,82 @@
+[
+  {
+    "at": "2026-10-23T06:04:02.771963+00:00",
+    "type": "request",
+    "method": "POST",
+    "url": "https://api.deepseek.com/chat/completions",
+    "model": "deepseek-flash",
+    "stream": true,
+    "max_tokens": 512,
+    "thinking": {
+      "type": "disabled"
+    },
+    "model_request_id": "model-request-414237a2-7f34-4f59-b019-5687fa78b272",
+    "request_sha256": "0ee31c5c8dca8e0cb839ec4da9198e71d4e0d0a0cfd761498c1543b9691c698d",
+    "tool_config_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "request_bytes": 9065,
+    "message_count": 2,
+    "tool_count": 0,
+    "private_contents_recorded": false,
+    "run_id": "run-8343f38b-cc37-4272-884a-5620c3ec07bc",
+    "session_id": "after-confirmation-revocation",
+    "runtime_request_id": "after-confirmation-revocation:1792735442001708000",
+    "configuration_version": "1"
+  },
+  {
+    "at": "2026-10-23T06:04:02.944129+00:00",
+    "type": "response",
+    "status": 200,
+    "url": "https://api.deepseek.com/chat/completions",
+    "request_id": null,
+    "content_type": "text/event-stream; charset=utf-8",
+    "model_request_id": "model-request-414237a2-7f34-4f59-b019-5687fa78b272",
+    "run_id": "run-8343f38b-cc37-4272-884a-5620c3ec07bc",
+    "session_id": "after-confirmation-revocation",
+    "runtime_request_id": "after-confirmation-revocation:1792735442001708000",
+    "configuration_version": "1"
+  },
+  {
+    "at": "2026-10-23T06:04:02.971866+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-414237a2-7f34-4f59-b019-5687fa78b272",
+    "response_id": "d406844c-15c6-401a-8238-88045c84744c",
+    "model": "deepseek-flash",
+    "created": 1792735443,
+    "usage": null,
+    "finish_reasons": [],
+    "run_id": "run-8343f38b-cc37-4272-884a-5620c3ec07bc",
+    "session_id": "after-confirmation-revocation",
+    "runtime_request_id": "after-confirmation-revocation:1792735442001708000",
+    "configuration_version": "1"
+  },
+  {
+    "at": "2026-10-23T06:04:04.049293+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-414237a2-7f34-4f59-b019-5687fa78b272",
+    "response_id": "d406844c-15c6-401a-8238-88045c84744c",
+    "model": "deepseek-flash",
+    "created": 1792735443,
+    "usage": {
+      "completion_tokens": 65,
+      "prompt_tokens": 1974,
+      "total_tokens": 2039,
+      "completion_tokens_details": null,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cache_write_tokens": null,
+        "cached_tokens": 1664,
+        "image_tokens": null,
+        "text_tokens": null
+      },
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 310
+    },
+    "finish_reasons": [
+      "stop"
+    ],
+    "run_id": "run-8343f38b-cc37-4272-884a-5620c3ec07bc",
+    "session_id": "after-confirmation-revocation",
+    "runtime_request_id": "after-confirmation-revocation:1792735442001708000",
+    "configuration_version": "1"
+  }
+]

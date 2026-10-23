@@ -1,0 +1,67 @@
+{
+  "status": "PASS_COMPONENT_DOM_SCOPE",
+  "checks": [
+    {
+      "check_id": "A15-QUERY-REAL-METADATA",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-ui-query.txt",
+      "sha256": "a47df9afa7e7de6208d1fb0cdc6e90536193094843a0f6fc7cd333e9c0d3dc47"
+    },
+    {
+      "check_id": "A15-PAGINATION-DETAILS-COST",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-ui-details.txt",
+      "sha256": "8c795533827ad16f0d1a65ca5500ae7b4c8776a270d41390273339b7d2ff5513"
+    },
+    {
+      "check_id": "A15-TIME-ID-EMPTY-AUTH",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-ui-edges.txt",
+      "sha256": "86f340f612052cf24ba1a5a2873277ae2c29f111554448e596096b62efe964cc"
+    },
+    {
+      "check_id": "A15-CANCEL-PENDING-READ",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-ui-cancel.txt",
+      "sha256": "975277740f7ce6eff4adf13c5ddf306e09e7085648b57a23daf9f95fe9384b07"
+    },
+    {
+      "check_id": "A15-OFFLINE-AND-RECOVERY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-ui-network.txt",
+      "sha256": "5e5fb239b2fbe75e4b787967adbcb2eb6f5168cd1faf3cacfc4fccb138cff348"
+    }
+  ],
+  "record_ids": [
+    "run-37da688d-3c2b-4fdb-9f58-003073eef52f",
+    "run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae"
+  ],
+  "existing_runtime_records_unchanged": true,
+  "task_count": 0,
+  "outbox_count": 0,
+  "actual_database_reopened": true,
+  "model_requests_for_ui_check": 0,
+  "private_body_recorded": false,
+  "screenshots_taken": false,
+  "visual_acceptance": "NOT_RUN",
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "linked_task_action_acceptance": "NOT_RUN",
+  "source_code_sha256": {
+    "app/webui/MaintainerRuntimeRecords.tsx": "230e82bdd683ef8f340d4e5a12cb1f36cc1687c0ef22838960ac7cfc8d27d2ee",
+    "app/webui/boss-v6.css": "90e7efb7273e5263fde5a64877609894622d4cefc184c7aed64fbf0294554353",
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "validation/runtime_records_query.py": "84c8b11508c4e5692364866a7aaa9a027e86d25e600553930f08204f51e4dd7a",
+    "evidence/T19/check_runtime_ui_server.py": "fc06690c56b9316eee175df2e79b7a6417822bcafe60349497122cf3d52fa295",
+    "evidence/T19/runtime_ui_cli.sh": "556fa589698c20427f0ceb77106670a327fb9116a8ad53ed31f940ebcd9592d5",
+    "evidence/T19/check_runtime_ui_cancel.sh": "3b53924f0790e492bac9cafa34b0794f6c0855c6c4f62a62f5e8e7592fa0c863",
+    "evidence/T19/runtime-ui/index.html": "4383f6399d0b47e2deadb8c0536a368694b78135dbb73cd6bb868e5394b007b5",
+    "evidence/T19/runtime-ui/main.tsx": "c2e5fb4ad48242faae244ca86f49341033c49b3437e5463b8c88473a157f015e",
+    "evidence/T19/runtime-ui/tsconfig.json": "262140b16f6a1ed81fd1f416f2c09c96b00c50ca9415f0a01bc5c6becb17f7b7",
+    "evidence/T19/runtime-ui/vite.config.mjs": "06b3b218f9743b04dde967f6f85dfa701e2e724a28e5ce98e8c44189fbdba1a5",
+    "evidence/T19/check_runtime_ui_cancel.js": "d26bd6f2d531fcee9effa3f6f4d63fc58a29ab337fffa046194797abe062f5db",
+    "evidence/T19/check_runtime_ui_details.js": "5c8dfeec6b0ac47fd35b80311ba8c2892549a971a82f9e83bdc9831a424b97f5",
+    "evidence/T19/check_runtime_ui_edges.js": "db661acf1e81a637a7a1bb9a24d41e1a197ef42b719a03136a889348b08668db",
+    "evidence/T19/check_runtime_ui_network.js": "21e483d80adc34789abb174192aecff0d3b71a9bb154ed261416d3e62175c699",
+    "evidence/T19/check_runtime_ui_query.js": "dc29076193dbf248c216e138c5c7a7dbc5407cbfed6216905efa3b438a89346a"
+  }
+}

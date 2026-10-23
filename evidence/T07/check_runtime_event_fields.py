@@ -1,13 +1,16 @@
 import hashlib
 import importlib.metadata
 import json
+import subprocess
 from pathlib import Path
 from typing import NotRequired, get_args, get_origin, get_type_hints
 
 from nanobot.webui import outbound_wire
 
 schema_path = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/runtime-events.schema.json")
-schema = json.loads(schema_path.read_text())
+received_commit = "d1abaaa16cab34757d4adbb37021314d86fa2c89"
+schema_bytes = subprocess.check_output(["git", "show", received_commit + ":specs/runtime-events.schema.json"], cwd=schema_path.parents[1])
+schema = json.loads(schema_bytes)
 source_path = Path(outbound_wire.__file__)
 results = []
 for name, native in (
@@ -32,7 +35,8 @@ for name, native in (
 report = {
     "status": "PASS_TYPED_EVENT_FIELDS_ONLY", "full_A07_accepted": False,
     "nanobot_distribution_version": importlib.metadata.version("nanobot-ai"),
-    "schema_id": schema["$id"], "schema_sha256": hashlib.sha256(schema_path.read_bytes()).hexdigest(),
+    "schema_id": schema["$id"], "schema_sha256": hashlib.sha256(schema_bytes).hexdigest(),
+    "received_commit": received_commit,
     "installed_outbound_wire_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
     "results": results,
     "unverified": ["实际公共WebSocket流", "内部推理过滤", "持久运行关联", "断线续接次序", "动态Tool事件字段"],

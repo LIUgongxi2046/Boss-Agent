@@ -1,0 +1,33 @@
+[
+  {
+    "type": "tool",
+    "at": "2026-10-23T06:48:45.433685+00:00",
+    "name": "query_metrics",
+    "query_id": "7ad07e32-b124-4f7f-bc06-e1d1c59b8dad",
+    "arguments_redacted": true,
+    "result_redacted": true
+  },
+  {
+    "type": "iteration",
+    "at": "2026-10-23T06:48:45.443446+00:00",
+    "iteration": 0,
+    "usage": {
+      "total_tokens": 3781
+    }
+  },
+  {
+    "type": "tool",
+    "at": "2026-10-23T06:48:47.447672+00:00",
+    "name": "read_evidence",
+    "arguments_redacted": true,
+    "result_redacted": true
+  },
+  {
+    "type": "iteration",
+    "at": "2026-10-23T06:48:47.457223+00:00",
+    "iteration": 1,
+    "usage": {
+      "total_tokens": 4995
+    }
+  }
+]

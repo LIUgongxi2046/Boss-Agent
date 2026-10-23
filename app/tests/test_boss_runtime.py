@@ -18,6 +18,7 @@ from business import Store, checksum, encode
 from boss_command_api import BossCommandAPI
 from connection import RecordedProvider, settings
 from controls import ControlStore
+from boss_runtime_records import runtime_records
 from fault_probe import CONTENT, QUERY, objects, runtime
 
 pytestmark = pytest.mark.skipif(
@@ -39,7 +40,7 @@ def test_live_written_state_survives_model_transport_failure(tmp_path):
     output = prepare_output(tmp_path)
 
     async def check():
-        async with runtime("w2-written-client-closed", output, close_after_write=True) as case:
+        async with runtime("w2-written-client-closed", output, close_after_write=True, record_runtime=True) as case:
             authorization = case["store"].authorize(case["ns"], "create_assignment", CONTENT)
             binding = {"authorization_id": authorization, "idempotency_key": "w2-written-result"}
             case["bindings"]["create_assignment"] = binding
@@ -55,14 +56,19 @@ def test_live_written_state_survives_model_transport_failure(tmp_path):
             replay = reopened.invoke("create_assignment", {
                 **CONTENT, **binding, "envelope": case["envelope"],
             })
-            original = next(row["output"] for row in case["records"]
-                            if row["type"] == "tool" and row["name"] == "create_assignment")
+            with reopened.connect() as db:
+                original = json.loads(db.execute("SELECT result FROM idempotency WHERE namespace=? AND operation='create_assignment' AND key=?",
+                                                (case["ns"], binding["idempotency_key"])).fetchone()[0])
             assert replay == original
             assert replay["task_id"] == tasks[0]["task_id"]
             assert reopened.invoke("read_assignment", {
                 "envelope": case["envelope"], "task_id": replay["task_id"],
             }) == tasks[0]
             assert len(objects(case, "task")) == 1
+            row = runtime_records(reopened, "MAINTAINER", case["ns"])["runs"][0]
+            assert row["status"] == "FAILED" and row["stop_reason"] == "error"
+            assert next(item for item in row["tool_results"] if item["tool_id"] == "create_assignment")["task_id"] == tasks[0]["task_id"]
+            assert row["model_requests"] and row["cost_total"] is None
 
     asyncio.run(check())
 
@@ -71,7 +77,7 @@ def test_live_explicit_cancellation_stops_pending_runtime(tmp_path):
     output = prepare_output(tmp_path)
 
     async def check():
-        async with runtime("w2-explicit-cancel", output) as case:
+        async with runtime("w2-explicit-cancel", output, record_runtime=True) as case:
             run = await case["bot"].run_streamed(
                 QUERY, session_key=case["ns"], sender_id="boss-1", hooks=[case["trace"]],
             )
@@ -86,6 +92,7 @@ def test_live_explicit_cancellation_stops_pending_runtime(tmp_path):
             with pytest.raises(asyncio.CancelledError):
                 await run.wait()
             assert objects(case, "task") == objects(case, "outbox") == []
+            assert runtime_records(case["store"], "BOSS", case["ns"])["runs"][0]["status"] == "CANCELED"
 
     asyncio.run(check())
 
@@ -94,17 +101,37 @@ def test_live_timeout_after_real_request_has_started(tmp_path):
     output = prepare_output(tmp_path)
 
     async def check():
-        async with runtime("w2-request-timeout", output) as case:
+        async with runtime("w2-request-timeout", output, record_runtime=True) as case:
+            started = asyncio.Event()
+            observe = case["provider"].transport_observer
+
+            def observe_request(event):
+                binding = observe(event)
+                if event["type"] == "request":
+                    started.set()
+                return binding
+
+            case["provider"].transport_observer = observe_request
             pending = asyncio.create_task(case["bot"].run(
                 QUERY, session_key=case["ns"], sender_id="boss-1", hooks=[case["trace"]],
             ))
-            async with asyncio.timeout(10):
-                while not any(row["type"] == "request" for row in case["provider"].requests):
-                    await asyncio.sleep(0.01)
+            admission = asyncio.create_task(started.wait())
+            # 从真实 HTTP request Hook 取得开始信号，界限继承 Provider 的120秒配置。
+            async with asyncio.timeout(120):
+                await asyncio.wait({pending, admission}, return_when=asyncio.FIRST_COMPLETED)
+            if not started.is_set():
+                admission.cancel()
+                await pending
+                raise AssertionError("Runtime结束前没有实际模型请求")
+            await admission
             with pytest.raises(TimeoutError):
-                async with asyncio.timeout(0.5):
+                deadline = asyncio.timeout(0.5)
+                case["runtime_recorder"].deadline_expired = deadline.expired
+                async with deadline:
                     await pending
             assert objects(case, "task") == objects(case, "outbox") == []
+            row = runtime_records(case["store"], "BOSS", case["ns"])["runs"][0]
+            assert row["status"] == "TIMED_OUT" and row["termination_source"] == "CALLER_DEADLINE_EXPIRED"
 
     asyncio.run(check())
 
@@ -113,13 +140,15 @@ def test_live_iteration_budget_stops_further_model_turns(tmp_path):
     output = prepare_output(tmp_path)
 
     async def check():
-        async with runtime("w2-iteration-budget", output, rounds=1) as case:
+        async with runtime("w2-iteration-budget", output, rounds=1, record_runtime=True) as case:
             result = await case["bot"].run(
                 QUERY, session_key=case["ns"], sender_id="boss-1", hooks=[case["trace"]],
             )
             assert result.stop_reason == "max_iterations"
             assert any(row["type"] == "request" for row in case["provider"].requests)
             assert objects(case, "task") == objects(case, "outbox") == []
+            row = runtime_records(case["store"], "BOSS", case["ns"])["runs"][0]
+            assert row["status"] == "FAILED" and row["stop_reason"] == "max_iterations"
 
     asyncio.run(check())
 

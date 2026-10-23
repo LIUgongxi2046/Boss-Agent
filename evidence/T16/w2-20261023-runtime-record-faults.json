@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check_id": "w2-explicit-cancel",
+      "run_id": "run-1280f2ee-fb71-4b9c-9656-c72f19aefc9b",
+      "status": "CANCELED",
+      "stop_reason": "cancelled",
+      "model_request_count": 3,
+      "task_count": 0,
+      "outbox_count": 0,
+      "usage_coverage": "PARTIAL_OBSERVED_REQUESTS",
+      "cost_total": null,
+      "event_trace_present": true,
+      "database_reopen_verified": true,
+      "evidence": "evidence/T16/runtime-record-faults/w2-explicit-cancel"
+    },
+    {
+      "check_id": "w2-iteration-budget",
+      "run_id": "run-372407e4-42cb-45a2-8229-debf28795a51",
+      "status": "FAILED",
+      "stop_reason": "max_iterations",
+      "model_request_count": 1,
+      "task_count": 0,
+      "outbox_count": 0,
+      "usage_coverage": "COMPLETE_OBSERVED_REQUESTS",
+      "cost_total": null,
+      "event_trace_present": true,
+      "database_reopen_verified": true,
+      "evidence": "evidence/T16/runtime-record-faults/w2-iteration-budget"
+    },
+    {
+      "check_id": "w2-written-client-closed",
+      "run_id": "run-8142c95f-18a3-47f5-873e-2d215928586f",
+      "status": "FAILED",
+      "stop_reason": "error",
+      "model_request_count": 1,
+      "task_count": 1,
+      "outbox_count": 0,
+      "usage_coverage": "COMPLETE_OBSERVED_REQUESTS",
+      "cost_total": null,
+      "event_trace_present": true,
+      "database_reopen_verified": true,
+      "evidence": "evidence/T16/runtime-record-faults/w2-written-client-closed"
+    },
+    {
+      "check_id": "w2-request-timeout",
+      "run_id": "run-6535b9e6-08a5-43c1-af85-16032b5f4281",
+      "status": "TIMED_OUT",
+      "stop_reason": "cancelled",
+      "model_request_count": 1,
+      "task_count": 0,
+      "outbox_count": 0,
+      "usage_coverage": "PARTIAL_OBSERVED_REQUESTS",
+      "cost_total": null,
+      "event_trace_present": false,
+      "database_reopen_verified": true,
+      "evidence": "evidence/T16/runtime-record-faults/w2-request-timeout"
+    }
+  ],
+  "source_type": "RUNTIME_RECORD",
+  "test_reports": [
+    "evidence/T16/w2-20261023-live-runtime-record-faults-initial.xml.gz",
+    "evidence/T16/w2-20261023-live-runtime-record-timeout.xml"
+  ],
+  "private_body_recorded": false,
+  "public_application_accepted": false,
+  "source_code_sha256_at_collection": {
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "validation/connection.py": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89",
+    "validation/model_probe.py": "06771039caad94e047a3217f27f6338263485a0dfb82bf2978dee820d2540775",
+    "validation/fault_probe.py": "63f3f445c92a6ec98285c4fb64f59f73c8c92d589f9606f6e335a4b30ce8f668",
+    "app/tests/test_boss_runtime.py": "52fa456a4ff2913cb1a852dd530040cf3dc2abf49b0b1f8352837967c961079d"
+  }
+}

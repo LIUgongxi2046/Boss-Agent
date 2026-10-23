@@ -12,7 +12,7 @@ current_schema_path = project / "specs" / "selection-probe.json"
 backend_path = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/openapi.yaml")
 events_path = backend_path.with_name("runtime-events.schema.json")
 dictionary_path = backend_path.with_name("data-dictionary.json")
-received_commit = "3f5b806"
+received_commit = "d1abaaa16cab34757d4adbb37021314d86fa2c89"
 
 
 def received_source(path):
@@ -29,6 +29,10 @@ dictionary_bytes = received_source(dictionary_path)
 workspace_path = project / "validation" / "boss_workspace_api.py"
 transcription_path = project / "validation" / "boss_transcription.py"
 research_tool_path = project / "validation" / "boss_agent_read_tools.py"
+runtime_records_path = project / "validation" / "boss_runtime_records.py"
+runtime_query_path = project / "validation" / "runtime_records_query.py"
+runtime_ui_path = project / "app" / "webui" / "MaintainerRuntimeRecords.tsx"
+meeting_tool_path = project / "validation" / "runtime_meeting_tool.py"
 inputs = {
     "agent_assets": hashlib.sha256(assets_path.read_bytes()).hexdigest(),
     "selection_probe": hashlib.sha256(current_schema_path.read_bytes()).hexdigest(),
@@ -38,6 +42,10 @@ inputs = {
     "workspace_projection_source": hashlib.sha256(workspace_path.read_bytes()).hexdigest(),
     "transcription_adapter_source": hashlib.sha256(transcription_path.read_bytes()).hexdigest(),
     "research_tool_source": hashlib.sha256(research_tool_path.read_bytes()).hexdigest(),
+    "runtime_records_source": hashlib.sha256(runtime_records_path.read_bytes()).hexdigest(),
+    "runtime_query_source": hashlib.sha256(runtime_query_path.read_bytes()).hexdigest(),
+    "runtime_ui_source": hashlib.sha256(runtime_ui_path.read_bytes()).hexdigest(),
+    "current_meeting_tool_source": hashlib.sha256(meeting_tool_path.read_bytes()).hexdigest(),
 }
 assets = json.loads(assets_path.read_text())
 schema = json.loads(current_schema_path.read_text())

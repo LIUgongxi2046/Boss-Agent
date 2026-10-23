@@ -1,0 +1,41 @@
+### Result
+{"status":"PASS","check_id":"A15-PAGINATION-DETAILS-COST","actual_run_ids":["run-37da688d-3c2b-4fdb-9f58-003073eef52f","run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae"],"linked_task_branch":"NOT_RUN_NO_TASK","dom":"- main:\n  - region \"运行记录查询\":\n    - heading \"运行记录\" [level=2]\n    - text: RUNTIME_RECORD · 获准技术元信息 Provider\n    - textbox \"Provider\": deepseek\n    - text: run_id\n    - textbox \"run_id\"\n    - text: 数据集\n    - textbox \"数据集\": selection\n    - text: 错误类型或终止原因\n    - textbox \"错误类型或终止原因\": completed\n    - text: 运行状态\n    - combobox \"运行状态\":\n      - option \"全部状态\"\n      - option \"QUEUED\"\n      - option \"RUNNING\"\n      - option \"WAITING_INPUT\"\n      - option \"SUCCEEDED\" [selected]\n      - option \"FAILED\"\n      - option \"CANCELED\"\n      - option \"TIMED_OUT\"\n    - text: 每页数量\n    - combobox \"每页数量\":\n      - option \"1\" [selected]\n      - option \"20\"\n      - option \"50\"\n      - option \"100\"\n    - text: 真实开始时间从\n    - textbox \"真实开始时间从\"\n    - text: 真实开始时间至\n    - textbox \"真实开始时间至\"\n    - button \"查询记录\":\n      - img\n      - text: 查询记录\n    - button \"取消读取\" [disabled]:\n      - img\n      - text: 取消读取\n  - status: 已重新读取获准技术记录\n  - region \"运行记录列表\":\n    - heading \"已记录的运行\" [level=2]\n    - text: 已读取 2 / 匹配 2 当前执行空间\n    - strong: ui-check\n    - text: 实际读取时间\n    - strong: 2026-10-23T06:51:57.134306+00:00\n    - table:\n      - rowgroup:\n        - row \"运行编号 / 真实时间 Provider / 配置版本 请求 / 工具返回 运行状态 / 终止原因 操作\":\n          - columnheader \"运行编号 / 真实时间\"\n          - columnheader \"Provider / 配置版本\"\n          - columnheader \"请求 / 工具返回\"\n          - columnheader \"运行状态 / 终止原因\"\n          - columnheader \"操作\"\n      - rowgroup:\n        - row \"run-37da688d-3c2b-4fdb-9f58-003073eef52f 2026-10-23T06:20:00.440596+00:00 deepseek v2 1 / 0 SUCCEEDED completed 打开记录 run-37da688d-3c2b-4fdb-9f58-003073eef52f\" [selected]:\n          - cell \"run-37da688d-3c2b-4fdb-9f58-003073eef52f 2026-10-23T06:20:00.440596+00:00\"\n          - cell \"deepseek v2\"\n          - cell \"1 / 0\"\n          - cell \"SUCCEEDED completed\"\n          - cell \"打开记录 run-37da688d-3c2b-4fdb-9f58-003073eef52f\":\n            - button \"打开记录 run-37da688d-3c2b-4fdb-9f58-003073eef52f\": 打开记录\n        - row \"run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae 2026-10-23T06:19:38.671036+00:00 deepseek v1 1 / 0 SUCCEEDED completed 打开记录 run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae\":\n          - cell \"run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae 2026-10-23T06:19:38.671036+00:00\"\n          - cell \"deepseek v1\"\n          - cell \"1 / 0\"\n          - cell \"SUCCEEDED completed\"\n          - cell \"打开记录 run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae\":\n            - button \"打开记录 run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae\": 打开记录\n  - complementary \"运行记录详情\":\n    - heading \"获准记录详情\" [level=2]\n    - text: 私人正文、凭据和内部推理不在读取范围 run_id\n    - strong: run-37da688d-3c2b-4fdb-9f58-003073eef52f\n    - text: request_id\n    - strong: second:1792736399900971000\n    - text: 请求编号来源\n    - strong: TURN\n    - text: session_id\n    - strong: second\n    - text: 数据集及版本\n    - strong: selection · v1\n    - text: 真实开始时间\n    - strong: 2026-10-23T06:20:00.440596+00:00\n    - text: 真实结束时间\n    - strong: 2026-10-23T06:20:10.209947+00:00\n    - text: 运行状态\n    - strong: SUCCEEDED\n    - text: 终止原因\n    - strong: completed\n    - text: 终止来源\n    - strong: 未知\n    - text: 模型完成已观察\n    - strong: 已经观察\n    - text: 业务完成\n    - strong: 未通过本投影判定\n    - text: 配置编号及版本\n    - strong: runtime-1 · v2\n    - text: Provider / 模型\n    - strong: deepseek / deepseek-flash\n    - text: 实际工具轮数限制\n    - strong: \"2\"\n    - text: TASK_HINTS\n    - strong: prompt-78af216c-b48c-4cbf-a898-01a9a383d0a0 · 内容v4 · 启用v2\n    - button \"核查明细\"\n    - heading \"业务结果关联\" [level=3]\n    - paragraph: 本次运行没有已观察的工具返回或关联任务\n    - button \"查看关联任务（没有关联任务）\" [disabled]\n    - heading \"实际请求与工具配置\" [level=3]\n    - text: 配置摘要\n    - strong: c082f34d132aa2a566b5a8dd8165c2f326fcfc06e3b49db47428550088f17a71\n    - text: 全部工具配置摘要\n    - strong: 9bc72480f74355aabeb043cd756f00e6b87d9d00f6e7fd4e5e152cea8ad58be7\n    - text: 模型请求编号\n    - strong: model-request-816dff6f-fb7b-4ad4-91c4-24f7f23266a9\n    - text: HTTP 状态\n    - strong: \"200\"\n    - text: 服务响应编号\n    - strong: 3129e7ba-0745-4f26-88c5-e87f60b3c310\n    - text: 模型结束原因\n    - strong: stop\n    - text: 请求摘要\n    - strong: f5cae3aada1b4e0a3eb480323d3577f8fdf32b7cf80f89941d9fec26e3868d7d\n    - text: 实际传输工具摘要\n    - strong: 9bc72480f74355aabeb043cd756f00e6b87d9d00f6e7fd4e5e152cea8ad58be7\n    - text: 输入 Token\n    - strong: \"2470\"\n    - text: 输出 Token\n    - strong: \"67\"\n    - text: 总 Token\n    - strong: \"2537\"\n    - text: 缓存命中 Token\n    - strong: \"2176\"\n    - text: 缓存未命中 Token\n    - strong: \"294\"\n    - text: 工具编号及实现\n    - strong: read_evidence · model_probe.BusinessTool\n    - text: Schema 摘要\n    - strong: 88b733828298d2099c669938c09f057e0599443c98481a49c46f9c2b3c2de596\n    - text: 实现源码摘要\n    - strong: 06771039caad94e047a3217f27f6338263485a0dfb82bf2978dee820d2540775\n    - region \"费用与覆盖范围\":\n      - heading \"用量与费用\" [level=2]\n      - text: 缺少用量保持未知 输入 Token\n      - strong: \"2470\"\n      - text: 输出 Token\n      - strong: \"67\"\n      - text: 总 Token\n      - strong: \"2537\"\n      - text: 缓存命中 Token\n      - strong: \"2176\"\n      - text: 缓存未命中 Token\n      - strong: \"294\"\n      - text: 语音用量\n      - strong: 未知\n      - text: 检索用量\n      - strong: 未知\n      - text: 计价日期或版本\n      - strong: 未知\n      - text: 币种\n      - strong: 未知\n      - text: 费用覆盖范围\n      - strong: COMPLETE_OBSERVED_REQUESTS\n      - text: 请求覆盖范围\n      - strong: HTTP_REQUESTS_OBSERVED_ONLY\n      - text: 已知费用小计\n      - strong: 未知\n      - text: 完整总额\n      - strong: null（未核算）"}
+### Ran Playwright code
+```js
+await (async (page) => {
+  const newest = "run-37da688d-3c2b-4fdb-9f58-003073eef52f";
+  const older = "run-47428cbf-2f1e-4ba6-92eb-85a9530db6ae";
+  const [more] = await Promise.all([
+    page.waitForResponse(item => item.url().includes("cursor_run_id=")),
+    page.getByRole("button", {name: "读取更多记录", exact: true}).click(),
+  ]);
+  if (more.status() !== 200) throw Error("真实游标请求未成功");
+  const query = new URL(more.url()).searchParams;
+  if (query.get("cursor_run_id") !== newest || query.get("provider") !== "deepseek")
+    throw Error("分页没有沿用当前真实游标及筛选条件");
+  await page.getByText("已读取 2 / 匹配 2", {exact: true}).waitFor();
+  const rows = page.locator("tbody tr");
+  if (await rows.count() !== 2 || !(await rows.nth(1).innerText()).includes(older))
+    throw Error("第二页记录与真实SQLite不一致");
+  await page.getByRole("button", {name: "打开记录 " + newest, exact: true}).click();
+  const aside = page.getByRole("complementary", {name: "运行记录详情"});
+  await aside.getByText("runtime-1 · v2", {exact: true}).waitFor();
+  if (!await aside.getByRole("button", {name: "查看关联任务（没有关联任务）", exact: true}).isDisabled())
+    throw Error("无真实交办时关联任务操作必须不可用");
+  const [detail] = await Promise.all([
+    page.waitForResponse(item => new URL(item.url()).searchParams.get("run_id") === newest),
+    aside.getByRole("button", {name: "核查明细", exact: true}).click(),
+  ]);
+  if (detail.status() !== 200) throw Error("单项记录重新读取未成功");
+  await aside.getByText("3129e7ba-0745-4f26-88c5-e87f60b3c310", {exact: true}).waitFor();
+  const text = await aside.innerText();
+  for (const expected of ["内容v4", "启用v2", "2176", "294", "null（未核算）",
+    "COMPLETE_OBSERVED_REQUESTS", "HTTP_REQUESTS_OBSERVED_ONLY", "未通过本投影判定", "read_evidence"])
+    if (!text.includes(expected)) throw Error("真实明细字段缺少：" + expected);
+  if (text.includes("合成水产饲料外销明细") || text.includes("简报优先展示现金"))
+    throw Error("技术记录页面包含私人正文");
+  return {status: "PASS", check_id: "A15-PAGINATION-DETAILS-COST", actual_run_ids: [newest, older],
+    linked_task_branch: "NOT_RUN_NO_TASK", dom: await page.locator("main").ariaSnapshot()};
+}
+)(page);
+```

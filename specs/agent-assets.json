@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
-  "version": "0.3.0-draft",
+  "version": "0.4.0-draft",
   "task_id": "T07",
   "status": "PENDING_T06",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "design_ref": "docs/LLD-agent.md",
-  "formal_backend_version": "1.0.0",
-  "formal_event_version": "1.0.0",
-  "received_backend_design": {"version":"1.0.0","source_commit":"3f5b806","working_tree_changes_included":false,"full_acceptance":"NOT_RUN","remaining":"独立语义审阅、公开接入、运行字段关联、资料不足与完整业务验收"},
+  "formal_backend_version": "1.2.1",
+  "formal_event_version": "1.2.1",
+  "received_backend_design": {"version":"1.2.1","source_commit":"d1abaaa16cab34757d4adbb37021314d86fa2c89","working_tree_changes_included":false,"full_acceptance":"NOT_RUN","remaining":"独立语义审阅、公开接入、运行字段关联、资料不足与完整业务验收"},
   "pending_public_read_tools": [
     {"operationId":"ownerPlansRead","role":"BOSS","input":"无查询参数","output":["plans","events","results","dispatches","technical_schedule","execution_owner"],"source":"OpenAPI /api/boss/ui/owner-plans GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01","SOP02","SOP06"]},
-    {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01"]}
+    {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01"]},
+    {"operationId":"meetingArrangementRead","role":"BOSS","input":"无查询参数","output":["source_type","meeting","draft","contacts","sources","revisions","business_at","invitation_sent"],"source":"OpenAPI /api/boss/ui/meeting-arrangement GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_meeting_tool.BossCurrentMeetingTool","sop_ids":["SOP04","SOP05","SOP10","SOP11"]}
   ],
   "current_tool_schema_version": "selection-probe 1.3.0",
   "agent": {
@@ -69,7 +70,7 @@
     {"sop_id":"SOP01","read_operations":["todayRead","ownerPlansRead","bossDashboardRead"],"command_operations":["todayReorder"],"workspace_projections":[],"runtime_registration":"DESIGN_ONLY"},
     {"sop_id":"SOP02","read_operations":["bossWorkspaceRead"],"command_operations":["boss.reminder.ack","boss.reminder.snooze","boss.reminder.close"],"workspace_projections":["notifications"],"runtime_registration":"DESIGN_ONLY"},
     {"sop_id":"SOP03","read_operations":["query_metrics","read_evidence"],"command_operations":[],"runtime_registration":"EXISTING_FIVE_TOOLS"},
-    {"sop_id":"SOP04","read_operations":["bossMeetingsRead","bossEvidenceRead"],"command_operations":["boss.meeting.brief.prepare"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP04","read_operations":["bossMeetingsRead","bossEvidenceRead","meetingArrangementRead"],"command_operations":["boss.meeting.brief.prepare","meetingDraftSave","meetingConfirm","meetingCancel","meetingHeld"],"runtime_registration":"CURRENT_MEETING_READ_ADAPTER_IMPLEMENTED_PUBLIC_REGISTRATION_PENDING"},
     {"sop_id":"SOP05","read_operations":["bossMeetingsRead","bossWorkspaceRead"],"command_operations":["boss.minutes.save","boss.minutes.confirm","boss.minutes.assignment.create"],"workspace_projections":["minutes"],"runtime_registration":"DESIGN_ONLY"},
     {"sop_id":"SOP06","read_operations":["read_assignment","bossTasksRead","ownerPlansRead"],"command_operations":["create_assignment","send_assignment","boss.assignment.nudge","boss.assignment.extend","boss.assignment.complete","boss.assignment.cancel"],"runtime_registration":"EXISTING_FIVE_TOOLS_AND_DESIGN_ONLY"},
     {"sop_id":"SOP07","read_operations":["bossWorkspaceRead","bossEvidenceRead"],"command_operations":["boss.approval.decide"],"workspace_projections":["approvals"],"runtime_registration":"DESIGN_ONLY"},
@@ -113,6 +114,17 @@
     "total_token_budget": null,
     "cost_budget": null,
     "no_progress_detector_status": "PENDING_T06_T16"
+  },
+  "runtime_records": {
+    "context_provider": "boss_runtime_records.RuntimeRecorder.context",
+    "hook_factory": "boss_runtime_records.RuntimeRecorder.hook_factory",
+    "transport_observer": "boss_runtime_records.RuntimeRecorder.observe_transport",
+    "technical_projection": "boss_runtime_records.runtime_records",
+    "storage": "current SQLite objects/runtime_run; namespace-scoped technical observations",
+    "runtime_adoption_check": "PASS_APPROVED_SOURCE_NEW_PROMPT_AND_CONFIGURATION_VERSIONS",
+    "public_integration": "PENDING_W3",
+    "full_A16_accepted": false,
+    "full_A19_accepted": false
   },
   "speech": {
     "client_component": "app/webui/BossVoiceAssignment.tsx",
