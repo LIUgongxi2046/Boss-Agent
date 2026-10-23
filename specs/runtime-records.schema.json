@@ -75,7 +75,12 @@
         "tool_id": {"$ref": "#/$defs/Identifier"}, "tool_call_id": {"$ref": "#/$defs/Identifier"}, "iteration": {"type": "integer", "minimum": 0},
         "query_id": {"$ref": "#/$defs/Identifier"}, "task_id": {"$ref": "#/$defs/Identifier"}, "message_id": {"$ref": "#/$defs/Identifier"},
         "version": {"$ref": "#/$defs/Version"}, "task_version": {"$ref": "#/$defs/Version"},
-        "status": {"type": "string"}, "task_status": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Identifier"}
+        "status": {"type": "string"}, "task_status": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Identifier"},
+        "source_type": {"const":"SIMULATED"}, "source_id":{"$ref":"#/$defs/Identifier"},
+        "review_sha256":{"$ref":"#/$defs/Sha256"}, "preparation_sha256":{"$ref":"#/$defs/Sha256"},
+        "result_sha256":{"$ref":"#/$defs/Sha256"}, "owner_decision_required":{"const":true},
+        "source_refs":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["source_id","version"],"properties":{"source_id":{"type":"string"},"version":{"type":"string"},"source_sha256":{"$ref":"#/$defs/Sha256"}}}},
+        "origin":{"type":"object","additionalProperties":false,"required":["interface_id","origin_entity_type","origin_record_id","origin_version","review_sha256"],"properties":{"interface_id":{"enum":["SI09","SI10"]},"origin_entity_type":{"type":"string"},"origin_record_id":{"type":"string"},"origin_version":{"type":"string"},"review_sha256":{"$ref":"#/$defs/Sha256"}}}
       }
     },
     "RuntimeRun": {
@@ -99,7 +104,11 @@
         "cost_total": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"}, "price_version": {"type": ["string", "null"]},
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
-        "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"}
+        "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"const":"FC01"},
+        "simulated_model_events":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["event_id","state","source_type","request_sha256","usage","cost_total"],"properties":{"event_id":{"type":"string"},"state":{"enum":["REQUESTED","RESPONSE_RECEIVED","FAILED","CANCELED","TIMED_OUT"]},"source_type":{"const":"SIMULATED"},"request_sha256":{"$ref":"#/$defs/Sha256"},"usage":{"type":"null"},"cost_total":{"type":"null"},"finish_reason":{"type":["string","null"]},"tool_call_ids":{"type":"array","items":{"type":"string"}}}}},
+        "tool_errors":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["tool_id","tool_call_id","error_type","source_type"],"properties":{"tool_id":{"type":"string"},"tool_call_id":{"type":"string"},"error_type":{"type":"string"},"source_type":{"const":"SIMULATED"}}}},
+        "owner_task_links":{"type":"array","maxItems":1,"items":{"type":"object","additionalProperties":false,"required":["task_id","task_version","request_id","preparation_sha256","action"],"properties":{"task_id":{"type":"string"},"task_version":{"type":"string"},"request_id":{"type":"string"},"preparation_sha256":{"$ref":"#/$defs/Sha256"},"action":{"const":"boss.supply_quality.coordinate"}}}}
       },
       "allOf": [{"if": {"properties": {"status": {"enum": ["SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"]}}}, "then": {"properties": {"finished_at": {"type": "string", "format": "date-time"}}}}]
     },

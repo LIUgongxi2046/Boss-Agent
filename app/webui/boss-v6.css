@@ -22,8 +22,8 @@
   background: linear-gradient(145deg,#edf5ff 0%,#f5f8fc 29%,#eef7fb 84%,#f0f6fa 100%);
   color: var(--boss-text);
   font-family: "PingFang SC", "Noto Sans CJK SC", "Microsoft Yahei", sans-serif;
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 24px;
   color-scheme: light;
 }
 .boss-v6, .boss-v6 * {box-sizing:border-box}
@@ -458,11 +458,11 @@
 .boss-workspace-search input,
 .boss-field input {
   min-height:44px;background:#fbfdff;border:1px solid #d6e4f2;
-  border-radius:9px;padding:9px 12px;font-size:13px;color:#294a6d;
+  border-radius:9px;padding:9px 12px;font-size:16px;line-height:24px;color:#294a6d;
   min-width:0;width:100%;
 }
 .boss-workspace-search button{min-height:44px}
-.boss-field{display:flex;flex-direction:column;gap:7px;margin:14px 0;color:#44617e;font-size:12.5px;font-weight:650}
+.boss-field{display:flex;flex-direction:column;gap:8px;margin:16px 0;color:#44617e;font-size:14px;line-height:22px;font-weight:650}
 .boss-field input{font-weight:500}
 .boss-workspace-extra{margin-top:15px}
 .boss-private-source{

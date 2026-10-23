@@ -26,7 +26,7 @@ class RuntimeValues(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     max_tool_rounds: int = Field(ge=1, le=12)
     max_output_tokens: int = Field(ge=128, le=8192)
-    tool_scope: list[str] = Field(min_length=1, max_length=15)
+    tool_scope: list[str] = Field(min_length=1, max_length=18)
     workspace_read_mode: Literal["SOURCE_EXCERPTS", "WORKSPACE_PROJECTIONS"] = "SOURCE_EXCERPTS"
     workspace_projections: list[str] = Field(default_factory=list, max_length=12)
 

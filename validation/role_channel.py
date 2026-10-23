@@ -1,5 +1,6 @@
 import hmac
 import json
+import time
 import uuid
 from urllib.parse import parse_qs, urlsplit
 
@@ -21,6 +22,10 @@ class RoleChannel(WebSocketChannel):
         self.audit = audit
         self.token_roles = {}
         self.connection_roles = {}
+        self.token_expirations = {}
+        self.connection_expirations = {}
+        self.connection_tokens = {}
+        self.fc01 = None
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
         self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
@@ -49,6 +54,7 @@ class RoleChannel(WebSocketChannel):
                 for key in ("token", "api_token"):
                     if key in payload:
                         self.token_roles[payload[key]] = role
+                        self.token_expirations[payload[key]] = time.monotonic() + payload["expires_in"]
             self.record(role, "bootstrap", response.status_code)
             return response
         query = parse_qs(address.query)
@@ -60,6 +66,8 @@ class RoleChannel(WebSocketChannel):
             response = await super()._dispatch_http(connection, request)
             if response is None:
                 self.connection_roles[connection] = role
+                self.connection_expirations[connection] = self.token_expirations[token]
+                self.connection_tokens[connection] = token
             return response
         if address.path.startswith("/api/"):
             if not self.gateway.tokens.check_api_token(request):
@@ -90,6 +98,27 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action in {"boss.fc01.prepare", "boss.fc01.coordinate", "boss.fc01.status"}:
+            request_id = envelope.get("request_id")
+            if not isinstance(request_id, str) or not request_id:
+                raise ValueError("当前请求缺少编号")
+            def active():
+                return self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+            try:
+                if self.fc01 is None:
+                    raise web.HTTPServiceUnavailable(text="当前FC01 Runtime尚未就绪")
+                if action == "boss.fc01.prepare":
+                    result = await self.fc01.prepare(role, envelope.get("payload"), active)
+                elif action == "boss.fc01.status":
+                    result = self.fc01.status(role, envelope.get("payload"), active)
+                else:
+                    result = self.fc01.coordinate(role, envelope.get("payload"), active)
+                status, response = 200, {"result": result}
+            except web.HTTPException as failure:
+                status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
+            self.record(role, action, status)
+            await connection.send(json.dumps({"event":"webui_response", "request_id":request_id, "ok":status == 200, **response}, ensure_ascii=False))
+            return
         if kind == "webui_request" and action == "skill.update":
             request_id = envelope.get("request_id")
             if not isinstance(request_id, str) or not request_id or len(request_id) > 128:

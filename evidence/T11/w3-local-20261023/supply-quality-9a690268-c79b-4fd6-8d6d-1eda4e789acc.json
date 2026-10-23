@@ -1,0 +1,318 @@
+{
+  "status": "PASS_PUBLIC_SIMULATED_SUPPLY_QUALITY_COORDINATION_RECEIPTS_SOURCE_ADOPTION_AND_RESTART",
+  "run_id": "supply-quality-9a690268-c79b-4fd6-8d6d-1eda4e789acc",
+  "at": "2026-10-23T15:29:29.589Z",
+  "application_directory": "validation/.work/supply-quality-9a690268-c79b-4fd6-8d6d-1eda4e789acc",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc01-n3-runtime-dist",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "aa8343dedd1c6cc4d111415ace17efe5294b1237ba0589777163bc34d4e3f9bd"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "ba611f463f17f70fb0ac166b99ea1f41cf2658af9f4a8a8d45b3d2c9e7da4606"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b510465c929ade247e4b50c40d5dd4b50764d1be14698352ee0a7028b560c34c"
+    },
+    {
+      "path": "validation/boss_supply_quality.py",
+      "sha256": "a4d86a8b25edbea567038a7c838674cdd1bf905412409e21d51e0b6d2f63e588"
+    },
+    {
+      "path": "validation/boss_supply_quality_views.py",
+      "sha256": "0c9069d6688d9b76129a82dfb61ee8eb2bc25e92c6e4285872bcef9797c8a826"
+    },
+    {
+      "path": "validation/boss_source_access.py",
+      "sha256": "ce56e76af493d5a3cb03ecf390f658fad32bf62dd9f5a15e6bad1d1604301b44"
+    },
+    {
+      "path": "validation/check_supply_quality_state.py",
+      "sha256": "8fd0fe465ddd9afcf1986ebef7b6377671b75bb419bd6408c661dae576c93e92"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityView.tsx",
+      "sha256": "8edfc1a58ade875a5a0386b483a3633d8bdf986aaf8b885c19252ba7e07498af"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "7254d1972446515024e4af8b9ff8d2e9bac08b926295ae177ae31a8d10f0e313"
+    },
+    {
+      "path": "app/webui/MaintainerSupplyQuality.tsx",
+      "sha256": "5ee7e579882bc3c0511da5a6f1d47251cf843d1bb87508e281e4396fa4d24eab"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "b3cd3484ffa1c0602593996c57940fd02632fa703e5c3b75c82f8768d4f9d26d"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "88fb4d3a196ad7b0090f0da2f8c81d0801072b2460fa4d3b5ad903913fa55cc4"
+    },
+    {
+      "path": "specs/simulated-supply-quality.schema.json",
+      "sha256": "15ebf46c862765eb3786ef4421eb30a69f81e3cb34262de569e700f4218399e0"
+    },
+    {
+      "path": "specs/supply-quality-results.schema.json",
+      "sha256": "cc05ef529d1159162c6bc54297e5b04f233501f102e98926acda89366c92ed89"
+    },
+    {
+      "path": "validation/desktop/check-supply-quality.cjs",
+      "sha256": "69e033b0676e38ff3a1d7cbe7bbee40689db963ba6a1a02f5a4926c33c6de694"
+    },
+    {
+      "path": "validation/product_fc01.py",
+      "sha256": "1bb97a1e48e210b8c85616d8f0dadc7e35c09ddc2e98376327198eec92c4b804"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "3230e8a68dde85f79f506fef207382285d5c53651de3f24c5cdc59e43af0718c"
+    },
+    {
+      "path": "fc01-n3-runtime-dist/asset-manifest.json",
+      "sha256": "2ed4feb29e03162f3ff2c5580d3379c55d71284933c8afaaab1b0df6442b665e"
+    }
+  ],
+  "ports": {
+    "business": 9071,
+    "webui": 9072,
+    "gateway": 19071
+  },
+  "records": [
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "EMPTY",
+      "http_status": 200,
+      "client_request_id": "supply-import-7293e42d-b8b4-41f0-9dec-5876fc6d02be",
+      "record_count": 0,
+      "receipt_sha256": "61a0ac4710f546de951356a870263932e33225c4d3df76ac4b62446d60eabe8a",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "FAILED",
+      "http_status": 502,
+      "client_request_id": "supply-import-5bfa26a6-b4f8-495f-a491-275699f19790",
+      "record_count": 0,
+      "receipt_sha256": "741fdab8610632d13aceea8bd8d58cd03adf2dfb2b0f4e8deae2738e9fdbcfd4",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "TIMED_OUT",
+      "http_status": 504,
+      "client_request_id": "supply-import-31df59b5-6635-4753-8024-83910ff8b7ca",
+      "record_count": 0,
+      "receipt_sha256": "d4e0f154aefd01da2f1115b665afebd7431b43bc1b1db127a0b408366a8a4ac0",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_gui_explicit_simulated_import",
+      "outcome": "SUCCESS",
+      "http_status": 200,
+      "client_request_id": "supply-import-fb5daa1d-6f30-4078-a7c1-e1852440aed6",
+      "record_count": 21,
+      "receipt_sha256": "7f81232a88d4bcaa642969510db5ca2ecba7a609e330569b499968c077fd1dab",
+      "same_request_replay": true
+    },
+    {
+      "check": "public_supply_filters",
+      "interface_id": "SI09",
+      "matched_count": 7,
+      "unknown_material_empty": true,
+      "incomplete_period_rejected": true,
+      "keyboard_submit": true
+    },
+    {
+      "check": "public_gui_current_source_viewer",
+      "source_id": "sim-business:inventory_lot:sim-stock-available-1",
+      "http_status": 200,
+      "body_sha256": "843a3ea55f11c8aaffc10a4eb2ff7a8b9c4704e8d53fe3d5fab3fb46e8277b39"
+    },
+    {
+      "check": "public_gui_coordination_original_request_and_actual_task_lifecycle",
+      "task_id": "0850d2a7-23d3-415b-ab7d-161cefb4e842",
+      "client_request_id": "supply-coordinate-faca8787-6d39-478f-a254-3ed67d6c70d0",
+      "unknown_request_retained_across_pages": true,
+      "task_selected_by_navigation": true,
+      "final_task_state": "COMPLETED_CONFIRMED",
+      "external_delivery": false
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440,
+      "role": "BOSS"
+    },
+    {
+      "check": "public_supply_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720,
+      "role": "BOSS"
+    },
+    {
+      "check": "actual_restart_preserves_business_and_professional_states",
+      "state": {
+        "initial_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "task_count": 1,
+        "tasks": [
+          {
+            "task_id": "0850d2a7-23d3-415b-ab7d-161cefb4e842",
+            "version": "4",
+            "status": "COMPLETED_CONFIRMED",
+            "related_meeting_id": null,
+            "related_event_ids": []
+          }
+        ],
+        "production_events": [
+          {
+            "id": "sim-production-event-1",
+            "state": "PROFESSIONAL_REVIEW_PENDING"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "sim-stock-available-1",
+            "quality_state": "RELEASED"
+          },
+          {
+            "id": "sim-stock-finished-1",
+            "quality_state": "HOLD"
+          },
+          {
+            "id": "sim-stock-pending-1",
+            "quality_state": "PENDING_TEST"
+          },
+          {
+            "id": "sim-stock-transit-1",
+            "quality_state": "RELEASED"
+          }
+        ],
+        "counts": {
+          "outbox": 1,
+          "feedback": 1,
+          "authorization": 3,
+          "external_import": 4,
+          "runtime_run": 0
+        },
+        "account_sha256": "10cfcb402e0921333f3ee5c807c8511f23897f8fd663ff524f384a7fc958c83a",
+        "business_sha256": "55fd74fbf1f0a2484ea47fda9d9b3b9e614a80c62a0cb43aa2727757c71b3cf7"
+      },
+      "source_type": "SIMULATED",
+      "external_service_invoked": false
+    },
+    {
+      "check": "public_current_dependency_and_gui_withdrawal",
+      "dependency_changed_source": "sim-business:production_event:sim-production-event-1",
+      "body_http_status": 409,
+      "withdrawn_source": "sim-business:inventory_lot:sim-stock-available-1",
+      "withdrawn_body_http_status": 410,
+      "current_body_reused": false,
+      "withdrawal_via_authenticated_gui": true
+    },
+    {
+      "check": "public_roles_logout_and_renderer",
+      "renderer_errors": 0,
+      "coordination_request_count": 1,
+      "model_requests": 0,
+      "final_state": {
+        "initial_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "task_count": 1,
+        "tasks": [
+          {
+            "task_id": "0850d2a7-23d3-415b-ab7d-161cefb4e842",
+            "version": "4",
+            "status": "COMPLETED_CONFIRMED",
+            "related_meeting_id": null,
+            "related_event_ids": []
+          }
+        ],
+        "production_events": [
+          {
+            "id": "sim-production-event-1",
+            "state": "PROFESSIONAL_REVIEW_PENDING"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "sim-stock-available-1",
+            "quality_state": "RELEASED"
+          },
+          {
+            "id": "sim-stock-finished-1",
+            "quality_state": "HOLD"
+          },
+          {
+            "id": "sim-stock-pending-1",
+            "quality_state": "PENDING_TEST"
+          },
+          {
+            "id": "sim-stock-transit-1",
+            "quality_state": "RELEASED"
+          }
+        ],
+        "counts": {
+          "outbox": 1,
+          "feedback": 1,
+          "authorization": 3,
+          "external_import": 5,
+          "runtime_run": 0
+        },
+        "account_sha256": "10cfcb402e0921333f3ee5c807c8511f23897f8fd663ff524f384a7fc958c83a",
+        "business_sha256": "6d2f899c17c945d93163a4f761bfad94a79e7c63311c58eb8a5cc46203f09a9f"
+      }
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A21_A23_accepted": false
+}

@@ -268,7 +268,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const supplyInterface=page==="F14"?"SI09":"SI10";
   const supplyEditor=currentSupply?.[supplyInterface]??EMPTY_SUPPLY_EDITOR;
   const importEditor=currentSupply?.import??EMPTY_IMPORT_EDITOR;
-  const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
+  const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
   const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
@@ -1157,7 +1157,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             setSourceReviewDirty(false);
             setSettingsDirty(false);
             setWorkDirty(false);
-            if(["F14","F21"].includes(page)&&!supplyEditor.pending)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
+            if(["F14","F21"].includes(page)&&!supplyEditor.pending&&!supplyEditor.pendingPreparation)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
             if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);
             navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);

@@ -32,7 +32,7 @@ def read_runtime_task_reference(store, role, namespace, run_id, task_id):
         require(initial["source_type"] == "SIMULATED", "当前资料不允许维护读取任务元信息", web.HTTPForbidden)
         run = store.get(db, namespace, "runtime_run", run_id)
         require(run["namespace"] == namespace, "运行空间不符", web.HTTPForbidden)
-        require(any(result.get("task_id") == task_id for result in run["tool_results"]),
+        require(any(result.get("task_id") == task_id for result in run["tool_results"] + run.get("owner_task_links", [])),
                 "任务没有关联到当前运行", web.HTTPForbidden)
         require(all(run.get(key) == initial[key] for key in ("dataset_id", "dataset_version")),
                 "运行数据范围无法核验")

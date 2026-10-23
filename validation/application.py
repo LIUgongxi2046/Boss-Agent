@@ -40,6 +40,9 @@ from product_runtime import ProductRuntime
 from boss_page_api import BossPageAPI
 from product_read_tools import product_read_tools
 from product_skills import ProductSkills
+from product_fc01 import ProductFc01
+from sop_write_tools.fc01 import Fc01Tool, TOOLS as FC01_TOOLS
+from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder
 from service import application as business_application
 from application_paths import application_work_directory, application_ports, application_frontend_directory
 
@@ -80,7 +83,7 @@ def prepare():
             "agents": {"defaults": {"workspace": str(WORK / "workspace"), "provider": "deepseek",
                 "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096,
                 "timezone": "Asia/Shanghai", "timezoneMode": "manual", "dream": {"enabled": False},
-                "idleCompactAfterMinutes": 0}},
+                "idleCompactAfterMinutes": 0, "maxToolResultChars": 200000}},
             "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com",
                 "extraBody": {"thinking": {"type": "disabled"}}}},
             "gateway": {"host": "127.0.0.1", "port": PORTS["gateway"], "heartbeat": {"enabled": False}},
@@ -121,10 +124,11 @@ async def serve():
     output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
     if product_mode:
         output.chmod(0o700)
-    provider = RecordedProvider(connection, output / "http-requests.json", redact_payload=product_mode)
+    fc01 = ProductFc01(store) if product_mode else None
+    provider = fc01.provider if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = ToolRegistry()
-    runtime_recorder = RuntimeRecorder(store, "ui-check", registry, lambda: runtime_control.snapshot()) if product_mode else None
+    runtime_recorder = Fc01RuntimeRecorder(store, "ui-check", registry, lambda: runtime_control.snapshot()) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -145,7 +149,7 @@ async def serve():
         registry.unregister(name)
     envelope = {"request_id": "ui-check", "owner_id": "boss-1", "execution_namespace": "ui-check", "dataset_id": "selection", "dataset_version": "1", "session_id": "ui-check"}
     for operation in OPERATIONS:
-        registry.register(ApplicationTool(operation, store, envelope, bindings, records))
+        registry.register(Fc01Tool(store, fc01.context_provider, operation) if product_mode else ApplicationTool(operation, store, envelope, bindings, records))
     def research_read_observed(metadata):
         records.append({"type": "tool", "name": "bossWorkspaceRead", "at": now(),
                         "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
@@ -153,7 +157,10 @@ async def serve():
     workspace_pages = BossPageAPI(store)
     if product_mode:
         for tool in product_read_tools(store, workspace_pages, research_read_observed):
-            registry.register(tool)
+            if tool.name not in FC01_TOOLS:
+                registry.register(tool)
+        for name in sorted(FC01_TOOLS - set(OPERATIONS)):
+            registry.register(Fc01Tool(store, fc01.context_provider, name))
     else:
         registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None
@@ -161,7 +168,7 @@ async def serve():
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,
                                          [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages)
-        provider.transport_observer = runtime_recorder.observe_transport
+        fc01.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
@@ -193,6 +200,8 @@ async def serve():
             runtime_control, skills, account_store=account_store)
     else:
         channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
+    if fc01 is not None:
+        channels.channels["websocket"].fc01 = fc01
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -200,6 +209,8 @@ async def serve():
     for signum in (signal.SIGTERM, signal.SIGINT):
         asyncio.get_running_loop().add_signal_handler(signum, stop.set)
     async with Nanobot(loop, config=config) as bot:
+        if fc01 is not None:
+            fc01.bot = bot
         async def context(request):
             current = store.context("ui-check")
             selected_prompts = load_runtime_prompts(store, "ui-check")

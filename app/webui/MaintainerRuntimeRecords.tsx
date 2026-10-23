@@ -15,6 +15,8 @@ type ToolResult = {
   message_id?: string; version?: string; status?: string; task_version?: string; task_status?: string;
 };
 export type RuntimeRecord = {
+  source_type?: "SIMULATED"; external_model_invoked?: false;
+  owner_task_links?: {task_id:string;task_version:string;request_id:string;preparation_sha256:string;action:string}[];
   run_id: string; request_id: string; request_id_source: string; session_id: string;
   turn_id?: string | null; namespace: string; started_at: string; finished_at?: string | null;
   status: string; stop_reason?: string | null; termination_source?: string | null;
@@ -161,7 +163,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
   function cancel() {
     active.current?.abort(); setLoading(false); setNotice("已取消本次读取，业务任务继续保持原有状态");
   }
-  const taskIds = [...new Set(selected?.tool_results.flatMap(result => result.task_id ? [result.task_id] : []) ?? [])];
+  const taskIds = [...new Set([...(selected?.tool_results.flatMap(result => result.task_id ? [result.task_id] : []) ?? []),...(selected?.owner_task_links?.map(link=>link.task_id) ?? [])])];
   return <>
     <section className="boss-panel" aria-label="运行记录查询">
       <div className="boss-panel-head"><h2>运行记录</h2><small>RUNTIME_RECORD · 获准技术元信息</small></div>
@@ -217,6 +219,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
             <Detail label="数据集及版本">{selected.dataset_id ? `${selected.dataset_id} · v${value(selected.dataset_version)}` : null}</Detail>
             <Detail label="真实开始时间">{selected.started_at}</Detail><Detail label="真实结束时间">{selected.finished_at}</Detail>
             <Detail label="运行状态">{selected.status}</Detail><Detail label="终止原因">{selected.stop_reason}</Detail>
+            <Detail label="模型事件来源">{selected.source_type === "SIMULATED" ? "SIMULATED · 未请求真实外部模型" : "原记录没有该字段"}</Detail>
             <Detail label="终止来源">{selected.termination_source}</Detail>
             <Detail label="模型完成已观察">{selected.model_completion_observed ? "已经观察" : "尚未观察"}</Detail>
             <Detail label="业务完成">未通过本投影判定</Detail>

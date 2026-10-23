@@ -12,14 +12,15 @@ const pages = JSON.parse(fs.readFileSync(path.join(root, 'specs/page-service-map
 const runId = 'page-dom-' + randomUUID();
 const directory = path.join(validation, '.work', runId);
 const accounts = accountAccess.provision(directory);
-const ports = {business: 8971, webui: 8972, gateway: 18971};
-const origin = 'http://127.0.0.1:8972';
+const ports = process.env.BOSS_APPLICATION_PORTS === undefined ? {business: 8971, webui: 8972, gateway: 18971} : JSON.parse(process.env.BOSS_APPLICATION_PORTS);
+const origin = 'http://127.0.0.1:'+ports.webui;
+const frontend = process.env.BOSS_PRODUCT_FRONTEND_DIR === undefined ? path.join(root,'.work/product/nanobot/nanobot/web/dist') : process.env.BOSS_PRODUCT_FRONTEND_DIR;
 const output = path.join(root, 'evidence/T09/w3-20261023', runId + '.json');
 const records = [];
 const inputs = ['specs/page-service-map.json', 'app/webui/BossDesktop.tsx', 'app/webui/MaintainerSkillVersions.tsx',
   'app/webui/MaintainerSkills.tsx', 'app/webui/BossSectorView.tsx', 'validation/boss_page_api.py',
   'validation/product_skills.py', 'validation/desktop/check-pages.cjs',
-  '.work/product/nanobot/nanobot/web/dist/asset-manifest.json'].map(file => ({path: file,
+  'app/webui/boss-v6.css',path.relative(root,path.join(frontend,'asset-manifest.json'))].map(file => ({path: file,
     sha256: createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')}));
 function manifest() {return JSON.parse(execFileSync(path.join(validation, '.venv/bin/python'), [
   path.join(root, 'evidence/T12/check_simulation_reads.py'), '--database', path.join(directory, 'business.sqlite'),

@@ -15,6 +15,7 @@ const accounts = accountAccess.provision(directory);
 const output = path.join(root, 'evidence/T11/w3-local-20261023', runId + '.json');
 const ports = process.env.BOSS_APPLICATION_PORTS ? JSON.parse(process.env.BOSS_APPLICATION_PORTS) : {business:8971, webui:8972, gateway:18971};
 const origin = 'http://127.0.0.1:'+ports.webui;
+const frontend = process.env.BOSS_PRODUCT_FRONTEND_DIR === undefined ? path.join(root,'.work/product/nanobot/nanobot/web/dist') : process.env.BOSS_PRODUCT_FRONTEND_DIR;
 const digest = value => createHash('sha256').update(value).digest('hex');
 const records = [], frames = [], sockets = [], errors = [];
 const inputs = ['validation/boss_page_api.py','validation/boss_command_api.py','validation/boss_workspace_api.py',
@@ -22,10 +23,10 @@ const inputs = ['validation/boss_page_api.py','validation/boss_command_api.py','
   'validation/check_supply_quality_state.py','app/webui/BossSupplyQualityView.tsx','app/webui/BossSupplyQualityPanel.tsx',
   'app/webui/MaintainerSupplyQuality.tsx','app/webui/BossDesktop.tsx','specs/openapi.yaml',
   'specs/simulated-supply-quality.schema.json','specs/supply-quality-results.schema.json',
-  'validation/desktop/check-supply-quality.cjs','.work/product/nanobot/nanobot/web/dist/asset-manifest.json']
+  'validation/desktop/check-supply-quality.cjs','validation/product_fc01.py','app/webui/boss-v6.css',path.relative(root,path.join(frontend,'asset-manifest.json'))]
   .map(file=>({path:file,sha256:digest(fs.readFileSync(path.join(root,file)))}));
 function save(status){fs.writeFileSync(output,JSON.stringify({status,run_id:runId,at:new Date().toISOString(),
-  application_directory:path.relative(root,directory),inputs,ports,records,external_api_mode:'SIMULATED_FIRST',
+  application_directory:path.relative(root,directory),frontend_directory:frontend,inputs,ports,records,external_api_mode:'SIMULATED_FIRST',
   model_requested:false,external_delivery_requested:false,visual_acceptance:'NOT_RUN',full_A11_A21_A23_accepted:false},null,2));}
 function note(check,values){records.push({check,...values});save('IN_PROGRESS');}
 function state(){return JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[
