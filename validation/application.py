@@ -37,11 +37,11 @@ from boss_agent_read_tools import BossResearchSourcesTool
 from boss_runtime_records import RuntimeRecorder
 from boss_memory_runtime import OwnerMemoryContext
 from product_runtime import ProductRuntime
-from runtime_owner_read_tools import BossTodayReadTool, BossOwnerPlansReadTool
-from runtime_assignment_source_tool import BossAssignmentSourcesReadTool
+from boss_page_api import BossPageAPI
+from product_read_tools import product_read_tools
 from product_skills import ProductSkills
 from service import application as business_application
-from application_paths import application_work_directory, application_ports
+from application_paths import application_work_directory, application_ports, application_frontend_directory
 
 WORK = application_work_directory(ROOT, os.environ.get("BOSS_APPLICATION_WORK_DIR"))
 PORTS = application_ports(os.environ.get("BOSS_APPLICATION_PORTS"))
@@ -150,16 +150,17 @@ async def serve():
         records.append({"type": "tool", "name": "bossWorkspaceRead", "at": now(),
                         "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
         audit.output.write_text(encode(records))
-    registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
+    workspace_pages = BossPageAPI(store)
     if product_mode:
-        for tool in (BossTodayReadTool(store, "BOSS"), BossOwnerPlansReadTool(store, "BOSS"),
-                     BossAssignmentSourcesReadTool(store, "BOSS")):
+        for tool in product_read_tools(store, workspace_pages, research_read_observed):
             registry.register(tool)
+    else:
+        registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None
     skills = None
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,
-                                         [registry.get(name) for name in registry.tool_names], provider)
+                                         [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages)
         provider.transport_observer = runtime_recorder.observe_transport
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
@@ -176,7 +177,7 @@ async def serve():
     original = channels.channels["websocket"]
     # Product v6 frontend only when explicitly requested; preserve T02 baseline.
     if os.environ.get("BOSS_PRODUCT_UI") == "1":
-        frontend = ROOT.parent / ".work/product/nanobot/nanobot/web/dist"
+        frontend = application_frontend_directory(ROOT, os.environ.get("BOSS_PRODUCT_FRONTEND_DIR"))
     else:
         frontend = ROOT / ".work/upstream/nanobot-0.3.5/nanobot/web/dist"
     if not (frontend / "index.html").is_file():

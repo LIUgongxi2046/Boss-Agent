@@ -22,3 +22,16 @@ def application_ports(configured=None):
     if len(set(ports.values())) != 3:
         raise ValueError("应用端口不能重复")
     return ports
+
+
+def application_frontend_directory(root, configured=None):
+    project = Path(root).resolve().parent
+    candidate = Path(configured) if configured is not None else project / ".work/product/nanobot/nanobot/web/dist"
+    if not candidate.is_absolute():
+        raise ValueError("前端构建目录必须使用绝对路径")
+    resolved = candidate.resolve()
+    if not resolved.is_relative_to(project):
+        raise ValueError("前端构建目录必须位于当前工程")
+    if not (resolved / "index.html").is_file():
+        raise FileNotFoundError("当前前端构建缺少 index.html")
+    return resolved

@@ -104,7 +104,7 @@ class ProductSkills:
         config = self.runtime._native()
         require(self._without_skills(config.model_dump(mode="json")) == self._without_skills(before),
                 "方法操作改变了其他运行配置")
-        self.runtime._apply(config, current["tool_scope"])
+        self.runtime._apply(config, current["tool_scope"], current)
         return result
 
     def execute(self, role, action, payload):

@@ -28,7 +28,7 @@ class BossResearchSourcesTool(Tool):
     @property
     def parameters(self):
         return {
-            "type": "object", "properties": {"projection": {"const": "research", "type": "string"}},
+            "type": "object", "properties": {"projection": {"const": "research", "enum": ["research"], "type": "string"}},
             "required": ["projection"], "additionalProperties": False,
         }
 

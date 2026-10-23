@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent 公共Runtime配置扩展
-  version: 0.2.0
+  version: 0.3.0
   description: 当前公共实现；完整T06正式接收待完成。配置启用不授予业务授权。
 x-reception:
   state: IN_REVIEW
@@ -33,6 +33,21 @@ components:
     RequestID: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
     Version: {type: string, pattern: '^[0-9]+$'}
     Sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    WorkspaceMode: {enum: [SOURCE_EXCERPTS, WORKSPACE_PROJECTIONS], default: SOURCE_EXCERPTS}
+    WorkspaceProjections:
+      type: array
+      maxItems: 12
+      uniqueItems: true
+      default: []
+      items: {enum: [notifications, minutes, approvals, outbox, organization, research, people, travel, calendar, memory, decisions, knowledge]}
+    WorkspaceAccess:
+      type: object
+      additionalProperties: false
+      required: [mode, enabled, allowed_projections]
+      properties:
+        mode: {$ref: '#/components/schemas/WorkspaceMode'}
+        enabled: {type: boolean}
+        allowed_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
     Values:
       type: object
       required: [max_tool_rounds, max_output_tokens, tool_scope]
@@ -43,9 +58,15 @@ components:
         tool_scope:
           type: array
           minItems: 1
-          maxItems: 9
+          maxItems: 15
           uniqueItems: true
-          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead, todayRead, ownerPlansRead, assignmentSourcesRead]}
+          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead, todayRead, ownerPlansRead, assignmentSourcesRead, bossDashboardRead, bossMeetingsRead, bossEvidenceRead, bossTasksRead, bossCalendarConflictRead, bossCalendarSharePreview]}
+        workspace_read_mode: {$ref: '#/components/schemas/WorkspaceMode'}
+        workspace_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
+      allOf:
+        - if: {required: [workspace_read_mode], properties: {workspace_read_mode: {const: WORKSPACE_PROJECTIONS}}}
+          then: {required: [workspace_projections], properties: {workspace_projections: {minItems: 1}}}
+          else: {properties: {workspace_projections: {maxItems: 0}}}
     Save:
       type: object
       required: [client_request_id, expected_version, values]
@@ -104,15 +125,17 @@ components:
         runtime_applied: {const: true}
         tool_scope: {type: array, items: {type: string}, uniqueItems: true}
         native_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        workspace_read_mode: {$ref: '#/components/schemas/WorkspaceMode'}
+        workspace_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
     RuntimeConfiguration:
       type: object
-      required: [projection, current, draft, effective, available_tools, native_config_sha256, admission_ready, active_run_count, private_body_available_here, business_authority_granted, model_validation_performed]
+      required: [projection, current, draft, effective, available_tools, available_workspace_projections, workspace_access, native_config_sha256, admission_ready, active_run_count, private_body_available_here, business_authority_granted, model_validation_performed]
       additionalProperties: false
       properties:
         projection: {const: runtime-configuration}
         current:
           type: object
-          required: [config_id, version, provider, model_id, api_type, tool_scope, max_tool_rounds, timeout, enabled]
+          required: [config_id, version, provider, model_id, api_type, tool_scope, max_tool_rounds, timeout, enabled, workspace_read_mode, workspace_projections]
           additionalProperties: false
           properties:
             config_id: {type: string}
@@ -124,9 +147,13 @@ components:
             max_tool_rounds: {type: integer, minimum: 1}
             timeout: {const: 120}
             enabled: {type: boolean}
+            workspace_read_mode: {$ref: '#/components/schemas/WorkspaceMode'}
+            workspace_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
         draft: {oneOf: [{$ref: '#/components/schemas/Draft'}, {type: 'null'}]}
         effective: {$ref: './runtime-records.schema.json#/$defs/RuntimeSnapshot'}
         available_tools: {type: array, uniqueItems: true, items: {type: string}}
+        available_workspace_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
+        workspace_access: {$ref: '#/components/schemas/WorkspaceAccess'}
         native_config_sha256: {$ref: '#/components/schemas/Sha256'}
         admission_ready: {type: boolean}
         active_run_count: {type: integer, minimum: 0}

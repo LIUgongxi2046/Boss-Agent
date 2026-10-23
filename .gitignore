@@ -20,4 +20,5 @@ node_modules/
 *.pem
 *.key
 .work/
+fc01-n3-dist/
 validation/connection.json

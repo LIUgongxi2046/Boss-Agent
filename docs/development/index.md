@@ -4,6 +4,7 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
 | T02 | [选型验证开发记录](T02.md) | ACCEPTED；A02 PASS（选型可行性）；后续产品验证见交接 |
 | T03 | [设计资产与交互](T03.md) | C03/A03；72页面、561状态、素材SHA-256；真实状态引用台账 |
 | T05 | [数据设计](T05.md) | C05/A05；SQLite、来源、版本与字段；状态引用台账 |
