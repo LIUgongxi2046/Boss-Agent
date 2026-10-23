@@ -16,6 +16,7 @@ from business import now
 from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
 from boss_recovery_api import BossRecoveryAPI
+from boss_owner_preferences import owner_profile
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -65,11 +66,7 @@ class BossPageAPI:
                 "dataset_version": data["dataset_version"],
                 "business_clock": clock["at"],
                 "refreshed_at": now(),
-                "profile": {
-                    "timezone": data["boss_profile"]["timezone"],
-                    "goals": data["boss_profile"]["goals"],
-                    "reading_requirement": data["boss_profile"]["confirmed_reading_requirement"],
-                },
+                "profile": owner_profile(db, data),
                 "source_coverage": {
                     "region": "region-1",
                     "trade_scope": "EXTERNAL_SALES",
