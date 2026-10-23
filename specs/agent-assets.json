@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "task_id": "T07",
+  "status": "PENDING_T06",
+  "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
+  "design_ref": "docs/LLD-agent.md",
+  "formal_backend_version": null,
+  "formal_event_version": null,
+  "current_tool_schema_version": "selection-probe 1.3.0",
+  "agent": {
+    "agent_id": "boss-1",
+    "owner_id": "boss-1",
+    "runtime": "nanobot-ai==0.3.5",
+    "provider": "deepseek",
+    "model_id": "deepseek-flash",
+    "api_type": "chat_completions",
+    "thinking": "disabled",
+    "additional_business_agents_enabled": false,
+    "business_authorization_source": "当前业务服务的本人授权记录",
+    "evaluation_answers_allowed_in_context": false
+  },
+  "prompts": {
+    "version_source": "SQLite prompt_draft 与 prompt_active",
+    "kinds": ["SECRETARY_ROLE", "EXPRESSION", "TASK_HINTS"],
+    "runtime_loader": "boss_prompt_config.load_runtime_prompts",
+    "activation_policy": "NEXT_BOSS_TURN_ONLY",
+    "context_record_is_model_evaluation": false,
+    "permission": "MAINTAINER 技术配置",
+    "grants_owner_authority": false,
+    "acceptance_ids": ["A07", "A16", "A19"]
+  },
+  "tools": [
+    {"tool_id":"query_metrics","version":"selection-probe","operationId":null,"current_operation":"query_metrics","schema_source":"specs/selection-probe.json operations[operation_id=query_metrics]","permission":"当前本人读取范围","side_effect":false,"adoption":"模型解释确定性指标与明细","acceptance_ids":["A07","A13","A16"]},
+    {"tool_id":"read_evidence","version":"selection-probe","operationId":null,"current_operation":"read_evidence","schema_source":"specs/selection-probe.json operations[operation_id=read_evidence]","permission":"当前本人资料范围","side_effect":false,"adoption":"当前有效原文、日期和版本引用","acceptance_ids":["A07","A15","A16"]},
+    {"tool_id":"create_assignment","version":"selection-probe","operationId":null,"current_operation":"create_assignment","schema_source":"specs/selection-probe.json operations[operation_id=create_assignment]","permission":"服务端当前本人授权","side_effect":true,"idempotency":"服务端注入 idempotency_key","adoption":"保存后重新查询 task_id","acceptance_ids":["A07","A14","A16"]},
+    {"tool_id":"send_assignment","version":"selection-probe","operationId":null,"current_operation":"send_assignment","schema_source":"specs/selection-probe.json operations[operation_id=send_assignment]","permission":"服务端当前本人授权、内容与对象版本","side_effect":true,"idempotency":"服务端注入 idempotency_key","adoption":"查询模拟发件箱和任务 message_ids","acceptance_ids":["A07","A14","A16"]},
+    {"tool_id":"read_assignment","version":"selection-probe","operationId":null,"current_operation":"read_assignment","schema_source":"specs/selection-probe.json operations[operation_id=read_assignment]","permission":"当前本人任务范围","side_effect":false,"adoption":"查询正式状态，完成由本人单独确认","acceptance_ids":["A07","A14","A16"]}
+  ],
+  "tool_policy": {
+    "model_supplied_fields_rejected": ["envelope", "authorization_id", "idempotency_key"],
+    "formal_operationId_assignment": "等待 T06；current_operation 仅引用当前源码",
+    "business_writes_require_current_authorization": true,
+    "unknown_result_policy": "查询原请求回执与业务对象"
+  },
+  "sops": [
+    {"sop_id":"SOP01","version":"0.1.0","requirement_id":"FR-01","input":"本人目标、日历、承诺、有效事件与次序","output":"有依据的今日事项","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A18"]},
+    {"sop_id":"SOP02","version":"0.1.0","requirement_id":"FR-02","input":"当前指标、规则、通知要求和已有交办","output":"参与原因及提醒决定结果","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A17"]},
+    {"sop_id":"SOP03","version":"0.1.0","requirement_id":"FR-03","input":"区域、产品、期间、单位、币种和明细","output":"数值、可复算明细、日期、来源及未知范围","current_tools":["query_metrics","read_evidence"],"tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A13","A16"]},
+    {"sop_id":"SOP04","version":"0.1.0","requirement_id":"FR-04","input":"会议版本、参与人、历史承诺与资料","output":"会前材料和缺口","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP05","version":"0.1.0","requirement_id":"FR-05","input":"获准会议记录、分类、决定与行动项","output":"本人确认纪要及各项交办结果","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP06","version":"0.1.0","requirement_id":"FR-06","input":"负责人、目的、期限、证据和反馈","output":"交办状态及必要本人决定","current_tools":["create_assignment","send_assignment","read_assignment"],"tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A16"]},
+    {"sop_id":"SOP07","version":"0.1.0","requirement_id":"FR-07","input":"申请版本、材料、缺口与本人决定","output":"当前版本的审批决定记录","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP08","version":"0.1.0","requirement_id":"FR-08","input":"稳定联系人、收件人、草稿版本和授权","output":"模拟发送结果与独立送达状态","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP09","version":"0.1.0","requirement_id":"FR-09","input":"问题、范围、截止日期及获准原文","output":"引用、事实、意见、推断及待验证问题","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A15","A18"]},
+    {"sop_id":"SOP10","version":"0.1.0","requirement_id":"FR-10","input":"联系人职责、目标、历史事实与承诺","output":"会面问题与依据","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP11","version":"0.1.0","requirement_id":"FR-11","input":"目的、参与人、时间与时区","output":"冲突、变更影响及准备清单","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP12","version":"0.1.0","requirement_id":"FR-12","input":"本人私人内容、忙碌时间与分享范围","output":"受控私人安排及获准忙碌分享","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
+    {"sop_id":"SOP13","version":"0.1.0","requirement_id":"FR-13","input":"本人当前确认、历史决定及有效引用","output":"当前记忆版本和修改删除后的采用检查","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A15","A19"]}
+  ],
+  "agriculture": {
+    "requirements": ["FR-14","FR-15","FR-16","FR-17","FR-18","FR-19","FR-20","FR-21","FR-22","FR-23"],
+    "FR-19_uses": ["BROILER","EGG","MILK","BEEF"],
+    "data_status": "等待 H3、获准专题来源和 T13 确定性计算接口",
+    "acceptance_ids": ["A21a","A21b","A21c","A22a","A22b","A22c","A23a","A23b","A23c","A23d"]
+  },
+  "budget": {
+    "current_application_default_max_tool_iterations": 12,
+    "current_application_default_max_output_tokens": 4096,
+    "current_http_timeout_seconds": 120,
+    "current_provider_max_retries": 0,
+    "effective_runtime_source": "application 当前配置及 Audit runtime_snapshot",
+    "product_total_timeout_seconds": null,
+    "total_token_budget": null,
+    "cost_budget": null,
+    "no_progress_detector_status": "PENDING_T06_T16"
+  },
+  "speech": {
+    "client_component": "app/webui/BossVoiceAssignment.tsx",
+    "client_max_duration_seconds": 60,
+    "client_max_audio_bytes": 3000000,
+    "provider": null,
+    "approved_recording": null,
+    "confirmed_text_required": true,
+    "actual_transcription_verified": false,
+    "acceptance_ids": ["A20"]
+  }
+}

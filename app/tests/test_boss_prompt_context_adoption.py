@@ -125,6 +125,36 @@ def test_replaced_source_blocks_next_turn_context_adoption(service):
     assert catalog(reads)[1]["active"][0]["context_load_count"]==0
 
 
+def test_source_withdrawal_between_selection_and_recording(service):
+    api, reads = service
+    setup_active(service)
+    selected = active_runtime_prompts(api.store)
+    api.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    record_runtime_context_load(api.store, selected)
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 0
+
+
+def test_prompt_selection_is_scoped_to_execution_namespace(service):
+    api, reads = service
+    setup_active(service)
+    api.store.initialize("independent-runtime")
+    assert active_runtime_prompts(api.store, "independent-runtime") == []
+
+
+def test_atomic_context_selection_survives_database_reopen(service):
+    from boss_prompt_config import load_runtime_prompts
+
+    api, reads = service
+    item, checked, activated = setup_active(service)
+    selected = load_runtime_prompts(api.store)
+    assert selected[0]["prompt_id"] == item["prompt_id"]
+    reopened = ControlStore(api.store.path)
+    assert catalog(BossPageAPI(reopened))[1]["active"][0]["context_load_count"] == 1
+    reopened.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    assert load_runtime_prompts(reopened) == []
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 1
+
+
 def test_duplicate_or_stale_context_record_not_exposed_to_business_owner(service):
     api,reads=service
     setup_active(service)
