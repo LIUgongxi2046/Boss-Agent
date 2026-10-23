@@ -77,7 +77,11 @@ class ControlStore(Store):
     def control_decide(self, db, ns, p):
         auth = self.get(db, ns, "authorization", p["authorization_id"])
         content = {key: value for key, value in p.items() if key != "authorization_id"}
-        require(not auth["revoked"] and auth["payload"] == content and datetime.fromisoformat(auth["valid_until"]) > datetime.fromisoformat(now()), "当前授权无效", web.HTTPForbidden)
+        require(auth["authorization_id"] == p["authorization_id"] and auth["action"] in {"extend_assignment", "complete_assignment"},
+                "决定授权标识或动作不符", web.HTTPForbidden)
+        data = self.get(db, ns, "initial", "snapshot")
+        self.require_current_authorization(auth, ns, data, auth["action"], content)
+        require(auth["payload"] == content, "决定参数与本人授权不符", web.HTTPForbidden)
         task = self.get(db, ns, "task", p["task_id"])
         require(task["version"] == p["task_version"], "任务版本冲突")
         if auth["action"] == "extend_assignment":
@@ -88,7 +92,7 @@ class ControlStore(Store):
         elif auth["action"] == "complete_assignment":
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
             require(task["status"] == "RESULT_SUBMITTED" and feedback["task_id"] == p["task_id"] and feedback["kind"] == "RESULT_SUBMITTED" and feedback["evidence_refs"], "当前结果证据不完整")
-            data = self.get(db, ns, "initial", "snapshot")
+            self.require_current_assignment_sources(db, ns, data, task)
             clock = self.get(db, ns, "clock", "current")["at"]
             for source_id in set(task["source_refs"]) | set(feedback["evidence_refs"]):
                 document = require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)

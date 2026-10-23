@@ -246,6 +246,9 @@ def minutes_assignment_create(api, db, data, payload, key):
     task = api.store.get(db, NS, "task", task_id)
     task.update(origin)
     api.store.put(db, NS, "task", task_id, task)
+    binding = api.store.get(db, NS, "assignment_source_binding", task_id)
+    binding["origin_source"] = {"source_id": doc["source_id"], "version": doc["version"], "sha256": checksum(doc)}
+    api.store.put(db, NS, "assignment_source_binding", task_id, binding)
     link = {
         "link_id": link_id,
         "meeting_id": meeting["meeting_id"],

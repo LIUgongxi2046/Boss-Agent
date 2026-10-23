@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.3.0
+  version: 1.3.1
   description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；四项会议动作等待W3接入，来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: EXISTING_COMMANDS_AND_READS_WITH_NEW_W1_DOMAINS_PENDING_W3
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.3.0
+  version: 1.3.1
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -39,6 +39,15 @@ x-source-policy:
   evidence_read: metadata or version change requires a new query; no silent use of a later document through an earlier query
   legacy_queries: missing query_source_binding returns 409 and requires explicit requery
   receipt_compatibility: committed business receipts remain readable; no business action replay
+  assignment_binding: assignment_source_binding pins creation-time source versions and full SHA256; confirmed minute tasks also pin their original minute source
+  assignment_execution: Store.create_assignment and Store.send_assignment check current source and coordinator validity; completion rechecks the binding in the same transaction
+  legacy_assignments: missing creation-time binding returns 409 before new send or completion; no inferred historical binding
+x-tool-authorization-policy:
+  implementation: Store.require_current_authorization
+  validation: owner, namespace, BOSS issuer, action, target, content version, exact payload, revocation and complete wall-clock authorization window
+  single_use: one create authorization produces one task even with concurrent different request keys; one send authorization produces one outbox result
+  committed_receipts: original request and content remain readable after revocation without performing another action
+  tool_read_projection: read_assignment returns declared read_output fields while preserving additional server-side task metadata
 paths:
   /api/boss/identity:
     get:

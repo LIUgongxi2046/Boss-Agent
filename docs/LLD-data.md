@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.3.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
+版本 `1.3.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -26,6 +26,7 @@ erDiagram
   MEETING ||--o{ TASK : relates
   TASK ||--o{ FEEDBACK : receives
   TASK ||--o{ MESSAGE : sends
+  TASK ||--|| ASSIGNMENT_SOURCE_BINDING : pins
   SOURCE ||--o{ CITATION : supports
   QUERY ||--|| QUERY_SOURCE_BINDING : pins
   SOURCE ||--o{ QUERY_SOURCE_BINDING : bounds
@@ -58,6 +59,7 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 今日次序 | today_order，以业务日期为 ID | 完整当前事项 ID 集合；snapshot_sha256 和 expected_version 同时校验；重启后采用 |
 | 查询 | query | 公式版本、明细引用、参数、原始精度和来源时效；参数改变重新查询 |
 | 查询来源绑定 | query_source_binding，以query_id为ID | 与query同一事务保存owner/dataset、来源版本/完整JSON摘要及每项明细摘要；读取当前原文前逐项验证 |
+| 交办来源绑定 | assignment_source_binding，以task_id为ID | 与交办同一事务保存owner/dataset、来源版本和完整摘要；纪要产生的交办另保存原始纪要来源摘要，发送或完成前重验 |
 
 字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录需W2绑定当前真实记录；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
 
@@ -68,6 +70,8 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 来源有效性采用W2的`source_validity(document,business_at)`，接收来源为提交`224fbe00b03df312791856f3e76850cd55baa848`中的`validation/boss_source_policy.py`，SHA256为`6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896`，维护责任为W2。W1的`require_current_simulated_source`同时检查当前老板访问范围、当前获准SIMULATED类型及有效状态。只有VALID进入当前引用；WITHDRAWN/EXPIRED停止采用，其他非当前状态要求复核。日期精度按来源保留，日期端点使用当前业务时间的时区解释；valid_until可空，缺少终点明确显示未知。
 
 当前五项Tool保持原输入与结果字段。query_metrics将来源实际版本、定位和当前版本声明的发布时间写入来源结果，business_as_of由获准CURRENT期间终点与初始档案的时区计算；read_at始终为实际读取时间。source_updated_at对应该当前版本声明的published_at，不把读取时间作为来源更新时间。query_source_binding保存完整document和实际明细的SHA256；read_evidence在当前事务中重验访问范围、有效性、版本和摘要，来源或明细改变后要求重新查询。旧库查询缺少绑定时明确返回409；不会根据当前内容为旧查询补造历史绑定。
+
+assignment_source_binding与新交办在同一事务保存；确认纪要产生的交办还保存origin_source的标识、版本和完整摘要。发送和完成决定读取当前来源后比对原绑定，资料变化时停止新动作；旧交办缺少绑定时409要求本人重新核查，不用当前资料推测创建时的版本。备份恢复逐对象保留绑定及撤销状态。read_assignment仅输出既有Tool Schema声明字段，服务端task的来源版本和纪要关联保持原记录。
 
 模拟申请附件的published_at记录该模拟版本的实际生成时间，valid_from采用当次模拟业务时钟，valid_until未知时为null；新版本独立记录这些字段，旧版本保持历史。VALID表示当前材料可读取，资金执行、申请批准和专业确认仍使用各自独立状态。会前材料保存来源完整摘要和有效时间，来源到期或同版本元信息变化时显示NEEDS_REVIEW，并停止返回旧引用正文及旧指标缓存。
 

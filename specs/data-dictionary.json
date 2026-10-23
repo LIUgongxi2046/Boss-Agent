@@ -1,12 +1,12 @@
 {
-  "version": "1.3.0",
+  "version": "1.3.1",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.3.0保留既有命令与五项Tool的输入/结果字段，增加document有效性和query_source_binding；旧查询缺少绑定时返回409要求重新查询，已保存业务动作和原回执保持。旧库没有meeting对象时使用原始snapshot。",
+    "compatibility": "1.3.1保留既有命令与五项Tool的输入/结果字段，新增交办创建时assignment_source_binding；缺少绑定的旧交办在发送或完成前返回409要求本人重新核查，不推测历史来源。旧查询缺少query_source_binding时返回409要求重新查询；历史业务动作、原回执和原始snapshot保持。",
     "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
@@ -93,6 +93,13 @@
         "origin_entry_id": {"type_ref": "identifier", "optional": true}, "origin_source_id": {"type_ref": "identifier", "optional": true}, "origin_source_version": {"type_ref": "version", "optional": true},
         "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason": {"type_ref": "private_text", "optional": true}, "canceled_at": {"type_ref": "instant", "clock": "WALL", "optional": true}
       }
+    },
+    "assignment_source_binding": {
+      "storage": "objects/assignment_source_binding; id=task_id", "access": "SERVER_ONLY", "version": "1",
+      "fields": {"task_id": {"type_ref": "identifier", "relation": "task.task_id"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
+        "source_versions": {"type": "object", "values": "version"}, "source_fingerprints": {"type": "object", "values": "SHA256"},
+        "origin_source": {"type": "object", "optional": true, "properties": {"source_id": "identifier", "version": "version", "sha256": "SHA256"}, "meaning": "由确认纪要创建的交办保存其原始来源；与task和关联记录同一事务保存"}},
+      "policy": "发送或完成决定在当前事务校验本人、数据集、来源版本及完整摘要。旧对象缺少绑定时409要求本人重新核查；原始回执继续可读。"
     },
     "self_commitment": {
       "storage": "objects/self_commitment", "access": "BOSS_ONLY", "version": "1",
@@ -433,7 +440,7 @@
     "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification"],
     "R03": ["query", "query_source_binding", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
     "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
-    "R06": ["task", "self_commitment", "feedback", "outbox", "event"],
+    "R06": ["task", "assignment_source_binding", "self_commitment", "feedback", "outbox", "event"],
     "R07": ["application", "application_decision", "document", "authorization"],
     "R08": ["contact", "message_draft", "message", "message_reply", "authorization"],
     "R09": ["document", "research"], "R10": ["contact", "person_brief", "task", "feedback"],

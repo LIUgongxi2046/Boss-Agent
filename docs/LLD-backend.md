@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.3.0；T06/A06；2026-10-23；引用LLD-data1.3.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.3.1；T06/A06；2026-10-23；引用LLD-data1.3.1、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -47,6 +47,10 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 `query_metrics`和`read_evidence`采用W2来源有效性规则与W1的访问检查。当前来源和引用记录都返回实际document版本。query_source_binding与query同一事务保存，在read_evidence读取当前原文前检查owner/dataset、来源ID/版本/完整摘要及实际明细摘要。来源版本或同版本元信息变化、旧查询没有绑定时返回409要求重新查询；WITHDRAWN/EXPIRED返回410，其他非当前状态409，访问范围或类型不符403。没有向旧查询自动补充来源绑定；已经保存的交办、消息和原请求回执继续保留。
 
 会前材料、纪要/审批、附件消息、人员会面、交通资料、会议草稿和本人承诺已在相应领域采用当前来源检查。W3还需在公共_require_current_source及直接原文、反馈、任务完成等读取位置采用相同规则，并核查全部公开投影的当前状态与历史展示。Source VALID仅表明当前获准资料可以读取，专业结论、对方接收与业务完成分别确认。
+
+五项真实Tool在自身事务执行相同规则。新create_assignment绑定当前来源版本与完整摘要，检查负责人有效期及交办期限；send_assignment和control_decide的完成决定重新读取assignment_source_binding。纪要交办同时重验原始纪要来源。源资料变化、到期、访问范围改变或旧交办缺少绑定时禁止新动作。公共后续采用点可调用Store.require_current_assignment_sources(db,namespace,data,task)，必须保留本次事务和原请求查重顺序。
+
+Store.invoke的新写入检查授权的owner、namespace、BOSS身份及签发者、action、target_id、content_version、完整参数、revoked及valid_from/valid_until。一次创建授权只产生一个task，一次发送授权只产生一个outbox；不同请求编号并发执行时在BEGIN IMMEDIATE内检查既有结果。相同编号及内容始终读取原回执，授权撤销后继续可读。独立完成/延期控制复用相同身份与时间检查，决定的content_version对应task_version。read_assignment按原始read_output字段投影，服务端来源和纪要扩展字段继续保存。
 
 当前计划未包含晨间模型生成和周期重复定义；需要 W2 提供真实 Runtime 任务能力和 W3 接入后继续完成，不登记 A17 完成。已有事件更新时保留 owner_plan_id 并检查 event_versions，不自动扩大本人范围。
 

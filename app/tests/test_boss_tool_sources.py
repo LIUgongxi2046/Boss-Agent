@@ -198,3 +198,261 @@ def test_expired_completion_evidence_blocks_decision_and_reference_status_is_cur
     with store.connect() as db:
         assert store.get(db, "ui-check", "task", task["task_id"])["status"] == "RESULT_SUBMITTED"
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0] == authorization_count
+
+
+def authorized_tool(store, operation, content, key):
+    from boss_command_api import _data_envelope
+    from business import initial_materials
+    authorization_id = store.authorize("ui-check", operation, content)
+    return {**content, "authorization_id": authorization_id, "idempotency_key": key,
+            "envelope": _data_envelope(initial_materials(), key)}
+
+
+def direct_creation(store):
+    from test_boss_command_api import create_input
+    content = {key: value for key, value in create_input().items() if key != "client_request_id"}
+    return authorized_tool(store, "create_assignment", content, "direct-source-create")
+
+
+@pytest.mark.parametrize("operation", ["create_assignment", "send_assignment"])
+@pytest.mark.parametrize("state,error", [("CONFLICTED", web.HTTPConflict), ("SUPERSEDED", web.HTTPConflict),
+    ("INCOMPLETE", web.HTTPConflict), ("RECEIVED", web.HTTPConflict), ("WITHDRAWN", web.HTTPGone), ("EXPIRED", web.HTTPGone)])
+def test_direct_writing_tools_check_current_source_before_write(tmp_path, operation, state, error):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+    expected_tasks = 0
+    if operation == "send_assignment":
+        created = store.invoke("create_assignment", payload)
+        content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+        payload = authorized_tool(store, operation, content, "direct-source-send")
+        expected_tasks = 1
+    with store.connect() as db:
+        document = store.get(db, "ui-check", "document", "finance-note")
+        document["validity_state"] = state
+        store.put(db, "ui-check", "document", "finance-note", document)
+    with pytest.raises(error):
+        store.invoke(operation, payload)
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == expected_tasks
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+        assert db.execute("SELECT COUNT(*) FROM idempotency WHERE operation=?", (operation,)).fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("change", ["version", "metadata"])
+def test_direct_send_requires_creation_time_source_binding(tmp_path, change):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    created = store.invoke("create_assignment", direct_creation(store))
+    content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+    payload = authorized_tool(store, "send_assignment", content, "direct-source-change-send")
+    with store.connect() as db:
+        document = store.get(db, "ui-check", "document", "finance-note")
+        if change == "version":
+            document["version"] = str(int(document["version"]) + 1)
+        else:
+            document["published_at"] = store.get(db, "ui-check", "document", "meeting-minutes")["published_at"]
+        store.put(db, "ui-check", "document", "finance-note", document)
+    with pytest.raises(web.HTTPConflict):
+        store.invoke("send_assignment", payload)
+    with store.connect() as db:
+        task = store.get(db, "ui-check", "task", created["task_id"])
+        assert task["status"] == "OPEN" and task["version"] == "1"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("field", ["owner_id", "scope", "issuer_identity", "target_id", "content_version", "valid_from"])
+def test_direct_tool_validates_current_authorization_identity_scope_and_window(tmp_path, field):
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+    with store.connect() as db:
+        authorization = store.get(db, "ui-check", "authorization", payload["authorization_id"])
+        data = store.get(db, "ui-check", "initial", "snapshot")
+        authorization[field] = {"owner_id": data["contacts"][0]["contact_id"], "scope": data["dataset_id"],
+            "issuer_identity": "MAINTAINER", "target_id": data["historical_task"]["task_id"],
+            "content_version": str(int(payload["content_version"]) + 1), "valid_from": authorization["valid_until"]}[field]
+        store.put(db, "ui-check", "authorization", authorization["authorization_id"], authorization)
+    with pytest.raises(web.HTTPForbidden):
+        store.invoke("create_assignment", payload)
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 0
+        assert db.execute("SELECT COUNT(*) FROM idempotency WHERE operation='create_assignment'").fetchone()[0] == 0
+
+
+def test_new_request_key_cannot_reuse_committed_create_authorization(tmp_path):
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+    original = store.invoke("create_assignment", payload)
+    assert store.invoke("create_assignment", payload) == original
+    with pytest.raises(web.HTTPConflict):
+        store.invoke("create_assignment", {**payload, "idempotency_key": "direct-source-create-another"})
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM idempotency WHERE operation='create_assignment'").fetchone()[0] == 1
+
+
+@pytest.mark.parametrize("operation", ["create_assignment", "send_assignment"])
+def test_direct_writing_tool_rejects_source_outside_owner_scope(tmp_path, operation):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+    if operation == "send_assignment":
+        created = store.invoke("create_assignment", payload)
+        content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+        payload = authorized_tool(store, operation, content, "direct-scope-send")
+    with store.connect() as db:
+        data = store.get(db, "ui-check", "initial", "snapshot")
+        document = store.get(db, "ui-check", "document", "finance-note")
+        document["access_scope"] = data["contacts"][0]["contact_id"]
+        store.put(db, "ui-check", "document", "finance-note", document)
+    with pytest.raises(web.HTTPForbidden):
+        store.invoke(operation, payload)
+
+
+@pytest.mark.parametrize("operation", ["create_assignment", "send_assignment"])
+def test_direct_writing_tool_checks_contact_at_business_clock(tmp_path, operation):
+    from datetime import date, datetime, time, timedelta
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+    if operation == "send_assignment":
+        created = store.invoke("create_assignment", payload)
+        content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+        payload = authorized_tool(store, operation, content, "direct-contact-send")
+    with store.connect() as db:
+        data = store.get(db, "ui-check", "initial", "snapshot")
+        clock = store.get(db, "ui-check", "clock", "current")
+        clock["at"] = datetime.combine(date.fromisoformat(data["contacts"][0]["valid_until"]) + timedelta(days=1),
+                                       time.min, tzinfo=datetime.fromisoformat(clock["at"]).tzinfo).isoformat()
+        store.put(db, "ui-check", "clock", "current", clock)
+    with pytest.raises(web.HTTPForbidden):
+        store.invoke(operation, payload)
+
+
+def test_direct_send_without_creation_binding_requires_explicit_review(tmp_path):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    created = store.invoke("create_assignment", direct_creation(store))
+    content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+    payload = authorized_tool(store, "send_assignment", content, "direct-legacy-send")
+    with store.connect() as db:
+        db.execute("DELETE FROM objects WHERE kind='assignment_source_binding' AND id=?", (created["task_id"],))
+    with pytest.raises(web.HTTPConflict):
+        store.invoke("send_assignment", payload)
+
+
+@pytest.mark.parametrize("field", ["owner_id", "scope", "issuer_identity", "target_id", "content_version", "valid_from"])
+def test_completion_control_validates_owner_authorization_before_decision(tmp_path, field):
+    from test_boss_command_api import create_input, send_input, feedback_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    status, created = api.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    status, sent = api.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 200
+    status, feedback = api.execute("MAINTAINER", "boss.simulation.feedback", feedback_input({"task_id": created["task_id"], "version": sent["task_version"]}))
+    assert status == 200
+    content = {"task_id": created["task_id"], "task_version": feedback["task"]["version"], "feedback_id": feedback["feedback_id"]}
+    authorization_id = store.authorize("ui-check", "complete_assignment", content)
+    with store.connect() as db:
+        data = store.get(db, "ui-check", "initial", "snapshot")
+        authorization = store.get(db, "ui-check", "authorization", authorization_id)
+        authorization[field] = {"owner_id": data["contacts"][0]["contact_id"], "scope": data["dataset_id"],
+            "issuer_identity": "MAINTAINER", "target_id": data["historical_task"]["task_id"],
+            "content_version": str(int(content["task_version"]) + 1), "valid_from": authorization["valid_until"]}[field]
+        store.put(db, "ui-check", "authorization", authorization_id, authorization)
+    with pytest.raises(web.HTTPForbidden):
+        store.control("ui-check", "decide", {"authorization_id": authorization_id, **content})
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
+
+
+def test_direct_tool_lifecycle_reopens_and_reads_committed_receipts_after_revocation(tmp_path):
+    from test_boss_command_api import send_input
+    store, _, _ = service(tmp_path)
+    creation = direct_creation(store)
+    created = store.invoke("create_assignment", creation)
+    content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+    sending = authorized_tool(store, "send_assignment", content, "direct-lifecycle-send")
+    sent = store.invoke("send_assignment", sending)
+    for authorization_id in (creation["authorization_id"], sending["authorization_id"]):
+        store.control("ui-check", "revoke", {"authorization_id": authorization_id})
+    restored = ControlStore(store.path)
+    assert restored.invoke("create_assignment", creation) == created
+    assert restored.invoke("send_assignment", sending) == sent
+    task = restored.invoke("read_assignment", {"envelope": creation["envelope"], "task_id": created["task_id"]})
+    assert task["status"] == "WAITING_FEEDBACK" and task["message_ids"] == [sent["message_id"]]
+    with restored.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 1
+        assert restored.get(db, "ui-check", "assignment_source_binding", created["task_id"])["source_versions"] == {"finance-note": "1"}
+
+
+def test_concurrent_new_keys_use_one_owner_creation_authorization_once(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    store, _, _ = service(tmp_path)
+    payload = direct_creation(store)
+
+    def execute(key):
+        return store.invoke("create_assignment", {**payload, "idempotency_key": key})
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(execute, key) for key in ("direct-concurrent-first", "direct-concurrent-second")]
+    outcomes = []
+    for future in futures:
+        if future.exception() is None:
+            outcomes.append(future.result()["status"])
+        else:
+            assert isinstance(future.exception(), web.HTTPConflict)
+            outcomes.append("CONFLICT")
+    assert sorted(outcomes) == ["CONFLICT", "OPEN"]
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM idempotency WHERE operation='create_assignment'").fetchone()[0] == 1
+
+
+def test_public_created_assignment_is_readable_through_declared_tool_schema(tmp_path):
+    from boss_command_api import _data_envelope
+    from business import initial_materials
+    from test_boss_command_api import create_input
+    store, _, _ = service(tmp_path)
+    status, created = BossCommandAPI(store).execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    result = store.invoke("read_assignment", {"envelope": _data_envelope(initial_materials(), "public-tool-read"), "task_id": created["task_id"]})
+    assert result["task_id"] == created["task_id"] and result["status"] == "OPEN"
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "task", created["task_id"])["source_versions"] == {"finance-note": "1"}
+
+
+@pytest.mark.parametrize("change,error", [("expired", web.HTTPGone), ("version", web.HTTPConflict), ("metadata", web.HTTPConflict)])
+def test_direct_send_rechecks_original_minutes_source_binding(tmp_path, change, error):
+    from test_boss_command_api import create_input, send_input
+    from test_boss_meeting_approval import minutes_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    assert api.execute("BOSS", "boss.minutes.save", minutes_input())[0] == 200
+    assert api.execute("BOSS", "boss.minutes.confirm", {"client_request_id": "direct-origin-confirm", "meeting_id": "meeting-1",
+        "expected_version": "1", "source_id": "meeting-minutes", "source_version": "1"})[0] == 200
+    with store.connect() as db:
+        minute = store.get(db, "ui-check", "minutes", "meeting-1")
+    values = create_input()
+    status, created = api.execute("BOSS", "boss.minutes.assignment.create", {"client_request_id": "direct-origin-create",
+        "meeting_id": "meeting-1", "minute_version": minute["version"],
+        "entry_id": next(entry["entry_id"] for entry in minute["entries"] if entry["kind"] == "ASSIGNMENT_DRAFT"),
+        **{key: values[key] for key in ("purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements")}})
+    assert status == 200
+    content = {key: value for key, value in send_input(created).items() if key != "client_request_id"}
+    payload = authorized_tool(store, "send_assignment", content, "direct-origin-send")
+    with store.connect() as db:
+        document = store.get(db, "ui-check", "document", "meeting-minutes")
+        if change == "expired":
+            document["valid_until"] = store.get(db, "ui-check", "clock", "current")["at"]
+        elif change == "version":
+            document["version"] = str(int(document["version"]) + 1)
+        else:
+            document["published_at"] = store.get(db, "ui-check", "document", "finance-note")["published_at"]
+        store.put(db, "ui-check", "document", "meeting-minutes", document)
+    with pytest.raises(error):
+        store.invoke("send_assignment", payload)
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "task", created["task_id"])["status"] == "OPEN"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
