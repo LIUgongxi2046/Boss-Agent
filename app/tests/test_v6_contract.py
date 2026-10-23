@@ -132,7 +132,7 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
     workspace_source = (ROOT / "app/webui/BossWorkspaceView.tsx").read_text(encoding="utf-8")
     part = workspace_source.split("export const WORKSPACE_PAGE_ROUTES", 1)[1].split("type Role", 1)[0]
     workplace_ids = re.findall(r"\b([FAND]\d{2}(?:-[A-Z]+)?):\s*\"", part)
-    assert len(workplace_ids) == 27  # F11 also uses dedicated module; not a read-only workspace projection
+    assert len(workplace_ids) == 26  # F10 and F11 now have independent owner write components
     for page_id in workplace_ids:
         assert by_id[page_id]["component_file"] == "app/webui/BossWorkspaceView.tsx"
         assert by_id[page_id]["render_status"] != "DESIGN_PLACEHOLDER_ONLY"
