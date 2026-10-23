@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.1.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T17/T18检查为依据。
+版本 `1.2.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -43,7 +43,7 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 授权 | authorization | action、target_id、content_version、scope、payload、valid_from/until、revoked；保存决定与将来持续采用分别校验 |
 | 交办 | task、feedback、outbox | OPEN→WAITING_FEEDBACK→IN_PROGRESS/RESULT_SUBMITTED；本人完成或取消终止催办；延期申请独立 |
 | 本人承诺 | self_commitment、self_commitment_revision | ACTIVE→COMPLETED_CONFIRMED/CANCELED；独立于对他人交办 |
-| 会议 | initial/snapshot.meeting、meeting_brief、minutes | 日程、会前材料、纪要和逐项交办分别保存；当前资料版本变化要求复核 |
+| 会议 | initial/snapshot.meeting、meeting、meeting_draft、meeting_brief、minutes | 初始来源、当前安排与待确认草稿分别保存；会前材料、纪要和逐项交办引用当前会议版本 |
 | 审批 | application、application_revision、application_decision | 材料缺少、待决定、本人决定分别维护；不执行资金或专业放行 |
 | 消息 | message_draft、message、outbox、message_reply | 草稿、模拟发送、送达与回复分别维护，使用 stable recipient_id 和正文版本 |
 | 私人安排 | private_calendar、calendar_share | 正文 BOSS_ONLY；busy 分享只含获准字段；当前授权撤销后预览拒绝 |
@@ -57,6 +57,8 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 查询 | query | 公式版本、明细引用、参数、原始精度和来源时效；参数改变重新查询 |
 
 字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录需W2绑定当前真实记录；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
+
+会议采用当前对象覆盖读取，`meeting_materials(db,data)`保留原始snapshot并校验当前meeting的owner_id和meeting_id。既有数据库没有meeting对象时使用原始会议，投影标记DRAFT和未知结束时间；首次确认安排才写入当前对象及meeting_revision。meeting_draft具有独立版本，保存和修改不改变当前会议。确认时绑定会议/草稿版本、联系人、来源内容与版本、私人占用、已确认行程及缓冲、业务时钟；变化后停止采用旧核查结果。HELD/CANCELED保持终态；取消不改变独立交办和历史消息。全部新增对象继续受namespace隔离和SQLite同一事务约束。
 
 ## 数值、单位、期间与农业关系
 

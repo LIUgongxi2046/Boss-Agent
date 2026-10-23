@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.1.0；T06/A06；2026-10-23；引用LLD-data1.1.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整合法输入匹配、独立语义与公开集成仍需验证。
+版本1.2.0；T06/A06；2026-10-23；引用LLD-data1.2.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整合法输入匹配、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -16,7 +16,7 @@ RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 
 
 现有读取使用 `/api/boss/ui/*` HTTP Bearer。现有写入使用已认证 nanobot WebSocket：`type=webui_request, request_id, action, payload`；响应 `event=webui_response, request_id, ok, result|error`。业务幂等 ID 在 payload 内，与传输 request_id 分开。重新连接产生新传输请求时仍保留原 client_request_id。此协议没有 Last-Event-ID 或 SSE 心跳承诺。
 
-OpenAPI定义全部当前HTTP读取、58项现有WebSocket命令、5项新增W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、现有读取位置、可用状态和缺少来源；通用模拟查询协议仍属于设计，需要T12接入真实服务。
+OpenAPI定义全部当前HTTP读取、58项基线WebSocket命令、9项W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、现有读取位置、可用状态和缺少来源；通用模拟查询协议仍属于设计，需要T12接入真实服务。
 
 Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同一入口和`content=/stop`，停止该会话活动及队列中的后续步骤。线程读取使用既有Runtime入口。独立T02验证服务的健康、空间、工具与配置路径在`x-validation-service.routes`分别定义角色；这些路径用于验证，不增加产品业务入口。
 
@@ -31,8 +31,14 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 | ownerPlanCancel | 同上 | ACTIVE/PAUSED→CANCELED；终态不恢复；历史保持 | N09、W3 |
 | todayRead | BOSS，无查询参数 | `TodayAPI(store).read(role)`：items/category/reason/source_refs/snapshot_sha256/order_version | F01、W3 |
 | todayReorder | BOSS，client_request_id、expected_version、snapshot_sha256、item_ids | `TodayAPI(store).reorder(role,payload)`；核对完整当前集合，返回新 version 和 authorization_id | F01、W3 |
+| meetingArrangementRead | BOSS，无查询参数 | `MeetingAPI(store).read(role)`；当前会议、独立草稿、引用范围、核查状态与历史版本 | F04、W3 |
+| meetingDraftSave | BOSS，meeting_id、meeting_version、expected_version（草稿）、purpose、完整时间/时区、preparation_due_at、participant_ids、source_refs及client_request_id | `execute(role,"draft.save",payload)`；保存草稿和影响摘要，当前安排保持 | F04、W3 |
+| meetingConfirm | BOSS，meeting_id、meeting_version、draft_version、review_sha256、acknowledge_conflict及client_request_id | `execute(role,"confirm",payload)`；核查完整上下文与来源后产生当前SCHEDULED版本 | F04、W3 |
+| meetingCancel / meetingHeld | BOSS，meeting_id、expected_version（会议）、reason及client_request_id | `execute(role,"cancel"或"held",payload)`；独立本人确认；终态不恢复，举行需开始时间已经到达 | F04、W3 |
 
-这些 HTTP 路径和 WebSocket action 在 `specs/openapi.yaml` 标记 PENDING_W3，当前只有领域入口已运行。不得把尚未接入公共入口的动作当作上线能力。
+四项会议动作与读取路径在`specs/openapi.yaml`标记PENDING_W3。F01/N09此前版本已由W3接入，记录见W3的T11；本目录当前1.2.0增量仍需相同集成版本复验。不得把领域检查当作公共入口或设备验收。
+
+会议完整时间通过IANA时区和UTC时差校验，结束须晚于开始，持续时间上限31天；准备期限可空，提供时须位于当前业务时间与会议开始之间。参会对象使用唯一有效联系人标识，材料引用校验当前许可、撤销和版本。私人占用及行程缓冲产生冲突条件，确认时重算摘要并要求本人明确知晓。保存草稿不签发安排授权；确认、取消与举行分别保存本人授权。meeting_materials被会前材料、纪要、人员会面、行程、私人日历、今日投影和恢复读取采用；公共查询与W2上下文接入要求见T14。
 
 计划只控制已有获准事件的时间和范围，不创建第二个 Cron。时间条件限 Asia/Shanghai，not_before 在当前业务时间之后366天以内；执行时还检查事件期限、保存时 event_versions、本人计划状态、当前撤销状态、技术启停、规则、免打扰、暂缓和去重。`authorization_id` 是已保存计划的本人确认依据；其撤销即时停止继续采用。15分钟授权窗口用于当次确认提交，已经保存的持续计划由当前 ACTIVE 状态、绑定对象版本及未撤销确认共同控制。
 
@@ -64,7 +70,7 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 |---|---|
 | SI01 档案组织 | owner_profile 与本人设置；完整组织字段待补充 |
 | SI02 联系关系 | contacts、people 会面；真实职责与资料限定获准样本 |
-| SI03 日历出行 | private_calendar、calendar_share、travel；完整会议变更待补充 |
+| SI03 日历出行 | private_calendar、calendar_share、travel、meeting/draft；会议状态与关联采用领域已验证，公共接入待完成 |
 | SI04 消息邮件 | draft/send/reply 与 outbox；外部送达未验证 |
 | SI05 会议资料 | brief/minutes/逐项交办；来源变化复核 |
 | SI06 任务承诺 | assignment/commitment/feedback/延期/完成/取消；历史反馈领域已验证，公共接入待完成 |

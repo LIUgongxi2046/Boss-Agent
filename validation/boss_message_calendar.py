@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_meetings import meeting_materials
 
 NS = "ui-check"
 MAX_TEXT = 2400
@@ -249,13 +250,16 @@ def _calendar(db, data):
 
 
 
-def work_meeting_conflict(start, end, meeting_start):
-    """Explain the *known* selected meeting start without inferring an end.
-
-    Returns the same acknowledgement decision used by calendar.save, so the
-    preflight UI and persisted mutation never disagree about the known input.
-    """
-    if start <= meeting_start < end:
+def work_meeting_conflict(start, end, meeting_start, meeting_end=None, meeting_state="DRAFT"):
+    active = meeting_state not in ("CANCELED", "HELD")
+    complete = meeting_end is not None
+    if not active:
+        status = "MEETING_INACTIVE"
+        acknowledgement = False
+    elif complete:
+        acknowledgement = start < meeting_end and end > meeting_start
+        status = "KNOWN_MEETING_INTERVAL_OVERLAP" if acknowledgement else "NO_OVERLAP_WITH_CURRENT_MEETING"
+    elif start <= meeting_start < end:
         status = "KNOWN_MEETING_START_OVERLAP"
         acknowledgement = True
     elif 0 <= (start - meeting_start).total_seconds() < 86400:
@@ -270,15 +274,16 @@ def work_meeting_conflict(start, end, meeting_start):
     return {
         "status": status,
         "meeting_starts_at": meeting_start.isoformat(),
-        "meeting_ends_at": None,
-        "meeting_end_known": False,
+        "meeting_ends_at": meeting_end.isoformat() if meeting_end else None,
+        "meeting_end_known": complete,
         "requires_owner_acknowledgement": acknowledgement,
-        "conflict_proven_absent": False,
+        "conflict_proven_absent": (not active or complete) and not acknowledgement,
         "coverage": "CURRENT_APPROVED_SIMULATED_MEETING_ONLY",
     }
 
 
 def calendar_save(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "expected_version", "starts_at", "ends_at",
         "timezone", "title", "private_body", "location",
@@ -303,12 +308,11 @@ def calendar_save(api, db, data, payload):
     sources = _source_refs(api, db, data, payload["attachment_refs"])
     meeting = data["meeting"]
     mstart = datetime.fromisoformat(meeting["starts_at"])
-    # The selected fixture does not provide a meeting end; we *cannot*
-    # infer an exact duration or claim a full conflict check.
-    conflict = work_meeting_conflict(start, end, mstart)
+    mend = datetime.fromisoformat(meeting["ends_at"]) if meeting.get("ends_at") else None
+    conflict = work_meeting_conflict(start, end, mstart, mend, meeting.get("state", "DRAFT"))
     require(not conflict["requires_owner_acknowledgement"]
             or payload["acknowledge_conflict"],
-            "会议缺少结束时间，邻近安排必须由本人确认冲突风险")
+            "当前会议与拟定日程存在冲突或时间覆盖未知，需要本人核查")
     if _exists(db, "private_calendar", "private-1"):
         api.store.put(db, NS, "private_calendar_revision",
                       f'private-1:v{current["version"]}', current)
@@ -319,8 +323,8 @@ def calendar_save(api, db, data, payload):
         "location": location, "attachment_refs": sources,
         "visibility": "PRIVATE", "status": "ACTIVE",
         "updated_at": now(),
-        "calendar_conflict_proven_absent": False,
-        "meeting_end_unknown": True,
+        "calendar_conflict_proven_absent": conflict["conflict_proven_absent"],
+        "meeting_end_unknown": not conflict["meeting_end_known"],
     }
     auth_id = api._authorize(db, "calendar.save", {
         "calendar_id": "private-1", "expected_version": current["version"],
@@ -348,7 +352,7 @@ def calendar_save(api, db, data, payload):
         "version": updated["version"], "status": "ACTIVE",
         "authorization_id": auth_id,
         "active_shares_invalidated": True,
-        "calendar_conflict_proven_absent": False,
+        "calendar_conflict_proven_absent": conflict["conflict_proven_absent"],
         "conflict_status": conflict["status"],
         "external_calendar_updated": False,
     }

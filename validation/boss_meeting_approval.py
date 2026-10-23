@@ -17,6 +17,7 @@ from datetime import datetime
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_meetings import meeting_materials
 
 NS = "ui-check"
 ENTRY_KINDS = frozenset({"OPINION", "SUGGESTION", "DECISION", "ASSIGNMENT_DRAFT"})
@@ -57,6 +58,7 @@ def currency_amount(value):
 
 
 def minutes_save(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "meeting_id", "meeting_version",
         "source_id", "source_version", "expected_version", "entries",
@@ -124,6 +126,7 @@ def minutes_save(api, db, data, payload):
 
 
 def minutes_confirm(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "meeting_id", "expected_version",
         "source_id", "source_version",
@@ -178,6 +181,7 @@ def minutes_assignment_create(api, db, data, payload, key):
         "entry_id", "purpose", "coordinator_id", "due_at",
         "timezone", "evidence_requirements",
     })
+    data = meeting_materials(db, data)
     meeting = data["meeting"]
     require(payload["meeting_id"] == meeting["meeting_id"],
             "交办草稿所属会议不符", web.HTTPBadRequest)

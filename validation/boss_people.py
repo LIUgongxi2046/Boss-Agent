@@ -14,6 +14,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 from boss_owner_preferences import effective_owner_goals
+from boss_meetings import meeting_materials
 
 NS = "ui-check"
 
@@ -124,6 +125,7 @@ def _work_facts(db, data, contact_id):
 
 
 def _compile(api, db, data, contact_id, refs, purpose, meeting_id):
+    data = meeting_materials(db, data)
     contact = _contact(api, db, data, contact_id)
     require(isinstance(purpose, str) and 0 < len(purpose.strip()) <= 1200,
             "会面目的不能为空或超限", web.HTTPBadRequest)
@@ -198,6 +200,7 @@ def prepare(api, db, data, payload):
 
 
 def attach(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "brief_id", "expected_version",
         "meeting_id", "meeting_version", "compiled_sha256",
@@ -207,6 +210,7 @@ def attach(api, db, data, payload):
     require(payload["meeting_id"] == meeting["meeting_id"]
             and payload["meeting_version"] == meeting["version"],
             "会议标识或版本已经变化", web.HTTPConflict)
+    require(meeting.get("state", "DRAFT") not in ("CANCELED", "HELD"), "已结束的会议不能增加会面议题")
     require(record["version"] == payload["expected_version"]
             and record["state"] in ("READY_FOR_REVIEW", "MATERIALS_MISSING")
             and record["compiled_sha256"] == payload["compiled_sha256"],
@@ -284,7 +288,7 @@ def meeting_impacts(db, meeting):
             {"source_id": item["source_id"], "version": item["version"]}
             for item in row["compiled"]["sources"]
         ]
-        valid = True
+        valid = row["linked_meeting_version"] == meeting["version"] and meeting.get("state", "DRAFT") not in ("CANCELED", "HELD")
         for pin in pins:
             source = _get(db, "document", pin["source_id"])
             if not source or source.get("withdrawn") or source.get("version") != pin["version"] or source.get("access_scope") != "boss-1":
@@ -300,6 +304,7 @@ def meeting_impacts(db, meeting):
 
 
 def projection(api, db, data):
+    data = meeting_materials(db, data)
     results = []
     for brief in _list(db, "person_brief"):
         row = dict(brief)

@@ -16,6 +16,7 @@ from aiohttp import web
 
 from boss_command_api import BossCommandAPI, _client_key, _aware_due
 from boss_message_calendar import work_meeting_conflict
+from boss_meetings import meeting_materials
 from business import now
 
 NS = "ui-check"
@@ -33,6 +34,7 @@ SAFE_RECEIPT_FIELDS = {
     "commitment_id", "external_message_sent", "due_at",
     "authorization_id",
     "plan_id", "date", "item_ids",
+    "meeting_version", "review_sha256", "meeting_changed", "invitation_sent", "independent_tasks_unchanged",
 }
 
 
@@ -77,10 +79,12 @@ class BossRecoveryAPI:
                 return 400, {"error": "INVALID_TIME_WINDOW"}
             with self.store.connect() as db:
                 self.store.active(db, self.namespace)
-                data = self.store.get(db, self.namespace, "initial", "snapshot")
+                data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
                 meeting = data["meeting"]
                 observed = work_meeting_conflict(
                     start, end, datetime.fromisoformat(meeting["starts_at"]),
+                    datetime.fromisoformat(meeting["ends_at"]) if meeting.get("ends_at") else None,
+                    meeting.get("state", "DRAFT"),
                 )
                 return 200, {
                     "source_type": "SIMULATED",

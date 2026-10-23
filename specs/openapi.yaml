@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.1.0
-  description: 当前HTTP读取、58项现有命令、5项新增领域动作、5项工具与14类模拟资料接口；新增公开路径等待W3接入，来源不足和未运行验收分别标记。
+  version: 1.2.0
+  description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；四项会议动作等待W3接入，来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
 x-acceptance: NOT_RUN
 x-integration: EXISTING_COMMANDS_AND_READS_WITH_NEW_W1_DOMAINS_PENDING_W3
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.1.0
+  version: 1.2.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -132,7 +132,7 @@ paths:
         - {name: timezone, in: query, required: true, schema: {type: string}}
       responses:
         '200':
-          description: 依据当前会议起始时间检查已知范围；会议结束未知
+          description: 使用当前会议版本与已知完整时间检查范围；结束未知时显示限制，取消或举行后的会议不占用当前安排
           content: {application/json: {schema: {type: object, required: [source_type, calendar_id, meeting_id, meeting_version, read_only, read_at]}}}
         default: {$ref: '#/components/responses/Error'}
   /api/boss/ui/sector:
@@ -204,6 +204,16 @@ paths:
                   snapshot_sha256: {type: string}
                   order_version: {$ref: '#/components/schemas/Version'}
                   coverage_state: {const: PARTIAL}
+        default: {$ref: '#/components/responses/Error'}
+  /api/boss/ui/meeting-arrangement:
+    get:
+      operationId: meetingArrangementRead
+      x-role: BOSS
+      x-integration: PENDING_W3
+      responses:
+        '200':
+          description: 当前会议、独立草稿、核查结果与可引用联系人和资料；无写入
+          content: {application/json: {schema: {type: object, required: [source_type, meeting, draft, contacts, sources, revisions, business_at, invitation_sent], properties: {source_type: {const: SIMULATED}, meeting: {type: object}, draft: {type: [object, 'null']}, contacts: {type: array, items: {type: object}}, sources: {type: array, items: {type: object}}, revisions: {type: array, items: {type: object}}, business_at: {type: string, format: date-time}, invitation_sent: {const: false}}}}}
         default: {$ref: '#/components/responses/Error'}
 components:
   securitySchemes:
@@ -888,7 +898,69 @@ components:
         expected_version: {$ref: '#/components/schemas/Version'}
         snapshot_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
         item_ids: {type: array, uniqueItems: true, items: {type: string}}
+    MeetingDraftSave:
+      type: object
+      required: [client_request_id, meeting_id, meeting_version, expected_version, purpose, starts_at, ends_at, timezone, preparation_due_at, participant_ids, source_refs]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        meeting_id: {type: string}
+        meeting_version: {$ref: '#/components/schemas/Version'}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        purpose: {type: string, minLength: 1, maxLength: 1200}
+        starts_at: {type: string, format: date-time}
+        ends_at: {type: string, format: date-time}
+        timezone: {type: string}
+        preparation_due_at: {type: [string, 'null'], format: date-time}
+        participant_ids: {type: array, minItems: 1, maxItems: 32, uniqueItems: true, items: {type: string}}
+        source_refs: {type: array, maxItems: 8, items: {$ref: '#/components/schemas/SourceReference'}}
+    MeetingConfirm:
+      type: object
+      required: [client_request_id, meeting_id, meeting_version, draft_version, review_sha256, acknowledge_conflict]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        meeting_id: {type: string}
+        meeting_version: {$ref: '#/components/schemas/Version'}
+        draft_version: {$ref: '#/components/schemas/Version'}
+        review_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        acknowledge_conflict: {type: boolean}
+    MeetingFinish:
+      type: object
+      required: [client_request_id, meeting_id, expected_version, reason]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        meeting_id: {type: string}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        reason: {type: string, minLength: 1, maxLength: 1200}
+    MeetingDraftReceipt:
+      type: object
+      required: [meeting_id, meeting_version, version, state, review_sha256, meeting_changed, invitation_sent]
+      properties:
+        meeting_id: {type: string}
+        meeting_version: {$ref: '#/components/schemas/Version'}
+        version: {$ref: '#/components/schemas/Version'}
+        state: {const: DRAFT}
+        review_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        meeting_changed: {const: false}
+        invitation_sent: {const: false}
+    MeetingReceipt:
+      type: object
+      required: [meeting_id, version, state, authorization_id, invitation_sent, external_calendar_updated, independent_tasks_unchanged]
+      properties:
+        meeting_id: {type: string}
+        version: {$ref: '#/components/schemas/Version'}
+        state: {enum: [SCHEDULED, CANCELED, HELD]}
+        authorization_id: {type: string}
+        invitation_sent: {const: false}
+        external_calendar_updated: {const: false}
+        independent_tasks_unchanged: {const: true}
 x-websocket-operations:
+  - {operationId: meetingDraftSave, action: boss.meeting.draft.save, role: BOSS, input: '#/components/schemas/MeetingDraftSave', output: '#/components/schemas/MeetingDraftReceipt', implementation: 'MeetingAPI.execute(role,draft.save,payload)', caller: BossMeetingArrangement, integration: PENDING_W3, result_required: [meeting_id, meeting_version, version, state, review_sha256, meeting_changed, invitation_sent]}
+  - {operationId: meetingConfirm, action: boss.meeting.confirm, role: BOSS, input: '#/components/schemas/MeetingConfirm', output: '#/components/schemas/MeetingReceipt', implementation: 'MeetingAPI.execute(role,confirm,payload)', caller: BossMeetingArrangement, integration: PENDING_W3, result_required: [meeting_id, version, state, authorization_id, invitation_sent, external_calendar_updated, independent_tasks_unchanged]}
+  - {operationId: meetingCancel, action: boss.meeting.cancel, role: BOSS, input: '#/components/schemas/MeetingFinish', output: '#/components/schemas/MeetingReceipt', implementation: 'MeetingAPI.execute(role,cancel,payload)', caller: BossMeetingArrangement, integration: PENDING_W3, result_required: [meeting_id, version, state, authorization_id, invitation_sent, external_calendar_updated, independent_tasks_unchanged]}
+  - {operationId: meetingHeld, action: boss.meeting.held, role: BOSS, input: '#/components/schemas/MeetingFinish', output: '#/components/schemas/MeetingReceipt', implementation: 'MeetingAPI.execute(role,held,payload)', caller: BossMeetingArrangement, integration: PENDING_W3, result_required: [meeting_id, version, state, authorization_id, invitation_sent, external_calendar_updated, independent_tasks_unchanged]}
   - operationId: ownerPlanSave
     action: boss.owner.plan.save
     role: BOSS
@@ -1056,7 +1128,7 @@ x-validation-service:
   boss_controls: [decide, revoke, withdraw, search, private_calendar, reference_status, reminder, rules]
   product_policy: 产品技术调度以boss.scheduler.*维护身份为准；原验证入口不可作为桌面公开权限或另一调度来源。
 x-pending:
-  - public integration of five new W1 domain actions
+  - public integration of four meeting actions and verification of all nine W1 domain actions on W3 source version
   - actual simulation broker implementation and approved missing materials
   - actual runtime streaming cancellation and persistence verification
   - complete legitimate input schema matching and independent semantic review

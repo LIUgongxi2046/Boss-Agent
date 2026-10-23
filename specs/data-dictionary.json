@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.1.0保留1.0.0命令输入，增加迟到反馈历史标识、完整设计状态、来源登记和Runtime元信息；指标使用既有CHANGE枚举返回确定性变化。",
+    "compatibility": "1.2.0保留既有命令输入，增加meeting当前版本、独立草稿与四项本人动作；旧库没有meeting对象时使用原始snapshot，首次确认才保存当前会议，不修改原始资料。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
     "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
@@ -153,9 +153,24 @@
         "action": {"type": "string", "enum": ["APPROVE", "REJECT", "REQUEST_MORE"]}, "comment": {"type_ref": "private_text", "maxLength": 1200}, "authorization_id": {"type_ref": "identifier"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}, "funds_transferred": {"type": "boolean", "const": false}, "professional_release_issued": {"type": "boolean", "const": false}}
     },
     "meeting": {
-      "storage": "initial/snapshot.meeting", "access": "BOSS_ONLY", "version": "1",
-      "fields": {"meeting_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "participant_ids": {"type": "array", "items": "contact.contact_id"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "material_ids": {"type": "array", "items": "document.source_id or event.event_id"}, "historical_commitment_ids": {"type": "array", "items": "task.task_id"}},
-      "unknown_fields": {"ends_at": "当前获准资料未提供；不能推断冲突不存在"}
+      "storage": "objects/meeting; initial/snapshot.meeting保存初始来源", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"meeting_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "participant_ids": {"type": "array", "items": "contact.contact_id"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "material_ids": {"type": "array", "items": "document.source_id or event.event_id"}, "historical_commitment_ids": {"type": "array", "items": "task.task_id"},
+        "state": {"type": "string", "enum": ["DRAFT", "SCHEDULED", "HELD", "CANCELED"], "optional": true, "meaning": "初始来源没有状态时投影为DRAFT"},
+        "purpose": {"type_ref": "private_text", "optional": true}, "ends_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "preparation_due_at": {"type_ref": "instant", "clock": "BUSINESS", "nullable": true, "optional": true},
+        "source_refs": {"type": "array", "items": "source_reference", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "updated_at": {"type_ref": "instant", "clock": "WALL", "optional": true},
+        "external_attendance_verified": {"type": "boolean", "const": false, "optional": true}, "decision_reason": {"type_ref": "private_text", "optional": true}},
+      "unknown_fields": {"ends_at": "初始获准资料未提供；本人确认完整时间后使用该版本，不能推断未知结束时间"},
+      "consumers": ["meeting_materials", "MeetingAPI", "briefing", "minutes", "people", "travel", "private_calendar", "today", "recovery"],
+      "terminal_states": ["HELD", "CANCELED"]
+    },
+    "meeting_draft": {
+      "storage": "objects/meeting_draft; revisions=meeting_draft_revision", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT", "CONFIRMED"]},
+        "details": {"type": "object", "properties": {"purpose": "private_text", "starts_at": "instant BUSINESS", "ends_at": "instant BUSINESS", "timezone": "IANA", "preparation_due_at": "instant BUSINESS or null", "participant_ids": "contact.contact_id[]", "source_refs": "source_reference[]"}},
+        "impact": {"type": "object", "meaning": "私人占用版本与冲突、关联行程标识、准备期限覆盖和本人确认条件，不含私人正文"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "saved_at": {"type_ref": "instant", "clock": "WALL"}, "confirmed_meeting_version": {"type_ref": "version", "optional": true}},
+      "confirmation_conditions": ["current meeting version", "current draft version", "matching source/contact/calendar/travel/clock digest", "explicit owner acknowledgement of conflict"],
+      "projection_only": {"review_current": "boolean; 不保存为来源事实"}
     },
     "minutes": {
       "storage": "objects/minutes", "access": "BOSS_ONLY", "version": "1",
@@ -405,7 +420,7 @@
   "requirement_entities": {
     "R01": ["today_order", "meeting", "task", "self_commitment", "event", "owner_goals"],
     "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification"],
-    "R03": ["query", "metric_detail"], "R04": ["meeting", "meeting_brief", "document", "task"],
+    "R03": ["query", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
     "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
     "R06": ["task", "self_commitment", "feedback", "outbox", "event"],
     "R07": ["application", "application_decision", "document", "authorization"],

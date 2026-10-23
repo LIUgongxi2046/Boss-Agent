@@ -8,6 +8,7 @@ from business import checksum, require
 from boss_command_api import BossCommandAPI
 from boss_message_calendar import _calendar
 from boss_owner_preferences import owner_profile
+from boss_meetings import meeting_materials
 
 NS = "ui-check"
 FINAL = {"CANCELED", "COMPLETED_CONFIRMED"}
@@ -31,7 +32,7 @@ class TodayAPI:
 
     def _read(self, db):
         self.store.active(db, NS)
-        data = self.store.get(db, NS, "initial", "snapshot")
+        data = meeting_materials(db, self.store.get(db, NS, "initial", "snapshot"))
         clock = self.store.get(db, NS, "clock", "current")
         zone = data["boss_profile"]["timezone"]
         date = datetime.fromisoformat(clock["at"]).astimezone(ZoneInfo(zone)).date().isoformat()
@@ -69,8 +70,9 @@ class TodayAPI:
                 append("application", row["application_id"], row["version"], row["title"], "DECIDE",
                        "申请需要本人决定或补充材料", "F07")
         meeting = data["meeting"]
-        append("meeting", meeting["meeting_id"], meeting["version"], "会议与会前材料", "COORDINATE",
-               "本人参加会议，需要核对当前资料和历史承诺", "F04", meeting["starts_at"])
+        if meeting.get("state", "DRAFT") not in ("CANCELED", "HELD"):
+            append("meeting", meeting["meeting_id"], meeting["version"], "会议与会前材料", "COORDINATE",
+                   "本人参加会议，需要核对当前资料和历史承诺", "F04", meeting["starts_at"])
         for event in self._rows(db, "event"):
             related_task = event.get("task_id")
             if event["event_id"] == data["event"]["event_id"]:

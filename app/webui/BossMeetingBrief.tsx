@@ -14,7 +14,7 @@ type Metrics={available:boolean;reason?:string;
   source_version:string;definition_version:string;
   metrics:Record<string,{value:string|null;unit:string}>;
   detail_refs:string[]}[];unexplained_causes:string[]};
-type Compiled={meeting:{meeting_id:string;version:string;starts_at:string;timezone:string};
+type Compiled={meeting:{meeting_id:string;version:string;starts_at:string;timezone:string;ends_at?:string|null;state?:string;preparation_due_at?:string|null};
   participants:Participant[];sources:Source[];commitments:Commitment[];
   event:{event_id:string;status:string;origin:string};metrics:Metrics;
   travel_impacts?:{travel_id:string;version:string;meeting_end_known:boolean}[];
@@ -24,13 +24,13 @@ type Compiled={meeting:{meeting_id:string;version:string;starts_at:string;timezo
     pinned_source_versions:{source_id:string;version:string}[]}[];
   missing_items:string[];needs_review:boolean;source_type:"SIMULATED"};
 type Saved={brief_id:string;meeting_id:string;version:string;state:string;
-  prepared_at:string;reviewed_by_owner:false;meeting_occurred:false;
+  prepared_at:string;reviewed_by_owner:false;meeting_occurred:boolean;
   message_sent:false;compiled:Compiled};
 type Briefing={source_type:"SIMULATED";projection:"briefing";data_version:string;
   saved:boolean;saved_brief:Saved|null;current:Compiled;current_status:string;
   needs_review:boolean;source_changed?:boolean;participant_changed?:boolean;
   business_changed?:boolean;revisions:{version:string;state:string;prepared_at:string}[];
-  meeting_occurred:false;material_request_sent:false};
+  meeting_occurred:boolean;material_request_sent:false};
 type Pending={action:string;payload:Record<string,unknown>;id:string;
   title:string;details:string[]};
 type Receipt={action:string;client_request_id:string;outcome:string;result?:{
@@ -239,6 +239,8 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
           <Fact label="会议 ID" value={b?.meeting.meeting_id}/>
           <Fact label="会议版本" value={b?.meeting.version}/>
           <Fact label="开始时间" value={b?textTime(b.meeting.starts_at):null}/>
+          <Fact label="结束时间" value={b?.meeting.ends_at?textTime(b.meeting.ends_at):"尚未提供"}/>
+          <Fact label="会议状态" value={b?.meeting.state||"DRAFT"}/>
           <Fact label="IANA 时区" value={b?.meeting.timezone}/>
           <Fact label="已保存材料版本" value={saved?.version||"尚未准备"}/>
           <Fact label="当前资料状态" value={data?.current_status||"待读取"}/>
@@ -316,7 +318,7 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
           {(b?.travel_impacts||[]).map(item=><div className="boss-workspace-item"
             key={item.travel_id}>
             <strong>行程影响：{item.travel_id}</strong>
-            <small>行程 v{item.version} · 会议结束时刻仍未知，准备时间须核查</small>
+            <small>行程 v{item.version} · {item.meeting_end_known?"已经提供会议结束时间":"会议结束时间尚未提供"}，准备时间须核查</small>
           </div>)}
           {!b?.people_meeting_impacts?.length&&!b?.travel_impacts?.length&&
             <p className="boss-helper">当前没有由 F10 关联的会面议题或 F11 已确认行程影响。</p>}
@@ -368,8 +370,8 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
           <Fact label="有效材料" value={b?.sources.filter(x=>x.status==="CURRENT").length}/>
           <Fact label="待补清单" value={b?.missing_items.length}/>
           <Fact label="当前需复核" value={data?.needs_review?"是":"否"}/>
-          <Fact label="材料准备期限" value="尚无获准的具体准备期限"/>
-          <Fact label="会议已举行" value="未知（本页不操作会议）"/>
+          <Fact label="材料准备期限" value={b?.meeting.preparation_due_at?textTime(b.meeting.preparation_due_at):"尚未提供"}/>
+          <Fact label="会议已举行" value={data?.meeting_occurred?"本人已经确认":"尚未确认"}/>
           <Fact label="资料请求已发送" value="否（仅草稿）"/>
           {(b?.missing_items||[]).map(x=><div className="boss-workspace-item" key={x}>{x}</div>)}
           <label className="boss-label" htmlFor="boss-brief-request-contact">资料请求联系人</label>

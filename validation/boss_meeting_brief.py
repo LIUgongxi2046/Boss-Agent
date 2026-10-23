@@ -15,6 +15,7 @@ from boss_travel import meeting_impacts
 from boss_people import meeting_impacts as people_meeting_impacts
 from boss_owner_preferences import owner_goal_reference
 from boss_metrics import aggregate_metrics
+from boss_meetings import meeting_materials
 
 NS="ui-check"
 
@@ -73,9 +74,12 @@ def _metrics(data, approved):
 
 
 def compile_brief(db,data):
+    data=meeting_materials(db,data)
     meeting=data["meeting"]
     current_docs=_documents(db,data)
     missing=[d["source_id"] for d in current_docs if d["status"]!="CURRENT"]
+    if meeting.get("state") == "CANCELED":
+        missing.append("meeting:CANCELED")
     contacts=[]
     clock=_get(db,"clock","current")
     today=datetime.fromisoformat(clock["at"]).date().isoformat() if clock else ""
@@ -118,7 +122,9 @@ def compile_brief(db,data):
     meeting_event=_get(db,"event",data["event"]["event_id"])
     return {
         "meeting":{"meeting_id":meeting["meeting_id"],"version":meeting["version"],
-                   "starts_at":meeting["starts_at"],"timezone":meeting["timezone"]},
+                   "starts_at":meeting["starts_at"],"timezone":meeting["timezone"],
+                   "ends_at":meeting.get("ends_at"),"state":meeting.get("state","DRAFT"),
+                   "preparation_due_at":meeting.get("preparation_due_at")},
         "participants":contacts,
         "sources":current_docs,
         "commitments":commitments,
@@ -140,6 +146,7 @@ def compile_brief(db,data):
 
 
 def prepare(api,db,data,payload):
+    data=meeting_materials(db,data)
     api._exact(payload,{"client_request_id","meeting_id","meeting_version",
                         "expected_version"})
     meeting=data["meeting"]
@@ -165,7 +172,7 @@ def prepare(api,db,data,payload):
         "compiled":compiled,
         "prepared_at":now(),
         "reviewed_by_owner":False,
-        "meeting_occurred":False,
+        "meeting_occurred":meeting.get("state")=="HELD",
         "message_sent":False,
         "source_type":"SIMULATED",
     }
@@ -176,7 +183,7 @@ def prepare(api,db,data,payload):
         "state":state,"source_count":len(compiled["sources"]),
         "missing_count":len(compiled["missing_items"]),
         "historical_commitment_count":len(compiled["commitments"]),
-        "message_sent":False,"meeting_occurred":False,
+        "message_sent":False,"meeting_occurred":record["meeting_occurred"],
     }
 
 
@@ -188,7 +195,7 @@ def briefing_projection(db,data):
             "saved":False,"saved_brief":None,
             "current":current,"current_status":"NOT_PREPARED",
             "needs_review":True,
-            "meeting_occurred":False,"material_request_sent":False,
+            "meeting_occurred":current["meeting"]["state"]=="HELD","material_request_sent":False,
             "revisions":[],
         }
     old=stored["compiled"]
@@ -198,12 +205,13 @@ def briefing_projection(db,data):
                for doc in current["sources"]}
     source_changed=pinned!=available
     participant_changed=old["participants"]!=current["participants"]
+    meeting_changed=old["meeting"]!=current["meeting"]
     # Other changes (e.g. new task or simulated event state) also need review.
     business_changed=(old["commitments"]!=current["commitments"] or old["event"]!=current["event"]
                       or old.get("travel_impacts",[])!=current["travel_impacts"]
                       or old.get("people_meeting_impacts",[])!=current["people_meeting_impacts"]
                       or old.get("owner_goal_reference",{})!=current["owner_goal_reference"])
-    changed=source_changed or participant_changed or business_changed or old["metrics"]!=current["metrics"]
+    changed=source_changed or participant_changed or meeting_changed or business_changed or old["metrics"]!=current["metrics"]
     status="NEEDS_REVIEW" if changed or current["needs_review"] else stored["state"]
     revisions=[
         {"version":row["version"],"state":row["state"],
@@ -238,7 +246,8 @@ def briefing_projection(db,data):
         "needs_review":status=="NEEDS_REVIEW",
         "source_changed":source_changed,
         "participant_changed":participant_changed,
+        "meeting_changed":meeting_changed,
         "business_changed":business_changed,
-        "meeting_occurred":False,"material_request_sent":False,
+        "meeting_occurred":current["meeting"]["state"]=="HELD","material_request_sent":False,
         "revisions":revisions,
     }
