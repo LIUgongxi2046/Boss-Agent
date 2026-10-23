@@ -1,11 +1,13 @@
 # Boss-Agent · 老板专用 Agent
 
+**开发交接（2026-10-23）**：[当前架构、实际功能、测试证据、缺口与接手顺序](docs/Boss-Agent开发交接文档-2026-10-23.md)。页面覆盖以 `specs/page-service-map.json` 为准，工单与验收以 `delivery-ledger.json` 为准。
+
 基于 **HKUDS/nanobot v0.3.5 + Electron 45.0.0 + DeepSeek** 改造，使用已确认的 **Boss-Agent Desktop v6.0** 蓝绿白高保真设计与“大鹏”IP。业务主体只有一位老板，技术维护身份独立，其他人员仅为模拟联系人或资料来源。
 
 ## 当前状态
 
 - **架构**：T04 / A04 静态设计通过；`docs/HLD.md` 与 `specs/hld-72-page-map.json` 固定 72 页架构映射。
-- **第一批前端与数据接入**：`app/webui/BossDesktop.tsx`、`app/webui/boss-v6.css`、`validation/boss_page_api.py` 已入库；实际业务指标由原有 Tool/SQLite 返回；提供身份受控的 72 页导航。当前 13 页部分接入代码，59 页仍待正式业务实现；尚未实现的页面不显示伪造操作成功。
+- **第一批前端与数据接入**：`app/webui/BossDesktop.tsx`、`app/webui/boss-v6.css`、`validation/boss_page_api.py` 已入库；实际业务指标由原有 Tool/SQLite 返回；提供身份受控的 72 页导航。当前 70 页已有不同程度的代码接入、2 页由上游身份认证承接；但 72 页的正式端到端与像素级验收均无通过记录，不能将部分接入当作功能完成。
 - **开源源码不复制入库**：`scripts/prepare_boss_webui.py` 固定拉取上游 commit 并在本地私有目录叠加增量代码，保证上游可追溯且复用原生会话/设置功能。
 - **开发和验收**：T11 正在进行，T05—T10 与 T18—T26 的完整专业设计/功能开发和产品验收仍有待办。没有声称已经在目标 Mac 安装/运行或通过视觉像素验收。
 
