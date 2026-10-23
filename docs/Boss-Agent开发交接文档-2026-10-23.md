@@ -21,10 +21,10 @@
 | 页面像素级验收 | **0/72** 取得 `visual_pixel_verified=true` | 源视觉尺寸和截图检查脚本存在，尚无目标 Mac 的逐页验收结果 |
 | 设计状态 | 72 页、561 个明确设计状态索引 | F/A/V 51 页有独立状态索引，N/D 21 页继承通用状态 |
 | 最近一次完整成功 CI | [Actions 39881014652](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39881014652) | 对应 `59a841d2...`：**300 项 Python 测试通过，React/TypeScript 生产构建通过** |
-| 最新 main | `a83e6272...` | 比上述成功 CI **仅多一个 README、项目台账、开发索引文档提交**；这不代表最新 HEAD 又跑过独立 CI |
+| 交接前代码基线 | `a83e6272...` | 比上述成功 CI 只多一笔 README/台账/索引文档提交；**交接文件本身和 README 的后续文档提交不代表重新跑过代码测试** |
 | 正式安装/真实 API/系统能力验收 | 未形成完整通过记录 | 不得声称 macOS Intel 正式安装包、真实 DeepSeek 完整流程、麦克风/通知权限和休眠恢复已通过 |
 
-**资料冲突的处理**：`README.md` 前半部分仍保留早期“13 页接入、59 页待开发”表述，`docs/development/T16.md` 等历史文档也有旧测试数量。遇到冲突，**以最新 `delivery-ledger.json`、`specs/page-service-map.json`、`main` 实际代码及对应 commit 的 Actions 结果为准**；不要复制历史文字当最新状态。
+**资料冲突的处理**：仓库 README 的早期“13 页接入、59 页待开发”表述已在本次交接时更正，但 `docs/development/T16.md` 等历史文档仍保留其当时的测试数量。**以最新 `delivery-ledger.json`、`specs/page-service-map.json`、`main` 实际代码及对应 commit 的 Actions 结果为准**；不要把历史里程碑数字当最新进度。
 
 ## 1. 固定产品边界和决策
 
