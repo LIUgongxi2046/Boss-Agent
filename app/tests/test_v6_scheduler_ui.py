@@ -32,8 +32,8 @@ def test_a13_uses_auth_mutation_and_real_backend_views_without_fake_success():
         'client.requestMutation', '/api/boss/ui/workspace/scheduler',
         '/api/boss/ui/operation-status', 'boss.scheduler.draft.save',
         'boss.scheduler.draft.validate','boss.scheduler.activate',
-        'boss.scheduler.pause','boss.scheduler.resume',
-        'boss.scheduler.cancel','boss.scheduler.manual_run',
+        'updateStatus("pause")','updateStatus("resume")',
+        'updateStatus("cancel")','boss.scheduler.manual_run',
         'NEXT_RUN_TIME' if False else 'next_run_time',
         'manual_dispatch_supported_here',
     ):
