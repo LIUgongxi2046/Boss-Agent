@@ -839,3 +839,54 @@
   text-decoration:underline;text-decoration-color:#d6a23d;
   text-underline-offset:3px;
 }
+
+
+/* N05: original Desktop v6 four view tabs, five-column task rows, right details. */
+.boss-v6 .boss-task-center{margin-bottom:13px}
+.boss-v6 .boss-task-filter-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;
+  gap:10px;align-items:end;
+}
+.boss-v6 .boss-task-filter-grid label{
+  display:flex;flex-direction:column;gap:6px;color:#526987;
+  font-size:12px;font-weight:680;min-width:0;
+}
+.boss-v6 .boss-task-filter-grid input,
+.boss-v6 .boss-task-filter-grid select{
+  min-height:44px;width:100%;min-width:0;
+  background:#fbfdff;border:1px solid #d6e4f2;border-radius:9px;
+  color:#284867;padding:9px 11px;font-size:12.5px;
+}
+.boss-v6 .boss-task-table-heading,
+.boss-v6 .boss-task-table-row{
+  display:grid;
+  grid-template-columns:minmax(175px,2fr) minmax(110px,1fr) minmax(150px,1.25fr) minmax(120px,1fr) minmax(138px,1.1fr);
+  gap:10px;align-items:center;text-align:left;min-width:825px;
+}
+.boss-v6 .boss-task-table-heading{
+  padding:10px 14px;background:#f4f8ff;
+  border-radius:10px 10px 0 0;
+  color:#6d83a0;font-size:11.5px;font-weight:750;
+}
+.boss-v6 .boss-task-table-row{
+  width:100%;padding:13px 14px;border:0;border-bottom:1px solid #e2edf7;
+  background:#fff;color:#365675;font-size:12px;cursor:pointer;
+  border-radius:0;
+}
+.boss-v6 .boss-task-table-row:hover{background:#f2f8ff}
+.boss-v6 .boss-task-table-row.selected{background:#eaf5ff;box-shadow:inset 3px 0 0 #0968EA}
+.boss-v6 .boss-task-table-row span{min-width:0;overflow-wrap:anywhere}
+.boss-v6 .boss-task-table-row strong{display:block;font-size:13px;color:#284969}
+.boss-v6 .boss-task-table-row small{display:block;font-size:11px;color:#8aa0b6;line-height:1.65;margin-top:4px}
+.boss-v6 .boss-task-table-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 0;color:#7690a8;font-size:12px;flex-wrap:wrap;
+}
+.boss-v6 .boss-task-table-footer .boss-btn{min-height:34px;padding:5px 10px}
+@media(max-width:1230px){
+  .boss-v6 .boss-task-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr)) auto}
+}
+@media(max-width:690px){
+  .boss-v6 .boss-task-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .boss-v6 .boss-task-filter-grid button{grid-column:1/-1}
+}

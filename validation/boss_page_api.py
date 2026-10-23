@@ -221,6 +221,7 @@ class BossPageAPI:
                     for item in self._items(db, self.namespace, "feedback")
                 ],
                 "historical_commitment": data.get("historical_task"),
+                "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
                 "read_at": now(),
             }
 

@@ -17,6 +17,7 @@ import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } 
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
+import { BossTaskCenter } from "./BossTaskCenter";
 import { MaintainerPromptVersion } from "./MaintainerPromptVersion";
 import { BossResearchView } from "./BossResearchView";
 import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
@@ -659,47 +660,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                 </div> :
-                page === "N05" ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="任务与承诺" note="从 SQLite 正式业务对象读取，不根据设计图生成任务">
-                      {tasks?.tasks.length ? tasks.tasks.map((t) =>
-                        <button key={t.task_id} type="button" className={"boss-task-row " + (selectedTaskId === t.task_id ? "selected" : "")}
-                          onClick={() => selectTask(t.task_id)}>
-                          <span className="boss-task-icon"><ClipboardCheck size={18}/></span>
-                          <span><strong>{waitText(t.purpose)}</strong>
-                          <small>状态：{t.status} · 唯一负责人：{waitText(t.coordinator_id)}</small>
-                          <small>版本 {waitText(t.version)} · 期限 {localTime(t.due_at)}</small></span><ChevronRight size={17}/>
-                        </button>
-                      ) : <Quiet message="还没有从 Agent 工具创建的交办；首次执行时不会伪造已有任务。" />}
-                    </Panel>
-                    <Panel title="历史承诺 · 仅供背景参考">
-                      {tasks?.historical_commitment ? <>
-                        <Value label="历史任务" value={tasks.historical_commitment.task_id}/>
-                        <Value label="背景状态" value={tasks.historical_commitment.status}/>
-                        <Value label="原定期限" value={localTime(tasks.historical_commitment.due_at)}/>
-                      </> : <Quiet message="历史材料尚未载入。" />}
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="选中任务">
-                      {(() => {
-                        const t = tasks?.tasks.find((row) => row.task_id === selectedTaskId) || tasks?.tasks[0];
-                        return t ? <>
-                          <Value label="对象 ID" value={t.task_id}/>
-                          <Value label="当前状态" value={t.status}/>
-                          <Value label="证据要求" value={t.evidence_requirements?.join("、")}/>
-                          <Value label="有效期限" value={localTime(t.due_at)}/>
-                          <Value label="来源资料" value={t.source_refs?.join("、")}/>
-                          <StatusLine variant="warn" text="确认完成、延期和催办属于 PRD 的授权写入流程；本批次只开放实际查询，不提供伪确认按钮。" />
-                        </> : <Quiet message="请选择一个已存在的交办对象。" />;
-                      })()}
-                    </Panel>
-                    <Panel title="下一步"><div className="boss-actions">
-                      <GlassButton onClick={() => navigate("N02")}>与 Agent 讨论交办</GlassButton>
-                      <GlassButton onClick={() => navigate("F01")}>返回今日工作</GlassButton>
-                    </div></Panel>
-                  </div>
-                </div> :
+                page === "N05" ? <BossTaskCenter
+                  data={tasks} selectedTaskId={selectedTaskId}
+                  onSelectTask={setSelectedTaskId}
+                  onOpenTask={selectTask}
+                  onNavigate={id=>navigate(id)} onReload={refresh}
+                /> :
                 page === "N04" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="会议与资料" note="来源与作者均为模拟数据标注">
