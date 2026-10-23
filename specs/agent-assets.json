@@ -9,8 +9,8 @@
   "formal_event_version": "1.4.1",
   "received_backend_design": {"version":"1.4.1","source_commit":"fc4b2b5e88f9178312f6a7116e160ceeb03e160b","working_tree_changes_included":false,"full_acceptance":"NOT_RUN","remaining":"独立语义审阅、公开接入、资料不足与完整业务验收"},
   "pending_public_read_tools": [
-    {"operationId":"ownerPlansRead","role":"BOSS","input":"无查询参数","output":["plans","events","results","dispatches","technical_schedule","execution_owner"],"source":"OpenAPI /api/boss/ui/owner-plans GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01","SOP02","SOP06"]},
-    {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01"]},
+    {"operationId":"ownerPlansRead","role":"BOSS","input":"无查询参数","output":["plans","events","results","dispatches","technical_schedule","execution_owner"],"source":"OpenAPI /api/boss/ui/owner-plans GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_owner_read_tools.BossOwnerPlansReadTool","sop_ids":["SOP01","SOP02","SOP06"]},
+    {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_owner_read_tools.BossTodayReadTool","sop_ids":["SOP01"]},
     {"operationId":"meetingArrangementRead","role":"BOSS","input":"无查询参数","output":["source_type","meeting","draft","contacts","sources","revisions","business_at","invitation_sent"],"source":"OpenAPI /api/boss/ui/meeting-arrangement GET","runtime_registration":"NOT_REGISTERED","adapter":"runtime_meeting_tool.BossCurrentMeetingTool","sop_ids":["SOP04","SOP05","SOP10","SOP11"]}
   ],
   "current_tool_schema_version": "selection-probe 1.3.0",
@@ -62,8 +62,8 @@
     "unknown_result_policy": "查询原请求回执与业务对象"
   },
   "sops": [
-    {"sop_id":"SOP01","version":"0.1.0","requirement_id":"FR-01","input":"本人目标、日历、承诺、有效事件与次序","output":"有依据的今日事项","tool_mapping_status":"MAPPED_RUNTIME_REGISTRATION_PENDING","acceptance_ids":["A07","A18"]},
-    {"sop_id":"SOP02","version":"0.1.0","requirement_id":"FR-02","input":"当前指标、规则、通知要求和已有交办","output":"参与原因及提醒决定结果","tool_mapping_status":"MAPPED_RUNTIME_REGISTRATION_PENDING","acceptance_ids":["A07","A17"]},
+    {"sop_id":"SOP01","version":"0.1.0","requirement_id":"FR-01","input":"本人目标、日历、承诺、有效事件与次序","output":"有依据的今日事项","tool_mapping_status":"READ_ADAPTER_AVAILABLE_REMAINING_RUNTIME_PENDING","acceptance_ids":["A07","A18"]},
+    {"sop_id":"SOP02","version":"0.1.0","requirement_id":"FR-02","input":"当前指标、规则、通知要求和已有交办","output":"参与原因及提醒决定结果","tool_mapping_status":"READ_ADAPTER_AVAILABLE_REMAINING_RUNTIME_PENDING","acceptance_ids":["A07","A17"]},
     {"sop_id":"SOP03","version":"0.1.0","requirement_id":"FR-03","input":"区域、产品、期间、单位、币种和明细","output":"数值、可复算明细、日期、来源及未知范围","current_tools":["query_metrics","read_evidence"],"tool_mapping_status":"EXISTING_TOOL_DOMAIN_VERIFIED_PUBLIC_V131_PENDING","acceptance_ids":["A07","A13","A16"]},
     {"sop_id":"SOP04","version":"0.1.0","requirement_id":"FR-04","input":"会议版本、参与人、历史承诺与资料","output":"会前材料和缺口","tool_mapping_status":"READ_ADAPTER_AVAILABLE_REMAINING_RUNTIME_PENDING","acceptance_ids":["A07","A14","A18"]},
     {"sop_id":"SOP05","version":"0.1.0","requirement_id":"FR-05","input":"获准会议记录、分类、决定与行动项","output":"本人确认纪要及各项交办结果","tool_mapping_status":"MAPPED_RUNTIME_REGISTRATION_PENDING","acceptance_ids":["A07","A14","A18"]},

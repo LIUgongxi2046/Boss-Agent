@@ -2,7 +2,7 @@
   "status": "CURRENT_PRODUCER_VALID_LEGACY_SCHEMA_MISMATCH",
   "full_A07_accepted": false,
   "input_sha256": {
-    "agent_assets": "d5cda0281f71c3e302ff7d8936fc6b773a2e486f9aaf217962d52011c88302a6",
+    "agent_assets": "6c4b83c8677dac556e408a2d51f367f448d01665166545cb70a8b0d8ab6d11b3",
     "selection_probe": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
     "backend_design": "109fc76ab599480a641150df791d93e75c8caf9bb60339c78d267be60b9760e9",
     "runtime_events": "8d29e99168f6d3cee3c5196c6563f77a9f15f1ffc757ea6b8a77e9f833bf868f",
@@ -14,7 +14,8 @@
     "runtime_records_source": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
     "runtime_query_source": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502",
     "runtime_ui_source": "77353ede61ec509a69e138dbf4f5a5281858f51fe9d8c467bb33134ed95d84ea",
-    "current_meeting_tool_source": "6b4f6ce2a034065e2951adcd3b3978b4eab07c3f4fdba62ae1f200934132ae04"
+    "current_meeting_tool_source": "6b4f6ce2a034065e2951adcd3b3978b4eab07c3f4fdba62ae1f200934132ae04",
+    "owner_read_tools_source": "b35961b0c7f2cdd14a541e7bf6b74655c0458d7dbb0865050a3dabe7e679d452"
   },
   "current_tool_count": 5,
   "secretary_sop_count": 13,
@@ -25,6 +26,7 @@
   "documented_simulation_interfaces": 14,
   "simulation_interfaces_mounted": false,
   "research_read_adapter_implemented": true,
+  "owner_read_adapters_domain_verified": 2,
   "research_read_public_runtime_registered": false,
   "voice_provider_fields_matched": 11,
   "backend_version": "1.4.1",

@@ -17,6 +17,8 @@
 
 本产品没有已实现的业务 Subagent 调度，不分配不存在的权限或后台代理。大型资料检索通过受限工具取得当前必要片段；开发窗口的 worktree 隔离与产品 Agent 机制分别管理。
 
+本人只读Adapter包括runtime_owner_read_tools.BossTodayReadTool、BossOwnerPlansReadTool及runtime_meeting_tool.BossCurrentMeetingTool，operationId分别为todayRead、ownerPlansRead和meetingArrangementRead。三项参数均为空对象，不接受调用方身份或空间。今日/计划读取已通过正式响应Schema、真实ToolRegistry及现有SQLite的8项独立检查；基础Store和共用领域依赖为W2当前源码，读取模块为W1 fc4b2b5，完整组合来源摘要见T07。当前实际今日事项3项、计划集合为空，资料覆盖PARTIAL；没有因此扩大资料或业务授权。公共注册、完整计划生命周期与模型采用仍待W3同一集成版本验证。
+
 ## 上下文与缓存
 
 稳定区域依次为系统职责、工具定义、当前有效技术方法与版本。动态区域包含 session、当前已确认记忆、本人目标、任务输入、获准资料与工具结果。实际 nanobot 序列化顺序及 DeepSeek 缓存命中需要请求证据，当前缓存收益与费用均为未知。

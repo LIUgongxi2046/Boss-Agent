@@ -37,6 +37,7 @@ runtime_records_path = project / "validation" / "boss_runtime_records.py"
 runtime_query_path = project / "validation" / "runtime_records_query.py"
 runtime_ui_path = project / "app" / "webui" / "MaintainerRuntimeRecords.tsx"
 meeting_tool_path = project / "validation" / "runtime_meeting_tool.py"
+owner_read_tools_path = project / "validation" / "runtime_owner_read_tools.py"
 inputs = {
     "agent_assets": hashlib.sha256(assets_path.read_bytes()).hexdigest(),
     "selection_probe": hashlib.sha256(current_schema_path.read_bytes()).hexdigest(),
@@ -51,6 +52,7 @@ inputs = {
     "runtime_query_source": hashlib.sha256(runtime_query_path.read_bytes()).hexdigest(),
     "runtime_ui_source": hashlib.sha256(runtime_ui_path.read_bytes()).hexdigest(),
     "current_meeting_tool_source": hashlib.sha256(meeting_tool_path.read_bytes()).hexdigest(),
+    "owner_read_tools_source": hashlib.sha256(owner_read_tools_path.read_bytes()).hexdigest(),
 }
 assets = json.loads(assets_path.read_text())
 schema = json.loads(current_schema_path.read_text())
@@ -121,6 +123,11 @@ for binding in assets["pending_public_read_tools"]:
     assert binding["role"] == "BOSS"
     assert binding["runtime_registration"] == "NOT_REGISTERED"
 assert len(assets["agriculture"]["requirements"]) == 10
+owner_reads = json.loads((project / "evidence/T07/w2-20261023-owner-read-adapters.json").read_text())
+assert owner_reads["status"] == "PASS_OWNER_READ_ADAPTER_COMPOSITION"
+assert set(owner_reads["registry_tool_names"]) == {"todayRead", "ownerPlansRead"}
+for binding in assets["pending_public_read_tools"]:
+    assert binding["adapter"]
 assert set(assets["agriculture"]["FR-19_uses"]) == {"BROILER", "EGG", "MILK", "BEEF"}
 assert not assets["agent"]["evaluation_answers_allowed_in_context"]
 assert not assets["prompts"]["grants_owner_authority"]
@@ -187,6 +194,7 @@ report = {
     "documented_simulation_interfaces": len(simulation_operations),
     "simulation_interfaces_mounted": False,
     "research_read_adapter_implemented": True,
+    "owner_read_adapters_domain_verified": len(owner_reads["registry_tool_names"]),
     "research_read_public_runtime_registered": False,
     "voice_provider_fields_matched": len(transcription_fields),
     "backend_version": backend["info"]["version"],
