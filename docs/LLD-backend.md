@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.5.0；T06/A06；2026-10-23；引用LLD-data1.5.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.6.0；T06/A06；2026-10-23；引用LLD-data1.6.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -16,7 +16,7 @@ RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 
 
 现有读取使用 `/api/boss/ui/*` HTTP Bearer。现有写入使用已认证 nanobot WebSocket：`type=webui_request, request_id, action, payload`；响应 `event=webui_response, request_id, ok, result|error`。业务幂等 ID 在 payload 内，与传输 request_id 分开。重新连接产生新传输请求时仍保留原 client_request_id。此协议没有 Last-Event-ID 或 SSE 心跳承诺。
 
-OpenAPI定义全部当前HTTP读取、58项基线WebSocket命令、9项W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、现有读取位置、可用状态和缺少来源；通用模拟查询协议仍属于设计，需要T12接入真实服务。
+OpenAPI定义全部当前HTTP读取、58项基线WebSocket命令、10项W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、读取位置、可用状态和缺少来源；SimulationAPI已实现当前获准资料的统一读取及独立技术检查，公共路由、AD02和Agent采用保持PENDING_W3_W2。
 
 Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同一入口和`content=/stop`，停止该会话活动及队列中的后续步骤。线程读取使用既有Runtime入口。独立T02验证服务的健康、空间、工具与配置路径在`x-validation-service.routes`分别定义角色；这些路径用于验证，不增加产品业务入口。
 
@@ -85,6 +85,12 @@ control_feedback在同一事务保存每项结果证据的实际版本、完整�
 领域函数在出错位置抛出 HTTPException 或输入错误；公共边界仅转换为安全响应。日志只记录身份、动作、状态、对象/授权 ID 与版本；不记录私人正文、录音、凭据或内部推理。
 
 ## 十四类模拟接口责任
+
+`GET /api/boss/ui/simulation-query`为BOSS-only，调用`SimulationAPI(store).query_http(role,query_string)`；`GET /api/boss/ui/simulation-inspect`为MAINTAINER-only，调用`inspect_http`。使用当前nanobot GET读取通道，不新增业务写入动作。interface_id必需；object_ids、product_ids以重复参数组成数组，其余参数仅允许一个值。直接领域读取为query(role,payload)、inspect(role,payload)，payload为interface_id/object_ids/filters；已有事务可使用project_in_transaction。身份由RoleChannel注入，owner/namespace/dataset参数拒绝。URI查询部分最多4096字节，超过414；候选或结果超过1000项返回413，要求缩小对象范围，不截断候选后返回不完整结果。对象选择支持业务ID、存储ID或entity_type:ID；object_id保存真实业务ID，storage_id保留资源键，record_id为entity_type:业务ID。初始嵌套记录的资源键采用获准原资料ID。
+
+当前SI07/SI08接受period_start/period_end、region_id、product_ids、legal_entity_id、customer_id、currency=CNY及source_version；期间必须完整等于已提供的BASE或CURRENT之一。SI13只另外接受source_version，其余接口只接受对象选择，不支持的筛选400。来源类型、访问范围、有效状态、版本、已有完整摘要逐次核查；缺少真实绑定的旧查询和交办需要复核。会议材料、会面、行程和会议草稿使用现有领域规则核查缓存上下文，当前领域核查只支持ui-check；其他空间的既有缓存正文保持不可采用并要求复核。所有Record的business_authorization_granted=false，资料正文属于不可信来源内容，不能作为系统指令或新增授权。
+
+结果保留真实存储版本、状态、原来源时间和顶层实际read_at。data=null时继续提供当前元信息和明确缺少项；技术检查始终data=null、sources/source_refs为空。维护读取独立使用SQLite JSON投影，只选择对象标识、类别、版本与状态，原文/私人正文/缓存快照不进入维护结果。查询不创建对象、授权、审计、回执或Runtime记录，不触发模型、外部检索、消息和Cron；原有写入继续使用正式领域动作。空结果配合PARTIAL/UNAVAILABLE及缺少范围，不能推断完整业务范围没有记录。
 
 独立控制入口的private_calendar读取同一namespace内的当前对象；尚未保存当前对象时采用获准initial安排。当前对象的calendar_id与owner_id必须符合本人范围，DELETED返回410。该读取不创建对象或恢复正文。SQLite原生备份恢复保持当前状态、来源绑定、本人复核历史、原请求回执和删除标记；重置创建新执行空间，既有空间继续保留历史并拒绝新动作。当前领域验证范围见T12，完整旧版本迁移与产品设备恢复继续验收。
 

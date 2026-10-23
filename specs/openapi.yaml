@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.5.0
+  version: 1.6.0
   description: 当前HTTP读取、58项基线命令、10项W1领域动作、5项工具与14类模拟资料接口；当前版本的公开集成、来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.5.0
+  version: 1.6.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -52,6 +52,43 @@ x-tool-authorization-policy:
   committed_receipts: original request and content remain readable after revocation without performing another action
   tool_read_projection: read_assignment returns declared read_output fields while preserving additional server-side task metadata
 paths:
+  /api/boss/ui/simulation-query:
+    get:
+      operationId: simulationQuery
+      x-role: BOSS
+      x-implementation: boss_simulation_api.SimulationAPI.query_http
+      x-integration: PENDING_W3
+      description: 只读查询当前有效空间的十四类获准模拟资料；正文与缓存逐次检查，不签发业务授权。
+      x-query-length-limit: 4096 UTF-8 bytes
+      parameters: &simulationQueryParameters
+        - {name: interface_id, in: query, required: true, schema: {$ref: './simulation-query.schema.json#/$defs/Interface'}}
+        - {name: object_ids, in: query, style: form, explode: true, schema: {$ref: './simulation-query.schema.json#/$defs/Query/properties/object_ids'}}
+        - {name: period_start, in: query, schema: {type: string, format: date}}
+        - {name: period_end, in: query, schema: {type: string, format: date}}
+        - {name: region_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: product_ids, in: query, style: form, explode: true, schema: {$ref: './simulation-query.schema.json#/$defs/Query/properties/filters/properties/product_ids'}}
+        - {name: legal_entity_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: customer_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: batch_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: purpose, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: stage, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
+        - {name: currency, in: query, schema: {type: string, pattern: '^[A-Z]{3}$'}}
+        - {name: source_version, in: query, schema: {$ref: '#/components/schemas/Version'}}
+      responses:
+        '200': {description: 当前资料、存储状态、来源有效性及缺少范围；availability不表示业务完成。, content: {application/json: {schema: {$ref: './simulation-query.schema.json#/$defs/Result'}}}}
+        default: {$ref: '#/components/responses/Error'}
+  /api/boss/ui/simulation-inspect:
+    get:
+      operationId: simulationInspect
+      x-role: MAINTAINER
+      x-implementation: boss_simulation_api.SimulationAPI.inspect_http
+      x-integration: PENDING_W3
+      description: 独立技术检查，仅返回对象标识、类型、版本和状态；data始终为null，不读取或返回私人正文。
+      x-query-length-limit: 4096 UTF-8 bytes
+      parameters: *simulationQueryParameters
+      responses:
+        '200': {description: TECHNICAL_METADATA投影，sources与每项source_refs为空。, content: {application/json: {schema: {$ref: './simulation-query.schema.json#/$defs/Result'}}}}
+        default: {$ref: '#/components/responses/Error'}
   /api/boss/ui/assignment-source-review:
     get:
       operationId: assignmentSourcesRead
@@ -436,27 +473,7 @@ components:
         source_id: {type: string, minLength: 1, maxLength: 128}
         version: {$ref: '#/components/schemas/Version'}
     SimulationQuery:
-      type: object
-      required: [interface_id, object_ids, filters]
-      additionalProperties: false
-      properties:
-        interface_id: {enum: [SI01, SI02, SI03, SI04, SI05, SI06, SI07, SI08, SI09, SI10, SI11, SI12, SI13, SI14]}
-        object_ids: {type: array, maxItems: 100, uniqueItems: true, items: {type: string, maxLength: 128}}
-        filters:
-          type: object
-          additionalProperties: false
-          properties:
-            period_start: {type: string, format: date}
-            period_end: {type: string, format: date}
-            region_id: {type: string}
-            product_ids: {type: array, uniqueItems: true, items: {type: string}}
-            legal_entity_id: {type: string}
-            customer_id: {type: string}
-            batch_id: {type: string}
-            purpose: {type: string}
-            stage: {type: string}
-            currency: {type: string}
-            source_version: {$ref: '#/components/schemas/Version'}
+      $ref: './simulation-query.schema.json#/$defs/Query'
     QueryResult:
       type: object
       required: [query_id, envelope, values, detail_refs, sources, missing_fields, unexplained_causes]
@@ -478,21 +495,7 @@ components:
         unexplained_causes: {type: array, items: {type: string}}
       x-authoritative-validation-schema: selection-probe.json io_schema as standalone schema root query_output
     SimulationResult:
-      type: object
-      required: [source_type, dataset_id, dataset_version, execution_namespace, interface_id, availability, records, sources, missing_fields, business_as_of, read_at]
-      properties:
-        source_type: {const: SIMULATED}
-        dataset_id: {type: string}
-        dataset_version: {$ref: '#/components/schemas/Version'}
-        execution_namespace: {type: string}
-        interface_id: {type: string}
-        availability: {enum: [AVAILABLE, PARTIAL, UNAVAILABLE]}
-        records: {type: array, items: {type: object}}
-        sources: {type: array, items: {$ref: '#/components/schemas/SourceReference'}}
-        missing_fields: {type: array, items: {type: string}}
-        business_as_of: {type: [string, 'null'], format: date-time}
-        read_at: {type: string, format: date-time}
-      x-policy: 空列表只有明确覆盖完整时才表示没有记录；资料不足使用PARTIAL/UNAVAILABLE，不伪造完整覆盖。
+      $ref: './simulation-query.schema.json#/$defs/Result'
     BusinessReceipt:
       type: object
       description: 实际已提交对象和授权的安全回执；每项动作的必需字段在 operation 定义维护。
@@ -1142,10 +1145,10 @@ x-tool-operations:
 x-simulation-operations:
   - {interface_id: SI01, operationId: simulationProfileRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [owner_goals, owner_notice], current_reader: 'BossPageAPI dashboard / workspace owner-goals and owner-notice', state: PARTIAL, missing: [complete organization]}
   - {interface_id: SI02, operationId: simulationContactsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [contact, person_brief], current_reader: 'BossWorkspaceAPI people', state: PARTIAL, missing: [external relationship sources]}
-  - {interface_id: SI03, operationId: simulationCalendarTravelRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [meeting, private_calendar, travel_plan], current_reader: 'BossPageAPI meetings / BossWorkspaceAPI calendar and travel', state: PARTIAL, missing: [meeting end and external booking]}
+  - {interface_id: SI03, operationId: simulationCalendarTravelRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [meeting, private_calendar, travel_plan], current_reader: 'SimulationAPI / current meeting and private calendar / travel', state: PARTIAL, missing: [external booking]}
   - {interface_id: SI04, operationId: simulationMessagesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [message_draft, message, message_reply, outbox], current_reader: 'BossWorkspaceAPI outbox', state: PARTIAL, missing: [real external delivery]}
   - {interface_id: SI05, operationId: simulationMeetingsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [meeting, meeting_brief, minutes, minutes_assignment_link], current_reader: 'BossWorkspaceAPI meeting-brief / minutes', state: PARTIAL, missing: [multiple meeting source coverage]}
-  - {interface_id: SI06, operationId: simulationTasksRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [task, self_commitment, feedback], current_reader: 'BossPageAPI tasks', state: PARTIAL, missing: [late feedback history entry]}
+  - {interface_id: SI06, operationId: simulationTasksRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [task, self_commitment, feedback], current_reader: 'SimulationAPI / current tasks and historical feedback', state: PARTIAL, missing: [complete approved business source coverage]}
   - {interface_id: SI07, operationId: simulationSalesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics / read_evidence', state: PARTIAL, missing: [new approved agricultural details]}
   - {interface_id: SI08, operationId: simulationFinanceRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics cost/revenue only', state: PARTIAL, missing: [cash, receivables aging, settlement source]}
   - {interface_id: SI09, operationId: simulationProcurementInventoryRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [agriculture_batch, agriculture_transfer], current_reader: NONE, state: UNAVAILABLE, missing: [approved quote contract inventory quality source]}
@@ -1155,7 +1158,18 @@ x-simulation-operations:
   - {interface_id: SI13, operationId: simulationKnowledgeRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [document, memory], current_reader: 'read_evidence / control_search / BossWorkspaceAPI knowledge', state: PARTIAL, missing: [full ingestion provenance and revocation propagation verification]}
   - {interface_id: SI14, operationId: simulationNotificationsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [event, reminder, dispatch, notification], current_reader: 'BossWorkspaceAPI notifications / scheduler', state: PARTIAL, missing: [system notifications and full personal recurring plans]}
 x-simulation-access:
-  state: DESIGN_NOT_MOUNTED
+  state: DOMAIN_IMPLEMENTED_PUBLIC_PENDING_W3
+  dispatch: SimulationAPI uses interface_id for each x-simulation-operations entry; existing business readers remain available
+  query: GET /api/boss/ui/simulation-query -> SimulationAPI.query_http(role,query_string)
+  inspect: GET /api/boss/ui/simulation-inspect -> SimulationAPI.inspect_http(role,query_string)
+  schema: simulation-query.schema.json
+  current_space: 服务端在同一只读事务要求唯一active空间；owner和数据集来自该空间，客户端不能指定。
+  filters: SI07/SI08支持完整期间、region_id、product_ids、legal_entity_id、customer_id、CNY和source_version；SI13支持source_version；其他接口只支持object_ids，额外筛选400。
+  http_query: interface_id必需；object_ids与product_ids采用重复参数表示数组，其余字段仅允许一个值；拒绝未知和空参数，超过4096字节返回414。直接领域调用使用Query对象，HTTP使用锁定nanobot现有GET读取通道。
+  object_selection: object_ids匹配业务ID、存储ID或entity_type与冒号及相应ID；object_id保存业务ID，storage_id保存资源存储键，record_id为entity_type与冒号及业务ID。空object_ids读取该接口当前获准范围；最多100项ID，候选或结果超过1000项返回413，不截断候选后返回不完整结果。
+  read_semantics: STORED_RECORD表示已保存事实或快照；business_authorization_granted始终false，业务确认和当前采用继续由正式领域动作检查。引用失效、版本或摘要变化、删除与撤销使data为null，并返回当前元信息及缺少说明。
+  cached_context: 会议、会面、行程与会议草稿使用现有领域核查当前上下文；现有领域核查范围外的历史缓存要求重新复核。旧查询必须具有实际来源和明细绑定。
+  side_effects: 查询不写入业务、审计、授权、回执或Runtime记录，不执行模型、外部检索或调度，不新增model tool_scope。
   policy: BOSS读取本人获准正文；MAINTAINER人工检查使用独立技术元信息投影，不借用BOSS身份；模拟写入仅允许当前已授权资料。
   missing_materials: 不通过默认记录、空值替零、预设专业结论或标签答案填补。
 x-runtime-operations:
@@ -1212,7 +1226,7 @@ x-validation-service:
   product_policy: 产品技术调度以boss.scheduler.*维护身份为准；原验证入口不可作为桌面公开权限或另一调度来源。
 x-pending:
   - current assignment binding and authorization adoption across public consumers on W3 source version
-  - actual simulation broker implementation and approved missing materials
+  - current simulation query public routes, AD02 manual calls and actual Agent tool adoption; approved missing materials remain unavailable
   - actual runtime streaming cancellation and persistence verification
   - runtime-records schema and current/legacy field validation on W3 public version
   - complete legitimate input schema matching and independent semantic review

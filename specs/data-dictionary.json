@@ -1,12 +1,12 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.5.0保留既有命令与五项Tool的输入/结果字段，增加本人来源复核读取与独立确认。旧交办通过当前资料复核产生当前绑定，已知旧绑定保留，未知历史不补造；旧查询需要重新查询，旧结果证据需要重新提交。历史业务状态、消息、原回执和原始snapshot保持。",
+    "compatibility": "1.6.0保留既有命令与五项Tool输入/结果，新增十四类当前模拟资料的只读查询和独立技术检查，正式Schema为simulation-query.schema.json。查询不新增存储对象或业务授权。旧交办经过本人来源复核建立当前绑定，未知历史不补造；旧查询需要来源及明细绑定，旧结果证据需要重新提交。历史状态、消息、原回执和原始snapshot保持。",
     "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
@@ -465,6 +465,19 @@
     "observed_at": "来源观察时间", "received_at": "服务收到资料的真实时间",
     "valid_from": "允许采用起始时间", "valid_until": "允许采用终止时间",
     "business_at": "模拟业务时间", "created_at": "真实创建时间", "read_at": "真实查询时间"
+  },
+  "read_projections": {
+    "simulation_query": {
+      "schema": "specs/simulation-query.schema.json",
+      "storage": "READ_ONLY; no new object or table",
+      "scope": "unique spaces.active namespace and approved selection/1 for boss-1",
+      "body": "BOSS_ONLY current canonical object or stored snapshot; invalid source or inactive content is null",
+      "technical": "MAINTAINER independent SQL metadata projection; data=null, no source body or cached snapshot",
+      "records": "record_id=entity_type:object_id; object_id is the business ID, storage_id is the resource key; entity_type, version, state, content_state, source_refs and business_authorization_granted=false; initial nested records retain their approved source ID as the resource key",
+      "source_policy": "current scope, validity, pinned version and available full source/detail fingerprints; cached domain context is independently checked",
+      "initial_policy": "current object takes precedence; a deletion marker prevents initial text from returning",
+      "unknown_policy": "all fourteen interfaces remain PARTIAL or UNAVAILABLE until complete approved materials and integrations exist"
+    }
   },
   "pending_entities": [],
   "requirement_entities": {

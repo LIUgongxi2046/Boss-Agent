@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.5.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
+版本 `1.6.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T12/T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -186,6 +186,10 @@ flowchart LR
 业务使用责任：BOSS命令产生任务/授权/本人设置，后续页面、工具及Cron按当前版本读取；MAINTAINER只产生获准模拟资料、反馈与技术配置；资料换版或撤销使会前材料、纪要引用、研究、人员会面和计划需要复核；通知知晓、关闭与暂缓不改变任务期限及完成状态。具体接收动作与acceptance_id分别见T06、T12—T18及T21—T24。
 
 ## 事务、重置与恢复
+
+十四类模拟查询由SimulationAPI在同一只读事务取得唯一active空间，当前获准范围为boss-1及selection/1。统一Record区分对象ID、类别、实际可空版本/状态、正文状态和引用状态；data复用当前实体或已经保存的快照，STORED_RECORD不表示当前业务授权或完整上下文确认，business_authorization_granted始终false。来源失效、绑定或缓存上下文变化使data为null，版本和失效原因仍可查询。私人安排和记忆删除后不返回初始正文，本人档案使用当前适用的已确认目标。维护投影独立选择JSON元信息，不调用本人读取方法，也不加载私人正文或缓存快照。
+
+SI07/SI08直接读取获准明细，并按完整期间、区域、产品、法人、客户、CNY及来源版本筛选。已保存query仅在其全部明细符合筛选范围时返回，并核查真实query_source_binding及明细摘要；不产生新查询或替换历史结果。其余接口按明确对象ID读取，SI13另外支持来源版本；不支持的字段400。SI09/SI10缺少获准资料时返回UNAVAILABLE及具体缺少范围，不能解释为不存在采购、库存或质量事项。Schema和完整读取责任见simulation-query.schema.json与LLD-backend。
 
 所有写入在 BEGIN IMMEDIATE 内读取空间有效性、幂等回执、当前对象和授权，再保存对象、关联、授权、回执及最小审计。CAS 失败拒绝，不重复执行。原请求回执读取不产生新授权或动作。本人计划与技术调度采用同一数据库和唯一派发函数。
 
