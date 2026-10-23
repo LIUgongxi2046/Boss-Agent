@@ -26,6 +26,7 @@ from boss_message_calendar import (
     calendar_share, calendar_revoke, calendar_delete,
 )
 from boss_meeting_brief import prepare as meeting_brief_prepare
+from boss_assignment_nudge import nudge as assignment_nudge
 from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
 from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
 from boss_research import prepare as research_prepare
@@ -87,6 +88,7 @@ class BossCommandAPI:
     ACTION_ROLES = {
         "boss.assignment.create": "BOSS",
         "boss.assignment.send": "BOSS",
+        "boss.assignment.nudge": "BOSS",
         "boss.assignment.complete": "BOSS",
         "boss.assignment.extend": "BOSS",
         "boss.assignment.cancel": "BOSS",
@@ -249,6 +251,8 @@ class BossCommandAPI:
                 result = self._create(db, data, payload, key)
             elif action == "boss.assignment.send":
                 result = self._send(db, data, payload, key)
+            elif action == "boss.assignment.nudge":
+                result = assignment_nudge(self, db, data, payload, key)
             elif action in ("boss.assignment.complete", "boss.assignment.extend"):
                 result = self._decide(db, payload, action)
             elif action == "boss.assignment.cancel":
