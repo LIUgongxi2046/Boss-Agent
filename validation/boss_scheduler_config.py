@@ -198,3 +198,52 @@ def set_status(api, db, data, payload, action):
         "manual_dispatch_executed": False, "external_message_sent": False,
         "owner_authorization_granted": False,
     }
+
+
+
+def manual_run(api, db, data, payload):
+    """Run the actual *simulated* dispatcher for ONE versioned approved event."""
+    api._exact(payload, {
+        "client_request_id", "event_id", "event_version",
+        "expected_schedule_version", "expected_rules_version",
+    })
+    schedule = api.store.get(db, NS, "schedule", "current")
+    rules = _get(db, "rules", "current")
+    require(schedule["enabled"] and not schedule["canceled"]
+            and isinstance(schedule.get("active_draft_version"), str),
+            "手动调度需已经验证并启用的技术计划；当前未满足")
+    require(schedule["version"] == _as_version(payload["expected_schedule_version"]),
+            "调度启用版本变化，必须重新读取")
+    require(rules is not None and rules["version"] ==
+            _as_version(payload["expected_rules_version"]),
+            "提醒规则版本变化，请重新检查")
+    identifier = payload["event_id"]
+    require(isinstance(identifier, str) and 0 < len(identifier) <= 128,
+            "事件标识无效", web.HTTPBadRequest)
+    event = api.store.get(db, NS, "event", identifier)
+    require(event["version"] == payload["event_version"],
+            "当前事件版本变化，禁止按旧版本触发")
+    # Technical operation never edits or creates arbitrary business events.
+    allowed = identifier == data["event"]["event_id"] or event.get("generated_by") in (
+        "BOSS_AUTHORIZED_TASK", "BOSS_OWN_COMMITMENT",
+    )
+    require(allowed and event.get("source_type") == "SIMULATED",
+            "事件并非获准模拟数据或已授权业务范围", web.HTTPForbidden)
+    result = api.store.dispatch_due_in_transaction(
+        db, NS, only_event_id=identifier,
+    )
+    outcome = result[0] if result else None
+    return {
+        "source_type": "SIMULATED",
+        "event_id": identifier, "event_version": event["version"],
+        "schedule_version": schedule["version"],
+        "rules_version": rules["version"],
+        "dispatch_state": outcome["state"] if outcome else "NOT_DUE",
+        "dispatch_reason": outcome["reason"] if outcome else "EVENT_NOT_YET_DUE",
+        "business_at": outcome["business_at"] if outcome else
+                       api.store.get(db, NS, "clock", "current")["at"],
+        "manual_dispatch_executed": True,
+        "external_message_sent": False,
+        "external_delivery_verified": False,
+        "owner_business_authorization_granted": False,
+    }
