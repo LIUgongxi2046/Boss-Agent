@@ -27,6 +27,8 @@ def _period_rows(data, scope, start, end):
     rows = []
     for original in data["details"]:
         row = _row_scope(original)
+        if "source_ids" in scope and row.get("source_id", "finance-note") not in scope["source_ids"]:
+            continue
         period = [row.get("period_start"), row.get("period_end")] if "period_start" in row else data["periods"][row["period"]]
         if period != [start, end] or row["region_id"] not in _regions(scope) or row["product_id"] not in scope["product_ids"]:
             continue
@@ -72,6 +74,10 @@ def _binding(store, db, ns, data, query):
 
 def require_current(store, db, ns, data, query):
     binding = _binding(store, db, ns, data, query)
+    if "scenario_id" in binding:
+        from boss_bi_scenarios import binding_current
+        binding_current(store, db, ns, data, binding)
+        return binding
     document = store._metric_source(db, ns, data)
     require(checksum(document) == binding["source_sha256"], "来源已经变化，需要重新查询")
     current = {row["record_id"]: checksum(row) for row in data["details"]}
@@ -81,7 +87,8 @@ def require_current(store, db, ns, data, query):
 
 
 def query_metrics(store, db, ns, data, payload):
-    document = store._metric_source(db, ns, data)
+    from boss_bi_scenarios import query_inputs
+    data, documents = query_inputs(store, db, ns, data, payload)
     env = payload["envelope"]
     digest = checksum(payload)
     receipt_id = checksum({"session_id": env["session_id"], "request_id": env["request_id"]})
@@ -126,6 +133,10 @@ def query_metrics(store, db, ns, data, payload):
     values, missing, period_values, coverage = [], ["FULL_BUSINESS_COVERAGE_NOT_VERIFIED"], {}, {}
     missing.extend(field + ":UNKNOWN" for field in ("target_version", "ownership_type", "asset_owner_id", "cost_owner_id") if payload.get(field) is None)
     all_rows = {row["record_id"]: row for row in baseline_rows + current_rows}
+    if all_rows and payload.get("scenario_id"):
+        used_ids = {row["source_id"] for row in all_rows.values()}
+        documents = [document for document in documents if document["source_id"] in used_ids]
+    document = documents[0]
     with localcontext() as context:
         context.prec = max(80, sum(len(value) for row in all_rows.values() for value in row.values() if isinstance(value, str)))
         for name, rows, scope in (("BASE", baseline_rows, baseline_scope), ("CURRENT", current_rows, payload)):
@@ -171,7 +182,7 @@ def query_metrics(store, db, ns, data, payload):
     known_periods = all(any(period_values[name][metric][0] is not None for metric in payload["metric_ids"]) for name in ("BASE", "CURRENT"))
     state = "INCOMPARABLE" if reasons else "COMPARABLE" if known_periods else "INSUFFICIENT_EVIDENCE"
     result = {"query_id": str(uuid.uuid4()), "envelope": env, "values": values, "detail_refs": list(all_rows),
-              "sources": [store.source(document, data, "INCOMPLETE")], "missing_fields": missing,
+              "sources": [{**store.source(item, data, "INCOMPLETE"), **({"coverage": item["coverage"]} if payload.get("scenario_id") else {})} for item in documents], "missing_fields": missing,
               "unexplained_causes": ["原因贡献明细尚未提供"], "context_snapshot": payload,
               "coverage": {"state": "PARTIAL" if all_rows else "UNAVAILABLE", "periods": coverage, "missing_regions": missing_regions,
                            "delayed_regions": delayed if sync_known else None, "unsynchronized_regions": unsynchronized if sync_known else None},
@@ -183,19 +194,22 @@ def query_metrics(store, db, ns, data, payload):
         "query_id": result["query_id"], "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
         "source_id": document["source_id"], "source_version": document["version"], "source_sha256": checksum(document),
         "definitions_sha256": checksum(data["metric_definitions"]), "detail_fingerprints": {identifier: checksum(row) for identifier, row in all_rows.items()},
-        "original_records": list(all_rows.values()), "document_snapshot": document})
+        "original_records": list(all_rows.values()), "document_snapshot": document,
+        **({"scenario_id": payload["scenario_id"], "document_snapshots": documents} if payload.get("scenario_id") else {})})
     store.put(db, ns, "bi_query_receipt", receipt_id, {"digest": digest, "query_id": result["query_id"], "session_id": env["session_id"], "request_id": env["request_id"]})
     return result
 
 
 def read_evidence(store, db, ns, data, payload, query):
-    require(set(payload["detail_refs"]) <= set(query["detail_refs"]) and payload["source_ids"] == ["finance-note"], "依据范围不符", web.HTTPForbidden)
+    require(set(payload["detail_refs"]) <= set(query["detail_refs"]) and set(payload["source_ids"]) <= {item["source_id"] for item in query["sources"]}, "依据范围不符", web.HTTPForbidden)
     require(len(payload["detail_refs"]) == len(set(payload["detail_refs"])), "依据明细重复", web.HTTPBadRequest)
     binding = require_current(store, db, ns, data, query)
     rows = [row for row in binding["original_records"] if row["record_id"] in payload["detail_refs"]]
-    document = binding["document_snapshot"]
-    return {"sources": query["sources"], "original_records": [{"record_id": row["record_id"], "version": row["version"], "content": row} for row in rows]
-            + [{"record_id": document["source_id"], "version": document["version"], "content": document}],
+    documents = binding.get("document_snapshots", [binding["document_snapshot"]])
+    documents = [document for document in documents if document["source_id"] in payload["source_ids"]]
+    require(all(row.get("source_id", "finance-note") in payload["source_ids"] for row in rows), "明细与所选来源不符", web.HTTPForbidden)
+    return {"sources": [item for item in query["sources"] if item["source_id"] in payload["source_ids"]], "original_records": [{"record_id": row["record_id"], "version": row["version"], "content": row} for row in rows]
+            + [{"record_id": document["source_id"], "version": document["version"], "content": document} for document in documents],
             "definition_version": query["context_snapshot"]["definition_version"], "conflicts": query["comparison"]["reasons"], "missing_fields": query["missing_fields"]}
 
 
@@ -213,18 +227,21 @@ class BIQueryAPI:
         validate("scoped_query_input", payload)
         return self.store.invoke("query_metrics", payload)
 
-    def dimensions(self, role):
+    def dimensions(self, role, scenario_id=None):
         self._role(role)
         from boss_simulation_api import _context
         with self.store.connect() as db:
             db.execute("BEGIN")
             context = _context(db)
             data = self.store.get(db, context["namespace"], "initial", "snapshot")
-            document = self.store._metric_source(db, context["namespace"], data)
+            from boss_bi_scenarios import query_inputs
+            data, documents = query_inputs(self.store, db, context["namespace"], data, {"scenario_id": scenario_id} if scenario_id is not None else {})
+            document = documents[0]
             rows = [_row_scope(row) for row in data["details"]]
             return {"source_type": "SIMULATED", "available_dimensions": {field: sorted({row[field] for row in rows if row.get(field) is not None})
                     for field in ("region_id", "product_id", *SCOPE_FIELDS)}, "periods": data["periods"], "metric_definitions": data["metric_definitions"],
                     "source_id": document["source_id"], "source_version": document["version"], "coverage_state": "PARTIAL",
+                    **({"scenario_id": scenario_id, "source_ids": [item["source_id"] for item in documents]} if scenario_id is not None else {}),
                     "missing_fields": ["FULL_BUSINESS_COVERAGE_NOT_VERIFIED", "TARGET_VERSION_NOT_PROVIDED", "OWNERSHIP_NOT_PROVIDED"]}
 
     def follow_up(self, role, payload):
@@ -255,6 +272,12 @@ class BIQueryAPI:
             if not historical:
                 require_current(self.store, db, ns, data, query)
                 result = {"adoption_state": "CURRENT", "result": query}
+                validate("bi_read", result)
+                return result
+            if "scenario_id" in binding:
+                from boss_bi_scenarios import binding_current
+                valid = binding_current(self.store, db, ns, data, binding, enforce=False)
+                result = {"adoption_state": "HISTORICAL_CURRENT" if valid else "HISTORICAL_REQUIRES_REQUERY", "result": query}
                 validate("bi_read", result)
                 return result
             document = self.store.get(db, ns, "document", binding["source_id"])

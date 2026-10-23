@@ -9,6 +9,16 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-fc02-bi-query:
+  scenario_catalog: BIScenarioAPI.catalog(MAINTAINER)
+  scenario_load: BIScenarioAPI.execute(MAINTAINER, boss.simulation.bi_scenario.load, payload)
+  scenario_receipt: BIScenarioAPI.receipt(MAINTAINER, client_request_id)
+  scenario_input_schema: bi-scenario-input.schema.json#/$defs/Load
+  scenario_result_schema: bi-scenario-input.schema.json#/$defs/LoadResult
+  scenario_record_schema: bi-scenario-input.schema.json#/$defs/Record
+  scenario_parameters: bi-scenarios.json; FC02-BI-1; seed=20261024; six explicit reproducible scenarios
+  scenario_query: scoped_query_input.scenario_id and optional source_ids; dimensions(BOSS, scenario_id); baseline selection/1 unchanged
+  scenario_provenance: SIMULATED_GENERATOR; USER_AUTHORIZED_FC02_BEHAVIOR_VALIDATION; no real enterprise data or third-party authorization claim
+  scenario_public_integration: PENDING_N3
   schema_extension: bi-query.schema.json
   assembled_schema: business.SPEC.io_schema
   query: Store.invoke(query_metrics, scoped_query_input) / BIQueryAPI.query(BOSS, payload)

@@ -7,6 +7,8 @@
     "scope_fields": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "region_id": {"type": "string", "minLength": 1},
         "region_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "product_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
@@ -32,6 +34,8 @@
       "required": ["query_mode", "envelope", "question", "metric_ids", "region_id", "product_ids", "legal_entity_id", "period_start", "period_end", "comparison_start", "comparison_end", "currency", "quantity_unit", "trade_scope", "definition_version", "business_basis", "settlement_state"],
       "properties": {
         "query_mode": {"const": "SCOPED"}, "envelope": {"$ref": "#/$defs/envelope"},
+        "scenario_id": {"$ref": "#/$defs/scope_fields/properties/scenario_id"},
+        "source_ids": {"$ref": "#/$defs/scope_fields/properties/source_ids"},
         "question": {"type": "string", "minLength": 1, "maxLength": 4000},
         "metric_ids": {"$ref": "#/$defs/scope_fields/properties/metric_ids"},
         "region_id": {"$ref": "#/$defs/scope_fields/properties/region_id"},
@@ -51,7 +55,7 @@
         "settlement_state": {"$ref": "#/$defs/scope_fields/properties/settlement_state"},
         "period_start": {"$ref": "#/$defs/scope_fields/properties/period_start"}, "period_end": {"$ref": "#/$defs/scope_fields/properties/period_end"},
         "comparison_start": {"$ref": "#/$defs/scope_fields/properties/comparison_start"}, "comparison_end": {"$ref": "#/$defs/scope_fields/properties/comparison_end"},
-        "comparison_scope": {"allOf": [{"$ref": "#/$defs/scope_fields"}, {"not": {"anyOf": [{"required": ["metric_ids"]}, {"required": ["period_start"]}, {"required": ["period_end"]}, {"required": ["comparison_start"]}, {"required": ["comparison_end"]}]}}]},
+        "comparison_scope": {"allOf": [{"$ref": "#/$defs/scope_fields"}, {"not": {"anyOf": [{"required": ["scenario_id"]}, {"required": ["metric_ids"]}, {"required": ["period_start"]}, {"required": ["period_end"]}, {"required": ["comparison_start"]}, {"required": ["comparison_end"]}]}}]},
         "parent_query_id": {"type": "string", "minLength": 1}
       }
     },

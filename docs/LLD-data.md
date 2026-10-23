@@ -187,6 +187,10 @@ flowchart LR
 
 ## 事务、重置与恢复
 
+### FC02 正式经营边界场景
+
+FC02-BI-1 使用 specs/bi-scenarios.json 的固定参数与seed=20261024生成六类明确SIMULATED输入。维护通过BIScenarioAPI载入独立bi_scenario对象，不替换selection/1初始八条明细。场景保存owner、dataset、namespace、版本、生成参数摘要、用途、来源ID及严格Schema记录；资料作者明确为本地确定性生成器，没有真实企业或第三方授权声明。来源使用独立document及版本历史、访问范围、有效期与原文，只有当前允许资料进入新查询。query_source_binding为场景查询保存scenario_id、全部采用的document_snapshots及明细摘要；当前来源、明细或定义变化后拒绝采用，历史结果与原回执保持。不同财务/业务口径可以使用同期间、指标与单位分别查询准确来源，不根据职位选择数值。载入、CAS、幂等回执、来源历史与FTS更新在同一事务保存；普通审计仅记录动作和版本元信息。公开注册、维护界面及场景选择由N3接收。
+
 ### SI09/SI10 外部资料模拟输入
 
 当前1.8.0的material_cost_report按成本种类、明确报告范围、成本口径及同归属/单位/币种区分入库与实际领用。asset_owner_id与cost_owner_id分别保存，成本归属须符合明确库存批次；未知成本归属保留null并停止跨期比较。所有权沿用COMPANY/CUSTOMER/COOPERATION。quantity与total_cost保存原报告，单价由确定性计算得到。期间必须完整、已报告且不晚于来源观察时间，相同范围的有效期间不得重复或重叠；冲销报告不参与计算。报告属于外部事实输入，不执行采购、财务记账或库存扣减。完整原料成本和因果贡献不根据局部报告推断。

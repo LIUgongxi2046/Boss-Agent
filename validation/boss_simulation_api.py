@@ -371,9 +371,20 @@ class SimulationAPI:
                 require(binding["query_id"] == record["object_id"] and binding["owner_id"] == context["owner_id"]
                         and binding["dataset_id"] == context["dataset_id"] and binding["dataset_version"] == context["dataset_version"],
                         "查询来源绑定不属于当前空间", web.HTTPForbidden)
-                refs.append({"source_id": binding["source_id"], "version": binding["source_version"], "source_sha256": binding["source_sha256"]})
+                documents = binding.get("document_snapshots", [])
+                if documents:
+                    refs.extend({"source_id": item["source_id"], "version": item["version"], "source_sha256": checksum(item)} for item in documents)
+                else:
+                    refs.append({"source_id": binding["source_id"], "version": binding["source_version"], "source_sha256": binding["source_sha256"]})
                 initial = self.store.get(db, context["namespace"], "initial", "snapshot")
-                details = [row for row in initial["details"] if row["record_id"] in body["detail_refs"]]
+                current_rows = initial["details"]
+                if "scenario_id" in binding:
+                    scenario = self.store.get(db, context["namespace"], "bi_scenario", binding["scenario_id"])
+                    require(scenario["owner_id"] == context["owner_id"], "经营场景不属于当前本人范围", web.HTTPForbidden)
+                    current_rows = scenario["records"]
+                    if binding["definitions_sha256"] != checksum(initial["metric_definitions"]):
+                        record["content_state"] = "NEEDS_REVIEW"
+                details = [row for row in current_rows if row["record_id"] in body["detail_refs"]]
                 if len(details) != len(body["detail_refs"]) or any(binding["detail_fingerprints"].get(row["record_id"]) != checksum(row) for row in details):
                     record["content_state"] = "NEEDS_REVIEW"
         if kind in ("meeting_brief", "person_brief"):
