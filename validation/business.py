@@ -126,15 +126,15 @@ class Store:
             self.active(db, ns)
             data = self.get(db, ns, "initial", "snapshot")
             if operation in ("create_assignment", "send_assignment"):
-                auth = self.get(db, ns, "authorization", payload["authorization_id"])
-                require(not auth["revoked"] and auth["action"] == operation and datetime.fromisoformat(auth["valid_until"]) > datetime.now(timezone.utc), "授权无效", web.HTTPForbidden)
                 content = {k: v for k, v in payload.items() if k not in ("envelope", "authorization_id", "idempotency_key")}
-                require(content == auth["payload"], "授权对象或内容版本不符", web.HTTPForbidden)
                 digest = checksum(content)
                 previous = db.execute("SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?", (ns, operation, payload["idempotency_key"])).fetchone()
                 if previous:
                     require(previous[0] == digest, "幂等内容冲突")
                     return json.loads(previous[1])
+                auth = self.get(db, ns, "authorization", payload["authorization_id"])
+                require(not auth["revoked"] and auth["action"] == operation and datetime.fromisoformat(auth["valid_until"]) > datetime.now(timezone.utc), "授权无效", web.HTTPForbidden)
+                require(content == auth["payload"], "授权对象或内容版本不符", web.HTTPForbidden)
             result = getattr(self, operation)(db, ns, data, payload)
             validate(OPERATIONS[operation]["output_schema"].rsplit("/", 1)[1], result)
             if operation in ("create_assignment", "send_assignment"):

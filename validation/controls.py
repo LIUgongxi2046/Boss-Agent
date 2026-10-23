@@ -42,6 +42,12 @@ class ControlStore(Store):
                 audit_input = {k: p[k] for k in ("task_id", "task_version", "author_contact_id", "kind")}
                 audit_result = {"feedback_id": result["feedback"]["feedback_id"], "task_id": result["task"]["task_id"],
                                 "task_version": result["task"]["version"], "historical_only": result["feedback"].get("historical_only", False)}
+            elif action == "search":
+                audit_input = {"query_sha256": checksum(p["query"])}
+                audit_result = {"source_ids": [row["source_id"] for row in result["results"]],
+                                "result_count": len(result["results"])}
+            elif action == "decide":
+                audit_result = {key: result[key] for key in ("task_id", "version", "status", "due_at")}
             db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
             return result
 

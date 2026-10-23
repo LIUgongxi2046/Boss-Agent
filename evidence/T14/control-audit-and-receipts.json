@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-23",
+  "workspace": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+  "source_scope": "W1 commit containing this evidence",
+  "source_base": "6fff123",
+  "data": "existing approved SIMULATED initial_materials only",
+  "verified": ["actual FTS search returns approved source to owner and records only digest and source references in general audit", "actual owner completion retains full task in its business object and only metadata in general audit", "same committed tool request reads original result after authorization revocation", "new action with revoked authorization rejected", "same idempotency key with different content rejected", "one task and one tool receipt persist"],
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests/test_boss_control_privacy.py app/tests/test_boss_api_spec.py app/tests/test_boss_command_api.py app/tests/test_boss_late_feedback.py --basetemp=.work/pytest-control-audit-green -p no:cacheprovider --junitxml=.work/control-audit-green.xml", "status": "PASS", "result": "27 passed in 2.09s"},
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-control-audit -p no:cacheprovider --junitxml=.work/w1-control-audit.xml", "status": "PASS", "result": "376 passed in 12.39s"}
+  ],
+  "integration": "W3 receives validation/business.py and controls.py; no public route change required for these behaviors",
+  "A14": "NOT_RUN",
+  "remaining": ["public late-feedback state guard", "all authorization consumers", "meeting changes", "complete E01-E06", "same integrated source version verification"]
+}
