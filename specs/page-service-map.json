@@ -46,7 +46,8 @@
     "FR06 owner-confirmed task nudge is a separate write after initial authorized send, with stable contact, current source pins, 24h simulated business-clock cooldown, and a metadata-only linked message in F06/N05. No external delivery or task completion is inferred.",
     "N05 owner-only self commitments now have real CAS/idempotent create, evidence-confirmed completion, extension, cancellation and persisted due events, separate from F06 assignment to contacts. Source/current evidence withdrawal yields NEEDS_REVIEW; no real external notifications.",
     "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable.",
-    "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified."
+    "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified.",
+    "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified."
   ],
   "pages": [
     {
@@ -3046,7 +3047,8 @@
         "boss.scheduler.activate",
         "boss.scheduler.pause",
         "boss.scheduler.resume",
-        "boss.scheduler.cancel"
+        "boss.scheduler.cancel",
+        "boss.scheduler.manual_run"
       ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -3067,7 +3069,8 @@
         "T24"
       ],
       "manual_dispatch_verified": false,
-      "real_cron_runtime_verified": false
+      "real_cron_runtime_verified": false,
+      "simulated_manual_dispatch_code_wired": true
     },
     {
       "page_id": "A14",
