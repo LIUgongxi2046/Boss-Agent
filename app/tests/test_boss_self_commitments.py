@@ -189,3 +189,34 @@ def test_commitment_recovery_receipt_contains_no_private_task_text(services):
     assert pages.serve("MAINTAINER","/api/boss/ui/operation-status",
         urlencode({"action":"boss.commitment.create",
                    "client_request_id":"owner-commitment-create-001"}))[0]==403
+
+
+
+def test_self_commitment_source_revision_requires_review(services):
+    cmd,pages=services
+    code,new=create(cmd,key="owner-ref-pinned-new",
+        source_refs=[{"source_id":"finance-note","version":"1"}])
+    assert code==200,new
+    assert read(pages)[1]["self_commitments"][0]["source_reference_state"]=="CURRENT"
+    assert cmd.store.control("ui-check","withdraw",{
+        "source_id":"finance-note","version":"1"})["withdrawn"]
+    _,current=read(pages)
+    assert current["self_commitments"][0]["source_reference_state"]=="NEEDS_REVIEW"
+    assert current["self_commitments"][0]["status"]=="ACTIVE"
+
+
+def test_historical_completion_evidence_revoked_is_not_trusted(services):
+    cmd,pages=services
+    created=create(cmd,key="owner-completion-history-new")[1]
+    code,done=action(cmd,"BOSS","boss.commitment.complete",
+        "owner-completion-history-confirm",
+        commitment_id=created["commitment_id"],expected_version="1",
+        evidence_refs=[{"source_id":"finance-note","version":"1"}])
+    assert code==200,done
+    assert read(pages)[1]["self_commitments"][0]["source_reference_state"]=="CURRENT"
+    assert cmd.store.control("ui-check","withdraw",{
+        "source_id":"finance-note","version":"1"})["withdrawn"]
+    _,record=read(pages)
+    assert record["self_commitments"][0]["status"]=="COMPLETED_CONFIRMED"
+    assert record["self_commitments"][0]["source_reference_state"]=="NEEDS_REVIEW"
+    assert record["self_commitments"][0]["completion_evidence"][0]["source_id"]=="finance-note"
