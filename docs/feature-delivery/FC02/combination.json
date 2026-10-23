@@ -1,0 +1,31 @@
+{
+  "feature_id": "FC02",
+  "role": "N2",
+  "status": "PASS_LIMITED_AGENT_DOMAIN_COMBINATION",
+  "public_feature_pass": false,
+  "public_base_commit": "2a49d2f7bd6a529a324c43d6155f243acfe401e3",
+  "domain_commit": "fe3010563c6986eff6f0c26c1b5b2554d061cff6",
+  "agent_commit": "15aeb1d1c61c50e5958565e2bb5c021c2b35fc79",
+  "combination_root": "validation/.work/fc02-fe30105-combination",
+  "composition": "公共基线独立检出加git cherry-pick --no-commit的正式领域七文件；Agent与检查来自N2提交",
+  "git_blob_ids": {
+    "combination/validation/business.py": "d7312ef31b7a57e4e36807d0b3b56cec375b90dc",
+    "combination/validation/boss_bi_queries.py": "37c801b9b54e55dea03abb52571d1614bfa9f88b",
+    "combination/validation/boss_metrics.py": "06c2c0f937e653f656e9e65dfdf07c85b782ef61",
+    "combination/specs/bi-query.schema.json": "68334046297ff8f68af3c9566d4e41e75233b1c0",
+    "agent/validation/fc02_agent/__init__.py": "9650a2d8dcd5b297ec6162974b32573f6fc8b6ea",
+    "agent/validation/fc02_agent/runtime.py": "a414dd094c2fb5ec4ac4d6bf8282c887edc985d7",
+    "agent/validation/fc02_agent/contract.py": "948cb89da7091865e81fa55ddce3a4b8bddb0023"
+  },
+  "checks": [
+    {"suite": "app/tests/fc02_agent/test_scoped.py", "passed": 5, "failed": 0, "skipped": 0, "seconds": 5.56, "evidence": "scoped-check.xml"},
+    {"suite": "app/tests/fc02_agent/test_agent.py", "passed": 17, "failed": 0, "skipped": 0, "seconds": 4.72, "evidence": "bi-check.xml"}
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "external_requests": 0,
+  "usage": null,
+  "cost_total": null,
+  "visual": "NOT_RUN",
+  "public_authentication_and_ui": "PENDING_N3_CANDIDATE",
+  "independent_feature_verdict": "PENDING_N4"
+}

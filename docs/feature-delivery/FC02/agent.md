@@ -1,10 +1,10 @@
 # FC02 Agent开发记录
 
-task_id：FC02-N2；当前IMPLEMENTED，等待正式领域及公共组合验收；唯一功能状态来源为原始项目specs/feature-delivery.json，验收依据为docs/FC02经营查询工单.md二十项检查点。代码基线ebc9035，当前提交新增validation/fc02_agent、app/tests/fc02_agent和本目录记录；保留SESSION-HANDOVER-W5.md。文档有效性CURRENT，核查日期2026-10-24。
+task_id：FC02-N2；当前独立适配及正式领域组合22项检查通过，等待公共候选验收；唯一功能状态来源为原始项目specs/feature-delivery.json，验收依据为docs/FC02经营查询工单.md二十项检查点。Agent代码提交15aeb1d1c61c50e5958565e2bb5c021c2b35fc79，包含validation/fc02_agent、app/tests/fc02_agent和本目录记录；保留SESSION-HANDOVER-W5.md。文档有效性CURRENT，核查日期2026-10-24。
 
-已完整读取当前工单与功能状态、适用AGENTS.md，核查PRD8.3、正式query_metrics/read_evidence、BusinessTool及RuntimeRecorder和FC01技术适配。S008规范继续适用。当前N1的FC02主记录和正式增量尚未提供，N3公共范围为products与query_id绑定依据。仅在FC02独立模块定义可信执行上下文，不新增领域状态或修改公共入口。
+已完整读取当前工单与功能状态、适用AGENTS.md，核查PRD8.3、正式query_metrics/read_evidence、BusinessTool及RuntimeRecorder和FC01技术适配。S008规范继续适用。N1正式领域提交fe3010563c6986eff6f0c26c1b5b2554d061cff6已在N2隔离组合接收；公共基线2a49d2f7bd6a529a324c43d6155f243acfe401e3。仅在FC02独立模块定义可信执行上下文，不新增领域状态或修改公共入口。
 
-当前工作对应FC02.C03/C10/C12/C13/C16/C17及适用异常。外部模型明确SIMULATED，领域与Registry、Runtime、SQLite实际执行。完整维度、查询幂等及持久追问恢复依赖N1正式接口；真实认证生产者与公共接收由N3提供。完整二十项判定由N4执行。
+当前工作对应FC02.C03/C10/C12/C13/C16/C17及适用异常。外部模型明确SIMULATED，领域与Registry、Runtime、SQLite实际执行。正式SCOPED查询、幂等及持久追问恢复使用N1接口；真实认证生产者与公共接收由N3提供。完整二十项判定由N4执行。
 
 ## 入口与输入输出
 
@@ -37,20 +37,21 @@ Runtime准入检查当前正式Schema与可信维度，提供boss-bi-query-conte
 
 ## 验证与证据
 
-当前独立结果17 passed、5 skipped，4.40秒；原始证据check.xml。17项包括真实查询与明细/原文、SQLite重建读取、明确维度继承和覆盖拒绝、实际两次BI Runtime追问及query_id连接、维护/失效身份/错误空间与资料版本拒绝、模型参数和请求关联拒绝、历史查询选择、来源撤销后停止当前采用、失败/取消/超时保留实际查询、费用null及正文排除。检查使用获准selection资料，socket.connect审计拒绝外部连接。
+当前准确组合22项通过、零跳过。bi-check.xml保存17项通过，4.72秒；scoped-check.xml保存5项通过，5.56秒。组合身份与源码blob见combination.json。17项包括真实查询与明细/原文、SQLite重建读取、明确维度继承和覆盖拒绝、实际两次BI Runtime追问及query_id连接、维护/失效身份/错误空间与资料版本拒绝、模型参数和请求关联拒绝、历史查询选择、来源撤销后停止当前采用、失败/取消/超时保留实际查询、费用null及正文排除。5项正式组合覆盖原请求幂等与回执、正式持久快照追问、超时后原查询恢复、实际SCOPED Runtime追问/依据、撤销后的历史回执。检查使用获准selection资料，socket.connect审计拒绝外部连接。
 
 ```bash
-validation/.venv/bin/python -m pytest app/tests/fc02_agent -q -p no:cacheprovider --basetemp=validation/.work/fc02-agent-verified --junitxml=docs/feature-delivery/FC02/check.xml
+env PYTHONDONTWRITEBYTECODE=1 FC02_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/fc02-fe30105-combination validation/.venv/bin/python -m pytest app/tests/fc02_agent/test_scoped.py -q -p no:cacheprovider --basetemp=validation/.work/fc02-scoped-fe30105 --junitxml=validation/.work/fc02-scoped-fe30105.xml
+env PYTHONDONTWRITEBYTECODE=1 FC02_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/fc02-fe30105-combination validation/.venv/bin/python -m pytest app/tests/fc02_agent/test_agent.py -q -p no:cacheprovider --basetemp=validation/.work/fc02-bi-fe30105 --junitxml=validation/.work/fc02-bi-fe30105.xml
 ```
 
-命令workdir为/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent；数据库及中间数据位于已忽略validation/.work/fc02-agent-verified。没有启动服务、占用端口或操作其他进程；没有重跑无变化FC01全量检查。
+命令workdir为/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent；数据库及中间数据位于已忽略validation/.work。没有启动服务、占用端口或操作其他进程；没有重跑无变化FC01全量检查。
 
-test_scoped.py的五项检查需要N1正式SCOPED实现及Schema，当前本目录领域尚未接收，因此明确跳过。它们覆盖原请求幂等与回执、正式持久快照追问、超时后原查询恢复、实际SCOPED Runtime追问/依据、撤销后的历史回执。当前N1目录尚未形成与本Runtime依赖一致的组合，不能把这些场景登记通过。
+隔离检出validation/.work/fc02-fe30105-combination的HEAD为公共基线2a49d2f，使用git cherry-pick --no-commit接收准确fe30105；staged修改只包含该提交的七项文件。Agent适配和专有检查来自15aeb1d，其他Runtime/Prompt依赖来自公共基线。原始角色目录只读，未接收未验收授权消费文件。本组合用于N2限定检查，未登记为N3正式公共候选。
 
-N3接收正式领域并形成组合候选后，可在N2目录设置FC02_DOMAIN_ROOT为该完整候选绝对路径，使用PYTHONDONTWRITEBYTECODE=1运行相同专有检查，并将basetemp和XML保存在N2独立目录。该参数只选择实际候选源码，不能指向缺少公共Runtime依赖的局部领域目录；不在候选目录写入缓存、数据库或证据。
+N3形成公共候选后，可在N2目录设置FC02_DOMAIN_ROOT为该完整候选绝对路径，使用PYTHONDONTWRITEBYTECODE=1运行受影响专有检查，并将basetemp和XML保存在N2独立目录。该参数只选择实际候选源码；不在其他角色目录写入缓存、数据库或证据。
 
 ## 必要剩余与接收条件
 
-已按N1当前specs/bi-query.schema.json与boss_bi_queries.py实现正式接收接口，N1最新可读提交仍为eda67b6，FC02增量尚未提交。接收时必须核查其准确提交及最终Schema；没有接收未验收授权消费文件。
+已核查N1正式fe30105的specs/bi-query.schema.json、boss_bi_queries.py、business.SPEC组合及实际消费者，五项正式组合检查全部通过。Agent源码无需追加修改；本次只补充当前准确组合证据和接收记录。
 
-N3需要接收N1正式领域和本独立模块，提供真实认证及当前请求生产者，采用明确SIMULATED Provider及两项Registry工具，把可见继承/覆盖条件、当前query_id与原回执接入公开页面，接收技术扩展Schema并发布准确候选。随后运行五项正式组合检查及N4二十项完整验收。当前17项限定通过不代替合法完整维度、持久恢复、公开账号/UI或完整功能PASS；不启动FC03。真实外部模型质量、费用、投递及视觉均未执行。
+N3需要接收N1正式领域和本独立模块，提供真实认证及当前请求生产者，采用明确SIMULATED Provider及两项Registry工具，把可见继承/覆盖条件、当前query_id与原回执接入公开页面，接收技术扩展Schema并发布准确候选。随后由N4核查完整二十项。当前22项限定检查通过不代替公开账号/UI或完整功能PASS；不启动FC03。真实外部模型质量、费用、投递及视觉均未执行。
