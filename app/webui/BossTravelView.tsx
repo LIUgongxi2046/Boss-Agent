@@ -425,10 +425,10 @@ export function BossTravelView({onNavigate,onViewSource}:Props) {
           <button type="button" className="boss-btn" onClick={()=>{setPending(null);setApproved(false);}}
             disabled={busy||checking}>返回</button>
           <button type="button" className="boss-btn" disabled={busy||checking}
-            onClick={()=>void reconcile()}>{checking&&<Loader2 size={14} className="boss-spin"/> 查询原请求回执</button>
+            onClick={()=>void reconcile()}>{checking&&<Loader2 size={14} className="boss-spin"/>} 查询原请求回执</button>
           <button type="button" className="boss-btn boss-btn-primary"
             disabled={busy||checking||!approved} onClick={()=>void submit()}>
-            {busy&&<Loader2 size={14} className="boss-spin"/> 确认并写入
+            {busy&&<Loader2 size={14} className="boss-spin"/>} 确认并写入
           </button>
         </footer>
       </section>
