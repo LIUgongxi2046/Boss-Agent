@@ -22,6 +22,8 @@ import { BossMeetingArrangement, type MeetingArrangementProjection } from "./Bos
 import { MaintainerRuntimeRecords } from "./MaintainerRuntimeRecords";
 import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
 import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
+import { MaintainerMemoryStatus } from "./MaintainerMemoryStatus";
+import { BossAssignmentSourceReview, type AssignmentSourceReviewProjection } from "./BossAssignmentSourceReview";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
 import { BossOwnerPreferences } from "./BossOwnerPreferences";
@@ -100,14 +102,6 @@ type ModelHealth = {
   observed_error_count?: number;
 };
 type Identity = { role: Role | null; owner_id: string | null };
-type MemoryTechnicalStatus = {
-  projection: "memory-technical-status"; namespace: string; checked_at: string;
-  memory: { memory_id: string; version: string; confirmation_state: string; valid_until: string | null };
-  future_context_eligible: boolean; future_turn_policy: string;
-  deletion_propagation: string; derived_memory_index: string;
-  model_adoption_verified: boolean; physical_secure_erasure_verified: boolean;
-  private_body_available_here: boolean; owner_content_mutation_allowed: boolean;
-};
 type PromptTechnicalView = {
   runtime_eligibility: {
     projection: "prompt-technical-status"; checked_at: string;
@@ -254,13 +248,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string}|null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string}|null>(null);
+  const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
     setAssignmentDirty(true);
   }, []);
   const [productScope, setProductScope] = useState("product-1,product-2");
-  const [selectedTaskId, setSelectedTaskId] = useState("");
+  const [selectedTaskId, setSelectedTaskId] = useState(() => new URLSearchParams(window.location.search).get("bossTask") ?? "");
   const [draftToReview, setDraftToReview] = useState("");
   const [sourceId, setSourceId] = useState("finance-note");
   const [sourceAnchor, setSourceAnchor] = useState<{
@@ -273,12 +268,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
   const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
-  const [memoryTechnicalStatus, setMemoryTechnicalStatus] = useState<MemoryTechnicalStatus | null>(null);
   const [promptTechnicalView, setPromptTechnicalView] = useState<PromptTechnicalView | null>(null);
   const [today, setToday] = useState<TodayProjection | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
   const [runtimeTask, setRuntimeTask] = useState<{taskId: string; runId: string} | null>(null);
+  const [runtimeRunId, setRuntimeRunId] = useState("");
+  const [sourceReview, setSourceReview] = useState<AssignmentSourceReviewProjection | null>(null);
+  const [sourceReviewLoading, setSourceReviewLoading] = useState(false);
+  const [sourceReviewError, setSourceReviewError] = useState("");
   const [loading, setLoading] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
@@ -306,14 +304,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     return () => abort.abort();
   }, [getToken, authAttempt]);
 
-  const navigate = useCallback((id: string, focus = "", bypassDirty = false) => {
+  const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string) => {
     if (!role || !allowed(id, role)) return;
-    if (!bypassDirty && ((page === "F06" && assignmentDirty &&
-        !["D04","D05","D01"].includes(id)) ||
-        (["N07","N08"].includes(page) && settingsDirty) ||
-        (["F01","F04","N09","A08"].includes(page) && workDirty)) && id !== page) {
+    const changingTask = taskId !== undefined && taskId !== selectedTaskId;
+    if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) ||
+        (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
+          (["N07","N08"].includes(page) && settingsDirty) ||
+          (["F01","F04","N09","A08"].includes(page) && workDirty))))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      setPendingNavigation({id,focus});
+      setPendingNavigation({id,focus,taskId});
       return;
     }
     if (id !== page) setPreviousPage(page);
@@ -322,11 +321,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
+    if (id === "F06" && (taskId ?? selectedTaskId)) url.searchParams.set("bossTask", taskId ?? selectedTaskId);
+    else url.searchParams.delete("bossTask");
     window.history.pushState({}, "", url);
+    if (taskId !== undefined) setSelectedTaskId(taskId);
+    if (id !== page || changingTask) setSourceReviewDirty(false);
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty, settingsDirty, workDirty]);
+  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, settingsDirty, workDirty]);
 
   useEffect(() => {
     const onBack = () => {
@@ -364,9 +367,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           throw new Error("Prompt技术诊断返回格式错误");
         setPromptTechnicalView(value);
       });
-    } else if (page === "A12") {
-      setMemoryTechnicalStatus(null);
-      read<MemoryTechnicalStatus>("/api/boss/ui/admin/memory-status", setMemoryTechnicalStatus);
     } else if (["A04", "A08", "N12", "A01", "A15", "F30"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
       if (["A15", "F30"].includes(page)) read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
@@ -385,6 +385,25 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     });
     return () => abort.abort();
   }, [role, page, sourceId, requestVersion, getToken]);
+
+  useEffect(() => {
+    setSourceReview(null); setSourceReviewError("");
+    if (role !== "BOSS" || page !== "F06" || !selectedTaskId) {setSourceReviewLoading(false); return;}
+    const abort = new AbortController();
+    setSourceReviewLoading(true);
+    void jsonRequest<AssignmentSourceReviewProjection>("/api/boss/ui/assignment-source-review?task_id=" +
+      encodeURIComponent(selectedTaskId), getToken, abort.signal).then(result => {
+      if (abort.signal.aborted) return;
+      if (result.source_type !== "SIMULATED" || result.task.task_id !== selectedTaskId)
+        throw new Error("交办来源返回范围无效");
+      setSourceReview(result); setSourceReviewLoading(false);
+    }).catch((failure: unknown) => {
+      if (abort.signal.aborted) return;
+      setSourceReview(null); setSourceReviewLoading(false);
+      setSourceReviewError(failure instanceof Error ? failure.message : String(failure));
+    });
+    return () => abort.abort();
+  }, [getToken, page, role, selectedTaskId, requestVersion]);
 
   useEffect(() => {
     if (role !== "BOSS" || !["F03", "N03"].includes(page)) return;
@@ -427,7 +446,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setSourceAnchor(anchor?{source_id:id,...anchor}:null);
     navigate("D01", page);
   };
-  const selectTask = (id: string) => { setSelectedTaskId(id); navigate("F06", page); };
+  const selectTask = (id: string) => navigate("F06", page, false, id);
   const sendQuestion = async (event: FormEvent) => {
     event.preventDefault();
     if (!question.trim()) {
@@ -714,9 +733,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onSubmit={onStartChat}
                   onOpenConversation={() => navigate("NATIVE")}
                 /> :
-                page === "F06" ? <BossAssignmentFlow
+                page === "F06" ? <><BossAssignmentFlow
                   tasks={tasks} selectedTaskId={selectedTaskId}
-                  onSelectTask={setSelectedTaskId} onReload={refresh}
+                  onSelectTask={selectTask} onReload={refresh}
                   onViewSource={() => goSource("finance-note")} context={dashboard}
                   draft={assignmentDraft} onDraftChange={updateAssignmentDraft}
                   onDraftSaved={()=>setAssignmentDirty(false)}
@@ -724,7 +743,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onOpenDuePicker={()=>navigate("D05")}
                   onViewMessages={()=>navigate("F08")}
                   onMessageDraftCreated={setDraftToReview}
-                /> :
+                />
+                {selectedTaskId && <BossAssignmentSourceReview key={selectedTaskId} data={sourceReview}
+                  loading={sourceReviewLoading} error={sourceReviewError} onReload={refresh} onCommand={scopedCommand}
+                  onReceipt={(action, clientRequestId) => jsonRequest("/api/boss/ui/operation-status?action=" +
+                    encodeURIComponent(action) + "&client_request_id=" + encodeURIComponent(clientRequestId), getToken)}
+                  onOpenSource={id => goSource(id)} onDirtyChange={setSourceReviewDirty}/>}</> :
                 (page==="D04"||page==="D05") ? <BossAssignmentPicker
                   key={page} pageId={page} contacts={dashboard?.contacts||[]}
                   timezone={dashboard?.profile.timezone||"Asia/Shanghai"}
@@ -936,6 +960,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 </div>
               </div> : ["A15","F30"].includes(page) ? <>
                 {page === "A15" && <MaintainerRuntimeRecords getToken={getToken}
+                  key={runtimeRunId} initialRunId={runtimeRunId}
                   onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>}
                 {page === "A15" && runtimeTask && <RuntimeTaskTechnicalView getToken={getToken}
                   taskId={runtimeTask.taskId} runId={runtimeTask.runId} onClose={() => setRuntimeTask(null)}/>}
@@ -1007,28 +1032,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               </> :
                 page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
                 page === "A12" ? <>
-                  <div className="boss-columns">
-                    <div className="boss-column"><Panel title="记忆技术状态" note="仅展示技术元信息">
-                      <Value label="老板范围" value={memoryTechnicalStatus?.namespace}/>
-                      <Value label="记忆标识" value={memoryTechnicalStatus?.memory.memory_id}/>
-                      <Value label="当前版本" value={memoryTechnicalStatus?.memory.version}/>
-                      <Value label="本人确认状态" value={memoryTechnicalStatus?.memory.confirmation_state}/>
-                      <Value label="有效期限" value={memoryTechnicalStatus ? memoryTechnicalStatus.memory.valid_until ?? "没有配置" : undefined}/>
-                      <Value label="后续上下文可采用" value={memoryTechnicalStatus ? memoryTechnicalStatus.future_context_eligible ? "符合当前确认条件" : "停止采用" : undefined}/>
-                      <Value label="当前采用规则" value={memoryTechnicalStatus?.future_turn_policy}/>
-                    </Panel></div>
-                    <div className="boss-column"><Panel title="索引、删除传播与核查">
-                      <Value label="派生记忆索引" value={memoryTechnicalStatus?.derived_memory_index}/>
-                      <Value label="删除传播" value={memoryTechnicalStatus?.deletion_propagation}/>
-                      <Value label="最近读取" value={memoryTechnicalStatus?.checked_at}/>
-                      <StatusLine text="技术状态检查只查询当前保存内容。真实模型采用和物理擦除需要独立验证。"/>
-                      <div className="boss-actions">
-                        <GlassButton onClick={refresh} disabled={loading}>重新核查技术状态</GlassButton>
-                        <GlassButton onClick={() => navigate("A14")}>查看获准动作记录</GlassButton>
-                        <GlassButton onClick={() => navigate("A15")}>查看运行记录</GlassButton>
-                      </div>
-                    </Panel></div>
-                  </div>
+                  <MaintainerMemoryStatus getToken={getToken} onNavigate={(id, reference) => {
+                    setRuntimeRunId(reference?.run_id ?? ""); navigate(id);
+                  }}/>
                   <BossWorkspaceView key="A12" role={role} pageId="A12" onNavigate={id=>navigate(id)} onViewSource={goSource}/>
                 </> :
                 page === "A03" ? <>
@@ -1100,10 +1106,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             if (!destination) throw new Error("离开页面缺少目标");
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
+            setSourceReviewDirty(false);
             setSettingsDirty(false);
             setWorkDirty(false);
             setPendingNavigation(null);
-            navigate(destination.id,destination.focus,true);
+            navigate(destination.id,destination.focus,true,destination.taskId);
           }}>放弃草稿并离开</button>
         </div>
         </DialogPrimitive.Content>

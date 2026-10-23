@@ -103,6 +103,7 @@ class BossCommandAPI:
         "boss.assignment.complete": "BOSS",
         "boss.assignment.extend": "BOSS",
         "boss.assignment.cancel": "BOSS",
+        "boss.assignment.sources.confirm": "BOSS",
         "boss.commitment.create": "BOSS",
         "boss.commitment.extend": "BOSS",
         "boss.commitment.complete": "BOSS",
@@ -185,7 +186,10 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
+            if action == "boss.assignment.sources.confirm":
+                from boss_assignment_sources import AssignmentSourcesAPI
+                result = AssignmentSourcesAPI(self.store).execute(role, payload)
+            elif action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
                 require(self.runtime_control is not None, "当前Runtime尚未准备", web.HTTPServiceUnavailable)
                 result = self.runtime_control.execute(self, action, payload)
             elif action in ("boss.meeting.draft.save", "boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held"):
@@ -274,21 +278,7 @@ class BossCommandAPI:
         return require_current_simulated_source(doc, data["owner_id"], business_at)
 
     def _require_current_task_sources(self, db, data, task):
-        """Task contents are not safe to send/close on unpinned provenance."""
         self.store.require_current_assignment_sources(db, NAMESPACE, data, task)
-        sources = task.get("source_refs", [])
-        pinned = task.get("source_versions")
-        require(isinstance(pinned, dict) and set(pinned) == set(sources),
-                "当前任务没有完整的创建时来源版本；须重新核查后再执行")
-        for source_id in sources:
-            doc = self._require_current_source(db, data, source_id)
-            require(doc.get("version") == pinned[source_id],
-                    "任务原始来源已经换版，旧授权不能用于新的材料")
-        origin_source = task.get("origin_source_id")
-        if origin_source:
-            source = self._require_current_source(db, data, origin_source)
-            require(source.get("version") == task.get("origin_source_version"),
-                    "纪要创建任务所引用的原始资料版本已变化，必须重新核查")
 
     def _transaction(self, action, payload):
         with self.store.connect() as db:
@@ -518,8 +508,11 @@ class BossCommandAPI:
         # Feedback is a response to a *sent* assignment, never a way for
         # the maintainer to forge a task state before the owner authorizes send.
         task = self.store.get(db, NAMESPACE, "task", body["task_id"])
-        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS", "CANCELED"),
+        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED"),
                 "当前交办不接受新的模拟反馈")
+        require(task["status"] != "RESULT_SUBMITTED" or body["kind"] == "RESULT_SUBMITTED",
+                "已提交结果的交办仅接受重新提交结果")
+        require(bool(task["message_ids"]), "交办必须已经发送才能接收模拟反馈")
         # 历史反馈继续核查资料身份；当前采用另外核查有效状态。
         data = self.store.get(db, NAMESPACE, "initial", "snapshot")
         for source_id in body["evidence_refs"]:

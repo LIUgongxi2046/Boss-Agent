@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("reference")
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     reference = (ROOT / args.reference).resolve(strict=True)
     if not reference.is_relative_to(ROOT / "evidence/T11"):
@@ -22,11 +23,15 @@ def main():
     schema = json.loads(schema_file.read_text())
     schema["$ref"] = "#/$defs/CurrentRuntimeRun"
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
-    database = ROOT / "validation/.work" / report["run_id"] / "business.sqlite"
+    memory_check = report["status"] == "PASS_PUBLIC_A12_OWNER_DELETION_AND_NEXT_ACTUAL_MODEL_CONTEXT"
+    assert memory_check or report["status"] == "PASS_PUBLIC_RUNTIME_CONFIGURATION_AND_A15_TASK_REFERENCE"
+    directory = (ROOT / report["application_directory"]).resolve(strict=True) if memory_check else ROOT / "validation/.work" / report["run_id"]
+    assert directory.parent == ROOT / "validation/.work"
+    database = directory / "business.sqlite"
     transport_file = database.parent / "diagnostics/http-requests.json"
     transport = json.loads(transport_file.read_text())
     actual_records = [entry["record"] for entry in report["records"] if "record" in entry]
-    assert len(actual_records) == 2
+    assert len(actual_records) == (1 if memory_check else 2)
     with sqlite3.connect(database.as_uri() + "?mode=ro", uri=True) as db:
         db.execute("BEGIN")
         for row in actual_records:
@@ -47,7 +52,15 @@ def main():
             assert row["status"] == "SUCCEEDED" and row["cost_total"] is None and row["price_version"] is None
         current = json.loads(db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='configuration' AND id='current'").fetchone()[0])
         assert current["version"] == "3" and current["max_tool_rounds"] == 6
-    output = ROOT / "evidence/T09/w3-20261023/public-runtime-schema-binding.json"
+        if memory_check:
+            memory = json.loads(db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='memory' AND id='current'").fetchone()[0])
+            assert memory["version"] == "2" and memory["confirmation_state"] == "DELETED" and memory["text"] == ""
+            assert actual_records[0]["memory_reference"] == {
+                "memory_id": memory["memory_id"], "version": "2", "confirmation_state": "DELETED",
+                "eligible": False, "confirmation_authority_checked": True}
+            assert actual_records[0]["model_behavior_evaluation_passed"] is False
+    output = args.output.resolve() if args.output is not None else ROOT / "evidence/T09/w3-20261023/public-runtime-schema-binding.json"
+    assert output.parent == ROOT / "evidence/T09/w3-20261023"
     result = {"status": "PASS_ACTUAL_PUBLIC_RUNTIME_SCHEMA_AND_TRANSPORT", "reference": str(reference.relative_to(ROOT)),
               "reference_sha256": hashlib.sha256(reference.read_bytes()).hexdigest(),
               "schema_sha256": hashlib.sha256(schema_file.read_bytes()).hexdigest(),

@@ -327,9 +327,11 @@
       "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
       "component_file": "app/webui/BossAssignmentFlow.tsx",
       "component_name": "BossAssignmentFlow (nested in BossDesktop)",
+      "additional_component_files": ["app/webui/BossAssignmentSourceReview.tsx"],
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
         "GET /api/boss/ui/tasks",
+        "GET /api/boss/ui/assignment-source-review",
         "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
@@ -338,10 +340,12 @@
         "boss.assignment.complete",
         "boss.assignment.extend",
         "boss.assignment.cancel",
-        "boss.assignment.nudge"
+        "boss.assignment.nudge",
+        "boss.assignment.sources.confirm"
       ],
       "other_integration_points": [
-        "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks"
+        "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks",
+        "bossTask preserves the selected task through source navigation and refresh; unsaved source review uses D06"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -358,7 +362,9 @@
         "app/tests/test_boss_recovery.py",
         "app/tests/test_boss_minutes_assignment_chain.py",
         "app/tests/test_v6_minutes_approval_ui.py",
-        "app/tests/test_boss_assignment_nudge.py"
+        "app/tests/test_boss_assignment_nudge.py",
+        "app/tests/test_product_assignment_sources.py",
+        "validation/desktop/check-source-review.cjs"
       ],
       "source_task_ids": [
         "T18",
@@ -3046,25 +3052,25 @@
       "logical_architecture_route": "/app/maintain/A12",
       "actual_webui_navigation": "?bossPage=A12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_MEMORY_TECHNICAL_STATUS_AND_SOURCE_INDEX",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_CURRENT_MEMORY_AND_ACTUAL_CONTEXT_SELECTION_STATUS",
+      "component_file": "app/webui/MaintainerMemoryStatus.tsx",
+      "component_name": "MaintainerMemoryStatus",
+      "additional_component_files": ["app/webui/BossWorkspaceView.tsx"],
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/source-index",
         "GET /api/boss/ui/admin/memory-status"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": ["app/webui/BossDesktop.tsx: MemoryTechnicalStatus"],
+      "other_integration_points": ["app/webui/BossDesktop.tsx: A12 current confirmation, deletion scopes and A15 run_id navigation"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [
-        "memory_index.verify",
-        "memory_index.repair"
-      ],
+      "operations_not_yet_implemented": ["loaded_session_backup_and_physical_erasure_verification"],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_admin_config.py",
+        "validation/desktop/check-memory-public.cjs"
       ],
       "source_task_ids": [
         "T19",
@@ -3194,13 +3200,14 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/model-usage",
         "GET /api/boss/ui/runtime-records",
+        "GET /api/boss/ui/runtime-records/task",
         "GET /api/boss/ui/maintenance"
       ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": ["product_runtime_recorder_configuration_adoption"],
+      "operations_not_yet_implemented": ["complete_runtime_failure_and_recovery_acceptance"],
       "tests": [
         "app/tests/test_product_runtime_access.py",
         "app/tests/test_boss_runtime_query.py",

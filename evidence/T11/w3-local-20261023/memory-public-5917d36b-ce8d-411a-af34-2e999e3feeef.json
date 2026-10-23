@@ -1,0 +1,451 @@
+{
+  "status": "PASS_PUBLIC_A12_OWNER_DELETION_AND_NEXT_ACTUAL_MODEL_CONTEXT",
+  "run_id": "memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef",
+  "at": "2026-10-23T10:05:09.481Z",
+  "application_directory": "validation/.work/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1",
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "1e3ed4d25fb9a116ff2483b4971550bc52e8f36b24559d7349b4117059d81dfc"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "f33c1f8ecbb5842e838022e38aebff4bf59b6e9929425d7d8acad07e0e89a930"
+    },
+    {
+      "path": "validation/boss_admin_config.py",
+      "sha256": "8c31fea3e7c58d8b45d1382c7e30df927118a356619499d627e705f352a306c9"
+    },
+    {
+      "path": "validation/boss_memory_runtime.py",
+      "sha256": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64"
+    },
+    {
+      "path": "validation/boss_memory.py",
+      "sha256": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "206a36ad69bf7c21e95fece577677e14f5e8f21bc383351d4cb92a2dff17cc95"
+    },
+    {
+      "path": "app/webui/MaintainerMemoryStatus.tsx",
+      "sha256": "6dcdb7396c1c939bf2a9a06d70306fa2e50c1f0cf2d5bb80406752d78e778443"
+    },
+    {
+      "path": "app/webui/BossWorkspaceView.tsx",
+      "sha256": "ef49db07224f29ba970c840e7d09f1e33c4ee6b0d6f126ef4851b96d0e84b385"
+    },
+    {
+      "path": "app/webui/MaintainerRuntimeRecords.tsx",
+      "sha256": "77353ede61ec509a69e138dbf4f5a5281858f51fe9d8c467bb33134ed95d84ea"
+    },
+    {
+      "path": "validation/desktop/check-memory-public.cjs",
+      "sha256": "54cba9b945480ede4003ec66f9be021dae3ad678a7ef9f6fab69d0d410ef710b"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d8c9e9def8d13488ab0288948f7d9458da930461a93d09b25d0bcb60776d7eb9"
+    }
+  ],
+  "records": [
+    {
+      "check": "a12_current_confirmation_and_a15_actual_run_navigation",
+      "status": {
+        "projection": "memory-technical-status",
+        "source_type": "RUNTIME_RECORD",
+        "namespace": "ui-check",
+        "checked_at": "2026-10-23T10:04:37.969107+00:00",
+        "owner_scope": {
+          "owner_id": "boss-1",
+          "dataset_id": "selection",
+          "dataset_version": "1"
+        },
+        "memory_source_type": "SIMULATED",
+        "memory": {
+          "memory_id": "memory-1",
+          "version": "1",
+          "confirmation_state": "CONFIRMED",
+          "valid_until": null
+        },
+        "future_context_eligible": true,
+        "confirmation_authority_checked": true,
+        "next_context_memory_version": "1",
+        "latest_context_selection": {
+          "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "memory_version": "1",
+          "eligible": true,
+          "selected_at": "2026-10-23T09:10:31.058242+00:00",
+          "run_status": "SUCCEEDED",
+          "model_completion_observed": true,
+          "matches_current_memory_version": true,
+          "observation": "CONTEXT_SELECTION_RECORDED"
+        },
+        "context_selection_count": 2,
+        "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
+        "deletion_propagation": "NOT_REQUESTED",
+        "derived_memory_index": "NOT_USED",
+        "deletion_scopes": {
+          "current_memory_content": "NOT_REQUESTED",
+          "initial_approved_source": "RETAINED",
+          "loaded_sessions": "NOT_VERIFIED",
+          "backups": "NOT_VERIFIED",
+          "physical_erasure": "NOT_VERIFIED"
+        },
+        "model_adoption_verified": false,
+        "physical_secure_erasure_verified": false,
+        "private_body_available_here": false,
+        "owner_content_mutation_allowed": false
+      }
+    },
+    {
+      "check": "offline_clears_technical_data_and_recovery_reloads_current_state",
+      "scope_query": 400
+    },
+    {
+      "check": "gui_owner_deletion_preserves_historical_observation_and_stops_future_eligibility",
+      "status": {
+        "projection": "memory-technical-status",
+        "source_type": "RUNTIME_RECORD",
+        "namespace": "ui-check",
+        "checked_at": "2026-10-23T10:04:43.047583+00:00",
+        "owner_scope": {
+          "owner_id": "boss-1",
+          "dataset_id": "selection",
+          "dataset_version": "1"
+        },
+        "memory_source_type": "SIMULATED",
+        "memory": {
+          "memory_id": "memory-1",
+          "version": "2",
+          "confirmation_state": "DELETED",
+          "valid_until": null
+        },
+        "future_context_eligible": false,
+        "confirmation_authority_checked": true,
+        "next_context_memory_version": null,
+        "latest_context_selection": {
+          "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "memory_version": "1",
+          "eligible": true,
+          "selected_at": "2026-10-23T09:10:31.058242+00:00",
+          "run_status": "SUCCEEDED",
+          "model_completion_observed": true,
+          "matches_current_memory_version": false,
+          "observation": "CONTEXT_SELECTION_RECORDED"
+        },
+        "context_selection_count": 2,
+        "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
+        "deletion_propagation": "CURRENT_CONTEXT_CLEARED",
+        "derived_memory_index": "NOT_USED",
+        "deletion_scopes": {
+          "current_memory_content": "CLEARED",
+          "initial_approved_source": "RETAINED",
+          "loaded_sessions": "NOT_VERIFIED",
+          "backups": "NOT_VERIFIED",
+          "physical_erasure": "NOT_VERIFIED"
+        },
+        "model_adoption_verified": false,
+        "physical_secure_erasure_verified": false,
+        "private_body_available_here": false,
+        "owner_content_mutation_allowed": false
+      }
+    },
+    {
+      "check": "next_home_task_records_actual_deleted_memory_version",
+      "record": {
+        "chat_id": "850d3bf0-0db7-4a05-8a93-2dc99d78a9fb",
+        "configuration_id": "runtime-1",
+        "configuration_version": "3",
+        "cost_total": null,
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "finished_at": "2026-10-23T10:04:53.088861+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "DELETED",
+          "eligible": false,
+          "memory_id": "memory-1",
+          "version": "2"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-996ded86-cf8a-4704-a284-1e01084656ba",
+            "request_sha256": "a52254155a2711e1b20a71eaed8be4da0758bd984550b3c437365666b593312a",
+            "response_ids": [
+              "730224cc-d2d7-409f-b582-92e3012dbaab"
+            ],
+            "tool_config_sha256": "30981e4d94e1a277aed0712e9620185bd4bbebf493e63e82ac6a43716b2ccf81",
+            "usage": {
+              "completion_tokens": 316,
+              "prompt_cache_hit_tokens": 1920,
+              "prompt_cache_miss_tokens": 1559,
+              "prompt_tokens": 3479,
+              "total_tokens": 3795
+            }
+          },
+          {
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-4280dc87-67a8-406b-a6e9-500a1b2c8788",
+            "request_sha256": "a302a3270b5c564b0f144d53385a3acd0f9f9f6dc3eaee217da5522573d91b49",
+            "response_ids": [
+              "1910fc05-cfd9-44b2-85e2-23f07712fa92"
+            ],
+            "tool_config_sha256": "30981e4d94e1a277aed0712e9620185bd4bbebf493e63e82ac6a43716b2ccf81",
+            "usage": {
+              "completion_tokens": 142,
+              "prompt_cache_hit_tokens": 3712,
+              "prompt_cache_miss_tokens": 827,
+              "prompt_tokens": 4539,
+              "total_tokens": 4681
+            }
+          },
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-a4a696e7-0c0f-429c-9ab9-d650a64f6a3e",
+            "request_sha256": "8db1d5664bdfd425f1337052c1cad5ce7e7b7bbe4bcaa953f75f1d6b5df155db",
+            "response_ids": [
+              "f9550a2e-369c-4a70-9ca6-7ddce31c288e"
+            ],
+            "tool_config_sha256": "30981e4d94e1a277aed0712e9620185bd4bbebf493e63e82ac6a43716b2ccf81",
+            "usage": {
+              "completion_tokens": 686,
+              "prompt_cache_hit_tokens": 4608,
+              "prompt_cache_miss_tokens": 1198,
+              "prompt_tokens": 5806,
+              "total_tokens": 6492
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "websocket:850d3bf0-0db7-4a05-8a93-2dc99d78a9fb:1792749884980833000",
+        "request_id_source": "TURN",
+        "run_id": "run-d03d3382-a763-465f-a32f-b57420e37515",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "89f08327eb57e7b750e036b409ebffe636f4355b2b78f52de6f280aba27e3b92",
+          "max_output_tokens": 2048,
+          "max_tool_rounds": 6,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "websocket:850d3bf0-0db7-4a05-8a93-2dc99d78a9fb",
+        "started_at": "2026-10-23T10:04:44.995160+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "30981e4d94e1a277aed0712e9620185bd4bbebf493e63e82ac6a43716b2ccf81",
+        "tool_configuration": [
+          {
+            "implementation": "boss_agent_read_tools.BossResearchSourcesTool",
+            "implementation_sha256": "3624e56c601a698798d2b2eaf2a0a4152d198967051ab3c82463142560ac1da4",
+            "schema_sha256": "9fd8e306e29a52418caa4bea5d34453aa4d84414cd344cb463b0357d5b5c8eaa",
+            "tool_id": "bossWorkspaceRead"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651",
+            "schema_sha256": "54fbecbfffecc89d89389cfd444b50fd6134c489fadd4acfd8370999101a3de6",
+            "tool_id": "create_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651",
+            "schema_sha256": "082ecd78be5c8ad567972878fd0353f7a27a0c2d29a9dce4257a07dab1c5ddc9",
+            "tool_id": "query_metrics"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651",
+            "schema_sha256": "3396c53cfe6a5627089c2e101f69152c707a0a2545d148cf34af2c5071f0433f",
+            "tool_id": "read_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651",
+            "schema_sha256": "bf541e68122b329dc030452632d18146f7eb491537bd229dd97b9c3931c3ad71",
+            "tool_id": "read_evidence"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651",
+            "schema_sha256": "1f9b3a3ea0ee650e060124b2d85af82a4307de02a06c6a2356cf489105045b89",
+            "tool_id": "send_assignment"
+          }
+        ],
+        "tool_results": [
+          {
+            "iteration": 0,
+            "query_id": "2320cfcb-686a-4afb-9623-74a1611482d4",
+            "tool_call_id": "call_00_ea3sMCxJ5FunNNC31nlb7869",
+            "tool_id": "query_metrics"
+          },
+          {
+            "iteration": 1,
+            "tool_call_id": "call_00_tilHjYFnmE0BjgQGCRLI6561",
+            "tool_id": "read_evidence"
+          }
+        ],
+        "turn_id": "websocket:850d3bf0-0db7-4a05-8a93-2dc99d78a9fb:1792749884980833000",
+        "usage": {
+          "completion_tokens": 1144,
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 3584,
+          "prompt_tokens": 13824,
+          "total_tokens": 14968
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "turn_end": {
+        "turn_id": "acd5ba77-e7a7-49b8-83fb-520c9922c966"
+      }
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a12_actual_next_context_selection",
+      "status": {
+        "projection": "memory-technical-status",
+        "source_type": "RUNTIME_RECORD",
+        "namespace": "ui-check",
+        "checked_at": "2026-10-23T10:04:55.915700+00:00",
+        "owner_scope": {
+          "owner_id": "boss-1",
+          "dataset_id": "selection",
+          "dataset_version": "1"
+        },
+        "memory_source_type": "SIMULATED",
+        "memory": {
+          "memory_id": "memory-1",
+          "version": "2",
+          "confirmation_state": "DELETED",
+          "valid_until": null
+        },
+        "future_context_eligible": false,
+        "confirmation_authority_checked": true,
+        "next_context_memory_version": null,
+        "latest_context_selection": {
+          "run_id": "run-d03d3382-a763-465f-a32f-b57420e37515",
+          "memory_version": "2",
+          "eligible": false,
+          "selected_at": "2026-10-23T10:04:44.995160+00:00",
+          "run_status": "SUCCEEDED",
+          "model_completion_observed": true,
+          "matches_current_memory_version": true,
+          "observation": "CONTEXT_SELECTION_RECORDED"
+        },
+        "context_selection_count": 3,
+        "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
+        "deletion_propagation": "CURRENT_CONTEXT_CLEARED",
+        "derived_memory_index": "NOT_USED",
+        "deletion_scopes": {
+          "current_memory_content": "CLEARED",
+          "initial_approved_source": "RETAINED",
+          "loaded_sessions": "NOT_VERIFIED",
+          "backups": "NOT_VERIFIED",
+          "physical_erasure": "NOT_VERIFIED"
+        },
+        "model_adoption_verified": false,
+        "physical_secure_erasure_verified": false,
+        "private_body_available_here": false,
+        "owner_content_mutation_allowed": false
+      },
+      "renderer_errors": []
+    },
+    {
+      "check": "logout_and_service_restart_preserve_deleted_state_and_actual_selection",
+      "version": "2",
+      "run_id": "run-d03d3382-a763-465f-a32f-b57420e37515",
+      "prior_token": 401
+    }
+  ],
+  "previous_evidence": {
+    "path": "evidence/T11/w3-local-20261023/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1.json",
+    "sha256": "a5b8a3153697cb4dc56fc1af06345eb234b0ca31d650f3a57dcc3d97394871ee"
+  },
+  "model_service": "api.deepseek.com",
+  "model_id": "deepseek-flash",
+  "source_type": "SIMULATED",
+  "cost_total": null,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A15_accepted": false
+}

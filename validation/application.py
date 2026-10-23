@@ -36,6 +36,8 @@ from boss_agent_read_tools import BossResearchSourcesTool
 from boss_runtime_records import RuntimeRecorder
 from boss_memory_runtime import OwnerMemoryContext
 from product_runtime import ProductRuntime
+from runtime_owner_read_tools import BossTodayReadTool, BossOwnerPlansReadTool
+from runtime_assignment_source_tool import BossAssignmentSourcesReadTool
 from service import application as business_application
 from application_paths import application_work_directory, application_ports
 
@@ -146,6 +148,10 @@ async def serve():
                         "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
         audit.output.write_text(encode(records))
     registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
+    if product_mode:
+        for tool in (BossTodayReadTool(store, "BOSS"), BossOwnerPlansReadTool(store, "BOSS"),
+                     BossAssignmentSourcesReadTool(store, "BOSS")):
+            registry.register(tool)
     runtime_control = None
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,

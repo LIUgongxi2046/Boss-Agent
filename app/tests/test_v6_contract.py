@@ -99,12 +99,13 @@ def test_page_service_map_is_explicit_about_partial_runtime():
     assert set(by_id["F06"]["code_wired_write_actions"]) == {
         "boss.assignment.create", "boss.assignment.send",
         "boss.assignment.complete", "boss.assignment.extend", "boss.assignment.cancel",
-        "boss.assignment.nudge",
+        "boss.assignment.nudge", "boss.assignment.sources.confirm",
     }
     assert set(by_id["A04"]["code_wired_write_actions"]) == {"boss.simulation.feedback", "boss.simulation.event.seed", "boss.simulation.clock.advance", "boss.simulation.message.reply"}
     assert by_id["F24"]["verified_http_read_routes"] == ["GET /api/boss/ui/model-health"]
     assert by_id["A15"]["verified_http_read_routes"] == [
-        "GET /api/boss/ui/model-usage", "GET /api/boss/ui/runtime-records", "GET /api/boss/ui/maintenance",
+        "GET /api/boss/ui/model-usage", "GET /api/boss/ui/runtime-records",
+        "GET /api/boss/ui/runtime-records/task", "GET /api/boss/ui/maintenance",
     ]
     for item in service_map["pages"]:
         assert item["component_file"]
@@ -136,7 +137,11 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
     workplace_ids = re.findall(r"\b([FAND]\d{2}(?:-[A-Z]+)?):\s*\"", part)
     assert len(workplace_ids) == 23  # F10/F11 and F26/N07/N08 use dedicated v6 components
     for page_id in workplace_ids:
-        assert by_id[page_id]["component_file"] == ("app/webui/BossOwnerPlans.tsx" if page_id == "N09" else "app/webui/BossWorkspaceView.tsx")
+        dedicated = {"N09": "app/webui/BossOwnerPlans.tsx", "A12": "app/webui/MaintainerMemoryStatus.tsx"}
+        expected = dedicated[page_id] if page_id in dedicated else "app/webui/BossWorkspaceView.tsx"
+        assert by_id[page_id]["component_file"] == expected
+        if page_id == "A12":
+            assert "app/webui/BossWorkspaceView.tsx" in by_id[page_id]["additional_component_files"]
         assert by_id[page_id]["render_status"] != "DESIGN_PLACEHOLDER_ONLY"
         assert any("/api/boss/ui/workspace/" in endpoint
                    for endpoint in by_id[page_id]["verified_http_read_routes"])

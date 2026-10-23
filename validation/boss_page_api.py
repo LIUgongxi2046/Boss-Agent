@@ -24,6 +24,8 @@ from boss_meetings import MeetingAPI, meeting_materials
 from boss_source_access import require_current_simulated_source
 from boss_source_policy import source_validity
 from boss_runtime_records import runtime_records
+from runtime_records_query import read_runtime_task_reference
+from boss_assignment_sources import AssignmentSourcesAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -195,36 +197,24 @@ class BossPageAPI:
                 self._items(db, self.namespace, "document")
             }
             tasks = []
+            source_reviews = AssignmentSourcesAPI(self.store)
             for task in self._items(db, self.namespace, "task"):
                 item = self._public_task(task)
-                pinned = task.get("source_versions")
-                violations = []
-                sources = task.get("source_refs", [])
-                if not isinstance(pinned, dict) or set(pinned) != set(sources):
-                    violations.append("UNPINNED_SOURCE_VERSION")
-                for source_id in sources:
-                    doc = available.get(source_id)
-                    if doc is None or (
-                        doc.get("access_scope") != data["owner_id"]
-                        or doc.get("source_type") != "SIMULATED"
-                    ) or source_validity(doc, business_at) != "VALID":
-                        violations.append("SOURCE_UNAVAILABLE")
-                    elif isinstance(pinned, dict) and doc.get("version") != pinned.get(source_id):
-                        violations.append("SOURCE_VERSION_CHANGED")
-                original_id = task.get("origin_source_id")
-                if original_id:
-                    doc = available.get(original_id)
-                    if doc is None or (
-                        doc.get("access_scope") != data["owner_id"]
-                        or doc.get("source_type") != "SIMULATED"
-                    ) or source_validity(doc, business_at) != "VALID":
-                        violations.append("MINUTE_SOURCE_UNAVAILABLE")
-                    elif doc.get("version") != task.get("origin_source_version"):
-                        violations.append("MINUTE_VERSION_CHANGED")
-                item["source_reference_state"] = (
-                    "NEEDS_REVIEW" if violations else "CURRENT"
-                )
-                item["source_reference_reasons"] = sorted(set(violations))
+                review = source_reviews.project_in_transaction("BOSS", db, task["task_id"])
+                item["source_reference_state"] = "CURRENT" if review["binding_state"] == "CURRENT" else "NEEDS_REVIEW"
+                reasons = []
+                if review["binding_state"] != "CURRENT":
+                    reasons.append("SOURCE_BINDING_" + review["binding_state"])
+                    for source in review["sources"]:
+                        prefix = "MINUTE" if source["is_minute_origin"] else "SOURCE"
+                        if source["source_status"] != "VALID":
+                            reasons.append(prefix + "_UNAVAILABLE")
+                        if source["pinned_version"] is None:
+                            reasons.append("UNPINNED_SOURCE_VERSION")
+                        elif source["current_version"] is not None and source["pinned_version"] != source["current_version"]:
+                            reasons.append(prefix + "_VERSION_CHANGED")
+                item["source_reference_reasons"] = list(dict.fromkeys(reasons))
+                item["result_evidence_requires_resubmission"] = review["result_evidence_requires_resubmission"]
                 tasks.append(item)
             return {
                 "source_type": "SIMULATED",
@@ -457,6 +447,18 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path in {"/api/boss/ui/assignment-source-review", "/api/boss/ui/runtime-records/task"}:
+                if path == "/api/boss/ui/assignment-source-review" and role != "BOSS":
+                    return 403, {"error": "FORBIDDEN"}
+                query = parse_qs(query_string, keep_blank_values=True)
+                keys = {"task_id"} if path == "/api/boss/ui/assignment-source-review" else {"run_id", "task_id"}
+                if set(query) != keys or any(len(values) != 1 or not values[0] for values in query.values()):
+                    return 400, {"error": "INVALID_QUERY_PARAMETERS"}
+                if self.namespace != DEMO_NAMESPACE:
+                    return 409, {"error": "EXECUTION_SCOPE_UNAVAILABLE"}
+                if path == "/api/boss/ui/assignment-source-review":
+                    return 200, AssignmentSourcesAPI(self.store).read(role, query["task_id"][0])
+                return 200, read_runtime_task_reference(self.store, role, self.namespace, query["run_id"][0], query["task_id"][0])
             if path == "/api/boss/ui/admin/runtime-configuration":
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}

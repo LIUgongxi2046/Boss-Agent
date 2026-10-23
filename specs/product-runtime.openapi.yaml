@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent 公共Runtime配置扩展
-  version: 0.1.0
+  version: 0.2.0
   description: 当前公共实现；完整T06正式接收待完成。配置启用不授予业务授权。
 x-reception:
   state: IN_REVIEW
-  core_version: 1.4.1
+  core_version: 1.5.0
   owner: W3
   receiver: W1/T06
   authority: configuration/current
@@ -43,9 +43,9 @@ components:
         tool_scope:
           type: array
           minItems: 1
-          maxItems: 6
+          maxItems: 9
           uniqueItems: true
-          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead]}
+          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead, todayRead, ownerPlansRead, assignmentSourcesRead]}
     Save:
       type: object
       required: [client_request_id, expected_version, values]

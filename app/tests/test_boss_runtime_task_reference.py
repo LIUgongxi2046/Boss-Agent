@@ -1,4 +1,5 @@
 import json
+import hashlib
 import sqlite3
 import sys
 from pathlib import Path
@@ -15,11 +16,16 @@ from controls import ControlStore
 
 @pytest.fixture
 def observed_task(tmp_path):
-    report = json.loads((ROOT / "evidence/T16/runtime-record-faults/w2-written-client-closed/runtime-records.json").read_text())
+    fixture = ROOT / "app/tests/fixtures/observed-runtime-failure"
+    report = json.loads((fixture / "runtime-records.json").read_text())
     run = report["runs"][0]
-    source = ROOT / "validation/.work" / run["namespace"] / "business.sqlite"
+    source = fixture / "business.sqlite"
+    manifest = json.loads((fixture / "manifest.json").read_text())
+    assert manifest["status"] == "ACTUAL_RUNTIME_NATIVE_SQLITE_BACKUP"
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == manifest["fixture_database_sha256"]
+    assert hashlib.sha256((fixture / "runtime-records.json").read_bytes()).hexdigest() == manifest["fixture_sha256"]["runtime-records.json"]
     target = tmp_path / "observed-task.sqlite"
-    with sqlite3.connect(source.as_uri() + "?mode=ro", uri=True) as original:
+    with sqlite3.connect(source.as_uri() + "?mode=ro&immutable=1", uri=True) as original:
         with sqlite3.connect(target) as copied:
             original.backup(copied)
     store = ControlStore(target)

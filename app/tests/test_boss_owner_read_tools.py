@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import importlib
 import json
 import sqlite3
@@ -13,7 +14,6 @@ from jsonschema import Draft202012Validator, FormatChecker
 from nanobot.agent.tools.registry import ToolRegistry
 
 ROOT = Path(__file__).resolve().parents[2]
-W1 = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent")
 COMMIT = "f854b07a66a153fc4a92c95c86cce788d009cffe"
 sys.path.insert(0, str(ROOT / "validation"))
 
@@ -24,15 +24,19 @@ from controls import ControlStore
 def existing_owner_store(tmp_path):
     for name in ("boss_today", "boss_owner_plans", "boss_meetings"):
         path = "validation/" + name + ".py"
-        assert (W1 / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=W1)
-    source = ROOT / ".work/w2-checks/memory-ui/memory.sqlite"
-    with sqlite3.connect(source.as_uri() + "?mode=ro", uri=True) as original:
+        assert (ROOT / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=ROOT)
+    fixture = ROOT / "app/tests/fixtures/observed-owner-state"
+    source = fixture / "business.sqlite"
+    manifest = json.loads((fixture / "manifest.json").read_text())
+    assert manifest["status"] == "ACTUAL_PUBLIC_GUI_NATIVE_SQLITE_BACKUP"
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == manifest["fixture_database_sha256"]
+    with sqlite3.connect(source.as_uri() + "?mode=ro&immutable=1", uri=True) as original:
         with sqlite3.connect(tmp_path / "owner-read.sqlite") as copied:
             original.backup(copied)
     yield ControlStore(tmp_path / "owner-read.sqlite")
     for name in ("boss_today", "boss_owner_plans", "boss_meetings"):
         path = "validation/" + name + ".py"
-        assert (W1 / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=W1)
+        assert (ROOT / path).read_bytes() == subprocess.check_output(["git", "show", COMMIT + ":" + path], cwd=ROOT)
 
 
 @pytest.mark.parametrize("class_name,operation,path", [
@@ -52,7 +56,7 @@ def test_owner_read_adapter_uses_current_domain_result_without_writes(existing_o
     with existing_owner_store.connect() as db:
         before = tuple(db.iterdump())
     result = json.loads(asyncio.run(tool.execute()))
-    backend = yaml.safe_load(subprocess.check_output(["git", "show", COMMIT + ":specs/openapi.yaml"], cwd=W1))
+    backend = yaml.safe_load(subprocess.check_output(["git", "show", COMMIT + ":specs/openapi.yaml"], cwd=ROOT))
     response = backend["paths"][path]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
     Draft202012Validator({**backend, **response}, format_checker=FormatChecker()).validate(result)
     assert result["source_type"] == "SIMULATED"

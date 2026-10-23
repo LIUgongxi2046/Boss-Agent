@@ -10,6 +10,8 @@ validation/desktop/node_modules/
 .DS_Store
 __pycache__/
 *.py[cod]
+*.sqlite-shm
+*.sqlite-wal
 node_modules/
 .env
 .env.*

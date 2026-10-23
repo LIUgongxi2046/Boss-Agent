@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="8" failures="0" skipped="0" tests="8" time="5.323" timestamp="2026-10-23T17:26:45.170687+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_assignment_sources" name="test_public_owner_review_tracks_current_source_without_sending" time="0.025"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_owner_review_track0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[]" time="0.014"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_source_review_quer0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=]" time="0.016"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_source_review_quer1')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;task_id=b]" time="0.015"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_source_review_quer2')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;namespace=ui-check]" time="0.014"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_source_review_quer3')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;owner_id=boss-1]" time="0.016"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_source_review_quer4')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_maintainer_cannot_review_or_confirm_owner_sources" time="0.013"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_maintainer_cannot_review_0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_result_resubmission_after_current_source_review" time="0.016"><error message="failed on setup with &quot;assert 400 == 200&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-source-public-red-valid/test_public_result_resubmissio0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        store = ControlStore(tmp_path / "source-public.sqlite")
+        store.initialize("ui-check")
+        commands, pages = BossCommandAPI(store), BossPageAPI(store)
+        with store.connect() as db:
+            original = store.get(db, "ui-check", "document", "finance-note")
+        source = {"source_id": "sim-doc-public-review", "title": original["source_id"],
+                  "author_contact_id": original["author_contact_id"], "published_at": datetime.fromisoformat(original["published_at"]).date().isoformat(), "content": original["content"]}
+        code, result = commands.execute("MAINTAINER", "boss.knowledge.source.create", {"client_request_id": "source-public-create", **source})
+        assert code == 200
+        code, task = commands.execute("BOSS", "boss.assignment.create", create_input(source_refs=[source["source_id"]]))
+&gt;       assert code == 200
+E       assert 400 == 200
+
+app/tests/test_product_assignment_sources.py:28: AssertionError</error></testcase></testsuite></testsuites>

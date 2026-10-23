@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="8" time="4.950" timestamp="2026-10-23T17:33:10.308794+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_assignment_sources" name="test_public_owner_review_tracks_current_source_without_sending" time="0.086"><failure message="assert 404 == 200">product = (&lt;controls.ControlStore object at 0x108416a20&gt;, &lt;boss_command_api.BossCommandAPI object at 0x108417fb0&gt;, &lt;boss_page_ap...81fa1e', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.428074+00:00', 'status': 'OPEN', ...})
+
+    def test_public_owner_review_tracks_current_source_without_sending(product):
+        store, commands, pages, source, task = product
+&gt;       assert read(product)["binding_state"] == "MISSING"
+               ^^^^^^^^^^^^^
+
+app/tests/test_product_assignment_sources.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+product = (&lt;controls.ControlStore object at 0x108416a20&gt;, &lt;boss_command_api.BossCommandAPI object at 0x108417fb0&gt;, &lt;boss_page_ap...81fa1e', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.428074+00:00', 'status': 'OPEN', ...})
+
+    def read(product):
+        _, _, pages, _, task = product
+        code, result = pages.serve("BOSS", "/api/boss/ui/assignment-source-review", "task_id=" + task["task_id"])
+&gt;       assert code == 200
+E       assert 404 == 200
+
+app/tests/test_product_assignment_sources.py:44: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[]" time="0.061"><failure message="assert 404 == 400">product = (&lt;controls.ControlStore object at 0x107842510&gt;, &lt;boss_command_api.BossCommandAPI object at 0x1084a7fb0&gt;, &lt;boss_page_ap...d8a988', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.721606+00:00', 'status': 'OPEN', ...})
+query = ''
+
+    @pytest.mark.parametrize("query", ["", "task_id=", "task_id=a&amp;task_id=b", "task_id=a&amp;namespace=ui-check", "task_id=a&amp;owner_id=boss-1"])
+    def test_public_source_review_query_rejection(product, query):
+        _, _, pages, _, _ = product
+&gt;       assert pages.serve("BOSS", "/api/boss/ui/assignment-source-review", query)[0] == 400
+E       assert 404 == 400
+
+app/tests/test_product_assignment_sources.py:80: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=]" time="0.113"><failure message="assert 404 == 400">product = (&lt;controls.ControlStore object at 0x1083dd250&gt;, &lt;boss_command_api.BossCommandAPI object at 0x1084a5f10&gt;, &lt;boss_page_ap...88a164', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.798234+00:00', 'status': 'OPEN', ...})
+query = 'task_id='
+
+    @pytest.mark.parametrize("query", ["", "task_id=", "task_id=a&amp;task_id=b", "task_id=a&amp;namespace=ui-check", "task_id=a&amp;owner_id=boss-1"])
+    def test_public_source_review_query_rejection(product, query):
+        _, _, pages, _, _ = product
+&gt;       assert pages.serve("BOSS", "/api/boss/ui/assignment-source-review", query)[0] == 400
+E       assert 404 == 400
+
+app/tests/test_product_assignment_sources.py:80: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;task_id=b]" time="0.061"><failure message="assert 404 == 400">product = (&lt;controls.ControlStore object at 0x1084141d0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x108292390&gt;, &lt;boss_page_ap...48fd51', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.921382+00:00', 'status': 'OPEN', ...})
+query = 'task_id=a&amp;task_id=b'
+
+    @pytest.mark.parametrize("query", ["", "task_id=", "task_id=a&amp;task_id=b", "task_id=a&amp;namespace=ui-check", "task_id=a&amp;owner_id=boss-1"])
+    def test_public_source_review_query_rejection(product, query):
+        _, _, pages, _, _ = product
+&gt;       assert pages.serve("BOSS", "/api/boss/ui/assignment-source-review", query)[0] == 400
+E       assert 404 == 400
+
+app/tests/test_product_assignment_sources.py:80: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;namespace=ui-check]" time="0.063"><failure message="assert 404 == 400">product = (&lt;controls.ControlStore object at 0x10845e1b0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x10845f7a0&gt;, &lt;boss_page_ap...19dfc0', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:14.996653+00:00', 'status': 'OPEN', ...})
+query = 'task_id=a&amp;namespace=ui-check'
+
+    @pytest.mark.parametrize("query", ["", "task_id=", "task_id=a&amp;task_id=b", "task_id=a&amp;namespace=ui-check", "task_id=a&amp;owner_id=boss-1"])
+    def test_public_source_review_query_rejection(product, query):
+        _, _, pages, _, _ = product
+&gt;       assert pages.serve("BOSS", "/api/boss/ui/assignment-source-review", query)[0] == 400
+E       assert 404 == 400
+
+app/tests/test_product_assignment_sources.py:80: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_source_review_query_rejection[task_id=a&amp;owner_id=boss-1]" time="0.064"><failure message="assert 404 == 400">product = (&lt;controls.ControlStore object at 0x1084ad4f0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x1084af170&gt;, &lt;boss_page_ap...1348c6', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:15.068800+00:00', 'status': 'OPEN', ...})
+query = 'task_id=a&amp;owner_id=boss-1'
+
+    @pytest.mark.parametrize("query", ["", "task_id=", "task_id=a&amp;task_id=b", "task_id=a&amp;namespace=ui-check", "task_id=a&amp;owner_id=boss-1"])
+    def test_public_source_review_query_rejection(product, query):
+        _, _, pages, _, _ = product
+&gt;       assert pages.serve("BOSS", "/api/boss/ui/assignment-source-review", query)[0] == 400
+E       assert 404 == 400
+
+app/tests/test_product_assignment_sources.py:80: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_maintainer_cannot_review_or_confirm_owner_sources" time="0.069"><failure message="assert 404 == 403">product = (&lt;controls.ControlStore object at 0x108528b00&gt;, &lt;boss_command_api.BossCommandAPI object at 0x10852a240&gt;, &lt;boss_page_ap...0d5687', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:15.150339+00:00', 'status': 'OPEN', ...})
+
+    def test_maintainer_cannot_review_or_confirm_owner_sources(product):
+        _, commands, pages, _, task = product
+        assert pages.serve("MAINTAINER", "/api/boss/ui/assignment-source-review", "task_id=" + task["task_id"])[0] == 403
+&gt;       assert commands.execute("MAINTAINER", "boss.assignment.sources.confirm", {"client_request_id": "source-denied-confirm"})[0] == 403
+E       assert 404 == 403
+
+app/tests/test_product_assignment_sources.py:86: AssertionError</failure></testcase><testcase classname="app.tests.test_product_assignment_sources" name="test_public_result_resubmission_after_current_source_review" time="0.080"><failure message="assert 404 == 200">product = (&lt;controls.ControlStore object at 0x108528a70&gt;, &lt;boss_command_api.BossCommandAPI object at 0x108599f40&gt;, &lt;boss_page_ap...c89838', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:15.230482+00:00', 'status': 'OPEN', ...})
+
+    def test_public_result_resubmission_after_current_source_review(product):
+        _, commands, pages, source, task = product
+&gt;       _, initial_review = confirm(product)
+                            ^^^^^^^^^^^^^^^^
+
+app/tests/test_product_assignment_sources.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/tests/test_product_assignment_sources.py:50: in confirm
+    view = read(product)
+           ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+product = (&lt;controls.ControlStore object at 0x108528a70&gt;, &lt;boss_command_api.BossCommandAPI object at 0x108599f40&gt;, &lt;boss_page_ap...c89838', 'execution_namespace': 'ui-check', 'persisted_at': '2026-10-23T09:33:15.230482+00:00', 'status': 'OPEN', ...})
+
+    def read(product):
+        _, _, pages, _, task = product
+        code, result = pages.serve("BOSS", "/api/boss/ui/assignment-source-review", "task_id=" + task["task_id"])
+&gt;       assert code == 200
+E       assert 404 == 200
+
+app/tests/test_product_assignment_sources.py:44: AssertionError</failure></testcase></testsuite></testsuites>

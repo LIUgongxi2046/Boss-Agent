@@ -1,0 +1,127 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "memory-public-ae08b961-029e-42c2-bef4-161ac3c58388",
+  "at": "2026-10-23T10:03:10.183Z",
+  "application_directory": "validation/.work/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1",
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "6d12e7bdd88aeed69abf5c57da8fcbae5691280396dbb47055aad2e17a5ae651"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "1e3ed4d25fb9a116ff2483b4971550bc52e8f36b24559d7349b4117059d81dfc"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "f33c1f8ecbb5842e838022e38aebff4bf59b6e9929425d7d8acad07e0e89a930"
+    },
+    {
+      "path": "validation/boss_admin_config.py",
+      "sha256": "8c31fea3e7c58d8b45d1382c7e30df927118a356619499d627e705f352a306c9"
+    },
+    {
+      "path": "validation/boss_memory_runtime.py",
+      "sha256": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64"
+    },
+    {
+      "path": "validation/boss_memory.py",
+      "sha256": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "206a36ad69bf7c21e95fece577677e14f5e8f21bc383351d4cb92a2dff17cc95"
+    },
+    {
+      "path": "app/webui/MaintainerMemoryStatus.tsx",
+      "sha256": "6dcdb7396c1c939bf2a9a06d70306fa2e50c1f0cf2d5bb80406752d78e778443"
+    },
+    {
+      "path": "app/webui/BossWorkspaceView.tsx",
+      "sha256": "ef49db07224f29ba970c840e7d09f1e33c4ee6b0d6f126ef4851b96d0e84b385"
+    },
+    {
+      "path": "app/webui/MaintainerRuntimeRecords.tsx",
+      "sha256": "77353ede61ec509a69e138dbf4f5a5281858f51fe9d8c467bb33134ed95d84ea"
+    },
+    {
+      "path": "validation/desktop/check-memory-public.cjs",
+      "sha256": "eb3799bc4e8a4e2167d88a0ba24d1dd9c011822c59521e3caa769ac0044c3f57"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d8c9e9def8d13488ab0288948f7d9458da930461a93d09b25d0bcb60776d7eb9"
+    }
+  ],
+  "records": [
+    {
+      "check": "a12_current_confirmation_and_a15_actual_run_navigation",
+      "status": {
+        "projection": "memory-technical-status",
+        "source_type": "RUNTIME_RECORD",
+        "namespace": "ui-check",
+        "checked_at": "2026-10-23T10:02:36.871857+00:00",
+        "owner_scope": {
+          "owner_id": "boss-1",
+          "dataset_id": "selection",
+          "dataset_version": "1"
+        },
+        "memory_source_type": "SIMULATED",
+        "memory": {
+          "memory_id": "memory-1",
+          "version": "1",
+          "confirmation_state": "CONFIRMED",
+          "valid_until": null
+        },
+        "future_context_eligible": true,
+        "confirmation_authority_checked": true,
+        "next_context_memory_version": "1",
+        "latest_context_selection": {
+          "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "memory_version": "1",
+          "eligible": true,
+          "selected_at": "2026-10-23T09:10:31.058242+00:00",
+          "run_status": "SUCCEEDED",
+          "model_completion_observed": true,
+          "matches_current_memory_version": true,
+          "observation": "CONTEXT_SELECTION_RECORDED"
+        },
+        "context_selection_count": 2,
+        "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
+        "deletion_propagation": "NOT_REQUESTED",
+        "derived_memory_index": "NOT_USED",
+        "deletion_scopes": {
+          "current_memory_content": "NOT_REQUESTED",
+          "initial_approved_source": "RETAINED",
+          "loaded_sessions": "NOT_VERIFIED",
+          "backups": "NOT_VERIFIED",
+          "physical_erasure": "NOT_VERIFIED"
+        },
+        "model_adoption_verified": false,
+        "physical_secure_erasure_verified": false,
+        "private_body_available_here": false,
+        "owner_content_mutation_allowed": false
+      }
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "previous_evidence": {
+    "path": "evidence/T11/w3-local-20261023/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1.json",
+    "sha256": "a5b8a3153697cb4dc56fc1af06345eb234b0ca31d650f3a57dcc3d97394871ee"
+  },
+  "model_service": "api.deepseek.com",
+  "model_id": "deepseek-flash",
+  "source_type": "SIMULATED",
+  "cost_total": null,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A15_accepted": false
+}

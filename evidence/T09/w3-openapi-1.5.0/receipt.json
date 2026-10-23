@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-OPENAPI-150",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-api-150-ccfca96",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "evidence/T06/validate_openapi.py"
+  ],
+  "started_at": "2026-10-23T10:04:08.099951+00:00",
+  "ended_at": "2026-10-23T10:04:10.766889+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/openapi.yaml",
+      "sha256": "f8ad3608fc0d5fde292b5c6d51198a836f6e3ee682dc8fd4c772508b462ff6f0"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-events.schema.json",
+      "sha256": "ab6f912b3ff72b9887bc9225b345774343f738b6f54b3e62246909e600585f93"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-records.schema.json",
+      "sha256": "a13753ddf8c30dbc98499bacc616a1449c3928587f5f0333132e2d07617f13ff"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/assignment-source-review.schema.json",
+      "sha256": "0b0ea12378cb359e955aeb88048a59677f76082d3a4097930751f10bb966c0b0"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T06/validate_openapi.py",
+      "sha256": "a3d46a414bfd954fdacd4fd282037d0c7b78312d5a0915571939dbede82dff06"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/openapi-venv/pyvenv.cfg",
+      "sha256": "81a590a61fb44c9bea84fbf03bc541ed4676aff7eb91417158357bd62bb52ca9"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-openapi-1.5.0/output.log",
+      "sha256": "de916c7aa510bd59bc0e706c50517ee2e6f4a57c13bb04edbde7fe5345949089"
+    }
+  ]
+}

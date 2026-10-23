@@ -27,6 +27,8 @@ from controls import ControlStore
 from model_probe import BusinessTool
 from product_runtime import ProductRuntime
 from boss_runtime_records import RuntimeRecorder
+from runtime_owner_read_tools import BossTodayReadTool, BossOwnerPlansReadTool
+from runtime_assignment_source_tool import BossAssignmentSourcesReadTool
 
 
 @pytest.fixture
@@ -51,6 +53,7 @@ def product(tmp_path):
                 "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
     tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
     tools.append(BossResearchSourcesTool(store, "BOSS"))
+    tools.extend((BossTodayReadTool(store, "BOSS"), BossOwnerPlansReadTool(store, "BOSS"), BossAssignmentSourcesReadTool(store, "BOSS")))
     provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
     loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
     runtime = ProductRuntime(store, filename, loop, registry, tools, provider)

@@ -36,6 +36,7 @@ SAFE_RECEIPT_FIELDS = {
     "plan_id", "date", "item_ids",
     "meeting_version", "review_sha256", "meeting_changed", "invitation_sent", "independent_tasks_unchanged",
     "historical_only",
+    "task_version", "sources_reconfirmed", "business_status_unchanged", "result_evidence_requires_resubmission",
 }
 
 

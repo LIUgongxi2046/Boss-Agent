@@ -23,7 +23,7 @@ class RuntimeValues(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     max_tool_rounds: int = Field(ge=1, le=12)
     max_output_tokens: int = Field(ge=128, le=8192)
-    tool_scope: list[str] = Field(min_length=1, max_length=6)
+    tool_scope: list[str] = Field(min_length=1, max_length=9)
 
 
 class ProductRuntime:
