@@ -1,9 +1,18 @@
 {
-  "version": "1.0.0-draft",
+  "version": "1.0.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
+  "field_policy": {
+    "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
+    "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
+    "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
+    "source_binding": "业务来源属于SIMULATED/PUBLIC_SOURCE，真实执行记录属于RUNTIME_RECORD；Prompt等技术配置另标TECHNICAL_CONFIG。",
+    "revision_binding": "*_revision对象保留原实体相同字段与版本，存储ID追加版本；历史字段不成为当前有效授权。",
+    "nested_property_notation": "嵌套properties中的string、integer、boolean、instant、date、identifier、version和decimal采用types或标准JSON类型；or null表示可空，[]表示数组，范围位于冒号之后。"
+  },
   "types": {
     "identifier": {"type": "string", "nullable": false, "meaning": "当前空间内稳定对象编号"},
     "version": {"type": "string", "pattern": "^[0-9]+$", "nullable": false, "meaning": "提交后递增版本"},
@@ -57,6 +66,297 @@
         "revoked": {"type": "boolean"}, "revoked_at": {"type": ["string", "null"], "clock": "WALL"}
       }
     },
+    "contact": {
+      "storage": "initial/snapshot.contacts", "access": "BOSS_WORK_SOURCE", "version": "1",
+      "fields": {"contact_id": {"type_ref": "identifier"}, "name": {"type": "string"}, "organization": {"type": "string"}, "responsibility": {"type": "string"}, "valid_from": {"type": "string", "format": "date"}, "valid_until": {"type": "string", "format": "date"}},
+      "relations": {"contact_id": ["task.coordinator_id", "feedback.author_contact_id", "message.recipient_id", "document.author_contact_id"]},
+      "identity_policy": "联系人属于资料对象，不具有账号、角色或凭据"
+    },
+    "task": {
+      "storage": "objects/task", "access": "BOSS_BODY_MAINTAINER_SIMULATION_METADATA", "version": "1",
+      "fields": {
+        "task_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
+        "coordinator_id": {"type_ref": "identifier", "relation": "contact.contact_id"},
+        "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string", "format": "IANA"},
+        "status": {"type": "string", "enum": ["OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED", "COMPLETED_CONFIRMED"]},
+        "evidence_requirements": {"type": "array", "items": "string"}, "authorization_id": {"type_ref": "identifier"},
+        "related_meeting_id": {"type_ref": "identifier"}, "related_event_ids": {"type": "array", "items": "event.event_id"},
+        "source_refs": {"type": "array", "items": "document.source_id"}, "source_versions": {"type": "object", "values": "version"},
+        "message_ids": {"type": "array", "items": "outbox.message_id"}, "feedback_ids": {"type": "array", "items": "feedback.feedback_id"},
+        "completion_authorization_id": {"type": ["string", "null"]}, "execution_namespace": {"type_ref": "identifier"},
+        "accepted_extension_feedback_ids": {"type": "array", "items": "feedback.feedback_id", "optional": true},
+        "origin_minute_id": {"type_ref": "identifier", "optional": true}, "origin_minute_version": {"type_ref": "version", "optional": true},
+        "origin_entry_id": {"type_ref": "identifier", "optional": true}, "origin_source_id": {"type_ref": "identifier", "optional": true}, "origin_source_version": {"type_ref": "version", "optional": true},
+        "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason": {"type_ref": "private_text", "optional": true}, "canceled_at": {"type_ref": "instant", "clock": "WALL", "optional": true}
+      }
+    },
+    "self_commitment": {
+      "storage": "objects/self_commitment", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "commitment_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
+        "status": {"type": "string", "enum": ["ACTIVE", "COMPLETED_CONFIRMED", "CANCELED"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"},
+        "importance": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "evidence_requirements": {"type": "array", "items": "string"},
+        "source_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "completion_evidence": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
+        "authorization_id": {"type_ref": "identifier"}, "completion_authorization_id": {"type": ["string", "null"]},
+        "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "external_message_sent": {"type": "boolean", "const": false},
+        "last_extension_authorization_id": {"type_ref": "identifier", "optional": true}, "completed_at": {"type_ref": "instant", "optional": true}, "canceled_at": {"type_ref": "instant", "optional": true},
+        "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason_sha256": {"type": "string", "optional": true}
+      }
+    },
+    "feedback": {
+      "storage": "objects/feedback", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"feedback_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"},
+        "kind": {"type": "string", "enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": {"type_ref": "private_text"}, "evidence_refs": {"type": "array", "items": "document.source_id"},
+        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}}
+    },
+    "message_draft": {
+      "storage": "objects/message_draft", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"draft_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["DRAFT", "SENT_SIMULATED"]},
+        "recipient_id": {"type_ref": "identifier"}, "recipient_name_at_save": {"type": "string"}, "organization_at_save": {"type": "string"}, "related_task_id": {"type": ["string", "null"]},
+        "body": {"type_ref": "private_text", "maxLength": 2400}, "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
+        "visibility": {"type": "string", "const": "RECIPIENT_ONLY"}, "content_sha256": {"type": "string"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "message_id": {"type": ["string", "null"]}}
+    },
+    "message": {
+      "storage": "objects/message_outbox", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"message_id": {"type_ref": "identifier"}, "draft_id": {"type_ref": "identifier"}, "draft_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "related_task_id": {"type": ["string", "null"]},
+        "body": {"type_ref": "private_text"}, "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "RECIPIENT_ONLY"}, "authorization_id": {"type_ref": "identifier"},
+        "sent_at": {"type_ref": "instant", "clock": "WALL"}, "send_state": {"type": "string", "const": "SENT_SIMULATED"}, "delivery_state": {"type": "string", "const": "NOT_VERIFIED"}, "reply_state": {"type": "string", "enum": ["NOT_RECEIVED", "RECEIVED_SIMULATED"]},
+        "external_channel_invoked": {"type": "boolean", "const": false}, "reply_id": {"type_ref": "identifier", "optional": true}}
+    },
+    "message_reply": {
+      "storage": "objects/message_reply", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"reply_id": {"type_ref": "identifier"}, "reply_to": {"type_ref": "identifier", "relation": "message.message_id"}, "author_contact_id": {"type_ref": "identifier"}, "text": {"type_ref": "private_text"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "related_task_id": {"type": ["string", "null"]},
+        "task_completion_confirmed": {"type": "boolean", "const": false}, "task_feedback_id": {"type": ["string", "null"]}, "task_status_after_reply": {"type": ["string", "null"]}}
+    },
+    "outbox": {
+      "storage": "objects/outbox", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"message_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "body": {"type_ref": "private_text"}, "content_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "idempotency_key": {"type": "string"}, "envelope": {"type": "object", "meaning": "服务端绑定 owner/dataset/namespace/session/request"}, "message_status": {"type": "string", "const": "SENT"}, "task_status": {"type": "string", "const": "WAITING_FEEDBACK"}, "sent_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
+    "application": {
+      "storage": "objects/application", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"application_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "title": {"type_ref": "private_text", "maxLength": 100}, "description": {"type_ref": "private_text", "maxLength": 1500}, "applicant_contact_id": {"type_ref": "identifier"},
+        "amount": {"type_ref": "decimal", "unit": "CNY", "scale": 2}, "currency": {"type": "string", "const": "CNY"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"},
+        "state": {"type": "string", "enum": ["PENDING_DECISION", "WAITING_MATERIAL", "APPROVED_RECORDED", "REJECTED_RECORDED"]}, "seeded_by_role": {"type": "string", "const": "MAINTAINER"}, "decision_id": {"type": ["string", "null"]},
+        "decision_authorization_id": {"type_ref": "identifier", "optional": true}, "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "optional": true}, "funds_transferred": {"type": "boolean", "const": false}, "professional_release_issued": {"type": "boolean", "const": false}}
+    },
+    "application_decision": {
+      "storage": "objects/application_decision", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"decision_id": {"type_ref": "identifier"}, "application_id": {"type_ref": "identifier"}, "application_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "amount": {"type_ref": "decimal", "unit": "CNY"}, "currency": {"type": "string", "const": "CNY"},
+        "action": {"type": "string", "enum": ["APPROVE", "REJECT", "REQUEST_MORE"]}, "comment": {"type_ref": "private_text", "maxLength": 1200}, "authorization_id": {"type_ref": "identifier"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}, "funds_transferred": {"type": "boolean", "const": false}, "professional_release_issued": {"type": "boolean", "const": false}}
+    },
+    "meeting": {
+      "storage": "initial/snapshot.meeting", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"meeting_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "participant_ids": {"type": "array", "items": "contact.contact_id"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "material_ids": {"type": "array", "items": "document.source_id or event.event_id"}, "historical_commitment_ids": {"type": "array", "items": "task.task_id"}},
+      "unknown_fields": {"ends_at": "当前获准资料未提供；不能推断冲突不存在"}
+    },
+    "minutes": {
+      "storage": "objects/minutes", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"minute_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "version": {"type_ref": "version"},
+        "entries": {"type": "array", "items": {"entry_id": "identifier", "kind": "OPINION|SUGGESTION|DECISION|ASSIGNMENT_DRAFT", "text": "private_text", "source_anchor": "string", "source_id": "identifier", "source_version": "version", "task_created": "boolean", "message_sent": "boolean"}},
+        "state": {"type": "string", "enum": ["DRAFT_REVIEW", "CONFIRMED"]}, "confirmed_at": {"type": ["string", "null"], "clock": "WALL"}, "confirmation_authorization_id": {"type": ["string", "null"]}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "task_count_created": {"type": "integer"}, "message_count_sent": {"type": "integer"}}
+    },
+    "minutes_assignment_link": {
+      "storage": "objects/minutes_assignment_link", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"link_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "minute_id": {"type_ref": "identifier"}, "minute_version": {"type_ref": "version"}, "entry_id": {"type_ref": "identifier"}, "entry_kind": {"type": "string", "const": "ASSIGNMENT_DRAFT"}, "entry_text_sha256": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "task_id": {"type_ref": "identifier"}, "authorization_id": {"type_ref": "identifier"}, "linked_at": {"type_ref": "instant", "clock": "WALL"}, "task_status_at_link": {"type": "string", "const": "OPEN"}, "message_sent_at_link": {"type": "boolean", "const": false}}
+    },
+    "private_calendar": {
+      "storage": "objects/private_calendar or initial/snapshot.private_calendar", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"calendar_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "ends_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "private_body": {"type_ref": "private_text", "maxLength": 2000}, "title": {"type_ref": "private_text", "maxLength": 160}, "location": {"type_ref": "private_text", "maxLength": 240},
+        "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "PRIVATE"}, "status": {"type": "string", "enum": ["ACTIVE", "DELETED"]}, "updated_at": {"type_ref": "instant", "optional": true}, "calendar_conflict_proven_absent": {"type": "boolean", "const": false, "optional": true}, "meeting_end_unknown": {"type": "boolean", "const": true, "optional": true}}
+    },
+    "calendar_share": {
+      "storage": "objects/calendar_share", "access": "BOSS_ONLY_WITH_SCOPED_BUSY_PREVIEW", "version": "1",
+      "fields": {"share_id": {"type_ref": "identifier"}, "calendar_id": {"type_ref": "identifier"}, "calendar_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "purpose_sha256": {"type": "string"}, "busy": {"type": "boolean", "const": true}, "starts_at": {"type_ref": "instant"}, "ends_at": {"type_ref": "instant"}, "timezone": {"type": "string"}, "expires_at": {"type_ref": "instant", "clock": "BUSINESS"}, "authorization_id": {"type_ref": "identifier"}, "revoked": {"type": "boolean"}, "revoked_at": {"type": ["string", "null"], "clock": "WALL"}, "revocation_reason": {"type": "string", "optional": true}, "external_delivery_created": {"type": "boolean", "const": false}}
+    },
+    "document": {
+      "storage": "objects/document + FTS5 knowledge", "access": "OWNER_SCOPE", "version": "1",
+      "fields": {"source_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE"]}, "author_contact_id": {"type_ref": "identifier"}, "content": {"type_ref": "private_text"}, "access_scope": {"type_ref": "identifier", "meaning": "获准 owner_id"}, "original_locator": {"type": "string"}, "published_at": {"type_ref": "instant"}, "valid_from": {"type_ref": "instant", "optional": true},
+        "observed_at": {"type_ref": "instant", "optional": true}, "withdrawn": {"type": "boolean", "optional": true}, "withdrawn_at": {"type": ["string", "null"], "optional": true}, "replaced_source_version": {"type_ref": "version", "optional": true}, "index_state": {"type": "string", "optional": true}, "title": {"type": "string", "optional": true}, "created_by_role": {"type": "string", "optional": true}}
+    },
+    "memory": {
+      "storage": "objects/memory/current", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"memory_id": {"type_ref": "identifier"}, "memory_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "confirmation_state": {"type": "string", "enum": ["CONFIRMED", "DELETED"]}, "text": {"type_ref": "private_text", "maxLength": 4000}},
+      "pending_fields": {"authorization_id": "W3/W2 需绑定确认授权，检查将来采用时的撤销状态"}
+    },
+    "schedule": {
+      "storage": "objects/schedule/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",
+      "fields": {"schedule_id": {"type_ref": "identifier"}, "schedule_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "trigger": {"type": "string", "const": "EVENT_OR_TIME"}, "timezone": {"type": "string", "const": "Asia/Shanghai"}, "enabled": {"type": "boolean"}, "canceled": {"type": "boolean"}, "active_draft_version": {"type_ref": "version", "optional": true}, "last_configured_at": {"type_ref": "instant", "optional": true}}
+    },
+    "rules": {
+      "storage": "objects/rules/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",
+      "fields": {"version": {"type_ref": "version"}, "cooldown_seconds": {"type": "integer", "unit": "second", "minimum": 0, "maximum": 86400}, "quiet_start": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "quiet_end": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "timezone": {"type": "string", "const": "Asia/Shanghai"}, "important_escalation": {"type": "boolean"}}
+    },
+    "event": {
+      "storage": "objects/event", "access": "BOSS_WITH_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["OPEN", "RECOVERED", "CANCELED"]}, "impact": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "task_id": {"type_ref": "identifier", "optional": true}, "task_version": {"type_ref": "version", "optional": true}, "commitment_id": {"type_ref": "identifier", "optional": true}, "commitment_version": {"type_ref": "version", "optional": true}, "generated_by": {"type": "string", "optional": true}, "updated_at": {"type_ref": "instant", "optional": true}, "transition_reason": {"type": "string", "optional": true}, "automatic_external_delivery": {"type": "boolean", "const": false, "optional": true}, "external_delivery_created": {"type": "boolean", "const": false, "optional": true}}
+    },
+    "reminder": {
+      "storage": "objects/reminder", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version", "optional": true}, "state": {"type": "string", "enum": ["SNOOZED", "CLOSED", "ACKNOWLEDGED"]}, "until": {"type": ["string", "null"], "clock": "BUSINESS"}}
+    },
+    "dispatch": {
+      "storage": "objects/dispatch", "access": "BOSS_WITH_MAINTAINER_TECHNICAL_METADATA", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SUPPRESSED", "DELIVERED"]}, "reason": {"type": ["string", "null"]}, "rule_version": {"type_ref": "version"}, "schedule_version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "owner_notice_version": {"type_ref": "version", "optional": true}}
+    },
+    "notification": {
+      "storage": "objects/notification and objects/delivery", "access": "BOSS_WITH_REDACTED_SYSTEM_NOTIFICATION", "version": "1", "inherits": "dispatch",
+      "fields": {"delivered_at": {"type_ref": "instant", "clock": "BUSINESS"}, "source_type": {"type": "string", "const": "SIMULATED"}},
+      "delivery_semantics": "DELIVERED 表示内部通知已保存；不能证明系统通知或外部人员送达"
+    },
+    "meeting_brief": {
+      "storage": "objects/meeting_brief", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"brief_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["READY_FOR_REVIEW", "NEEDS_REVIEW"]},
+        "compiled": {"type": "object", "properties": {"meeting": "meeting_reference", "participants": "contact[]", "sources": "source_reference[]", "commitments": "task_reference[]", "event": "event_reference", "metrics": "metric_result", "travel_impacts": "travel_reference[]", "people_meeting_impacts": "person_brief_reference[]", "owner_goal_reference": "owner_goal_version", "missing_items": "string[]", "needs_review": "boolean", "prepared_for_owner": "identifier", "source_type": "SIMULATED"}},
+        "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "reviewed_by_owner": {"type": "boolean", "const": false}, "meeting_occurred": {"type": "boolean", "const": false}, "message_sent": {"type": "boolean", "const": false}}
+    },
+    "research": {
+      "storage": "objects/research", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"research_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SOURCE_REVIEW_REQUIRED", "NEEDS_REVIEW"]},
+        "scope": {"type": "object", "properties": {"question": "string:2..160", "period": "string:0..60", "country": "string:0..60", "business_relation": "string:0..160", "cutoff_date": "date"}},
+        "matched_sources": {"type": "array", "items": {"source_id": "identifier", "version": "version", "published_at": "instant or date", "author_contact_id": "identifier or null", "original_locator": "string", "quote_start": "integer", "quote_end": "integer", "quote": "private_text", "match_start": "integer", "claim_kind": "UNVERIFIED_SOURCE_EXCERPT", "source_text_is_untrusted_instruction": "boolean"}},
+        "coverage": {"type": "object", "meaning": "可用/匹配/拒绝数量、20条上限、来源覆盖，公开搜索与语义检索当前 false"}, "facts_confirmed": {"type": "array", "const": []}, "author_opinions_confirmed": {"type": "array", "const": []}, "model_inferences": {"type": "array", "const": []}, "missing_items": {"type": "array", "items": "string"},
+        "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "published_conclusions": {"type": "boolean", "const": false}, "external_message_sent": {"type": "boolean", "const": false}}
+    },
+    "person_brief": {
+      "storage": "objects/person_brief", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"brief_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["READY_FOR_REVIEW", "MATERIALS_MISSING", "ATTACHED_TO_MEETING_AGENDA", "UNLINKED_FROM_MEETING_AGENDA"]},
+        "compiled": {"type": "object", "properties": {"contact": "contact", "purpose": "private_text", "meeting": "meeting_reference or null", "goals": "string[]", "sources": "source_reference[]", "tasks": "task_reference[]", "feedback": "feedback_reference[]", "questions": "object[]", "has_original_evidence": "boolean", "external_meeting_updated": "false", "personal_traits_inferred": "false"}},
+        "compiled_sha256": {"type": "string"}, "linked_meeting_version": {"type": ["string", "null"]}, "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "unlink_reason": {"type_ref": "private_text", "optional": true}}
+    },
+    "travel_plan": {
+      "storage": "objects/travel_plan", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"travel_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["DRAFT_REVIEWED", "CONFIRMED", "CANCELED"]},
+        "current": {"type": ["object", "null"], "properties": {"origin": "private_text", "destination": "private_text", "starts_at": "instant", "ends_at": "instant", "starts_at_utc": "instant", "ends_at_utc": "instant", "timezone": "IANA", "host_contact_id": "identifier", "host_responsibility": "string", "buffer_minutes": "integer:0..360", "transport_refs": "source_reference[]"}},
+        "pending": {"type": ["object", "null"], "properties": {"details": "travel_plan.current", "impact": "travel_impact", "review_sha256": "string", "reviewed_at": "instant"}},
+        "impact_at_confirmation": {"type": "object", "meaning": "会议起始/结束未知、私人占用、任务期限、已确认行程、资料缺口与覆盖范围", "optional": true},
+        "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "authorization_id": {"type_ref": "identifier", "optional": true}, "cancel_reason": {"type_ref": "private_text", "optional": true}}
+    },
+    "owner_goals": {
+      "storage": "objects/owner_goals_draft and owner_goals_active", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT_NOT_EFFECTIVE", "CONFIRMED"]},
+        "content": {"type": "object", "properties": {"goals": "string[1..8], each 1..160", "topics": "string[0..10], each 1..120", "reading_requirement": "string:1..800", "scope": "OWNER_WORKSPACE|DAILY_BRIEF|MEETING_PREP", "valid_until": "instant or null, BUSINESS clock", "source": "OWNER_EXPLICIT_INPUT"}},
+        "content_sha256": {"type": "string"}, "author_identity": {"type": "string", "const": "BOSS"}, "saved_at": {"type_ref": "instant", "optional": true}, "confirmed": {"type": "boolean", "optional": true}, "source_draft_version": {"type_ref": "version", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "confirmed_at": {"type_ref": "instant", "optional": true}}
+    },
+    "owner_notice": {
+      "storage": "objects/owner_notice_draft and owner_notice_active", "access": "BOSS_ONLY", "version": "1", "inherits_metadata": "owner_goals",
+      "fields": {"content": {"type": "object", "properties": {"timezone": "IANA", "quiet_start": "integer:0..23", "quiet_end": "integer:0..23", "notifications_enabled": "boolean", "important_during_quiet": "boolean", "reading_format": "ACTIONS_FIRST|SUMMARY|DETAIL", "visibility": "BOSS_ONLY", "calendar_share_limit": "BUSY_ONLY", "valid_until": "instant or null, BUSINESS clock", "source": "OWNER_EXPLICIT_INPUT"}}}
+    },
+    "prompt": {
+      "storage": "objects/prompt_draft, prompt_active, prompt_context_use", "access": "MAINTAINER_CONFIG_WITH_BOSS_RUNTIME_USE", "version": "1",
+      "fields": {"prompt_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "kind": {"type": "string", "enum": ["SECRETARY_ROLE", "EXPRESSION", "TASK_HINTS"]}, "title": {"type": "string", "maxLength": 120}, "instruction_text": {"type": "string", "minLength": 20, "maxLength": 5000}, "change_note": {"type": "string", "maxLength": 360}, "source_refs": {"type": "array", "items": "source_reference"}, "content_sha256": {"type": "string"},
+        "validation_status": {"type": "string", "enum": ["DRAFT_UNVALIDATED", "VALIDATED_STATIC_ONLY"]}, "validated_content_sha256": {"type": ["string", "null"]}, "validated_at": {"type": ["string", "null"]}, "updated_at": {"type_ref": "instant"}, "actual_model_evaluation_passed": {"type": "boolean", "const": false}},
+      "active_fields": {"kind": "prompt.kind", "active_version": "version", "prompt_id": "identifier", "prompt_version": "version", "content_sha256": "string", "enabled": "boolean", "activated_at": "instant", "deactivated_at": "instant optional", "adoption_policy": "NEXT_BOSS_TURN_ONLY", "actual_model_evaluation_passed": "false"},
+      "adoption_fields": {"kind": "prompt.kind", "prompt_id": "identifier", "prompt_version": "version", "active_version": "version", "content_sha256": "string", "at": "instant WALL", "context_load_count": "integer", "observation": "RUNTIME_CONTEXT_PROVIDER_INVOKED", "model_completion_verified": "false", "technical_configuration_grants_business_authority": "false"}
+    },
+    "configuration": {
+      "storage": "objects/configuration/current", "access": "SERVER_ONLY_WITH_REDACTED_MAINTAINER_STATUS", "version": "1",
+      "fields": {"config_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "provider": {"type": "string", "const": "deepseek"}, "api_type": {"type": "string", "const": "chat_completions"}, "model_id": {"type": "string"}, "credential_ref": {"type": "string", "access": "SERVER_ONLY"}, "tool_scope": {"type": "array", "items": "operationId"}, "max_tool_rounds": {"type": "integer"}, "timeout": {"type": "integer", "unit": "second"}, "enabled": {"type": "boolean"}},
+      "runtime_policy": "真实有效模型配置仍需 W2 验证，模拟配置记录不能证明 Runtime 已采用"
+    },
+    "scheduler_draft": {
+      "storage": "objects/scheduler_draft/current", "access": "MAINTAINER_ONLY", "version": "1",
+      "fields": {"draft_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "configuration": {"type": "object", "properties": {"trigger": "EVENT_OR_TIME", "timezone": "Asia/Shanghai", "quiet_start": "integer:0..23", "quiet_end": "integer:0..23", "cooldown_seconds": "integer:0..86400", "important_escalation": "boolean"}}, "validation_state": {"type": "string", "enum": ["DRAFT", "VALIDATED", "ACTIVE"]}, "validated_at": {"type": ["string", "null"]}, "activated_at": {"type": ["string", "null"]}, "saved_at": {"type_ref": "instant"}, "schedule_activated": {"type": "boolean"}, "schedule_version_at_validation": {"type_ref": "version", "optional": true}}
+    },
+    "query": {
+      "storage": "objects/query", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"query_id": {"type_ref": "identifier"}, "envelope": {"type": "object", "properties": {"request_id": "identifier", "owner_id": "identifier", "execution_namespace": "identifier", "dataset_id": "identifier", "dataset_version": "version", "session_id": "identifier"}},
+        "values": {"type": "array", "items": {"metric_id": "identifier", "period_scope": "BASE|CURRENT", "scope_description": "string", "value": "decimal or null", "unit": "string", "formula": "string", "definition_version": "version", "display_rounding": "string"}},
+        "detail_refs": {"type": "array", "items": "metric_detail.record_id"}, "sources": {"type": "array", "items": "source_reference_with_freshness"}, "missing_fields": {"type": "array", "items": "string"}, "unexplained_causes": {"type": "array", "items": "string"}}
+    },
+    "voice_transcript": {
+      "storage": "W2 TranscriptionResult and protected voice records", "access": "BOSS_ONLY", "version": "1", "design_status": "W2_PROVIDER_RESULT_DEFINED_PRODUCT_REVIEW_BINDING_PENDING",
+      "fields": {"text": {"type_ref": "private_text", "meaning": "真实服务原始转写；业务采用前需本人核查"}, "request_id": {"type_ref": "identifier"}, "provider_log_id": {"type": "string"}, "source_sha256": {"type": "string"}, "local_duration_ms": {"type": "integer", "unit": "millisecond"}, "provider_duration_ms": {"type": "integer", "unit": "millisecond"}, "elapsed_ms": {"type": "integer", "unit": "millisecond"}, "provider": {"type": "string", "const": "doubao"}, "resource_id": {"type": "string"}, "cost_total": {"type_ref": "decimal"}, "cost_coverage": {"type": "string"}},
+      "source": "W2 validation/boss_transcription.py TranscriptionResult; no credential or recording read",
+      "pending_product_fields": ["owner-reviewed text version", "confirmation authorization", "related business request ID", "cancellation and recording retention state"]
+    },
+    "runtime_run": {
+      "storage": "nanobot SessionManager and protected runtime records", "access": "ROLE_SCOPED_METADATA_WITH_BOSS_BODY", "version": "1", "design_status": "REQUIRES_W2_BINDING",
+      "fields": {"run_id": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "request_id": {"type_ref": "identifier"}, "configuration_version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["QUEUED", "RUNNING", "WAITING_INPUT", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"]}, "stop_reason": {"type": ["string", "null"]}, "started_at": {"type_ref": "instant", "clock": "WALL"}, "finished_at": {"type": ["string", "null"], "clock": "WALL"}, "tool_results": {"type": "array", "items": "persisted_business_result_reference"}, "usage": {"type": ["object", "null"]}, "cost_total": {"type_ref": "decimal", "nullable": true}, "price_version": {"type": ["string", "null"]}, "usage_coverage": {"type": "string"}}
+    },
+    "agriculture_batch": {
+      "storage": "objects/agriculture_batch, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"batch_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type": ["string", "null"]}, "ownership_type": {"type": "string", "enum": ["COMPANY", "CUSTOMER", "COOPERATION"]}, "asset_owner_id": {"type_ref": "identifier"}, "cost_owner_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string"}, "stage": {"type": "string"}, "unit_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "quality_state": {"type": "string"}, "settlement_state": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "agriculture_transfer": {
+      "storage": "objects/agriculture_transfer, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"transfer_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "from_batch_id": {"type_ref": "identifier"}, "to_batch_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "transferred_at": {"type_ref": "instant", "clock": "BUSINESS"}, "relationship_state": {"type": "string", "enum": ["CONFIRMED", "PENDING_REVIEW", "CONFLICTED"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "agriculture_observation": {
+      "storage": "objects/agriculture_observation, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"observation_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "unit_id": {"type_ref": "identifier"}, "observed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "measurement_method": {"type": "string"}, "metric_id": {"type_ref": "identifier"}, "value": {"type_ref": "decimal"}, "unit": {"type": "string"}, "coverage": {"type": "string"}, "estimation_status": {"type": "string", "enum": ["OBSERVED", "ESTIMATED", "CONFIRMED", "UNKNOWN"]}, "error_range": {"type": ["object", "null"]}, "professional_state": {"type": "string"}, "author_contact_id": {"type_ref": "identifier"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "exchange_rate": {
+      "storage": "objects/exchange_rate, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"rate_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "currency_from": {"type": "string"}, "currency_to": {"type": "string"}, "exchange_rate": {"type_ref": "decimal"}, "exchange_rate_date": {"type": "string", "format": "date"}, "rate_type": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "experiment": {
+      "storage": "objects/experiment, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"experiment_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "objective": {"type": "string"}, "treatment": {"type": "object"}, "control": {"type": ["object", "null"]}, "sample_size": {"type": ["integer", "null"]}, "denominator": {"type_ref": "decimal"}, "observation_window": {"type": "object", "properties": {"starts_at": "instant", "ends_at": "instant"}}, "conditions": {"type": "object"}, "outcome": {"type": "object"}, "applicability": {"type": "string"}, "review_source_id": {"type_ref": "identifier"}, "review_source_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "material_quote": {
+      "storage": "objects/material_quote, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"quote_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "material_id": {"type_ref": "identifier"}, "supplier_contact_id": {"type_ref": "identifier"}, "region_id": {"type_ref": "identifier"}, "price": {"type_ref": "decimal"}, "currency": {"type": "string"}, "price_unit": {"type": "string"}, "quality_grade": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "material_contract": {
+      "storage": "objects/material_contract, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"contract_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "supplier_contact_id": {"type_ref": "identifier"}, "material_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "unit_price": {"type_ref": "decimal"}, "currency": {"type": "string"}, "delivery_window": {"type": "object", "properties": {"starts_at": "instant", "ends_at": "instant"}}, "settlement_state": {"type": "string"}, "quality_requirements": {"type": ["object", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "inventory_lot": {
+      "storage": "objects/inventory_lot, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"inventory_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "material_id": {"type_ref": "identifier"}, "warehouse_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "asset_owner_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "available_quantity": {"type_ref": "decimal"}, "quality_state": {"type": "string"}, "expires_at": {"type": ["string", "null"]}, "in_transit": {"type": "boolean"}, "observed_at": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "feed_formula": {
+      "storage": "objects/feed_formula, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"formula_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "product_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string"}, "stage": {"type": "string"}, "professional_state": {"type": "string"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "ingredients": {"type": "array", "items": {"material_id": "identifier", "ratio": "decimal or null", "ratio_unit": "string", "quality_requirement": "object or null"}}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "仅作为成本与资源协调的来源，系统没有配方发布能力"
+    },
+    "business_order": {
+      "storage": "objects/business_order, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"order_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"}, "region_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "trade_type": {"type": "string"}, "due_at": {"type_ref": "instant"}, "amount": {"type_ref": "decimal"}, "currency": {"type": "string"}, "status": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "season_curve": {
+      "storage": "objects/season_curve, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"curve_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "region_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "channel_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"}, "points": {"type": "array", "items": {"date": "date", "value": "decimal or null", "unit": "string", "estimation_status": "string"}}, "coverage": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "transport_record": {
+      "storage": "objects/transport_record, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"transport_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "transfer_id": {"type_ref": "identifier"}, "departed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant"}, "received_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "receiver_contact_id": {"type_ref": "identifier"}, "observations": {"type": "array", "items": "agriculture_observation.observation_id"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "professional_record": {
+      "storage": "objects/professional_record, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"professional_record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"}, "batch_id": {"type": ["string", "null"]}, "event_id": {"type": ["string", "null"]}, "observation_ids": {"type": "array", "items": "agriculture_observation.observation_id"}, "state": {"type": "string", "enum": ["OBSERVED", "PENDING_REVIEW", "PROFESSIONALLY_CONFIRMED", "ACTION_REPORTED", "FOLLOWUP_PENDING", "REVIEW_RESULT_REPORTED"]}, "applicability": {"type": "string"}, "content": {"type_ref": "private_text"}, "followup_at": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "本人交办与专业状态分别保存，完成交办不能修改专业确认"
+    },
+    "cycle_cost": {
+      "storage": "objects/cycle_cost, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"cost_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "cycle_id": {"type_ref": "identifier"}, "batch_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "cost_owner_id": {"type_ref": "identifier"}, "cost_category": {"type": "string"}, "amount": {"type_ref": "decimal"}, "currency": {"type": "string"}, "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"}, "settlement_state": {"type": "string", "enum": ["PLANNED", "ACTIVE", "PARTIALLY_SETTLED", "SETTLED"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "livestock_output": {
+      "storage": "objects/livestock_output, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"output_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string", "enum": ["BROILER", "EGG", "MILK", "BEEF"]}, "stage": {"type": "string"}, "age_days": {"type": ["integer", "null"], "unit": "day"}, "feed_quantity": {"type_ref": "decimal"}, "feed_unit": {"type": "string"}, "output_quantity": {"type_ref": "decimal"}, "output_unit": {"type": "string"}, "eligible_output_quantity": {"type_ref": "decimal"}, "observation_start": {"type_ref": "instant"}, "observation_end": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "四种用途分别查询；单位、阶段或期间不相容时拒绝合并"
+    },
+    "equipment_relation": {
+      "storage": "objects/equipment_relation, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"relation_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "equipment_id": {"type_ref": "identifier"}, "unit_id": {"type_ref": "identifier"}, "batch_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "asset_owner_id": {"type_ref": "identifier"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "relation_state": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "quality_trace": {
+      "storage": "objects/quality_trace, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"trace_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "complaint_id": {"type_ref": "identifier"}, "input_batch_id": {"type_ref": "identifier"}, "output_batch_id": {"type_ref": "identifier"}, "processing_id": {"type_ref": "identifier"}, "inventory_id": {"type": ["string", "null"]}, "customer_id": {"type": ["string", "null"]}, "input_quantity": {"type_ref": "decimal"}, "output_quantity": {"type_ref": "decimal"}, "loss_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "trace_state": {"type": "string", "enum": ["CONFIRMED", "POSSIBLE", "MISSING", "CONFLICTED"]}, "inspection_state": {"type": "string"}, "professional_record_id": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "cash_receivable": {
+      "storage": "objects/cash_receivable, planned", "access": "BOSS_READ_ONLY_APPROVED_FINANCE_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"finance_record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type": ["string", "null"]}, "order_id": {"type": ["string", "null"]}, "record_type": {"type": "string", "enum": ["CASH", "RECEIVABLE", "PAYMENT", "SETTLEMENT"]}, "amount_local": {"type_ref": "decimal"}, "currency": {"type": "string"}, "due_at": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "settlement_state": {"type": "string"}, "exchange_rate_id": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "production_capacity": {
+      "storage": "objects/production_capacity, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"capacity_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "country": {"type": "string"}, "factory_id": {"type_ref": "identifier"}, "process_stage_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"}, "period_start": {"type_ref": "instant"}, "period_end": {"type_ref": "instant"}, "timezone": {"type": "string"}, "capacity_quantity": {"type_ref": "decimal"}, "planned_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "changeover_conditions": {"type": ["object", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "customer_feedback": {
+      "storage": "objects/customer_feedback, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"feedback_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "customer_id": {"type_ref": "identifier"}, "author_contact_id": {"type_ref": "identifier"}, "batch_id": {"type": ["string", "null"]}, "experiment_id": {"type": ["string", "null"]}, "application_version": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "content": {"type_ref": "private_text"}, "coverage": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
     "metric_detail": {
       "storage": "initial/snapshot.details", "access": "BOSS", "version": "1",
       "fields": {
@@ -84,6 +384,32 @@
     "valid_from": "允许采用起始时间", "valid_until": "允许采用终止时间",
     "business_at": "模拟业务时间", "created_at": "真实创建时间", "read_at": "真实查询时间"
   },
-  "pending_entities": ["contact", "task", "self_commitment", "feedback", "message", "message_draft", "application", "application_decision", "meeting", "meeting_minutes", "meeting_brief", "private_calendar", "calendar_share", "research", "people", "travel", "document", "memory", "schedule", "rules", "event", "notification", "runtime_run", "agriculture_batch", "agriculture_transfer", "agriculture_observation", "exchange_rate", "experiment"],
-  "pending_validation": ["complete field enumeration", "all R01-R32 field coverage", "migration and restore", "source deletion propagation", "independent semantic review"]
+  "pending_entities": [],
+  "requirement_entities": {
+    "R01": ["today_order", "meeting", "task", "self_commitment", "event", "owner_goals"],
+    "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification"],
+    "R03": ["query", "metric_detail"], "R04": ["meeting", "meeting_brief", "document", "task"],
+    "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
+    "R06": ["task", "self_commitment", "feedback", "outbox", "event"],
+    "R07": ["application", "application_decision", "document", "authorization"],
+    "R08": ["contact", "message_draft", "message", "message_reply", "authorization"],
+    "R09": ["document", "research"], "R10": ["contact", "person_brief", "task", "feedback"],
+    "R11": ["travel_plan", "meeting", "private_calendar", "document"],
+    "R12": ["private_calendar", "calendar_share", "authorization"], "R13": ["memory", "authorization", "application_decision", "document"],
+    "R14": ["material_quote", "material_contract", "inventory_lot", "feed_formula", "business_order", "production_capacity"],
+    "R15": ["season_curve", "business_order", "agriculture_batch", "agriculture_observation"],
+    "R16": ["agriculture_batch", "agriculture_transfer", "transport_record", "customer_feedback"],
+    "R17": ["agriculture_observation", "professional_record", "task", "feedback"],
+    "R18": ["agriculture_batch", "agriculture_transfer", "cycle_cost", "cash_receivable"],
+    "R19": ["agriculture_batch", "livestock_output", "customer_feedback", "person_brief"],
+    "R20": ["equipment_relation", "agriculture_batch", "agriculture_observation", "professional_record", "cycle_cost"],
+    "R21": ["quality_trace", "inventory_lot", "agriculture_batch", "professional_record", "customer_feedback"],
+    "R22": ["business_order", "production_capacity", "cash_receivable", "exchange_rate", "meeting", "travel_plan"],
+    "R23": ["experiment", "professional_record", "customer_feedback", "application_decision", "task"],
+    "R24": ["runtime_run", "configuration", "query", "task"], "R25": ["metric_detail", "document", "event", "feedback"],
+    "R26": ["owner_goals", "owner_notice", "configuration", "authorization"], "R27": ["voice_transcript", "runtime_run", "authorization", "task"],
+    "R28": ["authorization", "document", "private_calendar", "calendar_share"], "R29": ["authorization", "runtime_run", "task"],
+    "R30": ["runtime_run", "configuration", "query"], "R31": ["runtime_run", "query", "metric_detail"], "R32": ["runtime_run", "configuration", "schedule"]
+  },
+  "pending_validation": ["migration and restore", "source deletion propagation", "independent semantic review", "W2 runtime and voice record binding"]
 }

@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本 `1.0.0-draft`；T06/A06；2026-10-23；引用 LLD-data `1.0.0-draft`、PRD V1.2.0 和 HLD 1.0.0。本文件描述当前接口和确定的新增领域接口，完整接口清单尚需逐项补充，A06 保持 NOT_RUN。
+版本1.0.0；T06/A06；2026-10-23；引用LLD-data1.0.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整合法输入匹配、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -16,7 +16,7 @@ RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 
 
 现有读取使用 `/api/boss/ui/*` HTTP Bearer。现有写入使用已认证 nanobot WebSocket：`type=webui_request, request_id, action, payload`；响应 `event=webui_response, request_id, ok, result|error`。业务幂等 ID 在 payload 内，与传输 request_id 分开。重新连接产生新传输请求时仍保留原 client_request_id。此协议没有 Last-Event-ID 或 SSE 心跳承诺。
 
-已有读取包括 dashboard、tasks、meetings、evidence、metrics、workspace 各投影、sector、operation-status、calendar-share-preview、calendar-conflict、model-health，以及 MAINTAINER 的 maintenance/model-usage。具体参数继续由当前处理函数校验；正式 OpenAPI 草稿目前只展开 W1 新增能力。
+OpenAPI定义全部当前HTTP读取、58项现有WebSocket命令、5项新增W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、现有读取位置、可用状态和缺少来源；通用模拟查询协议仍属于设计，需要T12接入真实服务。
 
 ## W1 新增接口接收规范
 
@@ -77,7 +77,7 @@ RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 
 
 ## Runtime、外部依赖和观察
 
-Runtime 保持单一 nanobot AgentLoop。取消停止尚未执行步骤；已提交写入继续可查。超时、工具错误、轮数上限分别记录 stop_reason；不能以工具成功证明模型任务或本人业务完成。业务事件、UI 请求回执与模型流事件分别定义，runtime-events Schema 当前只规范已核查的回执，不填造未知上游事件。
+Runtime保持单一nanobot AgentLoop。取消停止尚未执行步骤，已提交写入继续可查。超时、工具错误、轮数上限分别记录stop_reason。runtime-events定义回执、普通消息与工具活动、文字增量、流片段结束、turn结束、恢复、重试状态和上下文压缩事件，字段来自锁定nanobot0.3.5源码。chat_id/turn_id/stream_id与业务run_id通过服务端记录关联，没有全域sequence或SSE恢复承诺。内部reasoning事件不得进入普通业务投影，实际通道过滤由W2/W3验证。
 
 DeepSeek 适配当前使用120秒超时、max_retries=0；没有备用模型。语音和检索的真实服务/权限、限制与费用由 W2 核查，缺少条件保持 BLOCKED。当前本机领域调用使用10秒 SQLite 锁等待；没有已测吞吐和限流阈值。发生故障保留准确错误、已执行结果及未知费用；业务服务不返回替代成功内容。
 

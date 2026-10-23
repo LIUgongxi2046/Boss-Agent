@@ -1,27 +1,69 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-events:1.0.0-draft",
-  "title": "已核查的 Boss WebSocket 请求回执",
-  "description": "对应 RoleChannel.webui_response；模型流和工具事件仍需接收固定上游实现后补充。",
-  "type": "object",
-  "required": ["event", "request_id", "ok"],
-  "properties": {
-    "event": {"const": "webui_response"},
-    "request_id": {"type": "string", "maxLength": 128},
-    "ok": {"type": "boolean"},
-    "result": {"type": "object"},
-    "error": {
-      "type": "object", "required": ["status", "message"],
-      "properties": {"status": {"type": "integer", "minimum": 400, "maximum": 599}, "message": {"type": "string"}},
-      "additionalProperties": false
+  "$id": "urn:boss-agent:runtime-events:1.0.0",
+  "title": "Boss-Agent WebSocket 回执与 Runtime 事件",
+  "description": "RoleChannel 回执和锁定 nanobot0.3.5 的 outbound_wire/runtime 源码字段。固定commit一致性与实际流验收由 W2/W3 完成。",
+  "oneOf": [
+    {"$ref": "#/$defs/CommandResponse"}, {"$ref": "#/$defs/Message"}, {"$ref": "#/$defs/Delta"},
+    {"$ref": "#/$defs/StreamEnd"}, {"$ref": "#/$defs/TurnEnd"}, {"$ref": "#/$defs/RecoveryState"},
+    {"$ref": "#/$defs/RetryStatus"}, {"$ref": "#/$defs/ContextCompaction"}
+  ],
+  "$defs": {
+    "CommandResponse": {
+      "type": "object", "required": ["event", "request_id", "ok"],
+      "properties": {
+        "event": {"const": "webui_response"}, "request_id": {"type": "string", "maxLength": 128}, "ok": {"type": "boolean"}, "result": {"type": "object"},
+        "error": {"type": "object", "required": ["status", "message"], "properties": {"status": {"type": "integer", "minimum": 400, "maximum": 599}, "message": {"type": "string"}}, "additionalProperties": false}
+      },
+      "oneOf": [
+        {"properties": {"ok": {"const": true}}, "required": ["result"], "not": {"required": ["error"]}},
+        {"properties": {"ok": {"const": false}}, "required": ["error"], "not": {"required": ["result"]}}
+      ], "additionalProperties": false
+    },
+    "ChatEvent": {
+      "type": "object", "required": ["event", "chat_id"],
+      "properties": {"event": {"type": "string"}, "chat_id": {"type": "string"}, "turn_id": {"type": "string"}}
+    },
+    "Message": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"required": ["text"], "properties": {
+        "event": {"const": "message"}, "text": {"type": "string"}, "kind": {"enum": ["tool_hint", "progress"]},
+        "media": {"type": "array", "items": {"type": "string"}}, "media_urls": {"type": "array", "items": {"type": "object", "additionalProperties": {"type": "string"}}},
+        "reply_to": {"type": "string"}, "latency_ms": {"type": "integer"}, "tool_events": {"type": "array", "items": {"type": "object"}}, "agent_ui": {}
+      }}], "unevaluatedProperties": false,
+      "x-meaning": "普通消息或工具活动；tool_events保留上游动态结构，受业务身份和来源权限约束"
+    },
+    "Delta": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"required": ["text"], "properties": {"event": {"const": "delta"}, "text": {"type": "string"}, "stream_id": {"type": "string"}}}],
+      "unevaluatedProperties": false, "x-meaning": "回答文字增量；按同一chat_id/stream_id的接收顺序呈现"
+    },
+    "StreamEnd": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"properties": {"event": {"const": "stream_end"}, "text": {"type": "string"}, "stream_id": {"type": "string"}, "resuming": {"const": true}, "merge_next": {"const": true}}}],
+      "unevaluatedProperties": false, "x-meaning": "当前流片段结束；merge_next/resuming时继续读取同一任务"
+    },
+    "TurnEnd": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"properties": {
+        "event": {"const": "turn_end"}, "latency_ms": {"type": "integer"}, "goal_state": {"type": "object"},
+        "usage": {"type": "object", "additionalProperties": {"type": "integer"}}, "round_usages": {"type": "array", "items": {"type": "object", "additionalProperties": {"type": "integer"}}},
+        "context_window_tokens": {"type": "integer"}, "outcome": {"type": "string"}, "failure_kind": {"type": "string"}, "failure_error_kind": {"type": "string"}, "failure_attempts": {"type": "integer"}, "failure_message": {"type": "string"}
+      }}], "unevaluatedProperties": false,
+      "x-meaning": "本次turn结束；outcome未传时上游定义为completed；业务写入和本人完成状态仍需单独查询"
+    },
+    "RecoveryState": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"required": ["status", "recovery_id", "attempts"], "properties": {"event": {"const": "recovery_state"}, "status": {"type": "string"}, "recovery_id": {"type": "string"}, "attempts": {"type": "integer"}, "reason": {"type": "string"}, "can_continue": {"type": "boolean"}}}],
+      "unevaluatedProperties": false
+    },
+    "RetryStatus": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"required": ["state", "attempt", "error_kind"], "properties": {"event": {"const": "retry_status"}, "state": {"type": "string"}, "attempt": {"type": "integer"}, "max_attempts": {"type": "integer"}, "error_kind": {"type": "string"}, "retry_after_s": {"type": "number", "minimum": 0}}}],
+      "unevaluatedProperties": false, "x-policy": "只呈现上游已发生状态，不授权重新执行业务写入；当前DeepSeek适配max_retries=0"
+    },
+    "ContextCompaction": {
+      "allOf": [{"$ref": "#/$defs/ChatEvent"}, {"required": ["compaction_id", "phase"], "properties": {"event": {"const": "context_compaction"}, "compaction_id": {"type": "string"}, "phase": {"enum": ["started", "succeeded", "failed", "cancelled"]}}}],
+      "unevaluatedProperties": false, "x-policy": "Dream与自动compact按项目配置关闭；出现事件需核查配置"
     }
   },
-  "oneOf": [
-    {"properties": {"ok": {"const": true}}, "required": ["result"], "not": {"required": ["error"]}},
-    {"properties": {"ok": {"const": false}}, "required": ["error"], "not": {"required": ["result"]}}
-  ],
-  "additionalProperties": false,
-  "x-ordering": "request_id 关联当次响应；业务终态通过原 client_request_id 回执和正式对象重新查询",
-  "x-terminal": "单个请求回执终止；不代表模型运行或关联业务任务完成",
-  "x-pending": ["model stream events", "tool events", "run lifecycle", "usage events", "resume ordering"]
+  "x-source": ["validation/role_channel.py", "nanobot/channels/websocket/runtime.py", "nanobot/webui/outbound_wire.py", "nanobot/bus/outbound_events.py"],
+  "x-correlation": "chat_id关联会话，turn_id关联当次turn，stream_id关联增量片段，request_id关联传输，client_request_id关联业务幂等回执；run_id由业务运行记录关联",
+  "x-ordering": "没有全域sequence或SSE Last-Event-ID承诺；断线后从上游持久会话/turn和原请求回执恢复，禁止直接重放写入",
+  "x-privacy": "内部reasoning_delta/reasoning_end不进入Boss业务审计、普通运行投影或业务事件Schema；W2/W3需验证通道过滤",
+  "x-pending": ["fixed commit identity verification", "actual DeepSeek streaming and cancellation", "tool event schema from actual allowed calls", "gateway reasoning event privacy", "resume ordering and persisted turn verification"]
 }

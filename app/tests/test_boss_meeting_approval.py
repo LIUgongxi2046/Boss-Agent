@@ -61,6 +61,16 @@ def decide_input(key="boss-approve-001",decision="APPROVE",**rest):
     }
 
 
+def test_today_tracks_current_application_state(services):
+    from boss_today import TodayAPI
+    api, pages = services
+    assert api.execute("MAINTAINER", "boss.simulation.application.seed", seed_input())[0] == 200
+    today = TodayAPI(api.store)
+    assert any(item["object_id"] == "application-1" and item["category"] == "DECIDE" for item in today.read("BOSS")["items"])
+    assert api.execute("BOSS", "boss.approval.decide", decide_input())[0] == 200
+    assert not any(item["object_id"] == "application-1" for item in today.read("BOSS")["items"])
+
+
 def run(api,role,action,payload):
     return api.execute(role,action,payload)
 

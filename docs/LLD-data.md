@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.0.0-draft`；2026-10-23；T05/A05；依据 PRD V1.2.0、HLD 1.0.0、共同代码 `63e6295`。字段清单为 `specs/data-dictionary.json`。本文件为 DESIGN，A05 尚未通过；新增领域行为以 T17/T18 的真实检查为依据。
+版本 `1.0.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -43,11 +43,11 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 授权 | authorization | action、target_id、content_version、scope、payload、valid_from/until、revoked；保存决定与将来持续采用分别校验 |
 | 交办 | task、feedback、outbox | OPEN→WAITING_FEEDBACK→IN_PROGRESS/RESULT_SUBMITTED；本人完成或取消终止催办；延期申请独立 |
 | 本人承诺 | self_commitment、self_commitment_revision | ACTIVE→COMPLETED_CONFIRMED/CANCELED；独立于对他人交办 |
-| 会议 | initial/snapshot.meeting、meeting_brief、meeting_minutes | 日程、会前材料、纪要和逐项交办分别保存；当前资料版本变化要求复核 |
+| 会议 | initial/snapshot.meeting、meeting_brief、minutes | 日程、会前材料、纪要和逐项交办分别保存；当前资料版本变化要求复核 |
 | 审批 | application、application_revision、application_decision | 材料缺少、待决定、本人决定分别维护；不执行资金或专业放行 |
 | 消息 | message_draft、message、outbox、message_reply | 草稿、模拟发送、送达与回复分别维护，使用 stable recipient_id 和正文版本 |
 | 私人安排 | private_calendar、calendar_share | 正文 BOSS_ONLY；busy 分享只含获准字段；当前授权撤销后预览拒绝 |
-| 研究/会面/行程 | research、people、travel 相关领域对象 | 原文版本、对象与范围由现有领域处理函数维护；所有字段仍需逐项纳入正式字典 |
+| 研究/会面/行程 | research、person_brief、travel_plan | 字典定义原文版本、引用、当前内容、待确认方案、有效性与关联会议；正文BOSS_ONLY |
 | 知识 | document、knowledge | 作者、来源属性、原文位置、版本、有效时间和撤销；FTS5 只承载索引 |
 | 个人记忆 | memory/current | PROPOSED/CONFIRMED/SUPERSEDED/DELETED；删除停止新任务采用，历史决定不反向改变 |
 | 技术调度 | schedule、rules、scheduler_draft | 维护配置保存/校验/启用分别记录；CronService 唯一执行 |
@@ -56,7 +56,7 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 今日次序 | today_order，以业务日期为 ID | 完整当前事项 ID 集合；snapshot_sha256 和 expected_version 同时校验；重启后采用 |
 | 查询 | query | 公式版本、明细引用、参数、原始精度和来源时效；参数改变重新查询 |
 
-表内未展开的已有领域对象表示字典仍需补充，不能据此宣布 A05 完成。
+字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录需W2绑定当前真实记录；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
 
 ## 数值、单位、期间与农业关系
 
@@ -100,4 +100,4 @@ R01—R13 分别由今日投影/计划、事件通知、query 明细、meeting_b
 
 R14—R23 分别要求原料合同与库存/配方、季节与养殖周期、苗种批次/运输接收、专业观察确认、生猪同周期结算、四种禽畜用途、养殖单元/设备关系、食品加工追溯、海外币种工段、研发对照评审。当前获准明细不足，新增关系 Schema 与来源核查继续由 T12/T21—T23 完成。
 
-R24 为 nanobot run/session/tool 和配置引用；R25 为 space/initial/clock/event/reset；R26 为角色投影；R27 为真实 STT 记录；R28 为 authorization/source scope；R29 为版本、幂等和原请求回执；R30 为真实时间/usage/price version；R31 为独立验收记录；R32 为源码/数据/迁移/恢复身份。真实 STT、完整 Runtime、专题数据、全域字段枚举及迁移恢复检查尚未完成，A05 保持未验收。
+R24为nanobot run/session/tool和配置引用；R25为空间/初始资料/时钟/事件/重置；R26为角色投影；R27为voice_transcript真实STT记录和本人确认；R28为authorization/source scope；R29为版本、幂等和原请求回执；R30为真实时间/usage/price version；R31为独立验收记录；R32为源码/数据/迁移/恢复身份。机器映射在requirement_entities，全部32项引用已校验。真实STT产品过程、完整Runtime、获准专题资料和迁移恢复尚未完成，A05保持未验收。

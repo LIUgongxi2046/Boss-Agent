@@ -59,7 +59,7 @@ class TodayAPI:
                 append("self_commitment", row["commitment_id"], row["version"], row["purpose"], "COORDINATE",
                        "本人承诺仍待履行和证据核查", "N05", row["due_at"], row["importance"] == "IMPORTANT")
         for row in self._rows(db, "application"):
-            if row["status"] in ("PENDING_DECISION", "WAITING_MATERIAL"):
+            if row["state"] in ("PENDING_DECISION", "WAITING_MATERIAL"):
                 append("application", row["application_id"], row["version"], row["title"], "DECIDE",
                        "申请需要本人决定或补充材料", "F07")
         meeting = data["meeting"]
