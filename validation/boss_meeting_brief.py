@@ -10,12 +10,13 @@ import json
 from datetime import datetime
 
 from aiohttp import web
-from business import now, require
+from business import checksum, now, require
 from boss_travel import meeting_impacts
 from boss_people import meeting_impacts as people_meeting_impacts
 from boss_owner_preferences import owner_goal_reference
 from boss_metrics import aggregate_metrics
 from boss_meetings import meeting_materials
+from boss_source_policy import source_validity
 
 NS="ui-check"
 
@@ -37,13 +38,15 @@ def _documents(db, data):
                             "source_type":"SIMULATED","excerpt":None})
             continue
         authorized=document.get("access_scope")==data["owner_id"] and document.get("source_type")=="SIMULATED"
-        withdrawn=bool(document.get("withdrawn"))
-        status="CURRENT" if authorized and not withdrawn else "WITHDRAWN" if withdrawn else "FORBIDDEN"
+        validity=source_validity(document,_get(db,"clock","current")["at"]) if authorized else "FORBIDDEN"
+        status="CURRENT" if validity=="VALID" else validity
         results.append({
             "source_id":source_id,"status":status,
             "version":document.get("version"),
             "source_type":"SIMULATED",
             "published_at":document.get("published_at"),
+            "valid_from":document.get("valid_from"),"valid_until":document.get("valid_until"),
+            "source_sha256":checksum(document) if status=="CURRENT" else None,
             "author_contact_id":document.get("author_contact_id"),
             "excerpt":document.get("content","")[:220] if status=="CURRENT" else None,
         })
@@ -199,9 +202,9 @@ def briefing_projection(db,data):
             "revisions":[],
         }
     old=stored["compiled"]
-    pinned={doc["source_id"]:(doc["version"],doc["status"])
+    pinned={doc["source_id"]:(doc["version"],doc["status"],doc.get("source_sha256"))
             for doc in old["sources"]}
-    available={doc["source_id"]:(doc["version"],doc["status"])
+    available={doc["source_id"]:(doc["version"],doc["status"],doc.get("source_sha256"))
                for doc in current["sources"]}
     source_changed=pinned!=available
     participant_changed=old["participants"]!=current["participants"]
@@ -229,7 +232,7 @@ def briefing_projection(db,data):
     latest={doc["source_id"]:doc for doc in current["sources"]}
     for old_doc in display_snapshot["compiled"]["sources"]:
         live=latest.get(old_doc["source_id"])
-        if not live or live["status"]!="CURRENT" or live["version"]!=old_doc["version"]:
+        if not live or live["status"]!="CURRENT" or live["version"]!=old_doc["version"] or live.get("source_sha256")!=old_doc.get("source_sha256"):
             old_doc["excerpt"]=None
             old_doc["display_redacted_due_to_source_change"]=True
     old_finance=next((doc for doc in display_snapshot["compiled"]["sources"]

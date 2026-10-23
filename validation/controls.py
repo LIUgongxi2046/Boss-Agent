@@ -7,6 +7,8 @@ from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 
 from business import Store, checksum, encode, initial_materials, now, require
+from boss_source_access import require_current_simulated_source
+from boss_source_policy import source_validity
 
 
 TEXT = {"type": "string", "minLength": 1}
@@ -86,6 +88,12 @@ class ControlStore(Store):
         elif auth["action"] == "complete_assignment":
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
             require(task["status"] == "RESULT_SUBMITTED" and feedback["task_id"] == p["task_id"] and feedback["kind"] == "RESULT_SUBMITTED" and feedback["evidence_refs"], "当前结果证据不完整")
+            data = self.get(db, ns, "initial", "snapshot")
+            clock = self.get(db, ns, "clock", "current")["at"]
+            for source_id in set(task["source_refs"]) | set(feedback["evidence_refs"]):
+                document = require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
+                if source_id in task.get("source_versions", {}):
+                    require(document["version"] == task["source_versions"][source_id], "完成依据的来源版本已经变化")
             task["status"] = "COMPLETED_CONFIRMED"
             task["completion_authorization_id"] = p["authorization_id"]
         else:
@@ -110,17 +118,30 @@ class ControlStore(Store):
 
     def control_search(self, db, ns, p):
         rows = db.execute("SELECT source_id,content FROM knowledge WHERE namespace=? AND knowledge MATCH ?", (ns, p["query"])).fetchall()
-        return {"results": [{"source_id": row[0], "content": row[1]} for row in rows]}
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
+        results = []
+        for source_id, indexed in rows:
+            document = self.get(db, ns, "document", source_id)
+            if (document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"]
+                    and source_validity(document, clock) == "VALID"):
+                require(indexed == document["content"], "资料索引与当前原文不一致，需要重新摄取")
+                results.append({"source_id": source_id, "content": document["content"]})
+        return {"results": results}
 
     def control_private_calendar(self, db, ns, p):
         return self.get(db, ns, "initial", "snapshot")["private_calendar"]
 
     def control_reference_status(self, db, ns, p):
         task = self.get(db, ns, "task", p["task_id"])
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
         sources = []
         for source_id in task["source_refs"]:
             document = self.get(db, ns, "document", source_id)
-            sources.append({"source_id": source_id, "version": document["version"], "state": "WITHDRAWN" if document.get("withdrawn", False) else "ACTIVE"})
+            require(document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"], "资料不属于当前本人获准范围", web.HTTPForbidden)
+            state = source_validity(document, clock)
+            sources.append({"source_id": source_id, "version": document["version"], "state": "ACTIVE" if state == "VALID" else state})
         return {"task_id": task["task_id"], "sources": sources}
 
     def control_clock(self, db, ns, p):

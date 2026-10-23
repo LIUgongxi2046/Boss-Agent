@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.2.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T14/T17/T18检查为依据。
+版本 `1.3.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -27,6 +27,8 @@ erDiagram
   TASK ||--o{ FEEDBACK : receives
   TASK ||--o{ MESSAGE : sends
   SOURCE ||--o{ CITATION : supports
+  QUERY ||--|| QUERY_SOURCE_BINDING : pins
+  SOURCE ||--o{ QUERY_SOURCE_BINDING : bounds
   SOURCE ||--o{ KNOWLEDGE : indexes
   OWNER_PLAN ||--o{ EVENT : scopes
   EVENT ||--o{ NOTIFICATION : produces
@@ -55,12 +57,19 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 事件与通知 | event、reminder、dispatch、delivery、notification | 业务事件状态、提醒处理与内部通知保存分别维护；去重按 event_id/version |
 | 今日次序 | today_order，以业务日期为 ID | 完整当前事项 ID 集合；snapshot_sha256 和 expected_version 同时校验；重启后采用 |
 | 查询 | query | 公式版本、明细引用、参数、原始精度和来源时效；参数改变重新查询 |
+| 查询来源绑定 | query_source_binding，以query_id为ID | 与query同一事务保存owner/dataset、来源版本/完整JSON摘要及每项明细摘要；读取当前原文前逐项验证 |
 
 字典同时定义本人目标/通知、Prompt、配置、查询、本人计划和今日次序。Runtime记录需W2绑定当前真实记录；voice_transcript引用W2现有TranscriptionResult，产品核查和确认字段等待对应业务接口。修订对象复用原实体字段，仍保留原版本和归属。
 
 会议采用当前对象覆盖读取，`meeting_materials(db,data)`保留原始snapshot并校验当前meeting的owner_id和meeting_id。既有数据库没有meeting对象时使用原始会议，投影标记DRAFT和未知结束时间；首次确认安排才写入当前对象及meeting_revision。meeting_draft具有独立版本，保存和修改不改变当前会议。确认时绑定会议/草稿版本、联系人、来源内容与版本、私人占用、已确认行程及缓冲、业务时钟；变化后停止采用旧核查结果。HELD/CANCELED保持终态；取消不改变独立交办和历史消息。全部新增对象继续受namespace隔离和SQLite同一事务约束。
 
 个人记忆采用读取在同一SQLite只读事务中检查当前版本及对应确认授权。既有确认事务把memory_id作为target_id，授权content_version/expected_version保存前置版本，当前记忆保存递增版本；这些字段与owner、scope和BOSS身份共同确定唯一对应确认。撤销后停止新上下文采用，原CONFIRMED状态、正文和历史决定保留。新确认递增版本，只采用新版本对应的确认；显式authorization_id存在时还需相同标识。初始获准记忆继续保留原始来源确认，独立验证入口的直接维护与产品新增确认分别管理。
+
+来源有效性采用W2的`source_validity(document,business_at)`，接收来源为提交`224fbe00b03df312791856f3e76850cd55baa848`中的`validation/boss_source_policy.py`，SHA256为`6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896`，维护责任为W2。W1的`require_current_simulated_source`同时检查当前老板访问范围、当前获准SIMULATED类型及有效状态。只有VALID进入当前引用；WITHDRAWN/EXPIRED停止采用，其他非当前状态要求复核。日期精度按来源保留，日期端点使用当前业务时间的时区解释；valid_until可空，缺少终点明确显示未知。
+
+当前五项Tool保持原输入与结果字段。query_metrics将来源实际版本、定位和当前版本声明的发布时间写入来源结果，business_as_of由获准CURRENT期间终点与初始档案的时区计算；read_at始终为实际读取时间。source_updated_at对应该当前版本声明的published_at，不把读取时间作为来源更新时间。query_source_binding保存完整document和实际明细的SHA256；read_evidence在当前事务中重验访问范围、有效性、版本和摘要，来源或明细改变后要求重新查询。旧库查询缺少绑定时明确返回409；不会根据当前内容为旧查询补造历史绑定。
+
+模拟申请附件的published_at记录该模拟版本的实际生成时间，valid_from采用当次模拟业务时钟，valid_until未知时为null；新版本独立记录这些字段，旧版本保持历史。VALID表示当前材料可读取，资金执行、申请批准和专业确认仍使用各自独立状态。会前材料保存来源完整摘要和有效时间，来源到期或同版本元信息变化时显示NEEDS_REVIEW，并停止返回旧引用正文及旧指标缓存。
 
 ## 数值、单位、期间与农业关系
 

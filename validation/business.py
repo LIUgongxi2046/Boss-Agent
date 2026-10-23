@@ -2,8 +2,9 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, time, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
@@ -149,13 +150,22 @@ class Store:
             db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(audit_input), encode(audit_output), now()))
         return result
 
-    def source(self):
-        return {"source_id": "finance-note", "source_type": "SIMULATED", "version": "1", "locator": "sqlite:documents/finance-note", "business_as_of": "2026-10-10T23:59:59+08:00", "source_updated_at": "2026-10-11T08:00:00+08:00", "read_at": now(), "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": "COMPLETE"}
+    def _metric_source(self, db, ns, data):
+        from boss_source_access import require_current_simulated_source
+        document = self.get(db, ns, "document", "finance-note")
+        require(document["source_id"] == "finance-note", "资料标识与当前引用不符", web.HTTPForbidden)
+        return require_current_simulated_source(document, data["owner_id"], self.get(db, ns, "clock", "current")["at"])
+
+    def source(self, document, data, quality_state):
+        as_of = datetime.combine(date.fromisoformat(data["periods"]["CURRENT"][1]), time(23, 59, 59), ZoneInfo(data["boss_profile"]["timezone"]))
+        return {"source_id": document["source_id"], "source_type": document["source_type"], "version": document["version"],
+                "locator": document["original_locator"], "business_as_of": as_of.isoformat(),
+                "source_updated_at": document["published_at"], "read_at": now(),
+                "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": quality_state}
 
     def query_metrics(self, db, ns, data, p):
         from boss_metrics import aggregate_metrics, compare_metrics
-        document = self.get(db, ns, "document", "finance-note")
-        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
+        document = self._metric_source(db, ns, data)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
         require([p["period_start"], p["period_end"]] == data["periods"]["CURRENT"] and [p["comparison_start"], p["comparison_end"]] == data["periods"]["BASE"], "期间不可比", web.HTTPBadRequest)
         require(set(p["product_ids"]) <= {"product-1", "product-2"}, "产品资料缺少", web.HTTPBadRequest)
@@ -175,16 +185,33 @@ class Store:
         for metric, (value, unit, formula) in compare_metrics(period_metrics["BASE"], period_metrics["CURRENT"]).items():
             if metric in p["metric_ids"]:
                 values.append({"metric_id": metric, "period_scope": "CHANGE", "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
-        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": missing, "unexplained_causes": ["原因贡献明细尚未提供"]}
+        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source(document, data, "INCOMPLETE" if missing else "COMPLETE")], "missing_fields": missing, "unexplained_causes": ["原因贡献明细尚未提供"]}
         self.put(db, ns, "query", result["query_id"], result)
+        self.put(db, ns, "query_source_binding", result["query_id"], {
+            "query_id": result["query_id"], "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
+            "source_id": document["source_id"], "source_version": document["version"], "source_sha256": checksum(document),
+            "detail_fingerprints": {row["record_id"]: checksum(row) for row in records},
+        })
         return result
 
     def read_evidence(self, db, ns, data, p):
         query = self.get(db, ns, "query", p["query_id"])
         require(set(p["detail_refs"]) <= set(query["detail_refs"]) and p["source_ids"] == ["finance-note"], "依据范围不符", web.HTTPForbidden)
-        document = self.get(db, ns, "document", "finance-note")
-        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
-        return {"sources": [self.source()], "original_records": [{"record_id": r["record_id"], "version": r["version"], "content": r} for r in data["details"] if r["record_id"] in p["detail_refs"]] + [{"record_id": "finance-note", "version": "1", "content": document}], "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
+        document = self._metric_source(db, ns, data)
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='query_source_binding' AND id=?", (ns, p["query_id"])).fetchone()
+        require(row is not None, "查询缺少完整来源绑定，需要重新查询")
+        binding = json.loads(row[0])
+        require(binding["owner_id"] == data["owner_id"] and binding["dataset_id"] == data["dataset_id"]
+                and binding["dataset_version"] == data["dataset_version"], "查询绑定不属于当前范围", web.HTTPForbidden)
+        require(binding["source_id"] == document["source_id"] and binding["source_version"] == document["version"]
+                and binding["source_sha256"] == checksum(document), "来源版本或内容已经变化，需要重新查询")
+        records = [record for record in data["details"] if record["record_id"] in p["detail_refs"]]
+        require(len(records) == len(p["detail_refs"]) and all(binding["detail_fingerprints"][record["record_id"]] == checksum(record) for record in records),
+                "明细版本或内容已经变化，需要重新查询")
+        return {"sources": [self.source(document, data, query["sources"][0]["quality_state"])],
+                "original_records": [{"record_id": record["record_id"], "version": record["version"], "content": record} for record in records]
+                + [{"record_id": document["source_id"], "version": document["version"], "content": document}],
+                "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
 
     def create_assignment(self, db, ns, data, p):
         require(p["coordinator_id"] == "coordinator-1" and p["related_meeting_id"] == "meeting-1" and p["related_event_ids"] == ["event-1"], "关联对象不符", web.HTTPBadRequest)

@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
 
 from business import checksum, initial_materials
 from boss_command_api import BossCommandAPI
+from boss_page_api import BossPageAPI
 from controls import ControlStore
 from test_boss_command_api import create_input
 
@@ -40,6 +41,9 @@ def test_approved_snapshot_relationships_and_repeatable_reset_are_isolated(tmp_p
 def test_sqlite_backup_preserves_source_withdrawal_and_deleted_memory(tmp_path):
     store = ControlStore(tmp_path / "source.sqlite")
     store.initialize("ui-check")
+    status, response = BossPageAPI(store).serve("BOSS", "/api/boss/ui/metrics")
+    assert status == 200
+    query = response["result"]
     store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
     status, result = BossCommandAPI(store).execute("BOSS", "boss.memory.delete", {
         "client_request_id": "backup-memory-delete", "expected_version": "1",
@@ -52,7 +56,10 @@ def test_sqlite_backup_preserves_source_withdrawal_and_deleted_memory(tmp_path):
         assert destination.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
     restored = ControlStore(backup_path)
     assert restored.context("ui-check")["memory"] is None
+    with pytest.raises(web.HTTPGone):
+        restored.invoke("read_evidence", {"envelope": query["envelope"], "query_id": query["query_id"], "source_ids": ["finance-note"], "detail_refs": query["detail_refs"]})
     with restored.connect() as db:
         assert restored.get(db, "ui-check", "document", "finance-note")["withdrawn"] is True
         assert restored.get(db, "ui-check", "memory", "current")["text"] == ""
+        assert restored.get(db, "ui-check", "query_source_binding", query["query_id"])["source_version"] == query["sources"][0]["version"]
         assert db.execute("SELECT COUNT(*) FROM knowledge WHERE namespace='ui-check' AND source_id='finance-note'").fetchone()[0] == 0

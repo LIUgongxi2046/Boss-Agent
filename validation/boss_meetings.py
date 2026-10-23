@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_source_access import require_current_simulated_source
 
 NS = "ui-check"
 
@@ -137,6 +138,7 @@ class MeetingAPI:
                     and ref["source_id"] not in seen, "会议材料引用格式错误或重复", web.HTTPBadRequest)
             seen.add(ref["source_id"])
             document = self.commands._require_current_source(db, data, ref["source_id"])
+            require_current_simulated_source(document, data["owner_id"], self.store.get(db, NS, "clock", "current")["at"])
             require(document["version"] == ref["version"], "会议材料版本已经变化")
         return {key: payload[key] for key in ("purpose", "starts_at", "ends_at", "timezone", "preparation_due_at", "participant_ids", "source_refs")}
 

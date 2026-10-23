@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from aiohttp import web
 
 from business import now, require, checksum
+from boss_source_access import require_current_simulated_source
 
 NS="ui-check"
 FINAL={"COMPLETED_CONFIRMED","CANCELED"}
@@ -34,6 +35,7 @@ def _source_refs(api, db, data, refs, *, allow_empty=True):
                 "重复来源不能代表两份不同证据",web.HTTPBadRequest)
         ids.add(ref["source_id"])
         doc=api._require_current_source(db,data,ref["source_id"])
+        require_current_simulated_source(doc,data["owner_id"],api.store.get(db,NS,"clock","current")["at"])
         require(doc["version"]==ref["version"],
                 "当前证据来源版本已变更")
         result.append({"source_id":doc["source_id"],"version":doc["version"]})

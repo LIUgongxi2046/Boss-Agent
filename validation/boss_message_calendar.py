@@ -15,6 +15,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 from boss_meetings import meeting_materials
+from boss_source_access import require_current_simulated_source
 
 NS = "ui-check"
 MAX_TEXT = 2400
@@ -67,6 +68,7 @@ def _source_refs(api, db, data, refs):
                 "重复的来源标识不得以不同版本重复授权", web.HTTPBadRequest)
         seen.add(row["source_id"])
         doc = api._require_current_source(db, data, row["source_id"])
+        require_current_simulated_source(doc, data["owner_id"], api.store.get(db, NS, "clock", "current")["at"])
         require(doc["version"] == row["version"],
                 "附件版本已变化，须重新授权")
         sources.append({"source_id": doc["source_id"], "version": doc["version"]})

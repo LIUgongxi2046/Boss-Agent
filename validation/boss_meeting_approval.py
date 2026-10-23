@@ -18,6 +18,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 from boss_meetings import meeting_materials
+from boss_source_access import require_current_simulated_source
 
 NS = "ui-check"
 ENTRY_KINDS = frozenset({"OPINION", "SUGGESTION", "DECISION", "ASSIGNMENT_DRAFT"})
@@ -42,6 +43,7 @@ def valid_source(api, db, owner_id, source_id, version):
     require(isinstance(source_id, str) and isinstance(version, str),
             "来源和版本缺少", web.HTTPBadRequest)
     doc = api._require_current_source(db, {"owner_id": owner_id}, source_id)
+    require_current_simulated_source(doc, owner_id, api.store.get(db, NS, "clock", "current")["at"])
     require(doc["version"] == version, "来源版本已经变化")
     return doc
 
@@ -306,6 +308,8 @@ def application_seed(api, db, data, payload):
         "author_contact_id": payload["applicant_contact_id"],
         "access_scope": data["owner_id"],
         "published_at": now(), "withdrawn": False,
+        "valid_from": api.store.get(db, NS, "clock", "current")["at"],
+        "valid_until": None, "validity_state": "VALID",
         "original_locator": "sqlite:applications/" + source_id,
         "content": attachment,
     }
@@ -376,6 +380,9 @@ def application_revise(api, db, data, payload):
     doc["version"] = str(int(doc["version"]) + 1)
     doc["content"] = attachment
     doc["published_at"] = now()
+    doc["valid_from"] = api.store.get(db, NS, "clock", "current")["at"]
+    doc["valid_until"] = None
+    doc["validity_state"] = "VALID"
     doc["withdrawn"] = False
     doc["withdrawn_at"] = None
     doc["replaced_source_version"] = old_version

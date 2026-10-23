@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.2.1
+  version: 1.3.0
   description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；四项会议动作等待W3接入，来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: EXISTING_COMMANDS_AND_READS_WITH_NEW_W1_DOMAINS_PENDING_W3
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.2.1
+  version: 1.3.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -26,6 +26,19 @@ x-revocation-policy:
   single_action_policy: 一次性授权到期后不再接受新提交，不以撤销改写已执行结果。
   projection_adoption: W3在授权列表can_revoke采用同一服务规则；维护身份不能撤销本人确认。
   memory_adoption: Store.context通过当前记忆及前置确认版本识别唯一授权；已撤销确认不进入新上下文。
+x-source-policy:
+  policy_provider: W2 validation/boss_source_policy.py
+  policy_source_commit: 224fbe00b03df312791856f3e76850cd55baa848
+  policy_sha256: 6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896
+  current_access_validator: boss_source_access.require_current_simulated_source
+  effective_clock: objects/clock/current.at
+  usable_state: VALID
+  states: [RECEIVED, VALID, INCOMPLETE, CONFLICTED, SUPERSEDED, WITHDRAWN, EXPIRED]
+  unavailable: 410 for withdrawn or expired; 409 for other noncurrent states; 403 for owner or type mismatch
+  query_binding: query_source_binding pins owner/dataset/source version and complete document/detail SHA256
+  evidence_read: metadata or version change requires a new query; no silent use of a later document through an earlier query
+  legacy_queries: missing query_source_binding returns 409 and requires explicit requery
+  receipt_compatibility: committed business receipts remain readable; no business action replay
 paths:
   /api/boss/identity:
     get:

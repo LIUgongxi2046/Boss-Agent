@@ -4,7 +4,7 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Clock3, FileSearch,
 import { useClient } from "@/providers/ClientProvider";
 
 type Source={source_id:string;version:string|null;status:string;published_at?:string;
-  author_contact_id?:string;excerpt:string|null};
+  valid_from?:string|null;valid_until?:string|null;author_contact_id?:string;excerpt:string|null};
 type Commitment={task_id:string;status:string;due_at:string;is_historical:boolean;
   evidence_requirements:string[]};
 type Participant={contact_id:string;name?:string;organization?:string;
@@ -268,8 +268,10 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated,
             </div>
             <Fact label="来源版本" value={source.version}/>
             <Fact label="材料作者" value={source.author_contact_id}/>
+            <Fact label="有效时间起点" value={source.valid_from||source.published_at||"尚未提供"}/>
+            <Fact label="有效时间终点" value={source.valid_until||"尚未提供"}/>
             {source.excerpt?<p>{source.excerpt}</p>:
-              <p>资料不可读或已撤销，保留条目与缺口；不生成替代内容。</p>}
+              <p>资料当前不可采用，保留条目与缺口。</p>}
             {source.status==="CURRENT"&&<div className="boss-actions">
               <button type="button" className="boss-btn" onClick={()=>onViewSource(source.source_id)}>
                 <FileSearch size={15}/> 打开有效原文</button>

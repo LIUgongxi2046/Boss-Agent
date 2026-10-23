@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.2.1；T06/A06；2026-10-23；引用LLD-data1.2.1、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.3.0；T06/A06；2026-10-23；引用LLD-data1.3.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -43,6 +43,10 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 计划只控制已有获准事件的时间和范围，不创建第二个 Cron。时间条件限 Asia/Shanghai，not_before 在当前业务时间之后366天以内；执行时还检查事件期限、保存时 event_versions、本人计划状态、当前撤销状态、技术启停、规则、免打扰、暂缓和去重。`authorization_id` 是已保存计划的本人确认依据；其撤销即时停止继续采用。15分钟授权窗口用于当次确认提交，已经保存的持续计划由当前 ACTIVE 状态、绑定对象版本及未撤销确认共同控制。
 
 `authorization_can_revoke`统一判断撤销资格。memory.confirm、owner_goals.confirm、owner_notice.confirm、owner_plan.save/resume及calendar.share的原确认窗口到期后，BOSS仍能撤销后续持续采用；状态、业务期限、归属和当前撤销记录继续检查。一次性授权到期后不能产生新动作；历史业务结果不反向改变。W3的授权列表can_revoke须采用同一函数，并使界面说明与当前规则一致。Store.context在当前读事务内调用confirmed_memory，按对象、前置版本与本人范围识别对应确认；已撤销确认不进入新上下文。
+
+`query_metrics`和`read_evidence`采用W2来源有效性规则与W1的访问检查。当前来源和引用记录都返回实际document版本。query_source_binding与query同一事务保存，在read_evidence读取当前原文前检查owner/dataset、来源ID/版本/完整摘要及实际明细摘要。来源版本或同版本元信息变化、旧查询没有绑定时返回409要求重新查询；WITHDRAWN/EXPIRED返回410，其他非当前状态409，访问范围或类型不符403。没有向旧查询自动补充来源绑定；已经保存的交办、消息和原请求回执继续保留。
+
+会前材料、纪要/审批、附件消息、人员会面、交通资料、会议草稿和本人承诺已在相应领域采用当前来源检查。W3还需在公共_require_current_source及直接原文、反馈、任务完成等读取位置采用相同规则，并核查全部公开投影的当前状态与历史展示。Source VALID仅表明当前获准资料可以读取，专业结论、对方接收与业务完成分别确认。
 
 当前计划未包含晨间模型生成和周期重复定义；需要 W2 提供真实 Runtime 任务能力和 W3 接入后继续完成，不登记 A17 完成。已有事件更新时保留 owner_plan_id 并检查 event_versions，不自动扩大本人范围。
 

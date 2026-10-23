@@ -233,5 +233,9 @@ def test_existing_application_revision_matches_declared_input(services):
     api, _ = services
     values = seed_input()
     created = checked(api, "boss.simulation.application.seed", values)
+    with api.store.connect() as db:
+        source = api.store.get(db, "ui-check", "document", created["source_id"])
+        assert source["valid_from"] == api.store.get(db, "ui-check", "clock", "current")["at"]
+        assert source["validity_state"] == "VALID"
     requested = checked(api, "boss.approval.decide", decide_input(key="schema-application-more", decision="REQUEST_MORE", expected_version=created["version"]))
     checked(api, "boss.simulation.application.revise", {**values, "client_request_id": "schema-application-revise", "expected_version": requested["version"]})
