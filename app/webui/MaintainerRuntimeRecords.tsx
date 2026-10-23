@@ -26,9 +26,9 @@ export type RuntimeRecord = {
     kind: string; content_sha256: string; source_refs: {source_id: string; version: string}[] }[];
   tool_config_sha256: string;
   tool_configuration: { tool_id: string; implementation: string;
-    schema_sha256: string; implementation_sha256: string }[];
+    schema_sha256: string; implementation_sha256?: string }[];
   model_requests: ModelRequest[]; tool_results: ToolResult[]; usage: Usage | null;
-  usage_coverage: string; model_attempts_coverage: string; cost_total: number | null;
+  usage_coverage: string; model_attempts_coverage?: string; cost_total: string | null;
   price_version: string | null; model_completion_observed: boolean;
   model_behavior_evaluation_passed: boolean; private_body_recorded: false;
 };
@@ -38,7 +38,13 @@ type Projection = {
   runs: RuntimeRecord[]; matched_count: number; limit: number; next_cursor: Cursor | null;
   private_body_available_here: false; business_mutation_performed: false;
 };
-type Props = {getToken: () => string; onOpenTask?: (taskId: string, runId: string) => void};
+type Props = {getToken: () => string; onOpenTask?: (taskId: string, runId: string) => void; initialRunId?: string};
+type TaskReference = {
+  projection: "runtime-task-reference"; source_type: "RUNTIME_RECORD"; task_source_type: "SIMULATED";
+  namespace: string; run_id: string; dataset_id: string; dataset_version: string;
+  task_id: string; task_version: string; task_status: string; read_at: string;
+  private_body_available_here: false; business_mutation_performed: false;
+};
 type Filters = {provider: string; run_id: string; dataset_id: string; status: string;
   stop_reason: string; started_from: string; started_until: string; limit: string};
 const INITIAL: Filters = {provider: "", run_id: "", dataset_id: "", status: "", stop_reason: "",
@@ -58,10 +64,11 @@ function UsageFields({usage}: {usage?: Usage | null}) {
   </>;
 }
 
-export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
-  const [filters, setFilters] = useState<Filters>(INITIAL);
+export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: Props) {
+  const [filters, setFilters] = useState<Filters>({...INITIAL, run_id: initialRunId ?? ""});
   const [data, setData] = useState<Projection | null>(null);
   const [selected, setSelected] = useState<RuntimeRecord | null>(null);
+  const [task, setTask] = useState<TaskReference | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -69,7 +76,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
   const active = useRef<AbortController | null>(null);
   const applied = useRef<URLSearchParams | null>(null);
   useEffect(() => {
-    setData(null); setSelected(null); setDetails(false); setError(""); setNotice(""); setLoading(false);
+    setData(null); setSelected(null); setTask(null); setDetails(false); setError(""); setNotice(""); setLoading(false);
     applied.current = null;
     return () => active.current?.abort();
   }, [getToken]);
@@ -77,7 +84,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
   function read(parameters: URLSearchParams, append = false, detail = false) {
     active.current?.abort();
     const abort = new AbortController(); active.current = abort;
-    setError(""); setNotice(""); setLoading(true);
+    setError(""); setNotice(""); setTask(null); setLoading(true);
     if (!append && !detail) {setData(null); setSelected(null); setDetails(false);}
     const token = getToken();
     if (!token) {setData(null); setSelected(null); setError("技术维护身份已失效，请重新登录"); setLoading(false); return;}
@@ -104,6 +111,32 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
       if (abort.signal.aborted) return;
       setError(failure instanceof Error ? failure.message : String(failure));
       setData(null); setSelected(null); setDetails(false); setLoading(false);
+    });
+  }
+  function openTask(taskId: string, record: RuntimeRecord) {
+    if (onOpenTask) {onOpenTask(taskId, record.run_id); return;}
+    active.current?.abort();
+    const abort = new AbortController(); active.current = abort;
+    setTask(null); setError(""); setNotice(""); setLoading(true);
+    const token = getToken();
+    if (!token) {setData(null); setSelected(null); setError("技术维护身份已失效，请重新登录"); setLoading(false); return;}
+    const parameters = new URLSearchParams({run_id: record.run_id, task_id: taskId});
+    void fetch("/api/boss/ui/runtime-records/task?" + parameters.toString(), {
+      headers: {Authorization: "Bearer " + token}, cache: "no-store", signal: abort.signal,
+    }).then(async response => {
+      if (!response.ok) throw Error("关联任务读取失败（HTTP " + response.status + "）");
+      const result = await response.json() as TaskReference;
+      if (result.projection !== "runtime-task-reference" || result.source_type !== "RUNTIME_RECORD" ||
+        result.task_source_type !== "SIMULATED" || result.run_id !== record.run_id || result.task_id !== taskId ||
+        result.namespace !== record.namespace || result.dataset_id !== record.dataset_id ||
+        result.dataset_version !== record.dataset_version || result.private_body_available_here !== false ||
+        result.business_mutation_performed !== false) throw Error("关联任务来源或读取范围无效");
+      if (abort.signal.aborted) return;
+      setTask(result); setLoading(false);
+    }).then(undefined, failure => {
+      if (abort.signal.aborted) return;
+      setError(failure instanceof Error ? failure.message : String(failure));
+      setTask(null); setData(null); setSelected(null); setDetails(false); setLoading(false);
     });
   }
   function query(event: FormEvent) {
@@ -170,7 +203,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
             <td>{record.run_id}<br/>{record.started_at}</td><td>{record.runtime.provider}<br/>v{record.configuration_version}</td>
             <td>{record.model_requests.length} / {record.tool_results.length}</td><td>{record.status}<br/>{value(record.stop_reason)}</td>
             <td><button type="button" className="boss-btn" disabled={loading} aria-label={"打开记录 " + record.run_id}
-              onClick={() => {setSelected(record); setDetails(false); setNotice("");}}>打开记录</button></td>
+              onClick={() => {setSelected(record); setTask(null); setDetails(false); setNotice("");}}>打开记录</button></td>
           </tr>)}</tbody>
         </table></div>}
         {data?.next_cursor && <button type="button" className="boss-btn" disabled={loading} onClick={more}>读取更多记录</button>}
@@ -201,8 +234,8 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
               <Detail label="结果对象">{result.query_id ?? result.task_id ?? result.message_id}</Detail>
               <Detail label="业务状态及版本">{value(result.task_status ?? result.status)} · {value(result.task_version ?? result.version)}</Detail>
             </div>)}
-            {taskIds.map(taskId => <button key={taskId} type="button" className="boss-btn" disabled={!onOpenTask}
-              onClick={() => onOpenTask?.(taskId, selected.run_id)}>查看关联任务 {taskId}</button>)}
+            {taskIds.map(taskId => <button key={taskId} type="button" className="boss-btn" disabled={loading}
+              onClick={() => openTask(taskId, selected)}>查看关联任务 {taskId}</button>)}
             {!taskIds.length && <button type="button" className="boss-btn" disabled>查看关联任务（没有关联任务）</button>}
             {details && <>
               <h3>实际请求与工具配置</h3><Detail label="配置摘要">{selected.runtime.config_sha256}</Detail>
@@ -220,6 +253,14 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask}: Props) {
             </>}
           </>}
         </section>
+        {task && <section className="boss-panel" aria-label="关联任务技术信息">
+          <div className="boss-panel-head"><h2>关联任务技术信息</h2><small>RUNTIME_RECORD · SIMULATED</small></div>
+          <Detail label="关联 run_id">{task.run_id}</Detail><Detail label="task_id">{task.task_id}</Detail>
+          <Detail label="当前任务状态">{task.task_status}</Detail><Detail label="当前任务版本">{task.task_version}</Detail>
+          <Detail label="执行空间">{task.namespace}</Detail>
+          <Detail label="数据集及版本">{task.dataset_id} · v{task.dataset_version}</Detail>
+          <Detail label="读取时间">{task.read_at}</Detail>
+        </section>}
         {selected && <section className="boss-panel" aria-label="费用与覆盖范围">
           <div className="boss-panel-head"><h2>用量与费用</h2><small>缺少用量保持未知</small></div>
           <UsageFields usage={selected.usage}/>

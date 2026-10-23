@@ -1,6 +1,6 @@
 # 老板 Agent 运行设计
 
-版本：0.4.0-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_T06，表示完整A06及相关修复待验收。当前实现为W2提交4d1c079及本次Runtime和当前会议读取修改，引用W1提交d1abaaa的T05/T06 1.2.1。输入SHA256由T07检查报告保存。独立审查者签署、公开接入和完整设计验收保持未完成。
+版本：0.5.0-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_A06_A07_ACCEPTANCE。代码为W2提交1d13d77及本轮维护组件和规范接收修改，正式规范引用W1提交fc4b2b5e88f9178312f6a7116e160ceeb03e160b的T05/T06 1.4.1。输入SHA256由T07检查报告保存。Tool与会议独立领域检查已验证至5b34dcf/1.3.1；1.4.1复验因实际W1源码已有未提交修改停止在版本检查。公共应用接收、独立审查者签署及完整设计验收保持未完成。
 
 ## 主体与治理
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | Context | RuntimeContextBlock、已确认 memory、本人目标、有效 Prompt、当前任务输入 | 来源文本作为资料；执行空间、owner、版本可查；不加载评分答案 |
 | Action | ToolRegistry、BusinessTool、业务服务 | 服务端白名单、参数 Schema、授权、幂等、当前对象及资料版本 |
-| Skill | Prompt 配置及待 T06 接收后的 SOP/Skill 资产 | 技术方法不能产生本人授权；按任务选择有效版本 |
+| Skill | Prompt配置及已映射业务操作的SOP/Skill设计资产 | 技术方法不能产生本人授权；完整Runtime注册及按任务采用待验证 |
 | Control | Audit 的 before_run、before_execute_tools、after_iteration、on_execute_tool_error；业务事务 | 无效工具及参数在执行前拒绝；模型及工具错误明确终止 |
 | Isolation | 业务 execution_namespace、nanobot session、独立检查目录 | 不创建额外业务 Agent、部门账号或调度器；重置后的历史空间拒绝写入 |
 | Verification | SQLite 重新查询、真实模型请求与独立业务断言 | 目录、启用、上下文加载、模型响应、业务状态、效果分别取证 |
@@ -37,7 +37,11 @@ Prompt 当前生命周期为草稿、静态校验、启用、停用。Runtime �
 | send_assignment | 同上 | 当前内容、收件人及任务版本获准后写入模拟发件箱；不表示外部送达 |
 | read_assignment | 同上 | 查询已保存任务与 message_ids；反馈和本人确认完成分别表达 |
 
-BusinessTool.parameters从成熟JSON Schema读取定义，模型不能填写envelope、authorization_id、idempotency_key。Tool执行结果来自业务Store.invoke。T06 1.2.1的x-tool-operations已确定五项operationId及输入、输出、错误Schema和Store方法；agent-assets.json逐项匹配。query_metrics保存查询记录，read_evidence/read_assignment保存审计，创建和发送分别保存task/outbox。具备RuntimeBinding时，BusinessTool将服务端请求及会话ID关联到业务envelope，保持原有owner、namespace和授权检查。经营查询和原文结果释放给模型前重新核查来源owner、类型、版本及source_validity；版本不一致或失效时明确拒绝。当前UI mutation与模型Tool的覆盖不同，新增操作仍需Runtime注册、服务端授权绑定及实际业务验证。
+BusinessTool.parameters从成熟JSON Schema读取定义，模型不能填写envelope、authorization_id、idempotency_key。Tool执行结果来自业务Store.invoke。T06 1.3.1的x-tool-operations确定五项operationId及既有输入、输出、错误Schema和Store方法；agent-assets.json逐项匹配，没有新增模型Tool。query_metrics同事务保存query及query_source_binding；read_evidence重查当前访问范围、来源版本、完整元信息和明细摘要，版本或元信息变化、旧查询缺少绑定时返回409。调用方重新query_metrics取得新query_id后读取当前原文；WITHDRAWN/EXPIRED返回410，其他非当前状态409，范围或类型错误403。现有Audit遇到工具错误明确终止当前尝试，后续新请求才重新查询；不自动重放业务写入。
+
+创建交办在实际业务事务校验来源、负责人及期限，并保存assignment_source_binding。发送和完成前重新检查创建时来源版本和完整摘要；缺少绑定或来源变化时返回409，要求本人核查。授权由Store.require_current_authorization检查owner、namespace、BOSS签发者、动作、目标、内容版本、完整参数、撤销和真实时间窗口。一份创建授权只产生一项任务，一份发送授权只产生一项发件箱结果；原请求和原内容读取已提交回执，不生成新执行。read_assignment返回原始Schema声明的字段，业务服务仍保留来源或纪要扩展字段。
+
+具备RuntimeBinding时，BusinessTool将服务端请求及会话ID关联到业务envelope，保持原有owner、namespace和授权检查。经营查询和原文结果释放给模型前重新核查当前来源。新规则要求W3同时接收W1 5b34dcf的业务模块、W2实际Tool与Runtime模块，并在同一集成版本复验；本目录独立组合检查不表示现有公共Runtime已经使用1.3.1。当前UI mutation与模型Tool的覆盖不同，其余SOP操作仍需Runtime注册、服务端授权绑定及实际业务验证。
 
 十三项 SOP 的后端操作引用维护在 `sop_backend_bindings`。每项包含读取和命令 operationId，结构检查同时查询 T06 的 HTTP、WebSocket 与 Tool 定义。DESIGN_ONLY 表示存在接口定义，尚未注册为模型 Tool。十四类模拟接口当前为 DESIGN_NOT_MOUNTED，各自资料缺口由 T06 记录；SI09/SI10 没有可用的获准业务资料，不能返回完整业务结果。
 
@@ -85,7 +89,7 @@ sequenceDiagram
 
 当前应用默认 maxToolIterations=12、maxTokens=4096；实际启用配置及 Runtime 快照为运行依据。RecordedProvider HTTP timeout=120 秒，max_retries=0。SDK 检查具有独立任务超时；正式产品总运行超时、Token 总预算、费用预算及无进展检测等待 T06/T16 明确定义与实现。未知预算不能被登记为已强制执行。
 
-运行状态引用PRD的QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT。T06事件1.2.1描述webui_response、message、delta、stream_end、turn_end、recovery_state、retry_status、context_compaction；request_id关联传输回执，chat_id/turn_id/stream_id关联上游会话与回答片段，client_request_id关联业务幂等。没有全域sequence，断线后通过持久会话及原请求回执查询，不能直接重放写入。
+运行状态引用PRD的QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT。T06事件1.4.1描述webui_response、message、delta、stream_end、turn_end、recovery_state、retry_status、context_compaction；request_id关联传输回执，chat_id/turn_id/stream_id关联上游会话与回答片段，client_request_id关联业务幂等。没有全域sequence，断线后通过持久会话及原请求回执查询，不能直接重放写入。
 
 SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自保存原因；显式取消表现为 CancelledError，外部任务超时表现为 TimeoutError。当前真实检查覆盖这些行为，见 T16。runtime_run 的 run_id、配置版本、用量及业务结果引用仍需 W3 与实际持久运行记录关联；不能根据 UI 文本生成正式状态。缺少必要输入停止依赖该输入的动作；参数或授权拒绝停止对应工具调用；模型错误保存真实失败；取消和超时停止后续调用。模型失败不能清除已经保存的业务结果，不得再次发送同一意图；不确定结果查询原请求回执及业务对象。
 
@@ -97,7 +101,7 @@ SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自�
 
 `runtime_records_query.read_runtime_records`提供技术元信息的受控查询，校验角色、执行空间、参数及RFC3339范围，在全部记录内筛选后使用真实started_at/run_id游标分页。`MaintainerRuntimeRecords`提供A15独立内容组件，包含实际筛选、列表、记录详情、配置和工具版本、业务对象引用、用量及覆盖范围；取消仅中止读取。五组真实DOM与只读API检查通过，输入来自实际DeepSeek运行SQLite，没有新增模型请求或业务对象。完整桌面入口、RoleChannel、关联任务操作与视觉验收继续待W3接入验证。
 
-`boss_memory_runtime.OwnerMemoryContext` 在一致读取事务中复用W1 1.2.1的confirmed_memory，核查当前记忆与确认授权。记忆原记录及历史仍保留，已撤销确认不进入新任务；新的本人确认采用新的版本。Provider只向本人上下文提供有效正文，并将不含正文的boss_memory_reference放入服务端RequestContext.attributes供RuntimeRecorder关联。MAINTAINER只读取同一判断产生的future_context_eligible。获准样本的确认有效、撤销后停止采用及新确认后三个独立Runtime均已通过真实DeepSeek检查，见T19；不能扩大为历史会话清理或物理擦除通过。
+`boss_memory_runtime.OwnerMemoryContext` 在一致读取事务中复用W1 1.3.1的confirmed_memory，核查当前记忆与确认授权。记忆原记录及历史仍保留，已撤销确认不进入新任务；新的本人确认采用新的版本。Provider只向本人上下文提供有效正文，并将不含正文的boss_memory_reference放入服务端RequestContext.attributes供RuntimeRecorder关联。MAINTAINER只读取同一判断产生的future_context_eligible。获准样本的确认有效、撤销后停止采用及新确认后三个独立Runtime均已通过真实DeepSeek检查，见T19；不能扩大为历史会话清理或物理擦除通过。
 
 ## 检索、摄取与语音
 
@@ -109,7 +113,7 @@ SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自�
 
 `boss_agent_read_tools.BossResearchSourcesTool` 将已准备研究的当前引用提供给模型，operationId为bossWorkspaceRead，projection仅允许research，角色仅允许BOSS。工具从实际页面服务重新读取，输出不包含联系人、个人记忆或其他投影。获准finance-note的DeepSeek真实检查覆盖原始版本、更新版本、明确冲突及撤销后四个独立Runtime和新会话，全部通过；原始证据见T15。公共Runtime注册和应用重启验收由W3完成，不能根据独立检查登记公共入口已启用。
 
-五项 Tool 与十三项 SOP 的语义核对见 `evidence/T07/w2-20261023-semantic-review.md`。四次既有真实运行的28项 Tool 结果通过字段校验和对象关联核对；来源文档换为版本2后，现有 read_evidence.sources.version仍返回1，完整来源语义等待 W1 修复。四种有 TypedDict 的 Runtime 事件已匹配安装版本的字段与必需属性，实际公共事件流、内部推理过滤与持久运行关联继续由 W3 验证。
+五项Tool与十三项SOP的语义核对见 `evidence/T07/w2-20261023-semantic-review.md`。既有真实模型记录的28项Tool结果通过1.3.1声明Schema校验；W2 Adapter与W1确定源码的独立实际调用已通过旧查询409、新查询版本2、六种非当前来源拒绝、缺少绑定拒绝、授权一次使用、原回执及交办来源变化停止发送。实际当前会议四动作和五个读取投影同样通过。新增组合检查没有发送模型请求，不扩展为全部SOP已被模型采用。四种TypedDict事件已匹配安装版本字段，公共事件流、内部推理过滤与持久运行关联继续由W3验证。
 
 录音使用明确本人操作和系统权限。用户已提供 Doubao 凭据引用，`boss_transcription.DoubaoTranscriptionProvider` 使用已核查的官方极速版 HTTP 接口及 `volc.bigasr.auc_turbo`，音频通过 base64 直接提交。FFmpeg 解码和重采样，标准 wave 库封装 WAV；服务端核查源文件3MB、解码时长60秒、15秒解码超时及90秒请求超时，没有自动重试。凭据与文字不进入对象展示，未知费用保持 null。用户授权选择公开真实语音样本验证服务，实际转写与公开应用接入继续分别验证。
 

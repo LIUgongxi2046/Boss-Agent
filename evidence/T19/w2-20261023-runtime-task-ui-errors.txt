@@ -1,0 +1,39 @@
+### Result
+{"status":"PASS","check_id":"A15-TASK-READ-ERRORS","offline_old_data_cleared":true,"invalid_session_status":401,"dom":"- main:\n  - region \"运行记录查询\":\n    - heading \"运行记录\" [level=2]\n    - text: RUNTIME_RECORD · 获准技术元信息 Provider\n    - textbox \"Provider\"\n    - text: run_id\n    - textbox \"run_id\"\n    - text: 数据集\n    - textbox \"数据集\"\n    - text: 错误类型或终止原因\n    - textbox \"错误类型或终止原因\"\n    - text: 运行状态\n    - combobox \"运行状态\":\n      - option \"全部状态\" [selected]\n      - option \"QUEUED\"\n      - option \"RUNNING\"\n      - option \"WAITING_INPUT\"\n      - option \"SUCCEEDED\"\n      - option \"FAILED\"\n      - option \"CANCELED\"\n      - option \"TIMED_OUT\"\n    - text: 每页数量\n    - combobox \"每页数量\":\n      - option \"1\"\n      - option \"20\"\n      - option \"50\" [selected]\n      - option \"100\"\n    - text: 真实开始时间从\n    - textbox \"真实开始时间从\"\n    - text: 真实开始时间至\n    - textbox \"真实开始时间至\"\n    - button \"查询记录\":\n      - img\n      - text: 查询记录\n    - button \"取消读取\" [disabled]:\n      - img\n      - text: 取消读取\n  - region \"运行记录列表\":\n    - heading \"已记录的运行\" [level=2]\n    - text: 记录待查询\n  - complementary \"运行记录详情\":\n    - heading \"获准记录详情\" [level=2]\n    - text: 私人正文、凭据和内部推理不在读取范围\n    - paragraph: 选择已有运行记录查看详情"}
+### Ran Playwright code
+```js
+await (async (page) => {
+  const runId = "run-8142c95f-18a3-47f5-873e-2d215928586f";
+  const taskId = "a11d0910-d79f-4144-8871-fe4ac16da38b";
+  const button = "查看关联任务 " + taskId;
+  await page.getByRole("button", {name: button, exact: true}).click();
+  await page.getByRole("region", {name: "关联任务技术信息", exact: true}).waitFor();
+  await page.context().setOffline(true);
+  await page.getByRole("button", {name: button, exact: true}).click();
+  await page.getByRole("alert").waitFor();
+  if (await page.getByRole("region", {name: "关联任务技术信息", exact: true}).count())
+    throw Error("读取失败后仍展示旧任务信息");
+  await page.context().setOffline(false);
+  await page.getByRole("button", {name: "查询记录", exact: true}).click();
+  await page.getByRole("button", {name: "打开记录 " + runId, exact: true}).click();
+  await page.evaluate(() => {document.querySelector('meta[name="maintainer-token"]').content = "expired-session";});
+  const [response] = await Promise.all([
+    page.waitForResponse(item => item.url().includes("/runtime-records/task?")),
+    page.getByRole("button", {name: button, exact: true}).click(),
+  ]);
+  if (response.status() !== 401) throw Error("失效身份没有拒绝关联任务读取");
+  await page.getByRole("alert").filter({hasText: "HTTP 401"}).waitFor();
+  if (await page.locator("tbody tr").count() ||
+    await page.getByRole("region", {name: "关联任务技术信息", exact: true}).count())
+    throw Error("身份失效后没有清理旧记录");
+  await page.reload();
+  return {status: "PASS", check_id: "A15-TASK-READ-ERRORS", offline_old_data_cleared: true,
+    invalid_session_status: response.status(), dom: await page.locator("main").ariaSnapshot()};
+}
+)(page);
+```
+### Page
+- Page URL: http://127.0.0.1:56488/
+- Page Title: 运行记录组件检查
+### Events
+- New console entries: .playwright-cli/console-2026-10-23T08-24-59-331Z.log#L5-L6

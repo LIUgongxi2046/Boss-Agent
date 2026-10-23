@@ -1,0 +1,64 @@
+{
+  "status": "PASS_TASK_REFERENCE_COMPONENT_SCOPE",
+  "checks": [
+    {
+      "check_id": "A15-REAL-TASK-REFERENCE",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-task-ui.txt",
+      "sha256": "7fe6d808b21081d1e5c36b1d75ba59c2f5c3179af87b8590adad47ecde971f73"
+    },
+    {
+      "check_id": "A15-TASK-CANCEL-PENDING-READ",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-task-ui-cancel.txt",
+      "sha256": "6173495c96708f48eb745e0145a99d05616a7360540139b2dde66520b33b3955"
+    },
+    {
+      "check_id": "A15-TASK-READ-ERRORS",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-runtime-task-ui-errors.txt",
+      "sha256": "cdf22e66ac218f4f70fa8cd526dcb968e7d01bd7f35b13f51de9a3cf85e93919"
+    }
+  ],
+  "test_reports": {
+    "runtime-task-reference": {
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "7.311"
+    },
+    "runtime-task-complete": {
+      "tests": "430",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "13",
+      "time": "62.059"
+    }
+  },
+  "run_id": "run-8142c95f-18a3-47f5-873e-2d215928586f",
+  "task_id": "a11d0910-d79f-4144-8871-fe4ac16da38b",
+  "task_status": "OPEN",
+  "task_count": 1,
+  "outbox_count": 0,
+  "source_database_unchanged": true,
+  "copy_database_unchanged": true,
+  "actual_database_reopened": true,
+  "new_model_requests": 0,
+  "screenshots_taken": false,
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "visual_acceptance": "NOT_RUN",
+  "full_A19_accepted": false,
+  "source_code_sha256_at_collection": {
+    "validation/runtime_records_query.py": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502",
+    "app/webui/MaintainerRuntimeRecords.tsx": "77353ede61ec509a69e138dbf4f5a5281858f51fe9d8c467bb33134ed95d84ea",
+    "app/tests/test_boss_runtime_task_reference.py": "9685290faee7a41ab8a8ae4854a02c686f4e102a6574955316c9ac30462af886",
+    "evidence/T19/check_runtime_ui_server.py": "94fd3af21eb5a395464a8cf8bd147a9ffe1c7f27b68999cccbe3185c0eaabb10",
+    "evidence/T19/check_runtime_task_ui_results.py": "9a34380246e7defdbfc23ab77f6d4ca3e133aaf899641bdb7ec80895a1fe0c81",
+    "evidence/T19/runtime_ui_cli.sh": "556fa589698c20427f0ceb77106670a327fb9116a8ad53ed31f940ebcd9592d5",
+    "evidence/T19/check_runtime_task_ui.js": "1aa106b10e3d6914a125297f1eef5f5b3e70020be8ff6aec6a22c5cc740cd22a",
+    "evidence/T19/check_runtime_task_ui_cancel.js": "28b5d36c4b80faf310360c824de0778e08fe384edcad927f0c0011f2b955d9cb",
+    "evidence/T19/check_runtime_task_ui_errors.js": "d60ece9c9a51e6dd7d6f9bf66f8a83eb5ee916e2baa63e5cf548c4d1ceba6b32",
+    "evidence/T19/check_runtime_task_ui_cancel.sh": "3f75958e12e34f0f4c43e3e6e188bf475d6ab1a8b33d318b116439ec77e9351d"
+  }
+}

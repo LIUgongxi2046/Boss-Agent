@@ -1,18 +1,19 @@
 {
-  "status": "PASS_DESIGN_STRUCTURE_ONLY",
+  "status": "CURRENT_PRODUCER_VALID_LEGACY_SCHEMA_MISMATCH",
   "full_A07_accepted": false,
   "input_sha256": {
-    "agent_assets": "9da8945757efa1dcf0b66d2dc9034c864b814714e455bccc5c0864f54e326ecd",
+    "agent_assets": "d5cda0281f71c3e302ff7d8936fc6b773a2e486f9aaf217962d52011c88302a6",
     "selection_probe": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
-    "backend_design": "2ff44e658b2d1bec28adde3431d05ccda0e83e69f4a9db66fcacca5eebcf11f5",
-    "runtime_events": "cef1b5a62328c5983f464ebcfea0db86ae36b90165713c9167c715e6427e1c6c",
-    "data_dictionary": "53ac7ee94da52554c4e4164d80a889e19e174007ebfddfc4d25c7fdaca14bffe",
+    "backend_design": "109fc76ab599480a641150df791d93e75c8caf9bb60339c78d267be60b9760e9",
+    "runtime_events": "8d29e99168f6d3cee3c5196c6563f77a9f15f1ffc757ea6b8a77e9f833bf868f",
+    "data_dictionary": "1d1892cbd24e362b26e9c171d0b7ed2bdf8400148225ed3078c6b1ce5f9e02b6",
+    "runtime_records_schema": "b83ff531f0502c763baf4f0d0618fc87054a7e50d22bd6411a051426af04b58a",
     "workspace_projection_source": "3c89b0d959456a2010cc7d6a335c66cdd31b2372acc7f802dfb23a02884dd402",
     "transcription_adapter_source": "337a9ef40be26618115f45713e73caad4e6c668da92e25d8dbcb31441744f0c1",
     "research_tool_source": "3624e56c601a698798d2b2eaf2a0a4152d198967051ab3c82463142560ac1da4",
     "runtime_records_source": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
-    "runtime_query_source": "84c8b11508c4e5692364866a7aaa9a027e86d25e600553930f08204f51e4dd7a",
-    "runtime_ui_source": "230e82bdd683ef8f340d4e5a12cb1f36cc1687c0ef22838960ac7cfc8d27d2ee",
+    "runtime_query_source": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502",
+    "runtime_ui_source": "77353ede61ec509a69e138dbf4f5a5281858f51fe9d8c467bb33134ed95d84ea",
     "current_meeting_tool_source": "6b4f6ce2a034065e2951adcd3b3978b4eab07c3f4fdba62ae1f200934132ae04"
   },
   "current_tool_count": 5,
@@ -26,12 +27,53 @@
   "research_read_adapter_implemented": true,
   "research_read_public_runtime_registered": false,
   "voice_provider_fields_matched": 11,
-  "backend_version": "1.2.1",
-  "backend_source_commit": "d1abaaa16cab34757d4adbb37021314d86fa2c89",
+  "backend_version": "1.4.1",
+  "backend_source_commit": "fc4b2b5e88f9178312f6a7116e160ceeb03e160b",
+  "source_binding_fields_matched": 8,
+  "assignment_binding_fields_matched": 7,
+  "source_validity_policy_sha256_matched": true,
+  "recorded_runtime_required_fields_matched": 27,
+  "actual_runtime_runs_observed": 15,
+  "legacy_runtime_schema_errors": [
+    {
+      "run_id": "run-6e41c397-1839-4c2b-a98d-b7a3a90b8258",
+      "path": [],
+      "validator": "required",
+      "message": "'model_attempts_coverage' is a required property"
+    },
+    {
+      "run_id": "run-6e41c397-1839-4c2b-a98d-b7a3a90b8258",
+      "path": [
+        "tool_configuration",
+        0
+      ],
+      "validator": "required",
+      "message": "'implementation_sha256' is a required property"
+    },
+    {
+      "run_id": "run-ff0a26be-2594-4603-9eb9-a3c85464e338",
+      "path": [],
+      "validator": "required",
+      "message": "'model_attempts_coverage' is a required property"
+    },
+    {
+      "run_id": "run-ff0a26be-2594-4603-9eb9-a3c85464e338",
+      "path": [
+        "tool_configuration",
+        0
+      ],
+      "validator": "required",
+      "message": "'implementation_sha256' is a required property"
+    }
+  ],
+  "current_producer_runs_schema_validated": 8,
+  "actual_runtime_projections_validated": 4,
+  "runtime_query_schema_matches_implementation": true,
   "remaining_backend_items": [
-    "public integration of four meeting actions and verification of all nine W1 domain actions on W3 source version",
+    "current assignment binding and authorization adoption across public consumers on W3 source version",
     "actual simulation broker implementation and approved missing materials",
     "actual runtime streaming cancellation and persistence verification",
+    "runtime-records schema and current/legacy field validation on W3 public version",
     "complete legitimate input schema matching and independent semantic review",
     "integration verification on W3 source version"
   ]

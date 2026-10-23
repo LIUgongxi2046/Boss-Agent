@@ -36,7 +36,7 @@ class BusinessTool(Tool):
 
     @property
     def description(self):
-        return {"query_metrics": "查询已授权经营明细并计算指标。", "read_evidence": "读取已有查询对应的原始资料和明细。", "create_assignment": "按当前老板授权创建交办。", "send_assignment": "按当前老板授权模拟发送交办。", "read_assignment": "重新查询交办的正式状态。"}[self.operation]
+        return {"query_metrics": "查询当前获准经营明细并计算指标，保存当前来源绑定并返回新的query_id。", "read_evidence": "读取已有查询对应的当前原始资料和明细。来源变化或查询缺少绑定时返回409，须重新query_metrics取得新query_id；撤销或到期来源停止采用。", "create_assignment": "按当前老板授权创建交办，校验来源、负责人及有效期限，并保存创建时来源绑定。", "send_assignment": "按当前老板授权模拟发送交办，重新核查创建时来源和当前负责人；来源变化或缺少绑定时停止，已提交结果查询原请求回执。", "read_assignment": "重新查询交办的正式状态；读取状态不产生本人完成授权。"}[self.operation]
 
     @property
     def parameters(self):

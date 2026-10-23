@@ -70,15 +70,37 @@ def memory_technical_status(store, role, namespace="ui-check"):
         db.execute("BEGIN")
         store.active(db, namespace)
         current = store.get(db, namespace, "memory", "current")
-        owner = store.get(db, namespace, "initial", "snapshot")["owner_id"]
+        snapshot = store.get(db, namespace, "initial", "snapshot")
+        owner = snapshot["owner_id"]
         eligible = confirmed_memory(db, namespace, current, owner) is not None
         state = current["confirmation_state"]
+        condition = "namespace=? AND kind='runtime_run' AND json_extract(body,'$.memory_reference.memory_id')=? AND json_extract(body,'$.memory_reference.confirmation_authority_checked')=1"
+        parameters = (namespace, current["memory_id"])
+        selection_count = db.execute("SELECT COUNT(*) FROM objects WHERE " + condition, parameters).fetchone()[0]
+        latest = db.execute(
+            "SELECT id,json_extract(body,'$.memory_reference.version'),json_extract(body,'$.memory_reference.eligible'),"
+            "json_extract(body,'$.started_at'),json_extract(body,'$.status'),json_extract(body,'$.model_completion_observed') "
+            "FROM objects WHERE " + condition + " ORDER BY json_extract(body,'$.started_at') DESC,id DESC LIMIT 1",
+            parameters,
+        ).fetchone()
+        selection = None
+        if latest is not None:
+            require(isinstance(latest[1], str) and latest[2] in (0, 1), "记忆采用记录字段无效")
+            selection = {
+                "run_id": latest[0], "memory_version": latest[1], "eligible": bool(latest[2]),
+                "selected_at": latest[3], "run_status": latest[4], "model_completion_observed": bool(latest[5]),
+                "matches_current_memory_version": latest[1] == current["version"],
+                "observation": "CONTEXT_SELECTION_RECORDED",
+            }
         # 字段白名单只包含技术元信息，正文不进入接口结果。
         deleted = state == "DELETED"
         return {
             "projection": "memory-technical-status",
+            "source_type": "RUNTIME_RECORD",
             "namespace": namespace,
             "checked_at": now(),
+            "owner_scope": {key: snapshot[key] for key in ("owner_id", "dataset_id", "dataset_version")},
+            "memory_source_type": snapshot["source_type"],
             "memory": {
                 "memory_id": current["memory_id"],
                 "version": current["version"],
@@ -86,6 +108,10 @@ def memory_technical_status(store, role, namespace="ui-check"):
                 "valid_until": current.get("valid_until"),
             },
             "future_context_eligible": eligible,
+            "confirmation_authority_checked": True,
+            "next_context_memory_version": current["version"] if eligible else None,
+            "latest_context_selection": selection,
+            "context_selection_count": selection_count,
             "future_turn_policy": "CURRENT_CONFIRMATION_REQUIRED",
             "deletion_propagation": (
                 "CURRENT_CONTEXT_CLEARED" if deleted and not current.get("text")
@@ -93,6 +119,11 @@ def memory_technical_status(store, role, namespace="ui-check"):
                 else "NOT_REQUESTED"
             ),
             "derived_memory_index": "NOT_USED",
+            "deletion_scopes": {
+                "current_memory_content": "CLEARED" if deleted and not current.get("text") else "RETAINED" if deleted else "NOT_REQUESTED",
+                "initial_approved_source": "RETAINED" if snapshot.get("memory", {}).get("text") else "NOT_PRESENT",
+                "loaded_sessions": "NOT_VERIFIED", "backups": "NOT_VERIFIED", "physical_erasure": "NOT_VERIFIED",
+            },
             "model_adoption_verified": False,
             "physical_secure_erasure_verified": False,
             "private_body_available_here": False,

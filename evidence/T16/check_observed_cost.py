@@ -18,6 +18,7 @@ files.extend(ROOT / "evidence" / "T15" / "w2-20261023" / name for name in (
 ))
 files.extend(sorted((ROOT / "evidence/T15/w2-20261023/source-citation-initial").glob("*-transport.json")))
 files.extend(sorted((ROOT / "evidence/T19/w2-20261023-memory-confirmation").glob("*-transport.json")))
+files.extend(sorted((ROOT / "evidence/T19/memory-ui-results").glob("*-transport.json")))
 rows = []
 observed_response_ids = set()
 for path in files:
@@ -53,7 +54,7 @@ report = {
     "status": "PASS_OBSERVED_USAGE_CALCULATION_ONLY", "currency": price["currency"],
     "price_version": price["price_version"], "price_source": price["source_url"],
     "price_sha256": hashlib.sha256(price_path.read_bytes()).hexdigest(),
-    "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认及四项异常运行记录请求",
+    "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认、A12停止采用及四项异常运行记录请求",
     "request_count": sum(row["request_count"] for row in rows), "rows": rows,
     "observed_usage_request_count": sum(row["observed_usage_request_count"] for row in rows),
     "missing_usage_request_count": sum(row["missing_usage_request_count"] for row in rows),

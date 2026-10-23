@@ -20,6 +20,33 @@ QUERY = {
 }
 
 
+def read_runtime_task_reference(store, role, namespace, run_id, task_id):
+    require(role is not None, "需要认证身份", web.HTTPUnauthorized)
+    require(role in {"BOSS", "MAINTAINER"}, "关联任务访问被拒绝", web.HTTPForbidden)
+    require(all(isinstance(value, str) and 1 <= len(value) <= 128 for value in (run_id, task_id)),
+            "运行或任务标识格式无效", web.HTTPBadRequest)
+    with store.connect() as db:
+        db.execute("BEGIN")
+        store.active(db, namespace)
+        initial = store.get(db, namespace, "initial", "snapshot")
+        require(initial["source_type"] == "SIMULATED", "当前资料不允许维护读取任务元信息", web.HTTPForbidden)
+        run = store.get(db, namespace, "runtime_run", run_id)
+        require(run["namespace"] == namespace, "运行空间不符", web.HTTPForbidden)
+        require(any(result.get("task_id") == task_id for result in run["tool_results"]),
+                "任务没有关联到当前运行", web.HTTPForbidden)
+        require(all(run.get(key) == initial[key] for key in ("dataset_id", "dataset_version")),
+                "运行数据范围无法核验")
+        task = store.get(db, namespace, "task", task_id)
+        # 历史工具回执仅用于核验关联，当前状态读取实际任务对象。
+        return {
+            "projection": "runtime-task-reference", "source_type": "RUNTIME_RECORD",
+            "task_source_type": initial["source_type"], "namespace": namespace, "run_id": run_id,
+            "dataset_id": initial["dataset_id"], "dataset_version": initial["dataset_version"],
+            "task_id": task_id, "task_version": task["version"], "task_status": task["status"],
+            "read_at": now(), "private_body_available_here": False, "business_mutation_performed": False,
+        }
+
+
 def read_runtime_records(store, role, namespace, run_id=None, query=None):
     require(role is not None, "需要认证身份", web.HTTPUnauthorized)
     require(role in {"BOSS", "MAINTAINER"}, "运行记录访问被拒绝", web.HTTPForbidden)

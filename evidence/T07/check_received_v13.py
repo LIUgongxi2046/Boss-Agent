@@ -15,13 +15,15 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 W1 = Path("/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent")
-COMMIT = "d1abaaa16cab34757d4adbb37021314d86fa2c89"
+COMMIT = "fc4b2b5e88f9178312f6a7116e160ceeb03e160b"
 inputs = {}
 for relative in ("specs/openapi.yaml", "specs/data-dictionary.json", "specs/runtime-events.schema.json",
                  "validation/business.py", "validation/controls.py", "validation/boss_meetings.py",
-                 "validation/boss_command_api.py", "validation/boss_memory.py"):
+                 "validation/boss_command_api.py", "validation/boss_memory.py", "specs/selection-probe.json",
+                 "validation/boss_source_access.py", "validation/boss_source_policy.py"):
     committed = subprocess.check_output(["git", "show", COMMIT + ":" + relative], cwd=W1)
-    assert (W1 / relative).read_bytes() == committed
+    if relative.startswith("validation/") or relative == "specs/selection-probe.json":
+        assert (W1 / relative).read_bytes() == committed
     inputs[relative] = hashlib.sha256(committed).hexdigest()
 sys.path.insert(0, str(ROOT / "validation"))
 sys.path.insert(0, str(W1 / "validation"))
@@ -31,7 +33,7 @@ from controls import ControlStore
 from boss_meetings import MeetingAPI
 from runtime_meeting_tool import BossCurrentMeetingTool
 
-backend = yaml.safe_load((W1 / "specs/openapi.yaml").read_text())
+backend = yaml.safe_load(subprocess.check_output(["git", "show", COMMIT + ":specs/openapi.yaml"], cwd=W1))
 validated = []
 
 
@@ -42,7 +44,7 @@ def schema_check(action, payload, result):
     validated.append(operation["operationId"])
 
 
-work = ROOT / ".work/w2-checks/received-v12"
+work = ROOT / ".work/w2-checks/received-v13"
 work.mkdir(parents=True, exist_ok=True)
 store = ControlStore(work / (str(uuid4()) + ".sqlite"))
 baseline = store.initialize("ui-check")
@@ -108,21 +110,30 @@ queried = store.invoke("query_metrics", query)
 with store.connect() as db:
     source = store.get(db, "ui-check", "document", "finance-note")
     store.put(db, "ui-check", "document", "finance-note", {**source, "version": "2"})
+with pytest.raises(web.HTTPConflict):
+    store.invoke("read_evidence", {
+        "envelope": query["envelope"], "query_id": queried["query_id"], "source_ids": ["finance-note"],
+        "detail_refs": queried["detail_refs"],
+    })
+fresh_query = store.invoke("query_metrics", query)
 readback = store.invoke("read_evidence", {
-    "envelope": query["envelope"], "query_id": queried["query_id"], "source_ids": ["finance-note"],
-    "detail_refs": queried["detail_refs"],
+    "envelope": query["envelope"], "query_id": fresh_query["query_id"], "source_ids": ["finance-note"],
+    "detail_refs": fresh_query["detail_refs"],
 })
 source_version = next(item["content"]["version"] for item in readback["original_records"] if item["record_id"] == "finance-note")
-dictionary = json.loads((W1 / "specs/data-dictionary.json").read_text())
-assert backend["info"]["version"] == dictionary["version"] == "1.2.1"
+assert next(item["content"]["content"] for item in readback["original_records"] if item["record_id"] == "finance-note") == source["content"]
+dictionary = json.loads(subprocess.check_output(["git", "show", COMMIT + ":specs/data-dictionary.json"], cwd=W1))
+assert backend["info"]["version"] == dictionary["version"] == "1.4.1"
+assert fresh_query["query_id"] != queried["query_id"]
+assert readback["sources"][0]["version"] == source_version == "2"
 assert backend["paths"]["/api/boss/ui/meeting-arrangement"]["get"]["operationId"] == tool.name
 Draft202012Validator(tool.parameters).validate({})
 read_schema = backend["paths"]["/api/boss/ui/meeting-arrangement"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
 for projection in (before, pending, scheduled, reopened, held_read):
     Draft202012Validator(read_schema, format_checker=FormatChecker()).validate(projection)
 report = {
-    "status": "PASS_CURRENT_MEETING_READ_WITH_SOURCE_VERSION_REVIEW_REQUIRED", "received_commit": COMMIT,
-    "backend_version": "1.2.1", "input_sha256": inputs,
+    "status": "PASS_CURRENT_MEETING_AND_SOURCE_VERSION_BINDING", "received_commit": COMMIT,
+    "backend_version": "1.4.1", "input_sha256": inputs,
     "runtime_meeting_tool_sha256": hashlib.sha256((ROOT / "validation/runtime_meeting_tool.py").read_bytes()).hexdigest(),
     "meeting_read": {"initial_version": "1", "draft_does_not_replace_current": True,
                      "confirmed_version": scheduled["meeting"]["version"], "canceled_version": reopened["meeting"]["version"],
@@ -132,11 +143,14 @@ report = {
                      "authentication_rejection": True, "maintainer_rejection": True, "contact_rejection": True},
     "source_revision_check": {"current_document_version": source_version, "reported_source_version": readback["sources"][0]["version"],
                               "source_version_matches": readback["sources"][0]["version"] == source_version,
-                              "body_changed": False, "owner": "W1 Store.source/Store.read_evidence"},
-    "source_fields_not_yet_declared": [field for field in ("valid_until", "validity_state")
-                                     if field not in dictionary["entities"]["document"]["fields"]],
+                              "body_changed": False, "earlier_query_status": 409, "fresh_query_created": True},
+    "source_validity_fields_declared": all(field in dictionary["entities"]["document"]["fields"]
+                                          for field in ("valid_until", "validity_state")),
     "external_request_sent": False, "public_runtime_registered": False, "full_A07_accepted": False,
 }
-output = Path(__file__).parent / "w2-20261023-received-v12.json"
+for relative, expected in inputs.items():
+    if relative.startswith("validation/") or relative == "specs/selection-probe.json":
+        assert hashlib.sha256((W1 / relative).read_bytes()).hexdigest() == expected
+output = Path(__file__).parent / "w2-20261023-received-v13.json"
 output.write_text(json.dumps(report, ensure_ascii=False, indent=2))
 print(json.dumps(report, ensure_ascii=False))

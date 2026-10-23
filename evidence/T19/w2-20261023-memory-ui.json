@@ -1,0 +1,101 @@
+{
+  "status": "PASS_COMPONENT_DOMAIN_AND_DOM_SCOPE",
+  "checks": [
+    {
+      "check_id": "A12-CURRENT-AND-HISTORICAL-OBSERVATIONS",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-initial.txt",
+      "sha256": "b3ed23604c39aeac119c6036f870b45b7312ea63ad17e438f3af9f2892cce69d"
+    },
+    {
+      "check_id": "A12-REVOCATION-AND-HISTORY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-revoked.txt",
+      "sha256": "ebaa4bdb05339a7d602f26d417ac7ead04661aeff7ddbabd7499f4d5be76e955"
+    },
+    {
+      "check_id": "A12-ACTUAL-NEW-RUNTIME-EXCLUSION",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-excluded.txt",
+      "sha256": "906b8a666a9f13d40593fbc09cdb023ce3044b2c3984d31dab6152470fd02424"
+    },
+    {
+      "check_id": "A12-DELETION-SCOPE-AND-REOPEN",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-deleted.txt",
+      "sha256": "551ec4d7cb8a8cd2a9be7b4d2f300f9479cf0edbce57b343fc3844fc7da1a7a3"
+    },
+    {
+      "check_id": "A12-DELETED-NEW-RUNTIME",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-deleted-runtime.txt",
+      "sha256": "6132ade769528d07d4c35aeaabddd3b1875f7504ea48d082fb8b47e52a990f56"
+    },
+    {
+      "check_id": "A12-READ-FAILURE-AUTH-AND-RECOVERY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-errors.txt",
+      "sha256": "eb81aa581fddcf952d053acb370e459cc7868318760e7c6466e02fca1843552f"
+    },
+    {
+      "check_id": "A12-CANCEL-PENDING-READ",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-memory-ui-cancel.txt",
+      "sha256": "304c7150687860d6e8531e240f733435706b5615247b883aa934822eb4215bb7"
+    }
+  ],
+  "actual_runtime_checks": [
+    {
+      "stage": "excluded",
+      "run_id": "run-5040ab53-c02e-40ce-97dd-3c2d62ae0a88",
+      "memory_version": "4",
+      "eligible": false,
+      "model_request_count": 1,
+      "model_completion_observed": true,
+      "answer_sha256": "cbec521fdfc999a7234c3010f9f6839f5059b52b20dd0f03cee62fd2491af123",
+      "transport_evidence": "evidence/T19/memory-ui-results/excluded-transport.json"
+    },
+    {
+      "stage": "deleted",
+      "run_id": "run-4a0c3047-dd3d-431d-b2ec-ca620a07b929",
+      "memory_version": "5",
+      "eligible": false,
+      "model_request_count": 1,
+      "model_completion_observed": true,
+      "answer_sha256": "9d74d7c92ef50b633c5c23cd099c19e07d3924affdede4904ad58542653d2a0a",
+      "transport_evidence": "evidence/T19/memory-ui-results/deleted-transport.json"
+    }
+  ],
+  "source_database_unchanged": true,
+  "isolated_copy_version": "5",
+  "task_count": 0,
+  "outbox_count": 0,
+  "new_model_request_count": 2,
+  "private_body_recorded": false,
+  "physical_secure_erasure_verified": false,
+  "screenshots_taken": false,
+  "visual_acceptance": "NOT_RUN",
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "full_A19_accepted": false,
+  "source_code_sha256_at_collection": {
+    "validation/boss_admin_config.py": "8c31fea3e7c58d8b45d1382c7e30df927118a356619499d627e705f352a306c9",
+    "validation/boss_memory_runtime.py": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64",
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "app/webui/MaintainerMemoryStatus.tsx": "6dcdb7396c1c939bf2a9a06d70306fa2e50c1f0cf2d5bb80406752d78e778443",
+    "app/webui/MaintainerRuntimeRecords.tsx": "adddb04ddbb8465daaf36c3094ce515e08a7478f74321181680d77fc80d4ded4",
+    "app/webui/boss-v6.css": "90e7efb7273e5263fde5a64877609894622d4cefc184c7aed64fbf0294554353",
+    "evidence/T19/check_memory_ui_server.py": "c6353dc4f63bfec3d921e73464c6a874bc19a0e984f52648e8719bd4c76a1b61",
+    "evidence/T19/check_memory_ui_state.py": "bb82ffee810b176a864bf662090a121c08809c95cf7ef960829d8358e695697c",
+    "evidence/T19/memory-ui/index.html": "ce326f8f102de579c2076950d19be0afa68305e81b4568e64be8458266cabd6a",
+    "evidence/T19/memory-ui/main.tsx": "ef0d31bc22a70251d6c8e0eed5b3256f3e67ae712b2b756dc51a8bfe9fa49d26",
+    "evidence/T19/memory-ui/tsconfig.json": "4e23b2bb803f0b23d48680cdc3620390398b35c54c1e9421009a2b565d1c5809",
+    "evidence/T19/memory-ui/vite.config.mjs": "cb6e1548b3f52d73d1e0af271801daf752f8f626ae3d4b3242831e733e7932b4",
+    "evidence/T19/check_memory_ui_cancel.js": "b27f3b1809ed0393561e3df2b36d7599303e7ed2ff9e0ffd52d5af1f8484e152",
+    "evidence/T19/check_memory_ui_deleted.js": "9c5462d8cbe842a76ab1f0ea93a7d2d95a46d0bf5c809243d37e9e2ea37d9fd0",
+    "evidence/T19/check_memory_ui_deleted_runtime.js": "8d9042dbc7cb1d7dddde3de46da22b8f5f745d36d17e607a189f3536bb924708",
+    "evidence/T19/check_memory_ui_errors.js": "0251471399dc7fa34fd89618a41009c6604091aee5ecca8caec10ce30b4f5fbd",
+    "evidence/T19/check_memory_ui_excluded.js": "46d3b23dae81c06ed1b4ca14e0e0bcf8237f920c68b489a11647871828b04754",
+    "evidence/T19/check_memory_ui_initial.js": "6562e3b9effaebf9ab6380fe2db79254b62907e260d1babbb5bf06defea45a74",
+    "evidence/T19/check_memory_ui_revoked.js": "e2482521d63d886bd69930adfe033d7fe811133a1afdf3484d39a8d76be06bed"
+  }
+}

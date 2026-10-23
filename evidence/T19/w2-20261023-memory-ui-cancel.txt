@@ -1,0 +1,15 @@
+### Result
+{"status":"PASS","check_id":"A12-CANCEL-PENDING-READ","backend_condition":"OWN_SERVICE_PROCESS_SUSPENDED","dom":"- main:\n  - region \"记忆技术状态查询\":\n    - heading \"记忆技术维护\" [level=2]\n    - text: RUNTIME_RECORD · 只读技术状态\n    - button \"检查技术状态\":\n      - img\n      - text: 检查技术状态\n    - button \"取消查询\" [disabled]:\n      - img\n      - text: 取消查询\n    - button \"查看获准记录\"\n    - button \"定位保存或索引失败\"\n  - status: 已取消本次技术状态读取，记忆内容保持当前状态\n  - status: 技术状态待查询\n  - region \"当前记忆确认\":\n    - heading \"当前记忆与确认\" [level=2]\n    - text: 本人范围与当前版本 老板范围\n    - strong: 尚未检查\n    - text: 执行空间\n    - strong: 尚未检查\n    - text: 数据集及版本\n    - strong: 尚未检查\n    - text: 记忆来源类型\n    - strong: 尚未检查\n    - text: 记忆标识\n    - strong: 尚未检查\n    - text: 当前记忆版本\n    - strong: 尚未检查\n    - text: 本人确认状态\n    - strong: 尚未检查\n    - text: 有效期限\n    - strong: 尚未检查\n    - text: 当前确认权限检查\n    - strong: 尚未检查\n    - text: 当前采用条件\n    - strong: 尚未检查\n    - text: 新任务可采用版本\n    - strong: 尚未检查\n    - text: 最近检查时间\n    - strong: 尚未检查\n    - img\n    - text: 本人内容的确认、修改和删除在老板入口完成。当前页面只读取技术元信息。\n  - region \"删除传播范围\":\n    - heading \"删除传播与索引\" [level=2]\n    - text: 各项范围独立核查 当前删除传播状态\n    - strong: 尚未检查\n    - text: 当前记忆内容\n    - strong: 尚未检查\n    - text: 派生记忆索引\n    - strong: 尚未检查\n    - text: 原始获准来源\n    - strong: 尚未检查\n    - text: 已载入历史会话\n    - strong: 尚未检查\n    - text: 备份传播\n    - strong: 尚未检查\n    - text: 物理安全擦除\n    - strong: 尚未检查\n    - text: 正文访问\n    - strong: 不提供正文\n    - text: 维护修改能力\n    - strong: 不允许修改本人内容\n  - complementary \"新会话与技术核查\":\n    - heading \"新会话与实际选择记录\" [level=2]\n    - text: 当前条件及历史观察分别显示 当前选择规则\n    - strong: 尚未检查\n    - text: 已记录选择次数\n    - strong: 尚未检查\n    - text: 当前模型遵从验证\n    - strong: 尚未检查"}
+### Ran Playwright code
+```js
+await (async (page) => {
+  await page.getByRole("button", {name: "检查技术状态", exact: true}).click();
+  await page.getByText("正在读取当前确认与删除传播状态", {exact: true}).waitFor();
+  await page.getByRole("button", {name: "取消查询", exact: true}).click();
+  await page.getByText("已取消本次技术状态读取，记忆内容保持当前状态", {exact: true}).waitFor();
+  if (!await page.getByRole("button", {name: "取消查询", exact: true}).isDisabled()) throw Error("取消后仍显示读取中");
+  return {status: "PASS", check_id: "A12-CANCEL-PENDING-READ", backend_condition: "OWN_SERVICE_PROCESS_SUSPENDED",
+    dom: await page.locator("main").ariaSnapshot()};
+}
+)(page);
+```

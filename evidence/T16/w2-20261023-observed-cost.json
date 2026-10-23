@@ -4,8 +4,8 @@
   "price_version": "official-page-verified-2026-10-23",
   "price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
   "price_sha256": "fc361c5ab5e13d5a17af811a26d3c690a944801f3973eaf89acd695af58a9ff8",
-  "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认及四项异常运行记录请求",
-  "request_count": 77,
+  "scope": "四次五工具多轮任务、获准样本记忆、研究引用四阶段、Runtime配置版本采用、记忆确认、A12停止采用及四项异常运行记录请求",
+  "request_count": 79,
   "rows": [
     {
       "source": "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/http-requests.json",
@@ -438,13 +438,45 @@
         "minimum_cny": "0.00069128",
         "maximum_cny": "0.00138256"
       }
+    },
+    {
+      "source": "evidence/T19/memory-ui-results/deleted-transport.json",
+      "sha256": "54933da1d2b54963593f6113025cd96eba3c1002a7846582609832c32f39f290",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 310,
+        "completion_tokens": 80
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00066328",
+        "maximum_cny": "0.00132656"
+      }
+    },
+    {
+      "source": "evidence/T19/memory-ui-results/excluded-transport.json",
+      "sha256": "168ff82b940954b57f1a9e7599adf315df2e649df8f8ee71199891e0e3ebb5c6",
+      "request_count": 1,
+      "observed_usage_request_count": 1,
+      "missing_usage_request_count": 0,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 311,
+        "completion_tokens": 132
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00087228",
+        "maximum_cny": "0.00174456"
+      }
     }
   ],
-  "observed_usage_request_count": 75,
+  "observed_usage_request_count": 77,
   "missing_usage_request_count": 2,
   "observed_scope_estimate_cny": {
-    "minimum_cny": "0.08664028",
-    "maximum_cny": "0.17328056"
+    "minimum_cny": "0.08817584",
+    "maximum_cny": "0.17635168"
   },
   "all_attempts_total_cost": null,
   "billing_statement_verified": false,

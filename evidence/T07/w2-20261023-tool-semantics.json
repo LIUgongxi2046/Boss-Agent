@@ -1,7 +1,19 @@
 {
-  "status": "PASS_BASELINE_SCHEMA_WITH_SOURCE_VERSION_REVIEW_REQUIRED",
+  "status": "PASS_RECEIVED_SOURCE_BINDING_AND_BASELINE_SCHEMA",
   "full_A07_accepted": false,
-  "backend_version": "1.1.0",
+  "backend_version": "1.3.1",
+  "received_commit": "5b34dcf77963351f249686375a76f07ac4486d03",
+  "received_source_sha256": {
+    "specs/openapi.yaml": "4ba84c8200fc203fe9755269fd1dbb3ef03400ca8c985753d6ad33d5fec08a9c",
+    "specs/data-dictionary.json": "d2eaa4961fd2b950ce9521bc8948e93838b29a4f7c791d203b6d84a8d1eeeee8",
+    "specs/runtime-events.schema.json": "6e2e6117fbee5b93088f8ba80f3c472dfbf44a613953a2a24ffae0b7b5472ca5",
+    "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
+    "validation/business.py": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738",
+    "validation/controls.py": "cb84b3885092f9cbb4b07b46ebaf45c43a9bd5c3bd0b8b758a6dc5a693cec917",
+    "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
+  },
+  "backend_specification_source": "FROZEN_GIT_OBJECTS",
   "recorded_tool_counts": {
     "query_metrics": 4,
     "read_evidence": 4,
@@ -42,18 +54,77 @@
     "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/events.json": "fed31dfbfeef56f2d101a7e9483856a93f2cd9afbac93b971168638754ab2aef"
   },
   "source_code_sha256": {
-    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/business.py": "f96822557b6b2e24a68ab0511c311d91f30dae17871b5d1f2d9293f98870b8cd",
-    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/model_probe.py": "08382243f7214d15dfb0f8e62b28a4d8f623fc5b7fb511f06bbe9f2163f57814",
-    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/specs/openapi.yaml": "638bf03fab74a1f0254734e13aad1e4fca42ff4484bc4a413451cb670fa9a48d"
+    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/business.py": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738",
+    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/model_probe.py": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873"
   },
   "source_revision_check": {
     "source_id": "finance-note",
     "current_document_version": "2",
-    "reported_source_version": "1",
-    "source_version_matches": false,
+    "reported_source_version": "2",
+    "source_version_matches": true,
     "body_changed": false,
     "external_request_sent": false,
-    "owner": "W1 business.Store.source and Store.read_evidence",
-    "required_behavior": "来源变更后当前引用返回正确版本，或明确拒绝旧查询并要求重读"
-  }
+    "earlier_query_status": 409,
+    "fresh_query_created": true,
+    "missing_binding_status": 409,
+    "same_version_metadata_change_status": 409,
+    "state_checks": [
+      {
+        "state": "RECEIVED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "INCOMPLETE",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "CONFLICTED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "SUPERSEDED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "WITHDRAWN",
+        "query_status": 410,
+        "evidence_status": 410
+      },
+      {
+        "state": "EXPIRED",
+        "query_status": 410,
+        "evidence_status": 410
+      }
+    ],
+    "withdrawn_query_status": 410,
+    "failed_tool_results_released": false,
+    "tool_adapter": "W2 BusinessTool with W1 1.3.1 ControlStore"
+  },
+  "assignment_adapter_checks": [
+    {
+      "source_changed_after_create": false,
+      "task_count": 1,
+      "outbox_count": 1,
+      "new_send_status": 200,
+      "duplicate_creation_rejected": true,
+      "original_creation_replayed_without_new_write": true,
+      "task_id": "e7a5d261-98da-4ab6-a7a3-3713a6002d80"
+    },
+    {
+      "source_changed_after_create": true,
+      "task_count": 1,
+      "outbox_count": 0,
+      "new_send_status": 409,
+      "duplicate_creation_rejected": true,
+      "original_creation_replayed_without_new_write": true,
+      "task_id": "ed7480c1-c2f7-41c1-ac8b-6b42adde47ea"
+    }
+  ],
+  "new_external_model_requests": 0,
+  "new_task_count": 2,
+  "new_outbox_count": 1
 }
