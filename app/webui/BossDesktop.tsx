@@ -21,6 +21,7 @@ import { BossMeetingBrief } from "./BossMeetingBrief";
 import { BossMeetingArrangement, type MeetingArrangementProjection } from "./BossMeetingArrangement";
 import { MaintainerRuntimeRecords } from "./MaintainerRuntimeRecords";
 import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
+import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
 import { BossOwnerPreferences } from "./BossOwnerPreferences";
@@ -310,14 +311,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (!bypassDirty && ((page === "F06" && assignmentDirty &&
         !["D04","D05","D01"].includes(id)) ||
         (["N07","N08"].includes(page) && settingsDirty) ||
-        (["F01","F04","N09"].includes(page) && workDirty)) && id !== page) {
+        (["F01","F04","N09","A08"].includes(page) && workDirty)) && id !== page) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setPendingNavigation({id,focus});
       return;
     }
     if (id !== page) setPreviousPage(page);
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
-    if (id !== page && ["F01","F04","N09"].includes(page)) setWorkDirty(false);
+    if (id !== page && ["F01","F04","N09","A08"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -1041,13 +1042,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 onNavigate={id=>navigate(id)} onViewSource={goSource}
               /> : <div className="boss-columns">
                 <div className="boss-column">
+                  {page === "A08" && <ProductRuntimeConfiguration getToken={getToken} onCommand={scopedCommand}
+                    onDirtyChange={setWorkDirty} onReload={refresh}/>}
                   <Panel title={metadata?.title || "维护工作"} note="独立维护身份 · 仅获准元信息">
                     {maintenance ? <>
                       <Value label="当前模拟配置的 Provider" value={maintenance.configured_provider}/>
                       <Value label="当前模拟配置的 Model" value={maintenance.configured_model}/>
                       <Value label="配置版本" value={maintenance.configuration_version}/>
                       <Value label="元数据来源" value={maintenance.status}/>
-                      <StatusLine variant="warn" text="上述为验证服务中的模拟配置元信息，不是实时启用模型的证明；请从原生 nanobot Settings 核查实际配置采用。" />
+                      <StatusLine text="运行配置和实际采用状态由公共模型运行配置提供；每项任务保留独立运行记录。" />
                     </> : <Quiet message="请在原生 nanobot Settings 中查看真实模型和维护配置。" />}
                     <div className="boss-actions">
                       <GlassButton primary onClick={() => navigate("NATIVE")}>打开原生 Settings <ArrowRight size={15}/></GlassButton>
@@ -1085,7 +1088,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           if (navigationFocus.current?.isConnected) navigationFocus.current.focus();
         }}>
         <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 未保存修改（D06）</h3></DialogPrimitive.Title>
-        <DialogPrimitive.Description asChild><p>{["N07","N08"].includes(page)?
+        <DialogPrimitive.Description asChild><p>{page === "A08" ? "当前运行配置有未保存内容。离开不会修改已经启用的配置。" : ["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
           page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :

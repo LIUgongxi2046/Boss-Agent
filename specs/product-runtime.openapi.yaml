@@ -1,0 +1,140 @@
+openapi: 3.1.0
+info:
+  title: Boss-Agent 公共Runtime配置扩展
+  version: 0.1.0
+  description: 当前公共实现；完整T06正式接收待完成。配置启用不授予业务授权。
+x-reception:
+  state: IN_REVIEW
+  core_version: 1.4.1
+  owner: W3
+  receiver: W1/T06
+  authority: configuration/current
+  runtime_records_schema: runtime-records.schema.json
+  activation_policy: reject while an actual run is active; apply native config and registry before acknowledging activation
+  native_config_change: reject new model admission until explicit save, validation and activation
+  recovery: service restart marks unfinished runs FAILED/service_restarted; saved current configuration and business receipts remain authoritative
+paths:
+  /api/boss/ui/admin/runtime-configuration:
+    get:
+      operationId: productRuntimeConfigurationRead
+      x-role: MAINTAINER
+      responses:
+        '200':
+          description: 当前启用配置、独立草稿、实际采用状态及工具目录；没有私人正文或凭据
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RuntimeConfiguration'}
+        '400': {description: 额外查询参数被拒绝}
+        '401': {description: 需要认证}
+        '403': {description: 需要维护身份}
+        '503': {description: 当前Runtime尚未准备}
+components:
+  schemas:
+    RequestID: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+    Version: {type: string, pattern: '^[0-9]+$'}
+    Sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    Values:
+      type: object
+      required: [max_tool_rounds, max_output_tokens, tool_scope]
+      additionalProperties: false
+      properties:
+        max_tool_rounds: {type: integer, minimum: 1, maximum: 12}
+        max_output_tokens: {type: integer, minimum: 128, maximum: 8192}
+        tool_scope:
+          type: array
+          minItems: 1
+          maxItems: 6
+          uniqueItems: true
+          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead]}
+    Save:
+      type: object
+      required: [client_request_id, expected_version, values]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        values: {$ref: '#/components/schemas/Values'}
+    Validate:
+      type: object
+      required: [client_request_id, expected_version, expected_content_sha256]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+    Activate:
+      type: object
+      required: [client_request_id, expected_version, expected_content_sha256, expected_active_version]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        expected_version: {$ref: '#/components/schemas/Version'}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+        expected_active_version: {$ref: '#/components/schemas/Version'}
+    Deactivate:
+      type: object
+      required: [client_request_id, expected_active_version]
+      additionalProperties: false
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        expected_active_version: {$ref: '#/components/schemas/Version'}
+    Draft:
+      type: object
+      required: [version, values, native_config_sha256, tool_catalog_sha256, content_sha256, validation_status, updated_at]
+      additionalProperties: false
+      properties:
+        version: {$ref: '#/components/schemas/Version'}
+        values: {$ref: '#/components/schemas/Values'}
+        native_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        tool_catalog_sha256: {$ref: '#/components/schemas/Sha256'}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        validation_status: {enum: [DRAFT_UNVALIDATED, VALIDATED_STATIC_ONLY, ACTIVATED]}
+        updated_at: {type: string, format: date-time}
+        validated_at: {type: string, format: date-time}
+        activated_at: {type: string, format: date-time}
+        active_version: {$ref: '#/components/schemas/Version'}
+    Receipt:
+      type: object
+      required: [config_id, version, enabled]
+      additionalProperties: false
+      properties:
+        config_id: {type: string}
+        version: {$ref: '#/components/schemas/Version'}
+        enabled: {type: boolean}
+        runtime_applied: {const: true}
+        tool_scope: {type: array, items: {type: string}, uniqueItems: true}
+        native_config_sha256: {$ref: '#/components/schemas/Sha256'}
+    RuntimeConfiguration:
+      type: object
+      required: [projection, current, draft, effective, available_tools, native_config_sha256, admission_ready, active_run_count, private_body_available_here, business_authority_granted, model_validation_performed]
+      additionalProperties: false
+      properties:
+        projection: {const: runtime-configuration}
+        current:
+          type: object
+          required: [config_id, version, provider, model_id, api_type, tool_scope, max_tool_rounds, timeout, enabled]
+          additionalProperties: false
+          properties:
+            config_id: {type: string}
+            version: {$ref: '#/components/schemas/Version'}
+            provider: {const: deepseek}
+            model_id: {const: deepseek-flash}
+            api_type: {const: chat_completions}
+            tool_scope: {type: array, uniqueItems: true, items: {type: string}}
+            max_tool_rounds: {type: integer, minimum: 1}
+            timeout: {const: 120}
+            enabled: {type: boolean}
+        draft: {oneOf: [{$ref: '#/components/schemas/Draft'}, {type: 'null'}]}
+        effective: {$ref: './runtime-records.schema.json#/$defs/RuntimeSnapshot'}
+        available_tools: {type: array, uniqueItems: true, items: {type: string}}
+        native_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        admission_ready: {type: boolean}
+        active_run_count: {type: integer, minimum: 0}
+        private_body_available_here: {const: false}
+        business_authority_granted: {const: false}
+        model_validation_performed: {const: false}
+x-websocket-operations:
+  - {operationId: productRuntimeSave, action: boss.runtime.save, role: MAINTAINER, input: '#/components/schemas/Save', output: '#/components/schemas/Draft'}
+  - {operationId: productRuntimeValidate, action: boss.runtime.validate, role: MAINTAINER, input: '#/components/schemas/Validate', output: '#/components/schemas/Draft'}
+  - {operationId: productRuntimeActivate, action: boss.runtime.activate, role: MAINTAINER, input: '#/components/schemas/Activate', output: '#/components/schemas/Receipt'}
+  - {operationId: productRuntimeDeactivate, action: boss.runtime.deactivate, role: MAINTAINER, input: '#/components/schemas/Deactivate', output: '#/components/schemas/Receipt'}

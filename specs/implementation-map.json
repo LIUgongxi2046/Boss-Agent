@@ -14,6 +14,11 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"specs/product-runtime.openapi.yaml","owner":"W3","task_id":"T11","scope":"公共Runtime配置扩展的实际接口定义，独立版本，等待W1正式接收，不改变已冻结1.4.1"},
+    {"path":"validation/check_public_runtime_evidence.py","owner":"W3","task_id":"T11","scope":"公共应用实际记录、原始传输、源码及正式Runtime Schema的只读核查"},
+    {"path":"validation/product_runtime.py","owner":"W3","task_id":"T11","scope":"公共应用的配置保存、校验、启用及实际Runtime采用；configuration/current保持唯一启用来源"},
+    {"path":"app/webui/ProductRuntimeConfiguration.tsx","owner":"W3","task_id":"T11","scope":"公共A08的真实配置操作及下一任务采用状态"},
+    {"path":"app/tests/test_product_runtime_configuration.py","owner":"W3","task_id":"T11","scope":"真实SQLite、固定nanobot配置与真实Provider对象的配置及采用检查，不调用模型"},
     {"path":"validation/design-checks/","owner":"W3","task_id":"T10","scope":"独立且固定版本的Markdown和Mermaid语法检查依赖"},
     {"path":"evidence/T01/check_mermaid.mjs","owner":"W3","task_id":"T10","scope":"原设计检查的独立依赖路径；检查数量和语义保持"},
     {"path":"evidence/T01/run_design_checks.py","owner":"W3","task_id":"T10","scope":"新检查回执绑定独立依赖清单与锁文件"},

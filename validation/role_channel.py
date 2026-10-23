@@ -14,14 +14,14 @@ from boss_command_api import BossCommandAPI
 
 
 class RoleChannel(WebSocketChannel):
-    def __init__(self, original, secrets, audit, business_store=None):
+    def __init__(self, original, secrets, audit, business_store=None, runtime_control=None):
         super().__init__(original.config, original.bus, gateway=original.gateway)
         self.secrets = secrets
         self.audit = audit
         self.token_roles = {}
         self.connection_roles = {}
-        self.boss_pages = BossPageAPI(business_store) if business_store is not None else None
-        self.boss_commands = BossCommandAPI(business_store) if business_store is not None else None
+        self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control) if business_store is not None else None
+        self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:

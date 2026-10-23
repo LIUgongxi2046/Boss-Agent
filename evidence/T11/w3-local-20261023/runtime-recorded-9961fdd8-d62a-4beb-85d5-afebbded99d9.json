@@ -1,0 +1,95 @@
+{
+  "status": "PASS_A15_RECORDED_PUBLIC_RUNTIME_AND_RESTART",
+  "run_id": "runtime-recorded-9961fdd8-d62a-4beb-85d5-afebbded99d9",
+  "at": "2026-10-23T09:03:44.026Z",
+  "records": [
+    {
+      "check": "actual_record_and_configuration_reopened",
+      "run_id": "run-6e15dfcb-82bc-4e14-adfb-990ece95c857",
+      "configuration_version": "3"
+    },
+    {
+      "check": "a15_real_record_detail_and_current_task_reference",
+      "run_id": "run-6e15dfcb-82bc-4e14-adfb-990ece95c857",
+      "task_id": "7ee8498c-9286-4d8b-a3ba-6d36c9855bb8",
+      "renderer_errors": [],
+      "private_task_body_excluded": true
+    },
+    {
+      "check": "logout_and_service_restart_preserve_records_and_configuration",
+      "prior_token": 401
+    }
+  ],
+  "prior_evidence": {
+    "path": "evidence/T11/w3-local-20261023/runtime-application-8eff47d5-18c7-4cda-83a3-cc69c555375c.json",
+    "sha256": "e2c834cf4117290b60228c9a07a5b1cffb9932f31389dc1ac098ae7d455c7553"
+  },
+  "applicable_product_inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "8e481bf1bb916c3894464a4838f56d7aa220e08b716d0b93ed5332889f3e5743"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "50654431359b01b4a0152655bf4b13cdd0fc45a67bde5b985a57910a9bb6f120"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "fb21a4353dd3ddedaf59d37c5520baa3b091bcefe75ccd23b156f1c2e568c12a"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "807251bcb5e0b6bb589fcf50d4f4d748364f3f7e38f88cfa8467ecf2996bfa8c"
+    },
+    {
+      "path": "validation/boss_runtime_records.py",
+      "sha256": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe"
+    },
+    {
+      "path": "validation/boss_memory_runtime.py",
+      "sha256": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64"
+    },
+    {
+      "path": "validation/connection.py",
+      "sha256": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89"
+    },
+    {
+      "path": "validation/controls.py",
+      "sha256": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d"
+    },
+    {
+      "path": "validation/business.py",
+      "sha256": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "ffc588ece6a12d90d90a65871664e960d6873d7ee0ea5352451946933df53ee6"
+    },
+    {
+      "path": "app/webui/ProductRuntimeConfiguration.tsx",
+      "sha256": "ac846eadb3e9f9e361a6d1d009c7716e5d62cea7212d2cac6043f87f2e247204"
+    },
+    {
+      "path": "app/webui/MaintainerRuntimeRecords.tsx",
+      "sha256": "230e82bdd683ef8f340d4e5a12cb1f36cc1687c0ef22838960ac7cfc8d27d2ee"
+    },
+    {
+      "path": "app/webui/RuntimeTaskTechnicalView.tsx",
+      "sha256": "2cf3245c7e008279f59afc3e27734ffb52863802af7a19db010299caa5bbf7b5"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d62f18f31a0d9f88f446ddcbc0620ad3b520fd9cdd40381de534c22255c230b9"
+    }
+  ],
+  "script_sha256": "4471877433775ac0e1b1df671c402960da44dfe7357948a033bf6c4637ba2ee3",
+  "new_model_calls": false,
+  "business_write_requested": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A16_accepted": false
+}

@@ -382,6 +382,11 @@
   position:fixed;left:50%;top:50%;z-index:1101;
   transform:translate(-50%,-50%);width:calc(100% - 40px);
 }
+.boss-runtime-fields {border:0;padding:12px 0;display:grid;gap:12px;min-width:0;}
+.boss-runtime-fields>label {display:grid;gap:6px;}
+.boss-runtime-fields input[type="number"] {max-width:220px;border:1px solid #d7e9fa;border-radius:9px;padding:10px;}
+.boss-runtime-fields fieldset {border:1px solid #d7e9fa;border-radius:9px;padding:12px;display:grid;gap:8px;min-width:0;}
+.boss-runtime-fields fieldset label {display:flex;align-items:center;gap:8px;min-height:44px;overflow-wrap:anywhere;}
 .boss-confirm>p {
   color:#59758f;font-size:13px;line-height:1.75;
   margin-bottom:16px;

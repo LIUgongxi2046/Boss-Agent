@@ -39,12 +39,13 @@ class BossPageAPI:
     nanobot gateway, expose secrets or grant owner authority to maintainers.
     """
 
-    def __init__(self, store, namespace: str = DEMO_NAMESPACE):
+    def __init__(self, store, namespace: str = DEMO_NAMESPACE, runtime_control=None):
         self.store = store
         self.namespace = namespace
         self.workspace = BossWorkspaceAPI(store, namespace)
         self.sectors = BossSectorAPI(store, namespace)
         self.recovery = BossRecoveryAPI(store, namespace)
+        self.runtime_control = runtime_control
 
     @staticmethod
     def _items(db, namespace, kind):
@@ -456,6 +457,14 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == "/api/boss/ui/admin/runtime-configuration":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                if self.runtime_control is None:
+                    return 503, {"error": "RUNTIME_NOT_READY"}
+                return 200, self.runtime_control.read()
             if path == "/api/boss/ui/runtime-records":
                 query = parse_qs(query_string, keep_blank_values=True)
                 if any(len(values) != 1 for values in query.values()):

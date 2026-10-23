@@ -33,6 +33,9 @@ from safe_diagnostics import RedactedEventList
 from boss_prompt_config import load_runtime_prompts
 from boss_owner_preferences import record_runtime_goal_context_load
 from boss_agent_read_tools import BossResearchSourcesTool
+from boss_runtime_records import RuntimeRecorder
+from boss_memory_runtime import OwnerMemoryContext
+from product_runtime import ProductRuntime
 from service import application as business_application
 from application_paths import application_work_directory, application_ports
 
@@ -116,6 +119,7 @@ async def serve():
     provider = RecordedProvider(connection, output / "http-requests.json", redact_payload=product_mode)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = ToolRegistry()
+    runtime_recorder = RuntimeRecorder(store, "ui-check", registry, lambda: runtime_control.snapshot()) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -126,7 +130,9 @@ async def serve():
     sessions = SessionManager(config.workspace_path)
     recovery = RecoveryCoordinator(sessions=sessions, bus=bus, unified_session=False)
     delivery = TurnDeliveryFactory(bus, route_policy=WebuiTurnRoutePolicy(sessions))
-    loop = AgentLoop.from_config(config, bus, provider=provider, tool_registry=registry, hooks=[audit], session_manager=sessions, turn_delivery_factory=delivery, recovery_admission=recovery)
+    loop = AgentLoop.from_config(config, bus, provider=provider, tool_registry=registry, hooks=[audit],
+                                 hook_factories=[runtime_recorder.hook_factory] if runtime_recorder is not None else [],
+                                 session_manager=sessions, turn_delivery_factory=delivery, recovery_admission=recovery)
     audit.runtime_snapshot = lambda: {"provider": "deepseek", "model_id": loop.model, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "config_sha256": effective_config_sha256}
     coordinator = WebuiTurnCoordinator(bus=bus, sessions=sessions, schedule_background=loop.schedule_background, recovery=recovery)
     unsubscribe = coordinator.subscribe()
@@ -140,13 +146,22 @@ async def serve():
                         "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
         audit.output.write_text(encode(records))
     registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
+    runtime_control = None
+    if product_mode:
+        runtime_control = ProductRuntime(store, config_path, loop, registry,
+                                         [registry.get(name) for name in registry.tool_names], provider)
+        provider.transport_observer = runtime_recorder.observe_transport
+        audit.runtime_snapshot = runtime_control.snapshot
     cron = CronService(WORK / "cron/jobs.json")
     async def scheduled(job):
         if job.name == "boss-events":
             return encode(store.dispatch_due("ui-check"))
         return await run_bound_cron_job(job, agent=loop, cron=cron)
     cron.on_job = scheduled
-    channels = ChannelManager(config, loop.bus, session_manager=loop.sessions, cron_service=cron, webui_runtime_model_name=lambda: loop.model, webui_refresh_runtime_config=loop.refresh_runtime_config, webui_recovery_action=recovery.handle_action, config_path=config_path)
+    channels = ChannelManager(config, loop.bus, session_manager=loop.sessions, cron_service=cron,
+                              webui_runtime_model_name=lambda: loop.model,
+                              webui_refresh_runtime_config=runtime_control.native_refresh_requested if runtime_control is not None else loop.refresh_runtime_config,
+                              webui_recovery_action=recovery.handle_action, config_path=config_path)
     original = channels.channels["websocket"]
     # Product v6 frontend only when explicitly requested; preserve T02 baseline.
     if os.environ.get("BOSS_PRODUCT_UI") == "1":
@@ -156,7 +171,7 @@ async def serve():
     if not (frontend / "index.html").is_file():
         raise FileNotFoundError("固定上游 WebUI 必须完成构建")
     original.gateway.http.static_dist_path = frontend
-    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store)
+    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control)
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -180,7 +195,18 @@ async def serve():
                     "runtime": audit.runtime_snapshot(),
                 }),
             )
-        bot.runtime.add_context_provider(context)
+        if runtime_control is not None:
+            async def owner_goals_context(request):
+                return RuntimeContextBlock(source="boss-confirmed-owner-goals", content=encode({
+                    "confirmed_owner_goals": record_runtime_goal_context_load(store, "ui-check"),
+                    "guidance_authority_boundary": "Technical prompts do not grant BOSS rights or authorize business writes.",
+                }))
+            bot.runtime.add_context_provider(runtime_control.context)
+            bot.runtime.add_context_provider(OwnerMemoryContext(store))
+            bot.runtime.add_context_provider(owner_goals_context)
+            bot.runtime.add_context_provider(runtime_recorder.context)
+        else:
+            bot.runtime.add_context_provider(context)
         await cron.start()
         if not any(job.name == "boss-events" for job in cron.list_jobs(include_disabled=True)):
             cron.add_job("boss-events", CronSchedule(kind="every", every_ms=500), "按当前业务时间检查获准事件", session_key="ui-check", origin_channel="websocket", origin_chat_id="ui-check")

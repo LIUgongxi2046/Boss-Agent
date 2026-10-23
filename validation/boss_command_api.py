@@ -164,10 +164,15 @@ class BossCommandAPI:
         "boss.owner.plan.resume": "BOSS",
         "boss.owner.plan.cancel": "BOSS",
         "boss.today.reorder": "BOSS",
+        "boss.runtime.save": "MAINTAINER",
+        "boss.runtime.validate": "MAINTAINER",
+        "boss.runtime.activate": "MAINTAINER",
+        "boss.runtime.deactivate": "MAINTAINER",
     }
 
-    def __init__(self, store):
+    def __init__(self, store, runtime_control=None):
         self.store = store
+        self.runtime_control = runtime_control
 
     def execute(self, role, action, payload):
         if role not in ("BOSS", "MAINTAINER"):
@@ -180,7 +185,10 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action in ("boss.meeting.draft.save", "boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held"):
+            if action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
+                require(self.runtime_control is not None, "当前Runtime尚未准备", web.HTTPServiceUnavailable)
+                result = self.runtime_control.execute(self, action, payload)
+            elif action in ("boss.meeting.draft.save", "boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held"):
                 result = MeetingAPI(self.store).execute(role, action.removeprefix("boss.meeting."), payload)
             elif action.startswith("boss.owner.plan."):
                 from boss_owner_plans import OwnerPlansAPI

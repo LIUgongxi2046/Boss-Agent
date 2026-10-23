@@ -2857,25 +2857,31 @@
       "logical_architecture_route": "/app/maintain/A08",
       "actual_webui_navigation": "?bossPage=A08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_MAINTENANCE_READ",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop + native Settings",
+      "render_status": "PARTIAL_RUNTIME_CONFIGURATION",
+      "component_file": "app/webui/ProductRuntimeConfiguration.tsx",
+      "component_name": "ProductRuntimeConfiguration + native Settings",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/maintenance"
+        "GET /api/boss/ui/maintenance",
+        "GET /api/boss/ui/admin/runtime-configuration"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"],
       "other_integration_points": [
-        "native settings mutation"
+        "native settings mutation",
+        "configuration/current and actual nanobot runtime",
+        "A15 actual run/version/tool references"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "model_config.save",
-        "model_config.validate",
-        "model_config.activate"
+        "full_model_configuration_validation",
+        "credential_rotation_and_recovery",
+        "full_budget_and_failure_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_product_runtime_configuration.py",
+        "validation/desktop/check-public-runtime.cjs",
+        "validation/desktop/check-public-runtime-recorded.cjs"
       ],
       "source_task_ids": [
         "T19",
