@@ -59,7 +59,7 @@ export function BossSettingsHub({onNavigate,onLogout}:Props){
   return <>
     <div className="boss-workspace-toolbar">
       <span className="boss-workspace-note">
-        <span className="boss-tag boss-tag-amber">SIMULATED · BOSS ONLY</span>
+        <span className="boss-tag boss-tag-amber">SIMULATED · BOSS_ONLY</span>
         F26 · 应用入口与本人设置
       </span>
       <button className="boss-btn" type="button" disabled={loading}
