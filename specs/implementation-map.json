@@ -13,6 +13,8 @@
   "visual_policy": "禁止主动视觉操作，视觉验收保持未执行。",
   "integration_owner": "W3",
   "integration_shared_paths": [
+    {"path":"validation/application_paths.py","owner":"W3","task_id":"T11","scope":"本工程内的独立应用数据目录与路径范围检查"},
+    {"path":"app/tests/test_product_work_directory.py","owner":"W3","task_id":"T11","scope":"真实目录、相对路径、外部范围与符号链接拒绝检查"},
     {"path":"app/tests/test_boss_command_api.py","owner":"W3","task_id":"T11","scope":"公共命令行为与历史反馈的真实SQLite检查"},
     {"path":"app/webui/BossMeetingBrief.tsx","owner":"W3","task_id":"T11","scope":"仅增加公共refreshVersion属性及读取依赖；资料与领域界面仍归W1"},
     {"path":"app/webui/BossWorkspaceView.tsx","owner":"W3","task_id":"T11","scope":"公共记忆采用与持续授权撤销提示"},

@@ -1,0 +1,232 @@
+{
+  "status": "PASS_MEETING_TERMINAL_AND_RESTART_ONLY",
+  "at": "2026-10-23T07:05:26.391Z",
+  "commit": "819e519842e41ee04e360c0ab99caf914c85baab",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "1e0ed35a988554cd6a6a2b3ad4332d49868b9ee57879e631b95b0c0300a40f61"
+    },
+    {
+      "path": "app/webui/BossMeetingBrief.tsx",
+      "sha256": "2a8aa00031ddffc5fde27ae34cd0db27200b85aa18e9a9cf76e64dff8ebeaa03"
+    },
+    {
+      "path": "app/webui/BossMeetingArrangement.tsx",
+      "sha256": "b74ecada168142686f26d70f456a36d26d572b80116f9faca1327ae0c4a26bb8"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "bf3e7a181476888f86ebc7d56a6fa79088faccf0cc9e8a17b718aab1b7f2b02b"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "e4f59a9623127fb9220c534c1ec5869bc0559155d4c2ab37b47f59074e6d4457"
+    },
+    {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "47450aec2f38775c1d67473dc172e8c4e32eac8d49a2c4775c83dbb4ac6e44ec"
+    },
+    {
+      "path": "validation/boss_meetings.py",
+      "sha256": "daf2fe1456635780a934e95dbe2623c1c270fedf05debdc5038bf0983b6de55a"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "c7c21dbad32f9e672cb40979b2671f13f96cd9b3a4355487815906c77a3cf640"
+    },
+    {
+      "path": "validation/application_paths.py",
+      "sha256": "9a4e5cef7359dac9e682d591282eb6e0f4a8e7e6999893582c02a2f4713b0cce"
+    },
+    {
+      "path": "validation/desktop/main.cjs",
+      "sha256": "c279d28feea3d9aedfa13e8b4f6f31a16fa703eabc812291e6fdb798e1ec5896"
+    },
+    {
+      "path": "validation/desktop/check-meeting.cjs",
+      "sha256": "9ab1b2de32c2956f906aaf2e9d55e607409d0b1ea23610e97f640a24a656d583"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "57cc6831d198ef793ffa67a449b13f399a079f329773bf6b6562ebbf9c7c8572"
+    }
+  ],
+  "records": [
+    {
+      "check": "document_navigation",
+      "pathname": "/",
+      "page_id": null
+    },
+    {
+      "check": "independent_owner_authorized_assignment",
+      "task_id": "1b38fdd4-0db4-4944-be36-7a322a06d562",
+      "state": "WAITING_FEEDBACK",
+      "source_type": "SIMULATED"
+    },
+    {
+      "check": "document_navigation",
+      "pathname": "/",
+      "page_id": "F04"
+    },
+    {
+      "check": "return_to_meeting_editing",
+      "page_id": "F04",
+      "arrangement_panels": 1,
+      "unsaved_dialogs": 0,
+      "renderer_errors": [],
+      "fields": [
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "labels": [
+            {
+              "prefix": "会议目的",
+              "length": 56
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "labels": [
+            {
+              "prefix": "开始时间",
+              "length": 13
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "labels": [
+            {
+              "prefix": "结束时间",
+              "length": 13
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "labels": [
+            {
+              "prefix": "IANA",
+              "length": 6
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "labels": [
+            {
+              "prefix": "准备期限",
+              "length": 18
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "checkbox",
+          "labels": [
+            {
+              "prefix": "陈明 ·",
+              "length": 32
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "checkbox",
+          "labels": [
+            {
+              "prefix": "李文 ·",
+              "length": 30
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "checkbox",
+          "labels": [
+            {
+              "prefix": "陈明 ·",
+              "length": 29
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "checkbox",
+          "labels": [
+            {
+              "prefix": "fina",
+              "length": 24
+            }
+          ]
+        },
+        {
+          "tag": "INPUT",
+          "type": "checkbox",
+          "labels": [
+            {
+              "prefix": "meet",
+              "length": 27
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "check": "unsaved_meeting_navigation_preserves_input",
+      "passed": true
+    },
+    {
+      "check": "draft_preserves_current_meeting",
+      "version": "1",
+      "current_version": "1"
+    },
+    {
+      "check": "owner_confirmation_refreshes_brief_and_preserves_tab",
+      "meeting_version": "2",
+      "current_brief_version": "2",
+      "invitation_sent": false,
+      "independent_business_unchanged": true
+    },
+    {
+      "check": "document_navigation",
+      "pathname": "/",
+      "page_id": "F04"
+    },
+    {
+      "check": "reload_reads_persisted_meeting",
+      "meeting_version": "2",
+      "renderer_errors": [],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "explicit_owner_terminal_action",
+      "state": "CANCELED",
+      "meeting_version": "3",
+      "independent_business_unchanged": true
+    },
+    {
+      "check": "service_restart_preserves_terminal_meeting",
+      "state": "CANCELED",
+      "meeting_version": "3",
+      "previous_token_status": 401,
+      "application_directory_isolated": true
+    }
+  ],
+  "source_type": "SIMULATED",
+  "visual_acceptance": "NOT_RUN",
+  "run_id": "meeting-cancel-1d26fe6b-0021-4460-b625-a4deebaa4b5c",
+  "terminal_action": "cancel",
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "full_A11_accepted": false
+}

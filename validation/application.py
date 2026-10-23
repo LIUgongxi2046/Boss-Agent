@@ -34,8 +34,10 @@ from boss_prompt_config import load_runtime_prompts
 from boss_owner_preferences import record_runtime_goal_context_load
 from boss_agent_read_tools import BossResearchSourcesTool
 from service import application as business_application
+from application_paths import application_work_directory, application_ports
 
-WORK = ROOT / ".work/application"
+WORK = application_work_directory(ROOT, os.environ.get("BOSS_APPLICATION_WORK_DIR"))
+PORTS = application_ports(os.environ.get("BOSS_APPLICATION_PORTS"))
 
 
 def product_log_filter(record):
@@ -67,7 +69,19 @@ def prepare():
     os.environ["MAINTAINER_PROBE_TOKEN"] = roles["MAINTAINER"]
     config = WORK / "config.json"
     if not config.exists():
-        config.write_text(encode({"agents": {"defaults": {"workspace": str(WORK / "workspace"), "provider": "deepseek", "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096, "timezone": "Asia/Shanghai", "timezoneMode": "manual", "dream": {"enabled": False}, "idleCompactAfterMinutes": 0}}, "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com", "extraBody": {"thinking": {"type": "disabled"}}}}, "gateway": {"host": "127.0.0.1", "port": 18791, "heartbeat": {"enabled": False}}, "channels": {"websocket": {"enabled": True, "host": "127.0.0.1", "port": 8872, "tokenIssueSecret": "${NANOBOT_WEBUI_SECRET}", "websocketRequiresToken": True, "showReasoning": False, "tokenTtlS": 3600}}, "tools": {"restrictToWorkspace": True}, "transcription": {"enabled": False}}))
+        config.write_text(encode({
+            "agents": {"defaults": {"workspace": str(WORK / "workspace"), "provider": "deepseek",
+                "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096,
+                "timezone": "Asia/Shanghai", "timezoneMode": "manual", "dream": {"enabled": False},
+                "idleCompactAfterMinutes": 0}},
+            "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com",
+                "extraBody": {"thinking": {"type": "disabled"}}}},
+            "gateway": {"host": "127.0.0.1", "port": PORTS["gateway"], "heartbeat": {"enabled": False}},
+            "channels": {"websocket": {"enabled": True, "host": "127.0.0.1", "port": PORTS["webui"],
+                "tokenIssueSecret": "${NANOBOT_WEBUI_SECRET}", "websocketRequiresToken": True,
+                "showReasoning": False, "tokenTtlS": 3600}},
+            "tools": {"restrictToWorkspace": True}, "transcription": {"enabled": False},
+        }))
     return roles, config
 
 
@@ -83,6 +97,8 @@ async def serve():
     roles, config_path = prepare()
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
+    if config.gateway.port != PORTS["gateway"] or config.channels.websocket["port"] != PORTS["webui"]:
+        raise ValueError("已保存配置与当前指定端口不一致")
     if hashlib.sha256(config_path.read_bytes()).hexdigest() != effective_config_sha256:
         raise ValueError("应用启动期间配置发生变化")
     store = ControlStore(WORK / "business.sqlite")
@@ -143,7 +159,7 @@ async def serve():
     channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store)
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
-    await web.TCPSite(server, "127.0.0.1", 8871).start()
+    await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
     stop = asyncio.Event()
     for signum in (signal.SIGTERM, signal.SIGINT):
         asyncio.get_running_loop().add_signal_handler(signum, stop.set)
@@ -170,7 +186,7 @@ async def serve():
             cron.add_job("boss-events", CronSchedule(kind="every", every_ms=500), "按当前业务时间检查获准事件", session_key="ui-check", origin_channel="websocket", origin_chat_id="ui-check")
         channel_task = asyncio.create_task(channels.start_all())
         agent_task = asyncio.create_task(loop.run())
-        (WORK / "instance.json").write_text(encode({"pid": os.getpid(), "at": now(), "baseline": baseline, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "model": loop.model}))
+        (WORK / "instance.json").write_text(encode({"pid": os.getpid(), "at": now(), "ports": PORTS, "baseline": baseline, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "model": loop.model}))
         print("应用验证服务已启动", flush=True)
         await stop.wait()
         loop.stop()

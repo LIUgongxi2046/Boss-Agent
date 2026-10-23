@@ -6,10 +6,28 @@ const { once } = require('node:events');
 
 const root = process.env.BOSS_VALIDATION_ROOT;
 if (!root || !path.isAbsolute(root)) throw new Error('缺少验证工程绝对路径');
-const work = path.join(root, '.work', 'desktop');
-fs.mkdirSync(work, { recursive: true });
+fs.mkdirSync(path.join(root, '.work'), { recursive: true });
+const applicationParent = fs.realpathSync(path.join(root, '.work'));
+const configuredApplicationWork = process.env.BOSS_APPLICATION_WORK_DIR;
+const applicationWork = configuredApplicationWork === undefined
+  ? path.join(applicationParent, 'application') : configuredApplicationWork;
+if (!path.isAbsolute(applicationWork) || path.dirname(path.resolve(applicationWork)) !== applicationParent)
+  throw new Error('应用数据目录必须位于本工程.work的直接子目录');
+if (fs.existsSync(applicationWork) && path.dirname(fs.realpathSync(applicationWork)) !== applicationParent)
+  throw new Error('应用数据目录不能引用工程范围以外的位置');
+const work = path.join(applicationParent, configuredApplicationWork === undefined
+  ? 'desktop' : 'desktop-' + path.basename(applicationWork));
+if (fs.existsSync(work) && path.dirname(fs.realpathSync(work)) !== applicationParent)
+  throw new Error('桌面配置目录不能引用工程范围以外的位置');
+fs.mkdirSync(path.join(work, 'tmp'), { recursive: true });
+fs.chmodSync(work, 0o700);
+const ports = process.env.BOSS_APPLICATION_PORTS === undefined
+  ? { business: 8871, webui: 8872, gateway: 18791 } : JSON.parse(process.env.BOSS_APPLICATION_PORTS);
+if (!ports || Array.isArray(ports) || Object.keys(ports).sort().join(',') !== 'business,gateway,webui' ||
+    Object.values(ports).some(value => !Number.isInteger(value) || value < 1024 || value > 65535) ||
+    new Set(Object.values(ports)).size !== 3) throw new Error('应用端口配置无效');
 app.setPath('userData', path.join(work, 'profile'));
-app.setPath('temp', path.join(root, '.work', 'tmp'));
+app.setPath('temp', path.join(work, 'tmp'));
 app.setPath('logs', path.join(work, 'logs'));
 app.setPath('crashDumps', path.join(work, 'crash-dumps'));
 const productMode = process.env.BOSS_PRODUCT_UI === '1';
@@ -26,7 +44,7 @@ let quitting = false;
 let window;
 let microphoneAuthorized = false;
 let serviceStartupElapsedMs = null;
-const origin = 'http://127.0.0.1:8872';
+const origin = 'http://127.0.0.1:' + ports.webui;
 const serviceStartupTimeoutMs = 90000;
 if (!app.requestSingleInstanceLock()) {
   record('duplicate_instance_rejected');
@@ -90,10 +108,16 @@ if (!app.requestSingleInstanceLock()) {
 
   app.whenReady().then(async () => {
     const log = fs.openSync(path.join(diagnostics, 'desktop-service.log'), 'a', productMode ? 0o600 : 0o644);
-    child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(root, '.work', 'tmp') }, stdio: ['ignore', log, log] });
+    child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(work, 'tmp') }, stdio: ['ignore', log, log] });
     const startedAt = Date.now();
     record('service_start_requested', { service_pid: child.pid, timeout_ms: serviceStartupTimeoutMs });
     child.on('error', error => { throw error; });
+    child.on('exit', code => {
+      if (!quitting) {
+        record('service_exit_unexpected', { exit_code: code });
+        app.exit(code === 0 || code === null ? 1 : code);
+      }
+    });
     const deadline = startedAt + serviceStartupTimeoutMs;
     let ready = false;
     while (!ready) {
@@ -102,13 +126,13 @@ if (!app.requestSingleInstanceLock()) {
         record('service_start_timeout', { service_pid: child.pid, elapsed_ms: Date.now() - startedAt });
         throw new Error('业务服务启动超时');
       }
-      const instance = path.join(root, '.work', 'application', 'instance.json');
+      const instance = path.join(applicationWork, 'instance.json');
       if (fs.existsSync(instance)) ready = JSON.parse(fs.readFileSync(instance)).pid === child.pid;
       if (!ready) await new Promise(resolve => setTimeout(resolve, 100));
     }
     serviceStartupElapsedMs = Date.now() - startedAt;
     record('service_started', { service_pid: child.pid, elapsed_ms: serviceStartupElapsedMs });
-    window = new BrowserWindow({ width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
+    window = new BrowserWindow({ show: process.env.BOSS_DESKTOP_TEST_WINDOW_HIDDEN !== '1', width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, address) => { if (new URL(address).origin !== origin) event.preventDefault(); });
     window.webContents.on('will-attach-webview', event => event.preventDefault());
@@ -118,7 +142,7 @@ if (!app.requestSingleInstanceLock()) {
       record('renderer_permission_decision', { permission, allowed });
       callback(allowed);
     });
-    session.defaultSession.webRequest.onHeadersReceived((details, callback) => callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': ["default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws://127.0.0.1:8872; media-src 'self' blob:; object-src 'none'; frame-src 'none'; base-uri 'self'"] } }));
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': ["default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws://127.0.0.1:" + ports.webui + "; media-src 'self' blob:; object-src 'none'; frame-src 'none'; base-uri 'self'"] } }));
     for (const event of ['suspend', 'resume', 'lock-screen', 'unlock-screen']) powerMonitor.on(event, () => record(event));
     await window.loadURL(origin);
     record('window_loaded', { versions: process.versions, architecture: process.arch });

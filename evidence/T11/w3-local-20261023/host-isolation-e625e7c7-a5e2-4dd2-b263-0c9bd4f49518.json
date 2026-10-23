@@ -1,0 +1,45 @@
+{
+  "status": "PASS_HIDDEN_HOST_AND_DIRECTORY_ISOLATION_ONLY",
+  "run_id": "host-isolation-e625e7c7-a5e2-4dd2-b263-0c9bd4f49518",
+  "at": "2026-10-23T07:09:57.276Z",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "d7d9fb1d1374c755d37c724672c31b047b1e571152eb57602633234254ba14e4"
+    },
+    {
+      "path": "validation/application_paths.py",
+      "sha256": "9a4e5cef7359dac9e682d591282eb6e0f4a8e7e6999893582c02a2f4713b0cce"
+    },
+    {
+      "path": "validation/desktop/main.cjs",
+      "sha256": "f85761b4ddd47f448ef193df40bf53b5aedb4dee2da394de5bccf767d8b524b4"
+    },
+    {
+      "path": "validation/desktop/check-host-isolation.cjs",
+      "sha256": "fbb8008299cb30f006f3288e73ba5a3027a603e3152c5e1b42db8377847e30b8"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "windows": [
+    {
+      "visible": false
+    }
+  ],
+  "permissions": {
+    "application": 448,
+    "desktop": 448,
+    "access": 384
+  },
+  "service_pid": 54338,
+  "service_startup_ms": 15594,
+  "business_write_requested": false,
+  "authentication_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_accepted": false,
+  "own_service_ports_released": true
+}

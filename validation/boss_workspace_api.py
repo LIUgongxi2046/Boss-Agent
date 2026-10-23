@@ -100,7 +100,7 @@ class BossWorkspaceAPI:
         if key == "voice":
             # Fixed local runtime configuration, never client-selected paths
             # or the raw Provider secret/transport state.
-            runtime_config = ROOT / ".work" / "application" / "config.json"
+            runtime_config = Path(self.store.path).parent / "config.json"
             enabled = False
             max_duration = 120
             provider = "NOT_CONFIGURED"
