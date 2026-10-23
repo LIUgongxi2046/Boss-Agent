@@ -1,15 +1,16 @@
 {
   "feature_id": "FC02",
   "role": "N3",
-  "status": "FORMAL_BOUNDARY_PUBLIC_CANDIDATE_READY_FOR_N4",
-  "implementation_commit": "8391754e41288e923626bb9b05b76305ef610b6f",
-  "base_candidate_commit": "faf66bf6c718b032e20a94231989894367a258c4",
+  "status": "FOLLOWUP_DOMAIN_REPAIR_READY_FOR_N4",
+  "implementation_commit": "d9b5b45467a56671ca6c212a292a25af1850d050",
+  "base_candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
   "candidate_authority": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
   "domain_commits": [
     "fe3010563c6986eff6f0c26c1b5b2554d061cff6",
     "4bcb0a937eaac5ae64031105ccfd2f7de413c8bb",
     "9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3",
-    "2731df3fb9a6f6ffc405846a301505f0141ff1d5"
+    "2731df3fb9a6f6ffc405846a301505f0141ff1d5",
+    "c707df80260c5181fd86861f284eaa8e63e567f7"
   ],
   "integrated_scenario_commits": [
     "f515905",
@@ -21,14 +22,16 @@
   ],
   "repair_commits": [
     "abcee1b97de02be4d9ca59473e2d779ec5be8328",
-    "60c282689dc5ab705861e00363bc7718700b5fc4"
+    "60c282689dc5ab705861e00363bc7718700b5fc4",
+    "d9b5b45467a56671ca6c212a292a25af1850d050"
   ],
   "repair_records": [
     "history-recovery.md",
     "async-recovery.md",
-    "boundary-adoption.md"
+    "boundary-adoption.md",
+    "followup-recovery.md"
   ],
-  "scope": "完整FC02二十项范围；正式六场景已接收，维护载入和原请求回执、本人场景及来源选择、双方口径并列与原文均实际采用；历史及异步保护在相同制品重新验证",
+  "scope": "完整FC02二十项范围；默认父查询按自身来源/明细/定义/会话核查后读取子场景，父子来源有效性、权限、摘要、幂等和持久原回执保持；当前九项必要领域回归与真实公共SDK/WebSocket、界面读取及同库重启通过；前端/Schema/Agent/公共入口/原生Client不变，复用准确制品",
   "frontend_directory": "fc02-n3-boundary-dist",
   "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
   "index_sha256": "8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6",
@@ -54,52 +57,44 @@
     "command": "npm run build -- --outDir ../../../../fc02-n3-boundary-dist",
     "directory": ".work/product/nanobot/webui",
     "source_mirrors": "五份正式前端文件与构建输入逐份SHA256相同；全新构建通过文件编辑工具采用正式文件及原生Client patch",
-    "record": "boundary-adoption.md#构建与一致性"
+    "record": "followup-recovery.md#制品与关联影响",
+    "executed_candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "rebuild_performed_for_current_candidate": false,
+    "adoption": "五份前端、patch、原生Client、manifest及index SHA256核查相同；本次领域修复不要求重新构建"
   },
   "checks": [
     {
       "result": "PASS",
-      "cases": 24,
-      "scope": "正式六场景18项、当前公共消费者6项；实际SQLite与SDK",
-      "evidence": "evidence/feature-delivery/FC02/boundary-consumers.xml"
+      "cases": 9,
+      "scope": "当前组合六项父子来源/跨场景/会话/幂等/历史检查和三项受影响回归",
+      "seconds": 5.2,
+      "evidence": "evidence/feature-delivery/FC02/followup-integration.xml"
     },
     {
       "result": "PASS",
-      "cases": 6,
-      "scope": "公共目录、列表、维度及存在/未知载入回执的正式Schema；实际SDK消费者，包含前述6项的增强验证",
-      "evidence": "evidence/feature-delivery/FC02/boundary-output.xml"
+      "scope": "真实维护载入及默认父查询，经公共boss.bi.follow_up和实际SDK切换weighted-ratios；准确父/子编号、继承期间、明确覆盖字段、14%及原文、父CURRENT；刷新/同库独立重启、原回执/历史、成功幂等/同键冲突、父子来源失效、FAILED只读恢复、零业务写入与renderer错误",
+      "evidence": "evidence/feature-delivery/FC02/fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485.json"
     },
     {
       "result": "PASS",
-      "scope": "真实维护载入六场景；实际成功响应形成后中断连接，重连载入只转发一次、原请求只读恢复；本人七项查询、14%加权比率、null边界、延迟与未同步、双方100/120并列和各自原文、刷新及18组DOM；零业务写入、零renderer错误",
-      "evidence": "evidence/feature-delivery/FC02/fc02-boundary-176212af-9f94-49fc-891f-04f8a7441691.json"
+      "scope": "当前五份前端、patch、原生Client和制品摘要相同，产品差异仅领域两行新增/一行移除；保留原制品和已验收DOM证据",
+      "evidence": "docs/feature-delivery/FC02/followup-recovery.md"
     },
     {
       "result": "PASS",
-      "scope": "来源撤销后的同库独立服务重启、历史及原请求、刷新、自然身份失效/重新认证、退出、维护403及12组历史DOM/键盘",
-      "evidence": "evidence/feature-delivery/FC02/fc02-history-3984d0c8-83cb-4c2e-bc37-0307b28ab841.json"
-    },
-    {
-      "result": "PASS",
-      "scope": "真实响应延迟；较早原文及回执不覆盖新查询或编辑范围，响应字节摘要一致",
-      "evidence": "evidence/feature-delivery/FC02/fc02-n3-timing-719b2fd4-0c29-4963-bdb8-95fe8532894e.json"
-    },
-    {
-      "result": "PASS",
-      "scope": "标准OpenAPI3.1及YAML重复字段检查",
-      "command": ".work/openapi-venv/bin/python validation/check_bi_public_spec.py"
+      "scope": "git diff --check"
     }
   ],
   "previous_independent_verdict": {
-    "candidate_commit": "faf66bf6c718b032e20a94231989894367a258c4",
-    "result": "BLOCKED",
-    "release_decision": "INSUFFICIENT_EVIDENCE",
-    "verified_checkpoints": 16,
+    "candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "result": "FAIL",
+    "release_decision": "NO_GO",
+    "verified_checkpoints": 17,
     "total_checkpoints": 20,
-    "record": "docs/feature-delivery/FC02/independent-faf66bf.json",
-    "manifest_sha256": "c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475"
+    "record": "docs/feature-delivery/FC02/independent-983b728.json",
+    "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411"
   },
-  "evidence_reuse_policy": "旧74项实际运行于9026c8a，N4按301项依赖核查用于faf66bf；本候选改变正式输入、Schema及公开消费者，N4须核查当前适用依赖，不直接继承旧16/20分数。不重复FC01及无变化业务全量。",
+  "evidence_reuse_policy": "N4对983b728的17/20、FAIL/NO_GO是原候选事实；当前领域局部修复及必要公共行为已有新证据，N4按准确差异核查C03/C16及受影响范围，所有二十项满足后才能完整PASS。",
   "required_input_checkpoints": [],
   "formal_input_checkpoints_received": [
     "FC02.C05",
@@ -107,10 +102,9 @@
     "FC02.C11"
   ],
   "test_ports": {
-    "business": 9841,
-    "webui": 9842,
-    "gateway": 19841,
-    "proxy": 9843
+    "business": 9921,
+    "webui": 9922,
+    "gateway": 19921
   },
   "history_ports": {
     "business": 9761,
@@ -134,5 +128,58 @@
   "independent_feature_verdict": "PENDING_N4_FOR_CURRENT_CANDIDATE",
   "verified_feature_checkpoints": null,
   "total_feature_checkpoints": 20,
-  "fc03_started": false
+  "fc03_started": false,
+  "received_domain_fixes": [
+    {
+      "commit": "c707df80260c5181fd86861f284eaa8e63e567f7",
+      "record_commit": "31b6313db73bd1b379796f469121dfcb32e0c145",
+      "adoption": "逐项采用两个文件的局部差异，保留当前公开扩展；仅领域文件2行新增/1行移除",
+      "files": [
+        "validation/boss_bi_queries.py",
+        "app/tests/test_fc02_followup_sources.py"
+      ],
+      "domain_sha256": "1a6237d88e51e6dbc660c0385ccdcdd02dd68c708238de636a3eef32a685317e",
+      "test_sha256": "c8b6247dca4352fa1d4923d42e3f5c5b4ab879bc3dfc18e4febced89a6a7a7cc"
+    }
+  ],
+  "domain_source_sha256": {
+    "validation/boss_bi_queries.py": "1a6237d88e51e6dbc660c0385ccdcdd02dd68c708238de636a3eef32a685317e",
+    "app/tests/test_fc02_followup_sources.py": "c8b6247dca4352fa1d4923d42e3f5c5b4ab879bc3dfc18e4febced89a6a7a7cc"
+  },
+  "reused_evidence": {
+    "candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "checkpoint_score_transferred": false,
+    "checkpoint_ids": [
+      "FC02.C01",
+      "FC02.C02",
+      "FC02.C04",
+      "FC02.C05",
+      "FC02.C06",
+      "FC02.C07",
+      "FC02.C08",
+      "FC02.C09",
+      "FC02.C10",
+      "FC02.C11",
+      "FC02.C12",
+      "FC02.C13",
+      "FC02.C14",
+      "FC02.C15",
+      "FC02.C17",
+      "FC02.C18",
+      "FC02.C19"
+    ],
+    "independent_record": "docs/feature-delivery/FC02/independent-983b728.json",
+    "scope": "原候选17项及C05/C08/C11通过事实按准确依赖保留；新候选分子待N4核查。未重复72/74项、FC01全量、无变化构建或整套DOM。"
+  },
+  "adopted_sdk_evidence": {
+    "executed_by": "N1",
+    "code_combination": "固定983b728且仅采用c707df8领域差异，领域文件SHA256与当前相同",
+    "cases": 3,
+    "result": "PASS",
+    "seconds": 6.92,
+    "record": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/.work/fc02-followup-sdk.xml",
+    "sha256": "ee033971f54b929c90e35c25b3a8f7ea131342a63a6f17ec05e3f77f6749a135",
+    "scope": "默认父查询切换场景、同场景继承、模型来源替换拒绝；没有声明N3重跑；当前公共SDK另行执行"
+  },
+  "current_record": "docs/feature-delivery/FC02/followup-recovery.md"
 }
