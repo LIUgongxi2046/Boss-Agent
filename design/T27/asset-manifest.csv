@@ -1,0 +1,4 @@
+asset_id,file_path,usage,width,height,format,transparency,source,license_or_restriction
+boss-logo,../../Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png,登录品牌,388,344,PNG,保留原始,Desktop v6,沿用项目授权范围
+dapeng-static,../../Boss-Agent-Desktop-Complete-v6/assets/dapeng-front.png,减少动态效果,762,708,PNG,保留原始,Desktop v6,沿用项目授权范围
+dapeng-idle,../../Boss-Agent-Desktop-Complete-v6/animation/01-待机悬浮.webp,登录动画,720,408,WEBP,保留原始,Desktop v6,沿用项目授权范围

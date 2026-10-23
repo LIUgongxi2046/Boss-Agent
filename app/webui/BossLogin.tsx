@@ -1,14 +1,26 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import "./boss-v6.css";
-import { fetchBootstrap, BootstrapAuthRequiredError, clearSavedSecret } from "@/lib/bootstrap";
+import "./boss-login.css";
+import { BootstrapAuthRequiredError, clearSavedSecret } from "@/lib/bootstrap";
+import type { BootstrapResponse } from "@/lib/types";
 
 let requestedRole: Role | null = null;
 
-export async function bossFetchBootstrap(baseUrl = "", secret = "", timeoutMs = 15000) {
-  const boot = await fetchBootstrap(baseUrl, secret, timeoutMs);
+export async function bossFetchBootstrap(baseUrl = "", secret = "", timeoutMs = 15000,
+  account?: { username: string; password: string; role: Role }) {
+  const headers: Record<string, string> = account ? {
+    "X-Boss-Username": account.username, "X-Boss-Password": account.password, "X-Boss-Role": account.role,
+  } : secret ? { Authorization: "Bearer " + secret } : {};
+  const result = await fetch(baseUrl + "/webui/bootstrap", {
+    headers, credentials: "same-origin", cache: "no-store", signal: AbortSignal.timeout(timeoutMs),
+  });
+  if (result.status === 401 || result.status === 403) throw new BootstrapAuthRequiredError("账号或密码无效");
+  if (!result.ok) throw new Error("认证服务连接失败");
+  const boot = await result.json() as BootstrapResponse;
+  if (!boot.ws_path) throw new Error("认证服务没有返回会话路径");
   if (!boot.api_token) throw new Error("认证服务没有返回访问令牌");
-  const response = await fetch("/api/boss/identity", {
+  const response = await fetch(baseUrl + "/api/boss/identity", {
     headers: { Authorization: "Bearer " + boot.api_token }, cache: "no-store", signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) throw new BootstrapAuthRequiredError("身份认证已失效");
@@ -32,15 +44,25 @@ type Props = {
 
 export function BossLogin({ mode = "auth", failed = false, expired = false, message = "", onSecret }: Props) {
   const [role, setRole] = useState<Role>("BOSS");
+  const [username, setUsername] = useState("");
   const [value, setValue] = useState("");
   const [visible, setVisible] = useState(false);
   const [validation, setValidation] = useState("");
   const [assetError, setAssetError] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const input = useRef<HTMLInputElement>(null);
   const submitted = useRef(false);
-  const busy = mode === "loading";
-  const error = validation || (failed ? "访问凭据无效或已失效，请重新输入。" :
-    mode === "error" ? message.includes("身份范围") ? "凭据身份与所选入口不符，请核查入口与访问凭据。" : "无法完成认证连接，请检查本机服务后重新尝试。" : "");
+  const busy = mode === "loading" || pending;
+  const error = validation || (failed ? "账号或密码无效，请重新输入。" :
+    mode === "error" ? message.includes("身份范围") ? "账号身份与当前入口不符。" : "无法完成认证连接，请检查本机服务后重新尝试。" : "");
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     if (!busy) {
@@ -49,70 +71,87 @@ export function BossLogin({ mode = "auth", failed = false, expired = false, mess
     }
   }, [busy, failed, expired, mode]);
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy || submitted.current) return;
-    if (!value.trim()) {
-      setValidation("请输入本机访问凭据。");
+    if (!username.trim() || !value) {
+      setValidation(!username.trim() ? "请输入账号。" : "请输入密码。");
       input.current?.focus();
       return;
     }
     submitted.current = true;
     setValidation("");
     requestedRole = role;
-    onSecret(value.trim(), role);
+    if (!/^[\x21-\x7e]{1,64}$/.test(username.trim()) || !/^[\x20-\x7e]{1,72}$/.test(value)) {
+      submitted.current = false;
+      setValidation("请使用本机配置的有效账号和密码。");
+      return;
+    }
+    setPending(true);
+    const boot = await bossFetchBootstrap("", "", 15000, { username: username.trim(), password: value, role })
+      .then(result => { setValue(""); return result; }, error => {
+        setValue(""); setPending(false); submitted.current = false;
+        setValidation(error instanceof BootstrapAuthRequiredError ? "账号或密码无效，或者账号身份与当前入口不符。" : "无法完成认证连接，请检查本机服务后重新尝试。");
+        input.current?.focus();
+        return null;
+      });
+    if (!boot?.api_token) return;
+    setPending(false);
+    onSecret(boot.api_token, role);
   }
 
   return <main className="boss-v6 boss-login" aria-busy={busy}>
     <div className="boss-login-content">
     <header className="boss-login-brand">
       <img src="/boss-brand/boss-logo-from-reference.png" alt="Boss Agent 标识" onError={() => setAssetError(true)}/>
-      <strong>Boss Agent</strong><span>大鹏 · 个人秘书</span>
+      <strong>Boss Agent</strong><span>老板的AI助理</span><span className="boss-login-beta">内测版本</span>
     </header>
     <div className="boss-login-layout">
       <section className="boss-login-welcome" aria-labelledby="boss-login-brand-title">
         <span className="boss-login-accent"/>
-        <h1 id="boss-login-brand-title">让重要的事，<br/>推进得更确定。</h1>
-        <p>在本人授权的范围内，持续处理安排、资料与待办。</p>
-        <img src="/boss-brand/dapeng-front.png" alt="大鹏吉祥物" onError={() => setAssetError(true)}/>
+        <h1 id="boss-login-brand-title">公司信息了如指掌，<br/>工作推进有条不紊</h1>
+        <img src={reducedMotion ? "/boss-brand/dapeng-front.png" : "/boss-brand/boss-idle.webp"}
+          data-motion={reducedMotion ? "reduced" : "animated"} alt="大鹏吉祥物" onError={() => setAssetError(true)}/>
         <span className="boss-login-local"><ShieldCheck size={18} aria-hidden="true"/>本机桌面 · 身份分别核验</span>
       </section>
       <section className="boss-login-card" aria-labelledby="boss-login-title">
-        <p className="boss-login-eyebrow">{expired ? "重新认证 · D08" : "欢迎使用 · N01"}</p>
-        <h2 id="boss-login-title">{expired ? "登录状态已过期" : "登录 Boss Agent"}</h2>
-        <p className="boss-login-description">{expired ? "重新核验当前权限后，可以查询已有运行结果。未完成的业务动作不会自动重新发送。" : "请选择访问入口，使用本机配置的访问凭据认证。"}</p>
+        <p className="boss-login-eyebrow">{expired ? "重新认证" : "欢迎使用"}</p>
+        <h2 id="boss-login-title">{expired ? "登录状态已过期" : role === "MAINTAINER" ? "技术维护登录" : "登录 Boss Agent"}</h2>
+        <p className="boss-login-description">{expired ? "请重新登录以继续查询已有工作。" : "使用本机账号和密码登录。"}</p>
         <form onSubmit={submit} noValidate>
-          <fieldset disabled={busy} className="boss-login-choices">
-            <legend>访问入口</legend>
-            {([["BOSS", "老板本人", "本人决定与日常工作"], ["MAINTAINER", "技术维护", "配置、模拟与运行检查"]] as const).map(([id, title, note]) =>
-              <label key={id} className={"boss-login-choice " + (role === id ? "selected" : "")}>
-                <input type="radio" name="boss-login-role" value={id} checked={role === id} onChange={() => setRole(id)}/>
-                <span><strong>{title}</strong><small>{note}</small></span>
-              </label>)}
-          </fieldset>
-          <label className="boss-login-label" htmlFor="boss-login-secret">本机访问凭据</label>
+          <label className="boss-login-label" htmlFor="boss-login-account">账号</label>
+          <div className="boss-login-input boss-login-account"><input ref={input} id="boss-login-account" name="username" autoComplete="username"
+            autoCapitalize="none" spellCheck={false} value={username} disabled={busy} maxLength={64}
+            aria-invalid={!!error} aria-describedby={error ? "boss-login-error" : undefined}
+            onChange={event => { setUsername(event.target.value); setValidation(""); }}/></div>
+          <label className="boss-login-label" htmlFor="boss-login-secret">密码</label>
           <div className="boss-login-input">
-            <input ref={input} id="boss-login-secret" name="boss-login-secret" type={visible ? "text" : "password"}
+            <input id="boss-login-secret" name="password" type={visible ? "text" : "password"} maxLength={72}
               autoComplete="current-password" autoCapitalize="none" spellCheck={false} value={value} disabled={busy}
-              aria-invalid={!!error} aria-describedby={error ? "boss-login-help boss-login-error" : "boss-login-help"}
+              aria-invalid={!!error} aria-describedby={error ? "boss-login-error" : undefined}
               onChange={event => { setValue(event.target.value); setValidation(""); }}
               onKeyDown={event => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }}/>
-            <button type="button" disabled={busy} aria-controls="boss-login-secret" aria-label={visible ? "隐藏访问凭据" : "显示访问凭据"}
+            <button type="button" disabled={busy} aria-controls="boss-login-secret" aria-label={visible ? "隐藏密码" : "显示密码"}
               onClick={() => setVisible(current => !current)}>{visible ? <EyeOff size={19}/> : <Eye size={19}/>}</button>
           </div>
-          <p id="boss-login-help" className="boss-login-help">身份与访问范围由服务端确认，入口选择不授予权限。</p>
           {error && <p id="boss-login-error" role="alert" className="boss-login-error">{error}</p>}
           <button className="boss-login-submit" type="submit" disabled={busy}>
             {busy ? <Loader2 className="boss-spin" size={19}/> : <ArrowRight size={19}/>}
-            {busy ? "正在核验身份…" : expired ? "重新认证" : "继续认证"}
+            {busy ? "正在登录…" : expired ? "重新认证" : "登录"}
           </button>
           <p className="boss-login-status" role="status" aria-live="polite">{busy ? "正在连接本机认证服务，请稍候。" : "通过认证后进入相应工作区域。"}</p>
           {expired && <button className="boss-btn" type="button" onClick={() => window.location.reload()}>返回登录</button>}
         </form>
+        <div className="boss-login-footer">
+        <button type="button" className="boss-login-maintenance" disabled={busy} onClick={() => {
+          setRole(current => current === "BOSS" ? "MAINTAINER" : "BOSS"); requestedRole = null;
+          setValue(""); setUsername(""); setValidation(""); setVisible(false); input.current?.focus();
+        }}>{role === "BOSS" ? "技术维护" : "返回本人登录"}</button>
         <details className="boss-login-assistance"><summary>认证帮助</summary>
-          <p>访问凭据由本机服务配置提供。请使用所属身份的有效凭据；外部联系人没有登录权限。</p>
+          <p>请使用本机初始化时提供的账号和密码。账号所属身份由服务端核验。</p>
           <p>本机服务需要保持运行。模型与语音服务需要相应网络连接。</p>
         </details>
+        </div>
         {assetError && <p role="alert" className="boss-login-error">品牌资源加载失败，请检查本机产品构建。</p>}
       </section>
     </div>

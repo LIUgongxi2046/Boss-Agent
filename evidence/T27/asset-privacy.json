@@ -1,0 +1,21 @@
+{
+  "status": "PASS_ASSET_METADATA_AND_PASSWORD_EXCLUSION",
+  "animation": {
+    "format": "WEBP",
+    "frames": 24,
+    "size": [
+      720,
+      408
+    ],
+    "loop": 0,
+    "sha256": "15a632c68f8fa992553df4f42577214d0760d65280c8314124e84e78a5edf225"
+  },
+  "repository_files_checked": 5044,
+  "source_sha256": {
+    "app/webui/BossLogin.tsx": "dd8838a63385c9b8c01ae697f9b0a80567e0d526e37e4be5a0ca0dca379b20c7",
+    "app/webui/boss-login.css": "a0936e8bc84e48e41b9d43eeb9e0bd245e100747482cdb3779cb7769d4f1c0cc",
+    "validation/boss_account_auth.py": "83d50c78fbc9a4c4f97823ca6fc9581e119cb94a5a95921e8e43631dba103f4f",
+    "validation/desktop/branding.cjs": "3292dce1a14e0788318295d6db8115875a2d1069b080bcd6b39688aef735d710"
+  },
+  "visual": "NOT_RUN"
+}

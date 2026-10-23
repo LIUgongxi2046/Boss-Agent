@@ -1,0 +1,88 @@
+{
+  "status": "PASS_INDEPENDENT_LOGIN_ONLY",
+  "at": "2026-10-23T07:32:20.003Z",
+  "records": [
+    {
+      "check": "copy-beta-default-boss",
+      "status": "PASS"
+    },
+    {
+      "check": "empty-input-focus-help",
+      "status": "PASS"
+    },
+    {
+      "check": "parallel-maintenance-help",
+      "status": "PASS"
+    },
+    {
+      "check": "content-bounds-1440-1024-1",
+      "status": "PASS"
+    },
+    {
+      "check": "content-bounds-1280-800-1",
+      "status": "PASS"
+    },
+    {
+      "check": "content-bounds-1024-768-1",
+      "status": "PASS"
+    },
+    {
+      "check": "content-bounds-1024-768-2",
+      "status": "PASS"
+    },
+    {
+      "check": "motion-preference-change",
+      "status": "PASS"
+    },
+    {
+      "check": "reject-password-BOSS",
+      "status": "PASS"
+    },
+    {
+      "check": "login-double-submit-BOSS",
+      "status": "PASS"
+    },
+    {
+      "check": "refresh-BOSS",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-BOSS",
+      "status": "PASS"
+    },
+    {
+      "check": "reject-password-MAINTAINER",
+      "status": "PASS"
+    },
+    {
+      "check": "login-double-submit-MAINTAINER",
+      "status": "PASS"
+    },
+    {
+      "check": "refresh-MAINTAINER",
+      "status": "PASS"
+    },
+    {
+      "check": "natural-token-expiry",
+      "status": "PASS"
+    },
+    {
+      "check": "reauthentication",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-MAINTAINER",
+      "status": "PASS"
+    },
+    {
+      "check": "renderer-errors-zero",
+      "status": "PASS"
+    },
+    {
+      "check": "brand-config-project-resource",
+      "status": "PASS"
+    }
+  ],
+  "visual": "NOT_RUN",
+  "public_integration": "NOT_RUN"
+}

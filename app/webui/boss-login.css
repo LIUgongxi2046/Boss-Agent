@@ -1,0 +1,11 @@
+.boss-login-brand .boss-login-beta{color:var(--boss-blue);background:#EDF5FC;border:1px solid var(--boss-border);border-radius:9px;padding:4px 12px;margin-left:auto;white-space:nowrap}
+.boss-login-account{margin-bottom:24px}
+.boss-login-account input{padding-right:16px}
+.boss-login-footer{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:24px;border-top:1px solid var(--boss-border);padding-top:16px;align-items:start}
+.boss-login-footer .boss-login-assistance{border:0;padding:0;min-width:0}
+.boss-login-maintenance{display:flex;align-items:center;min-height:44px;border:0;background:transparent;color:var(--boss-blue);padding:0;font-size:14px;cursor:pointer}
+.boss-login button:focus-visible,.boss-login input:focus-visible,.boss-login summary:focus-visible{outline:2px solid #0A64E8;outline-offset:2px}
+.boss-login button:disabled{cursor:wait;opacity:.65}
+.boss-login-welcome h1{font-size:clamp(28px,3vw,40px)}
+@media(max-width:760px){.boss-login-brand .boss-login-beta{margin-left:0}.boss-login-footer{gap:16px}.boss-login-welcome h1{font-size:28px}}
+@media(prefers-reduced-motion:reduce){.boss-login .boss-spin{animation:none}}
