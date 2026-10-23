@@ -243,3 +243,16 @@ python3 scripts/visual_diff.py --role boss
 - [项目交付台账](../delivery-ledger.json)
 - [开发记录索引](development/index.md)
 - [最新成功 CI](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39881014652)
+
+
+## 9. 2026-10-23 续开发增量（在上文 v1.0 基线之后）
+
+**本节是后续开发事实，取代本文开头“最近一次完整成功 CI”和此前 F10/F11 为只读的旧时间点记录；原始交接基线 `a83e6272` 保留供审计，不再是仓库最新代码。**
+
+- FR-10 / F10：新增 `validation/boss_people.py`、`app/webui/BossPeopleMeeting.tsx`，支持老板按稳定联系人 ID、当前职责和获准资料版本准备会面；根据真实 SQLite 历史/现有任务、反馈列出有出处的工作事实。老板可独立授权将材料纳入获准的现有模拟会议议题，或显式解除；并未创建员工身份、改变参会者名单、发送邀请或修改外部日历。
+- FR-11 / F11：新增 `validation/boss_travel.py`、`app/webui/BossTravelView.tsx`，支持行程草稿、时区及显式 UTC 偏移、工作会议/私人忙碌/任务到期/其他行程冲突和缺交通依据检查、本人单独确认、版本变更及取消。没有真实订票/天气 API/外部日历写入。
+- F04：`validation/boss_meeting_brief.py` 增加 F10 的已确认议题和 F11 的已确认冲突影响；已保存会前材料在相关业务关系变化后进入 `NEEDS_REVIEW`，并在 `app/webui/BossMeetingBrief.tsx` 展示对应 ID、版本和来源检查结果。不存在后台静默批准。
+- 统一走原有 BOSS-only WS 角色认证、SQLite `BEGIN IMMEDIATE`、版本 CAS、`client_request_id` 幂等、最小审计；UI 新增授权弹窗和原请求回执重查。注册入口、构建叠加及 CI 已更新。原始 v6 设计及 72 页映射保留；`specs/page-service-map.json` 已把 F10/F11 从只读组件映射改为实际写入组件。
+- 代码级证据：[GitHub Actions 39887407709](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39887407709) 已完成 Python 域测试和固定上游 React 生产构建。详细新增测试在 `app/tests/test_boss_people.py`、`app/tests/test_boss_travel.py`。完整记录 [T18-people-travel.md](development/T18-people-travel.md)。
+
+**本节不改变项目总验收状态**：T18 `IN_PROGRESS`，A18 `NOT_RUN`，72 页 `actual_e2e_verified=false`、`visual_pixel_verified=false`。后续仍按本交接第 5 节 P0—P3：业务功能与 E01—E06 → 技术/模型实机联调 → 补数据 → 全页面高保真与安装交付验收。
