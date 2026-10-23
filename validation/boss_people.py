@@ -67,7 +67,11 @@ def _sources(api, db, data, refs):
                 and isinstance(version, str) and 0 < len(version) <= 40,
                 "资料 ID 重复或版本不合法", web.HTTPBadRequest)
         used.add(identifier)
-        doc = api._require_current_source(db, data, identifier)
+        doc = api.store.get(db, NS, "document", identifier)
+        require(not doc.get("withdrawn")
+                and doc.get("access_scope") == data["owner_id"]
+                and doc.get("source_type") == "SIMULATED",
+                "来源不在当前获准范围或已经撤销", web.HTTPForbidden)
         require(doc["version"] == version, "资料版本已变化", web.HTTPConflict)
         sources.append({
             "source_id": identifier, "version": version,
