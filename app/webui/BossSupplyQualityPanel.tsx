@@ -5,7 +5,10 @@ export type SupplyQualityRecord={record_id:string;entity_type:string;version:str
 type Supply={material_id:string;legal_entity_id:string;asset_owner_id:string;ownership_type:string;customer_id:string|null;quantity_unit:string;currency:string;
   available_quantity:string|null;daily_quantity:string|null;coverage_days:string|null;quote_price_difference:string|null;contract_unit_prices:(string|null)[];
   actual_cost_change:null;required_quantity:string|null;quantity_gap:string|null;hypothetical_plan_quote_difference:string|null;calculation_basis:string;
-  consumption_assumptions:string[];excluded_inventory:{inventory_id:string;reason:string}[]};
+  consumption_assumptions:string[];excluded_inventory:{inventory_id:string;reason:string}[];cost_reports:CostReport[]};
+type CostReportSummary={report_id:string;source_id:string;source_version:string;period_start:string;period_end:string;quantity:string|null;total_cost:string|null;unit_cost:string|null};
+type CostReport={cost_type:"INBOUND_RECEIPT"|"ACTUAL_CONSUMPTION";cost_owner_id:string|null;report_scope_id:string;cost_basis_id:string;scope_description:string;currency:string;quantity_unit:string;
+  current:CostReportSummary;baseline:CostReportSummary|null;comparison_state:string;unit_cost_change:string|null;total_cost_change:string|null;formula:string;missing_fields:string[]};
 type Trace={processing_totals:{processing_id:string;input_quantity:string|null;output_quantity:string|null;loss_quantity:string|null;quantity_unit:string}[];
   confirmed_inventory:{inventory_id:string;batch_id:string;quantity:string|null;quantity_unit:string}[];
   confirmed_customers:{customer_id:string;quantity:string|null;quantity_unit:string}[];
@@ -92,9 +95,19 @@ export function BossSupplyQualityPanel({data,loading,error,onReload,onOpenSource
         <dl><dt>可用库存</dt><dd>{value(row.available_quantity,row.quantity_unit)}</dd><dt>假设日耗用</dt><dd>{value(row.daily_quantity,row.quantity_unit+"/日")}</dd>
           <dt>覆盖天数</dt><dd>{value(row.coverage_days,"日")}</dd><dt>同产地报价变化</dt><dd>{value(row.quote_price_difference,row.currency+"/"+row.quantity_unit)}</dd>
           <dt>合同单价</dt><dd>{row.contract_unit_prices.length?row.contract_unit_prices.map(price=>value(price,row.currency+"/"+row.quantity_unit)).join("；"):"未知"}</dd>
-          <dt>实际成本变化</dt><dd>{value(row.actual_cost_change)}</dd><dt>计划原料需要量</dt><dd>{value(row.required_quantity,row.quantity_unit)}</dd>
+          <dt>完整原料成本变化</dt><dd>{value(row.actual_cost_change)}</dd><dt>计划原料需要量</dt><dd>{value(row.required_quantity,row.quantity_unit)}</dd>
           <dt>计划供应缺口</dt><dd>{value(row.quantity_gap,row.quantity_unit)}</dd><dt>计划数量对应的报价变化假设</dt><dd>{value(row.hypothetical_plan_quote_difference,row.currency)}</dd></dl>
         <p className="boss-helper">{row.calculation_basis}</p>{row.consumption_assumptions.map(text=><p className="boss-helper" key={text}>{text}</p>)}
+        {row.cost_reports.length===0&&<p>入库成本与实际领用成本：尚未提供当前报告。</p>}
+        {row.cost_reports.map(report=><section key={JSON.stringify([report.cost_type,report.report_scope_id,report.cost_basis_id,report.cost_owner_id])} aria-label={report.cost_type==="INBOUND_RECEIPT"?"已报告入库成本":"已报告实际领用成本"}>
+          <h4>{report.cost_type==="INBOUND_RECEIPT"?"已报告入库成本":"已报告实际领用成本"}</h4>
+          <p>报告范围 {report.report_scope_id} · 成本口径 {report.cost_basis_id} · 成本归属 {report.cost_owner_id??"未知"}</p><p>{report.scope_description}</p>
+          <p>当前期间 {report.current.period_start} 至 {report.current.period_end} · 数量 {value(report.current.quantity,report.quantity_unit)} · 金额 {value(report.current.total_cost,report.currency)} · 单位成本 {value(report.current.unit_cost,report.currency+"/"+report.quantity_unit)}</p>
+          {report.baseline&&<p>基期 {report.baseline.period_start} 至 {report.baseline.period_end} · 数量 {value(report.baseline.quantity,report.quantity_unit)} · 金额 {value(report.baseline.total_cost,report.currency)} · 单位成本 {value(report.baseline.unit_cost,report.currency+"/"+report.quantity_unit)}</p>}
+          <p>报告单位成本变化 {value(report.unit_cost_change,report.currency+"/"+report.quantity_unit)} · 报告总成本变化 {value(report.total_cost_change,report.currency)} · 比较状态 {report.comparison_state}</p>
+          <p className="boss-helper">{report.formula}</p>{report.missing_fields.map(field=><p className="boss-helper" key={field}>{field}</p>)}
+          <button type="button" className="boss-btn" disabled={busy} onClick={()=>onOpenSource(report.current.source_id)}>打开当前成本报告</button>
+        </section>)}
         {row.excluded_inventory.length>0&&<p>排除库存：{row.excluded_inventory.map(item=>item.inventory_id+"（"+item.reason+"）").join("、")}</p>}
       </article>)}
       {data.trace&&<section aria-label="批次关系与数量">

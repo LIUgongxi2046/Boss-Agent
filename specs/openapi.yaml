@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.7.0
+  version: 1.8.0
   description: 当前HTTP读取、58项基线命令、13项W1领域动作、5项工具与14类模拟资料接口；包含明确SIMULATED的采购库存与生产质量导入、查询和本人协调，公开集成与正式验收分别记录。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.7.0
+  version: 1.8.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -98,7 +98,7 @@ paths:
         - {name: customer_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: material_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: asset_owner_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
-        - {name: ownership_type, in: query, schema: {enum: [COMPANY, CUSTOMER, PARTNER]}}
+        - {name: ownership_type, in: query, schema: {enum: [COMPANY, CUSTOMER, COOPERATION]}}
         - {name: batch_id, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: purpose, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
         - {name: stage, in: query, schema: {$ref: './simulation-query.schema.json#/$defs/Identifier'}}
@@ -1196,7 +1196,7 @@ x-simulation-operations:
   - {interface_id: SI06, operationId: simulationTasksRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [task, self_commitment, feedback], current_reader: 'SimulationAPI / current tasks and historical feedback', state: PARTIAL, missing: [complete approved business source coverage]}
   - {interface_id: SI07, operationId: simulationSalesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics / read_evidence', state: PARTIAL, missing: [new approved agricultural details]}
   - {interface_id: SI08, operationId: simulationFinanceRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [metric_detail, query], current_reader: 'query_metrics cost/revenue only', state: PARTIAL, missing: [cash, receivables aging, settlement source]}
-  - {interface_id: SI09, operationId: simulationProcurementInventoryRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [material_quote, material_contract, inventory_lot, material_consumption, feed_formula, business_order], current_reader: 'SimulationAPI / SupplyQualityAPI', state: PARTIAL_AFTER_EXPLICIT_IMPORT, missing: [real external service verification, complete business coverage]}
+  - {interface_id: SI09, operationId: simulationProcurementInventoryRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [material_quote, material_contract, inventory_lot, material_consumption, material_cost_report, feed_formula, business_order], current_reader: 'SimulationAPI / SupplyQualityAPI', state: PARTIAL_AFTER_EXPLICIT_IMPORT, missing: [real external service verification, complete business coverage]}
   - {interface_id: SI10, operationId: simulationProductionQualityRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [production_batch, quality_trace, professional_record, customer_feedback, production_event, agriculture_observation, production_capacity], current_reader: 'SimulationAPI / SupplyQualityAPI', state: PARTIAL_AFTER_EXPLICIT_IMPORT, missing: [real external service verification, complete business coverage]}
   - {interface_id: SI11, operationId: simulationApprovalsRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [application, application_decision], current_reader: 'BossWorkspaceAPI approvals', state: PARTIAL, missing: [new approved applications]}
   - {interface_id: SI12, operationId: simulationExternalSourcesRead, role: BOSS, input: '#/components/schemas/SimulationQuery', output: '#/components/schemas/SimulationResult', entities: [document, research, exchange_rate], current_reader: 'BossWorkspaceAPI research', state: PARTIAL, missing: [approved public market weather policy source and retrieval]}

@@ -28,6 +28,7 @@ COORDINATE_ACTION = "boss.supply_quality.coordinate"
 ACTION_INPUTS = {IMPORT_ACTION: ("MAINTAINER", "ImportInput"), WITHDRAW_ACTION: ("MAINTAINER", "WithdrawInput"), COORDINATE_ACTION: ("BOSS", "CoordinateInput")}
 ACTION_RESULTS = {IMPORT_ACTION: "ImportResult", WITHDRAW_ACTION: "WithdrawResult", COORDINATE_ACTION: "CoordinateResult"}
 TERMINAL_STATES = {"material_quote": {"SUPERSEDED"}, "material_contract": {"FULFILLED_REPORTED", "CANCELED_REPORTED"},
+                   "material_cost_report": {"REVERSED_REPORTED"},
                    "inventory_lot": {"REJECTED"}, "material_consumption": {"CANCELED"}, "production_batch": {"COMPLETED", "CANCELED"},
                    "production_event": {"CLOSED_REPORTED"}, "feed_formula": {"SUPERSEDED"}, "business_order": {"DELIVERED_REPORTED", "CANCELED"}}
 IDENTITY_FIELDS = {
@@ -35,14 +36,16 @@ IDENTITY_FIELDS = {
     "material_contract": ("legal_entity_id", "supplier_id", "material_id", "quantity_unit", "currency"),
     "inventory_lot": ("batch_id", "material_id", "product_id", "legal_entity_id", "asset_owner_id", "ownership_type", "customer_id", "quantity_unit"),
     "material_consumption": ("material_id", "legal_entity_id", "inventory_id", "quantity_unit", "currency"),
-    "production_batch": ("batch_type", "material_id", "product_id", "legal_entity_id", "customer_id", "ownership_type", "asset_owner_id", "quantity_unit"),
+    "production_batch": ("batch_type", "material_id", "product_id", "legal_entity_id", "customer_id", "ownership_type", "asset_owner_id", "cost_owner_id", "quantity_unit"),
     "quality_trace": ("input_batch_id", "output_batch_id", "processing_id", "inventory_id", "customer_id", "quantity_unit"),
     "professional_record": ("author_contact_id", "batch_id", "event_id"), "customer_feedback": ("customer_id", "author_contact_id", "batch_id"),
     "production_event": ("legal_entity_id",), "agriculture_observation": ("batch_id", "unit_id", "metric_id", "unit", "author_contact_id"),
     "feed_formula": ("product_id", "species", "purpose", "stage"),
     "production_capacity": ("legal_entity_id", "factory_id", "process_stage_id", "product_id", "period_start", "period_end", "timezone", "quantity_unit"),
     "business_order": ("legal_entity_id", "customer_id", "product_id", "region_id", "quantity_unit", "trade_type", "currency"),
+    "material_cost_report": ("material_id", "legal_entity_id", "asset_owner_id", "cost_owner_id", "ownership_type", "customer_id", "cost_type", "report_scope_id", "cost_basis_id", "period_start", "period_end", "inventory_ids", "quantity_unit", "currency"),
 }
+COST_SCOPE_FIELDS = ("material_id", "legal_entity_id", "asset_owner_id", "cost_owner_id", "ownership_type", "customer_id", "cost_type", "report_scope_id", "cost_basis_id", "quantity_unit", "currency")
 
 
 def source_id(kind, identifier):
@@ -90,6 +93,8 @@ def _direct_dependencies(record, initial_contacts):
         result.update(("agriculture_observation", identifier) for identifier in data["observation_ids"])
     if kind == "production_event":
         result.update(("production_batch", identifier) for identifier in data["batch_ids"])
+    if kind == "material_cost_report":
+        result.update(("inventory_lot", identifier) for identifier in data["inventory_ids"])
     return result
 
 
@@ -257,6 +262,7 @@ class SupplyQualityAPI:
                     require(current["version"] == reference["version"] and checksum(current) == reference["source_sha256"],
                             "引用资料采用的来源已经变化，需要明确重新导入该资料")
         self._validate_processing(world)
+        self._validate_cost_periods(world)
         for key, record in incoming.items():
             previous = previous_rows[key]
             kind, identifier = key
@@ -286,6 +292,18 @@ class SupplyQualityAPI:
         return result
 
     @staticmethod
+    def _validate_cost_periods(world):
+        groups = {}
+        for (kind, _), record in world.items():
+            if kind == "material_cost_report" and record["record_state"] == "ACTIVE" and record["state"] == "REPORTED":
+                data = record["data"]
+                groups.setdefault(tuple(data[field] for field in COST_SCOPE_FIELDS), []).append(data)
+        for reports in groups.values():
+            ordered = sorted(reports, key=lambda report: datetime.fromisoformat(report["period_start"]))
+            for previous, current in zip(ordered, ordered[1:]):
+                require(datetime.fromisoformat(previous["period_end"]) <= datetime.fromisoformat(current["period_start"]), "同一成本报告范围的期间重复或重叠", web.HTTPBadRequest)
+
+    @staticmethod
     def _validate_processing(world):
         groups = {}
         for (kind, _), record in world.items():
@@ -311,7 +329,8 @@ class SupplyQualityAPI:
         require(observed <= datetime.fromisoformat(context["clock"]) and (end is None or start < end), "外部资料观察或有效时间不合法", web.HTTPBadRequest)
         if previous:
             for field in IDENTITY_FIELDS[kind]:
-                require(previous["data"][field] is None or previous["data"][field] == data[field], "已知业务身份不能改为其他对象")
+                same = set(previous["data"][field]) == set(data[field]) if field == "inventory_ids" else previous["data"][field] is None or previous["data"][field] == data[field]
+                require(same, "已知业务身份不能改为其他对象")
             require(previous["state"] not in TERMINAL_STATES.get(kind, set()) or previous["state"] == record["state"], "已终止的外部业务状态不能重新启用")
         dimensions = {"legal_entity_id": "legal_entity_id", "customer_id": "customer_id", "product_id": "product_id", "region_id": "region_id"}
         for field, source_field in dimensions.items():
@@ -336,6 +355,9 @@ class SupplyQualityAPI:
             require(datetime.fromisoformat(data["quoted_at"]) <= observed, "报价时间晚于来源观察时间", web.HTTPBadRequest)
         if kind in ("material_consumption", "production_capacity"):
             require(datetime.fromisoformat(data["period_start"]) < datetime.fromisoformat(data["period_end"]), "业务期间的起止时间不合法", web.HTTPBadRequest)
+        if kind == "material_cost_report":
+            require(datetime.fromisoformat(data["period_start"]) < datetime.fromisoformat(data["period_end"]) <= observed,
+                    "成本报告期间必须完整且不晚于来源观察时间", web.HTTPBadRequest)
         if kind == "production_capacity":
             require(data["timezone"] in available_timezones(), "时区不属于有效IANA范围", web.HTTPBadRequest)
         if kind == "material_contract":
@@ -378,6 +400,13 @@ class SupplyQualityAPI:
         if kind == "material_consumption" and data["inventory_id"] is not None:
             inventory = world[("inventory_lot", data["inventory_id"])]["data"]
             require(all(inventory[field] == data[field] for field in ("material_id", "legal_entity_id", "quantity_unit", "currency")), "耗用与库存范围不符", web.HTTPBadRequest)
+        if kind == "material_cost_report":
+            for identifier in data["inventory_ids"]:
+                inventory = world[("inventory_lot", identifier)]["data"]
+                require(all(inventory[field] == data[field] for field in ("material_id", "legal_entity_id", "asset_owner_id", "ownership_type", "customer_id", "quantity_unit", "currency")),
+                        "成本报告与明确库存的材料、归属、单位或币种不符", web.HTTPBadRequest)
+                batch = world[("production_batch", inventory["batch_id"])]["data"]
+                require(batch["cost_owner_id"] == data["cost_owner_id"], "成本报告与明确批次的成本归属不符", web.HTTPBadRequest)
         if kind == "quality_trace" and data["trace_state"] == "CONFIRMED":
             input_batch, output_batch = world[("production_batch", data["input_batch_id"])]["data"], world[("production_batch", data["output_batch_id"])]["data"]
             require(input_batch["quantity_unit"] == output_batch["quantity_unit"] == data["quantity_unit"] and input_batch["legal_entity_id"] == output_batch["legal_entity_id"], "已确认追溯范围或单位不一致", web.HTTPBadRequest)

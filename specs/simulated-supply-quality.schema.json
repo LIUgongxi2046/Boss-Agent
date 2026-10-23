@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:simulated-supply-quality:1.7.0",
+  "$id": "urn:boss-agent:simulated-supply-quality:1.8.0",
   "title": "采购库存与生产质量的显式模拟外部资料",
   "$ref": "#/$defs/ImportInput",
   "x-entity-config": {
@@ -9,6 +9,7 @@
     "material_contract": {"interface": "SI09", "id": "contract_id", "state": "contract_state"},
     "inventory_lot": {"interface": "SI09", "id": "inventory_id", "state": "quality_state"},
     "material_consumption": {"interface": "SI09", "id": "consumption_id", "state": "state"},
+    "material_cost_report": {"interface": "SI09", "id": "report_id", "state": "state"},
     "production_batch": {"interface": "SI10", "id": "batch_id", "state": "state"},
     "quality_trace": {"interface": "SI10", "id": "trace_id", "state": "trace_state"},
     "professional_record": {"interface": "SI10", "id": "professional_record_id", "state": "state"},
@@ -124,15 +125,25 @@
       "required": ["order_id", "legal_entity_id", "customer_id", "product_id", "region_id", "quantity", "quantity_unit", "trade_type", "due_at", "amount", "currency", "status"],
       "properties": {"order_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "customer_id": {"$ref": "#/$defs/Id"}, "product_id": {"$ref": "#/$defs/Id"}, "region_id": {"$ref": "#/$defs/Id"}, "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "trade_type": {"enum": ["EXTERNAL_SALES", "INTERNAL_USE"]}, "due_at": {"$ref": "#/$defs/Time"}, "amount": {"$ref": "#/$defs/Value"}, "currency": {"$ref": "#/$defs/Currency"}, "status": {"enum": ["OPEN", "PARTIALLY_DELIVERED", "DELIVERED_REPORTED", "CANCELED"]}}
     },
+    "material_cost_report": {
+      "type": "object", "additionalProperties": false,
+      "required": ["report_id", "material_id", "legal_entity_id", "asset_owner_id", "cost_owner_id", "ownership_type", "customer_id", "cost_type", "report_scope_id", "cost_basis_id", "scope_description", "period_start", "period_end", "inventory_ids", "quantity", "total_cost", "quantity_unit", "currency", "state"],
+      "properties": {
+        "report_id": {"$ref": "#/$defs/Id"}, "material_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "asset_owner_id": {"$ref": "#/$defs/Id"}, "cost_owner_id": {"$ref": "#/$defs/OptionalId"}, "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "COOPERATION"]}, "customer_id": {"$ref": "#/$defs/OptionalId"},
+        "cost_type": {"enum": ["INBOUND_RECEIPT", "ACTUAL_CONSUMPTION"]}, "report_scope_id": {"$ref": "#/$defs/Id"}, "cost_basis_id": {"$ref": "#/$defs/Id"}, "scope_description": {"$ref": "#/$defs/Text"},
+        "period_start": {"$ref": "#/$defs/Time"}, "period_end": {"$ref": "#/$defs/Time"}, "inventory_ids": {"allOf": [{"$ref": "#/$defs/Ids"}], "minItems": 1}, "quantity": {"$ref": "#/$defs/Value"}, "total_cost": {"$ref": "#/$defs/Value"}, "quantity_unit": {"$ref": "#/$defs/Unit"}, "currency": {"$ref": "#/$defs/Currency"}, "state": {"enum": ["REPORTED", "REVERSED_REPORTED"]}
+      }
+    },
     "InputRecord": {
       "type": "object", "additionalProperties": false, "required": ["entity_type", "expected_version", "source", "data"],
-      "properties": {"entity_type": {"enum": ["contact", "material_quote", "material_contract", "inventory_lot", "material_consumption", "production_batch", "quality_trace", "professional_record", "customer_feedback", "production_event", "agriculture_observation", "feed_formula", "production_capacity", "business_order"]}, "expected_version": {"$ref": "#/$defs/Version"}, "source": {"$ref": "#/$defs/Source"}, "data": {"type": "object"}},
+      "properties": {"entity_type": {"enum": ["contact", "material_quote", "material_contract", "inventory_lot", "material_consumption", "material_cost_report", "production_batch", "quality_trace", "professional_record", "customer_feedback", "production_event", "agriculture_observation", "feed_formula", "production_capacity", "business_order"]}, "expected_version": {"$ref": "#/$defs/Version"}, "source": {"$ref": "#/$defs/Source"}, "data": {"type": "object"}},
       "allOf": [
         {"if": {"properties": {"entity_type": {"const": "contact"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/contact"}}}},
         {"if": {"properties": {"entity_type": {"const": "material_quote"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_quote"}}}},
         {"if": {"properties": {"entity_type": {"const": "material_contract"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_contract"}}}},
         {"if": {"properties": {"entity_type": {"const": "inventory_lot"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/inventory_lot"}}}},
         {"if": {"properties": {"entity_type": {"const": "material_consumption"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_consumption"}}}},
+        {"if": {"properties": {"entity_type": {"const": "material_cost_report"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/material_cost_report"}}}},
         {"if": {"properties": {"entity_type": {"const": "production_batch"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/production_batch"}}}},
         {"if": {"properties": {"entity_type": {"const": "quality_trace"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/quality_trace"}}}},
         {"if": {"properties": {"entity_type": {"const": "professional_record"}}}, "then": {"properties": {"data": {"$ref": "#/$defs/professional_record"}}}},

@@ -1,12 +1,12 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
-    "compatibility": "1.7.0保留既有命令与五项Tool名称；当前Tool Schema由business.SPEC提供，business-tools.schema.json兼容允许无关联会议和空关联事件。原selection-probe.json保持。十四类查询继续使用simulation-query.schema.json；采购库存与生产质量使用simulated-supply-quality.schema.json和supply-quality-results.schema.json。已有回执保持原结果，来源、身份与当前采用单独检查。",
+    "compatibility": "1.8.0保留既有动作和五项Tool名称、原initial与21条模拟输入；新增material_cost_report与SI09.supply.cost_reports。入库和实际领用按明确范围、口径及可比期间计算，报价/合同/计划假设与完整企业成本分别表达。当前Tool Schema由business.SPEC提供，原selection-probe.json保持。既有回执保持原结果；当前消费者接收相同版本的结果Schema。",
     "external_business_storage": "simulation_definition=si09-si10-business-v1的记录统一使用external_business_record，业务字段位于data，其严格类型由simulated-supply-quality.schema.json的x-entity-config与同名$defs决定。对应同名实体中的planned定义保留完整业务设计范围；当前模拟服务覆盖由该版本化Schema明确。",
     "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
@@ -31,6 +31,11 @@
     "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}
   },
   "entities": {
+    "material_cost_report": {
+      "storage": "objects/material_cost_report", "access": "MAINTAINER_EXPLICIT_SIMULATED_IMPORT_BOSS_CURRENT_READ", "version": "1.8.0", "inherits": "external_business_record",
+      "fields": {"data": {"type": "object", "schema_ref": "simulated-supply-quality.schema.json#/$defs/material_cost_report"}},
+      "business_policy": "只记录外部报告的入库或实际领用成本；引用库存保持同归属、单位、币种与当前采用状态，不执行采购、记账或库存扣减。"
+    },
     "external_business_record": {
       "storage": "objects/{entity_type}/{record_id}", "access": "MAINTAINER_EXPLICIT_SIMULATED_IMPORT_BOSS_CURRENT_READ", "version": "1.7.0",
       "schema_ref": "supply-quality-results.schema.json#/$defs/StoredRecord",
@@ -510,7 +515,7 @@
     "R09": ["document", "research"], "R10": ["contact", "person_brief", "task", "feedback"],
     "R11": ["travel_plan", "meeting", "private_calendar", "document"],
     "R12": ["private_calendar", "calendar_share", "authorization"], "R13": ["memory", "authorization", "application_decision", "document"],
-    "R14": ["material_quote", "material_contract", "inventory_lot", "feed_formula", "business_order", "production_capacity"],
+    "R14": ["material_quote", "material_contract", "inventory_lot", "material_cost_report", "feed_formula", "business_order", "production_capacity"],
     "R15": ["season_curve", "business_order", "agriculture_batch", "agriculture_observation"],
     "R16": ["agriculture_batch", "agriculture_transfer", "transport_record", "customer_feedback"],
     "R17": ["agriculture_observation", "professional_record", "task", "feedback"],

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:assignment-source-review:1.7.0",
+  "$id": "urn:boss-agent:assignment-source-review:1.8.0",
   "title": "本人重新核查交办来源",
   "$ref": "#/$defs/Projection",
   "$defs": {

@@ -88,7 +88,9 @@ control_feedback在同一事务保存每项结果证据的实际版本、完整�
 
 ### SI09/SI10 当前实施接口
 
-当前确定接收版本1.7.0，依据原始项目计划13.18；领域行为与结果Schema已验证，当前公共接入由W3接收。SupplyQualityAPI接收显式SIMULATED资料，不连接外部服务。MAINTAINER动作boss.simulation.supply_quality.import接收client_request_id、mode=SIMULATED、simulation_definition、outcome、records和error_code；SUCCESS执行完整Schema、时间、关系、CAS及来源检查后原子保存。EMPTY不删除已有事实；FAILED/TIMED_OUT保存明确的失败尝试及原回执，分别返回502/504。相同编号继续读取原结果，不自动生成新编号重试。普通审计只包含动作、类别、对象ID、版本、来源与结果元信息。
+当前1.8.0使用现有三个动作维护material_cost_report，记录引用当前库存及其传递来源，成本归属与明确批次一致。SI09的cost_reports按报告范围、成本口径及成本归属提供入库/实际领用的报告与基期数量、金额、计算单价和变化；期间时长不同、缺少数值、分母为零或成本归属未知时，不产生相应变化。calculate_cost_reports由同一事务的有效投影提供输入，不能凭该计算函数授予读取或执行权限。完整原料actual_cost_change继续要求完整来源；当前消费者同步接收1.8.0字段。
+
+当前确定接收版本1.8.0，依据原始项目计划13.18；领域行为与结果Schema已验证，当前公共接入由W3接收。SupplyQualityAPI接收显式SIMULATED资料，不连接外部服务。MAINTAINER动作boss.simulation.supply_quality.import接收client_request_id、mode=SIMULATED、simulation_definition、outcome、records和error_code；SUCCESS执行完整Schema、时间、关系、CAS及来源检查后原子保存。EMPTY不删除已有事实；FAILED/TIMED_OUT保存明确的失败尝试及原回执，分别返回502/504。相同编号继续读取原结果，不自动生成新编号重试。普通审计只包含动作、类别、对象ID、版本、来源与结果元信息。
 
 boss.simulation.supply_quality.withdraw核查当前实体版本，保存撤销状态和原文历史，并移除FTS当前条目。BOSS动作boss.supply_quality.coordinate核查当前来源与完整复核摘要，使用已有任务状态、本人授权和SQLite存储创建协调任务；不执行采购或专业业务。当前business.SPEC组合原定义和business-tools.schema.json，兼容无关联会议、空关联事件和明确注册的模拟外部来源，T02原文件保留。当前ToolRegistry继续读取同一business.SPEC。协调授权、交办、关联、原请求回执及审计在同一事务保存，授权有效期为实际时间15分钟；同一核查摘要的并发请求仅产生一个协调任务。
 

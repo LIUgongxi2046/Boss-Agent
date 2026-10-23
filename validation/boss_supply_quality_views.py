@@ -5,6 +5,7 @@ from decimal import Decimal, localcontext
 
 from business import checksum, now
 from boss_supply_quality import DEFINITION, external_records
+from boss_material_costs import calculate_cost_reports
 
 
 def decimal_text(value):
@@ -79,13 +80,20 @@ def _supply(records, clock, missing, withheld):
         required = Decimal(requirements[0]["quantity"]) if len(requirements) == 1 else None
         if len(requirements) > 1:
             missing.add("MULTIPLE_PLAN_ALLOCATION_NOT_PROVIDED")
-        missing.add("ACTUAL_COST_NOT_PROVIDED")
+        reports = calculate_cost_reports([row for row in records.get("material_cost_report", []) if tuple(row[field] for field in ("material_id", "legal_entity_id", "asset_owner_id", "ownership_type", "customer_id", "quantity_unit", "currency")) == scope])
+        if not reports:
+            missing.add("ACTUAL_COST_NOT_PROVIDED")
+        for cost_type in ("INBOUND_RECEIPT", "ACTUAL_CONSUMPTION"):
+            if not any(report["cost_type"] == cost_type for report in reports):
+                missing.add(cost_type + "_COST_REPORT_NOT_PROVIDED")
+        missing.add("FULL_ACTUAL_COST_NOT_PROVIDED")
         result.append({"material_id": material, "legal_entity_id": entity, "asset_owner_id": asset_owner,
             "ownership_type": ownership, "customer_id": customer, "quantity_unit": unit, "currency": currency,
             "available_quantity": decimal_text(available), "daily_quantity": decimal_text(daily), "coverage_days": decimal_text(coverage),
             "consumption_assumptions": [row["assumption"] for row in consumption], "excluded_inventory": excluded,
             "quote_price_difference": decimal_text(delta), "quote_ids": [row["quote_id"] for row in selected_quotes],
             "contract_unit_prices": [row["unit_price"] for row in contracts], "actual_cost_change": None,
+            "cost_reports": reports,
             "plan_requirements": requirements, "required_quantity": decimal_text(required),
             "quantity_gap": decimal_text(max(required - available, Decimal(0))) if required is not None and available is not None else None,
             "hypothetical_plan_quote_difference": decimal_text(required * delta) if required is not None and delta is not None else None,
@@ -125,7 +133,10 @@ def read_projection(store, db, context, interface_id):
         for record in projection["records"]:
             wrapper = record["data"]
             if wrapper is not None and wrapper.get("simulation_definition") == DEFINITION and wrapper["record_state"] == "ACTIVE":
-                by_kind[record["entity_type"]].append(wrapper["data"])
+                data = wrapper["data"]
+                if record["entity_type"] == "material_cost_report":
+                    data = {**data, "source_id": wrapper["source_id"], "source_version": wrapper["source_version"]}
+                by_kind[record["entity_type"]].append(data)
                 if projection is selected:
                     visible.append(wrapper)
     namespace = context["namespace"]
