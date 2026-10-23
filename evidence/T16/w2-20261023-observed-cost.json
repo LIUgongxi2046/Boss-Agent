@@ -1,0 +1,107 @@
+{
+  "status": "PASS_OBSERVED_USAGE_CALCULATION_ONLY",
+  "currency": "CNY",
+  "price_version": "official-page-verified-2026-10-23",
+  "price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "price_sha256": "fc361c5ab5e13d5a17af811a26d3c690a944801f3973eaf89acd695af58a9ff8",
+  "scope": "四次五工具多轮任务和两次获准样本记忆请求",
+  "request_count": 46,
+  "rows": [
+    {
+      "source": "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/http-requests.json",
+      "sha256": "c0d405898dd12a642addded4e325827a8708c271d69bb8d8300fdf27eb80cfd8",
+      "request_count": 11,
+      "tokens": {
+        "prompt_cache_hit_tokens": 65152,
+        "prompt_cache_miss_tokens": 4866,
+        "completion_tokens": 2526
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.01627304",
+        "maximum_cny": "0.03254608"
+      }
+    },
+    {
+      "source": "evidence/T16/deepseek-0-648b1933-2c71-46ac-991e-398043220d43/http-requests.json",
+      "sha256": "5157f02702b78adaf9cd9d7397563cba2d0d0eda20dc45a07d4ab93bad825272",
+      "request_count": 11,
+      "tokens": {
+        "prompt_cache_hit_tokens": 64640,
+        "prompt_cache_miss_tokens": 4895,
+        "completion_tokens": 2445
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.0159678",
+        "maximum_cny": "0.0319356"
+      }
+    },
+    {
+      "source": "evidence/T16/deepseek-1-02b44774-b245-4771-b533-9c2e251979eb/http-requests.json",
+      "sha256": "fd825f48b1fddfab6a65fc8ca7b0d67633d090c1194ee7702f681d2634729250",
+      "request_count": 11,
+      "tokens": {
+        "prompt_cache_hit_tokens": 64512,
+        "prompt_cache_miss_tokens": 4932,
+        "completion_tokens": 2495
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.01620224",
+        "maximum_cny": "0.03240448"
+      }
+    },
+    {
+      "source": "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/http-requests.json",
+      "sha256": "497b23a23b6d97c89ebed9381d5e06240c76ddb440eeec0f69f180aa482e7d1c",
+      "request_count": 11,
+      "tokens": {
+        "prompt_cache_hit_tokens": 65280,
+        "prompt_cache_miss_tokens": 4868,
+        "completion_tokens": 2585
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.0165136",
+        "maximum_cny": "0.0330272"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/before-sample-deletion.json",
+      "sha256": "c9e730faf10d9d9538da5c0dadf97fa85e39b245d5b9da73f17a6265993d8231",
+      "request_count": 1,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 288,
+        "completion_tokens": 86
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00066528",
+        "maximum_cny": "0.00133056"
+      }
+    },
+    {
+      "source": "evidence/T15/w2-20261023/after-sample-deletion.json",
+      "sha256": "6179ce71782fa6ef285e8caaa706edfeee8bf14df26ccadb5b41670725302fa0",
+      "request_count": 1,
+      "tokens": {
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 254,
+        "completion_tokens": 143
+      },
+      "current_price_estimate": {
+        "minimum_cny": "0.00085928",
+        "maximum_cny": "0.00171856"
+      }
+    }
+  ],
+  "observed_scope_estimate_cny": {
+    "minimum_cny": "0.06648124",
+    "maximum_cny": "0.13296248"
+  },
+  "all_attempts_total_cost": null,
+  "billing_statement_verified": false,
+  "coverage": "PARTIAL_OBSERVED_USAGE_ONLY",
+  "missing_coverage": [
+    "取消、超时及其他异常请求的完整usage",
+    "其他检查请求",
+    "账单及当次实际计费时段"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "price_version": "official-page-verified-2026-10-23",
+  "verified_date": "2026-10-23",
+  "source_url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "model": "deepseek-flash",
+  "currency": "CNY",
+  "unit_tokens": 1000000,
+  "off_peak": {"prompt_cache_hit_tokens": "0.02", "prompt_cache_miss_tokens": "1", "completion_tokens": "4"},
+  "peak": {"prompt_cache_hit_tokens": "0.04", "prompt_cache_miss_tokens": "2", "completion_tokens": "8"},
+  "billing_statement_verified": false,
+  "calculation_policy": "仅对已观察完整usage计算当前价格区间；没有账单和完整失败用量时全部费用保持未知"
+}

@@ -1,0 +1,30 @@
+{
+  "status": "PASS_DESIGN_STRUCTURE_ONLY",
+  "full_A07_accepted": false,
+  "input_sha256": {
+    "agent_assets": "83e698b814e9731e9e717d38dab33eef963c0376a49682248428e74db92c90d1",
+    "selection_probe": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
+    "backend_design": "85370bc01ab41543c42b008b64f6242d449008c594fb4c139e4329fa73496067",
+    "runtime_events": "d4aca773e13c6309d6522b030ab9ab7484c74551a5be950229f084a165700b55",
+    "data_dictionary": "9eb635e01668844a5265c19eaabd7069a92bd3ebf1e61f8ae2d3913beca18fe4",
+    "workspace_projection_source": "3c89b0d959456a2010cc7d6a335c66cdd31b2372acc7f802dfb23a02884dd402",
+    "transcription_adapter_source": "337a9ef40be26618115f45713e73caad4e6c668da92e25d8dbcb31441744f0c1"
+  },
+  "current_tool_count": 5,
+  "secretary_sop_count": 13,
+  "specified_public_read_bindings": 2,
+  "sop_backend_binding_count": 13,
+  "documented_tool_operations": 5,
+  "documented_command_operations": 63,
+  "documented_simulation_interfaces": 14,
+  "simulation_interfaces_mounted": false,
+  "voice_provider_fields_matched": 11,
+  "backend_version": "1.0.0",
+  "remaining_backend_items": [
+    "public integration of five new W1 domain actions",
+    "actual simulation broker implementation and approved missing materials",
+    "actual runtime streaming cancellation and persistence verification",
+    "complete legitimate input schema matching and independent semantic review",
+    "integration verification on W3 source version"
+  ]
+}

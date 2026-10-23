@@ -1,12 +1,17 @@
 {
   "schema_version": 1,
-  "version": "0.1.0",
+  "version": "0.2.0-draft",
   "task_id": "T07",
   "status": "PENDING_T06",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "design_ref": "docs/LLD-agent.md",
-  "formal_backend_version": null,
-  "formal_event_version": null,
+  "formal_backend_version": "1.0.0",
+  "formal_event_version": "1.0.0",
+  "received_backend_design": {"version":"1.0.0","source_commit":"3f5b806","working_tree_changes_included":false,"full_acceptance":"NOT_RUN","remaining":"独立语义审阅、公开接入、运行字段关联、资料不足与完整业务验收"},
+  "pending_public_read_tools": [
+    {"operationId":"ownerPlansRead","role":"BOSS","input":"无查询参数","output":["plans","events","results","dispatches","technical_schedule","execution_owner"],"source":"OpenAPI /api/boss/ui/owner-plans GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01","SOP02","SOP06"]},
+    {"operationId":"todayRead","role":"BOSS","input":"无查询参数","output":["items","snapshot_sha256","order_version","coverage_state"],"source":"OpenAPI /api/boss/ui/today GET","runtime_registration":"NOT_REGISTERED","sop_ids":["SOP01"]}
+  ],
   "current_tool_schema_version": "selection-probe 1.3.0",
   "agent": {
     "agent_id": "boss-1",
@@ -31,15 +36,15 @@
     "acceptance_ids": ["A07", "A16", "A19"]
   },
   "tools": [
-    {"tool_id":"query_metrics","version":"selection-probe","operationId":null,"current_operation":"query_metrics","schema_source":"specs/selection-probe.json operations[operation_id=query_metrics]","permission":"当前本人读取范围","side_effect":false,"adoption":"模型解释确定性指标与明细","acceptance_ids":["A07","A13","A16"]},
-    {"tool_id":"read_evidence","version":"selection-probe","operationId":null,"current_operation":"read_evidence","schema_source":"specs/selection-probe.json operations[operation_id=read_evidence]","permission":"当前本人资料范围","side_effect":false,"adoption":"当前有效原文、日期和版本引用","acceptance_ids":["A07","A15","A16"]},
-    {"tool_id":"create_assignment","version":"selection-probe","operationId":null,"current_operation":"create_assignment","schema_source":"specs/selection-probe.json operations[operation_id=create_assignment]","permission":"服务端当前本人授权","side_effect":true,"idempotency":"服务端注入 idempotency_key","adoption":"保存后重新查询 task_id","acceptance_ids":["A07","A14","A16"]},
-    {"tool_id":"send_assignment","version":"selection-probe","operationId":null,"current_operation":"send_assignment","schema_source":"specs/selection-probe.json operations[operation_id=send_assignment]","permission":"服务端当前本人授权、内容与对象版本","side_effect":true,"idempotency":"服务端注入 idempotency_key","adoption":"查询模拟发件箱和任务 message_ids","acceptance_ids":["A07","A14","A16"]},
-    {"tool_id":"read_assignment","version":"selection-probe","operationId":null,"current_operation":"read_assignment","schema_source":"specs/selection-probe.json operations[operation_id=read_assignment]","permission":"当前本人任务范围","side_effect":false,"adoption":"查询正式状态，完成由本人单独确认","acceptance_ids":["A07","A14","A16"]}
+    {"tool_id":"query_metrics","version":"selection-probe 1.3.0","operationId":"query_metrics","current_operation":"query_metrics","input_schema":"./selection-probe.json#/io_schema/$defs/query_input","output_schema":"./selection-probe.json#/io_schema/$defs/query_output","error_schema":"./selection-probe.json#/io_schema/$defs/error_output","implementation":"Store.query_metrics","permission":"当前本人读取范围","side_effect":"QUERY_RECORD","adoption":"模型解释确定性指标与明细","acceptance_ids":["A07","A13","A16"]},
+    {"tool_id":"read_evidence","version":"selection-probe 1.3.0","operationId":"read_evidence","current_operation":"read_evidence","input_schema":"./selection-probe.json#/io_schema/$defs/evidence_input","output_schema":"./selection-probe.json#/io_schema/$defs/evidence_output","error_schema":"./selection-probe.json#/io_schema/$defs/error_output","implementation":"Store.read_evidence","permission":"当前本人资料范围","side_effect":"AUDIT_ONLY","adoption":"当前有效原文、日期和版本引用","acceptance_ids":["A07","A15","A16"]},
+    {"tool_id":"create_assignment","version":"selection-probe 1.3.0","operationId":"create_assignment","current_operation":"create_assignment","input_schema":"./selection-probe.json#/io_schema/$defs/assignment_input","output_schema":"./selection-probe.json#/io_schema/$defs/assignment_output","error_schema":"./selection-probe.json#/io_schema/$defs/error_output","implementation":"Store.create_assignment","permission":"服务端当前本人授权","side_effect":"TASK_WRITE","idempotency":"服务端注入 idempotency_key","adoption":"保存后重新查询 task_id","acceptance_ids":["A07","A14","A16"]},
+    {"tool_id":"send_assignment","version":"selection-probe 1.3.0","operationId":"send_assignment","current_operation":"send_assignment","input_schema":"./selection-probe.json#/io_schema/$defs/send_input","output_schema":"./selection-probe.json#/io_schema/$defs/send_output","error_schema":"./selection-probe.json#/io_schema/$defs/error_output","implementation":"Store.send_assignment","permission":"服务端当前本人授权、内容与对象版本","side_effect":"OUTBOX_WRITE","idempotency":"服务端注入 idempotency_key","adoption":"查询模拟发件箱和任务 message_ids","acceptance_ids":["A07","A14","A16"]},
+    {"tool_id":"read_assignment","version":"selection-probe 1.3.0","operationId":"read_assignment","current_operation":"read_assignment","input_schema":"./selection-probe.json#/io_schema/$defs/read_input","output_schema":"./selection-probe.json#/io_schema/$defs/read_output","error_schema":"./selection-probe.json#/io_schema/$defs/error_output","implementation":"Store.read_assignment","permission":"当前本人任务范围","side_effect":"AUDIT_ONLY","adoption":"查询正式状态，完成由本人单独确认","acceptance_ids":["A07","A14","A16"]}
   ],
   "tool_policy": {
     "model_supplied_fields_rejected": ["envelope", "authorization_id", "idempotency_key"],
-    "formal_operationId_assignment": "等待 T06；current_operation 仅引用当前源码",
+    "formal_operationId_assignment": "五项当前 Tool 已映射 T06 草稿 x-tool-operations；完整 A06/A07 保持未验收",
     "business_writes_require_current_authorization": true,
     "unknown_result_policy": "查询原请求回执与业务对象"
   },
@@ -57,6 +62,21 @@
     {"sop_id":"SOP11","version":"0.1.0","requirement_id":"FR-11","input":"目的、参与人、时间与时区","output":"冲突、变更影响及准备清单","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
     {"sop_id":"SOP12","version":"0.1.0","requirement_id":"FR-12","input":"本人私人内容、忙碌时间与分享范围","output":"受控私人安排及获准忙碌分享","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A14","A18"]},
     {"sop_id":"SOP13","version":"0.1.0","requirement_id":"FR-13","input":"本人当前确认、历史决定及有效引用","output":"当前记忆版本和修改删除后的采用检查","tool_mapping_status":"PENDING_T06","acceptance_ids":["A07","A15","A19"]}
+  ],
+  "sop_backend_bindings": [
+    {"sop_id":"SOP01","read_operations":["todayRead","ownerPlansRead","bossDashboardRead"],"command_operations":["todayReorder"],"workspace_projections":[],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP02","read_operations":["bossWorkspaceRead"],"command_operations":["boss.reminder.ack","boss.reminder.snooze","boss.reminder.close"],"workspace_projections":["notifications"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP03","read_operations":["query_metrics","read_evidence"],"command_operations":[],"runtime_registration":"EXISTING_FIVE_TOOLS"},
+    {"sop_id":"SOP04","read_operations":["bossMeetingsRead","bossEvidenceRead"],"command_operations":["boss.meeting.brief.prepare"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP05","read_operations":["bossMeetingsRead","bossWorkspaceRead"],"command_operations":["boss.minutes.save","boss.minutes.confirm","boss.minutes.assignment.create"],"workspace_projections":["minutes"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP06","read_operations":["read_assignment","bossTasksRead","ownerPlansRead"],"command_operations":["create_assignment","send_assignment","boss.assignment.nudge","boss.assignment.extend","boss.assignment.complete","boss.assignment.cancel"],"runtime_registration":"EXISTING_FIVE_TOOLS_AND_DESIGN_ONLY"},
+    {"sop_id":"SOP07","read_operations":["bossWorkspaceRead","bossEvidenceRead"],"command_operations":["boss.approval.decide"],"workspace_projections":["approvals"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP08","read_operations":["bossWorkspaceRead"],"command_operations":["boss.message.draft.save","boss.message.send"],"workspace_projections":["outbox","organization"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP09","read_operations":["read_evidence","bossWorkspaceRead"],"command_operations":["boss.research.prepare"],"workspace_projections":["research"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP10","read_operations":["bossWorkspaceRead","bossMeetingsRead"],"command_operations":["boss.people.prepare","boss.people.attach","boss.people.detach"],"workspace_projections":["people"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP11","read_operations":["bossCalendarConflictRead","bossWorkspaceRead"],"command_operations":["boss.travel.review","boss.travel.confirm","boss.travel.cancel"],"workspace_projections":["travel"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP12","read_operations":["bossWorkspaceRead","bossCalendarSharePreview"],"command_operations":["boss.calendar.save","boss.calendar.share","boss.calendar.share.revoke","boss.calendar.delete"],"workspace_projections":["calendar"],"runtime_registration":"DESIGN_ONLY"},
+    {"sop_id":"SOP13","read_operations":["bossWorkspaceRead","read_evidence"],"command_operations":["boss.memory.confirm","boss.memory.delete"],"workspace_projections":["memory","decisions","knowledge"],"runtime_registration":"DESIGN_ONLY"}
   ],
   "agriculture": {
     "requirements": ["FR-14","FR-15","FR-16","FR-17","FR-18","FR-19","FR-20","FR-21","FR-22","FR-23"],
@@ -79,7 +99,10 @@
     "client_component": "app/webui/BossVoiceAssignment.tsx",
     "client_max_duration_seconds": 60,
     "client_max_audio_bytes": 3000000,
-    "provider": null,
+    "provider": "doubao",
+    "adapter": "boss_transcription.DoubaoTranscriptionProvider",
+    "resource_id": "volc.bigasr.auc_turbo",
+    "runtime_registration": "PENDING_W3",
     "approved_recording": null,
     "confirmed_text_required": true,
     "actual_transcription_verified": false,

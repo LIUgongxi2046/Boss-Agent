@@ -1,10 +1,10 @@
 # 老板 Agent 运行设计
 
-版本：0.1.0。日期：2026-10-23。任务 T07 / A07。状态 PENDING_T06。本文件依据当前 PRD V1.2.0、HLD 1.0.0、selection-probe 与基线 63e6295 的源码，记录当前可以核实的运行设计。正式 API、数据字典、事件 Schema 尚未交付，完整设计验收保持未完成；工具扩展等待 W1 确定版本。
+版本：0.2.0-draft。日期：2026-10-23。任务 T07 / A07。状态 PENDING_T06。本文件依据当前 PRD V1.2.0、HLD 1.0.0、selection-probe、基线63e6295的源码，以及 W1 提交3f5b806的 T05/T06 1.0.0，记录当前可以核实的运行设计。输入 SHA256 由 T07 检查报告保存。A05/A06 尚未验收，独立语义审阅、公开接入和完整设计验收保持未完成。
 
 ## 主体与治理
 
-唯一业务主体 `boss-1`；唯一 Agent 由 nanobot 0.3.5 的 AgentLoop 承载。MAINTAINER 维护技术配置；联系人只作为来源作者、收件人及负责人。模型为 DeepSeek `deepseek-flash`，协议 Chat Completions，thinking disabled。模型服务可用性需要真实请求验证。
+唯一业务主体 `boss-1`；唯一 Agent 由 nanobot0.3.5的 AgentLoop 承载。MAINTAINER 维护技术配置；联系人只作为来源作者、收件人及负责人。模型为 DeepSeek `deepseek-flash`，协议 Chat Completions，thinking disabled。当前凭据已通过真实服务连通性与五工具任务检查，范围见 T16。
 
 | 层级 | 载体与加载 | 强制控制和验证 |
 |---|---|---|
@@ -37,7 +37,9 @@ Prompt 当前生命周期为草稿、静态校验、启用、停用。Runtime �
 | send_assignment | 同上 | 当前内容、收件人及任务版本获准后写入模拟发件箱；不表示外部送达 |
 | read_assignment | 同上 | 查询已保存任务与 message_ids；反馈和本人确认完成分别表达 |
 
-BusinessTool.parameters 从成熟 JSON Schema 读取定义，模型不能填写 envelope、authorization_id、idempotency_key。Tool 执行结果来自业务 Store.invoke。当前 UI 业务 mutation 与模型 Tool 的覆盖不同，其他秘书能力尚需 T06/T16 映射，不把 UI 动作名称视作已注册模型工具。正式 operationId、错误码、事件和字段版本等待 T06，资产文件保留依赖状态。
+BusinessTool.parameters 从成熟 JSON Schema 读取定义，模型不能填写 envelope、authorization_id、idempotency_key。Tool 执行结果来自业务 Store.invoke。T06 1.0.0的 `x-tool-operations` 已确定这五项 operationId 及其输入、输出、错误 Schema 和 Store 方法；`agent-assets.json` 对应字段逐项匹配。query_metrics 保存查询记录，read_evidence/read_assignment 保存审计，创建和发送分别保存 task/outbox。当前 UI 业务 mutation 与模型 Tool 的覆盖不同，新增操作仍需 Runtime 注册、服务端授权绑定及实际业务验证。
+
+十三项 SOP 的后端操作引用维护在 `sop_backend_bindings`。每项包含读取和命令 operationId，结构检查同时查询 T06 的 HTTP、WebSocket 与 Tool 定义。DESIGN_ONLY 表示存在接口定义，尚未注册为模型 Tool。十四类模拟接口当前为 DESIGN_NOT_MOUNTED，各自资料缺口由 T06 记录；SI09/SI10 没有可用的获准业务资料，不能返回完整业务结果。
 
 ```mermaid
 sequenceDiagram
@@ -83,13 +85,17 @@ sequenceDiagram
 
 当前应用默认 maxToolIterations=12、maxTokens=4096；实际启用配置及 Runtime 快照为运行依据。RecordedProvider HTTP timeout=120 秒，max_retries=0。SDK 检查具有独立任务超时；正式产品总运行超时、Token 总预算、费用预算及无进展检测等待 T06/T16 明确定义与实现。未知预算不能被登记为已强制执行。
 
-运行状态引用 PRD 的 QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT，正式传输字段与事件顺序等待 T06。缺少必要输入停止依赖该输入的动作；参数或授权拒绝停止对应工具调用；模型错误保存真实失败；取消和超时停止后续调用。模型失败不能清除已经保存的业务结果，不得再次发送同一意图；不确定结果查询原请求回执及业务对象。
+运行状态引用 PRD 的 QUEUED、RUNNING、WAITING_INPUT、SUCCEEDED、FAILED、CANCELED、TIMED_OUT。T06 事件1.0.0描述 webui_response、message、delta、stream_end、turn_end、recovery_state、retry_status、context_compaction；request_id 关联传输回执，chat_id/turn_id/stream_id 关联上游会话与回答片段，client_request_id 关联业务幂等。没有全域 sequence，断线后通过持久会话及原请求回执查询，不能直接重放写入。
+
+SDK 的 completed 只说明模型运行结束，error 和 max_iterations 各自保存原因；显式取消表现为 CancelledError，外部任务超时表现为 TimeoutError。当前真实检查覆盖这些行为，见 T16。runtime_run 的 run_id、配置版本、用量及业务结果引用仍需 W3 与实际持久运行记录关联；不能根据 UI 文本生成正式状态。缺少必要输入停止依赖该输入的动作；参数或授权拒绝停止对应工具调用；模型错误保存真实失败；取消和超时停止后续调用。模型失败不能清除已经保存的业务结果，不得再次发送同一意图；不确定结果查询原请求回执及业务对象。
 
 ## 检索、摄取与语音
 
 当前来源为已有获准 SIMULATED 资料；知识摄取维护作者、原文位置、版本和索引，FTS5 为当前检索基础。Markdown 文件使用 markdown-it-py；其他格式的成熟解析依赖与获准文件需要在实际接入时确定。Embedding 和 Reranker 尚未采用，不声明相关能力。公开原文摄取需保存来源许可、获取日期、有效范围与原文定位。
 
-录音使用明确本人操作和系统权限，真实 STT 配置与录音当前缺少。转写文本由本人核查、修改或取消，确认后进入相同业务过程；转写响应不能自动授权发送。客户端当前限制 60 秒和 3MB；服务端限制、真实费用、取消与重复提交继续由 T20/W3 验证。原始录音与正文不进入维护诊断。
+录音使用明确本人操作和系统权限。用户已提供 Doubao 凭据引用，`boss_transcription.DoubaoTranscriptionProvider` 使用已核查的官方极速版 HTTP 接口及 `volc.bigasr.auc_turbo`，音频通过 base64 直接提交。FFmpeg 解码和重采样，标准 wave 库封装 WAV；服务端核查源文件3MB、解码时长60秒、15秒解码超时及90秒请求超时，没有自动重试。凭据与文字不进入对象展示，未知费用保持 null。用户授权选择公开真实语音样本验证服务，实际转写与公开应用接入继续分别验证。
+
+转写文本由本人核查、修改或取消，确认后进入相同业务过程；转写响应不能自动授权发送。客户端当前限制60秒和3MB。W3 接入保持已认证 BOSS 身份、录音授权、取消传播、资源释放及重复提交检查。原始录音与正文不进入维护诊断。
 
 ## 验证与交接
 
