@@ -7,6 +7,7 @@ export type SelfCommitment = {
   version:string;due_at:string;timezone:string;importance:string;
   evidence_requirements:string[];source_refs:{source_id:string;version:string}[];
   completion_evidence?:{source_id:string;version:string}[];
+  source_reference_state?:"CURRENT"|"NEEDS_REVIEW";
 };
 type Props={items:SelfCommitment[];businessClock?:string;onReload:()=>void};
 type Pending={action:string;id:string;payload:Record<string,unknown>;
@@ -195,6 +196,8 @@ export function BossPersonalCommitments({items,businessClock,onReload}:Props){
         <div className="boss-kv"><span>当前选中状态</span><strong>{active.status}</strong></div>
         <div className="boss-kv"><span>版本</span><strong>{active.version}</strong></div>
         <div className="boss-kv"><span>当前到期</span><strong>{active.due_at.replace("T"," ")}</strong></div>
+        <div className="boss-kv"><span>资料证据有效性</span><strong>{active.source_reference_state||"尚未核查"}</strong></div>
+        {active.source_reference_state==="NEEDS_REVIEW"&&<div className="boss-status boss-status-warn"><AlertCircle size={15}/> 本人承诺原始来源已撤销或版本变化，需重新核查当前证据。</div>}
         <div className="boss-kv"><span>当前模拟业务时钟</span><strong>{businessClock?.replace("T"," ")||"未知"}</strong></div>
         <div className="boss-form-grid">
           <label>核查证据来源 ID<input value={proofId}
