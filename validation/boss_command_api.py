@@ -38,6 +38,7 @@ from boss_research import prepare as research_prepare
 from boss_travel import review as travel_review, confirm as travel_confirm, cancel as travel_cancel
 from boss_people import prepare as people_prepare, attach as people_attach, detach as people_detach
 from boss_owner_preferences import (goals_save, goals_confirm, notice_save, notice_confirm)
+from boss_owner_authorizations import revoke as owner_authorization_revoke
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -151,6 +152,7 @@ class BossCommandAPI:
         "boss.owner.goals.confirm": "BOSS",
         "boss.owner.notice.save": "BOSS",
         "boss.owner.notice.confirm": "BOSS",
+        "boss.authorization.revoke": "BOSS",
     }
 
     def __init__(self, store):
@@ -376,6 +378,8 @@ class BossCommandAPI:
                 result = notice_save(self, db, data, payload)
             elif action == "boss.owner.notice.confirm":
                 result = notice_confirm(self, db, data, payload)
+            elif action == "boss.authorization.revoke":
+                result = owner_authorization_revoke(self, db, data, payload)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)
