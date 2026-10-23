@@ -121,7 +121,7 @@ def test_invalid_reference_and_outdated_source_never_create(demo):
         code, _ = demo.execute("BOSS", "boss.assignment.create", create_input(key, **changed))
         assert code == 400, key
     demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
-    assert demo.execute("BOSS", "boss.assignment.create", create_input("after-withdraw"))[0] == 403
+    assert demo.execute("BOSS", "boss.assignment.create", create_input("after-withdraw"))[0] == 410
     with demo.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 0
 
@@ -260,7 +260,7 @@ def test_source_withdrawn_after_create_prevents_send(demo):
     created = create(demo)
     demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
     status, _ = demo.execute("BOSS", "boss.assignment.send", send_input(created))
-    assert status == 403
+    assert status == 410
     with demo.store.connect() as db:
         task = demo.store.get(db, "ui-check", "task", created["task_id"])
         assert task["status"] == "OPEN"
@@ -290,7 +290,7 @@ def test_completed_evidence_withdrawn_before_owner_confirmation_is_blocked(demo)
         "task_version": response["task"]["version"],
         "feedback_id": response["feedback_id"],
     })
-    assert code == 403
+    assert code == 410
     with demo.store.connect() as db:
         assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
 

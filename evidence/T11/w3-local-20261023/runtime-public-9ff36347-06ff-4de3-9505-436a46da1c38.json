@@ -1,0 +1,71 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "runtime-public-9ff36347-06ff-4de3-9505-436a46da1c38",
+  "at": "2026-10-23T07:34:39.327Z",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "5e3b0cb1e7edc4bdf734d8ddf46facc9d761d96a04e790afd26cfa2465525cf0"
+    },
+    {
+      "path": "app/webui/MaintainerRuntimeRecords.tsx",
+      "sha256": "230e82bdd683ef8f340d4e5a12cb1f36cc1687c0ef22838960ac7cfc8d27d2ee"
+    },
+    {
+      "path": "app/webui/RuntimeTaskTechnicalView.tsx",
+      "sha256": "2cf3245c7e008279f59afc3e27734ffb52863802af7a19db010299caa5bbf7b5"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "08d1128a13cd21a60975931182ab0d39753e02ff1d428811abd708b97b42778d"
+    },
+    {
+      "path": "validation/boss_runtime_records.py",
+      "sha256": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe"
+    },
+    {
+      "path": "validation/runtime_records_query.py",
+      "sha256": "84c8b11508c4e5692364866a7aaa9a027e86d25e600553930f08204f51e4dd7a"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "d7d9fb1d1374c755d37c724672c31b047b1e571152eb57602633234254ba14e4"
+    },
+    {
+      "path": "validation/desktop/main.cjs",
+      "sha256": "f85761b4ddd47f448ef193df40bf53b5aedb4dee2da394de5bccf767d8b524b4"
+    },
+    {
+      "path": "validation/desktop/check-runtime-records.cjs",
+      "sha256": "b9b21c56f5338ad8f0d6a8e6dbc76ae6fb14c633a0dfe8a4f4496100d07561db"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "5b2e9c7697f23024df0d51852222df6b4e135e415d52d51e84e794ae89a6d67b"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "real_http_authentication_and_query_rejection",
+      "unauthed": 401,
+      "invalid_queries": 400,
+      "absent_run": 404
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "source_type": "RUNTIME_RECORD",
+  "business_write_requested": false,
+  "model_requested": false,
+  "positive_runtime_rows_verified": false,
+  "task_reference_action_verified": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_accepted": false
+}

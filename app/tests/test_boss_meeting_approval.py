@@ -116,7 +116,7 @@ def test_minutes_save_idempotent_and_stale_source_rejected(services):
         "client_request_id":"confirm-after-withdraw",
         "meeting_id":"meeting-1","expected_version":"1",
         "source_id":"meeting-minutes","source_version":"1",
-    })[0]==403
+    })[0]==410
     assert view(reads,"BOSS","minutes")[1]["minute"]["state"]=="DRAFT_REVIEW"
 
 
@@ -254,7 +254,7 @@ def test_withdrawn_application_attachment_blocks_approve_but_can_request_more(se
         "source_id":"application-1-attachment","version":"1",
     })["withdrawn"] is True
     assert run(api,"BOSS","boss.approval.decide",decide_input(
-        key="bad-approve-withdrawn"))[0]==403
+        key="bad-approve-withdrawn"))[0]==410
     more=run(api,"BOSS","boss.approval.decide",decide_input(
         key="more-after-withdrawn",decision="REQUEST_MORE",
         comment="附件已撤销，请提供当前有效证明"))
@@ -519,7 +519,7 @@ def test_withdrawn_minutes_source_blocks_new_linked_task(services):
         "source_id": "meeting-minutes", "version": "1",
     })
     assert run(api, "BOSS", "boss.minutes.assignment.create",
-               minute_assignment_input())[0] == 403
+               minute_assignment_input())[0] == 410
     _, minutes = view(reads, "BOSS", "minutes")
     assert minutes["minute"]["source_reference_state"] == "NEEDS_REVIEW"
     assert not minutes["linked_assignments"]

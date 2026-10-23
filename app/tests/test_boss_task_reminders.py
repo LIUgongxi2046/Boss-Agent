@@ -353,7 +353,7 @@ def test_revoked_original_task_source_blocks_completion_without_fake_success(con
         task_version=submitted[1]["task"]["version"],
         feedback_id=submitted[1]["feedback_id"],
     )
-    assert refused[0] == 403
+    assert refused[0] == 410
     task_now = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
     assert task_now["status"] == "RESULT_SUBMITTED"
     assert due(api, task["task_id"])["state"] == "OPEN"

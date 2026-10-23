@@ -3181,18 +3181,23 @@
       "logical_architecture_route": "/app/maintain/A15",
       "actual_webui_navigation": "?bossPage=A15",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_MAINTENANCE_USAGE",
+      "render_status": "PARTIAL_RUNTIME_QUERY_AND_TECHNICAL_TASK_REFERENCE",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop",
+      "additional_component_files": ["app/webui/MaintainerRuntimeRecords.tsx", "app/webui/RuntimeTaskTechnicalView.tsx"],
       "verified_http_read_routes": [
-        "GET /api/boss/ui/model-usage"
+        "GET /api/boss/ui/model-usage",
+        "GET /api/boss/ui/runtime-records",
+        "GET /api/boss/ui/maintenance"
       ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [],
+      "operations_not_yet_implemented": ["product_runtime_recorder_configuration_adoption"],
       "tests": [
+        "app/tests/test_product_runtime_access.py",
+        "app/tests/test_boss_runtime_query.py",
         "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [

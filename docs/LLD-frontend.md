@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.3.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.1.0和T07 0.3.0-draft，集成源码版本 `2deb385`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
+版本：0.4.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.3.0和T07 0.4.0-draft，集成源码版本`9d3680c`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -84,6 +84,8 @@ graph TD
 | BossOwnerPlans | OwnerPlanProjection、onCommand、onDirtyChange | 本人范围与时间、暂停恢复取消、原请求回执查询 |
 | BossMeetingArrangement | MeetingArrangementProjection、onCommand、onReload、onDirtyChange | 草稿与当前会议分别保存，四项本人动作、当前影响摘要与独立授权 |
 | BossMeetingBrief.refreshVersion | 公共Shell请求版本 | 重新读取当前会议及来源，保留当前页签与本地输入 |
+| MaintainerRuntimeRecords | 稳定getToken、onOpenTask(taskId,runId) | 真实记录查询、分页、详情重读、取消读取和费用未知状态 |
+| RuntimeTaskTechnicalView | taskId、runId、getToken | 重新核查运行中task引用与维护身份获准task_refs，仅展示当前技术元信息 |
 | BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
 | BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
 | MaintainerPromptVersion、Scheduler等 | 服务端维护配置和当前版本 | 保存/校验/启用/采用分别核查 |

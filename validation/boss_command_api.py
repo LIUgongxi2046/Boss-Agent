@@ -40,6 +40,7 @@ from boss_people import prepare as people_prepare, attach as people_attach, deta
 from boss_owner_preferences import (goals_save, goals_confirm, notice_save, notice_confirm)
 from boss_owner_authorizations import revoke as owner_authorization_revoke
 from boss_meetings import MeetingAPI, meeting_materials
+from boss_source_access import require_current_simulated_source
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -261,13 +262,8 @@ class BossCommandAPI:
     def _require_current_source(self, db, data, source_id):
         require(_is_text(source_id, 128), "来源标识无效", web.HTTPBadRequest)
         doc = self.store.get(db, NAMESPACE, "document", source_id)
-        require(
-            not doc.get("withdrawn") and doc.get("access_scope") == data["owner_id"]
-            and doc.get("source_type") == "SIMULATED",
-            "来源已撤销或不可作为当前执行依据",
-            web.HTTPForbidden,
-        )
-        return doc
+        business_at = self.store.get(db, NAMESPACE, "clock", "current")["at"]
+        return require_current_simulated_source(doc, data["owner_id"], business_at)
 
     def _require_current_task_sources(self, db, data, task):
         """Task contents are not safe to send/close on unpinned provenance."""
@@ -515,11 +511,15 @@ class BossCommandAPI:
         task = self.store.get(db, NAMESPACE, "task", body["task_id"])
         require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS", "CANCELED"),
                 "当前交办不接受新的模拟反馈")
-        # Feedback may cite only currently available, scope-checked simulated
-        # sources. The maintainer has no capability to forge a source ID.
+        # 历史反馈继续核查资料身份；当前采用另外核查有效状态。
         data = self.store.get(db, NAMESPACE, "initial", "snapshot")
         for source_id in body["evidence_refs"]:
-            self._require_current_source(db, data, source_id)
+            if task["status"] == "CANCELED":
+                source = self.store.get(db, NAMESPACE, "document", source_id)
+                require(source.get("source_type") == "SIMULATED" and source.get("access_scope") == data["owner_id"],
+                        "历史反馈资料不属于当前本人获准范围", web.HTTPForbidden)
+            else:
+                self._require_current_source(db, data, source_id)
         # No BOSS authorization is granted by simulated feedback; simulation
         # authors cannot approve a deadline or mark the task completed.
         result = self.store.control_feedback(db, NAMESPACE, body)

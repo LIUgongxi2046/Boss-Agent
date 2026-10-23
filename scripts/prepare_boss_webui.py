@@ -111,6 +111,8 @@ def copy_overlay() -> None:
         ("BossPersonalCommitments.tsx", "BossPersonalCommitments.tsx"),
         ("MaintainerPromptVersion.tsx", "MaintainerPromptVersion.tsx"),
         ("BossResearchView.tsx", "BossResearchView.tsx"),
+        ("MaintainerRuntimeRecords.tsx", "MaintainerRuntimeRecords.tsx"),
+        ("RuntimeTaskTechnicalView.tsx", "RuntimeTaskTechnicalView.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
         ("MaintainerKnowledgeEditor.tsx", "MaintainerKnowledgeEditor.tsx"),

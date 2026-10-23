@@ -153,7 +153,7 @@ def test_withdrawn_attachments_block_message_send(services):
                  draft_id=draft["draft_id"],expected_version="1",
                  recipient_id="coordinator-1",
                  expected_content_sha256=draft["content_sha256"])
-    assert status==403
+    assert status==410
     _,view=read(pages,"BOSS","outbox")
     assert view["sent_messages"]==[]
 

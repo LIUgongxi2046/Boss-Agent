@@ -26,7 +26,7 @@ def source_case(tmp_path):
 
 
 @pytest.mark.parametrize("operation", ["query_metrics", "read_evidence"])
-def test_model_tool_rejects_source_version_inconsistent_with_current_document(source_case, operation):
+def test_model_tool_uses_current_query_and_rejects_stale_evidence_binding(source_case, operation):
     store, query, result = source_case
     with store.connect() as db:
         document = store.get(db, "ui-check", "document", "finance-note")
@@ -35,16 +35,22 @@ def test_model_tool_rejects_source_version_inconsistent_with_current_document(so
     params = ({key: value for key, value in query.items() if key != "envelope"} if operation == "query_metrics" else {
         "query_id": result["query_id"], "source_ids": ["finance-note"], "detail_refs": result["detail_refs"],
     })
-    with pytest.raises(web.HTTPConflict):
-        asyncio.run(tool.execute(**params))
+    if operation == "query_metrics":
+        current = json.loads(asyncio.run(tool.execute(**params)))
+        assert current["sources"][0]["version"] == "2"
+        assert current["query_id"] != result["query_id"]
+    else:
+        with pytest.raises(web.HTTPConflict):
+            asyncio.run(tool.execute(**params))
 
 
-@pytest.mark.parametrize("state", ["EXPIRED", "CONFLICTED", "SUPERSEDED", "RECEIVED"])
-def test_model_metric_tool_rejects_ineligible_current_source(source_case, state):
+@pytest.mark.parametrize("state,error", [("EXPIRED", web.HTTPGone), ("CONFLICTED", web.HTTPConflict),
+                                        ("SUPERSEDED", web.HTTPConflict), ("RECEIVED", web.HTTPConflict)])
+def test_model_metric_tool_rejects_ineligible_current_source(source_case, state, error):
     store, query, _ = source_case
     with store.connect() as db:
         document = store.get(db, "ui-check", "document", "finance-note")
         store.put(db, "ui-check", "document", "finance-note", {**document, "validity_state": state})
     tool = BusinessTool("query_metrics", store, query["envelope"], {}, [])
-    with pytest.raises(web.HTTPConflict):
+    with pytest.raises(error):
         asyncio.run(tool.execute(**{key: value for key, value in query.items() if key != "envelope"}))

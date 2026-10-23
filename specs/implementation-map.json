@@ -12,7 +12,11 @@
   "visual_reference": ["Boss-Agent-Desktop-Complete-v6/meta/页面配置.json", "Boss-Agent-Desktop-Complete-v6/meta/v6-状态关联.json", "Boss-Agent-Desktop-Complete-v6/design-tokens.json"],
   "visual_policy": "禁止主动视觉操作，视觉验收保持未执行。",
   "integration_owner": "W3",
+  "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"app/tests/test_product_runtime_access.py","owner":"W3","task_id":"T11","scope":"公共运行记录的真实SQLite角色、查询、拒绝与零写入检查"},
+    {"path":"app/webui/RuntimeTaskTechnicalView.tsx","owner":"W3","task_id":"T11","scope":"按真实run_id核查交办关联，仅展示维护身份获准元信息"},
+    {"path":"app/tests/test_product_source_access.py","owner":"W3","task_id":"T11","scope":"1.3.0公共原文、知识、来源索引、当前写入与历史反馈"},
     {"path":"validation/application_paths.py","owner":"W3","task_id":"T11","scope":"本工程内的独立应用数据目录与路径范围检查"},
     {"path":"app/tests/test_product_work_directory.py","owner":"W3","task_id":"T11","scope":"真实目录、相对路径、外部范围与符号链接拒绝检查"},
     {"path":"app/tests/test_boss_command_api.py","owner":"W3","task_id":"T11","scope":"公共命令行为与历史反馈的真实SQLite检查"},

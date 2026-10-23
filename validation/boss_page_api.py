@@ -21,6 +21,9 @@ from boss_admin_config import memory_technical_status, prompt_technical_status
 from boss_owner_plans import OwnerPlansAPI
 from boss_today import TodayAPI
 from boss_meetings import MeetingAPI, meeting_materials
+from boss_source_access import require_current_simulated_source
+from boss_source_policy import source_validity
+from boss_runtime_records import runtime_records
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -112,8 +115,10 @@ class BossPageAPI:
 
     def _tasks(self):
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
             data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
+            business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
             task_messages = [{
                 "message_id": row["message_id"],
                 "task_id": row["task_id"],
@@ -198,20 +203,20 @@ class BossPageAPI:
                     violations.append("UNPINNED_SOURCE_VERSION")
                 for source_id in sources:
                     doc = available.get(source_id)
-                    if doc is None or doc.get("withdrawn") or (
+                    if doc is None or (
                         doc.get("access_scope") != data["owner_id"]
                         or doc.get("source_type") != "SIMULATED"
-                    ):
+                    ) or source_validity(doc, business_at) != "VALID":
                         violations.append("SOURCE_UNAVAILABLE")
                     elif isinstance(pinned, dict) and doc.get("version") != pinned.get(source_id):
                         violations.append("SOURCE_VERSION_CHANGED")
                 original_id = task.get("origin_source_id")
                 if original_id:
                     doc = available.get(original_id)
-                    if doc is None or doc.get("withdrawn") or (
+                    if doc is None or (
                         doc.get("access_scope") != data["owner_id"]
                         or doc.get("source_type") != "SIMULATED"
-                    ):
+                    ) or source_validity(doc, business_at) != "VALID":
                         violations.append("MINUTE_SOURCE_UNAVAILABLE")
                     elif doc.get("version") != task.get("origin_source_version"):
                         violations.append("MINUTE_VERSION_CHANGED")
@@ -283,6 +288,7 @@ class BossPageAPI:
         if not source_id or len(source_id) > 100:
             return 400, {"error": "SOURCE_REQUIRED"}
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
             data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             # Current documented records are the source of truth, including
@@ -295,10 +301,8 @@ class BossPageAPI:
             if row is None:
                 return 404, {"error": "SOURCE_NOT_FOUND"}
             doc = json.loads(row[0])
-            if doc.get("access_scope") != data["owner_id"]:
-                return 403, {"error": "SOURCE_FORBIDDEN"}
-            if doc.get("withdrawn"):
-                return 410, {"error": "SOURCE_WITHDRAWN", "source_id": source_id}
+            business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
+            require_current_simulated_source(doc, data["owner_id"], business_at)
             return 200, {
                 "source_type": doc["source_type"],
                 "source_id": doc["source_id"],
@@ -452,6 +456,14 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == "/api/boss/ui/runtime-records":
+                query = parse_qs(query_string, keep_blank_values=True)
+                if any(len(values) != 1 for values in query.values()):
+                    return 400, {"error": "DUPLICATE_QUERY_PARAMETER"}
+                parameters = {key: values[0] for key, values in query.items()}
+                if set(parameters) == {"run_id"}:
+                    return 200, runtime_records(self.store, role, self.namespace, run_id=parameters["run_id"])
+                return 200, runtime_records(self.store, role, self.namespace, query=parameters)
             if path == "/api/boss/ui/admin/memory-status":
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}

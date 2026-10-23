@@ -162,7 +162,7 @@ def test_expired_source_blocks_prompt_draft_change_without_new_version(service):
         prompt_id=draft["prompt_id"], expected_version=draft["version"], kind=draft["kind"],
         title=draft["title"], instruction_text=draft["instruction_text"],
         change_note=draft["change_note"], source_ids=["finance-note"])
-    assert result[0] == 409
+    assert result[0] == 410
     with api.store.connect() as db:
         assert api.store.get(db, "ui-check", "prompt_draft", item["prompt_id"])["version"] == draft["version"]
 

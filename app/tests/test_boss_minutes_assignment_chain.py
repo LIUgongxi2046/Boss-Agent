@@ -172,7 +172,7 @@ def test_draft_entry_and_finance_source_revocation_block_no_partial_writes(app):
     cmd.store.control(
         "ui-check", "withdraw", {"source_id": "meeting-minutes", "version": "1"},
     )
-    assert create_linked_task(cmd, "withdrawn-minute-entry")[0] == 403
+    assert create_linked_task(cmd, "withdrawn-minute-entry")[0] == 410
     code, redacted = minutes(page)
     assert code == 200
     assert redacted["minute"]["state"] == "CONFIRMED"
@@ -199,7 +199,7 @@ def test_business_source_withdrawn_blocks_linked_task_without_side_effect(app):
     cmd.store.control(
         "ui-check", "withdraw", {"source_id": "finance-note", "version": "1"},
     )
-    assert create_linked_task(cmd, "withdrawn-financial-evidence")[0] == 403
+    assert create_linked_task(cmd, "withdrawn-financial-evidence")[0] == 410
     with cmd.store.connect() as db:
         assert db.execute(
             "SELECT COUNT(*) FROM objects WHERE kind='task'"
@@ -431,7 +431,7 @@ def test_revoked_origin_minute_blocks_send_after_task_creation_without_outbox(ap
         task_version=task["version"], recipient_id="coordinator-1",
         body="原始纪要已撤销，因此消息不能发送", content_version="1",
     )
-    assert forbidden[0] == 403
+    assert forbidden[0] == 410
     assert tasks(page)[1]["tasks"][0]["status"] == "OPEN"
     assert minutes(page)[1]["minute"]["source_reference_state"] == "NEEDS_REVIEW"
     with cmd.store.connect() as db:

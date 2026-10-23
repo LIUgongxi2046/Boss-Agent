@@ -25,6 +25,7 @@ from boss_recovery_api import calendar_share_state
 from boss_meetings import meeting_materials
 from boss_memory import confirmed_memory
 from boss_owner_authorizations import authorization_can_revoke
+from boss_source_policy import source_validity
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -51,13 +52,16 @@ def _safe_date(raw):
     return raw if isinstance(raw, str) and len(raw) <= 64 else None
 
 
-def _safe_source(entry):
+def _safe_source(entry, business_at):
     return {
         "source_id": entry.get("source_id"),
         "source_type": entry.get("source_type"),
         "version": entry.get("version"),
         "author_contact_id": entry.get("author_contact_id"),
         "published_at": entry.get("published_at"),
+        "valid_from": entry.get("valid_from"),
+        "valid_until": entry.get("valid_until"),
+        "validity_state": source_validity(entry, business_at),
         "withdrawn": bool(entry.get("withdrawn")),
         "access_scope": "BOSS_ONLY" if entry.get("access_scope") == "boss-1" else "NOT_AUTHORIZED",
         "content_visible": False,
@@ -97,6 +101,7 @@ class BossWorkspaceAPI:
         return 200, output
 
     def _read(self, db, data, key, role, query_string):
+        business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
         if key == "voice":
             # Fixed local runtime configuration, never client-selected paths
             # or the raw Provider secret/transport state.
@@ -148,7 +153,7 @@ class BossWorkspaceAPI:
             if minute is not None:
                 source = current_sources.get(minute["source_id"])
                 current = bool(
-                    source and not source.get("withdrawn")
+                    source and source_validity(source, business_at) == "VALID"
                     and source.get("access_scope") == data["owner_id"]
                     and source.get("source_type") == "SIMULATED"
                     and source.get("version") == minute["source_version"]
@@ -166,7 +171,7 @@ class BossWorkspaceAPI:
                         "reference_state": "NEEDS_REVIEW",
                     } for entry in minute["entries"]]
             associated = [
-                _safe_source(current_sources[source_id])
+                _safe_source(current_sources[source_id], business_at)
                 for source_id in meeting["material_ids"]
                 if source_id in current_sources
             ]
@@ -321,7 +326,7 @@ class BossWorkspaceAPI:
             }
         if key == "sources" or key == "source-index":
             docs = _object_list(db, self.namespace, "document")
-            records = [_safe_source(d) for d in docs]
+            records = [_safe_source(d, business_at) for d in docs]
             if role == "MAINTAINER":
                 records = [{k: v for k, v in d.items() if k not in
                             ("author_contact_id",)} for d in records]
@@ -340,7 +345,7 @@ class BossWorkspaceAPI:
             documents = _object_list(db, self.namespace, "document")
             matches = []
             for document in documents:
-                if (document.get("withdrawn")
+                if (source_validity(document, business_at) != "VALID"
                         or document.get("access_scope") != data["owner_id"]
                         or document.get("source_type") != "SIMULATED"):
                     continue

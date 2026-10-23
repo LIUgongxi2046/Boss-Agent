@@ -18,6 +18,8 @@ import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
 import { BossMeetingArrangement, type MeetingArrangementProjection } from "./BossMeetingArrangement";
+import { MaintainerRuntimeRecords } from "./MaintainerRuntimeRecords";
+import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
 import { BossOwnerPreferences } from "./BossOwnerPreferences";
@@ -274,6 +276,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [today, setToday] = useState<TodayProjection | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
+  const [runtimeTask, setRuntimeTask] = useState<{taskId: string; runId: string} | null>(null);
   const [loading, setLoading] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
@@ -935,7 +938,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine variant="warn" text="可以进入已认证的开源原生目录；这不表示 PRD 规定的业务 SOP 版本、校验、启用和下一任务采用全部实现。" />
                   </Panel>
                 </div>
-              </div> : ["A15","F30"].includes(page) ? <div className="boss-columns">
+              </div> : ["A15","F30"].includes(page) ? <>
+                {page === "A15" && <MaintainerRuntimeRecords getToken={getToken}
+                  onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>}
+                {page === "A15" && runtimeTask && <RuntimeTaskTechnicalView getToken={getToken}
+                  taskId={runtimeTask.taskId} runId={runtimeTask.runId} onClose={() => setRuntimeTask(null)}/>}
+                <div className="boss-columns">
                 <div className="boss-column">
                   <Panel title="模型及工具实际运行记录" note={page+" · 只读技术元信息"}>
                     {modelHealth?.runtime_response_observed ?
@@ -960,7 +968,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine text="部分取消、超时或服务错误可能没有 Token 回执，不能因此计为零费用。" />
                   </Panel>
                 </div>
-              </div>
+              </div></>
               : page === "A04" ? <>
               <div className="boss-columns">
                 <div className="boss-column">
