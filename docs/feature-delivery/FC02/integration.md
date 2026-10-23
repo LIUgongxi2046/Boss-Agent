@@ -28,11 +28,11 @@ specs/product-bi.openapi.yaml 0.2.0 登记全部公开输入、输出和 WebSock
 
 ## 验证与准确制品
 
-当前必要公开增量检查PASS，见evidence/feature-delivery/FC02/fc02-history-e57dfd21-2416-4c3d-a46a-7d64b1973079.json及history-recovery.md。覆盖正常查询/追问、来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、12组受影响DOM尺寸和键盘。只修改公开BI组件；领域、Agent、Runtime和共享消费者复用N4对9026c8a的对应证据，未重复74项全量。78项组合及4项请求编号证据分别保存在integrated-final.xml和public-runtime-green.xml，适用原记录的实现及未变化消费者。
+当前必要公开增量检查PASS，见evidence/feature-delivery/FC02/fc02-history-6e8d0b95-f990-481e-a585-de0c060a2fa3.json及history-recovery.md。覆盖正常查询/追问、来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、12组受影响DOM尺寸和键盘。同一制品的实际响应延迟检查也PASS，见fc02-n3-timing-0aa94d7d-c7d7-49de-9bfc-6f198b3989f0.json和async-recovery.md；较早回执不覆盖已编辑条件，较早原始依据不覆盖新查询，两项响应字节摘要在延迟前后相同。只修改公开BI组件；领域、Agent、Runtime和共享消费者复用N4对9026c8a的对应证据，未重复74项全量。78项组合及4项请求编号证据分别保存在integrated-final.xml和public-runtime-green.xml，适用原记录的实现及未变化消费者。
 
 标准 OpenAPI3.1 与 YAML 重复字段检查通过：.work/openapi-venv/bin/python validation/check_bi_public_spec.py。git diff --check 通过。没有复验无变化FC01业务全量或启用暂停的STT。
 
-独立制品fc02-n3-history-dist，TypeScript/Vite构建通过，13.70秒；在.work/product/nanobot/webui执行npm run build -- --outDir ../../../../fc02-n3-history-dist。manifest SHA256为b1445dca6829bd7471c9748c14854a05bc0e4a1ac8865f69c03c6a8a124ecdb6，index.html SHA256为cd603631720b544566e1ac44b8e917d9c2d36eea4c9fd6367263970d154b81cf。BossBIView正式源码与构建输入SHA256均为d755c43bc2711fcee6f999d19da1a6c122d52deec94c8518fb77913d4a93a9a2；BossDesktop及CSS没有变更。已有用户预览和其他候选制品保持。
+独立制品fc02-n3-history-dist，TypeScript/Vite构建通过，14.10秒；在.work/product/nanobot/webui执行npm run build -- --outDir ../../../../fc02-n3-history-dist。manifest SHA256为c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475，index.html SHA256为39b597fd3398b368dcc290d93bfbaeefd159f743211c10df45b8606a3557d78b。BossBIView正式源码与构建输入SHA256均为7d0fda5afaf184d922449a1d5aa5e695fae8b0b57a7b09aaaf01f721dabd1eb5；BossDesktop及CSS没有变更。已有用户预览和其他候选制品保持。
 
 当前公开账号检查使用独立9761/9762/19761、账号和SQLite，具体证据见history-recovery.md。原18组F03/N03/D01公开组合记录为evidence/feature-delivery/FC02/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5.json，适用其记录的制品；当前受影响F03/N03历史状态已执行12组尺寸复验，D01及CSS保持原接收代码。
 

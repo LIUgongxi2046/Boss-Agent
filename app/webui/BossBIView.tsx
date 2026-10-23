@@ -75,17 +75,18 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     if(result){setScope(businessScope(result.result.context_snapshot));setQuestion(String(result.result.context_snapshot.question??"继续查询当前范围"));setMode(result.adoption_state==="HISTORICAL_REQUIRES_REQUERY"?"NEW":"FOLLOW_UP");}
   },[]);
   const loadReceipt=useCallback(async(key:string,signal?:AbortSignal)=>{
-    const epoch=identityEpoch.current,sequence=++receiptSequence.current;
+    const epoch=identityEpoch.current,sequence=++receiptSequence.current,version=generation.current;
     const current=()=>mounted.current&&!denied.current&&epoch===identityEpoch.current&&sequence===receiptSequence.current&&!signal?.aborted;
     activeRequest.current=key;setRequestKey(key);setReceiptLoading(true);setReceiptError("");setReceipt(null);setRead(null);setEvidence(null);
     await fetchJSON<Receipt>("/api/boss/ui/bi/receipt?"+new URLSearchParams({client_request_id:key}),signal).then(value=>{
-      if(current())applyReceipt(value);
+      if(current()&&generation.current===version)applyReceipt(value);
     },failure=>{if(current())setReceiptError(failure.message);});
     if(current())setReceiptLoading(false);
   },[fetchJSON,applyReceipt]);
   useEffect(()=>{
     const abort=new AbortController(),epoch=++identityEpoch.current;
     mounted.current=true;denied.current=false;setAccessDenied(false);clearProtected();setError("");setHistoryLoading(true);
+    const initialGeneration=generation.current;
     const current=()=>mounted.current&&!denied.current&&epoch===identityEpoch.current&&!abort.signal.aborted;
     const historyRequest=++historySequence.current;
     const requested=new URLSearchParams(window.location.search).get("biRequest");
@@ -103,7 +104,7 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     void fetchJSON<History>("/api/boss/ui/bi/history",abort.signal).then(saved=>{
       if(!current()||historyRequest!==historySequence.current)return;setHistory(saved);setHistoryLoading(false);
       const latest=saved.requests[0]?.client_request_id;
-      if(!requested&&!activeRequest.current&&latest)void loadReceipt(latest,abort.signal);
+      if(!requested&&!activeRequest.current&&latest&&generation.current===initialGeneration)void loadReceipt(latest,abort.signal);
     },failure=>{if(current()&&historyRequest===historySequence.current){setHistoryError(failure.message);setHistoryLoading(false);}});
     if(requested)void loadReceipt(requested,abort.signal);
     return()=>{mounted.current=false;identityEpoch.current++;generation.current++;receiptSequence.current++;abort.abort();};
@@ -111,7 +112,7 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   function edit(field:string,value:ScopeValue){setScope(current=>({...current,[field]:value}));setChanged(current=>new Set([...current,field]));setDirty(true);setEvidence(null);generation.current++;}
   function remember(key:string){const address=new URL(window.location.href);address.searchParams.set("biRequest",key);window.history.replaceState(null,"",address);}
   async function submit(){
-    if(busy||!dimensions||denied.current||receiptLoading)return;
+    if(busy||!dimensions||denied.current)return;
     const key=crypto.randomUUID(),version=++generation.current,epoch=identityEpoch.current;activeRequest.current=key;setRequestKey(key);remember(key);
     receiptSequence.current++;setReceiptLoading(false);setReceiptError("");
     setBusy(true);setError("");setEvidence(null);setRead(null);setReceipt(null);
@@ -139,7 +140,7 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     },failure=>{if(mounted.current&&!denied.current&&generation.current===version)setError(failure.message);});if(mounted.current&&!denied.current&&generation.current===version)setReading(false);
   }
   const visible=dirty?null:read?.result, comparison=scope.comparison_scope as Record<string,string|string[]|null>|undefined;
-  const formDisabled=busy||!dimensions||accessDenied||receiptLoading;
+  const formDisabled=busy||!dimensions||accessDenied;
   const options=(field:string)=>dimensions?.available_dimensions[field==="product_ids"?"product_id":field==="region_ids"?"region_id":field]??[];
   function fieldInput(field:string,label:string,current:ScopeValue|undefined,onChange:(value:ScopeValue)=>void,prefix="current"){
     const id=prefix+"-"+field;

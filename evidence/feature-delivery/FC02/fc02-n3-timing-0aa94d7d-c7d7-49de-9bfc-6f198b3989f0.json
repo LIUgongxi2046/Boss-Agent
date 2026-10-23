@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "run_id": "fc02-n3-timing-0aa94d7d-c7d7-49de-9bfc-6f198b3989f0",
+  "defect_id": "FC02-N4-UI-ASYNC-01",
+  "manifest_sha256": "c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-history-dist",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-n3-timing-0aa94d7d-c7d7-49de-9bfc-6f198b3989f0",
+  "ports": {
+    "business": 9751,
+    "webui": 9752,
+    "gateway": 19751
+  },
+  "proxy_port": 9753,
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "transport": "真实HTTP/WebSocket双向传递；实际响应字节保持一致，仅延迟指定查询的交付",
+  "checks": [
+    {
+      "check": "earlier_evidence_after_new_query",
+      "status": "PASS",
+      "earlier_query_id": "d8d1d84b-177e-49d8-950c-ce23d94f42f1",
+      "new_query_id": "3becbbbc-1b9c-49f5-aaaa-c317c348d107",
+      "new_product_ids": [
+        "product-2"
+      ],
+      "earlier_evidence_details_visible": 0,
+      "earlier_result_replaced_new_scope": false
+    },
+    {
+      "check": "earlier_initial_receipt_after_scope_edit",
+      "status": "PASS",
+      "defect_id": null,
+      "owner": "N3",
+      "earlier_client_request_id": "ce98f225-9568-4f1b-bdc6-ec7f93f5cbd6",
+      "earlier_query_id": "3becbbbc-1b9c-49f5-aaaa-c317c348d107",
+      "user_edited_product_ids": [
+        "product-1"
+      ],
+      "actual_product_ids": [
+        "product-1"
+      ],
+      "actual_table_count": 0,
+      "dirty_marker_count": 1,
+      "expected": "较早恢复响应不得替换用户已经编辑的范围，也不得显示旧范围答案"
+    }
+  ],
+  "events": [
+    {
+      "event": "real_upstream_response_held",
+      "path": "/api/boss/ui/metrics-evidence",
+      "at_monotonic": 71912.66180774,
+      "query_id": "d8d1d84b-177e-49d8-950c-ce23d94f42f1",
+      "status": 200,
+      "sha256": "0de1b413954b1d86023b831abc28bf558c6aee5081d846a42501e2e272ceb0d3",
+      "bytes": 2729
+    },
+    {
+      "event": "release_requested",
+      "path": "/api/boss/ui/metrics-evidence",
+      "at_monotonic": 71913.721000537
+    },
+    {
+      "event": "identical_body_delivered",
+      "path": "/api/boss/ui/metrics-evidence",
+      "at_monotonic": 71913.721207374,
+      "query_id": "d8d1d84b-177e-49d8-950c-ce23d94f42f1",
+      "sha256": "0de1b413954b1d86023b831abc28bf558c6aee5081d846a42501e2e272ceb0d3",
+      "bytes": 2729
+    },
+    {
+      "event": "real_upstream_response_held",
+      "path": "/api/boss/ui/bi/receipt",
+      "at_monotonic": 71914.282705874,
+      "query_id": "3becbbbc-1b9c-49f5-aaaa-c317c348d107",
+      "status": 200,
+      "sha256": "ee96ab1b6e4a1dbd58a4d7f06391435b15315349a6eacdefdd562275bfe60e85",
+      "bytes": 17252
+    },
+    {
+      "event": "release_requested",
+      "path": "/api/boss/ui/bi/receipt",
+      "at_monotonic": 71914.826574345
+    },
+    {
+      "event": "identical_body_delivered",
+      "path": "/api/boss/ui/bi/receipt",
+      "at_monotonic": 71914.82722221,
+      "query_id": "3becbbbc-1b9c-49f5-aaaa-c317c348d107",
+      "sha256": "ee96ab1b6e4a1dbd58a4d7f06391435b15315349a6eacdefdd562275bfe60e85",
+      "bytes": 17252
+    }
+  ]
+}
