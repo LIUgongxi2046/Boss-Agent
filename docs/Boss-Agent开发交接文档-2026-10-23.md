@@ -256,3 +256,17 @@ python3 scripts/visual_diff.py --role boss
 - 代码级证据：[GitHub Actions 39887407709](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39887407709) 已完成 Python 域测试和固定上游 React 生产构建。详细新增测试在 `app/tests/test_boss_people.py`、`app/tests/test_boss_travel.py`。完整记录 [T18-people-travel.md](development/T18-people-travel.md)。
 
 **本节不改变项目总验收状态**：T18 `IN_PROGRESS`，A18 `NOT_RUN`，72 页 `actual_e2e_verified=false`、`visual_pixel_verified=false`。后续仍按本交接第 5 节 P0—P3：业务功能与 E01—E06 → 技术/模型实机联调 → 补数据 → 全页面高保真与安装交付验收。
+
+
+## 10. 2026-10-23 本人设置 / 通知 / 授权功能追加交接
+
+本节续接第 9 节，不覆盖最初基线的审计含义。按 PRD FR-01/02/13/26/28，本轮新增：
+
+- N07 `BossOwnerPreferences.tsx` + `boss_owner_preferences.py`：已支持草稿保存与老板单独确认、目标/关注主题/阅读要求及适用范围、版本并发/幂等/有效期、历史快照。F01 明确展示本人确认的目标，F04 标识当前适用会议目标版本；新的通用 RuntimeContextBlock 只采纳 `OWNER_WORKSPACE` 有效设置，细分适用范围不擅自进入无关聊天。运行时调用记录不等于 DeepSeek 遵循质量。
+- N08：同一双阶段设置流程保存通知规则，校验 IANA 时区、免打扰小时、暂停、重要提醒开关与 BOSS_ONLY/BUSY_ONLY 隐私边界。有效配置并入**原有** `ControlStore.dispatch_due_in_transaction`，只做更严格的个人通知抑制，不创建第二套调度器。F02/N06 公开当前有效版本及 SQLite 派发原因；不提供虚假外部送达。
+- F26 `BossSettingsHub.tsx`：按 v6 卡片汇总真实本人设置、导航本人记忆、计划、历史决定与私人安排，并调用上游 `onLogout`。N07/N08 编辑离开接入 D06 草稿告警。
+- N10：`boss_owner_authorizations.py` 和 `BossWorkspaceView.tsx` 支持角色/原始归属/有效期/版本核验的授权撤销，并在单一 SQLite 事务里写入撤销回执、元数据及单独本人决定；不取消历史已执行结果，也不公开撤销私密原因。
+
+修改入口：`validation/boss_command_api.py`、`boss_workspace_api.py`、`boss_page_api.py`、`controls.py`、`application.py`、`boss_meeting_brief.py`、`boss_people.py`、`app/webui/BossDesktop.tsx`，构建复制脚本与 CI。对应测试 `test_boss_owner_preferences.py`、`test_boss_owner_authorizations.py`、`test_v6_owner_preferences_ui.py`；真实进度/剩余缺口见 [专项开发记录](development/T18-owner-preferences.md)、[72 页实时映射](../specs/page-service-map.json) 及同提交的 GitHub Actions。
+
+**不变的验收边界**：T18 仍 IN_PROGRESS，A18 仍 NOT_RUN；72 页实际 Mac Electron GUI E2E 和像素验收均未通过。下一轮优先 N09 本人计划、FR-01 日程排序及业务链路异常，然后真实模型/系统联调；依照用户优先顺序，农业数据最后补。
