@@ -148,3 +148,45 @@ def test_actual_runtime_hook_uses_version_selection_and_records_metadata_only():
     assert 'source="boss-confirmed-memory"' in source
     assert "guidance_authority_boundary" in source
     assert "technical prompts do not grant" in source.lower() or "Technical prompts do not grant" in source
+
+
+
+def test_a05_version_diff_reads_persisted_revision_only_for_maintainer(service):
+    api,reads=service
+    item,checked,activated=setup_active(service)
+    current=catalog(reads)[1]["drafts"][0]
+    original_text=current["instruction_text"]
+    saved=call(api,"MAINTAINER","boss.prompt.save","prompt-rewrite-01",
+        prompt_id=item["prompt_id"],expected_version=checked["version"],
+        kind="SECRETARY_ROLE",title="更新秘书职责",
+        instruction_text="新版本：仅显示有出处的模拟材料，缺失信息保持未知；所有业务执行仍须BOSS当前指令。",
+        change_note="修改与来源核对有关的表达限制",
+        source_ids=["finance-note"])
+    assert saved[0]==200,saved
+    status,result=catalog(reads)
+    assert status==200
+    assert len(result["revisions"])>=2
+    history=[x for x in result["revisions"] if x["prompt_id"]==item["prompt_id"]]
+    assert {row["version"] for row in history}>={"1","2"}
+    assert any(row["instruction_text"]==original_text for row in history)
+    assert result["drafts"][0]["instruction_text"]!=original_text
+    assert catalog(reads,"BOSS")[0]==403
+    assert "instruction_text" not in str(reads.serve(
+        "MAINTAINER","/api/boss/ui/workspace/system")[1])
+    assert "instruction_text" not in str(reads.serve(
+        "BOSS","/api/boss/ui/workspace/memory")[1])
+
+
+def test_a05_frontend_uses_real_technical_payload_and_diff_only():
+    page=(ROOT/"app/webui/MaintainerPromptVersion.tsx").read_text(encoding="utf-8")
+    mapping=__import__("json").loads((ROOT/"specs/page-service-map.json").read_text(encoding="utf-8"))
+    match=next(x for x in mapping["pages"] if x["page_id"]=="A05")
+    assert match["component_file"]=="app/webui/MaintainerPromptVersion.tsx"
+    assert set(match["code_wired_write_actions"])=={
+        "boss.prompt.save","boss.prompt.validate",
+        "boss.prompt.activate","boss.prompt.deactivate"
+    }
+    assert match["actual_e2e_verified"] is False
+    for text in ("prompt-versions","client.requestMutation","content_sha256",
+                 "revisions","removedLines","addedLines","runtime_context_adoption"):
+        assert text in page
