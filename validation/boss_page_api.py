@@ -222,12 +222,22 @@ class BossPageAPI:
                 ],
                 "historical_commitment": data.get("historical_task"),
                 "self_commitments": [{
-                    k: item[k] for k in (
+                    **{k: item[k] for k in (
                         "commitment_id", "purpose", "version", "status", "due_at",
                         "timezone", "importance", "evidence_requirements", "source_refs",
                         "completion_evidence", "created_at", "completed_at", "canceled_at",
                         "source_type",
-                    ) if k in item
+                    ) if k in item},
+                    "source_reference_state": (
+                        "CURRENT" if all(
+                            ref["source_id"] in available
+                            and available[ref["source_id"]].get("version") == ref["version"]
+                            and not available[ref["source_id"]].get("withdrawn")
+                            and available[ref["source_id"]].get("access_scope") == data["owner_id"]
+                            and available[ref["source_id"]].get("source_type") == "SIMULATED"
+                            for ref in item.get("source_refs", [])
+                        ) else "NEEDS_REVIEW"
+                    ),
                 } for item in self._items(db, self.namespace, "self_commitment")],
                 "self_due_events": [{
                     "event_id": row["event_id"],
