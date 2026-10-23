@@ -35,6 +35,7 @@ from boss_scheduler_config import (
 from boss_knowledge_ingestion import create as source_create, revise as source_revise, withdraw as source_withdraw
 from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
 from boss_research import prepare as research_prepare
+from boss_travel import review as travel_review, confirm as travel_confirm, cancel as travel_cancel
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -138,6 +139,9 @@ class BossCommandAPI:
         "boss.calendar.share": "BOSS",
         "boss.calendar.share.revoke": "BOSS",
         "boss.calendar.delete": "BOSS",
+        "boss.travel.review": "BOSS",
+        "boss.travel.confirm": "BOSS",
+        "boss.travel.cancel": "BOSS",
     }
 
     def __init__(self, store):
@@ -343,6 +347,12 @@ class BossCommandAPI:
                 result = calendar_revoke(self, db, data, payload)
             elif action == "boss.calendar.delete":
                 result = calendar_delete(self, db, data, payload)
+            elif action == "boss.travel.review":
+                result = travel_review(self, db, data, payload)
+            elif action == "boss.travel.confirm":
+                result = travel_confirm(self, db, data, payload)
+            elif action == "boss.travel.cancel":
+                result = travel_cancel(self, db, data, payload)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)
