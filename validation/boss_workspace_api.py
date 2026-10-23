@@ -20,7 +20,7 @@ from boss_prompt_config import KINDS, active_runtime_prompts
 from boss_research import project as research_projection
 from boss_travel import projection as travel_projection
 from boss_people import projection as people_projection
-from boss_owner_preferences import goals_projection, notice_projection
+from boss_owner_preferences import goals_projection, notice_projection, effective_owner_notice
 from boss_recovery_api import calendar_share_state
 
 NS = "ui-check"
@@ -375,6 +375,8 @@ class BossWorkspaceAPI:
             reminders = _object_list(db, self.namespace, "reminder")
             deliveries = _object_list(db, self.namespace, "delivery")
             rules = _object_list(db, self.namespace, "rules")
+            active_notice = effective_owner_notice(db, data)
+            dispatches = _object_list(db, self.namespace, "dispatch")
             return {
                 "events": [{k: row[k] for k in (
                     "event_id", "version", "state", "impact", "due_at", "task_id"
@@ -392,6 +394,20 @@ class BossWorkspaceAPI:
                         "version", "cooldown_seconds", "quiet_start", "quiet_end",
                         "timezone", "important_escalation")
                 } for row in rules],
+                "owner_notification_preferences": ({
+                    "version": active_notice["version"],
+                    "reading_format": active_notice["content"]["reading_format"],
+                    "notifications_enabled": active_notice["content"]["notifications_enabled"],
+                    "timezone": active_notice["content"]["timezone"],
+                    "quiet_start": active_notice["content"]["quiet_start"],
+                    "quiet_end": active_notice["content"]["quiet_end"],
+                    "important_during_quiet": active_notice["content"]["important_during_quiet"],
+                } if active_notice else None),
+                "dispatches": [{
+                    k: row[k] for k in ("event_id", "event_version",
+                        "state", "reason", "business_at", "rule_version",
+                        "schedule_version", "owner_notice_version") if k in row
+                } for row in dispatches],
                 "count": len(sent), "notification_draft_only": len(sent) == 0,
             }
         if key == "authorizations":
