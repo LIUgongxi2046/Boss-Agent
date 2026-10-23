@@ -98,7 +98,11 @@ def _details(api, db, data, payload):
                 and isinstance(ref["version"], str),
                 "交通依据标识无效或重复", web.HTTPBadRequest)
         seen.add(ref["source_id"])
-        source = api._require_current_source(db, data, ref["source_id"])
+        source = api.store.get(db, NS, "document", ref["source_id"])
+        require(not source.get("withdrawn")
+                and source.get("access_scope") == data["owner_id"]
+                and source.get("source_type") == "SIMULATED",
+                "交通资料已撤销或不在本人当前获准范围", web.HTTPForbidden)
         require(source["version"] == ref["version"],
                 "交通来源已换版，须重新核查", web.HTTPConflict)
         checked.append({"source_id": ref["source_id"], "version": source["version"]})
