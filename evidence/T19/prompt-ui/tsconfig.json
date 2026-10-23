@@ -1,0 +1,13 @@
+{
+  "extends": "../runtime-ui/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/product/nanobot/webui/src/*"],
+      "react": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react"],
+      "react/*": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react/*"],
+      "react-dom/*": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react-dom/*"],
+      "lucide-react": ["../../../.work/w2-checks/runtime-ui/node_modules/lucide-react"]
+    }
+  },
+  "include": ["main.tsx", "../../../app/webui/MaintainerPromptVersion.tsx", "../../../.work/w2-checks/runtime-ui/node_modules/vite/client.d.ts"]
+}

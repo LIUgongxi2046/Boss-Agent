@@ -1,0 +1,53 @@
+{
+  "status": "PASS_PROMPT_IDENTITY_COMPONENT_SCOPE",
+  "checks": [
+    {
+      "check_id": "A05-REVOKED-PROVIDER-IDENTITY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-prompt-identity-ui.txt",
+      "sha256": "3be209a602ae9adc8b73ed794d82f4d8ae70ca5b17f15dc3dad4a1945802cd1e"
+    },
+    {
+      "check_id": "A05-REVOKED-RECEIPT-IDENTITY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-prompt-receipt-identity-ui.txt",
+      "sha256": "6a78303e97f4873100a5951e9938f6401b9a476fda336dee876b760e684ed852"
+    }
+  ],
+  "test_report": {
+    "tests": "438",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "13",
+    "time": "21.273"
+  },
+  "upstream_source_revision": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+  "actual_upstream_source_sha256": {
+    "webui/src/providers/ClientProvider.tsx": "ea80a6b993abfc28169b68dec37e692a2294fbf80074db289a28d85320b24850",
+    "webui/src/lib/nanobot-client.ts": "d77cb44be9562591f72f87c0e3c37557f2ee8d23ca04443b949dbd326741b46a",
+    "webui/src/lib/runtime.ts": "23381ec8c4d538dfb82946bebcc938e896764b88d9a26f25307b7805229c9a07",
+    "webui/src/lib/types.ts": "fa72bcd12f5a42be81bfdbb192d75d6b5bbcc43b1a14490c6fb6d31e4918cfd1"
+  },
+  "source_and_two_copy_databases_unchanged": true,
+  "actual_databases_reopened": true,
+  "actual_runtime_record_count": 2,
+  "new_external_requests": 0,
+  "new_business_mutations": 0,
+  "native_mutation_transport_exercised": false,
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "visual_acceptance": "NOT_RUN",
+  "full_A19_accepted": false,
+  "source_code_sha256_at_collection": {
+    "app/webui/MaintainerPromptVersion.tsx": "172c975cd2a193e1a02c11426be4ae4391ec643265d33c7ac8269547c6d693c1",
+    "validation/boss_workspace_api.py": "3c89b0d959456a2010cc7d6a335c66cdd31b2372acc7f802dfb23a02884dd402",
+    "validation/boss_page_api.py": "d428721b6a27c40cc2ceeea73684612b1dc3a2329aaa1b90c77f3166a11a94ed",
+    "evidence/T19/check_prompt_identity_server.py": "c7ce7efcda1b285f3b1126aa329fd07cac27a5d44c5e8050fff6c18e00675802",
+    "evidence/T19/check_prompt_identity_ui.js": "bc992f6d943d1816d6cfdd50466cb6c821329feb034afb676e19ab3f124438c9",
+    "evidence/T19/check_prompt_receipt_identity_ui.js": "c0871ddacf352e4290fb1ed5f8542a7d510631e69e315f5db1b8212d2298ef74",
+    "evidence/T19/check_prompt_identity_results.py": "b3b7b270244265b6ba19ba51e4d366c05066a63d521cc33da2b1268ff9bf4124",
+    "evidence/T19/prompt-ui/index.html": "e0b05bb8b28241f0538d3e2a0ab7c8f236dd782d3ef48c896a5c35ca30c5482b",
+    "evidence/T19/prompt-ui/main.tsx": "527a62fed07e72a07b4b118acbfb25e8e45c62c522340e645976e5b61c4115cd",
+    "evidence/T19/prompt-ui/tsconfig.json": "8824adb8d718ac07da3f5ce2ccf84c82f6cfab4fd145f4e5b83172252b321931",
+    "evidence/T19/prompt-ui/vite.config.mjs": "6796fb8fe99e8025070159fa6b95bc7c1af123a4fdbcdbfa65ef4859a4563b4a"
+  }
+}
