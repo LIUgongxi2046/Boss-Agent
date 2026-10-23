@@ -131,3 +131,14 @@ A13 技术维护端已支持调度草稿保存、规则校验、启用、暂停�
 这些动作只对 BOSS 开放并写入现有 SQLite 事务；无真实交通预订、天气查询、外部会议邀请或日历改期。没有为页面填造农业指标。原 Desktop v6 Logo、配色、大鹏资源和 React Shell 不降级；目标 Mac、真实 DeepSeek 联调及 72 页像素截图验收仍待执行。
 
 [开发与剩余问题记录](docs/development/T18-people-travel.md) · [页面及接口实装状态](specs/page-service-map.json) · [本轮完整成功 CI](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39887407709)。
+
+
+## 第十批：N07/N08/F26 本人设置与 N10 授权撤销
+
+在冻结的 Desktop v6 Shell、蓝绿白色系和“大鹏”素材下，N07 新增本人目标、关注主题和阅读要求的版本化草稿与独立本人确认；已确认且在有效期内的设置按范围被 F01/F04 和 nanobot RuntimeContextBlock 读取。新聊天仅注入适用于完整工作区的目标；运行时提供器调用有独立采用记录，**不把上下文加载当成模型遵从或任务完成**。
+
+N08 新增本人通知暂停、免打扰、重要事件升级选择和阅读格式；真正参与原 CronService 采用的 SQLite `dispatch_due_in_transaction`，对技术调度只施加更严格的本人限制，不会绕过 A13 去重、技术暂停或原事件版本。F02/N06 可追查模拟派发和抑制原因；F26 汇总本人设置入口与当前有效版本，并复用原生退出登录。N07/N08 离开未保存编辑时显示 D06 确认。
+
+N10 支持老板本人按当前授权 ID 和版本撤销未到期授权，事务同时保存最小审计和幂等回执。**撤销仅阻止授权未来使用，不逆转已经执行的交办、发件或审批**。维护身份无权读取或代操作本人授权正文。
+
+以上仍属于代码与模拟 SQLite 业务切片，尚未完成目标 Mac 的真实 DeepSeek、Cron 恢复、72 页真实交互和像素级验收。没有增加农业演示业务明细或虚构结果。详情见 [本轮开发记录](docs/development/T18-owner-preferences.md)、[72 页实现状态](specs/page-service-map.json) 和 [CI 检查](https://github.com/LIUgongxi2046/Boss-Agent/actions)。
