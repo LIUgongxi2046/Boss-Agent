@@ -17,6 +17,10 @@ type Metrics={available:boolean;reason?:string;
 type Compiled={meeting:{meeting_id:string;version:string;starts_at:string;timezone:string};
   participants:Participant[];sources:Source[];commitments:Commitment[];
   event:{event_id:string;status:string;origin:string};metrics:Metrics;
+  travel_impacts?:{travel_id:string;version:string;meeting_end_known:boolean}[];
+  people_meeting_impacts?:{brief_id:string;version:string;contact_id:string;
+    meeting_version:string;source_state:string;
+    pinned_source_versions:{source_id:string;version:string}[]}[];
   missing_items:string[];needs_review:boolean;source_type:"SIMULATED"};
 type Saved={brief_id:string;meeting_id:string;version:string;state:string;
   prepared_at:string;reviewed_by_owner:false;meeting_occurred:false;
@@ -290,6 +294,29 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
         </Panel>
         </div>
         <div className="boss-tab-view" hidden={tab!=="议题"}>
+        <Panel title="已关联会面议题与行程影响" note="F10 / F11 的实际 SQLite 版本，不自动改期或发邀请">
+          {(b?.people_meeting_impacts||[]).map(item=><div className="boss-workspace-item"
+            key={item.brief_id}>
+            <strong>会面议题：{item.contact_id} · {item.brief_id}</strong>
+            <small>材料 v{item.version} · 会议 v{item.meeting_version} · 来源 {item.source_state}</small>
+            {(item.pinned_source_versions||[]).map(source=><small key={source.source_id}>
+              资料 {source.source_id} v{source.version}
+            </small>)}
+          </div>)}
+          {(b?.travel_impacts||[]).map(item=><div className="boss-workspace-item"
+            key={item.travel_id}>
+            <strong>行程影响：{item.travel_id}</strong>
+            <small>行程 v{item.version} · 会议结束时刻仍未知，准备时间须核查</small>
+          </div>)}
+          {!b?.people_meeting_impacts?.length&&!b?.travel_impacts?.length&&
+            <p className="boss-helper">当前没有由 F10 关联的会面议题或 F11 已确认行程影响。</p>}
+          <div className="boss-actions">
+            <button type="button" className="boss-btn" onClick={()=>onNavigate("F10")}>
+              查看人员会面</button>
+            <button type="button" className="boss-btn" onClick={()=>onNavigate("F11")}>
+              核查行程影响</button>
+          </div>
+        </Panel>
         <Panel title="当前可复算经营指标" note="同一已核验模拟数据集 · 原因缺少时不推测">
           {b?.metrics.available?
             b.metrics.values.map(period=><div className="boss-workspace-item" key={period.period_scope}>
