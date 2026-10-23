@@ -245,8 +245,8 @@ def effective_owner_notice(db, data):
 
 def owner_goal_reference(db, data):
     effective = effective_owner_goals(db, data)
-    if not effective:
-        return {"status": "NO_CURRENT_BOSS_CONFIRMATION",
+    if not effective or effective["content"]["scope"] not in ("OWNER_WORKSPACE", "MEETING_PREP"):
+        return {"status": "NO_APPLICABLE_CONFIRMED_MEETING_GOALS",
                 "active_version": None, "scope": None}
     return {
         "status": "CONFIRMED", "active_version": effective["version"],
@@ -284,7 +284,9 @@ def record_runtime_goal_context_load(store, namespace=NS):
         db.execute("BEGIN IMMEDIATE")
         data = store.get(db, namespace, "initial", "snapshot")
         active = effective_owner_goals(db, data)
-        if active is None:
+        if active is None or active["content"]["scope"] != "OWNER_WORKSPACE":
+            # The generic chat context cannot prove a DAILY_BRIEF/MEETING_PREP
+            # request. Do not leak scoped instructions into unrelated turns.
             return None
         current = _get(db, "owner_goals_runtime_use", active["version"])
         count = int(current.get("context_load_count", 0)) if current else 0
