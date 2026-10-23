@@ -32,6 +32,7 @@ from role_channel import RoleChannel
 from safe_diagnostics import RedactedEventList
 from boss_prompt_config import load_runtime_prompts
 from boss_owner_preferences import record_runtime_goal_context_load
+from boss_agent_read_tools import BossResearchSourcesTool
 from service import application as business_application
 
 WORK = ROOT / ".work/application"
@@ -118,6 +119,11 @@ async def serve():
     envelope = {"request_id": "ui-check", "owner_id": "boss-1", "execution_namespace": "ui-check", "dataset_id": "selection", "dataset_version": "1", "session_id": "ui-check"}
     for operation in OPERATIONS:
         registry.register(ApplicationTool(operation, store, envelope, bindings, records))
+    def research_read_observed(metadata):
+        records.append({"type": "tool", "name": "bossWorkspaceRead", "at": now(),
+                        "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
+        audit.output.write_text(encode(records))
+    registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     cron = CronService(WORK / "cron/jobs.json")
     async def scheduled(job):
         if job.name == "boss-events":

@@ -103,6 +103,17 @@ type MemoryTechnicalStatus = {
   model_adoption_verified: boolean; physical_secure_erasure_verified: boolean;
   private_body_available_here: boolean; owner_content_mutation_allowed: boolean;
 };
+type PromptTechnicalView = {
+  runtime_eligibility: {
+    projection: "prompt-technical-status"; checked_at: string;
+    model_adoption_verified: false; configuration_mutation_performed: false;
+    items: { kind: string; enabled: boolean; prompt_id: string | null;
+      prompt_version: string | null; active_version: string | null;
+      future_context_eligible: boolean; exclusion_reasons: string[];
+      source_status: { source_id: string; pinned_version: string;
+        current_version: string | null; validity_state: string }[] }[];
+  };
+};
 type Animation = "idle" | "thinking" | "complete" | "notice";
 
 type Props = {
@@ -156,7 +167,7 @@ const LABELS: Record<string, string> = {
 function allowed(page: string, role: Role) {
   if (page === "NATIVE") return true;
   if (!pages[page]) return false;
-  if (["N01", "D08"].includes(page)) return false; // handled by original nanobot AuthForm
+  if (["N01", "D08"].includes(page)) return false; // N01/D08由BossLogin认证入口承接。
   if (["D06", "D07"].includes(page)) return true;
   return pages[page].technical ? role === "MAINTAINER" : role === "BOSS";
 }
@@ -258,6 +269,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
   const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
   const [memoryTechnicalStatus, setMemoryTechnicalStatus] = useState<MemoryTechnicalStatus | null>(null);
+  const [promptTechnicalView, setPromptTechnicalView] = useState<PromptTechnicalView | null>(null);
   const [today, setToday] = useState<TodayProjection | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [loading, setLoading] = useState(false);
@@ -343,6 +355,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
       if (["F24", "D03"].includes(page)) read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
       if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
+    } else if (page === "A05") {
+      setPromptTechnicalView(null);
+      read<PromptTechnicalView>("/api/boss/ui/workspace/prompt-versions", value => {
+        if (value.runtime_eligibility?.projection !== "prompt-technical-status")
+          throw new Error("Prompt技术诊断返回格式错误");
+        setPromptTechnicalView(value);
+      });
     } else if (page === "A12") {
       setMemoryTechnicalStatus(null);
       read<MemoryTechnicalStatus>("/api/boss/ui/admin/memory-status", setMemoryTechnicalStatus);
@@ -956,7 +975,25 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               </div>
               </> : page === "A13" ? <MaintainerScheduler
                 key="A13" onNavigate={id=>navigate(id)}
-              /> : page === "A05" ? <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/> :
+              /> : page === "A05" ? <>
+                <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/>
+                <Panel title="当前来源与采用条件" note="技术状态检查不执行模型任务">
+                  <Value label="最近检查" value={promptTechnicalView?.runtime_eligibility.checked_at}/>
+                  <GlassButton onClick={refresh} disabled={loading}>重新检查采用条件</GlassButton>
+                  {promptTechnicalView?.runtime_eligibility.items.map(item => <article className="boss-workspace-item" key={item.kind}>
+                    <strong>{item.kind}</strong>
+                    <Value label="启用状态" value={item.enabled ? "启用" : "尚未启用"}/>
+                    <Value label="Prompt与版本" value={item.prompt_id ? item.prompt_id + " · v" + item.prompt_version : "没有配置"}/>
+                    <Value label="后续上下文可采用" value={item.future_context_eligible ? "符合当前条件" : "当前不能采用"}/>
+                    <Value label="当前排除原因" value={item.exclusion_reasons.length ? item.exclusion_reasons.join("、") : "没有排除项"}/>
+                    {item.source_status.map(source => <div className="boss-kv" key={source.source_id}>
+                      <span>{source.source_id}</span>
+                      <strong>引用v{source.pinned_version} · 当前{source.current_version ? "v" + source.current_version : "版本不可见"} · {source.validity_state}</strong>
+                    </div>)}
+                  </article>)}
+                  <StatusLine text="采用条件由当前启用版本、来源和业务时间计算；实际模型遵从与业务结果需要各自验证。"/>
+                </Panel>
+              </> :
                 page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
                 page === "A12" ? <>
                   <div className="boss-columns">

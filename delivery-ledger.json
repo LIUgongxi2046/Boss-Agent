@@ -1227,7 +1227,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": ["已接收T05/T06版本1.0.0和T07版本0.2.0-draft；T03视觉、全量字段/事件/页面状态语义与实际行为仍需核查，A08保持NOT_RUN。"]
+      "blockers": ["已接收T05/T06版本1.1.0和T07版本0.3.0-draft；T03视觉、全量字段/事件/页面状态语义与实际行为仍需核查，A08保持NOT_RUN。"]
     },
     {
       "id": "T09",
@@ -1304,6 +1304,8 @@
         "validation/application.py",
         "validation/role_channel.py",
         "validation/check_product_access.py",
+        "validation/check_research_runtime.py",
+        "validation/export_runtime_transport.py",
         "validation/desktop/",
         "app/tests/test_product_admin_access.py",
         "app/tests/test_boss_prompt_context_adoption.py",

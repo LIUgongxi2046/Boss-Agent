@@ -17,7 +17,7 @@ from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
 from boss_recovery_api import BossRecoveryAPI
 from boss_owner_preferences import owner_profile
-from boss_admin_config import memory_technical_status
+from boss_admin_config import memory_technical_status, prompt_technical_status
 from boss_owner_plans import OwnerPlansAPI
 from boss_today import TodayAPI
 
@@ -460,7 +460,12 @@ class BossPageAPI:
             if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview", "/api/boss/ui/calendar-conflict"):
                 return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
-                return self.workspace.serve(role, path, query_string)
+                status, result = self.workspace.serve(role, path, query_string)
+                if status == 200 and path == "/api/boss/ui/workspace/prompt-versions":
+                    if query_string:
+                        return 400, {"error": "INVALID_INPUT"}
+                    result["runtime_eligibility"] = prompt_technical_status(self.store, role, self.namespace)
+                return status, result
             if path == "/api/boss/ui/sector":
                 return self.sectors.serve(role, query_string)
             if path == "/api/boss/ui/maintenance":

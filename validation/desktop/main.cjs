@@ -25,7 +25,9 @@ let child;
 let quitting = false;
 let window;
 let microphoneAuthorized = false;
+let serviceStartupElapsedMs = null;
 const origin = 'http://127.0.0.1:8872';
+const serviceStartupTimeoutMs = 90000;
 if (!app.requestSingleInstanceLock()) {
   record('duplicate_instance_rejected');
   app.quit();
@@ -59,7 +61,7 @@ if (!app.requestSingleInstanceLock()) {
     const allowed = ['status', 'microphone_status', 'request_microphone', 'select_file', 'open_source', 'notify', 'quit'];
     if (!allowed.includes(action)) { record('ipc_denied', { action }); throw new Error('IPC 能力未授权'); }
     if (!window || event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame || new URL(event.senderFrame.url).origin !== origin) throw new Error('IPC 发送方无权访问');
-    if (action === 'status') return { versions: process.versions, service_pid: child.pid, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported() };
+    if (action === 'status') return { versions: process.versions, service_pid: child.pid, service_startup_ms: serviceStartupElapsedMs, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported() };
     await authorize(event, request.token);
     record('ipc_authorized', { action });
     if (action === 'microphone_status') return systemPreferences.getMediaAccessStatus('microphone');
@@ -89,18 +91,23 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     const log = fs.openSync(path.join(diagnostics, 'desktop-service.log'), 'a', productMode ? 0o600 : 0o644);
     child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(root, '.work', 'tmp') }, stdio: ['ignore', log, log] });
-    record('service_start_requested', { service_pid: child.pid });
+    const startedAt = Date.now();
+    record('service_start_requested', { service_pid: child.pid, timeout_ms: serviceStartupTimeoutMs });
     child.on('error', error => { throw error; });
-    const deadline = Date.now() + 20000;
+    const deadline = startedAt + serviceStartupTimeoutMs;
     let ready = false;
     while (!ready) {
       if (child.exitCode !== null) throw new Error('业务服务启动失败，退出码 ' + child.exitCode);
-      if (Date.now() > deadline) throw new Error('业务服务启动超时');
+      if (Date.now() > deadline) {
+        record('service_start_timeout', { service_pid: child.pid, elapsed_ms: Date.now() - startedAt });
+        throw new Error('业务服务启动超时');
+      }
       const instance = path.join(root, '.work', 'application', 'instance.json');
       if (fs.existsSync(instance)) ready = JSON.parse(fs.readFileSync(instance)).pid === child.pid;
       if (!ready) await new Promise(resolve => setTimeout(resolve, 100));
     }
-    record('service_started', { service_pid: child.pid });
+    serviceStartupElapsedMs = Date.now() - startedAt;
+    record('service_started', { service_pid: child.pid, elapsed_ms: serviceStartupElapsedMs });
     window = new BrowserWindow({ width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, address) => { if (new URL(address).origin !== origin) event.preventDefault(); });

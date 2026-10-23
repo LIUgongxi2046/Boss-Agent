@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.2.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收 T05/T06 1.0.0 和 T07 0.2.0-draft，集成源码版本 `ce2bd3c`。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和 T03 视觉仍未完成，A08 保持 NOT_RUN。
+版本：0.3.0；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.1.0和T07 0.3.0-draft，集成源码版本 `2deb385`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -121,5 +121,6 @@ T08正式接收必须包含：72页面各自组件、真实读写与事件、角
 | ownerPlanSave/Pause/Resume/Cancel：plan_id、expected_version、client_request_id | BossOwnerPlans → scopedCommand → OwnerPlansAPI | 创建 ACTIVE、PAUSED、ACTIVE、CANCELED，版本与重启连续性 |
 | identity.role 与 bootstrap.api_token | BossLogin 核验服务端身份 → 原生 App 保存当前认证 | 入口范围错误拒绝、401/403、过期及退出 |
 | memory technical status | MAINTAINER-only 读取 → BossDesktop A12 | 无正文、无外部范围参数，身份拒绝与技术重读 |
+| prompt-versions.runtime_eligibility | MAINTAINER-only 读取 → BossDesktop A05 | 当前来源版本、排除原因与采用条件；读取不记录上下文采用 |
 
-本机工程构建、367项接收前回归和372项接收后回归已通过；后者10项条件检查跳过。真实 Electron 57项技术记录覆盖 N01/D08、角色、三个尺寸及200%缩放、F01次序、N09计划、A12、刷新及重启；四项真实 DeepSeek 异常检查通过。结果见 T11 主记录。全部页面/状态、IME、跨页焦点和滚动、完整来源撤销、系统权限与视觉验收仍待执行。T09据完整FR/AC建立独立断言；T24在相同集成版本验证持久化及后续采用。构建通过不修改A08状态。
+本机工程构建、413项回归与30项相关公共入口检查已通过；完整回归11项条件检查跳过。当前真实Electron59项技术记录覆盖N01/D08、角色、三个尺寸及200%缩放、F01次序、N09计划、A05/A12、刷新及重启。70个认证后页面完成72次角色/页面组合DOM检查，没有renderer异常、失败读取或整页横向滚动。结果见T11主记录。全部动作及561状态、IME、跨页焦点和滚动、完整来源撤销、系统权限与视觉验收仍待执行。T09据完整FR/AC建立独立断言；T24在相同集成版本验证持久化及后续采用。构建通过不修改A08状态。

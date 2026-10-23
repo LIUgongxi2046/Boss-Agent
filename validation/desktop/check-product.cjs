@@ -22,7 +22,7 @@ async function start() {
     env: { ...process.env, BOSS_VALIDATION_ROOT: root, BOSS_PRODUCT_UI: '1', TMPDIR: path.join(root, '.work/tmp') },
   });
   activeDesktop = desktop;
-  const page = await desktop.firstWindow();
+  const page = await desktop.firstWindow({ timeout: 120000 });
   page.on('pageerror', error => save('renderer_error', { name: error.name, message: error.message }));
   page.on('requestfailed', request => save('request_failed', { path: new URL(request.url()).pathname }));
   await page.waitForURL('http://127.0.0.1:8872/', { waitUntil: 'domcontentloaded' });
@@ -244,9 +244,10 @@ async function main() {
   const status = await page.evaluate(() => window.bossDesktop.invoke({ action: 'status' }));
   assert.equal(status.versions.electron, '45.0.0');
   assert.equal(status.architecture, 'x64');
+  assert.ok(Number.isInteger(status.service_startup_ms) && status.service_startup_ms > 0);
   assert.equal(await page.evaluate(() => typeof window.require), 'undefined');
   assert.equal(await page.evaluate(() => typeof window.process), 'undefined');
-  save('host_isolation', { electron: status.versions.electron, architecture: status.architecture, service_pid: status.service_pid });
+  save('host_isolation', { electron: status.versions.electron, architecture: status.architecture, service_pid: status.service_pid, service_startup_ms: status.service_startup_ms });
   await ownerActions(page, localAccess);
   const before = await snapshot();
   const access = JSON.parse(fs.readFileSync(path.join(root, '.work/application/access.json')));
@@ -284,6 +285,13 @@ async function main() {
   assert.equal(await page.getByRole('button', { name: '今日工作', exact: true }).count(), 0);
   assert.equal(await page.getByRole('button', { name: '模型连接', exact: true }).isVisible(), true);
   save('role_switch_dom', { role: 'MAINTAINER', boss_navigation_present: false });
+  await page.getByRole('button', { name: 'Prompt 版本', exact: true }).click();
+  const promptPanel = page.locator('section.boss-panel').filter({ has: page.getByRole('heading', { name: '当前来源与采用条件', exact: true }) });
+  await promptPanel.locator('.boss-kv').filter({ hasText: '最近检查' }).locator('strong').filter({ hasText: /\d{4}-\d{2}-\d{2}T/ }).waitFor();
+  const promptRead = page.waitForResponse(response => new URL(response.url()).pathname === '/api/boss/ui/workspace/prompt-versions' && response.status() === 200);
+  await page.getByRole('button', { name: '重新检查采用条件', exact: true }).click();
+  assert.equal((await (await promptRead).json()).runtime_eligibility.configuration_mutation_performed, false);
+  save('prompt_technical_dom', { role: 'MAINTAINER', read_only: true });
   await page.getByRole('button', { name: '记忆技术维护', exact: true }).click();
   await page.getByRole('heading', { name: '记忆技术状态', exact: true }).waitFor();
   await page.getByRole('button', { name: '重新核查技术状态', exact: true }).waitFor();

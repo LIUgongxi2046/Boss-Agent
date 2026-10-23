@@ -55,3 +55,24 @@ def test_owner_plans_public_read_is_owner_only(tmp_path):
     assert api.serve("BOSS", "/api/boss/ui/owner-plans")[0] == 200
     assert api.serve("MAINTAINER", "/api/boss/ui/owner-plans")[0] == 403
     assert api.serve("BOSS", "/api/boss/ui/owner-plans", "namespace=ui-check")[0] == 400
+
+
+def test_prompt_projection_includes_current_technical_eligibility(tmp_path):
+    store = ControlStore(tmp_path / "prompt-status.sqlite")
+    store.initialize("ui-check")
+    api = BossPageAPI(store)
+    status, projection = api.serve("MAINTAINER", "/api/boss/ui/workspace/prompt-versions")
+    assert status == 200
+    technical = projection["runtime_eligibility"]
+    assert technical["private_body_available_here"] is False
+    assert technical["configuration_mutation_performed"] is False
+    assert technical["context_load_recorded"] is False
+    assert technical["model_adoption_verified"] is False
+    assert len(technical["items"]) == 3
+    assert all(item["exclusion_reasons"] == ["NOT_CONFIGURED"] for item in technical["items"])
+    assert api.serve("BOSS", "/api/boss/ui/workspace/prompt-versions")[0] == 403
+    assert api.serve(None, "/api/boss/ui/workspace/prompt-versions")[0] == 401
+    assert api.serve("MAINTAINER", "/api/boss/ui/workspace/prompt-versions", "namespace=ui-check")[0] == 400
+    with store.connect() as db:
+        assert db.execute("SELECT count(*) FROM objects WHERE namespace=? AND kind=?",
+                          ("ui-check", "prompt_context_use")).fetchone()[0] == 0

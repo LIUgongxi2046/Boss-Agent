@@ -1,0 +1,45 @@
+{
+  "status": "PASS_PUBLIC_RESEARCH_TOOL_ONLY",
+  "at": "2026-10-23T05:41:11.816760+00:00",
+  "commit": "2deb3858718e81621f2a0807916190a0a2725a95",
+  "source_sha256": {
+    "validation/application.py": "16e035606773e08511a62a5d5ac667aea8106c11fe03fa0bba8a2232856158ce",
+    "validation/boss_agent_read_tools.py": "028566d858df6481bba992302f59048fcf3bba792129dcad309d21c7db7a877f",
+    "validation/boss_research.py": "f6246b04d78541180b50b0d4f6dafb799dfb77c630d1aafd1fdcde307aaefd68",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896",
+    "validation/boss_prompt_config.py": "273ebaa346f217cb348682915c6c3fb3e0de8bc60d9d3bba5dc8e673b19f0b9a",
+    "validation/business.py": "09752e87ffc3206adc057c8fa5d0127dab25c70c9dc928394ccb0ca8ac0c6e91",
+    "validation/uv.lock": "fb258e6c0f6f7e8ed991c6d3c0641ef6fefa08564947bf5f1a6723787fbad401"
+  },
+  "source_type": "SIMULATED",
+  "research_preparation_written": true,
+  "research_version": "1",
+  "actual_read_tool_calls": 1,
+  "current_reference_state": "CURRENT_SOURCE_EXCERPTS",
+  "current_references": [
+    {
+      "source_id": "finance-note",
+      "version": "1"
+    }
+  ],
+  "model_requests": 3,
+  "response_ids": [
+    "184881fd-aca2-45fc-837b-67a936ba7497",
+    "dbaf6b5d-7346-4c94-8a20-29889e3c5402"
+  ],
+  "event_counts": {
+    "message_accepted": 1,
+    "turn_model_updated": 1,
+    "goal_status": 1,
+    "retry_status": 2,
+    "stream_end": 2,
+    "message": 2,
+    "delta": 67,
+    "turn_end": 1
+  },
+  "task_and_outbox_unchanged": true,
+  "private_body_recorded": false,
+  "cost_total": null,
+  "event_schema_validation": "NOT_RUN_SEE_REV01",
+  "full_A15_A16_accepted": false
+}

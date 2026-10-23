@@ -506,7 +506,8 @@
         "Source citation opens D01 with exact character offset and live document version check",
         "F09 confirmed missing-source request saves owner-only F08 DRAFT; separate send approval",
         "Native nanobot chat continuation can ask about source IDs without claiming model research succeeded",
-        "Technically ingested, role-scoped SIMULATED sources are immediately available to BOSS-only current source search; withdrawn or replaced versions cannot be served as current"
+        "Technically ingested, role-scoped SIMULATED sources are immediately available to BOSS-only current source search; withdrawn or replaced versions cannot be served as current",
+        "validation/boss_agent_read_tools.py::BossResearchSourcesTool is registered in the public Runtime; only the prepared research projection is allowed"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -2700,7 +2701,7 @@
       "logical_architecture_route": "/app/maintain/A05",
       "actual_webui_navigation": "?bossPage=A05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_REAL_PROMPT_DRAFT_VALIDATION_ACTIVATION_NEXT_CONTEXT_ADOPTION",
+      "render_status": "PARTIAL_REAL_PROMPT_LIFECYCLE_AND_SOURCE_ELIGIBILITY",
       "component_file": "app/webui/MaintainerPromptVersion.tsx",
       "component_name": "MaintainerPromptVersion",
       "verified_http_read_routes": [
@@ -2713,7 +2714,11 @@
         "boss.prompt.activate",
         "boss.prompt.deactivate"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "app/webui/BossDesktop.tsx",
+        "validation/boss_admin_config.py::prompt_technical_status",
+        "runtime_eligibility reports current source versions and exclusion reasons without recording a context load or proving model adoption"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [

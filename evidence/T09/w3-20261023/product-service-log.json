@@ -1,8 +1,8 @@
 {
   "status": "PASS_PRODUCT_SERVICE_LOG_FORMAT_ONLY",
-  "lines_checked": 482,
-  "log_sha256": "63387382de7657585e4eecb0939e49a0e433c2d171e93f150f03e3ceb8f87a66",
-  "source_sha256": "a4f89230e13e0ce0f3fc705bf4a618b81718a90a2b719d097a693bca366d6f30",
+  "lines_checked": 967,
+  "log_sha256": "5e91aa409e9c4c3bb936af7b8351c773dca85a526f1f215e6abdb75e68de6518",
+  "source_sha256": "16e035606773e08511a62a5d5ac667aea8106c11fe03fa0bba8a2232856158ce",
   "actual_model_output_assembly_observed": true,
   "message_body_and_traceback_formatted": false,
   "scope": "当前W3独立产品服务日志；其他诊断和安装包分别核查"
