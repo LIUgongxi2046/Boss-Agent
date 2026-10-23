@@ -31,6 +31,7 @@ from model_probe import Audit, BusinessTool
 from role_channel import RoleChannel
 from safe_diagnostics import RedactedEventList
 from boss_prompt_config import active_runtime_prompts, record_runtime_context_load
+from boss_owner_preferences import record_runtime_goal_context_load
 from service import application as business_application
 
 WORK = ROOT / ".work/application"
@@ -133,10 +134,12 @@ async def serve():
             current = store.context("ui-check")
             selected_prompts = active_runtime_prompts(store, "ui-check")
             record_runtime_context_load(store, selected_prompts, "ui-check")
+            confirmed_owner_goals = record_runtime_goal_context_load(store, "ui-check")
             return RuntimeContextBlock(
                 source="boss-confirmed-memory",
                 content=encode({
                     "memory": current["memory"],
+                    "confirmed_owner_goals": confirmed_owner_goals,
                     "maintained_prompts": selected_prompts,
                     "guidance_authority_boundary":
                         "Technical prompts do not grant BOSS rights, modify "
