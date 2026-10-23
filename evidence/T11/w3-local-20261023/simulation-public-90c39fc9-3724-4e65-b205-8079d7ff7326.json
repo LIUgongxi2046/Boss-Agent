@@ -1,0 +1,480 @@
+{
+  "status": "PASS_PUBLIC_FOURTEEN_SIMULATION_INTERFACES_AND_A02_INSPECTION",
+  "run_id": "simulation-public-90c39fc9-3724-4e65-b205-8079d7ff7326",
+  "at": "2026-10-23T10:59:56.463Z",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "cbfe2f5f25b392ce98729d567c22ad9b3bb9ebcfa10f44709d92c6ca5b414602"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "54bf8f70140833258d54b114bd4d72432e4e09d4bbc6a64cb1965c3c094d3329"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "ca838d8ea80da9c351946dc6099eb2f4ac54cb46d91f25c0b2fc2afbbe247b35"
+    },
+    {
+      "path": "validation/boss_simulation_api.py",
+      "sha256": "1552c07daeb952b104fd79b885701bd5d28d283c9b1e7a31e464a8c8bbb29794"
+    },
+    {
+      "path": "specs/simulation-query.schema.json",
+      "sha256": "52307e247933fad63b50bd3e3e185d451957c7245000d6a6a46f49a0fbb9dd54"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "e32c60cad37374e75a8f800ca0e6e8eb77aa7d25e7036fcc9a73a2d383ad5493"
+    },
+    {
+      "path": "app/webui/MaintainerSimulationInspect.tsx",
+      "sha256": "c26e648a183a5c92da7e346297320c98d62be24054af793c5d4a7bc003fbf001"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "6695743cdd6aeaf3e7caab3b9e586ce359730c4b73327ca138e8eb6be3c46b64"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "adf50b030679b51939a293666611b5a8b85693324688d48e75c671756cb7125f"
+    },
+    {
+      "path": "validation/desktop/check-simulation-public.cjs",
+      "sha256": "3aec7ef9572065267b01c8d175c9b7431a5dc8a1197911fa5d7ef38da6d8a8a0"
+    },
+    {
+      "path": "evidence/T12/check_simulation_reads.py",
+      "sha256": "c9f8ce2252863dd3ccf27524c4bfe31cb4ac9970350ad0f9f45f5ead1d9e5afe"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "8270116505d924104b2d8f65baa16850090236b1011ed85dfbec10ee1be6116b"
+    }
+  ],
+  "records": [
+    {
+      "check": "a02_authenticated_initial_form_and_uncalled_state",
+      "interface_options": 14,
+      "initial_response": "NOT_CALLED"
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI01",
+      "availability": "PARTIAL",
+      "records": 1,
+      "missing_fields": [
+        "COMPLETE_ORGANIZATION_NOT_PROVIDED"
+      ],
+      "response_sha256": "9dc28bf1c764870c41269e065dadb7a42ffa514f66026a94e3f1eaaab8a03d3d",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI02",
+      "availability": "PARTIAL",
+      "records": 3,
+      "missing_fields": [
+        "EXTERNAL_RELATIONSHIP_SOURCES_NOT_PROVIDED"
+      ],
+      "response_sha256": "0ec7d433adf99aa0e22eaceb262d302065da3da3aed898a87555c56d6d87fc9a",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI03",
+      "availability": "PARTIAL",
+      "records": 2,
+      "missing_fields": [
+        "EXTERNAL_BOOKING_NOT_VERIFIED"
+      ],
+      "response_sha256": "70495743e182428cbf61a6f5434d9dd1f577cb5dd9eb97cb1e6b74c5ff539950",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI04",
+      "availability": "UNAVAILABLE",
+      "records": 0,
+      "missing_fields": [
+        "REAL_EXTERNAL_DELIVERY_NOT_VERIFIED"
+      ],
+      "response_sha256": "96ab7a78c0ebe9af5814b57eebb90466231a2ea1b0efce76958a4efe841e2d3d",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI05",
+      "availability": "PARTIAL",
+      "records": 1,
+      "missing_fields": [
+        "MULTIPLE_MEETING_SOURCE_COVERAGE_NOT_PROVIDED"
+      ],
+      "response_sha256": "7a6ab1493aba4ae6e701bd2689a0c2b495f011e98c440ba4c8f5fde9faed4119",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI06",
+      "availability": "PARTIAL",
+      "records": 1,
+      "missing_fields": [
+        "ONLY_APPROVED_SELECTION_AND_CURRENT_OWNER_ACTIONS"
+      ],
+      "response_sha256": "6fb3a25ddbb7be7c150b7e1c2805fa8f771f8c975b4ced5e0994728136b9b94d",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI07",
+      "availability": "PARTIAL",
+      "records": 8,
+      "missing_fields": [
+        "CAUSE_CONTRIBUTIONS_NOT_PROVIDED",
+        "ONLY_TWO_APPROVED_TEN_DAY_PERIODS"
+      ],
+      "response_sha256": "80f85ed930fb8c386bd731bf628971544a33a9d88c4a56e1df7e23e5203d3bfd",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI08",
+      "availability": "PARTIAL",
+      "records": 8,
+      "missing_fields": [
+        "CASH_NOT_PROVIDED",
+        "RECEIVABLE_AGING_NOT_PROVIDED",
+        "SETTLEMENT_DETAIL_NOT_PROVIDED"
+      ],
+      "response_sha256": "97b2809230d07cc5749deeb4829ec68365dadfb55b777dc2e7b979d0f04b6e04",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI09",
+      "availability": "UNAVAILABLE",
+      "records": 0,
+      "missing_fields": [
+        "APPROVED_PROCUREMENT_INVENTORY_SOURCES_NOT_PROVIDED"
+      ],
+      "response_sha256": "2d7347ecaa2db5ba8af2904ba96b13906b4786bb1fea4865620cbc879d89af4d",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI10",
+      "availability": "UNAVAILABLE",
+      "records": 0,
+      "missing_fields": [
+        "APPROVED_PRODUCTION_QUALITY_SOURCES_NOT_PROVIDED"
+      ],
+      "response_sha256": "765619e101e517d1960f2acb2d900e6c325d5ff41095d7ff0994b785cd4269a3",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI11",
+      "availability": "UNAVAILABLE",
+      "records": 0,
+      "missing_fields": [
+        "ONLY_APPROVED_SIMULATED_APPLICATIONS"
+      ],
+      "response_sha256": "bb1a59c7a901178963539da52fb7a4fddd959ea6bc18ad94df2de0ca43e4be8d",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI12",
+      "availability": "UNAVAILABLE",
+      "records": 0,
+      "missing_fields": [
+        "EXTERNAL_RETRIEVAL_NOT_CONFIGURED",
+        "PUBLIC_MARKET_WEATHER_POLICY_SOURCES_NOT_PROVIDED"
+      ],
+      "response_sha256": "b8da7ee1dff57cf0cfeba63a94e761134bc712091d678d3779c7b0cde54dfc25",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI13",
+      "availability": "PARTIAL",
+      "records": 3,
+      "missing_fields": [
+        "ONLY_CURRENT_APPROVED_DOCUMENTS_AND_CONFIRMED_MEMORY"
+      ],
+      "response_sha256": "f7babf157c70ec1eea2ef238976144664cec21521658c06bcc6ba8bca9cd8583",
+      "private_body_excluded": true
+    },
+    {
+      "check": "gui_manual_current_interface_and_owner_http_role",
+      "interface_id": "SI14",
+      "availability": "PARTIAL",
+      "records": 1,
+      "missing_fields": [
+        "FULL_RECURRING_PLANS_NOT_IMPLEMENTED",
+        "SYSTEM_NOTIFICATION_DELIVERY_NOT_VERIFIED"
+      ],
+      "response_sha256": "07a5f1fb73084ddb87e9072c4d040133ffbc6537490fab871b3a6edd4f75a653",
+      "private_body_excluded": true
+    },
+    {
+      "check": "schema_filter_type_rejected_before_http",
+      "new_http_requests": 0
+    },
+    {
+      "check": "actual_filter_error_and_offline_recovery",
+      "filtered_records": 2,
+      "rejected_currency": 400,
+      "recovered": true
+    },
+    {
+      "check": "actual_pending_read_cancel_and_service_resume",
+      "pending_service": "own_profile_only",
+      "recovered": true
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a02_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "schema_role_logout_and_complete_business_table_invariance",
+      "domain_verification": {
+        "status": "PASS",
+        "schema_id": "urn:boss-agent:simulation-query:1.6.0",
+        "interfaces": [
+          {
+            "interface_id": "SI01",
+            "availability": "PARTIAL",
+            "records": 1,
+            "readable_records": 1,
+            "technical_records": 1,
+            "missing_fields": [
+              "COMPLETE_ORGANIZATION_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI02",
+            "availability": "PARTIAL",
+            "records": 3,
+            "readable_records": 3,
+            "technical_records": 3,
+            "missing_fields": [
+              "EXTERNAL_RELATIONSHIP_SOURCES_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI03",
+            "availability": "PARTIAL",
+            "records": 2,
+            "readable_records": 2,
+            "technical_records": 2,
+            "missing_fields": [
+              "EXTERNAL_BOOKING_NOT_VERIFIED"
+            ]
+          },
+          {
+            "interface_id": "SI04",
+            "availability": "UNAVAILABLE",
+            "records": 0,
+            "readable_records": 0,
+            "technical_records": 0,
+            "missing_fields": [
+              "REAL_EXTERNAL_DELIVERY_NOT_VERIFIED"
+            ]
+          },
+          {
+            "interface_id": "SI05",
+            "availability": "PARTIAL",
+            "records": 1,
+            "readable_records": 1,
+            "technical_records": 1,
+            "missing_fields": [
+              "MULTIPLE_MEETING_SOURCE_COVERAGE_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI06",
+            "availability": "PARTIAL",
+            "records": 1,
+            "readable_records": 1,
+            "technical_records": 1,
+            "missing_fields": [
+              "ONLY_APPROVED_SELECTION_AND_CURRENT_OWNER_ACTIONS"
+            ]
+          },
+          {
+            "interface_id": "SI07",
+            "availability": "PARTIAL",
+            "records": 8,
+            "readable_records": 8,
+            "technical_records": 8,
+            "missing_fields": [
+              "CAUSE_CONTRIBUTIONS_NOT_PROVIDED",
+              "ONLY_TWO_APPROVED_TEN_DAY_PERIODS"
+            ]
+          },
+          {
+            "interface_id": "SI08",
+            "availability": "PARTIAL",
+            "records": 8,
+            "readable_records": 8,
+            "technical_records": 8,
+            "missing_fields": [
+              "CASH_NOT_PROVIDED",
+              "RECEIVABLE_AGING_NOT_PROVIDED",
+              "SETTLEMENT_DETAIL_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI09",
+            "availability": "UNAVAILABLE",
+            "records": 0,
+            "readable_records": 0,
+            "technical_records": 0,
+            "missing_fields": [
+              "APPROVED_PROCUREMENT_INVENTORY_SOURCES_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI10",
+            "availability": "UNAVAILABLE",
+            "records": 0,
+            "readable_records": 0,
+            "technical_records": 0,
+            "missing_fields": [
+              "APPROVED_PRODUCTION_QUALITY_SOURCES_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI11",
+            "availability": "UNAVAILABLE",
+            "records": 0,
+            "readable_records": 0,
+            "technical_records": 0,
+            "missing_fields": [
+              "ONLY_APPROVED_SIMULATED_APPLICATIONS"
+            ]
+          },
+          {
+            "interface_id": "SI12",
+            "availability": "UNAVAILABLE",
+            "records": 0,
+            "readable_records": 0,
+            "technical_records": 0,
+            "missing_fields": [
+              "EXTERNAL_RETRIEVAL_NOT_CONFIGURED",
+              "PUBLIC_MARKET_WEATHER_POLICY_SOURCES_NOT_PROVIDED"
+            ]
+          },
+          {
+            "interface_id": "SI13",
+            "availability": "PARTIAL",
+            "records": 3,
+            "readable_records": 3,
+            "technical_records": 3,
+            "missing_fields": [
+              "ONLY_CURRENT_APPROVED_DOCUMENTS_AND_CONFIRMED_MEMORY"
+            ]
+          },
+          {
+            "interface_id": "SI14",
+            "availability": "PARTIAL",
+            "records": 1,
+            "readable_records": 1,
+            "technical_records": 1,
+            "missing_fields": [
+              "FULL_RECURRING_PLANS_NOT_IMPLEMENTED",
+              "SYSTEM_NOTIFICATION_DELIVERY_NOT_VERIFIED"
+            ]
+          }
+        ],
+        "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "before_tables_sha256": {
+          "objects": "2ed8651de633df5e1643eb98d9a03baa17706d3fac1607423cedbd255838acdc",
+          "idempotency": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "audit": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+          "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+        },
+        "after_tables_sha256": {
+          "objects": "2ed8651de633df5e1643eb98d9a03baa17706d3fac1607423cedbd255838acdc",
+          "idempotency": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "audit": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+          "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+        },
+        "implementation_sha256": "1552c07daeb952b104fd79b885701bd5d28d283c9b1e7a31e464a8c8bbb29794",
+        "schema_sha256": "52307e247933fad63b50bd3e3e185d451957c7245000d6a6a46f49a0fbb9dd54",
+        "new_model_calls": false,
+        "new_business_actions": false
+      },
+      "role_denied": 403,
+      "scope_denied": 400,
+      "anonymous_and_logged_out": 401,
+      "renderer_errors": []
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "application_directory": "validation/.work/simulation-public-90c39fc9-3724-4e65-b205-8079d7ff7326",
+  "external_api_mode": "SIMULATED_FIRST",
+  "source_type": "SIMULATED",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A12_A19_accepted": false
+}

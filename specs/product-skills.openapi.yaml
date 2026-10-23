@@ -5,7 +5,7 @@ info:
   description: 当前实际本地文件、配置与上下文接口，完整T06正式接收待完成；没有外部模型请求。
 x-reception:
   state: IN_REVIEW
-  core_version: 1.5.0
+  core_version: 1.6.0
   owner: W3
   receiver: W1/T06
   authority: native workspace/skills files and agents.defaults.disabled_skills

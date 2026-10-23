@@ -116,6 +116,7 @@ def copy_overlay() -> None:
         ("ProductRuntimeConfiguration.tsx", "ProductRuntimeConfiguration.tsx"),
         ("MaintainerMemoryStatus.tsx", "MaintainerMemoryStatus.tsx"),
         ("MaintainerSkills.tsx", "MaintainerSkills.tsx"),
+        ("MaintainerSimulationInspect.tsx", "MaintainerSimulationInspect.tsx"),
         ("BossAssignmentSourceReview.tsx", "BossAssignmentSourceReview.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
@@ -128,6 +129,7 @@ def copy_overlay() -> None:
         json.dumps(catalogue, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
     )
+    shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")
     for filename in ASSETS:
         shutil.copy2(DESIGN / "assets" / filename, ASSET_DIR / filename)
     for filename in ANIMATIONS:

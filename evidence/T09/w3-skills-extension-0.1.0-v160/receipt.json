@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K11-SKILLS-EXTENSION-160",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-api-160-aa946e1",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "-m",
+    "openapi_spec_validator",
+    "specs/product-skills.openapi.yaml"
+  ],
+  "started_at": "2026-10-23T10:55:25.752412+00:00",
+  "ended_at": "2026-10-23T10:55:26.784306+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/product-skills.openapi.yaml",
+      "sha256": "3736b3e86e823225d24876f16f8ff15a96597c9701e12af01b5767af1e4b3d53"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/agent-assets.json",
+      "sha256": "68287940e4c309cdf508f64d9dead6dba727d29ee320cd3519b102683ce827fb"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/product_skills.py",
+      "sha256": "699b498ba4876c39a121d19633d632dbe61eadba58c9f8f4f789bcc3e33cab9c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-skills-extension-0.1.0-v160/output.log",
+      "sha256": "c1d770b2a1d26234771dbf10385af37bfd154ab96974bf4397e3caa25b84fee0"
+    }
+  ]
+}

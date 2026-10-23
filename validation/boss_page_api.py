@@ -26,6 +26,7 @@ from boss_source_policy import source_validity
 from boss_runtime_records import runtime_records
 from runtime_records_query import read_runtime_task_reference
 from boss_assignment_sources import AssignmentSourcesAPI
+from boss_simulation_api import SimulationAPI
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -448,6 +449,10 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == "/api/boss/ui/simulation-query":
+                return 200, SimulationAPI(self.store).query_http(role, query_string)
+            if path == "/api/boss/ui/simulation-inspect":
+                return 200, SimulationAPI(self.store).inspect_http(role, query_string)
             if path == "/api/boss/ui/admin/skills":
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}

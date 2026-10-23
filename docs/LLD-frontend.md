@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.4.4；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.5.0和T07 0.6.1-draft，公共Runtime扩展0.2.0及原生方法扩展0.1.0等待正式接收，源码版本`1d7276d`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
+版本：0.4.5；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.6.0，T07现有设计为0.6.1-draft；公共Runtime扩展0.2.0及原生方法扩展0.1.0等待正式接收，源码版本`aa946e1`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -90,6 +90,7 @@ graph TD
 | BossAssignmentSourceReview | 当前task_id、Projection、onCommand、onReceipt、onOpenSource、onDirty | F06本人独立确认当前来源，业务状态保持；来源与交办切换受D06保护 |
 | MaintainerMemoryStatus | getToken、onNavigate(page,run_id) | A12当前确认、删除传播及实际上下文选择，只读取技术元信息；关联记录进入A15筛选 |
 | MaintainerSkills | 原生ClientProvider、token、当前Projection | A06十三项方法、版本、摘要与实际工具引用；原生配置启停、独立确认和身份清理 |
+| MaintainerSimulationInspect | 原生ClientProvider、当前simulation-query Schema、接口及参数 | A02十四类技术检查、实际响应、取消和离线恢复；不读取本人正文，不执行业务动作 |
 | BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
 | BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
 | MaintainerPromptVersion、Scheduler等 | 服务端维护配置和当前版本 | 保存/校验/启用/采用分别核查 |
@@ -124,6 +125,10 @@ F06通过`GET /api/boss/ui/assignment-source-review?task_id=...`读取唯一来�
 A12手动读取维护专用`admin/memory-status`，展示当前版本、本人确认、未来采用资格、最近实际运行的memory_reference及删除各项范围。读取失败清除旧投影，取消终止当前读取，退出卸载组件。页面不提供正文或本人修改能力。本人F13删除后，A12保留历史选择的原版本，新的真实任务记录当前DELETED版本和eligible=false；模型完成观察与模型遵从验证分别展示。历史会话、备份及物理擦除保持NOT_VERIFIED。
 
 A06通过维护专用`GET /api/boss/ui/admin/skills`读取本应用workspace/skills中的十三项原生方法。`skill.update`只允许技术维护身份、准确方法名、明确布尔状态和当前正文摘要；原生HTTP修改入口被拒绝。用户独立确认后在同一原生配置文件锁内保存disabled_skills，执行原生skill_state_action并采用同一Runtime快照。其他模型设置保持不变，启停不签发业务授权。参数、依赖或摘要无效时明确拒绝；结果未知时读取当前状态，不使用业务回执接口推断原生操作结果。
+
+A02通过`GET /api/boss/ui/simulation-inspect`人工检查SI01—SI14的当前对象、类别、版本、状态及缺少范围。接口选择来自当前Schema；对象编号使用重复object_ids，JSON筛选通过成熟JSON.parse读取，字段和类型按当前定义检查，完整期间、维度、权限及数量由服务端核查。Input/Output Schema和实际请求、响应及耗时可读取，没有调用结果时显示接口未调用。维护响应的data始终null，正文不进入状态或界面；本人通过独立`simulation-query`角色读取获准范围。参数编辑、身份改变和读取取消使旧异步结果失效，读取错误不保留旧结果。工具映射进入A09的实际目录。
+
+十四类查询由同一SimulationAPI读取唯一有效执行空间，客户端不选择owner、namespace或数据集。当前存在资料明确返回PARTIAL；缺少资料返回UNAVAILABLE及具体缺少项，不据接口存在推断全部专业资料或写入能力已经完成。全部接口读取均不产生业务授权、外部调用或模型请求。
 
 方法上下文使用固定SkillsLoader识别本人明确引用，再由BossSkillCatalog检查当前版本、启停和实际工具依赖；相同原生上下文只加入一次。方法正文编辑、草稿、历史恢复和全部SOP业务结果继续待完成。外部API当前按项目计划13.18使用显式SIMULATED模式，不安排新增真实模型请求；本地方法状态和上下文使用实际实现验证。
 

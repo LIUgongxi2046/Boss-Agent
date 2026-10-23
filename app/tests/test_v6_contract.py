@@ -137,10 +137,11 @@ def test_real_workspace_and_sector_routing_coverage_is_not_faked():
     workplace_ids = re.findall(r"\b([FAND]\d{2}(?:-[A-Z]+)?):\s*\"", part)
     assert len(workplace_ids) == 23  # F10/F11 and F26/N07/N08 use dedicated v6 components
     for page_id in workplace_ids:
-        dedicated = {"N09": "app/webui/BossOwnerPlans.tsx", "A12": "app/webui/MaintainerMemoryStatus.tsx"}
+        dedicated = {"N09": "app/webui/BossOwnerPlans.tsx", "A12": "app/webui/MaintainerMemoryStatus.tsx",
+                     "A02": "app/webui/MaintainerSimulationInspect.tsx"}
         expected = dedicated[page_id] if page_id in dedicated else "app/webui/BossWorkspaceView.tsx"
         assert by_id[page_id]["component_file"] == expected
-        if page_id == "A12":
+        if page_id in {"A02", "A12"}:
             assert "app/webui/BossWorkspaceView.tsx" in by_id[page_id]["additional_component_files"]
         assert by_id[page_id]["render_status"] != "DESIGN_PLACEHOLDER_ONLY"
         assert any("/api/boss/ui/workspace/" in endpoint

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="15" skipped="0" tests="18" time="3.985" timestamp="2026-10-23T18:43:55.345136+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI01]" time="0.014"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b053a70&gt;, interface = 'SI01'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI02]" time="0.012"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b0c29f0&gt;, interface = 'SI02'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI03]" time="0.013"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b0c1dc0&gt;, interface = 'SI03'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI04]" time="0.011"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b0c1fd0&gt;, interface = 'SI04'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI05]" time="0.012"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b0c2a20&gt;, interface = 'SI05'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI06]" time="0.010"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b0c2840&gt;, interface = 'SI06'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI07]" time="0.010"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b053410&gt;, interface = 'SI07'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI08]" time="0.013"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b10e4e0&gt;, interface = 'SI08'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI09]" time="0.011"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b10f740&gt;, interface = 'SI09'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI10]" time="0.010"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b10d3a0&gt;, interface = 'SI10'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI11]" time="0.013"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b10e270&gt;, interface = 'SI11'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI12]" time="0.011"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b116180&gt;, interface = 'SI12'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI13]" time="0.012"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b114e30&gt;, interface = 'SI13'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_queries_and_metadata_use_current_domain_without_writes[SI14]" time="0.013"><failure message="assert 404 == 200">store = &lt;controls.ControlStore object at 0x10b114c50&gt;, interface = 'SI14'
+
+    @pytest.mark.parametrize("interface", KINDS)
+    def test_public_simulation_queries_and_metadata_use_current_domain_without_writes(store, interface):
+        pages = BossPageAPI(store)
+        with store.connect() as db:
+            before = tuple(db.iterdump())
+        for role, endpoint in [("BOSS", "simulation-query"), ("MAINTAINER", "simulation-inspect")]:
+            code, result = pages.serve(role, "/api/boss/ui/" + endpoint, "interface_id=" + interface)
+&gt;           assert code == 200
+E           assert 404 == 200
+
+app/tests/test_product_simulation_access.py:23: AssertionError</failure></testcase><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_role_boundaries[None-simulation-query-401]" time="0.010" /><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_role_boundaries[None-simulation-inspect-401]" time="0.007" /><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_role_boundaries[MAINTAINER-simulation-query-403]" time="0.009" /><testcase classname="app.tests.test_product_simulation_access" name="test_public_simulation_role_boundaries[BOSS-simulation-inspect-403]" time="0.009"><failure message="assert 404 == 403">store = &lt;controls.ControlStore object at 0x10b364410&gt;, role = 'BOSS'
+path = 'simulation-inspect', status = 403
+
+    @pytest.mark.parametrize("role,path,status", [(None, "simulation-query", 401), (None, "simulation-inspect", 401),
+        ("MAINTAINER", "simulation-query", 403), ("BOSS", "simulation-inspect", 403)])
+    def test_public_simulation_role_boundaries(store, role, path, status):
+&gt;       assert BossPageAPI(store).serve(role, "/api/boss/ui/" + path, "interface_id=SI13")[0] == status
+E       assert 404 == 403
+
+app/tests/test_product_simulation_access.py:36: AssertionError</failure></testcase></testsuite></testsuites>

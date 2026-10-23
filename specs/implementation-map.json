@@ -15,6 +15,8 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"app/webui/MaintainerSimulationInspect.tsx","owner":"W3","task_id":"T11","scope":"A02通过正式维护投影人工检查十四类模拟接口，保留正文隔离及完整结果来源"},
+    {"path":"app/tests/test_product_simulation_access.py","owner":"W3","task_id":"T11","scope":"十四类模拟查询公共委派、当前Schema、角色、参数及零写入检查；领域实现由W1维护"},
     {"path":"specs/product-skills.openapi.yaml","owner":"W3","task_id":"T11","scope":"原生方法技术读取及限制范围的skill.update，独立扩展等待T06正式接收"},
     {"path":"validation/product_skills.py","owner":"W3","task_id":"T11","scope":"同一Runtime的原生SOP安装、技术读取、获准启停及实际上下文读取；领域Catalog由W2维护"},
     {"path":"app/webui/MaintainerSkills.tsx","owner":"W3","task_id":"T11","scope":"A06当前方法技术状态与原生启停；不改变领域方法正文或历史管理责任"},
@@ -30,7 +32,7 @@
     {"path":"validation/export_observed_runtime_fixture.py","owner":"W3","task_id":"T11","scope":"从本目录真实运行导出可复验数据；检查实际终态、源库一致性、Schema及获准资料"},
     {"path":"validation/legacy_assignment_fixture.py","owner":"W3","task_id":"T11","scope":"执行已有1.2.1提交在内存中的真实Store，使用同一获准selection创建独立迁移数据库；不修改代码或伪造缺失绑定"},
     {"path":"app/tests/test_product_assignment_sources.py","owner":"W3","task_id":"T11","scope":"1.5.0公共来源读取、本人确认、当前任务传播及结果重新提交的真实SQLite检查"},
-    {"path":"specs/product-runtime.openapi.yaml","owner":"W3","task_id":"T11","scope":"公共Runtime配置扩展的实际接口定义，独立版本，等待W1正式接收，不改变已冻结1.4.1"},
+    {"path":"specs/product-runtime.openapi.yaml","owner":"W3","task_id":"T11","scope":"公共Runtime配置扩展的实际接口定义，独立版本，等待W1正式接收；核心1.6.0保持其正式定义"},
     {"path":"validation/check_public_runtime_evidence.py","owner":"W3","task_id":"T11","scope":"公共应用实际记录、原始传输、源码及正式Runtime Schema的只读核查"},
     {"path":"validation/product_runtime.py","owner":"W3","task_id":"T11","scope":"公共应用的配置保存、校验、启用及实际Runtime采用；configuration/current保持唯一启用来源"},
     {"path":"app/webui/ProductRuntimeConfiguration.tsx","owner":"W3","task_id":"T11","scope":"公共A08的真实配置操作及下一任务采用状态"},

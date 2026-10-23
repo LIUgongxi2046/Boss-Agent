@@ -1,0 +1,74 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "simulation-public-43551301-7f5e-4145-bbee-18e77660f242",
+  "at": "2026-10-23T10:52:20.790Z",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "cbfe2f5f25b392ce98729d567c22ad9b3bb9ebcfa10f44709d92c6ca5b414602"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "54bf8f70140833258d54b114bd4d72432e4e09d4bbc6a64cb1965c3c094d3329"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "ca838d8ea80da9c351946dc6099eb2f4ac54cb46d91f25c0b2fc2afbbe247b35"
+    },
+    {
+      "path": "validation/boss_simulation_api.py",
+      "sha256": "1552c07daeb952b104fd79b885701bd5d28d283c9b1e7a31e464a8c8bbb29794"
+    },
+    {
+      "path": "specs/simulation-query.schema.json",
+      "sha256": "52307e247933fad63b50bd3e3e185d451957c7245000d6a6a46f49a0fbb9dd54"
+    },
+    {
+      "path": "specs/openapi.yaml",
+      "sha256": "e32c60cad37374e75a8f800ca0e6e8eb77aa7d25e7036fcc9a73a2d383ad5493"
+    },
+    {
+      "path": "app/webui/MaintainerSimulationInspect.tsx",
+      "sha256": "87adac0d92894f5e172469fa158d35a09f1cbbe2746816627d77684d3d0308c1"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "6695743cdd6aeaf3e7caab3b9e586ce359730c4b73327ca138e8eb6be3c46b64"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "adf50b030679b51939a293666611b5a8b85693324688d48e75c671756cb7125f"
+    },
+    {
+      "path": "validation/desktop/check-simulation-public.cjs",
+      "sha256": "005360fdf374331ac3a6dbdbb0547f5621d9d561d3a20fab711abbadaa85a799"
+    },
+    {
+      "path": "evidence/T12/check_simulation_reads.py",
+      "sha256": "c9f8ce2252863dd3ccf27524c4bfe31cb4ac9970350ad0f9f45f5ead1d9e5afe"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "28e330baf87cce3c642d04fa0d737e3d9ef0bdcfaf1c691e19c08fbf131aeee4"
+    }
+  ],
+  "records": [
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "application_directory": "validation/.work/simulation-public-43551301-7f5e-4145-bbee-18e77660f242",
+  "external_api_mode": "SIMULATED_FIRST",
+  "source_type": "SIMULATED",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A12_A19_accepted": false
+}

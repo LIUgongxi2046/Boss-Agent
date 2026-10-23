@@ -24,6 +24,7 @@ import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
 import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
 import { MaintainerMemoryStatus } from "./MaintainerMemoryStatus";
 import { MaintainerSkills } from "./MaintainerSkills";
+import { MaintainerSimulationInspect } from "./MaintainerSimulationInspect";
 import { BossAssignmentSourceReview, type AssignmentSourceReviewProjection } from "./BossAssignmentSourceReview";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
@@ -1011,7 +1012,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   <StatusLine text="采用条件由当前启用版本、来源和业务时间计算；实际模型遵从与业务结果需要各自验证。"/>
                 </Panel>
               </> :
-                page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
+                page === "A02" ? <>
+                  <MaintainerSimulationInspect onOpenTools={() => navigate("A09")}/>
+                  <BossWorkspaceView key="A02" role={role} pageId="A02" onNavigate={id => navigate(id)} onViewSource={goSource}/>
+                </> : page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
                 page === "A12" ? <>
                   <MaintainerMemoryStatus getToken={getToken} onNavigate={(id, reference) => {
                     setRuntimeRunId(reference?.run_id ?? ""); navigate(id);

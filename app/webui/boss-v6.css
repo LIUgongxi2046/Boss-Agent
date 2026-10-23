@@ -384,6 +384,9 @@
 }
 .boss-runtime-fields {border:0;padding:12px 0;display:grid;gap:12px;min-width:0;}
 .boss-runtime-fields>label {display:grid;gap:6px;}
+.boss-simulation-inspect pre {max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6;}
+.boss-simulation-inspect li {overflow-wrap:anywhere;}
+.boss-simulation-inspect textarea,.boss-simulation-inspect select {width:100%;min-width:0;border:1px solid #d7e9fa;border-radius:9px;padding:10px;font:inherit;}
 .boss-runtime-fields input[type="number"] {max-width:220px;border:1px solid #d7e9fa;border-radius:9px;padding:10px;}
 .boss-runtime-fields fieldset {border:1px solid #d7e9fa;border-radius:9px;padding:12px;display:grid;gap:8px;min-width:0;}
 .boss-runtime-fields fieldset label {display:flex;align-items:center;gap:8px;min-height:44px;overflow-wrap:anywhere;}

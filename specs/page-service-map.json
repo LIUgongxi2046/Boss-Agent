@@ -2565,10 +2565,12 @@
       "logical_architecture_route": "/app/maintain/A02",
       "actual_webui_navigation": "?bossPage=A02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_FOURTEEN_INTERFACE_TECHNICAL_INSPECTION",
+      "component_file": "app/webui/MaintainerSimulationInspect.tsx",
+      "component_name": "MaintainerSimulationInspect",
+      "additional_component_files": ["app/webui/BossWorkspaceView.tsx"],
       "verified_http_read_routes": [
+        "GET /api/boss/ui/simulation-inspect",
         "GET /api/boss/ui/workspace/tool-catalog"
       ],
       "code_wired_write_actions": [],
@@ -2576,13 +2578,14 @@
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "simulation.invoke",
-        "simulation.test"
+        "complete_simulated_write_interfaces_and_agent_adoption"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_product_simulation_access.py",
+        "app/tests/test_boss_simulation_api.py"
       ],
       "source_task_ids": [
         "T19",
