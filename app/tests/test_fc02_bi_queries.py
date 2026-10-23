@@ -169,3 +169,15 @@ def test_fc02_same_period_is_incomparable_and_empty_result_can_open_source(tmp_p
     empty = store.invoke("query_metrics", request("fc02-empty", currency="USD"))
     evidence = store.invoke("read_evidence", {"envelope": request("fc02-empty-source")["envelope"], "query_id": empty["query_id"], "source_ids": ["finance-note"], "detail_refs": []})
     assert [row["record_id"] for row in evidence["original_records"]] == ["finance-note"]
+
+
+def test_fc02_mixed_ownership_cannot_produce_combined_totals(tmp_path):
+    from boss_bi_queries import _aggregate
+    store, _, _ = service(tmp_path)
+    with store.connect() as db:
+        rows = deepcopy(store.get(db, "ui-check", "initial", "snapshot")["details"][:2])
+    rows[0].update(ownership_type="COMPANY", asset_owner_id="entity-1", cost_owner_id="entity-1")
+    rows[1].update(ownership_type="CUSTOMER", asset_owner_id="customer-1", cost_owner_id="customer-1")
+    metrics, missing = _aggregate(rows, request())
+    assert "INCOMPATIBLE_OWNERSHIP_SCOPE" in missing
+    assert all(value[0] is None for value in metrics.values())

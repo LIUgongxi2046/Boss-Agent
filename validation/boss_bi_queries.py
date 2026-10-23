@@ -42,8 +42,11 @@ def _aggregate(rows, scope):
     identifiers = [row["record_id"] for row in rows]
     require(len(identifiers) == len(set(identifiers)), "重复明细不能重复计入指标", web.HTTPBadRequest)
     totals, missing = [], []
+    owner_scopes = {tuple(row.get(field) for field in ("ownership_type", "asset_owner_id", "cost_owner_id")) for row in rows}
+    if len(owner_scopes) > 1:
+        missing.append("INCOMPATIBLE_OWNERSHIP_SCOPE")
     for field in ("quantity_tonnes", "revenue_cny", "cost_cny"):
-        if not rows or any(row.get(field) is None for row in rows):
+        if not rows or len(owner_scopes) > 1 or any(row.get(field) is None for row in rows):
             missing.append(field)
             totals.append(None)
         else:
@@ -165,7 +168,8 @@ def query_metrics(store, db, ns, data, payload):
                            "value": format(value, "f") if value is not None else None, "unit": "百分点" if metric == "gross_margin" else "%",
                            "formula": "current-base" if metric == "gross_margin" else "(current-base)/base*100",
                            "definition_version": payload["definition_version"], "display_rounding": "原始Decimal精度"})
-    state = "INCOMPARABLE" if reasons else "COMPARABLE" if current_rows and baseline_rows else "INSUFFICIENT_EVIDENCE"
+    known_periods = all(any(period_values[name][metric][0] is not None for metric in payload["metric_ids"]) for name in ("BASE", "CURRENT"))
+    state = "INCOMPARABLE" if reasons else "COMPARABLE" if known_periods else "INSUFFICIENT_EVIDENCE"
     result = {"query_id": str(uuid.uuid4()), "envelope": env, "values": values, "detail_refs": list(all_rows),
               "sources": [store.source(document, data, "INCOMPLETE")], "missing_fields": missing,
               "unexplained_causes": ["原因贡献明细尚未提供"], "context_snapshot": payload,
