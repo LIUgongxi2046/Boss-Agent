@@ -4,6 +4,7 @@ import hashlib
 import json
 import sys
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
@@ -11,7 +12,7 @@ import httpx
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "validation"))
 
-from boss_transcription import DoubaoTranscriptionProvider, MAX_AUDIO_BYTES, normalize_recording
+from boss_transcription import ENDPOINT, RESOURCE_ID, DoubaoTranscriptionProvider, MAX_AUDIO_BYTES, normalize_recording
 
 SAMPLE_URL = "https://las-ai-cn-beijing-online.tos-cn-beijing.volces.com/operator_cards_serving/public/online/las_asr/badaling.wav"
 SOURCE_URL = "https://docs.volcengine.com/docs/LakeAIService/SpeechtotextautomaticspeechrecognitionDoubao-recordingfilerecognitionenhancedversion?lang=en"
@@ -37,6 +38,8 @@ async def main(args):
         "authorization": "用户委托选择真实公开样本验证 Doubao STT",
         "source_sha256": source_sha256, "sample_bytes": len(audio),
         "local_duration_ms": duration_ms, "status": "LOCAL_AUDIO_VALIDATED",
+        "endpoint": ENDPOINT, "resource_id": RESOURCE_ID, "authentication_header": "X-Api-Key",
+        "checked_at": datetime.now(timezone.utc).isoformat(), "service_attempt_count": 0,
         "private_recording_used": False, "full_A20_accepted": False,
         "source_code_sha256": hashlib.sha256((ROOT / "validation" / "boss_transcription.py").read_bytes()).hexdigest(),
     }
@@ -47,6 +50,10 @@ async def main(args):
         return
     def record_observation(observation):
         report.update(observation)
+        report["service_attempt_count"] = 1
+        report["authentication_accepted"] = False if observation["http_status"] == 401 else (
+            True if observation["http_status"] == 200 and observation["provider_status"] == "20000000" else None
+        )
         report["status"] = "RESPONSE_RECEIVED" if (
             observation["http_status"] == 200 and observation["provider_status"] == "20000000"
         ) else "SERVICE_REJECTED"
@@ -67,6 +74,7 @@ async def main(args):
         "response_text_sha256": hashlib.sha256(text.encode()).hexdigest(),
         "transcript_body_recorded": False, "business_command_submitted": False,
         "ground_truth_accuracy_evaluated": False,
+        "authentication_accepted": True,
     })
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2))
     print(json.dumps(report, ensure_ascii=False))
