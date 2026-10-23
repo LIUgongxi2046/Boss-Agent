@@ -1,0 +1,35 @@
+{
+  "feature_id": "FC02",
+  "role": "N3",
+  "status": "INTEGRATED_CANDIDATE_READY_FOR_N4",
+  "implementation_commit": "1ed90420a3e39c69ab7564a0ea1d50f2242993ab",
+  "candidate_authority": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
+  "domain_commits": ["fe3010563c6986eff6f0c26c1b5b2554d061cff6", "4bcb0a937eaac5ae64031105ccfd2f7de413c8bb"],
+  "agent_commits": ["15aeb1d1c61c50e5958565e2bb5c021c2b35fc79", "738f5616ae03c951bd97c9abb4154de7937b79ef"],
+  "scope": "完整公开范围、比较条件、继承追问、来源与原始依据、真实SDK受限工具、原请求持久读取和取消；二十项独立验收等待N4",
+  "frontend_directory": "fc02-n3-scoped-dist",
+  "manifest_sha256": "03ea8a455e7cdc5c49d6a30b57ca385bac575acc24fda23e64b2510a5c7413bc",
+  "index_sha256": "68f2f03188c1dd44242c28b06e067ca0035275e0bf6dbb1984000747e2ccb08a",
+  "source_sha256": {
+    "app/webui/BossBIView.tsx": "a0924932cc6350297497d10db674e356b1ba0f96c33113d00b68a505a7c05422",
+    "app/webui/BossDesktop.tsx": "eea71cd0b35b2676b830f0e6a8e012a64a09789b282a52f25a15ebd4c5956aee",
+    "app/webui/boss-v6.css": "5f3f9251f8b00d62effd25fce5dcdc1930f8e92179278c66b2f0c6410ea28f80"
+  },
+  "checks": [
+    {"result": "PASS", "passed": 78, "evidence": "evidence/feature-delivery/FC02/integrated-final.xml"},
+    {"result": "PASS", "passed": 4, "scope": "最终请求编号与共享Runtime必要复验，包含于同一功能范围", "evidence": "evidence/feature-delivery/FC02/public-runtime-green.xml"},
+    {"result": "PASS", "scope": "公开账号、查询/追问/比较/恢复/来源、角色、Token、键盘及18组DOM尺寸", "evidence": "evidence/feature-delivery/FC02/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5.json"},
+    {"result": "PASS", "scope": "标准OpenAPI3.1及重复YAML字段", "command": ".work/openapi-venv/bin/python validation/check_bi_public_spec.py"}
+  ],
+  "test_ports": {"business": 9681, "webui": 9682, "gateway": 19681},
+  "test_data_policy": "独立账号和SQLite；保留用户预览及其他角色进程",
+  "external_api_mode": "SIMULATED_FIRST",
+  "usage": null,
+  "cost_total": null,
+  "visual": "NOT_RUN",
+  "real_model_quality": "NOT_RUN",
+  "device_installation": "NOT_RUN",
+  "independent_feature_verdict": "PENDING_N4",
+  "verified_feature_checkpoints": null,
+  "total_feature_checkpoints": 20
+}
