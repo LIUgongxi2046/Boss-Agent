@@ -1,42 +1,138 @@
 {
   "feature_id": "FC02",
   "role": "N3",
-  "status": "PUBLIC_REPAIRS_READY_FOR_INDEPENDENT_RECHECK",
-  "implementation_commit": "60c282689dc5ab705861e00363bc7718700b5fc4",
-  "base_candidate_commit": "9026c8aa67ac8369408144ba6971c6b8e12f2af0",
-  "repair_commits": ["abcee1b97de02be4d9ca59473e2d779ec5be8328", "60c282689dc5ab705861e00363bc7718700b5fc4"],
-  "repair_records": ["history-recovery.md", "async-recovery.md"],
+  "status": "FORMAL_BOUNDARY_PUBLIC_CANDIDATE_READY_FOR_N4",
+  "implementation_commit": "8391754e41288e923626bb9b05b76305ef610b6f",
+  "base_candidate_commit": "faf66bf6c718b032e20a94231989894367a258c4",
   "candidate_authority": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
-  "domain_commits": ["fe3010563c6986eff6f0c26c1b5b2554d061cff6", "4bcb0a937eaac5ae64031105ccfd2f7de413c8bb"],
-  "agent_commits": ["15aeb1d1c61c50e5958565e2bb5c021c2b35fc79", "738f5616ae03c951bd97c9abb4154de7937b79ef"],
-  "scope": "FC02完整工单范围保留；当前修复来源失效后的历史与原请求恢复，以及较早初始回执覆盖编辑条件；同一制品真实检查通过，完整功能等待N4和正式边界输入",
-  "frontend_directory": "fc02-n3-history-dist",
-  "manifest_sha256": "c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475",
-  "index_sha256": "39b597fd3398b368dcc290d93bfbaeefd159f743211c10df45b8606a3557d78b",
+  "domain_commits": [
+    "fe3010563c6986eff6f0c26c1b5b2554d061cff6",
+    "4bcb0a937eaac5ae64031105ccfd2f7de413c8bb",
+    "9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3",
+    "2731df3fb9a6f6ffc405846a301505f0141ff1d5"
+  ],
+  "integrated_scenario_commits": [
+    "f515905",
+    "4e6b8d6"
+  ],
+  "agent_commits": [
+    "15aeb1d1c61c50e5958565e2bb5c021c2b35fc79",
+    "738f5616ae03c951bd97c9abb4154de7937b79ef"
+  ],
+  "repair_commits": [
+    "abcee1b97de02be4d9ca59473e2d779ec5be8328",
+    "60c282689dc5ab705861e00363bc7718700b5fc4"
+  ],
+  "repair_records": [
+    "history-recovery.md",
+    "async-recovery.md",
+    "boundary-adoption.md"
+  ],
+  "scope": "完整FC02二十项范围；正式六场景已接收，维护载入和原请求回执、本人场景及来源选择、双方口径并列与原文均实际采用；历史及异步保护在相同制品重新验证",
+  "frontend_directory": "fc02-n3-boundary-dist",
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "index_sha256": "8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6",
   "source_sha256": {
-    "app/webui/BossBIView.tsx": "7d0fda5afaf184d922449a1d5aa5e695fae8b0b57a7b09aaaf01f721dabd1eb5",
-    "app/webui/BossDesktop.tsx": "eea71cd0b35b2676b830f0e6a8e012a64a09789b282a52f25a15ebd4c5956aee",
-    "app/webui/boss-v6.css": "5f3f9251f8b00d62effd25fce5dcdc1930f8e92179278c66b2f0c6410ea28f80"
+    "app/webui/BossBIView.tsx": "b63576e42de40803ac2ee192fb5c2109834d96ede111d547244cec6e386b97a9",
+    "app/webui/BossDesktop.tsx": "f7ce3d8253c115f42e4d440c8961113f857cc70e3204d528a3e8722732c790c2",
+    "app/webui/boss-v6.css": "44d42f713499bc4142912bbe108cf86e5d95ad4832e2f9522a6d662441d58b33",
+    "app/webui/BIBasisComparison.tsx": "6d477bfca1b02af98eca3beef6783a735da2027b28bb8ebfc8c7854fd4b06f14",
+    "app/webui/MaintainerBIScenarios.tsx": "b0ad69c322d19aee5694dcde7e21969dfe873ff87ab0e2d306b5c8fa99f9dc30",
+    "app/webui/nanobot-one-shot.patch": "98137a7b05abecf3ace02cff41d03f0243e248de898376727075a9765edadbcd"
+  },
+  "native_client": {
+    "path": ".work/product/nanobot/webui/src/lib/nanobot-client.ts",
+    "sha256": "48ae362a2d6ae0a3d817765a4e34459c3b77255e70bebd0205b7403c2fbe5527",
+    "patch": "app/webui/nanobot-one-shot.patch",
+    "applied": true,
+    "replay_after_reconnect": false,
+    "action": "boss.simulation.bi_scenario.load"
+  },
+  "build": {
+    "result": "PASS",
+    "seconds": 15.14,
+    "command": "npm run build -- --outDir ../../../../fc02-n3-boundary-dist",
+    "directory": ".work/product/nanobot/webui",
+    "source_mirrors": "五份正式前端文件与构建输入逐份SHA256相同；全新构建通过文件编辑工具采用正式文件及原生Client patch",
+    "record": "boundary-adoption.md#构建与一致性"
   },
   "checks": [
-    {"result": "PASS", "scope": "正常查询与追问、正式来源撤销、同库重启、历史及原请求、刷新、真实30秒身份失效与重认证、退出和维护403、12组DOM与键盘", "evidence": "evidence/feature-delivery/FC02/fc02-history-6e8d0b95-f990-481e-a585-de0c060a2fa3.json"},
-    {"result": "PASS", "scope": "真实HTTP/WebSocket响应延迟；较早回执及原始依据均不覆盖新条件，延迟前后响应字节摘要一致", "evidence": "evidence/feature-delivery/FC02/fc02-n3-timing-0aa94d7d-c7d7-49de-9bfc-6f198b3989f0.json"},
-    {"result": "PASS", "scope": "严格TypeScript与Vite独立构建", "seconds": 14.10, "command": "npm run build -- --outDir ../../../../fc02-n3-history-dist"}
+    {
+      "result": "PASS",
+      "cases": 24,
+      "scope": "正式六场景18项、当前公共消费者6项；实际SQLite与SDK",
+      "evidence": "evidence/feature-delivery/FC02/boundary-consumers.xml"
+    },
+    {
+      "result": "PASS",
+      "cases": 6,
+      "scope": "公共目录、列表、维度及存在/未知载入回执的正式Schema；实际SDK消费者，包含前述6项的增强验证",
+      "evidence": "evidence/feature-delivery/FC02/boundary-output.xml"
+    },
+    {
+      "result": "PASS",
+      "scope": "真实维护载入六场景；实际成功响应形成后中断连接，重连载入只转发一次、原请求只读恢复；本人七项查询、14%加权比率、null边界、延迟与未同步、双方100/120并列和各自原文、刷新及18组DOM；零业务写入、零renderer错误",
+      "evidence": "evidence/feature-delivery/FC02/fc02-boundary-176212af-9f94-49fc-891f-04f8a7441691.json"
+    },
+    {
+      "result": "PASS",
+      "scope": "来源撤销后的同库独立服务重启、历史及原请求、刷新、自然身份失效/重新认证、退出、维护403及12组历史DOM/键盘",
+      "evidence": "evidence/feature-delivery/FC02/fc02-history-3984d0c8-83cb-4c2e-bc37-0307b28ab841.json"
+    },
+    {
+      "result": "PASS",
+      "scope": "真实响应延迟；较早原文及回执不覆盖新查询或编辑范围，响应字节摘要一致",
+      "evidence": "evidence/feature-delivery/FC02/fc02-n3-timing-719b2fd4-0c29-4963-bdb8-95fe8532894e.json"
+    },
+    {
+      "result": "PASS",
+      "scope": "标准OpenAPI3.1及YAML重复字段检查",
+      "command": ".work/openapi-venv/bin/python validation/check_bi_public_spec.py"
+    }
   ],
-  "unchanged_evidence": {"candidate_commit":"9026c8aa67ac8369408144ba6971c6b8e12f2af0", "scope":"领域、Agent、Runtime、正式Schema与未变化消费者；没有在新候选重跑74项全量", "independent_record":"/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/feature-delivery/FC02/qa.md"},
-  "previous_independent_verdict": {"candidate_commit":"9026c8aa67ac8369408144ba6971c6b8e12f2af0", "result":"FAIL", "release_decision":"NO_GO", "verified_checkpoints":12, "total_checkpoints":20},
-  "test_ports": {"business": 9761, "webui": 9762, "gateway": 19761},
-  "timing_ports": {"business":9751,"webui":9752,"gateway":19751,"proxy":9753},
-  "test_data_policy": "独立账号和SQLite；保留用户预览及其他角色进程",
+  "previous_independent_verdict": {
+    "candidate_commit": "faf66bf6c718b032e20a94231989894367a258c4",
+    "result": "BLOCKED",
+    "release_decision": "INSUFFICIENT_EVIDENCE",
+    "verified_checkpoints": 16,
+    "total_checkpoints": 20,
+    "record": "docs/feature-delivery/FC02/independent-faf66bf.json",
+    "manifest_sha256": "c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475"
+  },
+  "evidence_reuse_policy": "旧74项实际运行于9026c8a，N4按301项依赖核查用于faf66bf；本候选改变正式输入、Schema及公开消费者，N4须核查当前适用依赖，不直接继承旧16/20分数。不重复FC01及无变化业务全量。",
+  "required_input_checkpoints": [],
+  "formal_input_checkpoints_received": [
+    "FC02.C05",
+    "FC02.C08",
+    "FC02.C11"
+  ],
+  "test_ports": {
+    "business": 9841,
+    "webui": 9842,
+    "gateway": 19841,
+    "proxy": 9843
+  },
+  "history_ports": {
+    "business": 9761,
+    "webui": 9762,
+    "gateway": 19761
+  },
+  "timing_ports": {
+    "business": 9751,
+    "webui": 9752,
+    "gateway": 19751,
+    "proxy": 9753
+  },
+  "test_data_policy": "独立账号、当前正式生成器、SQLite及端口；保留用户预览和其他角色进程",
   "external_api_mode": "SIMULATED_FIRST",
   "usage": null,
   "cost_total": null,
   "visual": "NOT_RUN",
   "real_model_quality": "NOT_RUN",
   "device_installation": "NOT_RUN",
+  "third_party_delivery": "NOT_RUN",
   "independent_feature_verdict": "PENDING_N4_FOR_CURRENT_CANDIDATE",
-  "required_input_checkpoints": ["FC02.C05", "FC02.C08", "FC02.C11"],
-  "required_input_owner": "N1正式经营边界、同步状态与双方来源；N3继续接收相应公开字段",
   "verified_feature_checkpoints": null,
-  "total_feature_checkpoints": 20
+  "total_feature_checkpoints": 20,
+  "fc03_started": false
 }
