@@ -190,3 +190,5 @@ def test_a05_frontend_uses_real_technical_payload_and_diff_only():
     for text in ("prompt-versions","client.requestMutation","content_sha256",
                  "revisions","removedLines","addedLines","runtime_context_adoption"):
         assert text in page
+    assert "window.confirm" not in page
+    assert "boss-a05-discard-title" in page
