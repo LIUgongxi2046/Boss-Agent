@@ -13,6 +13,7 @@ from datetime import datetime
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_owner_preferences import effective_owner_goals
 
 NS = "ui-check"
 
@@ -137,7 +138,10 @@ def _compile(api, db, data, contact_id, refs, purpose, meeting_id):
             "meeting_id": meeting_id, "version": meeting["version"] if meeting_id else None,
             "contact_is_participant": contact_id in meeting["participant_ids"] if meeting_id else False,
         },
-        "goals": list(data["boss_profile"]["goals"]),
+        "goals": (list(effective_owner_goals(db,data)["content"]["goals"])
+                  if effective_owner_goals(db,data) is not None
+                  and effective_owner_goals(db,data)["content"]["scope"] in
+                  ("OWNER_WORKSPACE","MEETING_PREP") else []),
         "sources": sources, **facts,
         "has_original_evidence": bool(sources),
         "external_meeting_updated": False,
