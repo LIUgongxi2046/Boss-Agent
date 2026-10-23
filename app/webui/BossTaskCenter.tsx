@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, ClipboardCheck, Clock3, FileSearch,
+import { ArrowRight, ClipboardCheck, Clock3, FileSearch,
   Filter, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
-import type { AssignmentTask, TaskFeedback, TaskLinkedMessage, TaskDueEvent, TaskListResponse } from "./BossAssignmentFlow";
+import type { AssignmentTask, TaskFeedback, TaskListResponse } from "./BossAssignmentFlow";
+type CenterTask = AssignmentTask & { related_meeting_id?: string };
 
 type Historical = {task_id:string;status:string;due_at:string;purpose?:string};
 type Response = TaskListResponse & {
@@ -43,7 +44,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
   const [meeting,setMeeting]=useState("");
   const [applied,setApplied]=useState({coordinator:"",before:"",status:"",meeting:""});
   const [page,setPage]=useState(0);
-  const tasks=data?.tasks||[];
+  const tasks=(data?.tasks||[]) as CenterTask[];
   const feedback=data?.feedback||[];
   const messages=data?.linked_messages||[];
   const events=data?.task_due_events||[];
