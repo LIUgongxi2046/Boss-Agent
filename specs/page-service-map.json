@@ -49,7 +49,8 @@
     "A13 now supports role-restricted, versioned technical scheduler draft/save/validate/activate/pause/resume/cancel with idempotent SQLite audit and no BOSS authorization. Manual run, real CronService runtime restart, and macOS lifecycle remain unverified.",
     "A13 can manually dispatch ONE approved versioned simulated event using the same canonical ControlStore.dispatch_due_in_transaction logic as CronService; local delivery/duplicate/quiet/plan suppressions are real SQLite outcomes. External/system notification and Mac restart still not verified.",
     "F11 Travel now has owner-only SQLite review/confirm/cancel, deterministic IANA offset/time checks, version-pinned conflict confirmation, and F04 live meeting-impact invalidation; no real transport/calendar booking or target Mac pixel acceptance.",
-    "F10 People meeting has stable-ID verified owner preparation, current role, task/feedback provenance, source-version redaction, confirmed attach/detach to current simulated meeting agenda and F04 freshness invalidation; no real employee account, invitation or calendar update."
+    "F10 People meeting has stable-ID verified owner preparation, current role, task/feedback provenance, source-version redaction, confirmed attach/detach to current simulated meeting agenda and F04 freshness invalidation; no real employee account, invitation or calendar update.",
+    "N07 owner goals, N08 notification preferences and F26 settings hub are now separate v6 React components. Drafts cannot take effect without BOSS-only second CAS confirmation. Runtime context load observations are not model compliance, and confirmed owner notification policy only adds suppressions to existing CronService rules. Real Mac/visual acceptance remains NOT_RUN."
   ],
   "pages": [
     {
@@ -1264,24 +1265,28 @@
       "logical_architecture_route": "/app/boss/F26",
       "actual_webui_navigation": "?bossPage=F26",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_V6_LIVE_OWNER_SETTINGS_HUB_AND_NATIVE_LOGOUT",
+      "component_file": "app/webui/BossSettingsHub.tsx",
+      "component_name": "BossSettingsHub",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/plans"
+        "GET /api/boss/ui/workspace/owner-goals",
+        "GET /api/boss/ui/workspace/owner-notice"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "Live owner-confirmed goals/notice versions and approved entry links into N07/N08/N09/N10/N11/F12/F13",
+        "Invokes existing upstream nanobot onLogout rather than introducing an authentication backend"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "owner_settings.save",
-        "auth.logout"
+        "F26.full_user_preferences_across_all_modules",
+        "F26.actual_mac_logout_restart_e2e",
+        "F26.visual_pixel_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_owner_preferences.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1877,28 +1882,31 @@
       "logical_architecture_route": "/app/boss/N07",
       "actual_webui_navigation": "?bossPage=N07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_VERSIONED_OWNER_GOALS_DRAFT_CONFIRM_AND_RUNTIME_CONTEXT",
+      "component_file": "app/webui/BossOwnerPreferences.tsx",
+      "component_name": "BossOwnerPreferences",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/memory",
+        "GET /api/boss/ui/workspace/owner-goals",
         "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
-        "boss.memory.confirm",
-        "boss.memory.delete"
+        "boss.owner.goals.save",
+        "boss.owner.goals.confirm"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "Confirmed scope-limited goal version powers F01 dashboard; F04 meeting brief change review; new runtime context provider records actual provider invocation rather than claiming model compliance",
+        "D06 unsaved owner form warning integrated in BossDesktop"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "owner_goals.save"
+        "goals.confirmed_model_quality_e2e",
+        "goals.mac_desktop_reboot_and_pixel_acceptance",
+        "goals.real_enterprise_profiles"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_recovery.py"
+        "app/tests/test_boss_owner_preferences.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1931,29 +1939,32 @@
       "logical_architecture_route": "/app/boss/N08",
       "actual_webui_navigation": "?bossPage=N08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_VERSIONED_OWNER_NOTIFICATION_PREFERENCES_WITH_CANONICAL_DISPATCH",
+      "component_file": "app/webui/BossOwnerPreferences.tsx",
+      "component_name": "BossOwnerPreferences",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/notifications",
+        "GET /api/boss/ui/workspace/owner-notice",
         "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
-        "boss.reminder.ack",
-        "boss.reminder.snooze",
-        "boss.reminder.close"
+        "boss.owner.notice.save",
+        "boss.owner.notice.confirm"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "Confirmed owner quiet hours and pause are additive suppression constraints in ControlStore.dispatch_due_in_transaction, reusing the same CronService path as A13",
+        "Calendar content cannot be shared here; F12 requires separate per-recipient busy-only grant"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "notification_preferences.save"
+        "notification_preferences.real_system_delivery",
+        "notification_preferences.mac_cron_sleep_resume",
+        "notification_preferences.full_owner_plan_management_and_f12_recipient_grants",
+        "notification_preferences.pixel_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py",
-        "app/tests/test_boss_recovery.py"
+        "app/tests/test_boss_owner_preferences.py",
+        "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
         "T18",
