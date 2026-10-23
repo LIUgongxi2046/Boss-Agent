@@ -45,15 +45,21 @@ class TodayAPI:
 
         tasks = self._rows(db, "task")
         historical = data.get("historical_task")
+        historical_ids = set()
         if historical and not any(t["task_id"] == historical["task_id"] for t in tasks):
             tasks.append(historical)
+            historical_ids.add(historical["task_id"])
         for task in tasks:
             if task["status"] in FINAL:
                 continue
-            append("task", task["task_id"], task["version"], task.get("purpose", "历史承诺"),
+            is_historical = task["task_id"] in historical_ids
+            append("historical_task" if is_historical else "task", task["task_id"], task["version"], task.get("purpose", "历史承诺"),
                    "DECIDE" if task["status"] == "RESULT_SUBMITTED" else "COORDINATE",
                    "本人需要核查完成证据" if task["status"] == "RESULT_SUBMITTED" else "交办仍需跟进当前负责人和期限",
-                   "F06", task.get("due_at"))
+                   "F04" if is_historical else "F06", task.get("due_at"))
+            if is_historical:
+                items[-1]["target_id"] = data["meeting"]["meeting_id"]
+                items[-1]["read_only"] = True
         for row in self._rows(db, "self_commitment"):
             if row["status"] not in FINAL:
                 append("self_commitment", row["commitment_id"], row["version"], row["purpose"], "COORDINATE",
@@ -65,9 +71,15 @@ class TodayAPI:
         meeting = data["meeting"]
         append("meeting", meeting["meeting_id"], meeting["version"], "会议与会前材料", "COORDINATE",
                "本人参加会议，需要核对当前资料和历史承诺", "F04", meeting["starts_at"])
-        task_ids = {t["task_id"] for t in tasks}
         for event in self._rows(db, "event"):
-            if event["state"] != "CANCELED" and event.get("task_id") not in task_ids:
+            related_task = event.get("task_id")
+            if event["event_id"] == data["event"]["event_id"]:
+                related_task = data["event"].get("task_id")
+            related_item = next((item for item in items if item["object_id"] == related_task), None)
+            if related_item is not None:
+                related_item["source_refs"].append({"kind": "event", "id": event["event_id"], "version": event["version"]})
+                related_item["important"] = related_item["important"] or (event["state"] == "OPEN" and event["impact"] == "IMPORTANT")
+            elif event["state"] != "CANCELED":
                 append("event", event["event_id"], event["version"], "经营事件", "INFORM",
                        "查看当前事件及处理依据", "F02", event["due_at"], event["impact"] == "IMPORTANT")
         private = _calendar(db, data)

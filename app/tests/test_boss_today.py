@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
 
 from controls import ControlStore
 from boss_today import TodayAPI
+from boss_command_api import BossCommandAPI
 
 
 def test_classification_provenance_order_cas_and_restart(tmp_path):
@@ -49,3 +50,18 @@ def test_changed_sources_reject_old_order_and_private_roles(tmp_path):
             today.read(role)
         with pytest.raises(error):
             today.reorder(role, {})
+
+
+def test_approved_event_merges_into_related_historical_commitment(tmp_path):
+    store = ControlStore(tmp_path / "today-linked-event.sqlite")
+    store.initialize("ui-check")
+    status, result = BossCommandAPI(store).execute("MAINTAINER", "boss.simulation.event.seed", {
+        "client_request_id": "today-approved-event", "event_id": "event-1",
+    })
+    assert status == 200, result
+    items = TodayAPI(store).read("BOSS")["items"]
+    assert not any(item["item_id"] == "event:event-1" for item in items)
+    historical = next(item for item in items if item["object_id"] == "historical-1")
+    assert {ref["kind"] for ref in historical["source_refs"]} == {"historical_task", "event"}
+    assert historical["page_id"] == "F04"
+    assert historical["target_id"] == "meeting-1"

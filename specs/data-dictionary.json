@@ -1,11 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
   "authority": "docs/LLD-data.md",
   "field_policy": {
+    "compatibility": "1.1.0保留1.0.0命令输入，增加迟到反馈历史标识、完整设计状态、来源登记和Runtime元信息；指标使用既有CHANGE枚举返回确定性变化。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
     "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
@@ -74,6 +75,8 @@
     },
     "task": {
       "storage": "objects/task", "access": "BOSS_BODY_MAINTAINER_SIMULATION_METADATA", "version": "1",
+      "prd_state_enum": ["DRAFT", "WAITING_AUTH", "OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "WAITING_MATERIAL", "RESULT_SUBMITTED", "COMPLETED_CONFIRMED", "CANCELED"],
+      "pending_state_implementation": ["DRAFT", "WAITING_AUTH", "WAITING_MATERIAL"],
       "fields": {
         "task_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
         "coordinator_id": {"type_ref": "identifier", "relation": "contact.contact_id"},
@@ -107,7 +110,7 @@
       "storage": "objects/feedback", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
       "fields": {"feedback_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"},
         "kind": {"type": "string", "enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": {"type_ref": "private_text"}, "evidence_refs": {"type": "array", "items": "document.source_id"},
-        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}}
+        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}, "historical_only": {"type": "boolean", "optional": true, "meaning": "取消后到达的反馈仅存历史，不恢复交办或催办；旧记录缺少该字段时按当前任务状态核查"}}
     },
     "message_draft": {
       "storage": "objects/message_draft", "access": "BOSS_ONLY", "version": "1",
@@ -118,6 +121,8 @@
     },
     "message": {
       "storage": "objects/message_outbox", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["DRAFT", "WAITING_AUTH", "READY", "SENDING", "SENT", "FAILED", "CANCELED"],
+      "state_mapping": {"DRAFT": "message_draft.status=DRAFT", "SENT": "send_state=SENT_SIMULATED; delivery_state独立", "WAITING_AUTH|READY|SENDING|FAILED|CANCELED": "完整产品执行状态仍待实现，不能按模型文字填写"},
       "fields": {"message_id": {"type_ref": "identifier"}, "draft_id": {"type_ref": "identifier"}, "draft_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "related_task_id": {"type": ["string", "null"]},
         "body": {"type_ref": "private_text"}, "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "RECIPIENT_ONLY"}, "authorization_id": {"type_ref": "identifier"},
         "sent_at": {"type_ref": "instant", "clock": "WALL"}, "send_state": {"type": "string", "const": "SENT_SIMULATED"}, "delivery_state": {"type": "string", "const": "NOT_VERIFIED"}, "reply_state": {"type": "string", "enum": ["NOT_RECEIVED", "RECEIVED_SIMULATED"]},
@@ -135,6 +140,8 @@
     },
     "application": {
       "storage": "objects/application", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "prd_state_enum": ["WAITING_MATERIAL", "PENDING_DECISION", "EXECUTING", "APPROVED", "REJECTED", "SUPPLEMENT_REQUESTED", "FAILED", "CANCELED"],
+      "state_mapping": {"APPROVED": "APPROVED_RECORDED", "REJECTED": "REJECTED_RECORDED", "SUPPLEMENT_REQUESTED": "WAITING_MATERIAL with REQUEST_MORE decision", "EXECUTING|FAILED|CANCELED": "异步执行状态待完整实现"},
       "fields": {"application_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "title": {"type_ref": "private_text", "maxLength": 100}, "description": {"type_ref": "private_text", "maxLength": 1500}, "applicant_contact_id": {"type_ref": "identifier"},
         "amount": {"type_ref": "decimal", "unit": "CNY", "scale": 2}, "currency": {"type": "string", "const": "CNY"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"},
         "state": {"type": "string", "enum": ["PENDING_DECISION", "WAITING_MATERIAL", "APPROVED_RECORDED", "REJECTED_RECORDED"]}, "seeded_by_role": {"type": "string", "const": "MAINTAINER"}, "decision_id": {"type": ["string", "null"]},
@@ -171,11 +178,14 @@
     },
     "document": {
       "storage": "objects/document + FTS5 knowledge", "access": "OWNER_SCOPE", "version": "1",
+      "prd_validity_enum": ["RECEIVED", "VALID", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED"],
+      "current_validity_mapping": "由当前版本/访问范围/withdrawn/有效时间推导，不以FTS命中代替VALID；完整冲突与过期来源状态仍待实现",
       "fields": {"source_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE"]}, "author_contact_id": {"type_ref": "identifier"}, "content": {"type_ref": "private_text"}, "access_scope": {"type_ref": "identifier", "meaning": "获准 owner_id"}, "original_locator": {"type": "string"}, "published_at": {"type_ref": "instant"}, "valid_from": {"type_ref": "instant", "optional": true},
         "observed_at": {"type_ref": "instant", "optional": true}, "withdrawn": {"type": "boolean", "optional": true}, "withdrawn_at": {"type": ["string", "null"], "optional": true}, "replaced_source_version": {"type_ref": "version", "optional": true}, "index_state": {"type": "string", "optional": true}, "title": {"type": "string", "optional": true}, "created_by_role": {"type": "string", "optional": true}}
     },
     "memory": {
       "storage": "objects/memory/current", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["PROPOSED", "CONFIRMED", "SUPERSEDED", "DELETED"],
       "fields": {"memory_id": {"type_ref": "identifier"}, "memory_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "confirmation_state": {"type": "string", "enum": ["CONFIRMED", "DELETED"]}, "text": {"type_ref": "private_text", "maxLength": 4000}},
       "pending_fields": {"authorization_id": "W3/W2 需绑定确认授权，检查将来采用时的撤销状态"}
     },
@@ -193,6 +203,8 @@
     },
     "reminder": {
       "storage": "objects/reminder", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["PENDING", "DELIVERED", "ACKNOWLEDGED", "SNOOZED", "CLOSED", "CANCELED", "FAILED"],
+      "state_mapping": "本人处理使用reminder.state；内部投递使用dispatch/delivery/notification；完整系统投递FAILED与待发送状态仍待验证",
       "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version", "optional": true}, "state": {"type": "string", "enum": ["SNOOZED", "CLOSED", "ACKNOWLEDGED"]}, "until": {"type": ["string", "null"], "clock": "BUSINESS"}}
     },
     "dispatch": {
@@ -261,8 +273,13 @@
     "query": {
       "storage": "objects/query", "access": "BOSS_ONLY", "version": "1",
       "fields": {"query_id": {"type_ref": "identifier"}, "envelope": {"type": "object", "properties": {"request_id": "identifier", "owner_id": "identifier", "execution_namespace": "identifier", "dataset_id": "identifier", "dataset_version": "version", "session_id": "identifier"}},
-        "values": {"type": "array", "items": {"metric_id": "identifier", "period_scope": "BASE|CURRENT", "scope_description": "string", "value": "decimal or null", "unit": "string", "formula": "string", "definition_version": "version", "display_rounding": "string"}},
+        "values": {"type": "array", "items": {"metric_id": "identifier", "period_scope": "BASE|CURRENT|CHANGE", "scope_description": "string", "value": "decimal or null", "unit": "string", "formula": "string", "definition_version": "version", "display_rounding": "string"}},
         "detail_refs": {"type": "array", "items": "metric_detail.record_id"}, "sources": {"type": "array", "items": "source_reference_with_freshness"}, "missing_fields": {"type": "array", "items": "string"}, "unexplained_causes": {"type": "array", "items": "string"}}
+    },
+    "source_registration": {
+      "storage": "objects/source_registration, planned", "access": "BOSS_SOURCE_BODY_WITH_MAINTAINER_PROVENANCE_METADATA", "version": "1", "design_status": "PROVENANCE_BINDING_REQUIRED",
+      "fields": {"source_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}, "origin_uri": {"type": "string"}, "author_contact_id": {"type": ["string", "null"]}, "published_at": {"type": ["string", "null"]}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "permission_basis": {"type": "string"}, "license_identifier": {"type": ["string", "null"]}, "license_uri": {"type": ["string", "null"]}, "content_sha256": {"type": "string"}, "access_scope": {"type_ref": "identifier"}, "valid_from": {"type": ["string", "null"]}, "valid_until": {"type": ["string", "null"]}, "withdrawn": {"type": "boolean"}, "withdrawn_at": {"type": ["string", "null"]}},
+      "source_policy": "既有SIMULATED事实使用明确的批准依据；公开材料需要核查出处与许可，缺少授权不得推断可以摄取或分发。"
     },
     "voice_transcript": {
       "storage": "W2 TranscriptionResult and protected voice records", "access": "BOSS_ONLY", "version": "1", "design_status": "W2_PROVIDER_RESULT_DEFINED_PRODUCT_REVIEW_BINDING_PENDING",

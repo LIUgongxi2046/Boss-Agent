@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.0.0
+  version: 1.1.0
   description: 当前HTTP读取、58项现有命令、5项新增领域动作、5项工具与14类模拟资料接口；新增公开路径等待W3接入，来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: EXISTING_COMMANDS_AND_READS_WITH_NEW_W1_DOMAINS_PENDING_W3
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.0.0
+  version: 1.1.0
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -386,7 +386,7 @@ components:
           items:
             type: object
             required: [metric_id, period_scope, scope_description, value, unit, formula, definition_version, display_rounding]
-            properties: {metric_id: {type: string}, period_scope: {enum: [BASE, CURRENT]}, scope_description: {type: string}, value: {type: [string, 'null']}, unit: {type: string}, formula: {type: string}, definition_version: {type: string}, display_rounding: {type: string}}
+            properties: {metric_id: {type: string}, period_scope: {enum: [BASE, CURRENT, CHANGE]}, scope_description: {type: string}, value: {type: [string, 'null']}, unit: {type: string}, formula: {type: string}, definition_version: {type: string}, display_rounding: {type: string}}
         detail_refs: {type: array, items: {type: string}}
         sources: {type: array, items: {type: object, required: [source_id, source_type, version, locator, business_as_of, source_updated_at, read_at, coverage, quality_state]}}
         missing_fields: {type: array, items: {type: string}}
@@ -1003,6 +1003,58 @@ x-simulation-access:
   state: DESIGN_NOT_MOUNTED
   policy: BOSS读取本人获准正文；MAINTAINER人工检查使用独立技术元信息投影，不借用BOSS身份；模拟写入仅允许当前已授权资料。
   missing_materials: 不通过默认记录、空值替零、预设专业结论或标签答案填补。
+x-runtime-operations:
+  - operationId: runtimeMessageSubmit
+    role: BOSS
+    transport: authenticated nanobot WebSocket
+    input:
+      type: object
+      required: [type, chat_id, content]
+      properties: {type: {const: message}, chat_id: {type: string}, content: {type: string, minLength: 1}, media: {type: array, items: {type: string}}}
+    output: runtime-events.schema.json Message/Delta/StreamEnd/TurnEnd
+    source: nanobot/webui/inbound_commands.py dispatch/_dispatch_message
+    adoption: 当前服务端角色、空间、资料和配置；模型文字不能产生额外业务权限。
+    timeout: provider 120 seconds per request; total task budget pending W2
+  - operationId: runtimeTurnCancel
+    role: BOSS
+    transport: authenticated nanobot WebSocket
+    input:
+      type: object
+      required: [type, chat_id, content]
+      additionalProperties: false
+      properties: {type: {const: message}, chat_id: {type: string}, content: {const: /stop}}
+    output: 上游消息与turn结束状态；业务动作通过原请求回执和正式对象另行查询。
+    source: nanobot/command/builtin.py cmd_stop and nanobot/agent/loop.py _cancel_active_tasks
+    scope: 指定chat会话内的当前活动任务与等待队列；当前没有按单个业务run_id撤销已提交结果的接口。
+    safety: 取消仅停止未执行步骤，已提交的SQLite业务动作继续存在，禁止重复发送。
+    validation: SOURCE_INSPECTED_REAL_RUNTIME_TEST_PENDING_W2
+  - operationId: runtimeThreadRead
+    role: BOSS
+    transport: authenticated nanobot HTTP
+    path: /api/sessions/{session_key}/webui-thread
+    input: 服务端校验当前会话访问权限的session_key
+    output: 上游持久turn和会话投影；敏感正文仅本人可见。
+    recovery: 断线或取消后重读持久turn，业务写入另查client_request_id。
+    validation: T02_SOURCE_REFERENCE_PRODUCT_RECHECK_PENDING_W2_W3
+x-validation-service:
+  source: validation/service.py
+  scope: T02独立选型验证服务；以下路径不表示产品WebUI公开路径。
+  authentication: separate server-side BOSS_PROBE_TOKEN and MAINTAINER_PROBE_TOKEN
+  max_request_bytes: 1048576
+  routes:
+    - {method: GET, path: /health, operationId: probeHealthRead, role: AUTHENTICATED, input: none, result: service/version}
+    - {method: POST, path: /datasets, operationId: probeDatasetInitialize, role: MAINTAINER, input: namespace, result: namespace/snapshot_sha256}
+    - {method: POST, path: /authorizations, operationId: probeAuthorizationCreate, role: BOSS, input: namespace/action/payload, result: authorization_id}
+    - {method: POST, path: '/operations/{operation}', operationId: probeToolInvoke, role: BOSS, input: x-tool-operations original schema, result: x-tool-operations original schema}
+    - {method: GET, path: '/spaces/{ns}/context', operationId: probeContextRead, role: BOSS, input: ns, result: current confirmed memory and runtime configuration}
+    - {method: PUT, path: '/spaces/{ns}/{kind}', operationId: probeConfigurationUpdate, role: BOSS_FOR_MEMORY_MAINTAINER_FOR_CONFIGURATION_AND_SCHEDULE, input: current version and allowed fields only, result: updated object with incremented version}
+    - {method: GET, path: '/spaces/{ns}/objects/{kind}', operationId: probeObjectsRead, role: BOSS, input: 'kind=task|outbox|notification|feedback|dispatch|event|delivery', result: current namespace objects}
+    - {method: POST, path: '/spaces/{ns}/events', operationId: probeEventNotify, role: MAINTAINER, input: event_id, result: delivered or suppressed internal notification}
+    - {method: POST, path: '/spaces/{ns}/reset', operationId: probeSpaceReset, role: MAINTAINER, input: new namespace, result: new namespace/snapshot_sha256 with previous space inactive}
+    - {method: POST, path: '/spaces/{ns}/controls/{action}', operationId: probeControlExecute, role: ACTION_ALLOWLIST, input: controls.FIELDS per action, result: actual ControlStore result}
+  maintenance_controls: [feedback, clock, event]
+  boss_controls: [decide, revoke, withdraw, search, private_calendar, reference_status, reminder, rules]
+  product_policy: 产品技术调度以boss.scheduler.*维护身份为准；原验证入口不可作为桌面公开权限或另一调度来源。
 x-pending:
   - public integration of five new W1 domain actions
   - actual simulation broker implementation and approved missing materials

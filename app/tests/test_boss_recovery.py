@@ -83,6 +83,8 @@ def test_revoked_share_authorization_blocks_future_preview(context):
                        authorization_id=share["authorization_id"], expected_version="1", reason="停止后续分享")
     assert code == 200, result
     assert pages.serve("BOSS", route, query) == (410, {"error": "SHARE_INACTIVE", "share_status": "AUTHORIZATION_REVOKED"})
+    projection = pages.serve("BOSS", "/api/boss/ui/workspace/calendar")[1]
+    assert projection["shares"][0]["effective_state"] == "REVOKED"
 
 
 def test_uncertain_mutation_can_check_original_receipt_without_side_effect(context):

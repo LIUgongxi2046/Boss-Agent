@@ -4,6 +4,7 @@ export type TodayItem = {
   item_id:string;object_id:string;version:string;title:string;
   category:"DECIDE"|"COORDINATE"|"INFORM";reason:string;page_id:string;
   due_at:string|null;important:boolean;source_refs:{kind:string;id:string;version:string}[];
+  target_id?:string;read_only?:boolean;
 };
 export type TodayProjection = {
   date:string;timezone:string;items:TodayItem[];snapshot_sha256:string;
@@ -61,7 +62,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onDi
           <h3>{item.title}</h3><p>{item.reason}</p>
           <small>{item.due_at||"期限尚未提供"} · 当前版本 {item.version}</small>
           <div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={()=>onNavigate(item.page_id,item.object_id)}>打开关联事项</button>
+            <button type="button" className="boss-btn" onClick={()=>onNavigate(item.page_id,item.target_id||item.object_id)}>{item.read_only?"查看历史承诺资料":"打开关联事项"}</button>
             <button type="button" className="boss-btn" disabled={index===0||busy||Boolean(pending)} onClick={()=>move(index,-1)} aria-label={"提高事项次序："+item.title}>提高次序</button>
             <button type="button" className="boss-btn" disabled={index===items.length-1||busy||Boolean(pending)} onClick={()=>move(index,1)} aria-label={"降低事项次序："+item.title}>降低次序</button>
           </div>

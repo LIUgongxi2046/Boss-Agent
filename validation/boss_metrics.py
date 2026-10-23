@@ -34,3 +34,18 @@ def aggregate_metrics(records):
         "gross_margin": (profit / revenue * 100 if profit is not None and revenue else None, "%", "gross_profit/revenue*100"),
         "gross_profit_per_tonne": (profit / quantity if profit is not None and quantity else None, "CNY/吨", "gross_profit/quantity"),
     }, "missing_fields": missing, "detail_refs": identifiers}
+
+
+def compare_metrics(base, current):
+    result = {}
+    require(set(base) == set(current), "比较指标集合不一致", web.HTTPBadRequest)
+    for metric, (before, unit, _) in base.items():
+        after, current_unit, _ = current[metric]
+        require(unit == current_unit, "指标单位不相容，不能计算变化", web.HTTPBadRequest)
+        if metric == "gross_margin":
+            value = after - before if after is not None and before is not None else None
+            result[metric] = (value, "百分点", "current_gross_margin-base_gross_margin")
+        else:
+            value = (after - before) / before * 100 if after is not None and before else None
+            result[metric] = (value, "%", "(current-base)/base*100")
+    return result

@@ -37,7 +37,12 @@ class ControlStore(Store):
             self.active(db, ns)
             result = getattr(self, "control_" + action)(db, ns, p)
             audit_result = {"calendar_id": result["calendar_id"], "visibility": result["visibility"]} if action == "private_calendar" else result
-            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(p), encode(audit_result), now()))
+            audit_input = p
+            if action == "feedback":
+                audit_input = {k: p[k] for k in ("task_id", "task_version", "author_contact_id", "kind")}
+                audit_result = {"feedback_id": result["feedback"]["feedback_id"], "task_id": result["task"]["task_id"],
+                                "task_version": result["task"]["version"], "historical_only": result["feedback"].get("historical_only", False)}
+            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
             return result
 
     def control_feedback(self, db, ns, p):
@@ -45,17 +50,19 @@ class ControlStore(Store):
         require(task["version"] == p["task_version"], "任务版本冲突")
         require(p["author_contact_id"] == task["coordinator_id"], "反馈作者不符", web.HTTPForbidden)
         require(p["kind"] in {"PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"}, "反馈类型无效", web.HTTPBadRequest)
-        require(task["status"] not in {"CANCELED", "COMPLETED_CONFIRMED"}, "当前任务已结束")
+        require(task["status"] != "COMPLETED_CONFIRMED", "已确认完成的任务不接受进度变更")
+        historical_only = task["status"] == "CANCELED"
         feedback_id = str(uuid.uuid4())
-        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now()}
+        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now(), "historical_only": historical_only}
         self.put(db, ns, "feedback", feedback_id, feedback)
         task["feedback_ids"].append(feedback_id)
         task["version"] = str(int(task["version"]) + 1)
-        if p["kind"] == "PROGRESS":
+        if p["kind"] == "PROGRESS" and not historical_only:
             task["status"] = "IN_PROGRESS"
         if p["kind"] == "RESULT_SUBMITTED":
             require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
-            task["status"] = "RESULT_SUBMITTED"
+            if not historical_only:
+                task["status"] = "RESULT_SUBMITTED"
         self.put(db, ns, "task", p["task_id"], task)
         return {"feedback": feedback, "task": task}
 
@@ -127,8 +134,19 @@ class ControlStore(Store):
     def control_event(self, db, ns, p):
         require(p["state"] in {"OPEN", "RECOVERED", "CANCELED"}, "事件状态无效", web.HTTPBadRequest)
         require(p["impact"] in {"NORMAL", "IMPORTANT"}, "事件影响无效", web.HTTPBadRequest)
-        self.put(db, ns, "event", p["event_id"], p)
-        return p
+        require(p["version"].isdecimal() and 1 <= int(p["version"]) <= 99999999, "事件版本必须为有效十进制字符串", web.HTTPBadRequest)
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event' AND id=?", (ns, p["event_id"])).fetchone()
+        event = dict(p)
+        if row:
+            previous = json.loads(row[0])
+            if previous["version"] == p["version"]:
+                require(all(previous.get(key) == value for key, value in p.items()), "相同事件版本不能更改内容")
+                return previous
+            require(int(p["version"]) == int(previous["version"]) + 1, "事件版本必须基于当前版本递增")
+            if previous.get("owner_plan_id"):
+                event["owner_plan_id"] = previous["owner_plan_id"]
+        self.put(db, ns, "event", p["event_id"], event)
+        return event
 
     def control_reminder(self, db, ns, p):
         event = self.get(db, ns, "event", p["event_id"])

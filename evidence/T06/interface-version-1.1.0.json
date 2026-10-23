@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.1.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "workspace": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+  "source_base": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
+  "source_scope": "W1 commit containing this evidence",
+  "receivers": ["W2 Agent and tool consumers", "W3 public integration and device validation"],
+  "artifacts": ["docs/LLD-data.md", "specs/data-dictionary.json", "docs/LLD-backend.md", "specs/openapi.yaml", "specs/runtime-events.schema.json"],
+  "checks": [
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation and duplicate YAML key validation"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v11-complete", "status": "PASS", "result": "all 58 existing command roles and input mappings; 508 actual SQLite receipts covering 62 actions; result schemas; event and component schemas; R01-R32 entity references; SI01-SI14 set; five original tool schema references"},
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v11-complete -p no:cacheprovider --junitxml=.work/w1-v11-complete.xml", "status": "PASS", "result": "373 passed in 8.63s", "raw": ".work/w1-v11-complete.xml"},
+    {"command": "node .work/ui-typecheck/node_modules/typescript/bin/tsc --project .work/ui-typecheck/tsconfig.json", "status": "PASS", "scope": "BossToday.tsx and BossOwnerPlans.tsx strict noEmit"}
+  ],
+  "verified_behaviors": ["owner plan concurrent idempotency, event scope and CAS", "immutable event content at the same version", "canceled task feedback preserved as history", "calendar share revocation persisted with authorization", "general tool audits exclude source body", "shared deterministic aggregation and CHANGE metrics", "historical references retain read-only navigation", "approved dataset reset isolation", "native SQLite backup preserves withdrawn sources and deleted memory"],
+  "public_integration": "new W1 domain actions and canceled-task public feedback guard pending W3",
+  "remaining": ["all legitimate input combinations and independent semantic review", "fixed-runtime actual stream/cancel verification", "full simulation broker and approved missing agricultural materials", "old-version migration and all authorization consumers", "public integration on W3 source version", "periodic morning plans and actual model execution", "device notifications and sleep recovery"],
+  "acceptances_changed": false,
+  "A05": "NOT_RUN",
+  "A06": "NOT_RUN",
+  "A12": "NOT_RUN",
+  "A13": "NOT_RUN",
+  "A14": "NOT_RUN",
+  "A17": "NOT_RUN",
+  "A18": "NOT_RUN"
+}

@@ -6,6 +6,7 @@ All state and the original request receipt are committed atomically.
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 
 from aiohttp import web
@@ -54,6 +55,12 @@ def revoke(api, db, data, payload):
         "version": str(int(current["version"]) + 1),
     })
     api.store.put(db, NS, "authorization", identifier, current)
+    if current["action"] == "calendar.share":
+        for share_id, body in db.execute("SELECT id,body FROM objects WHERE namespace=? AND kind='calendar_share'", (NS,)).fetchall():
+            share = json.loads(body)
+            if share["authorization_id"] == identifier and not share["revoked"]:
+                share.update(revoked=True, revoked_at=current["revoked_at"], revocation_reason="AUTHORIZATION_REVOKED")
+                api.store.put(db, NS, "calendar_share", share_id, share)
     return {
         "source_type": "SIMULATED", "authorization_id": identifier,
         "version": current["version"], "revoked": True,

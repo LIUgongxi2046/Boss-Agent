@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.0.0；T06/A06；2026-10-23；引用LLD-data1.0.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整合法输入匹配、独立语义与公开集成仍需验证。
+版本1.1.0；T06/A06；2026-10-23；引用LLD-data1.1.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；OpenAPI3.1标准检查通过。A06保持NOT_RUN，完整合法输入匹配、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -17,6 +17,8 @@ RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 
 现有读取使用 `/api/boss/ui/*` HTTP Bearer。现有写入使用已认证 nanobot WebSocket：`type=webui_request, request_id, action, payload`；响应 `event=webui_response, request_id, ok, result|error`。业务幂等 ID 在 payload 内，与传输 request_id 分开。重新连接产生新传输请求时仍保留原 client_request_id。此协议没有 Last-Event-ID 或 SSE 心跳承诺。
 
 OpenAPI定义全部当前HTTP读取、58项现有WebSocket命令、5项新增W1领域动作及5个工具；每项命令绑定角色、输入Schema、处理位置和必需回执字段。workspace路径参数及BOSS/MAINTAINER投影白名单分别定义，原请求回执采用原动作相同角色。十四类模拟接口逐项给出输入、结果、实体、现有读取位置、可用状态和缺少来源；通用模拟查询协议仍属于设计，需要T12接入真实服务。
+
+Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同一入口和`content=/stop`，停止该会话活动及队列中的后续步骤。线程读取使用既有Runtime入口。独立T02验证服务的健康、空间、工具与配置路径在`x-validation-service.routes`分别定义角色；这些路径用于验证，不增加产品业务入口。
 
 ## W1 新增接口接收规范
 
@@ -42,7 +44,7 @@ OpenAPI定义全部当前HTTP读取、58项现有WebSocket命令、5项新增W1�
 
 交办、消息、审批、会议、资料、提醒、运行与记忆状态完整继承 PRD 第5节。现有领域方法必须区分草稿、模拟发送、外部送达、反馈提交和本人完成；没有外部通道回执时 delivery_state 不得宣称已验证。
 
-本人计划暂停和取消不删除已经保存的任务、通知或消息。取消后迟到反馈属于历史，不能恢复催办；当前反馈入口对于已结束任务会拒绝，新历史反馈接收仍需 T14 实施。资料撤销、更新和申请变更使对应旧确认失效。已确定结果需查询原回执和正式对象，无自动新编号重发。
+本人计划暂停和取消不删除已经保存的任务、通知或消息。取消后迟到反馈保存为historical_only，保持任务CANCELED和已取消事件；当前领域接收已验证，公共反馈入口的状态检查与回执仍需W3接入。资料撤销、更新和申请变更使对应旧确认失效。已确定结果需查询原回执和正式对象，无自动新编号重发。
 
 | 错误 | 状态 | 自动重试 | 恢复 |
 |---|---|---|---|
@@ -65,7 +67,7 @@ OpenAPI定义全部当前HTTP读取、58项现有WebSocket命令、5项新增W1�
 | SI03 日历出行 | private_calendar、calendar_share、travel；完整会议变更待补充 |
 | SI04 消息邮件 | draft/send/reply 与 outbox；外部送达未验证 |
 | SI05 会议资料 | brief/minutes/逐项交办；来源变化复核 |
-| SI06 任务承诺 | assignment/commitment/feedback/延期/完成/取消；历史反馈接收待补充 |
+| SI06 任务承诺 | assignment/commitment/feedback/延期/完成/取消；历史反馈领域已验证，公共接入待完成 |
 | SI07 销售 BI | query_metrics/read_evidence；当前仅获准的两个十日期间明细 |
 | SI08 财务应收 | 成本收入明细；现金、账龄和结算数据不足 |
 | SI09 采购库存 | 原料合同/库存质量等获准数据不足 |

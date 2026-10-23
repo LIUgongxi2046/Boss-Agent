@@ -3,7 +3,6 @@ import json
 import sqlite3
 import uuid
 from datetime import datetime, timezone
-from decimal import Decimal
 from pathlib import Path
 
 from aiohttp import web
@@ -140,14 +139,21 @@ class Store:
             validate(OPERATIONS[operation]["output_schema"].rsplit("/", 1)[1], result)
             if operation in ("create_assignment", "send_assignment"):
                 db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (ns, operation, payload["idempotency_key"], digest, encode(result)))
-            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(payload), encode(result), now()))
+            audit_input = {"request_id": env["request_id"], "session_id": env["session_id"],
+                           "owner_id": env["owner_id"], "dataset_id": env["dataset_id"], "dataset_version": env["dataset_version"],
+                           **{key: payload[key] for key in ("authorization_id", "idempotency_key", "task_id", "query_id") if key in payload}}
+            audit_output = {key: result[key] for key in (
+                "task_id", "query_id", "status", "version", "message_id", "message_status",
+                "task_status", "task_version", "authorization_id", "execution_namespace",
+            ) if key in result}
+            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(audit_input), encode(audit_output), now()))
         return result
 
     def source(self):
         return {"source_id": "finance-note", "source_type": "SIMULATED", "version": "1", "locator": "sqlite:documents/finance-note", "business_as_of": "2026-10-10T23:59:59+08:00", "source_updated_at": "2026-10-11T08:00:00+08:00", "read_at": now(), "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": "COMPLETE"}
 
     def query_metrics(self, db, ns, data, p):
-        from boss_metrics import aggregate_metrics
+        from boss_metrics import aggregate_metrics, compare_metrics
         document = self.get(db, ns, "document", "finance-note")
         require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
@@ -156,14 +162,19 @@ class Store:
         records = [r for r in data["details"] if r["product_id"] in p["product_ids"]]
         values = []
         missing = []
+        period_metrics = {}
         for period in ("BASE", "CURRENT"):
             group = [r for r in records if r["period"] == period]
             computed = aggregate_metrics(group)
             metrics = computed["metrics"]
+            period_metrics[period] = metrics
             missing.extend(period + ":" + field for field in computed["missing_fields"])
             for metric in p["metric_ids"]:
                 value, unit, formula = metrics[metric]
                 values.append({"metric_id": metric, "period_scope": period, "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
+        for metric, (value, unit, formula) in compare_metrics(period_metrics["BASE"], period_metrics["CURRENT"]).items():
+            if metric in p["metric_ids"]:
+                values.append({"metric_id": metric, "period_scope": "CHANGE", "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
         result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": missing, "unexplained_causes": ["原因贡献明细尚未提供"]}
         self.put(db, ns, "query", result["query_id"], result)
         return result

@@ -7,7 +7,6 @@ transaction; viewing does not silently mutate or send message requests.
 from __future__ import annotations
 
 import json
-from decimal import Decimal
 from datetime import datetime
 
 from aiohttp import web
@@ -15,6 +14,7 @@ from business import now, require
 from boss_travel import meeting_impacts
 from boss_people import meeting_impacts as people_meeting_impacts
 from boss_owner_preferences import owner_goal_reference
+from boss_metrics import aggregate_metrics
 
 NS="ui-check"
 
@@ -58,21 +58,14 @@ def _metrics(data, approved):
     for period in ("BASE","CURRENT"):
         group=[r for r in details if r["period"]==period and
                r["region_id"]=="region-1" and r["trade_type"]=="EXTERNAL_SALES"]
-        q=sum((Decimal(r["quantity_tonnes"]) for r in group),Decimal(0))
-        revenue=sum((Decimal(r["revenue_cny"]) for r in group),Decimal(0))
-        costs=sum((Decimal(r["cost_cny"]) for r in group),Decimal(0))
-        profit=revenue-costs
-        gm=(profit/revenue*100) if revenue else None
+        computed=aggregate_metrics(group)
         result.append({
             "period_scope":period,"date_range":data["periods"][period],
             "source_id":"finance-note","source_version":approved["version"],
             "definition_version":"1","source_type":"SIMULATED",
-            "metrics":{
-                "sales_quantity":{"value":str(q),"unit":"吨"},
-                "revenue":{"value":str(revenue),"unit":"CNY"},
-                "gross_profit":{"value":str(profit),"unit":"CNY"},
-                "gross_margin":{"value":str(gm) if gm is not None else None,"unit":"%"},
-            },
+            "metrics":{metric:{"value":str(computed["metrics"][metric][0]) if computed["metrics"][metric][0] is not None else None,
+                               "unit":computed["metrics"][metric][1]}
+                       for metric in ("sales_quantity","revenue","gross_profit","gross_margin")},
             "detail_refs":[r["record_id"] for r in group],
         })
     return {"available":True,"values":result,
