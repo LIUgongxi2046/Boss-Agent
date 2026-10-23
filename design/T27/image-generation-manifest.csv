@@ -1,2 +1,3 @@
 asset_id,generation_tool,prompt_summary,source_image_path,output_file_path
-boss-app-icon,imagegen内置工具,蓝绿白大鹏高清macOS图标且保留透明背景与平滑轮廓,../../validation/desktop/branding/boss-agent-hd.png,../../validation/desktop/branding/boss-agent.png
+boss-app-icon,imagegen内置工具,严格依据登录与首页原Logo生成同形蓝绿标志且保持透明背景,../../Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png,../../validation/desktop/branding/boss-agent-hd.png
+dapeng-flight,imagegen内置工具,严格依据原大鹏形象生成四列两行八帧连续扑翼透明图集,../../Boss-Agent-Desktop-Complete-v6/assets/dapeng-front.png,assets/boss-flight-sprite.png

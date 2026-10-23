@@ -9,15 +9,17 @@ const root = path.resolve(__dirname, '../..');
 const load = createRequire(path.join(root, 'design/T27/harness/package.json'));
 const { chromium } = load('playwright');
 const branding = require('./branding.cjs');
-const work = path.join(root, 'validation/.work/t27');
+const nativeZoom = process.env.BOSS_T27_NATIVE_ZOOM === '1';
+const work = path.join(root, nativeZoom ? 'validation/.work/t27-native-zoom/service' : 'validation/.work/t27');
 fs.mkdirSync(path.join(work, 'tmp'), { recursive: true });
 process.env.TMPDIR = path.join(work, 'tmp');
-const dist = path.join(root, 'design/T27/harness/dist/boss-brand');
+const dist = path.join(root, nativeZoom ? '.work/t27-native-zoom/dist/boss-brand' : 'design/T27/harness/dist/boss-brand');
 fs.mkdirSync(dist, { recursive: true });
 for (const name of ['boss-logo-from-reference.png', 'dapeng-front.png']) fs.copyFileSync(path.join(root, 'Boss-Agent-Desktop-Complete-v6/assets', name), path.join(dist, name));
 fs.copyFileSync(path.join(root, 'Boss-Agent-Desktop-Complete-v6/animation/01-待机悬浮.webp'), path.join(dist, 'boss-idle.webp'));
+fs.copyFileSync(path.join(root, 'design/T27/assets/boss-flight-sprite.png'), path.join(dist, 'boss-flight-sprite.png'));
 const records = [];
-const save = check => records.push({ check, status: 'PASS' });
+const save = check => { records.push({ check, status: 'PASS' }); console.log(check); };
 
 async function main() {
   const service = spawn(path.join(root, 'validation/.venv/bin/python'), [path.join(root, 'design/T27/server.py')], {
@@ -29,12 +31,15 @@ async function main() {
   const { port } = JSON.parse(fs.readFileSync(path.join(work, 'instance.json')));
   assert.notEqual(port, 8872);
   let browser;
+  let page;
+  const errors = [];
+  const responses = [];
   try {
     browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, env: { ...process.env, TMPDIR: path.join(work, 'tmp') } });
     const context = await browser.newContext();
-    const page = await context.newPage();
-    const errors = [];
+    page = await context.newPage();
     page.on('pageerror', error => errors.push({ name: error.name, message: error.message }));
+    page.on('response', response => { if (new URL(response.url()).pathname === '/webui/bootstrap') responses.push({ status: response.status() }); });
     const waitForConnection = () => page.waitForEvent('websocket').then(socket => socket.waitForEvent('framereceived', {
       predicate: event => typeof event.payload === 'string' && JSON.parse(event.payload).event === 'ready',
     }));
@@ -45,6 +50,16 @@ async function main() {
     assert.equal(await page.getByText('内测版本', { exact: true }).count(), 1);
     assert.equal((await page.locator('#boss-login-brand-title').textContent()), '公司信息了如指掌，工作推进有条不紊。');
     save('copy-beta-default-boss');
+    const spacing = await page.locator('.boss-login-card form').evaluate(form => {
+      const groups = form.querySelectorAll('.boss-login-field');
+      const account = groups[0].getBoundingClientRect();
+      const password = groups[1].getBoundingClientRect();
+      const submit = form.querySelector('button[type="submit"]').getBoundingClientRect();
+      const label = groups[1].querySelector('label').getBoundingClientRect();
+      const input = groups[1].querySelector('.boss-login-input').getBoundingClientRect();
+      return { fields: password.top - account.bottom, submit: submit.top - password.bottom, label: input.top - label.bottom };
+    });
+    assert.ok(spacing.fields >= 24 && spacing.submit >= 24 && spacing.label >= 8); save('field-label-submit-spacing');
     await page.getByRole('button', { name: '登录', exact: true }).click();
     await page.getByRole('alert').filter({ hasText: '请输入账号' }).waitFor();
     assert.equal(await page.getByLabel('账号', { exact: true }).evaluate(element => element === document.activeElement), true);
@@ -69,14 +84,21 @@ async function main() {
       await page.waitForFunction(() => document.querySelector('[data-flight="active"]')?.getAnimations().some(animation => animation.playState === 'running'));
       const flight = await page.locator('[data-flight="active"]').evaluate(async image => {
         const initial = image.getBoundingClientRect();
+        const depthLayer = image.querySelector('.boss-login-bird-depth');
+        const depth = Number.parseFloat(getComputedStyle(depthLayer).scale);
+        const wing = image.querySelector('[data-flap]');
+        const wingTransform = getComputedStyle(wing).transform;
         await new Promise(resolve => setTimeout(resolve, 400));
         const current = image.getBoundingClientRect();
         const container = image.closest('main').getBoundingClientRect();
         return { moved: Math.hypot(initial.x - current.x, initial.y - current.y),
           contained: current.left >= container.left && current.top >= container.top && current.right <= container.right && current.bottom <= container.bottom,
+          depthChanged: Number.parseFloat(getComputedStyle(depthLayer).scale) !== depth,
+          wingChanged: getComputedStyle(wing).transform !== wingTransform,
           interaction: getComputedStyle(image.parentElement).pointerEvents };
       });
       assert.ok(flight.moved > 0); assert.equal(flight.contained, true); assert.equal(flight.interaction, 'none');
+      assert.equal(flight.depthChanged, true); assert.equal(flight.wingChanged, true);
       save(`random-flight-${width}-${height}-${zoom}`);
     }
     await page.locator('#root').evaluate(element => { element.style.zoom = '1'; });
@@ -86,11 +108,11 @@ async function main() {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.locator('[data-motion="animated"]').waitFor();
     await page.waitForFunction(() => {
-      const image = document.querySelector('[data-motion="animated"]');
+      const image = document.querySelector('[data-flap]');
       return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
     });
     save('motion-preference-change');
-    const accounts = JSON.parse(fs.readFileSync(path.join(root, 'validation/.work/application/accounts/credentials.json')));
+    const accounts = JSON.parse(fs.readFileSync(nativeZoom ? path.join(work, 'accounts/credentials.json') : path.join(root, 'validation/.work/application/accounts/credentials.json')));
     for (const account of accounts) {
       if (account.role === 'MAINTAINER') await page.getByRole('button', { name: '技术维护', exact: true }).click();
       await page.getByLabel('账号', { exact: true }).fill(account.username);
@@ -141,6 +163,12 @@ async function main() {
     save('brand-config-project-resource');
     fs.writeFileSync(path.join(root, 'evidence/T27/login-dom.json'), JSON.stringify({ status: 'PASS_INDEPENDENT_LOGIN_AND_HOME', at: new Date().toISOString(), records, visual: 'NOT_RUN', public_integration: 'NOT_RUN' }, null, 2));
   } finally {
+    if (page && !page.isClosed()) {
+      const state = await page.evaluate(() => ({ card: document.querySelector('.boss-login-card')?.textContent,
+        busy: document.querySelector('main')?.getAttribute('aria-busy'),
+        fields: [...document.querySelectorAll('.boss-login-field input')].map(input => ({ name: input.name, length: input.value.length, disabled: input.disabled })) }));
+      fs.writeFileSync(path.join(work, 'login-check-state.json'), JSON.stringify({ records, state, errors, responses }, null, 2));
+    }
     if (browser) await browser.close();
     service.kill('SIGTERM'); await once(service, 'exit');
   }

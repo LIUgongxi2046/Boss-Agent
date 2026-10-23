@@ -2,7 +2,7 @@ screen_id,asset_id,usage
 N01,boss-logo,品牌
 N01,boss-app-icon,桌面宿主图标
 N01,dapeng-static,减少动态效果
-N01,dapeng-idle,待机动画
+N01,dapeng-flight,八帧扑翼与远近飞行
 D08,boss-logo,品牌
 D08,dapeng-static,减少动态效果
-D08,dapeng-idle,待机动画
+D08,dapeng-flight,八帧扑翼与远近飞行
