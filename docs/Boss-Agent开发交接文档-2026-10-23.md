@@ -270,3 +270,8 @@ python3 scripts/visual_diff.py --role boss
 修改入口：`validation/boss_command_api.py`、`boss_workspace_api.py`、`boss_page_api.py`、`controls.py`、`application.py`、`boss_meeting_brief.py`、`boss_people.py`、`app/webui/BossDesktop.tsx`，构建复制脚本与 CI。对应测试 `test_boss_owner_preferences.py`、`test_boss_owner_authorizations.py`、`test_v6_owner_preferences_ui.py`；真实进度/剩余缺口见 [专项开发记录](development/T18-owner-preferences.md)、[72 页实时映射](../specs/page-service-map.json) 及同提交的 GitHub Actions。
 
 **不变的验收边界**：T18 仍 IN_PROGRESS，A18 仍 NOT_RUN；72 页实际 Mac Electron GUI E2E 和像素验收均未通过。下一轮优先 N09 本人计划、FR-01 日程排序及业务链路异常，然后真实模型/系统联调；依照用户优先顺序，农业数据最后补。
+
+
+### 本次功能代码的 CI 回执
+
+功能代码截至 `4be661d3d0993ff33014bb2ff52204e49332adb2`：对应 [Actions 39891454896](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39891454896) 已确认 **346 项 Python 测试通过，React 生产构建通过**。后续文档/台账提交不代表另一次实机验收。T18/A18 保持原未通过状态。
