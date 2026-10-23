@@ -43,7 +43,9 @@
     "A05 now renders real versioned Prompt save/structure validation/activation/deactivation and MAINTAINER-only runtime context loading metadata; activation alone does not prove a DeepSeek call or evaluation quality. Technical guidance cannot modify BOSS permissions.",
     "N05 now renders source Desktop v6 tab/filter/five-column task center, using current simulated business clock and persisted task/feedback/source/due-event records; actions lead to F06 owner confirmation. Browser screenshot and acceptance still NOT_RUN.",
     "F04/F06 newly persisted material and follow-up draft IDs are carried only in authenticated React state to F08 for review; this does not send automatically, disclose to MAINTAINER, or bypass source/version/owner validations.",
-    "FR06 owner-confirmed task nudge is a separate write after initial authorized send, with stable contact, current source pins, 24h simulated business-clock cooldown, and a metadata-only linked message in F06/N05. No external delivery or task completion is inferred."
+    "FR06 owner-confirmed task nudge is a separate write after initial authorized send, with stable contact, current source pins, 24h simulated business-clock cooldown, and a metadata-only linked message in F06/N05. No external delivery or task completion is inferred.",
+    "N05 owner-only self commitments now have real CAS/idempotent create, evidence-confirmed completion, extension, cancellation and persisted due events, separate from F06 assignment to contacts. Source/current evidence withdrawal yields NEEDS_REVIEW; no real external notifications.",
+    "F06 now has an independently owner-authorized simulated nudge; it does not update deadline or certify external delivery, and nudge events remain auditable."
   ],
   "pages": [
     {
@@ -1740,17 +1742,23 @@
       "logical_architecture_route": "/app/boss/N05",
       "actual_webui_navigation": "?bossPage=N05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_V6_TASK_CENTER_FILTERS_AND_REAL_STATUS",
+      "render_status": "PARTIAL_V6_TASK_CENTER_AND_OWNER_COMMITMENTS",
       "component_file": "app/webui/BossTaskCenter.tsx",
       "component_name": "BossTaskCenter",
       "verified_http_read_routes": [
         "GET /api/boss/ui/tasks"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": [
+        "boss.commitment.create",
+        "boss.commitment.extend",
+        "boss.commitment.complete",
+        "boss.commitment.cancel"
+      ],
       "other_integration_points": [
         "F06 owner-authorized task state transitions",
         "Current simulation business clock for overdue classification",
-        "Source status, evidence references and simulated send history"
+        "Source status, evidence references and simulated send history",
+        "Owner-only personal commitment due events are persisted, separate from employee assignment and simulated external messages"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1761,12 +1769,14 @@
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_task_center.py",
-        "app/tests/test_boss_assignment_nudge.py"
+        "app/tests/test_boss_assignment_nudge.py",
+        "app/tests/test_boss_self_commitments.py"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "personal_commitments_e2e_mac_verified": false
     },
     {
       "page_id": "N06",
