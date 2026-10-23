@@ -30,6 +30,10 @@ from boss_knowledge_ingestion import create as source_create, revise as source_r
 from boss_prompt_config import save as prompt_save, validate as prompt_validate, activate as prompt_activate, deactivate as prompt_deactivate
 from boss_research import prepare as research_prepare
 from boss_task_reminders import synchronize_task_due, current as task_due_event
+from boss_self_commitments import (
+    create as commitment_create, extend as commitment_extend,
+    complete as commitment_complete, cancel as commitment_cancel,
+)
 from boss_meeting_approval import (
     minutes_save, minutes_confirm, minutes_assignment_create,
     application_seed, application_revise, approval_decide,
@@ -86,6 +90,10 @@ class BossCommandAPI:
         "boss.assignment.complete": "BOSS",
         "boss.assignment.extend": "BOSS",
         "boss.assignment.cancel": "BOSS",
+        "boss.commitment.create": "BOSS",
+        "boss.commitment.extend": "BOSS",
+        "boss.commitment.complete": "BOSS",
+        "boss.commitment.cancel": "BOSS",
         "boss.simulation.feedback": "MAINTAINER",
         "boss.simulation.event.seed": "MAINTAINER",
         "boss.simulation.clock.advance": "MAINTAINER",
@@ -245,6 +253,14 @@ class BossCommandAPI:
                 result = self._decide(db, payload, action)
             elif action == "boss.assignment.cancel":
                 result = self._cancel(db, payload)
+            elif action == "boss.commitment.create":
+                result = commitment_create(self, db, data, payload)
+            elif action == "boss.commitment.extend":
+                result = commitment_extend(self, db, data, payload)
+            elif action == "boss.commitment.complete":
+                result = commitment_complete(self, db, data, payload)
+            elif action == "boss.commitment.cancel":
+                result = commitment_cancel(self, db, data, payload)
             elif action == "boss.simulation.feedback":
                 result = self._feedback(db, payload)
             elif action == "boss.simulation.event.seed":
