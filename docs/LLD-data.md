@@ -1,6 +1,6 @@
 # Boss-Agent 数据设计
 
-版本 `1.4.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
+版本 `1.4.1`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T13/T14/T17/T18检查为依据。
 
 ## 数据归属与物理存储
 
@@ -78,6 +78,8 @@ status来自实际Hook；SUCCEEDED只表示SDK正常结束，独立业务完成�
 当前五项Tool保持原输入与结果字段。query_metrics将来源实际版本、定位和当前版本声明的发布时间写入来源结果，business_as_of由获准CURRENT期间终点与初始档案的时区计算；read_at始终为实际读取时间。source_updated_at对应该当前版本声明的published_at，不把读取时间作为来源更新时间。query_source_binding保存完整document和实际明细的SHA256；read_evidence在当前事务中重验访问范围、有效性、版本和摘要，来源或明细改变后要求重新查询。旧库查询缺少绑定时明确返回409；不会根据当前内容为旧查询补造历史绑定。
 
 assignment_source_binding与新交办在同一事务保存；确认纪要产生的交办还保存origin_source的标识、版本和完整摘要。发送和完成决定读取当前来源后比对原绑定，资料变化时停止新动作；旧交办缺少绑定时409要求本人重新核查，不用当前资料推测创建时的版本。备份恢复逐对象保留绑定及撤销状态。read_assignment仅输出既有Tool Schema声明字段，服务端task的来源版本和纪要关联保持原记录。
+
+反馈在提交时另存evidence_versions、evidence_fingerprints和evidence_states，覆盖每项evidence_refs；新增反馈在当前事务检查来源，普通反馈只能采用当前有效资料。取消后的迟到反馈可保留失效证据的实际标识与当时状态，类型、source_id和owner范围仍需相符，historical_only保持true。完成决定同时核查交办创建时来源及结果提交时证据，不能用较新的同名资料代替旧证据。旧结果缺少完整证据绑定时409，重新提交产生独立feedback_id并保留原记录。
 
 模拟申请附件的published_at记录该模拟版本的实际生成时间，valid_from采用当次模拟业务时钟，valid_until未知时为null；新版本独立记录这些字段，旧版本保持历史。VALID表示当前材料可读取，资金执行、申请批准和专业确认仍使用各自独立状态。会前材料保存来源完整摘要和有效时间，来源到期或同版本元信息变化时显示NEEDS_REVIEW，并停止返回旧引用正文及旧指标缓存。
 

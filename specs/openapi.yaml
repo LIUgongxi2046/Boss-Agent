@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Boss-Agent W1 领域接口接收规范
-  version: 1.4.0
+  version: 1.4.1
   description: 当前HTTP读取、58项基线命令、9项W1领域动作、5项工具与14类模拟资料接口；当前版本的公开集成、来源不足和未运行验收分别标记。
 security:
   - bearerAuth: []
@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-operation-defaults:
-  version: 1.4.0
+  version: 1.4.1
   idempotency: execution_namespace/action/client_request_id with complete payload digest
   concurrency: BEGIN IMMEDIATE plus current object version CAS
   timeout: SQLite connection 10 seconds; external DeepSeek 120 seconds
@@ -42,6 +42,9 @@ x-source-policy:
   assignment_binding: assignment_source_binding pins creation-time source versions and full SHA256; confirmed minute tasks also pin their original minute source
   assignment_execution: Store.create_assignment and Store.send_assignment check current source and coordinator validity; completion rechecks the binding in the same transaction
   legacy_assignments: missing creation-time binding returns 409 before new send or completion; no inferred historical binding
+  feedback_binding: new feedback pins submitted evidence versions, full SHA256 and source states; completion rechecks the submitted evidence independently of task creation sources
+  legacy_feedback: missing complete evidence binding returns 409 before completion and requires a fresh explicit result submission
+  historical_feedback: canceled tasks keep late evidence as historical only, including expired evidence metadata; source identity, owner and type remain mandatory
 x-tool-authorization-policy:
   implementation: Store.require_current_authorization
   validation: owner, namespace, BOSS issuer, action, target, content version, exact payload, revocation and complete wall-clock authorization window
@@ -664,10 +667,12 @@ components:
         - {$ref: '#/components/schemas/CommandFields'}
         - required: [client_request_id, task_id, task_version, author_contact_id, kind, content, evidence_refs]
           propertyNames: {enum: [client_request_id, task_id, task_version, author_contact_id, kind, content, evidence_refs, proposed_due_at]}
-          properties: {kind: {enum: [PROGRESS, EXTENSION_REQUEST, RESULT_SUBMITTED]}, evidence_refs: {type: array, maxItems: 16, items: {type: string}}}
+          properties: {kind: {enum: [PROGRESS, EXTENSION_REQUEST, RESULT_SUBMITTED]}, evidence_refs: {type: array, maxItems: 16, uniqueItems: true, items: {type: string}}}
           if: {properties: {kind: {const: EXTENSION_REQUEST}}}
           then: {required: [proposed_due_at]}
           else: {not: {required: [proposed_due_at]}}
+        - if: {properties: {kind: {const: RESULT_SUBMITTED}}}
+          then: {properties: {evidence_refs: {minItems: 1}}}
     CommitmentCreate:
       allOf:
         - {$ref: '#/components/schemas/CommandFields'}

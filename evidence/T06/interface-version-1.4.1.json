@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.4.1",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "source_base": "3db52bb",
+  "source_scope": "W1 commit containing this evidence",
+  "work_item_id": "T14-RESULT-EVIDENCE-BINDING",
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v141-verified -p no:cacheprovider --junitxml=.work/w1-v141-verified.xml", "status": "PASS", "result": "477 passed in 16.87s", "raw_result": ".work/w1-v141-verified.xml"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v141-verified", "status": "PASS", "actual_sqlite_receipts": 689, "declared_actions_observed": 67, "baseline_role_mappings": 58},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v141-final", "status": "PASS", "result": "16 passed in 1.48s; each of 58 baseline public actions has at least one valid declared input and actual result"},
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation and duplicate YAML key validation"},
+    {"command": "evidence/T05/check_runtime_bindings.py with explicit W2 records/provider/memory paths", "status": "PASS", "actual_runs": 9, "current_producer_records": 4, "query_schema_matches_implementation": true, "schema_sha256": "b83ff531f0502c763baf4f0d0618fc87054a7e50d22bd6411a051426af04b58a", "original_record_and_producer_files_manifest": "evidence/T05/runtime-binding-1.4.0.json actual_record_files/provider_files_sha256"}
+  ],
+  "tool_source_authorization_cases": 70,
+  "verified": ["new feedback records each source version, full SHA256 and validity state at submission", "active feedback rejects all six noncurrent source states before saving", "completion checks extra evidence independently of original task sources", "source version or same-version metadata changes reject completion without adding authorization or changing task state", "legacy result without complete evidence bindings requires new submission", "new submission preserves original feedback and can be independently confirmed after database reopen", "canceled feedback preserves expired source history while checking source identity, type and owner"],
+  "w3_reception": {"domain": "validation/controls.py", "public_consumer": "BossCommandAPI._feedback", "required_change": "allow a new result submission for an already sent RESULT_SUBMITTED task using current CAS, author and idempotency checks; retain canceled history and completed-task rejection", "ui": "explain that legacy or changed result evidence needs a fresh coordinator submission"},
+  "new_external_requests": false,
+  "new_agricultural_facts": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": ["W3 public resubmission and integrated verification", "explicit owner review for legacy assignments without source binding", "complete fourteen simulated interfaces", "migration, full source deletion and session/cache propagation", "independent semantics, all variants and E01-E06", "runtime/voice/current UI acceptance", "morning/recurring tasks, device notifications and full parent acceptance"]
+}

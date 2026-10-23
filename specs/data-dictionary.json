@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "schema_state": "FROZEN_FOR_IMPLEMENTATION",
   "task_id": "T05",
   "acceptance_state": "NOT_RUN",
@@ -118,7 +118,9 @@
       "storage": "objects/feedback", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
       "fields": {"feedback_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"},
         "kind": {"type": "string", "enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": {"type_ref": "private_text"}, "evidence_refs": {"type": "array", "items": "document.source_id"},
-        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}, "historical_only": {"type": "boolean", "optional": true, "meaning": "取消后到达的反馈仅存历史，不恢复交办或催办；旧记录缺少该字段时按当前任务状态核查"}}
+        "evidence_versions": {"type": "object", "values": "version", "optional": true}, "evidence_fingerprints": {"type": "object", "values": "SHA256", "optional": true}, "evidence_states": {"type": "object", "values": "source validity state", "optional": true},
+        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}, "historical_only": {"type": "boolean", "optional": true, "meaning": "取消后到达的反馈仅存历史，不恢复交办或催办；旧记录缺少该字段时按当前任务状态核查"}},
+      "binding_policy": "当前新反馈保存提交时证据版本、完整摘要和有效状态；结果完成前逐项重验。旧反馈没有完整绑定时409要求重新提交，不根据当前来源补充历史。历史反馈保留失效资料的当时标识和状态，仍需核查类型、标识和owner范围。"
     },
     "message_draft": {
       "storage": "objects/message_draft", "access": "BOSS_ONLY", "version": "1",

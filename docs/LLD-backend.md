@@ -1,6 +1,6 @@
 # Boss-Agent 后端设计
 
-版本1.4.0；T06/A06；2026-10-23；引用LLD-data1.4.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
+版本1.4.1；T06/A06；2026-10-23；引用LLD-data1.4.1、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
 ## 服务、身份与事务
 
@@ -51,6 +51,8 @@ Runtime提交使用`type=message,chat_id,content`，当前会话取消使用同�
 五项真实Tool在自身事务执行相同规则。新create_assignment绑定当前来源版本与完整摘要，检查负责人有效期及交办期限；send_assignment和control_decide的完成决定重新读取assignment_source_binding。纪要交办同时重验原始纪要来源。源资料变化、到期、访问范围改变或旧交办缺少绑定时禁止新动作。公共后续采用点可调用Store.require_current_assignment_sources(db,namespace,data,task)，必须保留本次事务和原请求查重顺序。
 
 Store.invoke的新写入检查授权的owner、namespace、BOSS身份及签发者、action、target_id、content_version、完整参数、revoked及valid_from/valid_until。一次创建授权只产生一个task，一次发送授权只产生一个outbox；不同请求编号并发执行时在BEGIN IMMEDIATE内检查既有结果。相同编号及内容始终读取原回执，授权撤销后继续可读。独立完成/延期控制复用相同身份与时间检查，决定的content_version对应task_version。read_assignment按原始read_output字段投影，服务端来源和纪要扩展字段继续保存。
+
+control_feedback在同一事务保存每项结果证据的实际版本、完整摘要及当前有效状态。普通反馈拒绝非当前资料；CANCELED的历史反馈允许失效资料但继续检查来源类型、标识和本人范围，历史标记不变。control_decide的完成动作逐项核对提交时证据，包含不属于原始交办来源的额外证据；变化或旧记录缺少绑定时409，不提交新授权和完成状态。重新提交结果保存独立反馈与当前绑定，原反馈保持。W3公共反馈入口需允许已发送且RESULT_SUBMITTED任务按当前CAS提交新的结果，原请求幂等、取消历史和COMPLETED_CONFIRMED拒绝继续有效。
 
 当前计划未包含晨间模型生成和周期重复定义；需要 W2 提供真实 Runtime 任务能力和 W3 接入后继续完成，不登记 A17 完成。已有事件更新时保留 owner_plan_id 并检查 event_versions，不自动扩大本人范围。
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.4.0",
+  "$id": "urn:boss-agent:runtime-records:1.4.1",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {

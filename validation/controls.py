@@ -60,15 +60,31 @@ class ControlStore(Store):
         require(p["kind"] in {"PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"}, "反馈类型无效", web.HTTPBadRequest)
         require(task["status"] != "COMPLETED_CONFIRMED", "已确认完成的任务不接受进度变更")
         historical_only = task["status"] == "CANCELED"
+        if p["kind"] == "RESULT_SUBMITTED":
+            require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
+        refs = p.get("evidence_refs", [])
+        require(len(set(refs)) == len(refs), "反馈证据引用重复", web.HTTPBadRequest)
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
+        documents = {}
+        for source_id in refs:
+            document = self.get(db, ns, "document", source_id)
+            require(document.get("source_id") == source_id and document.get("source_type") == "SIMULATED"
+                    and document.get("access_scope") == data["owner_id"], "反馈证据不属于当前本人获准范围", web.HTTPForbidden)
+            if not historical_only:
+                require_current_simulated_source(document, data["owner_id"], clock)
+            documents[source_id] = document
         feedback_id = str(uuid.uuid4())
-        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now(), "historical_only": historical_only}
+        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now(), "historical_only": historical_only,
+                    "evidence_versions": {source_id: document["version"] for source_id, document in documents.items()},
+                    "evidence_fingerprints": {source_id: checksum(document) for source_id, document in documents.items()},
+                    "evidence_states": {source_id: source_validity(document, clock) for source_id, document in documents.items()}}
         self.put(db, ns, "feedback", feedback_id, feedback)
         task["feedback_ids"].append(feedback_id)
         task["version"] = str(int(task["version"]) + 1)
         if p["kind"] == "PROGRESS" and not historical_only:
             task["status"] = "IN_PROGRESS"
         if p["kind"] == "RESULT_SUBMITTED":
-            require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
             if not historical_only:
                 task["status"] = "RESULT_SUBMITTED"
         self.put(db, ns, "task", p["task_id"], task)
@@ -93,11 +109,19 @@ class ControlStore(Store):
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
             require(task["status"] == "RESULT_SUBMITTED" and feedback["task_id"] == p["task_id"] and feedback["kind"] == "RESULT_SUBMITTED" and feedback["evidence_refs"], "当前结果证据不完整")
             self.require_current_assignment_sources(db, ns, data, task)
+            versions = feedback.get("evidence_versions")
+            fingerprints = feedback.get("evidence_fingerprints")
+            require(isinstance(versions, dict) and isinstance(fingerprints, dict)
+                    and set(versions) == set(fingerprints) == set(feedback["evidence_refs"]),
+                    "结果缺少提交时证据绑定，需要重新提交当前证据")
             clock = self.get(db, ns, "clock", "current")["at"]
             for source_id in set(task["source_refs"]) | set(feedback["evidence_refs"]):
                 document = require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
                 if source_id in task.get("source_versions", {}):
                     require(document["version"] == task["source_versions"][source_id], "完成依据的来源版本已经变化")
+                if source_id in versions:
+                    require(document["version"] == versions[source_id] and checksum(document) == fingerprints[source_id],
+                            "结果证据在提交后已经变化，需要重新提交当前证据")
             task["status"] = "COMPLETED_CONFIRMED"
             task["completion_authorization_id"] = p["authorization_id"]
         else:

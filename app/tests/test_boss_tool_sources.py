@@ -456,3 +456,117 @@ def test_direct_send_rechecks_original_minutes_source_binding(tmp_path, change, 
     with store.connect() as db:
         assert store.get(db, "ui-check", "task", created["task_id"])["status"] == "OPEN"
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("change", ["version", "metadata", "missing_binding"])
+def test_completion_requires_result_submission_time_evidence_binding(tmp_path, change):
+    from test_boss_command_api import create_input, send_input, feedback_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    status, created = api.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    status, sent = api.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 200
+    status, result = api.execute("MAINTAINER", "boss.simulation.feedback", feedback_input(
+        {"task_id": created["task_id"], "version": sent["task_version"]}, evidence=["meeting-minutes"]))
+    assert status == 200
+    with store.connect() as db:
+        if change == "missing_binding":
+            feedback = store.get(db, "ui-check", "feedback", result["feedback_id"])
+            feedback.pop("evidence_versions", None)
+            feedback.pop("evidence_fingerprints", None)
+            store.put(db, "ui-check", "feedback", feedback["feedback_id"], feedback)
+        else:
+            document = store.get(db, "ui-check", "document", "meeting-minutes")
+            if change == "version":
+                document["version"] = str(int(document["version"]) + 1)
+            else:
+                document["published_at"] = store.get(db, "ui-check", "document", "finance-note")["published_at"]
+            store.put(db, "ui-check", "document", "meeting-minutes", document)
+        authorization_count = db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0]
+    status, _ = api.execute("BOSS", "boss.assignment.complete", {"client_request_id": "result-binding-complete",
+        "task_id": created["task_id"], "task_version": result["task"]["version"], "feedback_id": result["feedback_id"]})
+    assert status == 409
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0] == authorization_count
+
+
+@pytest.mark.parametrize("scope_valid", [True, False])
+def test_canceled_feedback_keeps_expired_evidence_history_with_owner_scope_checks(tmp_path, scope_valid):
+    from test_boss_command_api import create_input, send_input, feedback_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    status, created = api.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    status, sent = api.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 200
+    status, canceled = api.execute("BOSS", "boss.assignment.cancel", {"client_request_id": "history-scope-cancel",
+        "task_id": created["task_id"], "task_version": sent["task_version"], "reason": create_input()["purpose"]})
+    assert status == 200
+    with store.connect() as db:
+        data = store.get(db, "ui-check", "initial", "snapshot")
+        document = store.get(db, "ui-check", "document", "finance-note")
+        document["valid_until"] = store.get(db, "ui-check", "clock", "current")["at"]
+        if not scope_valid:
+            document["access_scope"] = data["contacts"][0]["contact_id"]
+        store.put(db, "ui-check", "document", "finance-note", document)
+    payload = {key: value for key, value in feedback_input({"task_id": created["task_id"], "version": canceled["version"]}).items()
+               if key != "client_request_id"}
+    if scope_valid:
+        result = store.control("ui-check", "feedback", payload)
+        assert result["feedback"]["historical_only"] is True and result["task"]["status"] == "CANCELED"
+    else:
+        with pytest.raises(web.HTTPForbidden):
+            store.control("ui-check", "feedback", payload)
+
+
+@pytest.mark.parametrize("state,error", [("CONFLICTED", web.HTTPConflict), ("SUPERSEDED", web.HTTPConflict),
+    ("INCOMPLETE", web.HTTPConflict), ("RECEIVED", web.HTTPConflict), ("WITHDRAWN", web.HTTPGone), ("EXPIRED", web.HTTPGone)])
+def test_active_feedback_cannot_adopt_noncurrent_source_before_save(tmp_path, state, error):
+    from test_boss_command_api import create_input, send_input, feedback_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    status, created = api.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    status, sent = api.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 200
+    with store.connect() as db:
+        document = store.get(db, "ui-check", "document", "finance-note")
+        document["validity_state"] = state
+        store.put(db, "ui-check", "document", "finance-note", document)
+    payload = {key: value for key, value in feedback_input({"task_id": created["task_id"], "version": sent["task_version"]}).items()
+               if key != "client_request_id"}
+    with pytest.raises(error):
+        store.control("ui-check", "feedback", payload)
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "task", created["task_id"])["status"] == "WAITING_FEEDBACK"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='feedback'").fetchone()[0] == 0
+
+
+def test_new_result_evidence_submission_preserves_old_binding_and_can_be_confirmed(tmp_path):
+    from test_boss_command_api import create_input, send_input, feedback_input
+    store, _, _ = service(tmp_path)
+    api = BossCommandAPI(store)
+    status, created = api.execute("BOSS", "boss.assignment.create", create_input())
+    assert status == 200
+    status, sent = api.execute("BOSS", "boss.assignment.send", send_input(created))
+    assert status == 200
+    payload = {key: value for key, value in feedback_input({"task_id": created["task_id"], "version": sent["task_version"]},
+        evidence=["meeting-minutes"]).items() if key != "client_request_id"}
+    first = store.control("ui-check", "feedback", payload)
+    with store.connect() as db:
+        old = store.get(db, "ui-check", "feedback", first["feedback"]["feedback_id"])
+        document = store.get(db, "ui-check", "document", "meeting-minutes")
+        document["version"] = str(int(document["version"]) + 1)
+        store.put(db, "ui-check", "document", "meeting-minutes", document)
+    second = store.control("ui-check", "feedback", {**payload, "task_version": first["task"]["version"]})
+    reopened = ControlStore(store.path)
+    with reopened.connect() as db:
+        assert reopened.get(db, "ui-check", "feedback", old["feedback_id"]) == old
+        assert second["feedback"]["evidence_versions"] == {"meeting-minutes": document["version"]}
+    status, _ = BossCommandAPI(reopened).execute("BOSS", "boss.assignment.complete", {"client_request_id": "result-binding-current-complete",
+        "task_id": created["task_id"], "task_version": second["task"]["version"], "feedback_id": second["feedback"]["feedback_id"]})
+    assert status == 200
+    with reopened.connect() as db:
+        assert reopened.get(db, "ui-check", "task", created["task_id"])["status"] == "COMPLETED_CONFIRMED"
