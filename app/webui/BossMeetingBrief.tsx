@@ -18,6 +18,7 @@ type Compiled={meeting:{meeting_id:string;version:string;starts_at:string;timezo
   participants:Participant[];sources:Source[];commitments:Commitment[];
   event:{event_id:string;status:string;origin:string};metrics:Metrics;
   travel_impacts?:{travel_id:string;version:string;meeting_end_known:boolean}[];
+  owner_goal_reference?:{status:string;active_version:string|null;scope:string|null;goal_count?:number;topic_count?:number};
   people_meeting_impacts?:{brief_id:string;version:string;contact_id:string;
     meeting_version:string;source_state:string;
     pinned_source_versions:{source_id:string;version:string}[]}[];
@@ -294,6 +295,15 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
         </Panel>
         </div>
         <div className="boss-tab-view" hidden={tab!=="议题"}>
+        <Panel title="本人会议目标版本" note="N07 独立本人确认 · 仅在适用范围内进入当前会议准备">
+          <Fact label="适用状态" value={b?.owner_goal_reference?.status||"待核对"}/>
+          <Fact label="本人确认的目标版本" value={b?.owner_goal_reference?.active_version||"无适用版本"}/>
+          <Fact label="适用范围" value={b?.owner_goal_reference?.scope||"尚未确认"}/>
+          <Fact label="目标数量" value={b?.owner_goal_reference?.goal_count??0}/>
+          <div className="boss-actions">
+            <button type="button" className="boss-btn" onClick={()=>onNavigate("N07")}>核对 N07 本人目标</button>
+          </div>
+        </Panel>
         <Panel title="已关联会面议题与行程影响" note="F10 / F11 的实际 SQLite 版本，不自动改期或发邀请">
           {(b?.people_meeting_impacts||[]).map(item=><div className="boss-workspace-item"
             key={item.brief_id}>
