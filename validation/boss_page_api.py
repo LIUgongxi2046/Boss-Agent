@@ -27,6 +27,8 @@ from boss_runtime_records import runtime_records
 from runtime_records_query import read_runtime_task_reference
 from boss_assignment_sources import AssignmentSourcesAPI
 from boss_simulation_api import SimulationAPI
+from boss_bi_scenarios import BIScenarioAPI
+from public_bi_scenarios import maintainer_catalog
 from boss_supply_quality import SupplyQualityAPI
 
 DEMO_NAMESPACE = "ui-check"
@@ -302,6 +304,7 @@ class BossPageAPI:
                 "version": doc["version"],
                 "published_at": doc.get("published_at"),
                 "author_contact_id": doc.get("author_contact_id"),
+                **{field:doc[field] for field in ("author_kind","author_display_name","generator_version","business_basis","allowed_use","valid_from","valid_until") if field in doc},
                 "original_locator": doc.get("original_locator"),
                 "content": doc["content"],
                 "read_at": now(),
@@ -471,6 +474,14 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path in {"/api/boss/ui/admin/bi-scenarios","/api/boss/ui/admin/bi-scenario-receipt"}:
+                if role != "MAINTAINER":
+                    return 403, {"error":"FORBIDDEN"}
+                parameters = parse_qs(query_string,keep_blank_values=True)
+                expected = set() if path.endswith("bi-scenarios") else {"client_request_id"}
+                if set(parameters) != expected or any(len(values) != 1 or not values[0] for values in parameters.values()):
+                    return 400, {"error":"INVALID_QUERY_PARAMETERS"}
+                return 200, maintainer_catalog(self.store,role) if not expected else BIScenarioAPI(self.store).receipt(role,parameters["client_request_id"][0])
             if path in {"/api/boss/ui/admin/sop-method", "/api/boss/ui/admin/sop-history", "/api/boss/ui/admin/sop-operation-status"}:
                 if role != "MAINTAINER":
                     return 403, {"error": "FORBIDDEN"}

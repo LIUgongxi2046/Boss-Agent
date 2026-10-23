@@ -27,4 +27,5 @@ fc01-n3-c15-runtime-dist/
 fc02-n3-query-dist/
 fc02-n3-scoped-dist/
 fc02-n3-history-dist/
+fc02-n3-boundary-dist/
 validation/connection.json

@@ -1,15 +1,44 @@
 openapi: 3.1.0
 info:
   title: BI公开查询与原始依据扩展
-  version: 0.2.0
+  version: 0.3.0
   description: 经营范围、继承追问、原始依据和持久请求恢复；公开生产者采用实际SDK与受限工具，外部事件SIMULATED。完整FC02二十项等待独立验收。
 x-reception: {state: IN_REVIEW, owner: N3, core_version: 1.8.0}
 security: [{BearerAuth: []}]
 paths:
+  /api/boss/ui/admin/bi-scenarios:
+    get:
+      operationId: publicMaintainerBIScenarios
+      x-role: MAINTAINER
+      responses:
+        '200': {description: 正式生成目录及当前空间已载入版本, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioCatalog'}}}}
+        '401': {description: 未认证}
+        '403': {description: 仅维护身份可读取}
+  /api/boss/ui/admin/bi-scenario-receipt:
+    get:
+      operationId: publicMaintainerBIScenarioReceipt
+      x-role: MAINTAINER
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 原载入回执；未知结果不重新执行载入, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioLoadReceipt'}}}}
+        '401': {description: 未认证}
+        '403': {description: 仅维护身份可读取}
+  /api/boss/ui/bi/scenarios:
+    get:
+      operationId: publicOwnerLoadedBIScenarios
+      x-role: BOSS
+      responses:
+        '200': {description: 本人当前空间已载入场景与来源元信息, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioList'}}}}
+        '401': {description: 未认证}
+        '403': {description: 本人或数据范围不符}
   /api/boss/ui/bi/dimensions:
     get:
       operationId: publicBIDimensions
       x-role: BOSS
+      parameters:
+        - {name: scenario_id, in: query, required: false, schema: {type: string, minLength: 1}}
+        - {name: source_ids, in: query, required: false, style: form, explode: true, schema: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}}
       responses:
         '200': {description: 当前许可来源提供的维度与覆盖, content: {application/json: {schema: {$ref: '#/components/schemas/Dimensions'}}}}
         '401': {description: 未认证}
@@ -80,11 +109,58 @@ components:
   securitySchemes:
     BearerAuth: {type: http, scheme: bearer}
   schemas:
+    ScenarioMetadata:
+      type: object
+      additionalProperties: false
+      required: [scenario_id, version, source_ids, generator_version, seed, manifest_sha256, allowed_use, record_count, sources]
+      properties:
+        scenario_id: {type: string}
+        version: {type: string}
+        source_ids: {type: array, items: {type: string}}
+        generator_version: {const: FC02-BI-1}
+        seed: {const: 20261024}
+        manifest_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        allowed_use: {const: FC02_BEHAVIOR_VALIDATION}
+        record_count: {type: integer, minimum: 1}
+        sources: {type: array, items: {$ref: '#/components/schemas/SourceOption'}}
+    ScenarioList:
+      type: object
+      additionalProperties: false
+      required: [source_type, scenarios]
+      properties:
+        source_type: {const: SIMULATED}
+        scenarios: {type: array, items: {$ref: '#/components/schemas/ScenarioMetadata'}}
+    ScenarioCatalog:
+      type: object
+      additionalProperties: false
+      required: [source_type, generator_version, seed, allowed_use, author_kind, real_enterprise_data, third_party_authorization, description, scenarios, loaded_scenarios]
+      properties:
+        source_type: {const: SIMULATED}
+        generator_version: {const: FC02-BI-1}
+        seed: {const: 20261024}
+        allowed_use: {const: FC02_BEHAVIOR_VALIDATION}
+        author_kind: {const: SIMULATED_GENERATOR}
+        real_enterprise_data: {const: false}
+        third_party_authorization: {const: false}
+        description: {type: string}
+        scenarios: {type: object, additionalProperties: {type: object, required: [purpose, series], properties: {purpose: {type: string}, series: {type: array, minItems: 1, items: {type: object}}}}}
+        loaded_scenarios: {type: array, items: {$ref: '#/components/schemas/ScenarioMetadata'}}
+    ScenarioLoadReceipt:
+      type: object
+      additionalProperties: false
+      required: [action, client_request_id, outcome, result]
+      properties:
+        action: {const: boss.simulation.bi_scenario.load}
+        client_request_id: {type: string}
+        outcome: {enum: [RECORDED, NOT_FOUND_IN_CURRENT_STORE]}
+        result: {oneOf: [{type: 'null'}, {$ref: './bi-scenario-input.schema.json#/$defs/LoadResult'}]}
     RequestID: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
     BusinessScope:
       type: object
       additionalProperties: false
       properties:
+        scenario_id: {type: string, minLength: 1}
+        source_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
         region_id: {type: string, minLength: 1}
         region_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
         product_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
@@ -108,7 +184,7 @@ components:
         comparison_scope:
           allOf:
             - {$ref: '#/components/schemas/BusinessScope'}
-            - not: {anyOf: [{required: [metric_ids]}, {required: [period_start]}, {required: [period_end]}, {required: [comparison_start]}, {required: [comparison_end]}, {required: [comparison_scope]}]}
+            - not: {anyOf: [{required: [scenario_id]}, {required: [metric_ids]}, {required: [period_start]}, {required: [period_end]}, {required: [comparison_start]}, {required: [comparison_end]}, {required: [comparison_scope]}]}
     FullScope:
       allOf:
         - {$ref: '#/components/schemas/BusinessScope'}
@@ -206,8 +282,23 @@ components:
         metric_definitions: {type: array, minItems: 1, items: {type: object, required: [metric_id, definition_version], properties: {metric_id: {type: string}, definition_version: {type: string}}}}
         source_id: {type: string, minLength: 1}
         source_version: {type: string, minLength: 1}
+        scenario_id: {type: string, minLength: 1}
+        source_ids: {type: array, uniqueItems: true, items: {type: string, minLength: 1}}
+        source_options: {type: array, items: {$ref: '#/components/schemas/SourceOption'}}
         coverage_state: {const: PARTIAL}
         missing_fields: {type: array, items: {type: string}}
+    SourceOption:
+      type: object
+      additionalProperties: false
+      required: [source_id, version, business_basis, author_kind, author_display_name, allowed_use, validity_state]
+      properties:
+        source_id: {type: string}
+        version: {type: string}
+        business_basis: {type: [string, 'null']}
+        author_kind: {type: [string, 'null']}
+        author_display_name: {type: [string, 'null']}
+        allowed_use: {type: [string, 'null']}
+        validity_state: {type: string}
     MetricProjection:
       type: object
       additionalProperties: false
@@ -243,6 +334,7 @@ components:
         missing_fields: {type: array, items: {type: string}}
       x-authoritative-validation-schema: selection-probe.json io_schema as standalone schema root evidence_output
 x-websocket-operations:
+  - {operationId: publicMaintainerBIScenarioLoad, action: boss.simulation.bi_scenario.load, role: MAINTAINER, input: './bi-scenario-input.schema.json#/$defs/Load', output: './bi-scenario-input.schema.json#/$defs/LoadResult', replay_after_reconnect: false, recovery: '/api/boss/ui/admin/bi-scenario-receipt'}
   - {operationId: publicBIQuery, action: boss.bi.query, role: BOSS, input: '#/components/schemas/QueryRequest', output: '#/components/schemas/PublicReceipt'}
   - {operationId: publicBIFollowUp, action: boss.bi.follow_up, role: BOSS, input: '#/components/schemas/FollowUpRequest', output: '#/components/schemas/PublicReceipt'}
   - {operationId: publicBICancel, action: boss.bi.cancel, role: BOSS, input: '#/components/schemas/CancelRequest', output: '#/components/schemas/PublicReceipt'}

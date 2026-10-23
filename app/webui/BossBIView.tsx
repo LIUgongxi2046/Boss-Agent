@@ -1,26 +1,30 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useClient } from "@/providers/ClientProvider";
+import { BIBasisComparison } from "./BIBasisComparison";
 
 type ScopeValue = string | string[] | null | Record<string, string | string[] | null>;
-type Scope = Record<string, ScopeValue>;
+export type Scope = Record<string, ScopeValue>;
+type SourceOption={source_id:string;version:string;business_basis:string|null;author_kind:string|null;author_display_name:string|null;allowed_use:string|null;validity_state:string};
+type LoadedScenario={scenario_id:string;version:string;source_ids:string[];record_count:number;allowed_use:string;sources:SourceOption[]};
 type Dimensions = { source_type: string; available_dimensions: Record<string,string[]>; periods: Record<string,string[]>;
-  metric_definitions: {metric_id:string;definition_version:string}[]; source_id:string;source_version:string;coverage_state:string;missing_fields:string[] };
+  metric_definitions: {metric_id:string;definition_version:string}[]; source_id:string;source_version:string;coverage_state:string;missing_fields:string[];
+  scenario_id?:string;source_ids?:string[];source_options:SourceOption[] };
 type MetricValue = {metric_id:string;period_scope:string;value:string|null;unit:string;formula:string;definition_version:string;display_rounding:string;scope_description:string};
-type Query = {query_id:string;context_snapshot:Scope;parent_query_id:string|null;overridden_fields:string[];source_type:string;queried_at:string;
+export type Query = {query_id:string;context_snapshot:Scope;parent_query_id:string|null;overridden_fields:string[];source_type:string;queried_at:string;
   values:MetricValue[];detail_refs:string[];sources:{source_id:string;version:string;source_type:string;coverage:string;business_as_of:string;source_updated_at:string;quality_state:string}[];
   coverage:{state:string;periods:Record<string,{record_count:number;region_ids:string[];period_start:string;period_end:string}>;missing_regions:string[];delayed_regions:string[]|null;unsynchronized_regions:string[]|null};
   comparison:{state:string;reasons:string[]};missing_fields:string[];unexplained_causes:string[]};
-type Read = {adoption_state:string;result:Query};
+export type Read = {adoption_state:string;result:Query};
 type Receipt = {client_request_id:string;request_state:string;run_id:string|null;receipt:{outcome:string;query:Read|null}|null;cancel_requested?:boolean};
 type History = {requests:{client_request_id:string;created_at:string;run_id:string|null}[]};
-type Evidence = {query_id:string;result:{definition_version:string;original_records:{record_id:string;version:string;content:unknown}[];conflicts:string[];missing_fields:string[]}};
+export type Evidence = {query_id:string;result:{definition_version:string;original_records:{record_id:string;version:string;content:unknown}[];conflicts:string[];missing_fields:string[]}};
 const LABELS:Record<string,string>={sales_quantity:"销量",revenue:"营业收入",cost:"成本",gross_profit:"毛利",gross_margin:"毛利率",gross_profit_per_tonne:"单吨毛利"};
-const FIELDS:[string,string][]=[["region_id","地区"],["region_ids","地区范围"],["product_ids","产品范围"],["legal_entity_id","法人"],
+const FIELDS:[string,string][]=[["source_ids","资料来源"],["region_id","地区"],["region_ids","地区范围"],["product_ids","产品范围"],["legal_entity_id","法人"],
   ["currency","币种"],["quantity_unit","数量单位"],["trade_scope","交易范围"],["definition_version","定义版本"],
   ["business_basis","业务口径"],["settlement_state","结算状态"],["target_version","目标版本"],["customer_id","客户"],
   ["ownership_type","归属类型"],["asset_owner_id","资产归属"],["cost_owner_id","成本归属"]];
 const OPTIONAL=new Set(["target_version","customer_id","ownership_type","asset_owner_id","cost_owner_id"]);
-const ARRAYS=new Set(["region_ids","product_ids","metric_ids"]);
+const ARRAYS=new Set(["region_ids","product_ids","metric_ids","source_ids"]);
 const DATES:[string,string][]=[["period_start","当前期间开始"],["period_end","当前期间结束"],["comparison_start","比较期间开始"],["comparison_end","比较期间结束"]];
 function businessScope(snapshot:Scope):Scope{return Object.fromEntries(Object.entries(snapshot).filter(([field])=>!["envelope","query_mode","question","parent_query_id"].includes(field)));}
 function Panel({title,children}:{title:string;children:ReactNode}){return <section className="boss-panel"><header className="boss-panel-head"><h2>{title}</h2></header>{children}</section>;}
@@ -38,14 +42,18 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   const [sourceError,setSourceError]=useState(""),[historyError,setHistoryError]=useState(""),[receiptError,setReceiptError]=useState("");
   const [historyLoading,setHistoryLoading]=useState(true),[receiptLoading,setReceiptLoading]=useState(false),[requestKey,setRequestKey]=useState("");
   const [accessDenied,setAccessDenied]=useState(false);
+  const [scenarioId,setScenarioId]=useState(()=>new URLSearchParams(window.location.search).get("biScenario")??"");
+  const [scenarioList,setScenarioList]=useState<LoadedScenario[]>([]),[scenarioError,setScenarioError]=useState("");
+  const [dimensionSources,setDimensionSources]=useState<string[]|null>(null);
   const [evidence,setEvidence]=useState<Evidence|null>(null),[reading,setReading]=useState(false),[dirty,setDirty]=useState(false);
   const generation=useRef(0),activeRequest=useRef(""),readId=useRef<string|null>(null),mounted=useRef(true);
-  const identityEpoch=useRef(0),denied=useRef(false),restoredScope=useRef(false),receiptSequence=useRef(0),historySequence=useRef(0);
+  const identityEpoch=useRef(0),denied=useRef(false),restoredScope=useRef(false),receiptSequence=useRef(0),historySequence=useRef(0),dimensionSequence=useRef(0);
   readId.current=read?.result.query_id??null;
   const clearProtected=useCallback(()=>{
     setDimensions(null);setScope({});setRead(null);setReceipt(null);setHistory({requests:[]});setEvidence(null);
     setRequestKey("");activeRequest.current="";readId.current=null;restoredScope.current=false;
     setQuestion("查询当前经营指标及变化");setMode("NEW");
+    setScenarioList([]);setScenarioError("");setScenarioId("");setDimensionSources(null);dimensionSequence.current++;
     setChanged(new Set());setDirty(false);setBusy(false);setReading(false);setReceiptLoading(false);setHistoryLoading(false);
     setSourceError("");setHistoryError("");setReceiptError("");generation.current++;receiptSequence.current++;historySequence.current++;
   },[]);
@@ -72,7 +80,11 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     const result=value.receipt?.query;
     restoredScope.current=Boolean(result);
     setRead(result??null);setEvidence(null);setReading(false);setDirty(false);setChanged(new Set());
-    if(result){setScope(businessScope(result.result.context_snapshot));setQuestion(String(result.result.context_snapshot.question??"继续查询当前范围"));setMode(result.adoption_state==="HISTORICAL_REQUIRES_REQUERY"?"NEW":"FOLLOW_UP");}
+    if(result){
+      const snapshot=result.result.context_snapshot;
+      setScope(businessScope(snapshot));setScenarioId(typeof snapshot.scenario_id==="string"?snapshot.scenario_id:"");setDimensionSources(Array.isArray(snapshot.source_ids)?snapshot.source_ids:null);
+      setQuestion(String(snapshot.question??"继续查询当前范围"));setMode(result.adoption_state==="HISTORICAL_REQUIRES_REQUERY"?"NEW":"FOLLOW_UP");
+    }
   },[]);
   const loadReceipt=useCallback(async(key:string,signal?:AbortSignal)=>{
     const epoch=identityEpoch.current,sequence=++receiptSequence.current,version=generation.current;
@@ -86,21 +98,12 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   useEffect(()=>{
     const abort=new AbortController(),epoch=++identityEpoch.current;
     mounted.current=true;denied.current=false;setAccessDenied(false);clearProtected();setError("");setHistoryLoading(true);
+    setScenarioId(new URLSearchParams(window.location.search).get("biScenario")??"");
     const initialGeneration=generation.current;
     const current=()=>mounted.current&&!denied.current&&epoch===identityEpoch.current&&!abort.signal.aborted;
     const historyRequest=++historySequence.current;
     const requested=new URLSearchParams(window.location.search).get("biRequest");
-    void fetchJSON<Dimensions>("/api/boss/ui/bi/dimensions",abort.signal).then(data=>{
-      if(!current())return;setDimensions(data);
-      if(restoredScope.current)return;
-      const available=data.available_dimensions,next:Scope={};
-      for(const [field] of FIELDS){const dimension=field==="region_ids"?"region_id":field==="product_ids"?"product_id":field;
-        next[field]=OPTIONAL.has(field)?null:ARRAYS.has(field)?available[dimension]??[]:available[dimension]?.[0]??"";}
-      next.metric_ids=data.metric_definitions.map(item=>item.metric_id);
-      next.definition_version=data.metric_definitions[0]?.definition_version??"";
-      next.period_start=data.periods.CURRENT[0];next.period_end=data.periods.CURRENT[1];next.comparison_start=data.periods.BASE[0];next.comparison_end=data.periods.BASE[1];
-      setScope(next);
-    },failure=>{if(current())setSourceError(failure.message);});
+    void fetchJSON<{scenarios:LoadedScenario[]}>("/api/boss/ui/bi/scenarios",abort.signal).then(value=>{if(current())setScenarioList(value.scenarios);},failure=>{if(current())setScenarioError(failure.message);});
     void fetchJSON<History>("/api/boss/ui/bi/history",abort.signal).then(saved=>{
       if(!current()||historyRequest!==historySequence.current)return;setHistory(saved);setHistoryLoading(false);
       const latest=saved.requests[0]?.client_request_id;
@@ -109,7 +112,35 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     if(requested)void loadReceipt(requested,abort.signal);
     return()=>{mounted.current=false;identityEpoch.current++;generation.current++;receiptSequence.current++;abort.abort();};
   },[fetchJSON,loadReceipt,clearProtected]);
-  function edit(field:string,value:ScopeValue){setScope(current=>({...current,[field]:value}));setChanged(current=>new Set([...current,field]));setDirty(true);setEvidence(null);generation.current++;}
+  const dimensionSourceKey=JSON.stringify(dimensionSources);
+  useEffect(()=>{
+    if(denied.current)return;
+    const abort=new AbortController(),epoch=identityEpoch.current,sequence=++dimensionSequence.current;
+    const current=()=>mounted.current&&!denied.current&&epoch===identityEpoch.current&&sequence===dimensionSequence.current&&!abort.signal.aborted;
+    setDimensions(null);setSourceError("");
+    if(dimensionSources?.length===0){setSourceError("请选择本次查询的资料来源");return()=>abort.abort();}
+    const parameters=new URLSearchParams();if(scenarioId)parameters.set("scenario_id",scenarioId);for(const identifier of dimensionSources??[])parameters.append("source_ids",identifier);
+    void fetchJSON<Dimensions>("/api/boss/ui/bi/dimensions"+(parameters.size?"?"+parameters:""),abort.signal).then(data=>{
+      if(!current())return;setDimensions(data);if(restoredScope.current)return;
+      const available=data.available_dimensions,next:Scope={};
+      for(const [field] of FIELDS){const dimension=field==="region_ids"?"region_id":field==="product_ids"?"product_id":field;
+        next[field]=OPTIONAL.has(field)?null:ARRAYS.has(field)?available[dimension]??[]:available[dimension]?.[0]??"";}
+      next.metric_ids=data.metric_definitions.map(item=>item.metric_id);next.definition_version=data.metric_definitions[0]?.definition_version??"";
+      next.period_start=data.periods.CURRENT[0];next.period_end=data.periods.CURRENT[1];next.comparison_start=data.periods.BASE[0];next.comparison_end=data.periods.BASE[1];
+      next.source_ids=data.source_options.filter(source=>source.business_basis===null||source.business_basis===next.business_basis).map(source=>source.source_id);
+      if(data.scenario_id)next.scenario_id=data.scenario_id;setScope(next);
+    },failure=>{if(current())setSourceError(failure.message);});
+    return()=>abort.abort();
+  },[fetchJSON,scenarioId,dimensionSourceKey]);
+  function edit(field:string,value:ScopeValue){
+    setScope(current=>({...current,[field]:value}));setChanged(current=>new Set([...current,field]));setDirty(true);setEvidence(null);generation.current++;
+    if(field==="source_ids"&&Array.isArray(value)){restoredScope.current=true;setDimensionSources(value);}
+  }
+  function chooseScenario(identifier:string){
+    generation.current++;receiptSequence.current++;restoredScope.current=false;setScenarioId(identifier);setDimensionSources(null);setScope({});setRead(null);setReceipt(null);setReceiptLoading(false);
+    setRequestKey("");activeRequest.current="";setEvidence(null);setChanged(new Set());setDirty(false);setMode("NEW");setError("");setReceiptError("");
+    const address=new URL(window.location.href);address.searchParams.delete("biRequest");if(identifier)address.searchParams.set("biScenario",identifier);else address.searchParams.delete("biScenario");window.history.replaceState(null,"",address);
+  }
   function remember(key:string){const address=new URL(window.location.href);address.searchParams.set("biRequest",key);window.history.replaceState(null,"",address);}
   async function submit(){
     if(busy||!dimensions||denied.current)return;
@@ -141,18 +172,23 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   }
   const visible=dirty?null:read?.result, comparison=scope.comparison_scope as Record<string,string|string[]|null>|undefined;
   const formDisabled=busy||!dimensions||accessDenied;
-  const options=(field:string)=>dimensions?.available_dimensions[field==="product_ids"?"product_id":field==="region_ids"?"region_id":field]??[];
+  const sourceOptions=scenarioList.find(row=>row.scenario_id===scenarioId)?.sources??dimensions?.source_options??[];
+  const options=(field:string)=>field==="source_ids"?sourceOptions.map(source=>source.source_id):dimensions?.available_dimensions[field==="product_ids"?"product_id":field==="region_ids"?"region_id":field]??[];
   function fieldInput(field:string,label:string,current:ScopeValue|undefined,onChange:(value:ScopeValue)=>void,prefix="current"){
     const id=prefix+"-"+field;
     const choices=dimensions?options(field):Array.isArray(current)?current:[];
     if(ARRAYS.has(field))return <label key={id}>{label}<select aria-label={prefix==="compare"?"比较条件"+label:label} multiple value={Array.isArray(current)?current:[]} disabled={formDisabled}
-      onChange={event=>onChange([...event.target.selectedOptions].map(option=>option.value))}>{choices.map(value=><option key={value} value={value}>{value}</option>)}</select></label>;
+      onChange={event=>onChange([...event.target.selectedOptions].map(option=>option.value))}>{choices.map(value=><option key={value} value={value}>{field==="source_ids"?value+" · "+(sourceOptions.find(source=>source.source_id===value)?.business_basis??"当前基准资料"):value}</option>)}</select></label>;
     return <label key={id}>{label}<input aria-label={prefix==="compare"?"比较条件"+label:label} list={id+"-options"} value={typeof current==="string"?current:""} disabled={formDisabled}
       placeholder={OPTIONAL.has(field)?"未知，尚未提供":"请输入明确条件"} onChange={event=>onChange(event.target.value===""&&OPTIONAL.has(field)?null:event.target.value)}/>
       <datalist id={id+"-options"}>{options(field).map(value=><option key={value} value={value}/>)}</datalist></label>;
   }
   return <div className="boss-columns boss-bi-view"><div className="boss-column">
     <Panel title="经营指标查询">
+      <div className="boss-form-grid boss-bi-fields"><label>经营资料场景<select aria-label="经营资料场景" value={scenarioId} disabled={busy||accessDenied} onChange={event=>chooseScenario(event.target.value)}>
+        <option value="">selection/1 · 当前基准资料</option>{scenarioList.map(row=><option key={row.scenario_id} value={row.scenario_id}>{row.scenario_id} · v{row.version} · {row.record_count} 条记录</option>)}</select></label></div>
+      {scenarioError&&<p role="alert">已载入场景读取失败：{scenarioError}</p>}
+      {scenarioId&&<p>SIMULATED · 程序行为验证资料，保持原始口径及各自来源。</p>}
       <p>当前资料属性 {dimensions?.source_type??(accessDenied?"无权访问":sourceError?"不可采用":"正在读取")} · 已知覆盖 {dimensions?.coverage_state??"未知"}</p>
       {sourceError&&<p role="alert" className="boss-status boss-status-warn">当前来源：{sourceError}</p>}
       {error&&<p role="alert" className="boss-status boss-status-warn">{error}</p>}
@@ -184,6 +220,8 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
       {read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"&&<p role="status">历史查询需要重新查询，当前原始依据不可采用。历史条件与原始数值保留供查阅。</p>}
     </Panel>
     {visible&&<Panel title="原始精度与计算公式">{visible.values.map(value=><details className="boss-workspace-item" key={value.metric_id+value.period_scope}><summary>{LABELS[value.metric_id]??value.metric_id} · {value.period_scope}</summary><p>原始值 {value.value??"未定义"} · {value.unit} · 定义版本 {value.definition_version}</p><p>{value.formula}</p><p>{value.display_rounding}</p><p>{value.scope_description}</p></details>)}</Panel>}
+    {!accessDenied&&(dimensions||read||sourceError)&&<BIBasisComparison key={identityEpoch.current} current={visible?read??null:null} request={fetchJSON} onSource={onSource}
+      reviewKey={(read?.result.query_id??"")+":"+(read?.adoption_state??"")+":"+sourceError+":"+dimensionSourceKey}/>}
     <Panel title="本次查询原始依据"><button className="boss-button" disabled={!visible||reading||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>void readEvidence()}>{reading?"正在读取本次依据":"读取本次查询原始依据"}</button>
       {evidence&&<><p>查询 {evidence.query_id} · 定义版本 {evidence.result.definition_version}</p>{evidence.result.original_records.map(record=><details key={record.record_id} className="boss-workspace-item"><summary>{record.record_id} · v{record.version}</summary><pre>{JSON.stringify(record.content,null,2)}</pre></details>)}{evidence.result.conflicts.map(text=><p key={text}>{text}</p>)}</>}
     </Panel>

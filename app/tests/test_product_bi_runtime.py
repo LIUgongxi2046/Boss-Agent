@@ -62,7 +62,8 @@ def validate_public_output(kind, body):
     schema = yaml.safe_load(path.read_text())
     core = directory / "openapi.yaml"
     registry = Registry().with_resources([(path.as_uri(),Resource.from_contents(schema,default_specification=DRAFT202012)),
-        (core.as_uri(),Resource.from_contents(yaml.safe_load(core.read_text()),default_specification=DRAFT202012))])
+        (core.as_uri(),Resource.from_contents(yaml.safe_load(core.read_text()),default_specification=DRAFT202012)),
+        ((directory / "bi-scenario-input.schema.json").as_uri(),Resource.from_contents(json.loads((directory / "bi-scenario-input.schema.json").read_text())))])
     Draft202012Validator({**schema,"$id":path.as_uri(),"$ref":"#/components/schemas/"+kind},registry=registry,format_checker=FormatChecker()).validate(body)
 
 

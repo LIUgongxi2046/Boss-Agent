@@ -6,6 +6,7 @@
 |---|---|---|
 | FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
 | FC02-N3 | [BI连续查询公共集成](../feature-delivery/FC02/integration.md) | 完整FR-03及二十项检查点，当前工单为原始项目docs/FC02经营查询工单.md |
+| FC02-N3-BOUNDARY-ADOPTION | [正式经营边界与双方口径的公共采用](../feature-delivery/FC02/boundary-adoption.md) | C05/C08/C11，维护载入、本人场景与来源、双口径及实际Runtime；状态引用原始功能来源 |
 | FC02-N4-UI-HISTORY-01 | [来源失效后的历史查询与原请求恢复](../feature-delivery/FC02/history-recovery.md) | C12/C14公共恢复、来源有效性、身份与持久请求；状态引用原始功能来源 |
 | FC02-N4-UI-ASYNC-01 | [初始回执与条件编辑的异步顺序](../feature-delivery/FC02/async-recovery.md) | C03/C15实际响应延迟、编辑条件与查询编号；状态引用原始功能来源 |
 | FC02-N1 | [BI范围、比较与持久恢复](../feature-delivery/FC02/backend.md) | 已接收正式领域提交，完整功能状态引用原始项目功能记录 |

@@ -227,15 +227,17 @@ class BIQueryAPI:
         validate("scoped_query_input", payload)
         return self.store.invoke("query_metrics", payload)
 
-    def dimensions(self, role, scenario_id=None):
+    def dimensions(self, role, scenario_id=None, source_ids=None):
         self._role(role)
+        selection = {**({"scenario_id":scenario_id} if scenario_id is not None else {}), **({"source_ids":source_ids} if source_ids is not None else {})}
+        validate("scope_fields",selection)
         from boss_simulation_api import _context
         with self.store.connect() as db:
             db.execute("BEGIN")
             context = _context(db)
             data = self.store.get(db, context["namespace"], "initial", "snapshot")
             from boss_bi_scenarios import query_inputs
-            data, documents = query_inputs(self.store, db, context["namespace"], data, {"scenario_id": scenario_id} if scenario_id is not None else {})
+            data, documents = query_inputs(self.store, db, context["namespace"], data, selection)
             document = documents[0]
             rows = [_row_scope(row) for row in data["details"]]
             return {"source_type": "SIMULATED", "available_dimensions": {field: sorted({row[field] for row in rows if row.get(field) is not None})

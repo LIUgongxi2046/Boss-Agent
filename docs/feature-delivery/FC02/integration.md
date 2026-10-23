@@ -6,6 +6,8 @@
 
 接收 N1 fe3010563c6986eff6f0c26c1b5b2554d061cff6、4bcb0a937eaac5ae64031105ccfd2f7de413c8bb；接收 N2 15aeb1d1c61c50e5958565e2bb5c021c2b35fc79、738f5616ae03c951bd97c9abb4154de7937b79ef。领域代码、正式范围 Schema、Agent 工具与组合记录均在本候选内。全局索引登记各角色记录，原有未提交交接及原始证据保持。
 
+接收N1正式场景9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3、2731df3fb9a6f6ffc405846a301505f0141ff1d5，对应当前f515905/4e6b8d6。六项正式生成场景及双方来源通过维护载入、本人维度和明确来源进入同一受限Runtime。A04维护、F03/N03选择和双方口径并列、D01实际作者与用途，以及连接中断后只读回执均已接收；详细依据、实现和复现见boundary-adoption.md。
+
 validation/product_bi.py 提供认证请求生产者、独立请求工具范围、共享 Provider/Recorder 分派、原请求与实际 SDK request_id/run_id/session_id 的持久关联，以及维度、当前/历史读取、回执和取消。客户端只能提交问题、明确范围及原请求编号；owner、namespace、dataset 和 envelope 由当前认证与数据提供。query_metrics/read_evidence 使用同一正式组合 Schema，追问支持 comparison_scope 和明确新增可选字段，未指定字段继承持久快照。
 
 application 使用同一实际 Nanobot AgentLoop。BI 请求仅开放 query_metrics/read_evidence，配置启用范围仍由维护身份管理；实际 Registry、模拟事件工具摘要和 Runtime 记录采用相同的两项工具。FC01 请求由原 FC01 Provider 和 Recorder 处理，BI 模块没有业务写入工具。模型参数必须匹配服务端冻结范围；模拟事件逐次消费本次实际工具返回，沿用会话历史时仍执行当前新查询。
@@ -24,17 +26,21 @@ F03/N03 使用 BossBIView，覆盖指标、地区/地区范围、产品、法人
 
 字段标签14px/22px，输入、表格数值、正文和原始依据16px/24px；D01使用当前已接收原文Token。界面支持键盘与200%缩放，资料讨论不产生交办、批准或发送授权。没有客户端计算业务指标或预设业务答案。
 
-specs/product-bi.openapi.yaml 0.2.0 登记全部公开输入、输出和 WebSocket 动作。实际请求保存前通过公共 Schema 校验，领域再次执行正式 SCOPED 校验；实际维度、查询、回执及历史输出通过公共规范验证。runtime-records.schema.json 支持FC01/FC02及准确BI字段，保持私人正文不可读取。
+specs/product-bi.openapi.yaml 0.3.0 登记全部公开输入、输出和 WebSocket 动作，含维护场景目录、载入与原回执、本人已载入列表、scenario_id/source_ids、来源选项和实际作者/用途。实际请求保存前通过公共 Schema 校验，领域再次执行正式 SCOPED 校验；实际维度、查询、回执、历史、场景目录和列表输出通过公共规范验证。runtime-records.schema.json 支持FC01/FC02及准确BI字段，保持私人正文不可读取。
 
 ## 验证与准确制品
 
-当前必要公开增量检查PASS，见evidence/feature-delivery/FC02/fc02-history-6e8d0b95-f990-481e-a585-de0c060a2fa3.json及history-recovery.md。覆盖正常查询/追问、来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、12组受影响DOM尺寸和键盘。同一制品的实际响应延迟检查也PASS，见fc02-n3-timing-0aa94d7d-c7d7-49de-9bfc-6f198b3989f0.json和async-recovery.md；较早回执不覆盖已编辑条件，较早原始依据不覆盖新查询，两项响应字节摘要在延迟前后相同。只修改公开BI组件；领域、Agent、Runtime和共享消费者复用N4对9026c8a的对应证据，未重复74项全量。78项组合及4项请求编号证据分别保存在integrated-final.xml和public-runtime-green.xml，适用原记录的实现及未变化消费者。
+当前24项正式场景及公共消费者PASS，另6项公共返回Schema与实际SDK消费者PASS，分别见boundary-consumers.xml和boundary-output.xml。维护目录与六场景实际载入、真实响应形成后中断连接、重连后仅转发一次并读取原回执、本人七项查询、双方100/120收入及各自原文、刷新和十八组尺寸PASS，见fc02-boundary-176212af-9f94-49fc-891f-04f8a7441691.json。加权毛利率14%，零分母及缺少利润保持null，延迟与未同步地区分别显示；实际7查询、7运行、6场景，原始selection资料摘要保持，task/authorization/outbox均零，renderer错误零。
+
+同一制品的来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、十二组历史尺寸和键盘PASS，见fc02-history-3984d0c8-83cb-4c2e-bc37-0307b28ab841.json。实际响应延迟检查PASS，见fc02-n3-timing-719b2fd4-0c29-4963-bdb8-95fe8532894e.json；较早回执不覆盖已编辑条件，较早原始依据不覆盖新查询，响应字节摘要在延迟前后相同。历史与异步主记录继续引用history-recovery.md、async-recovery.md，当前制品验证补充于boundary-adoption.md。
+
+N4对faf66bf6c718b032e20a94231989894367a258c4独立确认16/20、BLOCKED，准确快照见independent-faf66bf.json。其74项证据运行于9026c8a，按301项依赖核查用于faf66bf；当前正式输入、Schema及公开消费者已有变化，新候选必须重新核查相应依赖，不能直接沿用旧分数。没有重复无变化74项全量或FC01业务全量。
 
 标准 OpenAPI3.1 与 YAML 重复字段检查通过：.work/openapi-venv/bin/python validation/check_bi_public_spec.py。git diff --check 通过。没有复验无变化FC01业务全量或启用暂停的STT。
 
-独立制品fc02-n3-history-dist，TypeScript/Vite构建通过，14.10秒；在.work/product/nanobot/webui执行npm run build -- --outDir ../../../../fc02-n3-history-dist。manifest SHA256为c66d167f9b6e7187dd47c1cb76db7350941153a3f9be98bf54d90585728a2475，index.html SHA256为39b597fd3398b368dcc290d93bfbaeefd159f743211c10df45b8606a3557d78b。BossBIView正式源码与构建输入SHA256均为7d0fda5afaf184d922449a1d5aa5e695fae8b0b57a7b09aaaf01f721dabd1eb5；BossDesktop及CSS没有变更。已有用户预览和其他候选制品保持。
+独立制品fc02-n3-boundary-dist，严格TypeScript/Vite构建PASS，15.14秒。manifest SHA256为633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411，index.html SHA256为8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6。五份正式前端文件与构建输入摘要逐份相同。原生Client包含app/webui/nanobot-one-shot.patch的实际修改，连接恢复不重发场景载入；全新构建必须通过文件编辑工具采用该patch。具体输入摘要及构建步骤见candidate.json、boundary-adoption.md。已有用户预览和其他候选制品保持。
 
-当前公开账号检查使用独立9761/9762/19761、账号和SQLite，具体证据见history-recovery.md。原18组F03/N03/D01公开组合记录为evidence/feature-delivery/FC02/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5.json，适用其记录的制品；当前受影响F03/N03历史状态已执行12组尺寸复验，D01及CSS保持原接收代码。
+当前公开账号检查使用独立9841/9842/19841/9843、9761/9762/19761和9751/9752/19751/9753，均有独立账号与SQLite。新增场景的F03/N03/D01十八组尺寸与历史状态十二组尺寸均在当前制品通过；没有使用视觉功能。详细数据目录与命令见boundary-adoption.md。
 
 外部API和模型事件全部SIMULATED_FIRST，本地认证、权限、SQLite、确定性业务、实际SDK与工具执行。视觉、真实模型质量、外部投递和设备安装未执行。测试数量不计入FC02二十项分数。
 

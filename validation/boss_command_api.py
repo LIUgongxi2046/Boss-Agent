@@ -42,6 +42,7 @@ from boss_owner_authorizations import revoke as owner_authorization_revoke
 from boss_meetings import MeetingAPI, meeting_materials
 from boss_source_access import require_current_business_source
 from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQualityAPI
+from boss_bi_scenarios import BIScenarioAPI, LOAD_ACTION as BI_SCENARIO_LOAD
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -98,6 +99,7 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        BI_SCENARIO_LOAD: "MAINTAINER",
         **{action: definition[0] for action, definition in SUPPLY_QUALITY_ACTIONS.items()},
         **{"boss.sop." + action: "MAINTAINER" for action in ("save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel")},
         "boss.assignment.create": "BOSS",
@@ -190,7 +192,9 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action in SUPPLY_QUALITY_ACTIONS:
+            if action == BI_SCENARIO_LOAD:
+                result = BIScenarioAPI(self.store).execute(role,action,payload)
+            elif action in SUPPLY_QUALITY_ACTIONS:
                 result = SupplyQualityAPI(self.store).execute(role, action, payload)
             elif action.startswith("boss.sop."):
                 require(self.skills is not None, "当前方法服务尚未准备", web.HTTPServiceUnavailable)

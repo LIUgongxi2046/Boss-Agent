@@ -260,6 +260,10 @@
 .boss-bi-compare-field input[type=checkbox]{width:18px;height:18px}
 .boss-bi-compare-field input:not([type=checkbox]),.boss-bi-compare-field select{font-size:16px;line-height:24px;width:100%;min-width:0}
 .boss-bi-view .boss-kv dd{white-space:normal;overflow-wrap:anywhere}
+.boss-bi-comparison-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.boss-bi-maintainer p,.boss-bi-maintainer li{font-size:16px;line-height:24px;overflow-wrap:anywhere}
+.boss-bi-maintainer{margin-bottom:18px}
+@media(max-width:1100px){.boss-bi-comparison-grid{grid-template-columns:minmax(0,1fr)}}
 .boss-v6 .boss-bi-table{font-size:16px;line-height:24px}
 .boss-v6 .boss-bi-table thead th{font-size:14px;line-height:22px}
 .boss-v6 .boss-document-source{font-size:16px;line-height:24px}

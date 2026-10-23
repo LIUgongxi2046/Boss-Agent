@@ -14,6 +14,7 @@ from nanobot.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 from business import ROOT, checksum, now, require, validate
 from boss_bi_queries import BIQueryAPI
+from public_bi_scenarios import loaded_scenarios, dimension_options
 from boss_runtime_records import ATTRIBUTE
 from fc02_agent import Fc02Context, Fc02Tool, bind_query, bind_scoped_followup
 from fc02_agent.runtime import Fc02RuntimeRecorder, Fc02SimulatedProvider
@@ -222,10 +223,14 @@ class ProductBI:
         from urllib.parse import parse_qs
         self.api._role(role)
         query = parse_qs(query_string, keep_blank_values=True)
-        require(all(len(value) == 1 and value[0] for value in query.values()), "经营读取参数无效", web.HTTPBadRequest)
+        require(all(value and all(value) and (len(value) == 1 or path == "/api/boss/ui/bi/dimensions" and field == "source_ids") for field,value in query.items()), "经营读取参数无效", web.HTTPBadRequest)
+        if path == "/api/boss/ui/bi/scenarios":
+            require(not query,"场景列表不接受额外字段",web.HTTPBadRequest)
+            return loaded_scenarios(self.store,role)
         if path == "/api/boss/ui/bi/dimensions":
-            require(not query, "维度读取不接受额外字段", web.HTTPBadRequest)
-            return self.api.dimensions(role)
+            require(set(query) <= {"scenario_id","source_ids"}, "维度读取字段无效", web.HTTPBadRequest)
+            result = self.api.dimensions(role,query["scenario_id"][0] if "scenario_id" in query else None,query.get("source_ids"))
+            return dimension_options(self.store,role,result)
         if path == "/api/boss/ui/bi/receipt":
             require(set(query) == {"client_request_id"}, "原请求读取字段无效", web.HTTPBadRequest)
             return self.receipt(role, query["client_request_id"][0])

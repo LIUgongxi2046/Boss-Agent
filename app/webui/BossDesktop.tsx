@@ -43,6 +43,7 @@ import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
 import { BossToday, type TodayProjection } from "./BossToday";
 import { BossBIView } from "./BossBIView";
+import { MaintainerBIScenarios } from "./MaintainerBIScenarios";
 import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
 import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
@@ -79,7 +80,8 @@ type Meetings = {
   meeting: Dashboard["meeting"];
   documents: { source_id: string; version: string; published_at: string; source_type: string }[];
 };
-type Evidence = { source_id: string; source_type: string; version: string; content: string; published_at?: string; author_contact_id?: string };
+type Evidence = { source_id: string; source_type: string; version: string; content: string; published_at?: string; author_contact_id?: string;
+  author_kind?:string;author_display_name?:string;generator_version?:string;business_basis?:string;allowed_use?:string;valid_from?:string;valid_until?:string };
 type Maintenance = { configured_provider: string; configured_model: string; configuration_version: string; source_type: string; status: string; counts: Record<string, number>; task_refs?: MaintenanceTaskRef[] };
 type ModelHealth = {
   source_type: string; provider: string; data_source: string;
@@ -810,7 +812,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                       <Value label="来源 ID" value={evidence?.source_id}/>
                       <Value label="版本" value={evidence?.version}/>
                       <Value label="来源属性" value={evidence?.source_type}/>
-                      <Value label="作者" value={evidence?.author_contact_id}/>
+                      <Value label="作者" value={evidence?.author_display_name??evidence?.author_contact_id}/>
+                      {evidence?.author_kind&&<Value label="作者类型" value={evidence.author_kind}/>}
+                      {evidence?.business_basis&&<Value label="业务口径" value={evidence.business_basis}/>}
+                      {evidence?.allowed_use&&<Value label="允许用途" value={evidence.allowed_use}/>}
+                      {evidence?.valid_until&&<Value label="来源有效期" value={(evidence.valid_from??"未知")+" 至 "+evidence.valid_until}/>}
                       {evidence?.content ? <blockquote className="boss-source boss-document-source">{
                         sourceAnchor &&
                         evidence.source_id===sourceAnchor.source_id &&
@@ -950,6 +956,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 </div>
               </div></>
               : page === "A04" ? <>
+              <MaintainerBIScenarios/>
               <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>

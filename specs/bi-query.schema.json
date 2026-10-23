@@ -99,6 +99,8 @@
       "type": "object", "additionalProperties": false, "required": ["envelope", "parent_query_id", "question", "overrides"],
       "properties": {"envelope": {"$ref": "#/$defs/envelope"}, "parent_query_id": {"type": "string", "minLength": 1}, "question": {"type": "string", "minLength": 1}, "overrides": {
         "type":"object","additionalProperties":false,"properties":{
+          "scenario_id":{"$ref":"#/$defs/scope_fields/properties/scenario_id"},
+          "source_ids":{"$ref":"#/$defs/scope_fields/properties/source_ids"},
           "region_id":{"$ref":"#/$defs/scope_fields/properties/region_id"},
           "region_ids":{"$ref":"#/$defs/scope_fields/properties/region_ids"},
           "product_ids":{"$ref":"#/$defs/scope_fields/properties/product_ids"},
