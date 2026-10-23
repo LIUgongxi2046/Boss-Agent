@@ -70,7 +70,7 @@ def main():
         "source_sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in source_files},
         "business_database_unchanged": True, "business_object_counts": counts,
         "external_request_count": 0, "stt_request_count": 0,
-        "model_adoption": "PENDING_EXPLICIT_TECHNICAL_CONTENT_AUTHORIZATION",
+        "model_adoption": "DEFERRED_REAL_API_VALIDATION", "external_api_mode": "SIMULATED_FIRST",
         "public_integration": "PENDING_W3", "full_A07_accepted": False, "full_A19_accepted": False,
     }
     output = ROOT / "evidence/T19/w2-20261023-native-sop-catalog.json"

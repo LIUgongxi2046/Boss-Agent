@@ -89,6 +89,8 @@ class BossSkillCatalog:
 
     def set_enabled(self, role, sop_id, *, enabled, expected_content_sha256, config_path):
         _require_role(role, {"MAINTAINER"})
+        if hasattr(self, "drafts"):
+            self.drafts.require_ready()
         if type(enabled) is not bool or not isinstance(sop_id, str):
             raise web.HTTPBadRequest(text="方法编号或启停状态无效")
         if not isinstance(expected_content_sha256, str) or len(expected_content_sha256) != 64:
@@ -113,6 +115,8 @@ class BossSkillCatalog:
 
     def context(self, role, sop_ids):
         _require_role(role, {"BOSS"})
+        if hasattr(self, "drafts"):
+            self.drafts.require_ready()
         if not isinstance(sop_ids, list) or not sop_ids or any(not isinstance(item, str) for item in sop_ids):
             raise web.HTTPBadRequest(text="需要明确的SOP编号列表")
         if len(set(sop_ids)) != len(sop_ids):
@@ -128,6 +132,8 @@ class BossSkillCatalog:
         # 正文读取沿用原生机制，输出前再次核查本次版本及工具引用。
         block = self.loader.build_explicit_skill_runtime_context(" ".join("$" + item["name"] for item in chosen))
         current, latest_documents = self._snapshot()
+        if hasattr(self, "drafts"):
+            self.drafts.require_ready()
         latest = {item["sop_id"]: item for item in current}
         if block is None or any(latest[item["sop_id"]] != item or latest_documents[item["name"]] != documents[item["name"]] for item in chosen):
             raise web.HTTPConflict(text="方法读取期间配置或内容发生变化")

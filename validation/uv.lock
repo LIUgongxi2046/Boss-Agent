@@ -145,6 +145,7 @@ dependencies = [
     { name = "packaging" },
     { name = "playwright" },
     { name = "pytest" },
+    { name = "pyyaml" },
 ]
 
 [package.metadata]
@@ -156,6 +157,7 @@ requires-dist = [
     { name = "packaging", specifier = "==26.3" },
     { name = "playwright", specifier = "==1.55.0" },
     { name = "pytest", specifier = "==8.4.2" },
+    { name = "pyyaml", specifier = "==6.0.3" },
 ]
 
 [[package]]

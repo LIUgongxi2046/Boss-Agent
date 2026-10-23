@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "0.6.1-draft",
+  "version": "0.6.2-draft",
   "task_id": "T07",
   "status": "PENDING_A06_A07_ACCEPTANCE",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
@@ -77,9 +77,13 @@
     "human_only_operations": ["assignmentSourcesConfirm"],
     "local_lifecycle_evidence": "evidence/T19/w2-20261023-native-sop-catalog.json",
     "local_native_context_verified": true,
-    "live_model_adoption": "PENDING_TECHNICAL_CONTENT_AUTHORIZATION",
+    "external_api_mode": "SIMULATED_FIRST",
+    "live_model_adoption": "DEFERRED_REAL_API_VALIDATION",
     "public_runtime_registration": "PENDING_W3",
-    "method_draft_save_and_version_history": "NOT_IMPLEMENTED"
+    "method_draft_save_and_version_history": "LOCAL_DOMAIN_AND_COMPONENT_IMPLEMENTED_PUBLIC_INTEGRATION_PENDING",
+    "draft_service": "boss_skill_drafts.BossSkillDrafts",
+    "draft_component": "app/webui/MaintainerSkillVersions.tsx",
+    "draft_lifecycle_evidence": "evidence/T19/w2-20261023-sop-drafts.json"
   },
   "sops": [
     {"sop_id":"SOP01","version":"0.1.0","requirement_id":"FR-01","input":"本人目标、日历、承诺、有效事件与次序","output":"有依据的今日事项","tool_mapping_status":"READ_ADAPTER_AVAILABLE_REMAINING_RUNTIME_PENDING","acceptance_ids":["A07","A18"]},
