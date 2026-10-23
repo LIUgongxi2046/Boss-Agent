@@ -45,7 +45,9 @@ type HistoricalTask = { task_id: string; status: string; due_at?: string; eviden
 type Dashboard = {
   source_type: "SIMULATED"; namespace: string; dataset_version: string;
   business_clock: string; refreshed_at: string;
-  profile: { timezone: string; goals: string[]; reading_requirement: string };
+  profile: { timezone: string; goals: string[]; reading_requirement: string|null;
+    topics?: string[]; owner_confirmation?: string; active_version?: string|null;
+    applicability?: string; };
   source_coverage: { region: string; trade_scope: string; periods: Record<string, string[]> };
   tasks: Task[]; historical_commitment: HistoricalTask | null;
   meeting: { meeting_id: string; starts_at: string; timezone: string; participant_ids: string[]; material_ids: string[] } | null;
@@ -530,6 +532,27 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     </Panel>
                   </div>
                   <div className="boss-column">
+                    <Panel title="本人目标与阅读要求" note="N07 当前有效本人版本 · FR-01 / FR-13">
+                      <Value label="确认状态" value={dashboard?.profile.owner_confirmation==="CONFIRMED"?
+                        "本人确认 · 后续适用":"尚无在当前有效期的本人确认目标"}/>
+                      <Value label="有效版本" value={dashboard?.profile.active_version||"无"}/>
+                      {(dashboard?.profile.goals||[]).map((goal,i)=>
+                        <div className="boss-workspace-item" key={i}>
+                          <strong>{i+1}. {goal}</strong>
+                        </div>)}
+                      {(dashboard?.profile.topics||[]).length>0&&
+                        <Value label="关注主题" value={dashboard?.profile.topics?.join("、")}/>}
+                      {dashboard?.profile.reading_requirement&&
+                        <div className="boss-workspace-item">
+                          <strong>已确认的阅读要求</strong>
+                          <p>{dashboard.profile.reading_requirement}</p>
+                        </div>}
+                      <div className="boss-actions">
+                        <GlassButton onClick={() => navigate("N07")}>
+                          <Settings size={15}/> 管理本人目标与阅读要求
+                        </GlassButton>
+                      </div>
+                    </Panel>
                     <Panel title="会议与本人承诺">
                       {dashboard?.meeting ? <>
                         <Value label="关联会议" value={dashboard.meeting.meeting_id}/>
