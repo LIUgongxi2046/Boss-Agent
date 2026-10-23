@@ -13,3 +13,4 @@
 | T18 | [F04来源版本化会前材料、F08资料请求草稿](T18-meeting-brief.md) | 实际SQLite事务和v6四页签组件已开发；A18/像素/实机未验收 |
 | T18 | [F05已确认纪要逐项关联F06任务](T18-minute-task-chain.md) | 分项授权+SQLite版本链路已开发；实际Mac/E2E/视觉仍待验收 |
 | T18 | [F09 专题研究与 F04—F09 跨页面功能链路](T18-research.md) | 已有版本化研究、撤销失效检查与 CI 集成测试；模型、Mac 及像素验收仍待执行 |
+| T19 | [A05 Prompt版本保存/校验/启停/上下文采纳](T19-prompt-lifecycle.md) | 真实配置及React已接入；DeepSeek质量、Mac实机/高保真验收待执行 |
