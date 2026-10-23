@@ -1,6 +1,6 @@
 # Boss-Agent · 老板专用 Agent
 
-**开发交接（2026-10-23）**：[当前架构、实际功能、测试证据、缺口与接手顺序](docs/Boss-Agent开发交接文档-2026-10-23.md)。页面覆盖以 `specs/page-service-map.json` 为准，工单与验收以 `delivery-ledger.json` 为准。
+**最新开发交接（2026-10-23 · v2.0）**：[完整接手文档：当前状态、已开发能力、剩余23项任务、本机启动、PRD/v6验收与开发顺序](docs/Boss-Agent开发交接文档-2026-10-23-v2.md)；[v1 历史基线](docs/Boss-Agent开发交接文档-2026-10-23.md)。页面覆盖以 `specs/page-service-map.json` 为准，工单与验收以 `delivery-ledger.json` 为准。
 
 基于 **HKUDS/nanobot v0.3.5 + Electron 45.0.0 + DeepSeek** 改造，使用已确认的 **Boss-Agent Desktop v6.0** 蓝绿白高保真设计与“大鹏”IP。业务主体只有一位老板，技术维护身份独立，其他人员仅为模拟联系人或资料来源。
 
