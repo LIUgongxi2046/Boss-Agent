@@ -19,13 +19,14 @@ from boss_meeting_brief import briefing_projection
 from boss_prompt_config import KINDS, active_runtime_prompts
 from boss_research import project as research_projection
 from boss_travel import projection as travel_projection
+from boss_people import projection as people_projection
 from boss_recovery_api import calendar_share_state
 
 NS = "ui-check"
 BOSS_PAGES = {
     "memory", "calendar", "notifications", "authorizations", "decisions",
     "outbox", "sources", "knowledge", "organization", "plans", "voice",
-    "minutes", "approvals", "briefing", "research", "travel",
+    "minutes", "approvals", "briefing", "research", "travel", "people",
 }
 MAINT_PAGES = {
     "dataset", "source-index", "tool-catalog", "metric-definitions",
@@ -117,6 +118,8 @@ class BossWorkspaceAPI:
             return research_projection(db,data)
         if key == "travel":
             return travel_projection(self, db, data)
+        if key == "people":
+            return people_projection(self, db, data)
         if key == "briefing":
             return briefing_projection(db,data)
         if key == "minutes":
