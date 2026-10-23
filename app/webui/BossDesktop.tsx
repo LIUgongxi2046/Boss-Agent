@@ -17,6 +17,7 @@ import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } 
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
+import { BossTravelView } from "./BossTravelView";
 import { BossTaskCenter } from "./BossTaskCenter";
 import { MaintainerPromptVersion } from "./MaintainerPromptVersion";
 import { BossResearchView } from "./BossResearchView";
@@ -123,7 +124,7 @@ const MAINT_NAV = [
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
 const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
+  "F01", "N02", "N03", "F03", "N04", "N05", "F11", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 const ANIMATIONS: Record<Animation, string> = {
@@ -773,6 +774,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 page === "F09" ? <BossResearchView
                   key={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
+                /> :
+                page === "F11" ? <BossTravelView
+                  key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
                 /> :
                 page === "F04" ? <BossMeetingBrief
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
