@@ -25,7 +25,8 @@ type Scheduler = {
   recent_dispatches:{event_id:string;event_version:string;state:string;
     reason?:string;business_at:string}[];
   cron_runtime_verified_here:false;next_run_time:null;
-  manual_dispatch_supported_here:false;external_delivery_verified:false;
+  manual_dispatch_supported_here:boolean;external_delivery_verified:false;
+  available_manual_events:{event_id:string;version:string;due_at:string;state:string}[];
 };
 type Result = {version?:string;validation_state?:string;
   enabled?:boolean;canceled?:boolean;schedule_activated?:boolean};
@@ -54,6 +55,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
   const [checkBusy,setCheckBusy]=useState(false);
   const [error,setError]=useState("");
   const [notice,setNotice]=useState("");
+  const [selectedEvent,setSelectedEvent]=useState("");
   const [pending,setPending]=useState<Pending|null>(null);
   const [checked,setChecked]=useState(false);
   const dialog=useRef<HTMLElement|null>(null);
@@ -76,6 +78,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
     }).then(result=>{
       if(abort.signal.aborted)return;
       setData(result);setLoading(false);
+      setSelectedEvent(old=>result.available_manual_events.some(x=>x.event_id===old)?old:"");
       if(!dirty){
         setCfg(result.draft?.configuration||
           (result.rules?{
@@ -209,6 +212,25 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
       "仅修改本机事件调度与通知规则，不发送真实外部消息，也不授予老板业务动作。",
     ]);
   }
+  function prepareManualRun(){
+    if(!data?.manual_dispatch_supported_here||data.schedule.canceled){
+      setError("当前没有获准可用的模拟技术调度器");return;
+    }
+    const event=data.available_manual_events.find(x=>x.event_id===selectedEvent);
+    if(!event){setError("先选择当前批准的数据集事件");return;}
+    propose("boss.scheduler.manual_run",{
+      event_id:event.event_id,event_version:event.version,
+      expected_schedule_version:data.schedule.version,
+      expected_rules_version:data.rules?.version||"0",
+    },"按当前事件版本执行模拟调度",[
+      "模拟事件："+event.event_id+" v"+event.version,
+      "到期时间："+event.due_at,
+      "当前模拟时钟："+data.simulated_business_time,
+      "技术计划："+data.schedule.schedule_id+" v"+data.schedule.version,
+      "本次调用共享真实Cron规则；未到期显示 NOT_DUE，已送达的版本抑制重复。",
+      "不接入实际外部通知，不给维护者添加老板业务授权。",
+    ]);
+  }
   function updateStatus(action:"pause"|"resume"|"cancel"){
     if(!data)return;
     propose("boss.scheduler."+action,{
@@ -291,6 +313,27 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
           </div>
         </section>
         <section className="boss-panel">
+          <div className="boss-panel-head"><h2>获准手动模拟执行</h2><small>使用与CronService相同的到期/静默/重复抑制规则</small></div>
+          <label className="boss-label" htmlFor="boss-scheduler-event">当前批准模拟事件</label>
+          <select id="boss-scheduler-event" className="boss-single-input"
+            value={selectedEvent} onChange={e=>setSelectedEvent(e.target.value)}>
+            <option value="">请选择已有模拟事件</option>
+            {(data?.available_manual_events||[]).map(item=><option value={item.event_id} key={item.event_id}>
+              {item.event_id} · v{item.version} · {item.state} · {item.due_at}
+            </option>)}
+          </select>
+          <div className="boss-actions">
+            <button type="button" className="boss-btn boss-btn-primary"
+              disabled={!data?.manual_dispatch_supported_here||!selectedEvent||busy}
+              onClick={prepareManualRun}>
+              <PlayCircle size={15}/> 核对并手动模拟触发</button>
+          </div>
+          <div className="boss-status boss-status-warn">
+            <Clock3 size={16}/> 模拟时钟未到期、静默时间或老板已关闭的提醒不会伪造成送达。
+            这里的 DELIVERED 仅为模拟内部通知，不代表桌面系统通知或外部收件人已收到。
+          </div>
+        </section>
+        <section className="boss-panel">
           <div className="boss-panel-head"><h2>调度记录</h2><small>实际数据库技术状态</small></div>
           {(data?.recent_dispatches||[]).map((row,i)=><div className="boss-workspace-item"
             key={row.event_id+"-"+i}>
@@ -317,7 +360,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
           <Kv label="CronService 实机运行验证" value={data?.cron_runtime_verified_here}/>
           <Kv label="模拟事件手动触发" value={data?.manual_dispatch_supported_here}/>
           <div className="boss-status boss-status-warn"><AlertCircle size={16}/>
-            手动运行尚未接入获准的真实调度执行器，因此本页不提供伪造的“执行成功”按钮。
+            手动模拟执行现在使用与Cron相同的已授权本地调度器规则；但真实操作系统通知与重启恢复尚未实测。
             下一次执行时间没有验证来源时保持未知。
           </div>
           <div className="boss-actions">
