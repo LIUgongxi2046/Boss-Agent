@@ -139,8 +139,21 @@ class BossPageAPI:
                 "source_type": "SIMULATED",
             } for row in self._items(db, self.namespace, "message_outbox")
               if row.get("related_task_id") and row.get("message_id")]
+            nudge_messages = [{
+                "message_id": row["message_id"],
+                "task_id": row["task_id"],
+                "type": "ASSIGNMENT_NUDGE",
+                "recipient_id": row["recipient_id"],
+                "sent_at": row["sent_at"],
+                "business_at": row["business_at"],
+                "send_state": row["message_status"],
+                "delivery_state": row["delivery_state"],
+                "reply_state": row["reply_state"],
+                "external_channel_invoked": False,
+                "source_type": "SIMULATED",
+            } for row in self._items(db, self.namespace, "assignment_nudge")]
             linked_messages = sorted(
-                [*task_messages, *followup_messages],
+                [*task_messages, *followup_messages, *nudge_messages],
                 key=lambda row: (row["sent_at"], row["message_id"]),
             )
             # Task-specific due notifications are owned by the same SQLite
