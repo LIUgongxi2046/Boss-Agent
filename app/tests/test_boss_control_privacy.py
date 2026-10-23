@@ -69,3 +69,30 @@ def test_committed_tool_request_can_be_read_after_its_authorization_is_revoked(t
     with store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 1
         assert db.execute("SELECT COUNT(*) FROM idempotency WHERE operation='create_assignment'").fetchone()[0] == 1
+
+
+def test_private_calendar_control_reads_the_current_owner_saved_version(tmp_path):
+    from business import checksum
+    from test_boss_message_calendar import calendar_input
+    store = ControlStore(tmp_path / "current-calendar.sqlite")
+    store.initialize("ui-check")
+    payload = calendar_input()
+    status, saved = BossCommandAPI(store).execute("BOSS", "boss.calendar.save", {"client_request_id": "control-calendar-save", **payload})
+    assert status == 200
+    current = store.control("ui-check", "private_calendar", {})
+    assert current.get("version") == saved["version"]
+    assert checksum(current["private_body"]) == checksum(payload["private_body"])
+    assert current["status"] == "ACTIVE"
+
+
+def test_deleted_private_calendar_cannot_be_read_through_initial_snapshot_control(tmp_path):
+    from test_boss_message_calendar import calendar_input
+    store = ControlStore(tmp_path / "deleted-calendar.sqlite")
+    store.initialize("ui-check")
+    api = BossCommandAPI(store)
+    status, saved = api.execute("BOSS", "boss.calendar.save", {"client_request_id": "control-calendar-before-delete", **calendar_input()})
+    assert status == 200
+    status, _ = api.execute("BOSS", "boss.calendar.delete", {"client_request_id": "control-calendar-delete", "expected_version": saved["version"]})
+    assert status == 200
+    with pytest.raises(web.HTTPGone):
+        ControlStore(store.path).control("ui-check", "private_calendar", {})

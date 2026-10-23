@@ -158,7 +158,18 @@ class ControlStore(Store):
         return {"results": results}
 
     def control_private_calendar(self, db, ns, p):
-        return self.get(db, ns, "initial", "snapshot")["private_calendar"]
+        data = self.get(db, ns, "initial", "snapshot")
+        calendar_id = data["private_calendar"]["calendar_id"]
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id=?", (ns, calendar_id)).fetchone()
+        if row is None:
+            current = data["private_calendar"]
+        else:
+            current = json.loads(row[0])
+        require(current["calendar_id"] == calendar_id and current["owner_id"] == data["owner_id"],
+                "私人安排不属于当前本人范围", web.HTTPForbidden)
+        if row is not None:
+            require(current["status"] == "ACTIVE", "私人安排当前已经删除", web.HTTPGone)
+        return current
 
     def control_reference_status(self, db, ns, p):
         task = self.get(db, ns, "task", p["task_id"])
