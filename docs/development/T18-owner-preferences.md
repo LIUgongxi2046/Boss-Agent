@@ -60,3 +60,8 @@ python scripts/prepare_boss_webui.py --build
 - **N09 本人计划**目前仍为只读引用；不应在老板端另起第二个 Cron 责任源。正式创建/变更/暂停/取消须与 A13 和 PRD 进一步打通。
 - N07 的 DeepSeek 真实采用质量、长会话/中断恢复、范围语义等未在目标 Mac 验证；N08 的真实系统通知权限、休眠唤醒与外部投递未做实机验收。F01 事项自主排序、真正逐日汇总、F02 规则全场景与农业专业资料仍有缺口。
 - 72 页 561 状态的可用性、屏幕缩放、字体、像素、Mac Intel 安装、真实模型和 E01—E06 综合验证仍没有完整通过证据。原始 v6 视觉基线没有改变，新增页面还需正式逐页比对。农业指标数据留待功能稳定后按 T21—T23 补充；本轮没有增加虚构 KPI。
+
+
+## 最新验证回执（已核查）
+
+截至本次功能代码提交 `4be661d3d0993ff33014bb2ff52204e49332adb2`，对应 [GitHub Actions 39891454896](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39891454896) 的两项任务均为 **success**：Python 安全/领域/回归 **346 passed**，固定上游 nanobot React/TypeScript/Vite 生产构建通过。后续仓库提交仅补交接文档及交付台账，不能据此推导出新的目标 Mac Electron 或像素验收结果。
