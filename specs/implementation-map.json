@@ -15,6 +15,11 @@
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"specs/product-auth.openapi.yaml","owner":"W3","task_id":"T11","scope":"公共账号、原生会话、身份和退出的0.1.0独立扩展，等待T06正式接收"},
+    {"path":"validation/boss_account_auth.py","owner":"W3","task_id":"T11","scope":"公共认证包装只保证单一Cache-Control响应；账号密码及摘要领域规则继续归T27"},
+    {"path":"app/tests/test_boss_account_auth.py","owner":"W3","task_id":"T11","scope":"独立HTTP会话检查选择本工程隔离验证目录，不使用默认应用账号"},
+    {"path":"validation/desktop/account-access.cjs","owner":"W3","task_id":"T11","scope":"独立桌面检查显式初始化本机账号并通过真实公共入口认证，不输出密码"},
+    {"path":"validation/desktop/check-account-public.cjs","owner":"W3","task_id":"T11","scope":"公共账号认证、实际完整工作区权限、品牌配置、数据保持与重启检查；不调用外部模型或视觉功能"},
     {"path":"validation/sop_recovery_check.py","owner":"W3","task_id":"T11","scope":"仅在已停止的本工程独立应用中，使用实际已校验草稿准备恢复记录或只读核查原生上下文；不调用模型"},
     {"path":"validation/desktop/check-sop-versions.cjs","owner":"W3","task_id":"T11","scope":"独立隐藏Electron公共方法生命周期、历史、回执、权限及准备记录重启恢复；不调用外部模型或视觉功能"},
     {"path":"validation/desktop/check-sector-scope.cjs","owner":"W3","task_id":"T11","scope":"独立隐藏Electron十三专题范围切换、身份与离线清理及A06实际待处理读取取消；不请求外部服务"},

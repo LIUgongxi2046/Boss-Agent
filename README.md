@@ -20,12 +20,11 @@
 ```bash
 python3 scripts/configure_local_deepseek.py
 # 文件保存在其他本机目录时可用 --source 指定文件路径，不要传 Key 本身
-# 需先安装 validation/.venv，才能进行真实 API 检查
+# 使用项目锁定的本机环境
 cd validation && uv sync --locked && cd ..
-validation/.venv/bin/python scripts/check_local_deepseek.py
 ```
 
-`scripts/configure_local_deepseek.py` 只创建 Git 忽略、权限 0600 的本地密钥文件和无密钥的连接引用。真实连通性检测可能有少量模型费用；成功回执只含模型标识、响应 ID 与 Token，不保存 Key 和正文。启动桌面研发版后，可运行 `validation/.venv/bin/python scripts/check_local_boss_agent.py` 做本机真实 DeepSeek 会话与模拟经营查询联调。
+`scripts/configure_local_deepseek.py` 只创建 Git 忽略、权限0600的本地密钥文件和无密钥的连接引用。当前全部外部API依赖按项目计划13.18使用显式SIMULATED资料，当前开发与本地验收不安排新增真实外部请求。既有真实模型证据保留其适用版本，完整真实接入继续独立验证。
 
 ## 本地开发（macOS Intel）
 
@@ -35,10 +34,11 @@ validation/.venv/bin/python scripts/check_local_deepseek.py
 python3 scripts/prepare_boss_webui.py --build
 cd validation && uv sync --locked && cd ..
 npm --prefix validation/desktop ci
+validation/.venv/bin/python scripts/provision_boss_accounts.py
 bash scripts/run_boss_local.sh
 ```
 
-登录使用本地生成的 `validation/.work/application/access.json` 中的 BOSS 或 MAINTAINER 凭据，请勿提交或分享该文件。模型密钥只能通过服务端引用配置；不要放在仓库、前端或命令参数。
+首次初始化创建真实本机`boss`和`maintainer`账号，分别属于BOSS与MAINTAINER；随机密码位于受保护的`validation/.work/application/accounts/credentials.json`，账号数据库只保存bcrypt摘要。重复初始化拒绝覆盖，已有账号直接使用。登录后由nanobot发放会话令牌，退出撤销当前身份令牌。内部`access.json`仅供服务端使用；产品登录入口使用账号密码。模型密钥通过服务端引用配置，密码和密钥不进入源码、前端存储或命令参数。
 
 ```bash
 python -m pytest -q app/tests/test_boss_page_api.py

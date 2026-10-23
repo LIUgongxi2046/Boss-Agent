@@ -1699,7 +1699,7 @@
       "id": "T27",
       "acceptance_ids": ["A27"],
       "depends_on": ["T11"],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": ["app/webui/BossLogin.tsx", "app/webui/boss-login.css", "validation/boss_account_auth.py", "validation/desktop/branding.cjs", "validation/desktop/branding/", "scripts/provision_boss_accounts.py", "app/tests/test_boss_account_auth.py", "validation/desktop/check-login-polish.cjs", "design/T27/", "docs/development/T27.md", "evidence/T27/"],
       "blockers": []
     }

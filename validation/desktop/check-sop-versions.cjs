@@ -5,11 +5,13 @@ const {createHash, randomUUID} = require('node:crypto');
 const {execFileSync} = require('node:child_process');
 const {_electron: electron} = require('playwright');
 const {expect} = require('@playwright/test');
+const accountAccess = require('./account-access.cjs');
 
 const root = path.resolve(__dirname, '../..');
 const validation = path.join(root, 'validation');
 const runId = 'sop-versions-' + randomUUID();
 const directory = path.join(validation, '.work', runId);
+const accounts = accountAccess.provision(directory);
 const output = path.join(root, 'evidence/T11/w3-local-20261023', runId + '.json');
 const ports = {business: 8971, webui: 8972, gateway: 18971};
 const origin = 'http://127.0.0.1:8972';
@@ -35,7 +37,7 @@ async function launch() {return electron.launch({args: [__dirname], cwd: validat
   env: {...process.env, BOSS_VALIDATION_ROOT: validation, BOSS_PRODUCT_UI: '1', BOSS_APPLICATION_WORK_DIR: directory,
     BOSS_APPLICATION_PORTS: JSON.stringify(ports), BOSS_DESKTOP_TEST_WINDOW_HIDDEN: '1', TMPDIR: path.join(validation, '.work/tmp')}});}
 async function check() {
-  let desktop = null, page, access, maint;
+  let desktop = null, page, maint;
   const errors = [], sockets = [], commands = [];
   async function start() {
     desktop = await launch(); page = await desktop.firstWindow({timeout: 120000});
@@ -45,26 +47,19 @@ async function check() {
       if (frame.type === 'webui_request' && frame.action.startsWith('boss.sop.')) commands.push(frame);
     }));
     await page.waitForURL(origin + '/');
-    access = JSON.parse(fs.readFileSync(path.join(directory, 'access.json')));
   }
   async function stop() {
     for (const socket of sockets.splice(0)) socket.close();
     if (desktop) {await desktop.close(); desktop = null;}
   }
   async function login(role) {
-    await expect(page.getByLabel('本机访问凭据', {exact: true})).toBeEnabled();
-    await page.getByRole('radio', {name: role === 'BOSS' ? /^老板本人/ : /^技术维护/}).check();
-    await page.getByLabel('本机访问凭据', {exact: true}).fill(access[role]);
-    await page.getByRole('button', {name: '继续认证', exact: true}).click();
-    await page.locator('.boss-v6[data-role="' + role + '"]').waitFor();
+    await accountAccess.login(page, accounts, role);
   }
   async function logout() {
-    await page.getByTitle('退出当前身份', {exact: true}).click();
-    await expect(page.getByLabel('本机访问凭据', {exact: true})).toBeEnabled();
+    await accountAccess.logout(page);
   }
   async function rpc(role) {
-    const response = await fetch(origin + '/webui/bootstrap', {headers: {'X-Nanobot-Auth': access[role]}});
-    assert.equal(response.status, 200); const auth = await response.json();
+    const auth = await accountAccess.bootstrap(origin, accounts, role);
     const socket = new WebSocket(origin.replace('http:', 'ws:') + auth.ws_path + '?token=' + encodeURIComponent(auth.token));
     sockets.push(socket);
     await new Promise(resolve => socket.addEventListener('message', event => {if (JSON.parse(event.data).event === 'ready') resolve();}));

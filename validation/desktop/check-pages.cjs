@@ -4,12 +4,14 @@ const path = require('node:path');
 const { createHash, randomUUID } = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const { _electron: electron } = require('playwright');
+const accountAccess = require('./account-access.cjs');
 
 const root = path.resolve(__dirname, '../..');
 const validation = path.join(root, 'validation');
 const pages = JSON.parse(fs.readFileSync(path.join(root, 'specs/page-service-map.json'))).pages;
 const runId = 'page-dom-' + randomUUID();
 const directory = path.join(validation, '.work', runId);
+const accounts = accountAccess.provision(directory);
 const ports = {business: 8971, webui: 8972, gateway: 18971};
 const origin = 'http://127.0.0.1:8972';
 const output = path.join(root, 'evidence/T09/w3-20261023', runId + '.json');
@@ -39,13 +41,9 @@ async function check() {
         responses.push({ path: address.pathname, status: response.status() });
     });
     await page.waitForURL(origin + '/');
-    const access = JSON.parse(fs.readFileSync(path.join(directory, 'access.json')));
     const before = manifest();
     for (const role of ['BOSS', 'MAINTAINER']) {
-      await page.getByRole('radio', { name: role === 'BOSS' ? /^老板本人/ : /^技术维护/ }).check();
-      await page.getByLabel('本机访问凭据', { exact: true }).fill(access[role]);
-      await page.getByRole('button', { name: '继续认证', exact: true }).click();
-      await page.locator('.boss-v6[data-role="' + role + '"]').waitFor();
+      await accountAccess.login(page, accounts, role);
       for (const entry of pages.filter(item => item.role_gate === role || item.role_gate === 'AUTHENTICATED_BOSS_OR_MAINTAINER')) {
         responses = [];
         await page.goto(origin + '/?bossPage=' + entry.page_id, { waitUntil: 'networkidle' });
@@ -68,8 +66,7 @@ async function check() {
           application_directory: path.relative(root, directory), model_requested: false, external_api_mode: 'SIMULATED_FIRST',
         }, null, 2));
       }
-      await page.getByTitle('退出当前身份', { exact: true }).click();
-      await page.getByLabel('本机访问凭据', { exact: true }).waitFor();
+      await accountAccess.logout(page);
     }
     const visited = new Set(records.map(row => row.page_id));
     assert.equal(visited.size, pages.filter(row => row.role_gate !== 'ANONYMOUS').length);

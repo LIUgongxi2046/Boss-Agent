@@ -2,6 +2,7 @@ import json
 import stat
 import sys
 import asyncio
+import os
 from pathlib import Path
 
 import pytest
@@ -41,6 +42,7 @@ def test_real_local_accounts_and_passwords():
 
 
 def test_nanobot_account_lifecycle():
+    os.environ["BOSS_T27_NATIVE_ZOOM"] = "1"
     sys.path.insert(0, str(ROOT / "design/T27"))
     from server import account_server, ACCOUNTS
     import aiohttp

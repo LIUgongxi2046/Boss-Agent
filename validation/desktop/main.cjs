@@ -1,4 +1,5 @@
-const { app, BrowserWindow, dialog, ipcMain, Notification, powerMonitor, session, shell, systemPreferences } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, nativeImage, Notification, powerMonitor, session, shell, systemPreferences } = require('electron');
+const branding = require('./branding.cjs');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -107,6 +108,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
+    branding.configureApp(app, nativeImage);
     const log = fs.openSync(path.join(diagnostics, 'desktop-service.log'), 'a', productMode ? 0o600 : 0o644);
     child = spawn(path.join(root, '.venv', 'bin', 'python'), [path.join(root, 'application.py')], { cwd: root, env: { ...process.env, TMPDIR: path.join(work, 'tmp') }, stdio: ['ignore', log, log] });
     const startedAt = Date.now();
@@ -132,7 +134,8 @@ if (!app.requestSingleInstanceLock()) {
     }
     serviceStartupElapsedMs = Date.now() - startedAt;
     record('service_started', { service_pid: child.pid, elapsed_ms: serviceStartupElapsedMs });
-    window = new BrowserWindow({ show: process.env.BOSS_DESKTOP_TEST_WINDOW_HIDDEN !== '1', width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
+    window = new BrowserWindow({ ...branding.windowOptions(), show: process.env.BOSS_DESKTOP_TEST_WINDOW_HIDDEN !== '1', width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
+    branding.attachWindow(window);
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, address) => { if (new URL(address).origin !== origin) event.preventDefault(); });
     window.webContents.on('will-attach-webview', event => event.preventDefault());

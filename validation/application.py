@@ -29,6 +29,7 @@ from connection import RecordedProvider, settings
 from controls import ControlStore
 from model_probe import Audit, BusinessTool
 from role_channel import RoleChannel
+from boss_account_auth import AccountStore, account_channel_class
 from safe_diagnostics import RedactedEventList
 from boss_prompt_config import load_runtime_prompts
 from boss_owner_preferences import record_runtime_goal_context_load
@@ -101,6 +102,8 @@ async def serve():
         logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False)
     connection = settings()
     roles, config_path = prepare()
+    product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
+    account_store = AccountStore(WORK / "accounts/accounts.sqlite") if product_mode else None
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
     if config.gateway.port != PORTS["gateway"] or config.channels.websocket["port"] != PORTS["webui"]:
@@ -114,7 +117,6 @@ async def serve():
         baseline = store.initialize("ui-check")
     else:
         baseline = {"namespace": "ui-check", "snapshot_sha256": existing[0]}
-    product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
     output = WORK / "diagnostics" if product_mode else ROOT.parent / "evidence/T02/application"
     output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
     if product_mode:
@@ -185,7 +187,11 @@ async def serve():
             loop.context.skills.disabled_skills = set(disabled)
             loop.subagents.disabled_skills = set(disabled)
         original.gateway.http.skill_state_action = apply_skill_state
-    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
+    if product_mode:
+        channels.channels["websocket"] = account_channel_class(RoleChannel)(original, roles, output / "access.jsonl", store,
+            runtime_control, skills, account_store=account_store)
+    else:
+        channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()

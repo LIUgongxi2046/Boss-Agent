@@ -11,7 +11,7 @@
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
     "MAINTAINER": "same gateway; maintenance metadata and one simulation feedback action only",
-    "ANONYMOUS": "BossLogin in native nanobot bootstrap and expiry states; server role verification before protected Shell"
+    "ANONYMOUS": "BossLogin account/password authentication through AccountRoleChannel; native nanobot token lifecycle and server role verification before protected Shell"
   },
   "notes": [
     "70 pages use authenticated role navigation; N01 and D08 use native authentication states. All 72 have code bindings; full functionality and acceptance remain separate.",
@@ -1576,12 +1576,12 @@
       "logical_architecture_route": "/app/auth/N01",
       "actual_webui_navigation": "Native bootstrap AUTH_REQUIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_BRANDED_AUTHENTICATION_AND_SERVER_ROLE_CHECK",
+      "render_status": "PARTIAL_ACCOUNT_AUTHENTICATION_AND_NATIVE_BRANDING",
       "component_file": "app/webui/BossLogin.tsx",
       "component_name": "BossLogin",
       "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["AccountStore bcrypt verification; AccountRoleChannel delegates native nanobot tokens and current RoleChannel business scope"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -1591,8 +1591,8 @@
         "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
-        "T18",
-        "T19",
+        "T11",
+        "T27",
         "T24"
       ]
     },

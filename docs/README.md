@@ -17,6 +17,7 @@
 | DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
 | DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[结构化映射](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
 | DOC-INTEGRATION | 当前源码、来源规则、会议终态、身份、独立宿主与A15公共查询 | [T11公共集成](development/T11.md)、[运行环境](运行环境.md) | T11 | IN_PROGRESS；正式验收未通过 | 2026-10-23 |
+| DOC-ACCOUNT | T27账号密码、会话、身份范围、桌面品牌与公共重启 | [T27主记录](development/T27.md)、[公共接收](development/T11.md)、[本机初始化工具](../scripts/provision_boss_accounts.py) | T27/T11 | IN_PROGRESS；完整A27未验收 | 2026-10-23 |
 | DOC-LLD | 数据/API、Runtime记录、Agent与前端字段和责任 | [数据](LLD-data.md)、[后端](LLD-backend.md)、[Agent](LLD-agent.md)、[前端](LLD-frontend.md) | T05—T08 | IN_REVIEW；状态引用台账 | 2026-10-23 |
 | DOC-REVIEW | 全部FR/AC、异常、安全及实施接收条件 | [T09评审与验收](development/T09.md)、[T10执行接收](development/T10.md)、[设计评审](设计评审.md) | T09/T10 | IN_PROGRESS | 2026-10-23 |
 | DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |

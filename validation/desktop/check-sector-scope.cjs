@@ -5,11 +5,13 @@ const {execFileSync} = require('node:child_process');
 const {createHash, randomUUID} = require('node:crypto');
 const {_electron: electron} = require('playwright');
 const {expect} = require('@playwright/test');
+const accountAccess = require('./account-access.cjs');
 
 const root = path.resolve(__dirname, '../..');
 const validation = path.join(root, 'validation');
 const runId = 'sector-scope-' + randomUUID();
 const directory = path.join(validation, '.work', runId);
+const accounts = accountAccess.provision(directory);
 const output = path.join(root, 'evidence/T11/w3-local-20261023', runId + '.json');
 const ports = {business: 8971, webui: 8972, gateway: 18971};
 const origin = 'http://127.0.0.1:8972';
@@ -43,17 +45,11 @@ async function check() {
     page.on('response', response => {const address = new URL(response.url());
       if (address.pathname === '/api/boss/ui/sector') reads.push({page_id: address.searchParams.get('page'), status: response.status()});});
     await page.waitForURL(origin + '/');
-    const access = JSON.parse(fs.readFileSync(path.join(directory, 'access.json')));
     async function login(role) {
-      await expect(page.getByLabel('本机访问凭据', {exact: true})).toBeEnabled();
-      await page.getByRole('radio', {name: role === 'BOSS' ? /^老板本人/ : /^技术维护/}).check();
-      await page.getByLabel('本机访问凭据', {exact: true}).fill(access[role]);
-      await page.getByRole('button', {name: '继续认证', exact: true}).click();
-      await page.locator('.boss-v6[data-role="' + role + '"]').waitFor();
+      await accountAccess.login(page, accounts, role);
     }
     async function boot(role) {
-      const response = await fetch(origin + '/webui/bootstrap', {headers: {'X-Nanobot-Auth': access[role]}});
-      assert.equal(response.status, 200); return (await response.json()).api_token;
+      return (await accountAccess.bootstrap(origin, accounts, role)).api_token;
     }
     async function navigate(id) {
       await page.getByTitle('全部设计页面', {exact: true}).click();
@@ -105,8 +101,7 @@ async function check() {
     await page.getByRole('heading', {name: '经营筛选范围', exact: true}).waitFor();
     note('public_sector_tab_and_actual_offline_recovery', {current_page: 'V19-EGG', previous_fields_absent: true,
       offline_current_data_removed: true, recovered: true});
-    await page.getByTitle('退出当前身份', {exact: true}).click();
-    await expect(page.getByLabel('本机访问凭据', {exact: true})).toBeEnabled();
+    await accountAccess.logout(page);
     assert.equal(await page.locator('.boss-sector-filters').count(), 0);
     const expired = await fetch(origin + '/api/boss/ui/sector?page=V19-EGG', {headers: {Authorization: 'Bearer ' + boss}});
     assert.equal(expired.status, 401);

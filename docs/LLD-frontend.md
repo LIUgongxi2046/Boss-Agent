@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.4.6；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.6.0，T07现有设计为0.6.2-draft；公共Runtime扩展0.2.0及方法版本扩展0.2.0等待正式接收，源码版本`7aab440`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
+版本：0.4.7；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.6.0，T07现有设计为0.6.2-draft；公共Runtime及方法版本扩展0.2.0、本机账号扩展0.1.0等待正式接收，源码版本`2161bb4`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -9,6 +9,8 @@ PRD V1.2.0维护FR-01—32、AD01—16及AC。HLD 1.0.0维护唯一身份、Runt
 固定前端为nanobot commit `1bb712d3488915ca4ed9ccc1a93067ff722f5ab9`的React 18、TypeScript、Vite工程。`scripts/prepare_boss_webui.py`把`app/webui/`加入同一认证Shell。构建目录为本worktree的`.work/product/nanobot`，正式dist位于其`nanobot/web/dist`。构建manifest记录上游和页面元数据摘要。静态HTML承担设计预览，产品使用React业务组件。
 
 实际导航使用`?bossPage=<page_id>`与浏览器history；`NATIVE`用于上游会话。N01/D08 通过版本化认证修改接入 `BossLogin`。页面ID与角色必须同时通过`allowed`及服务端身份检查；客户端路径不授予权限。技术页面由MAINTAINER访问，业务页面由BOSS访问，D06/D07使用认证后的公共状态。
+
+N01/D08采用T27的账号密码表单及专用CSS，默认本人，下方提供维护和帮助入口。AccountRoleChannel包装当前RoleChannel并使用同一nanobot会话；密码不进入onSecret、URL或浏览器存储，原生bootstrap保存API token。公共构建保留完整Shell及业务组件，加入已提交的扑翼图集。原生Electron采用Boss Agent应用名称、窗口标题和品牌图标；正式安装仍由T25验证。认证接口见独立`specs/product-auth.openapi.yaml`0.1.0，完整T06接收保持待完成。
 
 ## 2. 身份、数据与副作用
 

@@ -124,6 +124,7 @@ def copy_overlay() -> None:
         ("MaintainerKnowledgeEditor.tsx", "MaintainerKnowledgeEditor.tsx"),
         ("MaintainerScheduler.tsx", "MaintainerScheduler.tsx"),
         ("boss-v6.css", "boss-v6.css"),
+        ("boss-login.css", "boss-login.css"),
     ]:
         shutil.copy2(ROOT / "app" / "webui" / source_name, BOSS_DIR / target_name)
     (BOSS_DIR / "page-meta.json").write_text(
@@ -135,6 +136,7 @@ def copy_overlay() -> None:
         shutil.copy2(DESIGN / "assets" / filename, ASSET_DIR / filename)
     for filename in ANIMATIONS:
         shutil.copy2(DESIGN / "animation" / filename, ASSET_DIR / filename)
+    shutil.copy2(ROOT / "design/T27/assets/boss-flight-sprite.png", ASSET_DIR / "boss-flight-sprite.png")
 
     # Read the pristine pinned source from Git every time for idempotence.
     original = subprocess.run(

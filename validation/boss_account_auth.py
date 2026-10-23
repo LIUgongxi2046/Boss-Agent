@@ -111,6 +111,8 @@ def account_channel_class(role_channel_class):
                     del headers[name]
             headers["X-Nanobot-Auth"] = self.secrets[role]
             response = await super()._dispatch_http(connection, Request(request.path, headers))
+            if "Cache-Control" in response.headers:
+                del response.headers["Cache-Control"]
             response.headers["Cache-Control"] = "no-store"
             return response
 
