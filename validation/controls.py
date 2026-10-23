@@ -166,6 +166,8 @@ class ControlStore(Store):
         rules = json.loads(rules_row[0])
         clock = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"])
         local = clock.astimezone(ZoneInfo(rules["timezone"]))
+        from boss_owner_preferences import owner_notification_suppression
+        data = self.get(db, ns, "initial", "snapshot")
         results = []
         for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
             event = json.loads(row[0])
@@ -178,6 +180,7 @@ class ControlStore(Store):
             reminder_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='reminder' AND id=?", (ns, event["event_id"])).fetchone()
             reminder = json.loads(reminder_row[0]) if reminder_row else None
             reason = None
+            owner_notice_version = None
             if not schedule["enabled"] or schedule["canceled"]:
                 reason = "PLAN_PAUSED_OR_CANCELED"
             elif event["state"] == "CANCELED":
@@ -191,14 +194,22 @@ class ControlStore(Store):
             elif previous and previous["event_version"] == event["version"]:
                 reason = "DUPLICATE_EVENT"
             else:
-                start, end = rules["quiet_start"], rules["quiet_end"]
-                quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
-                escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
-                if quiet and not escalation:
-                    reason = "QUIET_HOURS"
-                elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
-                    reason = "COOLDOWN"
+                owner_reason, owner_notice_version = owner_notification_suppression(
+                    db, data, clock, event, rules,
+                )
+                if owner_reason:
+                    reason = owner_reason
+                else:
+                    start, end = rules["quiet_start"], rules["quiet_end"]
+                    quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
+                    escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
+                    if quiet and not escalation:
+                        reason = "QUIET_HOURS"
+                    elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
+                        reason = "COOLDOWN"
             result = {"event_id": event["event_id"], "event_version": event["version"], "state": "SUPPRESSED" if reason else "DELIVERED", "reason": reason, "rule_version": rules["version"], "schedule_version": schedule["version"], "business_at": clock.isoformat()}
+            if owner_notice_version is not None:
+                result["owner_notice_version"] = owner_notice_version
             self.put(db, ns, "dispatch", event["event_id"], result)
             if reason is None:
                 delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
