@@ -69,6 +69,17 @@
         "usage": {"$ref": "#/$defs/Usage"}, "finish_reasons": {"type": "array", "items": {"type": "string"}}
       }
     },
+    "BIQueryContext": {
+      "type":"object","additionalProperties":false,
+      "required":["parameters","previous_query_id","overridden_fields","inherited_fields","parameters_sha256"],
+      "properties":{
+        "parameters":{"type":"object","not":{"anyOf":[{"required":["question"]},{"required":["envelope"]}]}},
+        "previous_query_id":{"type":["string","null"]},
+        "overridden_fields":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+        "inherited_fields":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+        "parameters_sha256":{"$ref":"#/$defs/Sha256"}
+      }
+    },
     "ToolResultReference": {
       "type": "object", "additionalProperties": false, "required": ["tool_id", "tool_call_id", "iteration"],
       "properties": {
@@ -77,6 +88,9 @@
         "version": {"$ref": "#/$defs/Version"}, "task_version": {"$ref": "#/$defs/Version"},
         "status": {"type": "string"}, "task_status": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Identifier"},
         "source_type": {"const":"SIMULATED"}, "source_id":{"$ref":"#/$defs/Identifier"},
+        "bi_query_context":{"$ref":"#/$defs/BIQueryContext"},
+        "definition_versions":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
+        "detail_refs":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "review_sha256":{"$ref":"#/$defs/Sha256"}, "preparation_sha256":{"$ref":"#/$defs/Sha256"},
         "result_sha256":{"$ref":"#/$defs/Sha256"}, "owner_decision_required":{"const":true},
         "source_refs":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["source_id","version"],"properties":{"source_id":{"type":"string"},"version":{"type":"string"},"source_sha256":{"$ref":"#/$defs/Sha256"}}}},
@@ -105,7 +119,9 @@
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
         "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
-        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"const":"FC01"},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02"]},
+        "bi_query_context":{"type":"array","items":{"$ref":"#/$defs/BIQueryContext"}},
+        "bi_readable_query_ids":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "simulated_model_events":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["event_id","state","source_type","request_sha256","usage","cost_total"],"properties":{"event_id":{"type":"string"},"state":{"enum":["REQUESTED","RESPONSE_RECEIVED","FAILED","CANCELED","TIMED_OUT"]},"source_type":{"const":"SIMULATED"},"request_sha256":{"$ref":"#/$defs/Sha256"},"usage":{"type":"null"},"cost_total":{"type":"null"},"finish_reason":{"type":["string","null"]},"tool_call_ids":{"type":"array","items":{"type":"string"}}}}},
         "tool_errors":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["tool_id","tool_call_id","error_type","source_type"],"properties":{"tool_id":{"type":"string"},"tool_call_id":{"type":"string"},"error_type":{"type":"string"},"source_type":{"const":"SIMULATED"}}}},
         "owner_task_links":{"type":"array","maxItems":1,"items":{"type":"object","additionalProperties":false,"required":["task_id","task_version","request_id","preparation_sha256","action"],"properties":{"task_id":{"type":"string"},"task_version":{"type":"string"},"request_id":{"type":"string"},"preparation_sha256":{"$ref":"#/$defs/Sha256"},"action":{"const":"boss.supply_quality.coordinate"}}}}

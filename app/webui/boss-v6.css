@@ -245,7 +245,21 @@
 .boss-table td{color:#234464;font-variant-numeric:tabular-nums}
 .boss-table tr:last-child td,.boss-table tr:last-child th{border-bottom:0}
 .boss-v6 .boss-bi-fields label{font-size:14px;line-height:22px}
-.boss-v6 .boss-bi-fields input,.boss-v6 .boss-bi-fields select{font-size:16px;line-height:24px}
+.boss-v6 .boss-bi-fields input,.boss-v6 .boss-bi-fields select,.boss-v6 .boss-bi-fields textarea{font-size:16px;line-height:24px}
+.boss-bi-view .boss-panel{overflow-wrap:anywhere}
+.boss-bi-view .boss-panel p,.boss-bi-view .boss-panel dd,.boss-bi-view .boss-panel pre{font-size:16px;line-height:24px}
+.boss-bi-fields select[multiple]{min-height:96px}
+.boss-bi-fields textarea{min-height:80px;resize:vertical}
+.boss-bi-view button{font:inherit;padding:8px 14px;border:1px solid #c9dbe9;border-radius:10px;background:#f7fbff;color:#193c63;cursor:pointer}
+.boss-bi-view button:disabled{opacity:.5;cursor:default}
+.boss-bi-view .boss-button-primary{background:#1f6bd5;color:white;border-color:#1f6bd5}
+.boss-bi-history{padding-left:20px;display:grid;gap:10px}
+.boss-bi-history button{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left}
+.boss-bi-compare-field{margin:12px 0;font-size:14px;line-height:22px}
+.boss-bi-compare-field>label{display:flex;gap:8px;align-items:center}
+.boss-bi-compare-field input[type=checkbox]{width:18px;height:18px}
+.boss-bi-compare-field input:not([type=checkbox]),.boss-bi-compare-field select{font-size:16px;line-height:24px;width:100%;min-width:0}
+.boss-bi-view .boss-kv dd{white-space:normal;overflow-wrap:anywhere}
 .boss-v6 .boss-bi-table{font-size:16px;line-height:24px}
 .boss-v6 .boss-bi-table thead th{font-size:14px;line-height:22px}
 .boss-v6 .boss-document-source{font-size:16px;line-height:24px}

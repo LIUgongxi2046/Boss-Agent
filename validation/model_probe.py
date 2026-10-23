@@ -41,12 +41,14 @@ class BusinessTool(Tool):
     @property
     def parameters(self):
         ref = OPERATIONS[self.operation]["input_schema"].rsplit("/", 1)[1]
-        schema = copy.deepcopy(SPEC["io_schema"]["$defs"][ref])
+        definitions = copy.deepcopy(SPEC["io_schema"]["$defs"])
         injected = {"envelope", "authorization_id", "idempotency_key"}
-        schema["properties"] = {k: v for k, v in schema["properties"].items() if k not in injected}
-        schema["required"] = [k for k in schema["required"] if k not in injected]
-        schema["$defs"] = {"identifier": SPEC["io_schema"]["$defs"]["identifier"]}
-        return schema
+        for name in (ref, "legacy_query_input", "scoped_query_input"):
+            definition = definitions.get(name)
+            if definition is not None and "properties" in definition:
+                definition["properties"] = {key: value for key, value in definition["properties"].items() if key not in injected}
+                definition["required"] = [key for key in definition.get("required", []) if key not in injected]
+        return {"$ref": "#/$defs/" + ref, "$defs": definitions}
 
     async def execute(self, **kwargs):
         envelope = self.envelope

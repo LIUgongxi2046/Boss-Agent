@@ -41,6 +41,7 @@ from boss_page_api import BossPageAPI
 from product_read_tools import product_read_tools
 from product_skills import ProductSkills
 from product_fc01 import ProductFc01
+from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
 from sop_write_tools.fc01 import Fc01Tool, TOOLS as FC01_TOOLS
 from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder
 from service import application as business_application
@@ -125,10 +126,11 @@ async def serve():
     if product_mode:
         output.chmod(0o700)
     fc01 = ProductFc01(store) if product_mode else None
-    provider = fc01.provider if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
+    bi = ProductBI(store) if product_mode else None
+    provider = FeatureProvider(fc01, bi) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
     provider.generation = config.resolve_preset().to_generation_settings()
-    registry = ToolRegistry()
-    runtime_recorder = Fc01RuntimeRecorder(store, "ui-check", registry, lambda: runtime_control.snapshot()) if product_mode else None
+    registry = FeatureToolRegistry() if product_mode else ToolRegistry()
+    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -149,7 +151,7 @@ async def serve():
         registry.unregister(name)
     envelope = {"request_id": "ui-check", "owner_id": "boss-1", "execution_namespace": "ui-check", "dataset_id": "selection", "dataset_version": "1", "session_id": "ui-check"}
     for operation in OPERATIONS:
-        registry.register(Fc01Tool(store, fc01.context_provider, operation) if product_mode else ApplicationTool(operation, store, envelope, bindings, records))
+        registry.register((FeatureBusinessTool(store, fc01, bi, operation) if operation in BI_TOOLS else Fc01Tool(store, fc01.context_provider, operation)) if product_mode else ApplicationTool(operation, store, envelope, bindings, records))
     def research_read_observed(metadata):
         records.append({"type": "tool", "name": "bossWorkspaceRead", "at": now(),
                         "output": {"source_type": "SIMULATED", "status": metadata["current_reference_state"]}})
@@ -169,6 +171,7 @@ async def serve():
         runtime_control = ProductRuntime(store, config_path, loop, registry,
                                          [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages)
         fc01.runtime = runtime_control
+        bi.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
@@ -202,6 +205,7 @@ async def serve():
         channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
     if fc01 is not None:
         channels.channels["websocket"].fc01 = fc01
+        channels.channels["websocket"].bi = bi
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -211,6 +215,7 @@ async def serve():
     async with Nanobot(loop, config=config) as bot:
         if fc01 is not None:
             fc01.bot = bot
+            bi.bot = bot
         async def context(request):
             current = store.context("ui-check")
             selected_prompts = load_runtime_prompts(store, "ui-check")
@@ -237,6 +242,7 @@ async def serve():
             bot.runtime.add_context_provider(skills.context)
             bot.runtime.add_context_provider(OwnerMemoryContext(store))
             bot.runtime.add_context_provider(owner_goals_context)
+            bot.runtime.add_context_provider(bi.scope_context)
             bot.runtime.add_context_provider(runtime_recorder.context)
         else:
             bot.runtime.add_context_provider(context)

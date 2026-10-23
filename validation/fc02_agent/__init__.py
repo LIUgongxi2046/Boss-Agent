@@ -42,8 +42,8 @@ def bind_query(parameters, *, previous_query_id=None, previous_parameters=None, 
     else:
         current_scope = {key: value for key, value in parameters.items() if key != "parent_query_id"}
         previous_scope = {key: value for key, value in previous_parameters.items() if key != "parent_query_id"}
-        require(set(previous_scope) == set(current_scope) and all(
-            current_scope[key] == previous_scope[key] for key in current_scope if key not in fields),
+        require((set(previous_scope) ^ set(current_scope)) <= fields and all(
+            current_scope[key] == previous_scope[key] for key in set(current_scope) & set(previous_scope) if key not in fields),
             "追问改变了未明确覆盖的字段", web.HTTPConflict)
         if parameters.get("query_mode") == "SCOPED":
             require(parameters.get("parent_query_id") == previous_query_id, "正式追问父查询不符", web.HTTPConflict)

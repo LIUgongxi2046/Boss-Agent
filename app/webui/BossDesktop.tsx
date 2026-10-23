@@ -42,6 +42,7 @@ import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
 import { BossToday, type TodayProjection } from "./BossToday";
+import { BossBIView } from "./BossBIView";
 import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
 import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
@@ -72,18 +73,6 @@ type Dashboard = {
   assignment_source_ids?: string[];
   notifications: { event_id: string; state: string }[];
 };
-type Metrics = {
-  source_type: "SIMULATED";
-  result: {
-    query_id: string;
-    values: { metric_id: string; period_scope: string; scope_description:string; value: string | null; unit: string; formula: string; definition_version: string; display_rounding:string }[];
-    sources: { source_id: string; source_type: string; version:string; coverage: string; business_as_of: string; source_updated_at:string; quality_state:string }[];
-    missing_fields: string[]; unexplained_causes: string[];
-  };
-  read_at:string;
-};
-type MetricEvidence={source_type:"SIMULATED";query_id:string;read_at:string;result:{definition_version:string;
-  original_records:{record_id:string;version:string;content:unknown}[];conflicts:string[];missing_fields:string[]}};
 type Tasks = TaskListResponse & { historical_commitment: HistoricalTask | null; source_type: string };
 type Meetings = {
   source_type: string;
@@ -167,10 +156,6 @@ const ANIMATIONS: Record<Animation, string> = {
   thinking: "/boss-brand/03-思考分析.webp",
   complete: "/boss-brand/05-完成确认.webp",
   notice: "/boss-brand/06-通知提醒.webp",
-};
-const LABELS: Record<string, string> = {
-  sales_quantity: "外销数量", revenue: "营业收入", cost: "经营成本",
-  gross_profit: "毛利", gross_margin: "毛利率", gross_profit_per_tonne: "单吨毛利",
 };
 function allowed(page: string, role: Role) {
   if (page === "NATIVE") return true;
@@ -279,7 +264,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setAssignmentDraft(old=>({...old,[field]:value}));
     setAssignmentDirty(true);
   }, []);
-  const [productScope, setProductScope] = useState("product-1,product-2");
   const [selectedTaskId, setSelectedTaskId] = useState(() => new URLSearchParams(window.location.search).get("bossTask") ?? "");
   const [draftToReview, setDraftToReview] = useState("");
   const [sourceId, setSourceId] = useState("finance-note");
@@ -287,15 +271,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     source_id:string;version:string;start:number;end:number;
   }|null>(null);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const [metrics, setMetrics] = useState<Metrics | null>(null);
-  const [submittedProductScope,setSubmittedProductScope]=useState<string|null>(null);
-  const [metricEvidence,setMetricEvidence]=useState<MetricEvidence|null>(null);
-  const [readingMetricEvidence,setReadingMetricEvidence]=useState(false);
-  const metricEvidenceAbort=useRef<AbortController|null>(null);
-  const currentMetricQuery=useRef<string|null>(null);
-  currentMetricQuery.current=metrics?.result.query_id??null;
-  const currentMetricScope=useRef(productScope);
-  currentMetricScope.current=productScope;
   const [tasks, setTasks] = useState<Tasks | null>(null);
   const [meetings, setMeetings] = useState<Meetings | null>(null);
   const [evidence, setEvidence] = useState<Evidence | null>(null);
@@ -322,13 +297,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [sourceReviewLoading, setSourceReviewLoading] = useState(false);
   const [sourceReviewError, setSourceReviewError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
   const [inputError, setInputError] = useState("");
   const [animate, setAnimate] = useState<Animation>("idle");
   const nextRequest = useRef(0);
   const [requestVersion, setRequestVersion] = useState(0);
-  const [metricsRequest, setMetricsRequest] = useState(0);
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const navigationFocus = useRef<HTMLElement | null>(null);
@@ -469,39 +442,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     });
     return () => abort.abort();
   }, [getToken, page, role, selectedTaskId, requestVersion]);
-
-  useEffect(() => {
-    if (role !== "BOSS" || !["F03", "N03"].includes(page)) return;
-    if (metricsRequest === 0) return;
-    if(submittedProductScope!==productScope){setMetrics(null);setQuerying(false);return;}
-    const abort = new AbortController();
-    setMetrics(null);
-    setQuerying(true);
-    setError("");
-    const url = "/api/boss/ui/metrics?products=" + encodeURIComponent(productScope);
-    void jsonRequest<Metrics>(url, getToken, abort.signal).then((value) => {
-      if (abort.signal.aborted||currentMetricScope.current!==productScope) return;
-      setMetrics(value); setQuerying(false); setAnimate("complete");
-    }).catch((err: unknown) => {
-      if (abort.signal.aborted||currentMetricScope.current!==productScope) return;
-      setQuerying(false); setError(String(err instanceof Error ? err.message : err));
-    });
-    return () => abort.abort();
-  }, [role, page, metricsRequest, getToken,productScope,submittedProductScope]);
-
-  useEffect(()=>{metricEvidenceAbort.current?.abort();setMetricEvidence(null);setReadingMetricEvidence(false);
-    return()=>metricEvidenceAbort.current?.abort();},[metrics?.result.query_id,role,page,getToken]);
-  async function readMetricEvidence(){
-    if(!metrics||readingMetricEvidence)return;
-    const queryId=metrics.result.query_id;
-    metricEvidenceAbort.current?.abort();const abort=new AbortController();metricEvidenceAbort.current=abort;
-    setReadingMetricEvidence(true);setMetricEvidence(null);setError("");
-    await jsonRequest<MetricEvidence>("/api/boss/ui/metrics-evidence?"+new URLSearchParams({query_id:queryId}),getToken,abort.signal).then(value=>{
-      if(value.query_id!==queryId||value.source_type!=="SIMULATED")throw new Error("原始依据与本次查询不符");
-      return value;
-    }).then(value=>{if(abort.signal.aborted||currentMetricQuery.current!==queryId)return;setMetricEvidence(value);setReadingMetricEvidence(false);},reason=>{
-      if(abort.signal.aborted||currentMetricQuery.current!==queryId)return;setReadingMetricEvidence(false);setError(reason instanceof Error?reason.message:String(reason));});
-  }
 
   const userNav = role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV;
   const metadata = pages[page];
@@ -757,80 +697,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <StatusLine variant="warn" text="未获准动作不得发送，缺少依据不能生成成功结果。" />
                   </Panel></div>
                 </div> :
-                ["N03", "F03"].includes(page) ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="经营指标查询" note="F03 · 实际复用 query_metrics Tool">
-                      <div className="boss-form-grid boss-bi-fields">
-                        <label>业务范围<input readOnly value="region-1 · EXTERNAL_SALES"/></label>
-                        <label>产品范围<select aria-label="产品范围" value={productScope} onChange={(e) => {setProductScope(e.target.value);setMetrics(null);}}>
-                          <option value="product-1,product-2">产品 1 + 产品 2</option>
-                          <option value="product-1">产品 1</option>
-                          <option value="product-2">产品 2</option>
-                        </select></label>
-                        <label>指标口径<input readOnly value="definition_version=1"/></label>
-                        <label>当前/基准期间<input readOnly value="由获准业务数据集定义"/></label>
-                      </div>
-                      <div className="boss-actions">
-                        <GlassButton primary onClick={() => {setSubmittedProductScope(productScope);setAnimate("thinking"); setMetricsRequest((n) => n+1);}} disabled={querying}>
-                          {querying && <Loader2 size={15} className="boss-spin"/>} 提交查询
-                        </GlassButton>
-                        <GlassButton onClick={() => navigate("F03")}>查看明细与追问</GlassButton>
-                      </div>
-                    </Panel>
-                    <Panel title="经营对比" note="数值来自真实业务 Tool；保留 Decimal 原始字符串">
-                      {metrics ? <div className="boss-table-scroll"><table className="boss-table boss-bi-table">
-                        <thead><tr><th>指标</th><th>基准期</th><th>当前期</th><th>单位</th><th>变化量</th></tr></thead>
-                        <tbody>{Object.keys(LABELS).map((key) => {
-                          const base = metrics.result.values.find((v) => v.metric_id === key && v.period_scope === "BASE");
-                          const current = metrics.result.values.find((v) => v.metric_id === key && v.period_scope === "CURRENT");
-                          const change = metrics.result.values.find((v) => v.metric_id === key && v.period_scope === "CHANGE");
-                          return <tr key={key}><th scope="row">{LABELS[key]}</th>
-                            <td>{base?.value ?? "未定义"}</td><td>{current?.value ?? "未定义"}</td>
-                            <td>{current?.unit ?? base?.unit ?? "—"}</td><td>{change?.value===null?"未定义":change?.value??"未知"} {change?.unit}</td></tr>;
-                        })}</tbody></table></div> : <Quiet message="尚未执行该页查询。点击“提交查询”调用经过 Schema 校验的实际业务工具。" />}
-                    </Panel>
-                    {metrics&&<Panel title="原始精度与计算公式">
-                      <p>本次查询 {metrics.result.query_id} · 已提交产品范围 {submittedProductScope} · 实际读取 {metrics.read_at}</p>
-                      {metrics.result.values.map(value=><details className="boss-workspace-item" key={value.metric_id+":"+value.period_scope}>
-                        <summary>{LABELS[value.metric_id]??value.metric_id} · {value.period_scope}</summary>
-                        <p>原始值 {value.value??"未定义"} · 单位 {value.unit} · 定义版本 {value.definition_version}</p>
-                        <p>{value.formula}</p><p>展示精度：{value.display_rounding} · 范围 {value.scope_description}</p>
-                      </details>)}
-                    </Panel>}
-                    {metricEvidence&&<Panel title="本次查询原始依据">
-                      <p>查询 {metricEvidence.query_id} · 定义版本 {metricEvidence.result.definition_version} · 读取 {metricEvidence.read_at}</p>
-                      {metricEvidence.result.original_records.map(record=><details className="boss-workspace-item" key={record.record_id}>
-                        <summary>{record.record_id} · v{record.version}</summary><pre>{typeof record.content==="string"?record.content:JSON.stringify(record.content,null,2)}</pre>
-                      </details>)}
-                      {metricEvidence.result.conflicts.map(text=><StatusLine key={text} variant="warn" text={text}/>)}
-                      {metricEvidence.result.missing_fields.map(text=><StatusLine key={text} variant="warn" text={"缺少："+text}/>)}
-                    </Panel>}
-                    <Panel title="继续追问">
-                      <div className="boss-actions"><GlassButton onClick={() => navigate("N02")}><MessageCircle size={15}/> 进入 DeepSeek 会话</GlassButton>
-                        <GlassButton onClick={()=>void readMetricEvidence()} disabled={!metrics||readingMetricEvidence}>{readingMetricEvidence?"正在读取本次依据":"读取本次查询原始依据"}</GlassButton></div>
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="指标来源与覆盖">
-                      <Value label="业务范围" value={metrics?.result.sources[0]?.coverage || "待查询"}/>
-                      <Value label="资料截至" value={metrics?.result.sources[0]?.business_as_of || "待查询"}/>
-                      <Value label="资料来源" value={metrics?.result.sources[0]?.source_id}/>
-                      <Value label="本次查询 ID" value={metrics?.result.query_id}/>
-                      <Value label="数据属性" value={metrics?.source_type}/>
-                      {metrics?.result.sources.map(source=><div className="boss-workspace-item" key={source.source_id}>
-                        <p>{source.source_id} · v{source.version} · {source.source_type} · {source.quality_state}</p>
-                        <p>覆盖 {source.coverage} · 业务截至 {source.business_as_of} · 来源更新 {source.source_updated_at}</p>
-                        <GlassButton onClick={()=>goSource(source.source_id)}>打开当前来源原文</GlassButton>
-                      </div>)}
-                    </Panel>
-                    <Panel title="可解释性与缺口">
-                      {metrics ? <>
-                        {(metrics.result.unexplained_causes || []).map((v,i) => <StatusLine key={i} variant="warn" text={v}/>)}
-                        {(metrics.result.missing_fields || []).map((v,i) => <StatusLine key={"missing-"+i} variant="warn" text={"缺少：" + v}/>)}
-                      </> : <p className="boss-helper">指标公式、定义版本、缺失原因需等实际查询完成后展示。</p>}
-                    </Panel>
-                  </div>
-                </div> :
+                ["N03", "F03"].includes(page) ? <BossBIView getToken={getToken} onSource={goSource}/> :
                 page === "F27" ? <BossVoiceAssignment
                   getToken={getToken}
                   onSubmit={onStartChat}

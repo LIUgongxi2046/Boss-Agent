@@ -93,7 +93,31 @@
     },
     "bi_follow_up": {
       "type": "object", "additionalProperties": false, "required": ["envelope", "parent_query_id", "question", "overrides"],
-      "properties": {"envelope": {"$ref": "#/$defs/envelope"}, "parent_query_id": {"type": "string", "minLength": 1}, "question": {"type": "string", "minLength": 1}, "overrides": {"$ref": "#/$defs/scope_fields"}}
+      "properties": {"envelope": {"$ref": "#/$defs/envelope"}, "parent_query_id": {"type": "string", "minLength": 1}, "question": {"type": "string", "minLength": 1}, "overrides": {
+        "type":"object","additionalProperties":false,"properties":{
+          "region_id":{"$ref":"#/$defs/scope_fields/properties/region_id"},
+          "region_ids":{"$ref":"#/$defs/scope_fields/properties/region_ids"},
+          "product_ids":{"$ref":"#/$defs/scope_fields/properties/product_ids"},
+          "metric_ids":{"$ref":"#/$defs/scope_fields/properties/metric_ids"},
+          "legal_entity_id":{"$ref":"#/$defs/scope_fields/properties/legal_entity_id"},
+          "customer_id":{"$ref":"#/$defs/scope_fields/properties/customer_id"},
+          "ownership_type":{"$ref":"#/$defs/scope_fields/properties/ownership_type"},
+          "asset_owner_id":{"$ref":"#/$defs/scope_fields/properties/asset_owner_id"},
+          "cost_owner_id":{"$ref":"#/$defs/scope_fields/properties/cost_owner_id"},
+          "currency":{"$ref":"#/$defs/scope_fields/properties/currency"},
+          "quantity_unit":{"$ref":"#/$defs/scope_fields/properties/quantity_unit"},
+          "trade_scope":{"$ref":"#/$defs/scope_fields/properties/trade_scope"},
+          "definition_version":{"$ref":"#/$defs/scope_fields/properties/definition_version"},
+          "target_version":{"$ref":"#/$defs/scope_fields/properties/target_version"},
+          "business_basis":{"$ref":"#/$defs/scope_fields/properties/business_basis"},
+          "settlement_state":{"$ref":"#/$defs/scope_fields/properties/settlement_state"},
+          "period_start":{"$ref":"#/$defs/scope_fields/properties/period_start"},
+          "period_end":{"$ref":"#/$defs/scope_fields/properties/period_end"},
+          "comparison_start":{"$ref":"#/$defs/scope_fields/properties/comparison_start"},
+          "comparison_end":{"$ref":"#/$defs/scope_fields/properties/comparison_end"},
+          "comparison_scope":{"$ref":"#/$defs/scoped_query_input/properties/comparison_scope"}
+        }
+      }}
     }
   }
 }
