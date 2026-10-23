@@ -40,7 +40,9 @@
     "F09 is an owner-scoped versioned research draft with exact quote/source-id/offset and publication cutoff. Missing causality/model inference/country relation remains explicitly unknown. No simulated source converted into verified factual claim. No public-web/semantic ingestion and no Mac pixel acceptance.",
     "A07 technical knowledge lifecycle: explicit SIMULATED source create/revise/withdraw with CAS and SQLite FTS indexing. MAINTAINER only sees metadata; BOSS F09 sees approved, current text. External crawling and multi-format ingestion remain pending.",
     "FR05->FR06 confirmed minute entry link is independently authorized and creates exactly one OPEN task per entry/version; sending still requires separate BOSS action. Latest creation/sending validates coordinator validity against actual simulation clock.",
-    "A05 now renders real versioned Prompt save/structure validation/activation/deactivation and MAINTAINER-only runtime context loading metadata; activation alone does not prove a DeepSeek call or evaluation quality. Technical guidance cannot modify BOSS permissions."
+    "A05 now renders real versioned Prompt save/structure validation/activation/deactivation and MAINTAINER-only runtime context loading metadata; activation alone does not prove a DeepSeek call or evaluation quality. Technical guidance cannot modify BOSS permissions.",
+    "N05 now renders source Desktop v6 tab/filter/five-column task center, using current simulated business clock and persisted task/feedback/source/due-event records; actions lead to F06 owner confirmation. Browser screenshot and acceptance still NOT_RUN.",
+    "F04/F06 newly persisted material and follow-up draft IDs are carried only in authenticated React state to F08 for review; this does not send automatically, disclose to MAINTAINER, or bypass source/version/owner validations."
   ],
   "pages": [
     {
@@ -1735,14 +1737,18 @@
       "logical_architecture_route": "/app/boss/N05",
       "actual_webui_navigation": "?bossPage=N05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_TASK_LIST",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "render_status": "PARTIAL_V6_TASK_CENTER_FILTERS_AND_REAL_STATUS",
+      "component_file": "app/webui/BossTaskCenter.tsx",
+      "component_name": "BossTaskCenter",
       "verified_http_read_routes": [
         "GET /api/boss/ui/tasks"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "F06 owner-authorized task state transitions",
+        "Current simulation business clock for overdue classification",
+        "Source status, evidence references and simulated send history"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -1750,7 +1756,8 @@
         "assignment.followup"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_boss_task_center.py"
       ],
       "source_task_ids": [
         "T18",
