@@ -903,7 +903,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
               </div>
               </> : page === "A05" ? <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/> :
-              </> : page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
+                page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
                 page === "A03" ? <>
                 <BossWorkspaceView key="A03" role={role} pageId="A03"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
