@@ -148,51 +148,61 @@ class ControlStore(Store):
         return {"namespace": p["namespace"], "snapshot_sha256": checksum(data)}
 
     def dispatch_due(self, ns):
+        """Scheduled execution owns a fresh transaction, unchanged for CronService."""
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            self.active(db, ns)
-            schedule = self.get(db, ns, "schedule", "current")
-            rules_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'", (ns,)).fetchone()
-            if rules_row is None:
-                return []
-            rules = json.loads(rules_row[0])
-            clock = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"])
-            local = clock.astimezone(ZoneInfo(rules["timezone"]))
-            results = []
-            for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
-                event = json.loads(row[0])
-                if datetime.fromisoformat(event["due_at"]) > clock:
-                    continue
-                previous_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='delivery' AND id=?", (ns, event["event_id"])).fetchone()
-                previous = json.loads(previous_row[0]) if previous_row else None
-                reminder_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='reminder' AND id=?", (ns, event["event_id"])).fetchone()
-                reminder = json.loads(reminder_row[0]) if reminder_row else None
-                reason = None
-                if not schedule["enabled"] or schedule["canceled"]:
-                    reason = "PLAN_PAUSED_OR_CANCELED"
-                elif event["state"] == "CANCELED":
-                    reason = "SOURCE_CANCELED"
-                elif reminder and reminder["state"] == "CLOSED":
-                    reason = "BOSS_CLOSED"
-                elif reminder and reminder["state"] == "SNOOZED" and datetime.fromisoformat(reminder["until"]) > clock:
-                    reason = "BOSS_SNOOZED"
-                elif event.get("task_id") and self.get(db, ns, "task", event["task_id"])["status"] in {"COMPLETED_CONFIRMED", "CANCELED"}:
-                    reason = "TASK_ENDED"
-                elif previous and previous["event_version"] == event["version"]:
-                    reason = "DUPLICATE_EVENT"
-                else:
-                    start, end = rules["quiet_start"], rules["quiet_end"]
-                    quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
-                    escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
-                    if quiet and not escalation:
-                        reason = "QUIET_HOURS"
-                    elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
-                        reason = "COOLDOWN"
-                result = {"event_id": event["event_id"], "event_version": event["version"], "state": "SUPPRESSED" if reason else "DELIVERED", "reason": reason, "rule_version": rules["version"], "schedule_version": schedule["version"], "business_at": clock.isoformat()}
-                self.put(db, ns, "dispatch", event["event_id"], result)
-                if reason is None:
-                    delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
-                    self.put(db, ns, "delivery", event["event_id"], delivery)
-                    self.put(db, ns, "notification", event["event_id"] + ":" + event["version"], delivery)
-                results.append(result)
-            return results
+            return self.dispatch_due_in_transaction(db, ns)
+
+    def dispatch_due_in_transaction(self, db, ns, only_event_id=None):
+        """Same canonical dispatcher for Cron and an authorized manual test event.
+
+        Caller must own BEGIN IMMEDIATE; no external messaging occurs here.
+        """
+        self.active(db, ns)
+        schedule = self.get(db, ns, "schedule", "current")
+        rules_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'", (ns,)).fetchone()
+        if rules_row is None:
+            return []
+        rules = json.loads(rules_row[0])
+        clock = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"])
+        local = clock.astimezone(ZoneInfo(rules["timezone"]))
+        results = []
+        for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
+            event = json.loads(row[0])
+            if only_event_id is not None and event["event_id"] != only_event_id:
+                continue
+            if datetime.fromisoformat(event["due_at"]) > clock:
+                continue
+            previous_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='delivery' AND id=?", (ns, event["event_id"])).fetchone()
+            previous = json.loads(previous_row[0]) if previous_row else None
+            reminder_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='reminder' AND id=?", (ns, event["event_id"])).fetchone()
+            reminder = json.loads(reminder_row[0]) if reminder_row else None
+            reason = None
+            if not schedule["enabled"] or schedule["canceled"]:
+                reason = "PLAN_PAUSED_OR_CANCELED"
+            elif event["state"] == "CANCELED":
+                reason = "SOURCE_CANCELED"
+            elif reminder and reminder["state"] == "CLOSED":
+                reason = "BOSS_CLOSED"
+            elif reminder and reminder["state"] == "SNOOZED" and datetime.fromisoformat(reminder["until"]) > clock:
+                reason = "BOSS_SNOOZED"
+            elif event.get("task_id") and self.get(db, ns, "task", event["task_id"])["status"] in {"COMPLETED_CONFIRMED", "CANCELED"}:
+                reason = "TASK_ENDED"
+            elif previous and previous["event_version"] == event["version"]:
+                reason = "DUPLICATE_EVENT"
+            else:
+                start, end = rules["quiet_start"], rules["quiet_end"]
+                quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
+                escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
+                if quiet and not escalation:
+                    reason = "QUIET_HOURS"
+                elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
+                    reason = "COOLDOWN"
+            result = {"event_id": event["event_id"], "event_version": event["version"], "state": "SUPPRESSED" if reason else "DELIVERED", "reason": reason, "rule_version": rules["version"], "schedule_version": schedule["version"], "business_at": clock.isoformat()}
+            self.put(db, ns, "dispatch", event["event_id"], result)
+            if reason is None:
+                delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
+                self.put(db, ns, "delivery", event["event_id"], delivery)
+                self.put(db, ns, "notification", event["event_id"] + ":" + event["version"], delivery)
+            results.append(result)
+        return results
