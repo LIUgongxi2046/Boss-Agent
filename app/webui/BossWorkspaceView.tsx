@@ -47,7 +47,8 @@ type Notification = {
 };
 type Auth = {
   authorization_id: string; action: string; target_id: string; content_version: string;
-  revoked: boolean; valid_until: string; valid_from?: string;
+  revoked: boolean; valid_until: string; valid_from?: string; version?:string;
+  can_revoke?:boolean; revoked_at?:string;
 };
 type Workspace = {
   source_type: "SIMULATED"; namespace: string; data_version: string;
@@ -147,6 +148,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
   const [searched,setSearched] = useState("");
   const [timeInput,setTimeInput] = useState("");
   const [dirty,setDirty] = useState(false);
+  const [revokeReason,setRevokeReason] = useState("");
 
   useEffect(()=>{
     if(!route || ROLES[route]!==role) {setError("当前角色不允许访问该业务投影");return;}
@@ -290,6 +292,25 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         action==="snooze"?"暂缓至："+v(fields.until):"当前事件状态："+event.state,
         "保留源事件及历史通知记录；不会假定任何外部消息已经发送。",
       ]);
+  }
+  function revokeAuthorization(record:Auth){
+    if(pageId!=="N10"){setError("请进入本人授权页核对后撤销");return;}
+    if(!record.can_revoke||!record.version){
+      setError("原授权已到期、被撤销或不可核验，不能再次撤销");return;
+    }
+    if(!revokeReason.trim()||revokeReason.trim().length>400){
+      setError("撤销原因需要填写1—400字");return;
+    }
+    propose("boss.authorization.revoke",{
+      authorization_id:record.authorization_id,
+      expected_version:record.version,
+      reason:revokeReason.trim(),
+    },"本人确认撤销未来授权",[
+      "原授权："+record.authorization_id+" · v"+record.version,
+      "原动作："+record.action+" · 对象："+record.target_id,
+      "撤销原因："+revokeReason.trim(),
+      "本次撤销仅阻止以后使用原授权，不能撤销已经发送或已经执行的业务决定。",
+    ]);
   }
   function seedEvent(){
     const id=data?.technical_links?.event_id||data?.simulated_event_id;
@@ -444,10 +465,23 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
             <Fact label="授权标识">{a.authorization_id}</Fact>
             <Fact label="对象">{a.target_id}</Fact>
             <Fact label="内容版本">{a.content_version}</Fact>
+            <Fact label="授权记录版本">{v(a.version)}</Fact>
             <Fact label="截止时间">{date(a.valid_until)}</Fact>
+            {a.revoked&&<Fact label="撤销时间">{date(a.revoked_at)}</Fact>}
+            {pageId==="N10"&&<div className="boss-actions">
+              <button type="button" className="boss-btn" disabled={!a.can_revoke||busy}
+                onClick={()=>revokeAuthorization(a)}>
+                <ShieldCheck size={15}/> 撤销此项未来授权
+              </button>
+            </div>}
           </div>)}
           {!(w.authorizations||[]).length&&<Empty message="尚无明确授权记录。没有记录不代表 Agent 可以自行执行写入。"/>}
-          <Notice message="仅返回当前本人获准的授权元信息。撤销尚未执行授权与修改范围的独立操作仍待实现。"/>
+          {pageId==="N10"&&<label className="boss-field">
+            <span>本人撤销原因（应用于选中的授权）</span>
+            <input value={revokeReason} onChange={e=>setRevokeReason(e.target.value)}
+              placeholder="先填写具体原因，再选择要撤销的授权" maxLength={400}/>
+          </label>}
+          <Notice message="N10 只允许本人撤销未到期且有效的已有授权；撤销写入当前 SQLite 和审计，不能倒转已经执行的任务、消息或历史决定。其他角色无权调用。" />
         </Layer>}
         {route==="decisions"&&<Layer title="已保存的历史决定" description="N11 · 只读，不重写过去依据">
           {(w.history||[]).map((h,i)=><div className="boss-workspace-item" key={String(i)}>
