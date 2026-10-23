@@ -221,6 +221,21 @@ class BossPageAPI:
                     for item in self._items(db, self.namespace, "feedback")
                 ],
                 "historical_commitment": data.get("historical_task"),
+                "self_commitments": [{
+                    k: item[k] for k in (
+                        "commitment_id", "purpose", "version", "status", "due_at",
+                        "timezone", "importance", "evidence_requirements", "source_refs",
+                        "completion_evidence", "created_at", "completed_at", "canceled_at",
+                        "source_type",
+                    ) if k in item
+                } for item in self._items(db, self.namespace, "self_commitment")],
+                "self_due_events": [{
+                    "event_id": row["event_id"],
+                    "commitment_id": row["commitment_id"],
+                    "event_version": row["version"], "event_state": row["state"],
+                    "due_at": row["due_at"], "external_delivery_verified": False,
+                } for row in self._items(db, self.namespace, "event")
+                  if row.get("generated_by") == "BOSS_OWN_COMMITMENT"],
                 "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
                 "read_at": now(),
             }
