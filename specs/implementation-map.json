@@ -9,11 +9,16 @@
   "task_context": "docs/Boss-Agent项目计划.md 第10节相同任务及第13节",
   "design_inputs": ["docs/LLD-data.md", "docs/LLD-backend.md", "docs/LLD-agent.md", "docs/LLD-frontend.md", "specs/data-dictionary.json", "specs/openapi.yaml", "specs/runtime-events.schema.json", "specs/agent-assets.json", "specs/acceptance-cases.json"],
   "design_input_policy": "缺少文件保持前置待完成，当前代码已明确部分可依据 D21 独立推进；正式验收依赖继续使用 depends_on。",
+  "external_api_policy": {"source":"用户要求全部任务的外部API依赖先使用模拟数据；项目计划13.18","applies_to":"全部现有及后续任务的外部API部分，包括外部模型、语音、业务系统和第三方资料服务","current_mode":"SIMULATED_FIRST","development":"使用显式模拟模式和当前Schema完成公共页面、服务、状态、权限、保存重读及异常流程；外部凭据或额度缺少不阻止内部可执行功能；当前模拟开发不新增真实外部API请求","evidence":"模拟来源须明确标识；模拟行为检查与真实服务验证分别登记，不作为真实模型、转写或第三方调用验收，不改变正式检查点分母","handoff":"续接标识EXTERNAL-API-SIMULATED-FIRST-20261023；W3已经读取原始项目计划并采用，不恢复第四窗口监督"},
   "visual_reference": ["Boss-Agent-Desktop-Complete-v6/meta/页面配置.json", "Boss-Agent-Desktop-Complete-v6/meta/v6-状态关联.json", "Boss-Agent-Desktop-Complete-v6/design-tokens.json"],
   "visual_policy": "禁止主动视觉操作，视觉验收保持未执行。",
   "integration_owner": "W3",
   "integration_test_policy": "W3按已接收OpenAPI的x-source-policy维护公共动作相关测试的HTTP状态与当前查询语义，保留全部零变更、授权、回执和原文断言；领域实现继续归W1/W2。",
   "integration_shared_paths": [
+    {"path":"specs/product-skills.openapi.yaml","owner":"W3","task_id":"T11","scope":"原生方法技术读取及限制范围的skill.update，独立扩展等待T06正式接收"},
+    {"path":"validation/product_skills.py","owner":"W3","task_id":"T11","scope":"同一Runtime的原生SOP安装、技术读取、获准启停及实际上下文读取；领域Catalog由W2维护"},
+    {"path":"app/webui/MaintainerSkills.tsx","owner":"W3","task_id":"T11","scope":"A06当前方法技术状态与原生启停；不改变领域方法正文或历史管理责任"},
+    {"path":"app/tests/test_product_skills.py","owner":"W3","task_id":"T11","scope":"实际本地配置、原生方法、角色、参数、上下文及零模型请求检查"},
     {"path":"app/tests/test_v6_contract.py","owner":"W3","task_id":"T08","scope":"当前F06来源确认、A12专用组件及A15技术读取映射，保留全部72页面及未验收断言"},
     {"path":"app/tests/test_boss_owner_read_tools.py","owner":"W3","task_id":"T11","scope":"使用本工程真实桌面数据库副本，核查接收提交中的领域源码；保留只读、权限和Schema断言"},
     {"path":"app/tests/test_boss_task_reminders.py","owner":"W3","task_id":"T11","scope":"使用真实旧版本Store生成缺少来源绑定的迁移库，保留来源拒绝和零发件断言"},
@@ -51,7 +56,7 @@
   "profiles": {
     "design": {"checks": ["核对完整需求、字段、权限、使用方和依赖；结构检查通过后进行独立语义审阅"], "output": "evidence/{task_id}/{run_id}/"},
     "domain": {"commands": [["python", "-m", "pytest", "-q", "app/tests"]], "checks": ["相关真实 SQLite/API 流程、CAS、幂等、拒绝、重读及重启；使用已有获准资料"], "output": "evidence/{task_id}/{run_id}/"},
-    "runtime": {"commands": [["python", "-m", "pytest", "-q", "app/tests"]], "checks": ["真实模型/工具调用及下一任务采用；明确未具备的外部条件"], "output": "evidence/{task_id}/{run_id}/"},
+    "runtime": {"commands": [["python", "-m", "pytest", "-q", "app/tests"]], "checks": ["外部API当前采用显式SIMULATED数据验证实际工具、状态和公共使用方；真实服务与模型质量单独保留待验证"], "output": "evidence/{task_id}/{run_id}/"},
     "integration": {"commands": [["python", "-m", "pytest", "-q", "app/tests"], ["python", "scripts/prepare_boss_webui.py", "--build"], ["node", "--check", "validation/desktop/main.cjs"], ["python", "scripts/check_git_secrets.py"]], "checks": ["集成 SHA 的实际业务和目标设备检查；视觉未执行"], "output": "evidence/{task_id}/{run_id}/"}
   },
   "tasks": [

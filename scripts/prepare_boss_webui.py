@@ -115,6 +115,7 @@ def copy_overlay() -> None:
         ("RuntimeTaskTechnicalView.tsx", "RuntimeTaskTechnicalView.tsx"),
         ("ProductRuntimeConfiguration.tsx", "ProductRuntimeConfiguration.tsx"),
         ("MaintainerMemoryStatus.tsx", "MaintainerMemoryStatus.tsx"),
+        ("MaintainerSkills.tsx", "MaintainerSkills.tsx"),
         ("BossAssignmentSourceReview.tsx", "BossAssignmentSourceReview.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),

@@ -7,6 +7,7 @@ from nanobot.channels.websocket.runtime import WebSocketChannel
 from nanobot.webui.http_utils import bearer_token
 from websockets.datastructures import Headers
 from websockets.http11 import Request
+from aiohttp import web
 
 from business import now
 from boss_page_api import BossPageAPI
@@ -14,13 +15,14 @@ from boss_command_api import BossCommandAPI
 
 
 class RoleChannel(WebSocketChannel):
-    def __init__(self, original, secrets, audit, business_store=None, runtime_control=None):
+    def __init__(self, original, secrets, audit, business_store=None, runtime_control=None, skills=None):
         super().__init__(original.config, original.bus, gateway=original.gateway)
         self.secrets = secrets
         self.audit = audit
         self.token_roles = {}
         self.connection_roles = {}
-        self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control) if business_store is not None else None
+        self.skills = skills
+        self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
         self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control) if business_store is not None else None
 
     def record(self, role, operation, status):
@@ -75,6 +77,9 @@ class RoleChannel(WebSocketChannel):
                 status, body = self.boss_pages.serve(role, address.path, address.query)
                 self.record(role, address.path, status)
                 return connection.respond(status, json.dumps(body, ensure_ascii=False))
+            if self.skills is not None and address.path.startswith("/api/webui/skills/"):
+                self.record(role, address.path, 403)
+                return connection.respond(403, "方法管理需要通过获准入口")
             allowed = role == "BOSS" or role == "MAINTAINER" and address.path in {"/api/settings", "/api/settings/usage", "/api/settings/provider-models", "/api/webui/automations", "/api/webui/skills", "/api/settings/mcp-presets"}
             if not allowed:
                 self.record(role, address.path, 403)
@@ -85,6 +90,32 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action == "skill.update":
+            request_id = envelope.get("request_id")
+            if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+                raise ValueError("方法状态请求缺少有效标识")
+            try:
+                if role != "MAINTAINER":
+                    raise web.HTTPForbidden(text="仅技术维护身份可以修改方法")
+                if self.skills is None:
+                    raise web.HTTPServiceUnavailable(text="当前方法服务尚未准备")
+                http = self.gateway.http
+                if http.skill_state_action is None:
+                    raise web.HTTPServiceUnavailable(text="当前方法采用服务尚未准备")
+                result = self.skills.update(role, envelope.get("payload"))
+                disabled = set(self.skills.catalog.loader.disabled_skills)
+                http.disabled_skills.clear()
+                http.disabled_skills.update(disabled)
+                http._apply_skill_state()
+                status = 200
+                response = {"result": result}
+            except web.HTTPException as failure:
+                status = failure.status
+                response = {"error": {"status": status, "message": failure.text}}
+            self.record(role, action, status)
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id,
+                "ok": status == 200, **response}, ensure_ascii=False))
+            return
         if kind == "webui_request" and action == "boss.auth.logout":
             request_id = envelope.get("request_id")
             if not isinstance(request_id, str) or not request_id or len(request_id) > 128:

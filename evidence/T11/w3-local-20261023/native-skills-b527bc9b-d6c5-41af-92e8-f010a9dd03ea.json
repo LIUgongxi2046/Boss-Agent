@@ -1,0 +1,1319 @@
+{
+  "status": "PASS_PUBLIC_A06_NATIVE_FILES_ENABLE_DISABLE_AND_RESTART",
+  "run_id": "native-skills-b527bc9b-d6c5-41af-92e8-f010a9dd03ea",
+  "at": "2026-10-23T10:33:30.948Z",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "cbfe2f5f25b392ce98729d567c22ad9b3bb9ebcfa10f44709d92c6ca5b414602"
+    },
+    {
+      "path": "validation/product_skills.py",
+      "sha256": "699b498ba4876c39a121d19633d632dbe61eadba58c9f8f4f789bcc3e33cab9c"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "1e3ed4d25fb9a116ff2483b4971550bc52e8f36b24559d7349b4117059d81dfc"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "54bf8f70140833258d54b114bd4d72432e4e09d4bbc6a64cb1965c3c094d3329"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "f7e2fd3cd3ed4023b64db7cc703b7cb1bd9eda1365c9a3edea32c35d3d270581"
+    },
+    {
+      "path": "validation/boss_native_skills.py",
+      "sha256": "89f8f1ca878f9ab88ab4cc064e3f1a72eff004b91405985e02212eb2d64bc20a"
+    },
+    {
+      "path": "specs/agent-assets.json",
+      "sha256": "68287940e4c309cdf508f64d9dead6dba727d29ee320cd3519b102683ce827fb"
+    },
+    {
+      "path": "specs/product-skills.openapi.yaml",
+      "sha256": "1b574519c39b21cc9ed5081c6c897752942f51ec2fbf7319c13de67b1dad64ea"
+    },
+    {
+      "path": "app/webui/MaintainerSkills.tsx",
+      "sha256": "0b132a63aad879bac712fa90092410ddc219db80913acf796f7297bd260aa810"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "afbb187978f79d7bf907ea47593e327a06c4ac32baa6a852a84a2cdd83ed5f68"
+    },
+    {
+      "path": "validation/desktop/check-native-skills.cjs",
+      "sha256": "119f2d047daf9b9c2d15b93cd510efebd35b184a1444e50a53402b8b763a5408"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "fd0f6fb9c8f679c98d260ea1a7c2770e1cbff2d487fa5dade54ce343d7c26ab6"
+    }
+  ],
+  "records": [
+    {
+      "check": "a06_actual_native_files_versions_and_registered_tool_dependencies",
+      "status": {
+        "projection": "sop-technical-status",
+        "items": [
+          {
+            "sop_id": "SOP01",
+            "name": "boss-sop01",
+            "requirement_id": "FR-01",
+            "version": "0.1.0",
+            "content_sha256": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "todayRead",
+              "ownerPlansRead",
+              "bossDashboardRead"
+            ],
+            "command_operations": [
+              "todayReorder"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "bossDashboardRead",
+              "ownerPlansRead",
+              "todayRead",
+              "todayReorder"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP02",
+            "name": "boss-sop02",
+            "requirement_id": "FR-02",
+            "version": "0.1.0",
+            "content_sha256": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.reminder.ack",
+              "boss.reminder.snooze",
+              "boss.reminder.close"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.reminder.ack",
+              "boss.reminder.close",
+              "boss.reminder.snooze",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP03",
+            "name": "boss-sop03",
+            "requirement_id": "FR-03",
+            "version": "0.1.0",
+            "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "query_metrics",
+              "read_evidence"
+            ],
+            "command_operations": [],
+            "human_only_operations": [],
+            "missing_tools": [],
+            "tool_references_resolved": true,
+            "context_eligible": true,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP04",
+            "name": "boss-sop04",
+            "requirement_id": "FR-04",
+            "version": "0.1.0",
+            "content_sha256": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossEvidenceRead",
+              "meetingArrangementRead"
+            ],
+            "command_operations": [
+              "boss.meeting.brief.prepare",
+              "meetingDraftSave",
+              "meetingConfirm",
+              "meetingCancel",
+              "meetingHeld"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.meeting.brief.prepare",
+              "bossEvidenceRead",
+              "bossMeetingsRead",
+              "meetingArrangementRead",
+              "meetingCancel",
+              "meetingConfirm",
+              "meetingDraftSave",
+              "meetingHeld"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP05",
+            "name": "boss-sop05",
+            "requirement_id": "FR-05",
+            "version": "0.1.0",
+            "content_sha256": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.minutes.save",
+              "boss.minutes.confirm",
+              "boss.minutes.assignment.create"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.minutes.assignment.create",
+              "boss.minutes.confirm",
+              "boss.minutes.save",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP06",
+            "name": "boss-sop06",
+            "requirement_id": "FR-06",
+            "version": "0.1.0",
+            "content_sha256": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_assignment",
+              "bossTasksRead",
+              "ownerPlansRead",
+              "assignmentSourcesRead"
+            ],
+            "command_operations": [
+              "create_assignment",
+              "send_assignment",
+              "boss.assignment.nudge",
+              "boss.assignment.extend",
+              "boss.assignment.complete",
+              "boss.assignment.cancel",
+              "assignmentSourcesConfirm"
+            ],
+            "human_only_operations": [
+              "assignmentSourcesConfirm"
+            ],
+            "missing_tools": [
+              "assignmentSourcesRead",
+              "boss.assignment.cancel",
+              "boss.assignment.complete",
+              "boss.assignment.extend",
+              "boss.assignment.nudge",
+              "bossTasksRead",
+              "ownerPlansRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP07",
+            "name": "boss-sop07",
+            "requirement_id": "FR-07",
+            "version": "0.1.0",
+            "content_sha256": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossEvidenceRead"
+            ],
+            "command_operations": [
+              "boss.approval.decide"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.approval.decide",
+              "bossEvidenceRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP08",
+            "name": "boss-sop08",
+            "requirement_id": "FR-08",
+            "version": "0.1.0",
+            "content_sha256": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.message.draft.save",
+              "boss.message.send"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.message.draft.save",
+              "boss.message.send",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP09",
+            "name": "boss-sop09",
+            "requirement_id": "FR-09",
+            "version": "0.1.0",
+            "content_sha256": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_evidence",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.research.prepare"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.research.prepare",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP10",
+            "name": "boss-sop10",
+            "requirement_id": "FR-10",
+            "version": "0.1.0",
+            "content_sha256": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossMeetingsRead"
+            ],
+            "command_operations": [
+              "boss.people.prepare",
+              "boss.people.attach",
+              "boss.people.detach"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.people.attach",
+              "boss.people.detach",
+              "boss.people.prepare",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP11",
+            "name": "boss-sop11",
+            "requirement_id": "FR-11",
+            "version": "0.1.0",
+            "content_sha256": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.travel.review",
+              "boss.travel.confirm",
+              "boss.travel.cancel"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.travel.cancel",
+              "boss.travel.confirm",
+              "boss.travel.review",
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP12",
+            "name": "boss-sop12",
+            "requirement_id": "FR-12",
+            "version": "0.1.0",
+            "content_sha256": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossCalendarSharePreview"
+            ],
+            "command_operations": [
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "boss.calendar.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.calendar.delete",
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "bossCalendarSharePreview",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP13",
+            "name": "boss-sop13",
+            "requirement_id": "FR-13",
+            "version": "0.1.0",
+            "content_sha256": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "read_evidence"
+            ],
+            "command_operations": [
+              "boss.memory.confirm",
+              "boss.memory.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.memory.confirm",
+              "boss.memory.delete",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          }
+        ],
+        "configuration_source": "NATIVE_SKILL_FILES_AND_DISABLED_SKILLS",
+        "configuration_mutation_performed": false,
+        "private_body_available_here": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false,
+        "native_configuration_sha256": "e8be85a71bc1b7600567c7727895204dc85e33e065a5b812a1ac6264dfe115f4",
+        "runtime_admission_ready": true
+      }
+    },
+    {
+      "check": "gui_disable_persists_native_state_and_preserves_model_admission",
+      "status": {
+        "projection": "sop-technical-status",
+        "items": [
+          {
+            "sop_id": "SOP01",
+            "name": "boss-sop01",
+            "requirement_id": "FR-01",
+            "version": "0.1.0",
+            "content_sha256": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "todayRead",
+              "ownerPlansRead",
+              "bossDashboardRead"
+            ],
+            "command_operations": [
+              "todayReorder"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "bossDashboardRead",
+              "ownerPlansRead",
+              "todayRead",
+              "todayReorder"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP02",
+            "name": "boss-sop02",
+            "requirement_id": "FR-02",
+            "version": "0.1.0",
+            "content_sha256": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.reminder.ack",
+              "boss.reminder.snooze",
+              "boss.reminder.close"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.reminder.ack",
+              "boss.reminder.close",
+              "boss.reminder.snooze",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP03",
+            "name": "boss-sop03",
+            "requirement_id": "FR-03",
+            "version": "0.1.0",
+            "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+            "enabled": false,
+            "native_available": false,
+            "read_operations": [
+              "query_metrics",
+              "read_evidence"
+            ],
+            "command_operations": [],
+            "human_only_operations": [],
+            "missing_tools": [],
+            "tool_references_resolved": true,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP04",
+            "name": "boss-sop04",
+            "requirement_id": "FR-04",
+            "version": "0.1.0",
+            "content_sha256": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossEvidenceRead",
+              "meetingArrangementRead"
+            ],
+            "command_operations": [
+              "boss.meeting.brief.prepare",
+              "meetingDraftSave",
+              "meetingConfirm",
+              "meetingCancel",
+              "meetingHeld"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.meeting.brief.prepare",
+              "bossEvidenceRead",
+              "bossMeetingsRead",
+              "meetingArrangementRead",
+              "meetingCancel",
+              "meetingConfirm",
+              "meetingDraftSave",
+              "meetingHeld"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP05",
+            "name": "boss-sop05",
+            "requirement_id": "FR-05",
+            "version": "0.1.0",
+            "content_sha256": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.minutes.save",
+              "boss.minutes.confirm",
+              "boss.minutes.assignment.create"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.minutes.assignment.create",
+              "boss.minutes.confirm",
+              "boss.minutes.save",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP06",
+            "name": "boss-sop06",
+            "requirement_id": "FR-06",
+            "version": "0.1.0",
+            "content_sha256": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_assignment",
+              "bossTasksRead",
+              "ownerPlansRead",
+              "assignmentSourcesRead"
+            ],
+            "command_operations": [
+              "create_assignment",
+              "send_assignment",
+              "boss.assignment.nudge",
+              "boss.assignment.extend",
+              "boss.assignment.complete",
+              "boss.assignment.cancel",
+              "assignmentSourcesConfirm"
+            ],
+            "human_only_operations": [
+              "assignmentSourcesConfirm"
+            ],
+            "missing_tools": [
+              "assignmentSourcesRead",
+              "boss.assignment.cancel",
+              "boss.assignment.complete",
+              "boss.assignment.extend",
+              "boss.assignment.nudge",
+              "bossTasksRead",
+              "ownerPlansRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP07",
+            "name": "boss-sop07",
+            "requirement_id": "FR-07",
+            "version": "0.1.0",
+            "content_sha256": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossEvidenceRead"
+            ],
+            "command_operations": [
+              "boss.approval.decide"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.approval.decide",
+              "bossEvidenceRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP08",
+            "name": "boss-sop08",
+            "requirement_id": "FR-08",
+            "version": "0.1.0",
+            "content_sha256": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.message.draft.save",
+              "boss.message.send"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.message.draft.save",
+              "boss.message.send",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP09",
+            "name": "boss-sop09",
+            "requirement_id": "FR-09",
+            "version": "0.1.0",
+            "content_sha256": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_evidence",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.research.prepare"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.research.prepare",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP10",
+            "name": "boss-sop10",
+            "requirement_id": "FR-10",
+            "version": "0.1.0",
+            "content_sha256": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossMeetingsRead"
+            ],
+            "command_operations": [
+              "boss.people.prepare",
+              "boss.people.attach",
+              "boss.people.detach"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.people.attach",
+              "boss.people.detach",
+              "boss.people.prepare",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP11",
+            "name": "boss-sop11",
+            "requirement_id": "FR-11",
+            "version": "0.1.0",
+            "content_sha256": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.travel.review",
+              "boss.travel.confirm",
+              "boss.travel.cancel"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.travel.cancel",
+              "boss.travel.confirm",
+              "boss.travel.review",
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP12",
+            "name": "boss-sop12",
+            "requirement_id": "FR-12",
+            "version": "0.1.0",
+            "content_sha256": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossCalendarSharePreview"
+            ],
+            "command_operations": [
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "boss.calendar.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.calendar.delete",
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "bossCalendarSharePreview",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP13",
+            "name": "boss-sop13",
+            "requirement_id": "FR-13",
+            "version": "0.1.0",
+            "content_sha256": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "read_evidence"
+            ],
+            "command_operations": [
+              "boss.memory.confirm",
+              "boss.memory.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.memory.confirm",
+              "boss.memory.delete",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          }
+        ],
+        "configuration_source": "NATIVE_SKILL_FILES_AND_DISABLED_SKILLS",
+        "configuration_mutation_performed": false,
+        "private_body_available_here": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false,
+        "native_configuration_sha256": "94828bfe93ba6370386164fbb2b68209d15a759c93cd1d1084468bf5fd140533",
+        "runtime_admission_ready": true
+      },
+      "invalid_inputs": [
+        400,
+        409
+      ],
+      "raw_native_write": 403,
+      "business_sha256": {
+        "task": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "outbox": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "a06_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "service_restart_gui_enable_role_boundaries_and_zero_business_mutation",
+      "status": {
+        "projection": "sop-technical-status",
+        "items": [
+          {
+            "sop_id": "SOP01",
+            "name": "boss-sop01",
+            "requirement_id": "FR-01",
+            "version": "0.1.0",
+            "content_sha256": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "todayRead",
+              "ownerPlansRead",
+              "bossDashboardRead"
+            ],
+            "command_operations": [
+              "todayReorder"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "bossDashboardRead",
+              "ownerPlansRead",
+              "todayRead",
+              "todayReorder"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP02",
+            "name": "boss-sop02",
+            "requirement_id": "FR-02",
+            "version": "0.1.0",
+            "content_sha256": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.reminder.ack",
+              "boss.reminder.snooze",
+              "boss.reminder.close"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.reminder.ack",
+              "boss.reminder.close",
+              "boss.reminder.snooze",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP03",
+            "name": "boss-sop03",
+            "requirement_id": "FR-03",
+            "version": "0.1.0",
+            "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "query_metrics",
+              "read_evidence"
+            ],
+            "command_operations": [],
+            "human_only_operations": [],
+            "missing_tools": [],
+            "tool_references_resolved": true,
+            "context_eligible": true,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP04",
+            "name": "boss-sop04",
+            "requirement_id": "FR-04",
+            "version": "0.1.0",
+            "content_sha256": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossEvidenceRead",
+              "meetingArrangementRead"
+            ],
+            "command_operations": [
+              "boss.meeting.brief.prepare",
+              "meetingDraftSave",
+              "meetingConfirm",
+              "meetingCancel",
+              "meetingHeld"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.meeting.brief.prepare",
+              "bossEvidenceRead",
+              "bossMeetingsRead",
+              "meetingArrangementRead",
+              "meetingCancel",
+              "meetingConfirm",
+              "meetingDraftSave",
+              "meetingHeld"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP05",
+            "name": "boss-sop05",
+            "requirement_id": "FR-05",
+            "version": "0.1.0",
+            "content_sha256": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.minutes.save",
+              "boss.minutes.confirm",
+              "boss.minutes.assignment.create"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.minutes.assignment.create",
+              "boss.minutes.confirm",
+              "boss.minutes.save",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP06",
+            "name": "boss-sop06",
+            "requirement_id": "FR-06",
+            "version": "0.1.0",
+            "content_sha256": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_assignment",
+              "bossTasksRead",
+              "ownerPlansRead",
+              "assignmentSourcesRead"
+            ],
+            "command_operations": [
+              "create_assignment",
+              "send_assignment",
+              "boss.assignment.nudge",
+              "boss.assignment.extend",
+              "boss.assignment.complete",
+              "boss.assignment.cancel",
+              "assignmentSourcesConfirm"
+            ],
+            "human_only_operations": [
+              "assignmentSourcesConfirm"
+            ],
+            "missing_tools": [
+              "assignmentSourcesRead",
+              "boss.assignment.cancel",
+              "boss.assignment.complete",
+              "boss.assignment.extend",
+              "boss.assignment.nudge",
+              "bossTasksRead",
+              "ownerPlansRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP07",
+            "name": "boss-sop07",
+            "requirement_id": "FR-07",
+            "version": "0.1.0",
+            "content_sha256": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossEvidenceRead"
+            ],
+            "command_operations": [
+              "boss.approval.decide"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.approval.decide",
+              "bossEvidenceRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP08",
+            "name": "boss-sop08",
+            "requirement_id": "FR-08",
+            "version": "0.1.0",
+            "content_sha256": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.message.draft.save",
+              "boss.message.send"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.message.draft.save",
+              "boss.message.send",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP09",
+            "name": "boss-sop09",
+            "requirement_id": "FR-09",
+            "version": "0.1.0",
+            "content_sha256": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "read_evidence",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.research.prepare"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.research.prepare",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP10",
+            "name": "boss-sop10",
+            "requirement_id": "FR-10",
+            "version": "0.1.0",
+            "content_sha256": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossMeetingsRead"
+            ],
+            "command_operations": [
+              "boss.people.prepare",
+              "boss.people.attach",
+              "boss.people.detach"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.people.attach",
+              "boss.people.detach",
+              "boss.people.prepare",
+              "bossMeetingsRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP11",
+            "name": "boss-sop11",
+            "requirement_id": "FR-11",
+            "version": "0.1.0",
+            "content_sha256": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "command_operations": [
+              "boss.travel.review",
+              "boss.travel.confirm",
+              "boss.travel.cancel"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.travel.cancel",
+              "boss.travel.confirm",
+              "boss.travel.review",
+              "bossCalendarConflictRead",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP12",
+            "name": "boss-sop12",
+            "requirement_id": "FR-12",
+            "version": "0.1.0",
+            "content_sha256": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "bossCalendarSharePreview"
+            ],
+            "command_operations": [
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "boss.calendar.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.calendar.delete",
+              "boss.calendar.save",
+              "boss.calendar.share",
+              "boss.calendar.share.revoke",
+              "bossCalendarSharePreview",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          },
+          {
+            "sop_id": "SOP13",
+            "name": "boss-sop13",
+            "requirement_id": "FR-13",
+            "version": "0.1.0",
+            "content_sha256": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369",
+            "enabled": true,
+            "native_available": true,
+            "read_operations": [
+              "bossWorkspaceRead",
+              "read_evidence"
+            ],
+            "command_operations": [
+              "boss.memory.confirm",
+              "boss.memory.delete"
+            ],
+            "human_only_operations": [],
+            "missing_tools": [
+              "boss.memory.confirm",
+              "boss.memory.delete",
+              "bossWorkspaceRead"
+            ],
+            "tool_references_resolved": false,
+            "context_eligible": false,
+            "business_authorization_granted": false,
+            "model_adoption_verified": false
+          }
+        ],
+        "configuration_source": "NATIVE_SKILL_FILES_AND_DISABLED_SKILLS",
+        "configuration_mutation_performed": false,
+        "private_body_available_here": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false,
+        "native_configuration_sha256": "20b69c0a57091839e884578f737a188389fd2d3160506c467a87695034a9be0e",
+        "runtime_admission_ready": true
+      },
+      "boss_read_and_update": 403,
+      "previous_token": 401,
+      "renderer_errors": [],
+      "business_sha256": {
+        "task": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "outbox": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "application_directory": "validation/.work/native-skills-b527bc9b-d6c5-41af-92e8-f010a9dd03ea",
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "model_quality_verified": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A19_accepted": false
+}

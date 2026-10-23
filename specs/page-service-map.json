@@ -2768,23 +2768,25 @@
       "logical_architecture_route": "/app/maintain/A06",
       "actual_webui_navigation": "?bossPage=A06",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_NATIVE_SKILLS_HANDOFF",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop + native nanobot Skills",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_NATIVE_SOP_FILES_STATE_AND_CONTEXT",
+      "component_file": "app/webui/MaintainerSkills.tsx",
+      "component_name": "MaintainerSkills",
+      "verified_http_read_routes": ["GET /api/boss/ui/admin/skills"],
+      "code_wired_write_actions": ["skill.update"],
       "other_integration_points": [
-        "native nanobot Skills catalog (#/skills) inside the authenticated Shell"
+        "Same Runtime SkillsLoader, ToolRegistry and native disabled_skills configuration; method changes do not grant business permissions"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "sop.save",
         "sop.validate",
-        "sop.activate"
+        "sop.history.restore"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_product_skills.py",
+        "app/tests/test_boss_native_skills.py"
       ],
       "source_task_ids": [
         "T19",

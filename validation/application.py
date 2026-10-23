@@ -38,6 +38,7 @@ from boss_memory_runtime import OwnerMemoryContext
 from product_runtime import ProductRuntime
 from runtime_owner_read_tools import BossTodayReadTool, BossOwnerPlansReadTool
 from runtime_assignment_source_tool import BossAssignmentSourcesReadTool
+from product_skills import ProductSkills
 from service import application as business_application
 from application_paths import application_work_directory, application_ports
 
@@ -153,11 +154,13 @@ async def serve():
                      BossAssignmentSourcesReadTool(store, "BOSS")):
             registry.register(tool)
     runtime_control = None
+    skills = None
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,
                                          [registry.get(name) for name in registry.tool_names], provider)
         provider.transport_observer = runtime_recorder.observe_transport
         audit.runtime_snapshot = runtime_control.snapshot
+        skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
     async def scheduled(job):
         if job.name == "boss-events":
@@ -177,7 +180,12 @@ async def serve():
     if not (frontend / "index.html").is_file():
         raise FileNotFoundError("固定上游 WebUI 必须完成构建")
     original.gateway.http.static_dist_path = frontend
-    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control)
+    if skills is not None:
+        def apply_skill_state(disabled):
+            loop.context.skills.disabled_skills = set(disabled)
+            loop.subagents.disabled_skills = set(disabled)
+        original.gateway.http.skill_state_action = apply_skill_state
+    channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -208,6 +216,7 @@ async def serve():
                     "guidance_authority_boundary": "Technical prompts do not grant BOSS rights or authorize business writes.",
                 }))
             bot.runtime.add_context_provider(runtime_control.context)
+            bot.runtime.add_context_provider(skills.context)
             bot.runtime.add_context_provider(OwnerMemoryContext(store))
             bot.runtime.add_context_provider(owner_goals_context)
             bot.runtime.add_context_provider(runtime_recorder.context)

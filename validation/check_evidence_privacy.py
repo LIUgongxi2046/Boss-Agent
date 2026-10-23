@@ -20,7 +20,7 @@ def check(application_directory=ROOT / "validation/.work/application"):
     assert all(isinstance(value, str) and value for value in secrets)
     secret_bytes = [value.encode() for value in secrets]
     count = 0
-    for directory in ("evidence", "docs", "specs", "app", "scripts"):
+    for directory in ("evidence", "docs", "specs", "app", "scripts", "agent"):
         for path in (ROOT / directory).rglob("*"):
             if path.is_file() and path.suffix in {".json", ".jsonl", ".xml", ".md", ".py", ".tsx", ".ts", ".cjs", ".css", ".yaml", ".sqlite"}:
                 content = path.read_bytes()
@@ -30,7 +30,7 @@ def check(application_directory=ROOT / "validation/.work/application"):
     return {"status": "PASS_LITERAL_SECRET_CHECK_ONLY", "files_checked": count,
             "secret_sources_checked": len(secrets), "secret_values_recorded": False,
             "application_directory": str(application_directory.relative_to(ROOT)),
-            "scope": "evidence/docs/specs/app/scripts所列文本文件及SQLite文件的凭据字节检查；不替代全部隐私审查"}
+            "scope": "evidence/docs/specs/app/scripts/agent所列文本文件及SQLite文件的凭据字节检查；不替代全部隐私审查"}
 
 
 if __name__ == "__main__":

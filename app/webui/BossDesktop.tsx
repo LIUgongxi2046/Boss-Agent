@@ -23,6 +23,7 @@ import { MaintainerRuntimeRecords } from "./MaintainerRuntimeRecords";
 import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
 import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
 import { MaintainerMemoryStatus } from "./MaintainerMemoryStatus";
+import { MaintainerSkills } from "./MaintainerSkills";
 import { BossAssignmentSourceReview, type AssignmentSourceReviewProjection } from "./BossAssignmentSourceReview";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
@@ -938,27 +939,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                     <GlassButton onClick={()=>navigate("A08")}>返回技术工作台</GlassButton>
                   </Panel>
                 </div>
-              </div> : page === "A06" ? <div className="boss-columns">
-                <div className="boss-column">
-                  <Panel title="SOP 与 Skills" note="A06 · 复用 nanobot 原生目录及工具注册表">
-                    <StatusLine text="SOP 与 Skills 的安装、校验和正式采用由已有 nanobot Settings/Skills 承载；本页不再造一个未经验证的配置引擎。" />
-                    <Value label="已固定的 Agent 核心" value="nanobot v0.3.5"/>
-                    <Value label="业务角色" value="技术维护，不具备老板业务授权"/>
-                    <Value label="本页状态" value="原生设置承接 · 自定义流程版本管理待开发"/>
-                    <div className="boss-actions">
-                      <GlassButton primary onClick={() => {
-                        window.location.hash="#/skills";
-                        navigate("NATIVE");
-                      }}>打开原生 Skills 目录 <ArrowRight size={15}/></GlassButton>
-                    </div>
-                  </Panel>
-                </div>
-                <div className="boss-column">
-                  <Panel title="启用和验证边界">
-                    <StatusLine variant="warn" text="可以进入已认证的开源原生目录；这不表示 PRD 规定的业务 SOP 版本、校验、启用和下一任务采用全部实现。" />
-                  </Panel>
-                </div>
-              </div> : ["A15","F30"].includes(page) ? <>
+              </div> : page === "A06" ? <MaintainerSkills/> : ["A15","F30"].includes(page) ? <>
                 {page === "A15" && <MaintainerRuntimeRecords getToken={getToken}
                   key={runtimeRunId} initialRunId={runtimeRunId}
                   onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>}

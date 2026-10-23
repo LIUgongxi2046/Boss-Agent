@@ -1,6 +1,6 @@
 # Boss-Agent 前端设计
 
-版本：0.4.3；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.5.0和T07 0.6.0-draft，公共Runtime扩展0.2.0等待正式接收，源码版本`ccfca967`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
+版本：0.4.4；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.5.0和T07 0.6.1-draft，公共Runtime扩展0.2.0及原生方法扩展0.1.0等待正式接收，源码版本`1d7276d`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
 
@@ -89,6 +89,7 @@ graph TD
 | ProductRuntimeConfiguration | getToken、onCommand、onDirtyChange、onReload | A08当前配置与独立草稿，保存、静态校验、启用和停止新任务；原请求回执、CAS与D06 |
 | BossAssignmentSourceReview | 当前task_id、Projection、onCommand、onReceipt、onOpenSource、onDirty | F06本人独立确认当前来源，业务状态保持；来源与交办切换受D06保护 |
 | MaintainerMemoryStatus | getToken、onNavigate(page,run_id) | A12当前确认、删除传播及实际上下文选择，只读取技术元信息；关联记录进入A15筛选 |
+| MaintainerSkills | 原生ClientProvider、token、当前Projection | A06十三项方法、版本、摘要与实际工具引用；原生配置启停、独立确认和身份清理 |
 | BossAssignmentFlow等老板组件 | 当前任务、版本、来源及导航回调 | 本人授权、回执、CAS、刷新重读 |
 | BossWorkspaceView | page_id、角色和读取函数 | 通用只读投影；完整映射见page-service-map |
 | MaintainerPromptVersion、Scheduler等 | 服务端维护配置和当前版本 | 保存/校验/启用/采用分别核查 |
@@ -121,6 +122,10 @@ A08采用维护专用运行配置投影与四项boss.runtime动作，字段与�
 F06通过`GET /api/boss/ui/assignment-source-review?task_id=...`读取唯一来源绑定。本人核查后通过`boss.assignment.sources.confirm`、task_version和review_sha256独立确认，任务业务状态保持，发送继续使用独立授权。`bossTask`保存当前选择，查看原文后返回和刷新恢复同一交办；未保存的核查依据在切换来源或交办时进入D06。当前绑定与结果证据分别核查，当前结果证据需要重新提交时明确显示。
 
 A12手动读取维护专用`admin/memory-status`，展示当前版本、本人确认、未来采用资格、最近实际运行的memory_reference及删除各项范围。读取失败清除旧投影，取消终止当前读取，退出卸载组件。页面不提供正文或本人修改能力。本人F13删除后，A12保留历史选择的原版本，新的真实任务记录当前DELETED版本和eligible=false；模型完成观察与模型遵从验证分别展示。历史会话、备份及物理擦除保持NOT_VERIFIED。
+
+A06通过维护专用`GET /api/boss/ui/admin/skills`读取本应用workspace/skills中的十三项原生方法。`skill.update`只允许技术维护身份、准确方法名、明确布尔状态和当前正文摘要；原生HTTP修改入口被拒绝。用户独立确认后在同一原生配置文件锁内保存disabled_skills，执行原生skill_state_action并采用同一Runtime快照。其他模型设置保持不变，启停不签发业务授权。参数、依赖或摘要无效时明确拒绝；结果未知时读取当前状态，不使用业务回执接口推断原生操作结果。
+
+方法上下文使用固定SkillsLoader识别本人明确引用，再由BossSkillCatalog检查当前版本、启停和实际工具依赖；相同原生上下文只加入一次。方法正文编辑、草稿、历史恢复和全部SOP业务结果继续待完成。外部API当前按项目计划13.18使用显式SIMULATED模式，不安排新增真实模型请求；本地方法状态和上下文使用实际实现验证。
 
 ## 7. 验收与接收条件
 

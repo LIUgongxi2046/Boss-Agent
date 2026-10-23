@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: Boss-Agent 公共原生方法扩展
+  version: 0.1.0
+  description: 当前实际本地文件、配置与上下文接口，完整T06正式接收待完成；没有外部模型请求。
+x-reception:
+  state: IN_REVIEW
+  core_version: 1.5.0
+  owner: W3
+  receiver: W1/T06
+  authority: native workspace/skills files and agents.defaults.disabled_skills
+  business_authorization_granted: false
+paths:
+  /api/boss/ui/admin/skills:
+    get:
+      operationId: productNativeSkillsRead
+      x-role: MAINTAINER
+      responses:
+        '200':
+          description: 十三项方法当前版本、摘要、启停及实际工具引用状态；没有正文
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Projection'}
+        '400': {description: 任何查询参数均被拒绝}
+        '401': {description: 身份未认证或令牌失效}
+        '403': {description: 需要技术维护身份}
+        '409': {description: 当前原生文件或其引用无法核验}
+        '503': {description: 当前方法服务尚未准备}
+components:
+  schemas:
+    Sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    Name: {enum: [boss-sop01, boss-sop02, boss-sop03, boss-sop04, boss-sop05, boss-sop06, boss-sop07, boss-sop08, boss-sop09, boss-sop10, boss-sop11, boss-sop12, boss-sop13]}
+    SopID: {enum: [SOP01, SOP02, SOP03, SOP04, SOP05, SOP06, SOP07, SOP08, SOP09, SOP10, SOP11, SOP12, SOP13]}
+    Operations: {type: array, uniqueItems: true, items: {type: string, minLength: 1}}
+    Item:
+      type: object
+      additionalProperties: false
+      required: [sop_id, name, requirement_id, version, content_sha256, enabled, native_available, read_operations, command_operations, human_only_operations, missing_tools, tool_references_resolved, context_eligible, business_authorization_granted, model_adoption_verified]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        name: {$ref: '#/components/schemas/Name'}
+        requirement_id: {type: string, pattern: '^FR-[0-9]{2}$'}
+        version: {type: string, minLength: 1}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        enabled: {type: boolean}
+        native_available: {type: boolean}
+        read_operations: {$ref: '#/components/schemas/Operations'}
+        command_operations: {$ref: '#/components/schemas/Operations'}
+        human_only_operations: {$ref: '#/components/schemas/Operations'}
+        missing_tools: {$ref: '#/components/schemas/Operations'}
+        tool_references_resolved: {type: boolean}
+        context_eligible: {type: boolean}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+    Projection:
+      type: object
+      additionalProperties: false
+      required: [projection, items, configuration_source, configuration_mutation_performed, private_body_available_here, business_authorization_granted, model_adoption_verified, native_configuration_sha256, runtime_admission_ready]
+      properties:
+        projection: {const: sop-technical-status}
+        items: {type: array, minItems: 13, maxItems: 13, items: {$ref: '#/components/schemas/Item'}}
+        configuration_source: {const: NATIVE_SKILL_FILES_AND_DISABLED_SKILLS}
+        configuration_mutation_performed: {const: false}
+        private_body_available_here: {const: false}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+        native_configuration_sha256: {$ref: '#/components/schemas/Sha256'}
+        runtime_admission_ready: {type: boolean}
+    Update:
+      type: object
+      additionalProperties: false
+      required: [name, enabled, expected_content_sha256]
+      properties:
+        name: {$ref: '#/components/schemas/Name'}
+        enabled: {type: boolean}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+    Result:
+      type: object
+      additionalProperties: false
+      required: [name, enabled, deleted, sop_id, version, content_sha256, activation_policy, business_authorization_granted, model_adoption_verified]
+      properties:
+        name: {$ref: '#/components/schemas/Name'}
+        enabled: {type: boolean}
+        deleted: {const: false}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        version: {type: string, minLength: 1}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        activation_policy: {const: NEXT_CONTEXT_LOAD}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+x-websocket-operations:
+  skill.update:
+    role: MAINTAINER
+    request_schema: '#/components/schemas/Update'
+    response_schema: '#/components/schemas/Result'
+    serialization: same native configuration file lock
+    scope: exact current boss-sop01 through boss-sop13 names only
+    persistence: native disabled_skills; desired boolean state is idempotent
+    adoption: apply native skill_state_action and current Runtime snapshot before response
+    errors: [400, 401, 403, 404, 409, 503]
+    recovery: read current file and state after an uncertain response; does not use business operation receipts
