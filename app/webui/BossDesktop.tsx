@@ -41,7 +41,7 @@ import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
-import { BossToday, type TodayProjection } from "./BossToday";
+import { BossToday, type TodayProjection, type TodayOrderReceipt } from "./BossToday";
 import { BossBIView } from "./BossBIView";
 import { MaintainerBIScenarios } from "./MaintainerBIScenarios";
 import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
@@ -454,6 +454,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
        p.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role]);
   const refresh = () => setRequestVersion((v) => v + 1);
+  const readTodayOrder=useCallback((requestId:string,signal?:AbortSignal)=>jsonRequest<TodayOrderReceipt>(
+    "/api/boss/ui/operation-status?action=boss.today.reorder&client_request_id="+encodeURIComponent(requestId),getToken,signal),[getToken]);
   const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
     if (typeof payload.client_request_id !== "string") throw new Error("业务请求缺少原请求编号");
     const receipt = await jsonRequest<{outcome: string}>(
@@ -585,7 +587,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               {role === "BOSS" ? (
                 page === "F01" ? <>
                   <BossToday data={today} loading={loading} error={error} onReload={refresh}
-                    onDirtyChange={setWorkDirty} onReorder={payload => scopedCommand("boss.today.reorder", payload)}
+                    onDirtyChange={setWorkDirty} onReorder={payload => client.requestMutation("boss.today.reorder",payload).then(()=>undefined)} onReadOrder={readTodayOrder}
                     onNavigate={(target, objectId) => target === "F06" ? selectTask(objectId) : navigate(target, objectId)}/>
                   <div className="boss-columns">
                   <div className="boss-column">
