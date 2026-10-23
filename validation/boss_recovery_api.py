@@ -30,6 +30,7 @@ SAFE_RECEIPT_FIELDS = {
     "minute_id", "minute_version", "entry_id", "meeting_id",
     "independent_send_required", "message_sent",
     "application_id", "decision_id",
+    "commitment_id", "external_message_sent", "due_at",
     "authorization_id",
 }
 

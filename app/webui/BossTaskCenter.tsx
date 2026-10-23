@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import { ArrowRight, ClipboardCheck, Clock3, FileSearch,
   Filter, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
 import type { AssignmentTask, TaskFeedback, TaskListResponse } from "./BossAssignmentFlow";
+import { BossPersonalCommitments, type SelfCommitment } from "./BossPersonalCommitments";
 type CenterTask = AssignmentTask & { related_meeting_id?: string };
 
 type Historical = {task_id:string;status:string;due_at?:string;purpose?:string};
 type Response = TaskListResponse & {
   historical_commitment?:Historical|null;
+  self_commitments?:SelfCommitment[];
   business_clock?:string;
   read_at?:string;
   source_type?:string;
@@ -85,7 +87,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
           aria-selected={tab===key} className={tab===key?"selected":""}
           onClick={()=>changeTab(key)}>
           {key}
-          <span>{key==="本人承诺"?(data?.historical_commitment?1:0):
+          <span>{key==="本人承诺"?((data?.self_commitments?.length||0)+(data?.historical_commitment?1:0)):
             key==="他人交办"?tasks.length:
             key==="等待反馈"?tasks.filter(t=>["WAITING_FEEDBACK","IN_PROGRESS"].includes(t.status)).length:
             tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}</span>
@@ -125,6 +127,8 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
           <div className="boss-panel-head"><h2>对象与正式业务记录</h2>
             <small>原版 v6 五列信息 · 数据来自当前有权 SQLite 对象</small></div>
           {tab==="本人承诺" ? <>
+            <BossPersonalCommitments items={data?.self_commitments||[]}
+              businessClock={data?.business_clock} onReload={onReload}/>
             {data?.historical_commitment?<div className="boss-workspace-item">
               <strong>{data.historical_commitment.task_id}</strong>
               <Display name="历史状态" value={data.historical_commitment.status}/>
