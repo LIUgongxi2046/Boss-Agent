@@ -1,0 +1,75 @@
+openapi: 3.1.0
+info:
+  title: BI公开查询与原始依据扩展
+  version: 0.1.0
+  description: 当前已实现产品范围查询和按query_id读取正式原始依据；完整FC02二十项尚未验收。
+x-reception: {state: IN_REVIEW, owner: N3, core_version: 1.8.0}
+security: [{BearerAuth: []}]
+paths:
+  /api/boss/ui/metrics:
+    get:
+      operationId: publicBusinessMetrics
+      x-role: BOSS
+      description: 当前产品范围传给正式query_metrics，其余参数从当前获准数据读取。额外字段及重复参数拒绝。
+      parameters:
+        - {name: products, in: query, required: false, schema: {type: string, minLength: 1}}
+      responses:
+        '200': {description: 当前确定性计算结果, content: {application/json: {schema: {$ref: '#/components/schemas/MetricProjection'}}}}
+        '400': {description: 请求范围或参数不受支持}
+        '401': {description: 未认证}
+        '403': {description: 不是当前本人范围}
+        '409': {description: 来源或数据版本需要复核}
+        '410': {description: 来源撤销或过期}
+  /api/boss/ui/metrics-evidence:
+    get:
+      operationId: publicMetricQueryEvidence
+      x-role: BOSS
+      description: 从持久查询读取实际明细和来源标识，正式read_evidence再次核查本人范围、版本及来源摘要。
+      parameters:
+        - {name: query_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 与当前查询绑定的原始依据, content: {application/json: {schema: {$ref: '#/components/schemas/EvidenceProjection'}}}}
+        '400': {description: 缺少查询编号、额外字段或重复参数}
+        '401': {description: 未认证}
+        '403': {description: 查询不属于当前本人范围}
+        '404': {description: 查询不存在}
+        '409': {description: 来源或明细变化，需要重新查询}
+        '410': {description: 来源撤销或过期}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
+  schemas:
+    MetricProjection:
+      type: object
+      additionalProperties: false
+      required: [source_type, result, read_at]
+      properties:
+        source_type: {const: SIMULATED}
+        result: {$ref: './openapi.yaml#/components/schemas/QueryResult'}
+        read_at: {type: string, format: date-time}
+    EvidenceProjection:
+      type: object
+      additionalProperties: false
+      required: [source_type, query_id, result, read_at]
+      properties:
+        source_type: {const: SIMULATED}
+        query_id: {type: string, minLength: 1, maxLength: 128}
+        result: {$ref: '#/components/schemas/QueryEvidenceResult'}
+        read_at: {type: string, format: date-time}
+    QueryEvidenceResult:
+      type: object
+      additionalProperties: false
+      required: [sources, original_records, definition_version, conflicts, missing_fields]
+      properties:
+        sources: {type: array, minItems: 1, items: {$ref: './openapi.yaml#/components/schemas/QueryResult/properties/sources/items'}}
+        original_records:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [record_id, version, content]
+            properties: {record_id: {type: string, minLength: 1}, version: {type: string, minLength: 1}, content: {type: object}}
+        definition_version: {type: string, minLength: 1}
+        conflicts: {type: array, items: {type: string}}
+        missing_fields: {type: array, items: {type: string}}
+      x-authoritative-validation-schema: selection-probe.json io_schema as standalone schema root evidence_output

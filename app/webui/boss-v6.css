@@ -244,6 +244,11 @@
 .boss-table tbody th{font-weight:650;color:#365c80}
 .boss-table td{color:#234464;font-variant-numeric:tabular-nums}
 .boss-table tr:last-child td,.boss-table tr:last-child th{border-bottom:0}
+.boss-v6 .boss-bi-fields label{font-size:14px;line-height:22px}
+.boss-v6 .boss-bi-fields input,.boss-v6 .boss-bi-fields select{font-size:16px;line-height:24px}
+.boss-v6 .boss-bi-table{font-size:16px;line-height:24px}
+.boss-v6 .boss-bi-table thead th{font-size:14px;line-height:22px}
+.boss-v6 .boss-document-source{font-size:16px;line-height:24px}
 .boss-helper{font-size:12.5px;line-height:1.75;color:#667f98;margin:9px 0}
 .boss-source{
   padding:16px;border-left:3px solid #66a9db;background:#f3faff;color:#254967;

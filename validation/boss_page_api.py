@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import parse_qs
 from aiohttp import web
 
-from business import now
+from business import now, require
 from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
 from boss_recovery_api import BossRecoveryAPI
@@ -308,6 +308,8 @@ class BossPageAPI:
             }
 
     def _metrics(self, query):
+        require(set(query) <= {"products"} and all(len(values) == 1 for values in query.values()),
+                "查询字段或重复参数无效", web.HTTPBadRequest)
         data = self._snapshot()
         raw = query.get("products", ["product-1,product-2"])[0]
         products = [v.strip() for v in raw.split(",") if v.strip()]
@@ -342,6 +344,26 @@ class BossPageAPI:
             "result": result,
             "read_at": now(),
         }
+
+    def _metrics_evidence(self, query):
+        require(set(query) == {"query_id"} and len(query["query_id"]) == 1,
+                "原始依据需要唯一查询编号", web.HTTPBadRequest)
+        query_id = query["query_id"][0]
+        require(isinstance(query_id, str) and 1 <= len(query_id) <= 128, "查询编号无效", web.HTTPBadRequest)
+        with self.store.connect() as db:
+            db.execute("BEGIN")
+            self.store.active(db, self.namespace)
+            initial = self.store.get(db, self.namespace, "initial", "snapshot")
+            original = self.store.get(db, self.namespace, "query", query_id)
+            envelope = original["envelope"]
+            require(envelope["owner_id"] == initial["owner_id"] and envelope["execution_namespace"] == self.namespace
+                    and all(envelope[key] == initial[key] for key in ("dataset_id", "dataset_version")),
+                    "查询不属于当前本人范围", web.HTTPForbidden)
+            require(bool(original["detail_refs"]), "当前查询没有可读取的明细", web.HTTPConflict)
+            source_ids = [source["source_id"] for source in original["sources"]]
+        result = self.store.invoke("read_evidence", {"envelope": {**envelope, "request_id":str(uuid.uuid4()), "session_id":"boss-ui"},
+                    "query_id":query_id, "source_ids":source_ids, "detail_refs":original["detail_refs"]})
+        return 200, {"source_type":"SIMULATED", "query_id":query_id, "result":result, "read_at":now()}
 
     def _model_runtime(self, role: str):
         """Project metadata-only model/probe log; never return prompts or API keys."""
@@ -558,6 +580,8 @@ class BossPageAPI:
                 return self._evidence(query)
             if path == "/api/boss/ui/metrics":
                 return self._metrics(query)
+            if path == "/api/boss/ui/metrics-evidence":
+                return self._metrics_evidence(query)
             return 404, {"error": "API_NOT_FOUND"}
         except web.HTTPException as error:
             # No stack traces or sensitive object text in the renderer.
