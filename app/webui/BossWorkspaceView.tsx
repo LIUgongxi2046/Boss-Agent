@@ -10,10 +10,10 @@ export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
   F02: "notifications",
 
 
-  F13: "memory", F25: "dataset", F26: "plans",
+  F13: "memory", F25: "dataset",
   F28: "authorizations", F29: "decisions",
-  F32: "system", N06: "notifications", N07: "memory",
-  N08: "notifications", N09: "plans", N10: "authorizations",
+  F32: "system", N06: "notifications",
+  N09: "plans", N10: "authorizations",
   N11: "decisions", D02: "authorizations", D09: "notifications",
   A01: "system", A02: "tool-catalog", A03: "dataset",
   A09: "tool-catalog",
