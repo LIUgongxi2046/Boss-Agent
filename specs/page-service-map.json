@@ -42,7 +42,8 @@
     "FR05->FR06 confirmed minute entry link is independently authorized and creates exactly one OPEN task per entry/version; sending still requires separate BOSS action. Latest creation/sending validates coordinator validity against actual simulation clock.",
     "A05 now renders real versioned Prompt save/structure validation/activation/deactivation and MAINTAINER-only runtime context loading metadata; activation alone does not prove a DeepSeek call or evaluation quality. Technical guidance cannot modify BOSS permissions.",
     "N05 now renders source Desktop v6 tab/filter/five-column task center, using current simulated business clock and persisted task/feedback/source/due-event records; actions lead to F06 owner confirmation. Browser screenshot and acceptance still NOT_RUN.",
-    "F04/F06 newly persisted material and follow-up draft IDs are carried only in authenticated React state to F08 for review; this does not send automatically, disclose to MAINTAINER, or bypass source/version/owner validations."
+    "F04/F06 newly persisted material and follow-up draft IDs are carried only in authenticated React state to F08 for review; this does not send automatically, disclose to MAINTAINER, or bypass source/version/owner validations.",
+    "FR06 owner-confirmed task nudge is a separate write after initial authorized send, with stable contact, current source pins, 24h simulated business-clock cooldown, and a metadata-only linked message in F06/N05. No external delivery or task completion is inferred."
   ],
   "pages": [
     {
@@ -322,7 +323,8 @@
         "boss.assignment.send",
         "boss.assignment.complete",
         "boss.assignment.extend",
-        "boss.assignment.cancel"
+        "boss.assignment.cancel",
+        "boss.assignment.nudge"
       ],
       "other_integration_points": [
         "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks"
@@ -341,7 +343,8 @@
         "app/tests/test_boss_command_api.py",
         "app/tests/test_boss_recovery.py",
         "app/tests/test_boss_minutes_assignment_chain.py",
-        "app/tests/test_v6_minutes_approval_ui.py"
+        "app/tests/test_v6_minutes_approval_ui.py",
+        "app/tests/test_boss_assignment_nudge.py"
       ],
       "source_task_ids": [
         "T18",
@@ -1757,7 +1760,8 @@
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
-        "app/tests/test_boss_task_center.py"
+        "app/tests/test_boss_task_center.py",
+        "app/tests/test_boss_assignment_nudge.py"
       ],
       "source_task_ids": [
         "T18",
