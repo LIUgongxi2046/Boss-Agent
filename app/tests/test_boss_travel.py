@@ -123,7 +123,8 @@ def test_private_calendar_and_task_due_are_checked_not_hidden_or_guessed(app):
     assert [x["task_id"] for x in impact["task_deadlines"]] == ["historical-1"]
     assert impact["meeting"]["start_overlap"] is False
     assert impact["meeting"]["end_known"] is False
-    assert "private_body" not in json.dumps(impact)
+    assert "private_body" not in impact["private_calendar"]
+    assert "不能外泄的私人内容" not in json.dumps(impact, ensure_ascii=False)
     assert action(cmd, "boss.travel.confirm", "trip-missing-ack",
                   **confirm_input(draft, acknowledge_conflicts=False))[0] == 409
     assert action(cmd, "boss.travel.confirm", "trip-valid-ack",
@@ -235,7 +236,7 @@ def test_source_and_private_calendar_change_invalidate_stale_review(app):
         "acknowledge_conflict": False,
     })
     assert changed[0] == 200, changed
-    assert read(pages)[1]["plans"][1]["pending_is_current"] is False
+    assert next(p for p in read(pages)[1]["plans"] if p["travel_id"] == other["travel_id"])["pending_is_current"] is False
     assert action(cmd, "boss.travel.confirm", "trip-calendar-changed",
                   **confirm_input(other))[0] == 409
 
