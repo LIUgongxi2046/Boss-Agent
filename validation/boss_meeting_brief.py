@@ -13,6 +13,7 @@ from datetime import datetime
 from aiohttp import web
 from business import now, require
 from boss_travel import meeting_impacts
+from boss_people import meeting_impacts as people_meeting_impacts
 
 NS="ui-check"
 
@@ -135,6 +136,7 @@ def compile_brief(db,data):
         },
         "metrics":calculation,
         "travel_impacts":meeting_impacts(db,meeting),
+        "people_meeting_impacts":people_meeting_impacts(db,meeting),
         "missing_items":sorted(set(missing)),
         "needs_review":bool(missing),
         "prepared_for_owner":data["owner_id"],
@@ -203,7 +205,8 @@ def briefing_projection(db,data):
     participant_changed=old["participants"]!=current["participants"]
     # Other changes (e.g. new task or simulated event state) also need review.
     business_changed=(old["commitments"]!=current["commitments"] or old["event"]!=current["event"]
-                      or old.get("travel_impacts",[])!=current["travel_impacts"])
+                      or old.get("travel_impacts",[])!=current["travel_impacts"]
+                      or old.get("people_meeting_impacts",[])!=current["people_meeting_impacts"])
     changed=source_changed or participant_changed or business_changed or old["metrics"]!=current["metrics"]
     status="NEEDS_REVIEW" if changed or current["needs_review"] else stored["state"]
     revisions=[
