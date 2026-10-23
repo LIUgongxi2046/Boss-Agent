@@ -66,7 +66,7 @@ type Pending = {
   action:string;payload:Record<string,unknown>;key:string;
   title:string;lines:string[];
 };
-type Props = {pageId:"F08"|"F12";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void};
+type Props = {pageId:"F08"|"F12";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;focusDraftId?:string;onFocusDraftConsumed?:()=>void};
 
 function Block({title,note,children}: {title:string;note?:string;children:ReactNode}) {
   return <section className="boss-panel">
@@ -198,7 +198,7 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
   return {propose,dialog,status,error,busy};
 }
 
-export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props) {
+export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusDraftId,onFocusDraftConsumed}:Props) {
   const {getToken}=useClient();
   const isMessage=pageId==="F08";
   const [state,setState]=useState<Outbox|CalendarData|null>(null);
@@ -250,6 +250,16 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource}:Props
     }).then(data=>{
       if(abort.signal.aborted)return;
       setState(data);setLoading(false);
+      if(isMessage&&focusDraftId){
+        const matched=(data as Outbox).drafts.find(d=>d.draft_id===focusDraftId);
+        if(matched){
+          setSelectedDraft(matched.draft_id);setSelectedRecipient(matched.recipient_id);
+          setRelatedTask(matched.related_task_id||"");setMessageBody(matched.body);
+          setAttachmentId(matched.attachment_refs[0]?.source_id||"");
+          setAttachmentVersion(matched.attachment_refs[0]?.version||"1");
+          setDirty(false);onFocusDraftConsumed?.();
+        }else setError("原跨页面草稿已不在当前有权范围，请重新核查发件箱。");
+      }
       if(!isMessage&&!dirty){
         const c=(data as CalendarData).calendar;
         setStart(splitDate(c.starts_at));setEnd(splitDate(c.ends_at));

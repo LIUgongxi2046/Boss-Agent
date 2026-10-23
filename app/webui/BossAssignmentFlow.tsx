@@ -58,7 +58,7 @@ type Action =
   | "boss.message.draft.save";
 type Result = {
   task_id?: string; task?: { task_id: string; status: string; version: string };
-  status?: string; version?: string; feedback_id?: string;
+  status?: string; version?: string; feedback_id?: string; draft_id?: string;
 };
 type Pending = {
   action: Action; payload: Record<string, unknown>;
@@ -76,7 +76,7 @@ function required(value: string, field: string): string {
 }
 function displayTime(value?: string) { return value ? value.replace("T", " ") : "待核查"; }
 
-function useTransaction(onReload: () => void, onCreated?: (id: string) => void) {
+function useTransaction(onReload: () => void, onCreated?: (id: string) => void, onMessageDraftCreated?: (id: string) => void) {
   const { client, getToken } = useClient();
   const [lookupBusy,setLookupBusy] = useState(false);
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -128,6 +128,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
         pending.action, { ...pending.payload, client_request_id: pending.id },
       );
       if (pending.action === "boss.assignment.create" && result.task_id) onCreated?.(result.task_id);
+      if (pending.action === "boss.message.draft.save" && result.draft_id) onMessageDraftCreated?.(result.draft_id);
       setNotice("实际模拟业务已保存。状态：" + (result.status || result.task?.status || "已记录") +
         "；交办：" + (result.task_id || result.task?.task_id || "未知") + "。请重读当前状态。");
       setPending(null); setApproved(false); onReload();
@@ -137,7 +138,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
       setError((e instanceof Error ? e.message : String(e)) +
         "。结果可能待核查，请先重读正式状态；本弹窗重试使用同一幂等标识。");
     } finally { setBusy(false); }
-  }, [approved, busy, client, onCreated, onReload, pending]);
+  }, [approved, busy, client, onCreated, onMessageDraftCreated, onReload, pending]);
   const reconcile = useCallback(async () => {
     if (!pending || busy || lookupBusy) return;
     const token = getToken();
@@ -159,6 +160,8 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
       if(body.outcome==="RECORDED"&&body.result){
         if(pending.action==="boss.assignment.create"&&body.result.task_id)
           onCreated?.(body.result.task_id);
+        if(pending.action==="boss.message.draft.save"&&body.result.draft_id)
+          onMessageDraftCreated?.(body.result.draft_id);
         setNotice("已从实际 SQLite 幂等回执核实该交办动作已保存，任务状态正在重读。");
         setPending(null);setApproved(false);onReload();
       }else if(body.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
@@ -168,7 +171,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
     } catch(e) {
       setError(e instanceof Error?e.message:String(e));
     }finally{setLookupBusy(false);}
-  },[pending,busy,lookupBusy,getToken,onCreated,onReload]);
+  },[pending,busy,lookupBusy,getToken,onCreated,onMessageDraftCreated,onReload]);
   const dialog = pending ? <div className="boss-confirm-backdrop">
     <section ref={dialogRef} tabIndex={-1} className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-confirm-title">
       <h3 id="boss-confirm-title"><ShieldCheck size={19}/> {pending.title}</h3>
@@ -195,7 +198,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void) 
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
   draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker,
-  onViewMessages }: {
+  onViewMessages, onMessageDraftCreated }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string) => void; onReload: () => void;
   onViewSource: () => void; context: AssignmentContext | null;
@@ -204,10 +207,11 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   onDraftSaved: () => void;
   onOpenCoordinatorPicker: () => void; onOpenDuePicker: () => void;
   onViewMessages: () => void;
+  onMessageDraftCreated: (id: string) => void;
 }) {
   const { propose, dialog, notice, busy } = useTransaction(onReload, id => {
     onSelectTask(id); onDraftSaved();
-  });
+  }, onMessageDraftCreated);
   const {purpose,coordinator,due,evidence,body,newDue,reason}=draft;
   const [error,setError]=useState("");
   const rows=tasks?.tasks||[];

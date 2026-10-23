@@ -222,6 +222,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   }, []);
   const [productScope, setProductScope] = useState("product-1,product-2");
   const [selectedTaskId, setSelectedTaskId] = useState("");
+  const [draftToReview, setDraftToReview] = useState("");
   const [sourceId, setSourceId] = useState("finance-note");
   const [sourceAnchor, setSourceAnchor] = useState<{
     source_id:string;version:string;start:number;end:number;
@@ -633,6 +634,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onOpenCoordinatorPicker={()=>navigate("D04")}
                   onOpenDuePicker={()=>navigate("D05")}
                   onViewMessages={()=>navigate("F08")}
+                  onMessageDraftCreated={setDraftToReview}
                 /> :
                 (page==="D04"||page==="D05") ? <BossAssignmentPicker
                   key={page} pageId={page} contacts={dashboard?.contacts||[]}
@@ -798,7 +800,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 /> :
                 (page === "F08" || page === "F12") ? <BossCommunicationCalendar
                   key={page} pageId={page} onViewSource={goSource}
-                  onNavigate={id=>navigate(id)}
+                  onNavigate={id=>navigate(id)} focusDraftId={draftToReview}
+                  onFocusDraftConsumed={()=>setDraftToReview("")}
                 /> :
                 page === "F09" ? <BossResearchView
                   key={page} onNavigate={id=>navigate(id)}
@@ -806,6 +809,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 /> :
                 page === "F04" ? <BossMeetingBrief
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
+                  onMessageDraftCreated={setDraftToReview}
                 /> :
                 (page === "F05" || page === "F07") ? <BossMeetingApprovalView
                   key={page} pageId={page}

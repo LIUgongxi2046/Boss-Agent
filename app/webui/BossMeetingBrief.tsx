@@ -31,7 +31,7 @@ type Pending={action:string;payload:Record<string,unknown>;id:string;
 type Receipt={action:string;client_request_id:string;outcome:string;result?:{
   version?:string;state?:string;status?:string;draft_id?:string;
 }};
-type Props={onNavigate:(page:string)=>void;onViewSource:(id:string)=>void};
+type Props={onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;onMessageDraftCreated:(id:string)=>void};
 
 const textTime=(raw:string)=>raw.replace("T"," ");
 function Panel({title,children,note}:{title:string;note?:string;children:ReactNode}){
@@ -43,7 +43,7 @@ function Panel({title,children,note}:{title:string;note?:string;children:ReactNo
 function Fact({label,value}:{label:string;value:string|number|null|undefined}){
   return <div className="boss-kv"><span>{label}</span><strong>{value??"未知"}</strong></div>;
 }
-export function BossMeetingBrief({onNavigate,onViewSource}:Props){
+export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}:Props){
   const {client,getToken}=useClient();
   const [data,setData]=useState<Briefing|null>(null);
   const [revision,setRevision]=useState(0);
@@ -113,6 +113,7 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
     try{
       const r=await client.requestMutation<{state?:string;status?:string;version?:string;
         draft_id?:string}>(pending.action,{...pending.payload,client_request_id:pending.id});
+      if(pending.action==="boss.message.draft.save"&&r.draft_id)onMessageDraftCreated(r.draft_id);
       setNotice("已保存实际模拟业务结果："+(r.state||r.status||"DRAFT")+
         "；版本 "+(r.version||"1")+
         "。资料请求只成为草稿，不会发送。");
@@ -139,6 +140,7 @@ export function BossMeetingBrief({onNavigate,onViewSource}:Props){
       if(outcome.action!==pending.action||outcome.client_request_id!==pending.id)
         throw Error("操作标识不匹配");
       if(outcome.outcome==="RECORDED"){
+        if(pending.action==="boss.message.draft.save"&&outcome.result?.draft_id)onMessageDraftCreated(outcome.result.draft_id);
         setNotice("服务端确认当前动作已落库，正在重读正式业务状态。");
         setPending(null);setApproved(false);reload();
       }else if(outcome.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
