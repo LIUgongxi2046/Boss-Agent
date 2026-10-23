@@ -8,6 +8,8 @@ from boss_page_api import BossPageAPI
 
 
 class BossResearchSourcesTool(Tool):
+    allowed_projections=frozenset({"research"})
+
     def __init__(self, store, role, *, observation_sink: Callable[[dict], None] | None = None):
         require(role is not None, "需要认证身份", web.HTTPUnauthorized)
         require(role == "BOSS", "研究原文只允许本人读取", web.HTTPForbidden)

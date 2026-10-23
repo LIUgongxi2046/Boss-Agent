@@ -63,6 +63,9 @@ class BossSkillCatalog:
             if references != operations:
                 raise web.HTTPConflict(text="方法正文的工具引用与当前定义不一致：" + name)
             missing = sorted(operations - HUMAN_ONLY_OPERATIONS - registered)
+            workspace_reader = self.registry.get("bossWorkspaceRead")
+            allowed_projections = frozenset(getattr(workspace_reader, "allowed_projections", ()))
+            missing_projections = sorted(set(binding.get("workspace_projections", [])) - allowed_projections)
             enabled = name not in self.loader.disabled_skills
             items.append({
                 "sop_id": sop_id, "name": name, "requirement_id": sop["requirement_id"],
@@ -70,8 +73,10 @@ class BossSkillCatalog:
                 "enabled": enabled, "native_available": name in available,
                 "read_operations": binding["read_operations"], "command_operations": binding["command_operations"],
                 "human_only_operations": sorted(operations & HUMAN_ONLY_OPERATIONS),
-                "missing_tools": missing, "tool_references_resolved": not missing,
-                "context_eligible": enabled and name in available and not missing,
+                "missing_tools": missing, "missing_projections": missing_projections,
+                "tool_references_resolved": not missing and not missing_projections,
+                "projection_references_resolved": not missing_projections,
+                "context_eligible": enabled and name in available and not missing and not missing_projections,
                 "business_authorization_granted": False, "model_adoption_verified": False,
             })
             documents[name] = content
@@ -101,7 +106,7 @@ class BossSkillCatalog:
             raise web.HTTPNotFound(text="当前方法不存在")
         if item["content_sha256"] != expected_content_sha256:
             raise web.HTTPConflict(text="方法内容已经变化，需要重新核查")
-        if enabled and item["missing_tools"]:
+        if enabled and (item["missing_tools"] or item["missing_projections"]):
             raise web.HTTPConflict(text="方法工具引用尚未全部注册")
         if not config_path.is_file():
             raise web.HTTPConflict(text="当前原生运行配置文件缺少")
@@ -128,7 +133,7 @@ class BossSkillCatalog:
         chosen = [indexed[sop_id] for sop_id in sop_ids]
         for item in chosen:
             if not item["context_eligible"]:
-                raise web.HTTPConflict(text="当前方法停用、依赖不可用或工具引用缺少：" + item["name"])
+                raise web.HTTPConflict(text="当前方法停用、依赖不可用或工具与投影引用缺少：" + item["name"])
         # 正文读取沿用原生机制，输出前再次核查本次版本及工具引用。
         block = self.loader.build_explicit_skill_runtime_context(" ".join("$" + item["name"] for item in chosen))
         current, latest_documents = self._snapshot()
