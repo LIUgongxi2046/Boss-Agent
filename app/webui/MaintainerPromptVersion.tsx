@@ -55,6 +55,7 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
   const [sources,setSources]=useState("");
   const [dirty,setDirty]=useState(false);
   const [pending,setPending]=useState<Pending|null>(null);
+  const [discardIntent,setDiscardIntent]=useState<{kind:Kind;chosen:string}|null>(null);
   const [approved,setApproved]=useState(false);
   const [busy,setBusy]=useState(false);
   const [lookupBusy,setLookupBusy]=useState(false);
@@ -117,13 +118,27 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
   const addedLines=currentLines.filter(l=>!oldLines.includes(l));
   const active=data?.active.find(a=>a.kind===kind);
   const candidates=data?.drafts.filter(p=>p.kind===kind)||[];
-  function selectPrompt(id:string) {
-    if(dirty&&!window.confirm("当前有未保存修改，确定放弃并切换版本吗？"))return;
+  function selectPrompt(id:string,force=false) {
+    if(dirty&&!force){setDiscardIntent({kind,chosen:id});return;}
     setChosen(id);const selected=data?.drafts.find(p=>p.prompt_id===id);
     setTitle(selected?.title||"");setBody(selected?.instruction_text||"");
     setChangeNote(selected?.change_note||"");
     setSources(selected?.source_refs.map(x=>x.source_id).join(", ")||"");
     setDirty(false);setError("");setNotice("");
+  }
+  function changeKind(next:Kind,force=false){
+    if(next===kind)return;
+    if(dirty&&!force){setDiscardIntent({kind:next,chosen:""});return;}
+    setKind(next);setChosen("");setTitle("");setBody("");
+    setChangeNote("");setSources("");setDirty(false);
+    setError("");setNotice("");
+  }
+  function confirmDiscard(){
+    const next=discardIntent;
+    setDiscardIntent(null);
+    if(!next)return;
+    if(next.kind!==kind)changeKind(next.kind,true);
+    else selectPrompt(next.chosen,true);
   }
   function prepare(action:string,fields:Record<string,unknown>,label:string,scope:string[]){
     setPending({key:"boss-"+crypto.randomUUID(),action,fields,title:label,details:scope});
@@ -249,9 +264,7 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
           <div className="boss-minutes-tabs" role="tablist">
             {KINDS.map(row=><button type="button" role="tab" key={row.id}
               aria-selected={row.id===kind} className={row.id===kind?"selected":""}
-              onClick={()=>{if(dirty&&!window.confirm("放弃当前未保存修改？"))return;
-                setKind(row.id);setChosen("");setTitle("");setBody("");
-                setChangeNote("");setSources("");setDirty(false);}}>
+              onClick={()=>changeKind(row.id)}>
               {row.label} <span>{data?.drafts.filter(x=>x.kind===row.id).length||0}</span>
             </button>)}
           </div>
@@ -356,6 +369,21 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
         </section>
       </div>
     </div>
+    {discardIntent&&<div className="boss-confirm-backdrop">
+      <section className="boss-confirm" role="dialog" aria-modal="true"
+        aria-labelledby="boss-a05-discard-title">
+        <h3 id="boss-a05-discard-title"><AlertCircle size={18}/> 未保存修改（D06）</h3>
+        <p>当前 Prompt 草稿已编辑但尚未保存。离开后不会保留本次输入，
+          服务端仍保持上一次正式保存的内容和版本。</p>
+        <div className="boss-actions">
+          <button type="button" className="boss-btn" onClick={()=>setDiscardIntent(null)}>
+            返回继续编辑
+          </button>
+          <button type="button" className="boss-btn boss-btn-primary"
+            onClick={confirmDiscard}>明确放弃草稿并切换</button>
+        </div>
+      </section>
+    </div>}
     {pending&&<div className="boss-confirm-backdrop">
       <section className="boss-confirm" ref={modalRef} tabIndex={-1} role="dialog" aria-modal="true"
         aria-labelledby="boss-a05-confirm-title">
