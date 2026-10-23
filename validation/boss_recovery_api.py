@@ -35,6 +35,7 @@ SAFE_RECEIPT_FIELDS = {
     "authorization_id",
     "plan_id", "date", "item_ids",
     "meeting_version", "review_sha256", "meeting_changed", "invitation_sent", "independent_tasks_unchanged",
+    "historical_only",
 }
 
 

@@ -20,6 +20,7 @@ from boss_owner_preferences import owner_profile
 from boss_admin_config import memory_technical_status, prompt_technical_status
 from boss_owner_plans import OwnerPlansAPI
 from boss_today import TodayAPI
+from boss_meetings import MeetingAPI, meeting_materials
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -53,12 +54,12 @@ class BossPageAPI:
     def _snapshot(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            return self.store.get(db, self.namespace, "initial", "snapshot")
+            return meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
 
     def _dashboard(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             clock = self.store.get(db, self.namespace, "clock", "current")
             tasks = self._items(db, self.namespace, "task")
             notifications = self._items(db, self.namespace, "notification")
@@ -112,7 +113,7 @@ class BossPageAPI:
     def _tasks(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             task_messages = [{
                 "message_id": row["message_id"],
                 "task_id": row["task_id"],
@@ -283,7 +284,7 @@ class BossPageAPI:
             return 400, {"error": "SOURCE_REQUIRED"}
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             # Current documented records are the source of truth, including
             # applications created later by the authorized simulation editor.
             # Never trust an arbitrary client locator or path.
@@ -478,11 +479,13 @@ class BossPageAPI:
                 return 200, self._model_runtime(role)
             if role != "BOSS":
                 return 403, {"error": "FORBIDDEN"}
-            if path in ("/api/boss/ui/today", "/api/boss/ui/owner-plans"):
+            if path in ("/api/boss/ui/today", "/api/boss/ui/owner-plans", "/api/boss/ui/meeting-arrangement"):
                 if query_string:
                     return 400, {"error": "INVALID_INPUT"}
                 if path == "/api/boss/ui/today":
                     return 200, TodayAPI(self.store).read(role)
+                if path == "/api/boss/ui/meeting-arrangement":
+                    return 200, MeetingAPI(self.store).read(role)
                 return 200, OwnerPlansAPI(self.store).read(role)
             if path == "/api/boss/ui/dashboard":
                 return 200, self._dashboard()

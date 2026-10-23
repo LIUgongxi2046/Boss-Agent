@@ -17,6 +17,7 @@ import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } 
 import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
+import { BossMeetingArrangement, type MeetingArrangementProjection } from "./BossMeetingArrangement";
 import { BossTravelView } from "./BossTravelView";
 import { BossPeopleMeeting } from "./BossPeopleMeeting";
 import { BossOwnerPreferences } from "./BossOwnerPreferences";
@@ -272,6 +273,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [promptTechnicalView, setPromptTechnicalView] = useState<PromptTechnicalView | null>(null);
   const [today, setToday] = useState<TodayProjection | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
+  const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
   const [loading, setLoading] = useState(false);
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState("");
@@ -302,13 +304,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (!bypassDirty && ((page === "F06" && assignmentDirty &&
         !["D04","D05","D01"].includes(id)) ||
         (["N07","N08"].includes(page) && settingsDirty) ||
-        (["F01","N09"].includes(page) && workDirty)) && id !== page) {
+        (["F01","F04","N09"].includes(page) && workDirty)) && id !== page) {
       setPendingNavigation({id,focus});
       return;
     }
     if (id !== page) setPreviousPage(page);
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
-    if (id !== page && ["F01","N09"].includes(page)) setWorkDirty(false);
+    if (id !== page && ["F01","F04","N09"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -350,6 +352,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (role === "BOSS") {
       if (page === "F01") read<TodayProjection>("/api/boss/ui/today", setToday);
       if (page === "N09") read<OwnerPlanProjection>("/api/boss/ui/owner-plans", setOwnerPlans);
+      if (page === "F04") read<MeetingArrangementProjection>("/api/boss/ui/meeting-arrangement", setMeetingArrangement);
       if (["F01", "F06", "D04", "D05", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
       if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
@@ -872,10 +875,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 page === "F11" ? <BossTravelView
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
                 /> :
-                page === "F04" ? <BossMeetingBrief
+                page === "F04" ? <><BossMeetingArrangement
+                  data={meetingArrangement} loading={loading} error={error}
+                  onReload={refresh} onCommand={scopedCommand} onDirtyChange={setWorkDirty}
+                /><BossMeetingBrief
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
                   onMessageDraftCreated={setDraftToReview}
-                /> :
+                  refreshVersion={requestVersion}
+                /></> :
                 (page === "F05" || page === "F07") ? <BossMeetingApprovalView
                   key={page} pageId={page}
                   onViewSource={goSource}
@@ -1072,6 +1079,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         <h3 id="boss-unsaved-title"><AlertCircle size={19}/> 未保存修改（D06）</h3>
         <p>{["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
+          page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
           "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p>
         <div className="boss-actions">

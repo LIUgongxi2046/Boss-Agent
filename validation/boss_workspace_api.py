@@ -9,7 +9,6 @@ Endpoints are deliberately under the authenticated RoleChannel gateway.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -23,6 +22,9 @@ from boss_travel import projection as travel_projection
 from boss_people import projection as people_projection
 from boss_owner_preferences import goals_projection, notice_projection, effective_owner_notice
 from boss_recovery_api import calendar_share_state
+from boss_meetings import meeting_materials
+from boss_memory import confirmed_memory
+from boss_owner_authorizations import authorization_can_revoke
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -43,14 +45,6 @@ def _object_list(db, namespace, kind, limit=100):
         (namespace, kind, limit),
     ).fetchall()
     return [json.loads(row[0]) for row in require]
-
-
-def _future_authorization_expiry(raw):
-    try:
-        value = datetime.fromisoformat(raw)
-        return value.tzinfo is not None and value > datetime.now(timezone.utc)
-    except (TypeError, ValueError):
-        return False
 
 
 def _safe_date(raw):
@@ -91,8 +85,9 @@ class BossWorkspaceAPI:
         if key not in allowed:
             return 403, {"error": "FORBIDDEN"}
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             output = self._read(db, data, key, role, query_string)
         output["read_at"] = now()
         output["source_type"] = "SIMULATED"
@@ -283,8 +278,8 @@ class BossWorkspaceAPI:
                     "confirmation_state": current["confirmation_state"],
                     "text": current.get("text", "") if current["confirmation_state"] == "CONFIRMED" else "",
                 },
-                "effective": current["confirmation_state"] == "CONFIRMED",
-                "future_turn_policy": "CONFIRMED_ONLY",
+                "effective": confirmed_memory(db, self.namespace, current, data["owner_id"]) is not None,
+                "future_turn_policy": "CURRENT_NON_REVOKED_CONFIRMATION_ONLY",
                 "physical_secure_erasure_verified": False,
             }
         if key == "calendar":
@@ -316,7 +311,8 @@ class BossWorkspaceAPI:
                 "meeting": {
                     "meeting_id": data["meeting"]["meeting_id"],
                     "starts_at": data["meeting"]["starts_at"],
-                    "ends_at": None, "end_is_known": False,
+                    "ends_at": data["meeting"].get("ends_at"),
+                    "end_is_known": bool(data["meeting"].get("ends_at")),
                 },
                 "visibility": "BOSS_PRIVATE",
                 "external_share_created": False,
@@ -430,14 +426,7 @@ class BossWorkspaceAPI:
                     "content_version", "version", "revoked", "revoked_at",
                     "valid_from", "valid_until", "scope",
                 ) if k in row},
-                "can_revoke": bool(
-                    row.get("issuer_identity") == "BOSS"
-                    and row.get("owner_id") == data["owner_id"]
-                    and row.get("scope") == self.namespace
-                    and row.get("action") != "authorization.revoke"
-                    and not row.get("revoked")
-                    and _future_authorization_expiry(row.get("valid_until"))
-                ),
+                "can_revoke": authorization_can_revoke(row, data["owner_id"], self.namespace),
             } for row in rows],
             "revocation_only_affects_future_use": True,
             "historical_actions_reversed": False,

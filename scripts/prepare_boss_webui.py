@@ -102,6 +102,7 @@ def copy_overlay() -> None:
         ("BossMeetingApproval.tsx", "BossMeetingApproval.tsx"),
         ("BossMinutesAssignmentActions.tsx", "BossMinutesAssignmentActions.tsx"),
         ("BossMeetingBrief.tsx", "BossMeetingBrief.tsx"),
+        ("BossMeetingArrangement.tsx", "BossMeetingArrangement.tsx"),
         ("BossTravelView.tsx", "BossTravelView.tsx"),
         ("BossPeopleMeeting.tsx", "BossPeopleMeeting.tsx"),
         ("BossOwnerPreferences.tsx", "BossOwnerPreferences.tsx"),

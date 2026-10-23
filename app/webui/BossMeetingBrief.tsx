@@ -36,7 +36,7 @@ type Pending={action:string;payload:Record<string,unknown>;id:string;
 type Receipt={action:string;client_request_id:string;outcome:string;result?:{
   version?:string;state?:string;status?:string;draft_id?:string;
 }};
-type Props={onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;onMessageDraftCreated:(id:string)=>void};
+type Props={onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;onMessageDraftCreated:(id:string)=>void;refreshVersion?:number};
 
 const textTime=(raw:string)=>raw.replace("T"," ");
 function Panel({title,children,note}:{title:string;note?:string;children:ReactNode}){
@@ -48,7 +48,7 @@ function Panel({title,children,note}:{title:string;note?:string;children:ReactNo
 function Fact({label,value}:{label:string;value:string|number|null|undefined}){
   return <div className="boss-kv"><span>{label}</span><strong>{value??"未知"}</strong></div>;
 }
-export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}:Props){
+export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated,refreshVersion=0}:Props){
   const {client,getToken}=useClient();
   const [data,setData]=useState<Briefing|null>(null);
   const [revision,setRevision]=useState(0);
@@ -85,7 +85,7 @@ export function BossMeetingBrief({onNavigate,onViewSource,onMessageDraftCreated}
       setError(e instanceof Error?e.message:String(e));setLoading(false);
     });
     return ()=>controller.abort();
-  },[revision,getToken]);
+  },[revision,getToken,refreshVersion]);
 
   useEffect(()=>{
     if(!pending)return;

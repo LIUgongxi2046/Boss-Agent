@@ -1268,7 +1268,7 @@
       "depends_on": [
         "T09"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/Boss-Agent项目计划.md",
         "specs/implementation-map.json",
@@ -1277,7 +1277,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["T09完整评审未通过；历史E00-STRATEGY环境绝对路径与当前独立目录不同，全量台账校验尚未通过。"]
     },
     {
       "id": "T11",

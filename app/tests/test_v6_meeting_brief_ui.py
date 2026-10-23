@@ -19,9 +19,11 @@ def test_f04_is_a_real_business_component_not_a_generic_readonly_page():
     assert catalog["F04"]["title"]=="会前材料"
     assert page["component_file"]=="app/webui/BossMeetingBrief.tsx"
     assert page["role_gate"]=="BOSS"
-    assert page["render_status"]=="PARTIAL_VERSIONED_MEETING_BRIEF_AND_F08_DRAFT"
+    assert page["render_status"]=="PARTIAL_OWNER_MEETING_LIFECYCLE_BRIEF_AND_F08_DRAFT"
+    assert page["additional_component_files"]==["app/webui/BossMeetingArrangement.tsx"]
     assert set(page["code_wired_write_actions"])=={
         "boss.meeting.brief.prepare","boss.message.draft.save",
+        "boss.meeting.draft.save","boss.meeting.confirm","boss.meeting.cancel","boss.meeting.held",
     }
     assert "meeting_brief.prepare" not in page["operations_not_yet_implemented"]
     assert page["actual_e2e_verified"] is False
@@ -47,6 +49,8 @@ def test_f04_uses_authenticated_mutation_and_source_version_ui():
             assert required in view
     assert "BossMeetingBrief" in shell
     assert '"BossMeetingBrief.tsx"' in build
+    assert '"BossMeetingArrangement.tsx"' in build
+    assert 'read<MeetingArrangementProjection>("/api/boss/ui/meeting-arrangement"' in shell
     assert "dangerouslySetInnerHTML" not in view
     assert "localStorage" not in view
     assert "eval(" not in view

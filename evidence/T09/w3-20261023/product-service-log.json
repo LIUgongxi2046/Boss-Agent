@@ -1,7 +1,7 @@
 {
   "status": "PASS_PRODUCT_SERVICE_LOG_FORMAT_ONLY",
-  "lines_checked": 967,
-  "log_sha256": "5e91aa409e9c4c3bb936af7b8351c773dca85a526f1f215e6abdb75e68de6518",
+  "lines_checked": 1920,
+  "log_sha256": "e414a52c8b71d5429152f75d795073c23a8187a08cbbbb9014f7ecadab6dfbcb",
   "source_sha256": "16e035606773e08511a62a5d5ac667aea8106c11fe03fa0bba8a2232856158ce",
   "actual_model_output_assembly_observed": true,
   "message_body_and_traceback_formatted": false,

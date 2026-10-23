@@ -39,6 +39,7 @@ from boss_travel import review as travel_review, confirm as travel_confirm, canc
 from boss_people import prepare as people_prepare, attach as people_attach, detach as people_detach
 from boss_owner_preferences import (goals_save, goals_confirm, notice_save, notice_confirm)
 from boss_owner_authorizations import revoke as owner_authorization_revoke
+from boss_meetings import MeetingAPI, meeting_materials
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -121,6 +122,10 @@ class BossCommandAPI:
         "boss.reminder.snooze": "BOSS",
         "boss.reminder.close": "BOSS",
         "boss.meeting.brief.prepare": "BOSS",
+        "boss.meeting.draft.save": "BOSS",
+        "boss.meeting.confirm": "BOSS",
+        "boss.meeting.cancel": "BOSS",
+        "boss.meeting.held": "BOSS",
         "boss.research.prepare": "BOSS",
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
@@ -174,7 +179,9 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action.startswith("boss.owner.plan."):
+            if action in ("boss.meeting.draft.save", "boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held"):
+                result = MeetingAPI(self.store).execute(role, action.removeprefix("boss.meeting."), payload)
+            elif action.startswith("boss.owner.plan."):
                 from boss_owner_plans import OwnerPlansAPI
                 result = OwnerPlansAPI(self.store).execute(role, action.removeprefix("boss.owner.plan."), payload)
             elif action == "boss.today.reorder":
@@ -285,7 +292,7 @@ class BossCommandAPI:
             key, digest, prev = self._check_existing(db, action, payload)
             if prev is not None:
                 return prev
-            data = self.store.get(db, NAMESPACE, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, NAMESPACE, "initial", "snapshot"))
             if action == "boss.assignment.create":
                 result = self._create(db, data, payload, key)
             elif action == "boss.assignment.send":
@@ -506,7 +513,7 @@ class BossCommandAPI:
         # Feedback is a response to a *sent* assignment, never a way for
         # the maintainer to forge a task state before the owner authorizes send.
         task = self.store.get(db, NAMESPACE, "task", body["task_id"])
-        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS"),
+        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS", "CANCELED"),
                 "当前交办不接受新的模拟反馈")
         # Feedback may cite only currently available, scope-checked simulated
         # sources. The maintainer has no capability to forge a source ID.
@@ -521,7 +528,8 @@ class BossCommandAPI:
             "version": result["task"]["version"],
             "status": result["task"]["status"],
         }, "feedback_id": result["feedback"]["feedback_id"],
-                "feedback_kind": result["feedback"]["kind"]}
+                "feedback_kind": result["feedback"]["kind"],
+                "historical_only": result["task"]["status"] == "CANCELED"}
 
     def _decide(self, db, payload, action):
         fields = {"client_request_id", "task_id", "task_version", "feedback_id"}
@@ -622,6 +630,7 @@ class BossCommandAPI:
             text=payload["text"].strip(),
             confirmation_state="CONFIRMED",
             version=str(int(current["version"]) + 1),
+            authorization_id=auth_id,
         )
         current["memory_version"] = current["version"]
         # No raw text in the authorization, idempotency receipt or audit log.

@@ -12,6 +12,15 @@
   "visual_reference": ["Boss-Agent-Desktop-Complete-v6/meta/页面配置.json", "Boss-Agent-Desktop-Complete-v6/meta/v6-状态关联.json", "Boss-Agent-Desktop-Complete-v6/design-tokens.json"],
   "visual_policy": "禁止主动视觉操作，视觉验收保持未执行。",
   "integration_owner": "W3",
+  "integration_shared_paths": [
+    {"path":"app/tests/test_boss_command_api.py","owner":"W3","task_id":"T11","scope":"公共命令行为与历史反馈的真实SQLite检查"},
+    {"path":"app/webui/BossMeetingBrief.tsx","owner":"W3","task_id":"T11","scope":"仅增加公共refreshVersion属性及读取依赖；资料与领域界面仍归W1"},
+    {"path":"app/webui/BossWorkspaceView.tsx","owner":"W3","task_id":"T11","scope":"公共记忆采用与持续授权撤销提示"},
+    {"path":"app/tests/test_product_meeting_access.py","owner":"W3","task_id":"T11","scope":"当前会议公共读取、动作、回执与历史反馈的真实SQLite检查"},
+    {"path":"app/tests/test_product_memory_access.py","owner":"W3","task_id":"T11","scope":"记忆确认授权关联、公共采用状态与重启检查"},
+    {"path":"app/tests/test_v6_meeting_brief_ui.py","owner":"W3","task_id":"T08","scope":"W1会议组件交接后的公共页面与构建映射"},
+    {"path":"validation/boss_recovery_api.py","owner":"W3","task_id":"T11","scope":"公共回执字段白名单；领域行为仍归W1"}
+  ],
   "public_file_policy": "第13.2节公共文件由 W3 编辑；W1/W2 通过各项主记录交付接入需求。",
   "profiles": {
     "design": {"checks": ["核对完整需求、字段、权限、使用方和依赖；结构检查通过后进行独立语义审阅"], "output": "evidence/{task_id}/{run_id}/"},

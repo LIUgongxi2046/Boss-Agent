@@ -353,7 +353,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         {route==="memory"&&<Layer title="长期决定与个人记忆" description="仅本人可修改 · FR-13">
           <Fact label="业务状态">{v(w.memory?.confirmation_state)}</Fact>
           <Fact label="当前版本">{v(w.memory?.version)}</Fact>
-          <Fact label="新会话采用">{w.effective?"本人已经确认采用":"不采用（已删除/未确认）"}</Fact>
+          <Fact label="新会话采用">{w.effective?"本人已经确认采用":"当前确认无效，后续会话停止采用"}</Fact>
           <label className="boss-label" htmlFor="boss-memory-input">本人确认的持续要求</label>
           <textarea id="boss-memory-input" rows={5} value={draft}
             onChange={e=>{setDraft(e.target.value);setDirty(true);}}
@@ -459,6 +459,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
           <Notice message="记录中的 SENT 仅为本地模拟发件箱结果，不证明真实外部渠道已投递、送达或回复。"/>
         </Layer>}
         {route==="authorizations"&&<Layer title="本人动作授权" description="FR-28 · 有效期、动作与对象">
+          <p className="boss-helper">持续设置可以停止后续采用；可撤销资格由服务端核查。历史业务记录继续保留。</p>
           {(w.authorizations||[]).map((a,i)=><div className="boss-workspace-item" key={a.authorization_id+String(i)}>
             <div className="boss-workspace-item-top"><strong>{a.action}</strong>
               <span className={"boss-tag "+(a.revoked?"boss-tag-amber":"boss-tag-blue")}>{a.revoked?"已撤销":"未撤销"}</span></div>
