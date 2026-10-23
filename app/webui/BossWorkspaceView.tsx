@@ -9,7 +9,7 @@ import { useClient } from "@/providers/ClientProvider";
 export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
   F02: "notifications",
 
-  F10: "organization",
+
   F13: "memory", F25: "dataset", F26: "plans",
   F28: "authorizations", F29: "decisions",
   F32: "system", N06: "notifications", N07: "memory",
