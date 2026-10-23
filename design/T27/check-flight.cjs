@@ -42,6 +42,13 @@ async function main() {
     await page.goto(`http://127.0.0.1:${instance.port}`);
     await page.locator('[data-heading]').waitFor({ timeout: 5000 });
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    const layers = await page.locator('.boss-login-flight').evaluate(layer => ({
+      flight: Number(getComputedStyle(layer).zIndex), content: Number(getComputedStyle(document.querySelector('.boss-login-content')).zIndex),
+      interaction: getComputedStyle(layer).pointerEvents,
+    }));
+    assert.ok(layers.flight > layers.content, '飞鸟必须位于登录内容前景');
+    assert.equal(layers.interaction, 'none');
+    assert.equal(await page.evaluate(() => CSS.supports('mix-blend-mode', 'plus-lighter')), true);
     const capture = await page.locator('[data-flight="active"]').evaluate(async bird => {
       const records = [];
       const begin = performance.now();
@@ -50,9 +57,18 @@ async function main() {
       while (Number(bird.dataset.flightLeg) < firstCircuit + 2 || performance.now() - begin < 30000) {
         const box = bird.getBoundingClientRect();
         const bounds = bird.closest('main').getBoundingClientRect();
-        const matrix = new DOMMatrix(getComputedStyle(bird.querySelector('.boss-login-bird-facing')).transform);
+        const sideStyle = getComputedStyle(bird.querySelector('.boss-login-bird-facing'));
+        const frontStyle = getComputedStyle(bird.querySelector('.boss-login-bird-turn'));
+        const matrix = new DOMMatrix(sideStyle.transform);
+        const frontMatrix = new DOMMatrix(frontStyle.transform);
+        const heading = Number(bird.dataset.heading);
         records.push({ time: renderedAt, x: box.x + box.width / 2, y: box.y + box.height / 2,
-          headX: matrix.m11, headY: matrix.m12, heading: Number(bird.dataset.heading), circuit: Number(bird.dataset.flightLeg),
+          headX: matrix.m11, headY: matrix.m12, heading, circuit: Number(bird.dataset.flightLeg),
+          sideOpacity: Number(sideStyle.opacity), frontOpacity: Number(frontStyle.opacity),
+          visibleWidth: Number(sideStyle.opacity) * Math.hypot(matrix.m11, matrix.m12) + Number(frontStyle.opacity),
+          pitch: Math.atan(matrix.m12 / matrix.m11),
+          bank: Math.atan2(frontMatrix.m12, frontMatrix.m11),
+          scale: Number.parseFloat(getComputedStyle(bird.querySelector('.boss-login-bird-depth')).scale),
           contained: box.left >= bounds.left - 1 && box.top >= bounds.top - 1 && box.right <= bounds.right + 1 && box.bottom <= bounds.bottom + 1 });
         if (performance.now() - begin > 90000) throw new Error('飞行周期没有连续完成');
         const previousFrame = renderedAt;
@@ -67,14 +83,24 @@ async function main() {
       const dy = current.y - previous.y;
       const distance = Math.hypot(dx, dy);
       const headLength = Math.hypot(current.headX, current.headY);
+      const elapsed = (current.time - previous.time) / 1000;
       return { dx, dy, elapsed: current.time - previous.time, speed: distance / ((current.time - previous.time) / 1000),
-        facing: headLength > 0.02 && distance > 0.1 ? (dx * current.headX + dy * current.headY) / (distance * headLength) : 1,
+        facing: distance > 0.1 ? (dx * Math.cos(current.heading) + dy * Math.sin(current.heading)) / distance : 1,
+        sideFacing: current.sideOpacity > 0.5 && headLength > 0.02 && distance > 0.1 ? (dx * current.headX + dy * current.headY) / (distance * headLength) : 1,
+        pitchSpeed: Math.abs(current.pitch - previous.pitch) / elapsed,
+        scaleSpeed: Math.abs(current.scale - previous.scale) / elapsed,
+        scaleAcceleration: index > 0 ? Math.abs((current.scale - previous.scale) / elapsed -
+          (previous.scale - samples[index - 1].scale) / ((previous.time - samples[index - 1].time) / 1000)) / elapsed : 0,
         turn: Math.abs(Math.atan2(Math.sin(current.heading - previous.heading), Math.cos(current.heading - previous.heading))) };
     });
     fs.writeFileSync(path.join(root, '.work/t27-flight-samples.json'), JSON.stringify({ samples, movements }, null, 2));
     assert.ok(samples.every(sample => sample.contained), '飞行必须保持在内容视口内');
     assert.ok(capture.completedCircuits >= 2, '必须连续完成两个飞行周期');
     assert.ok(movements.every(movement => movement.facing > 0), '鸟的朝向必须与实际位移保持一致');
+    assert.ok(movements.every(movement => movement.sideFacing > 0), '侧面姿态必须保持向前');
+    assert.ok(samples.every(sample => sample.visibleWidth > 0.8 && Math.abs(sample.frontOpacity + sample.sideOpacity - 1) < 0.001), '转弯姿态必须连续可见');
+    assert.ok(samples.every(sample => sample.scale >= 0.619 && sample.scale <= 0.941 && Math.abs(sample.bank) <= 0.151 && Math.abs(sample.pitch) <= 0.301), '缩放与飞行角度必须保持范围');
+    assert.ok(movements.every(movement => movement.pitchSpeed < 1 && movement.scaleSpeed < 0.09 && movement.scaleAcceleration < 0.12), '姿态与透视变化必须平滑');
     assert.ok(movements.some(movement => movement.dx > 1) && movements.some(movement => movement.dx < -1), '必须覆盖两个水平方向');
     assert.ok(movements.every(movement => movement.turn < 0.5), '转弯必须连续');
     assert.ok(movements.every(movement => movement.speed > 12 && movement.speed < 180), '飞行速度必须连续且保持范围');
@@ -86,6 +112,10 @@ async function main() {
       minimumFacingDot: Math.min(...movements.map(movement => movement.facing)),
       maximumTurnRadians: Math.max(...movements.map(movement => movement.turn)),
       minimumSpeed: Math.min(...movements.map(movement => movement.speed)), maximumSpeed: Math.max(...movements.map(movement => movement.speed)),
+      layers, minimumVisibleWidth: Math.min(...samples.map(sample => sample.visibleWidth)),
+      minimumScale: Math.min(...samples.map(sample => sample.scale)), maximumScale: Math.max(...samples.map(sample => sample.scale)),
+      maximumPitchSpeed: Math.max(...movements.map(movement => movement.pitchSpeed)), maximumScaleSpeed: Math.max(...movements.map(movement => movement.scaleSpeed)),
+      maximumScaleAcceleration: Math.max(...movements.map(movement => movement.scaleAcceleration)),
       source_sha256: { ...sources, ...Object.fromEntries(['design/T27/check-flight.cjs', 'design/T27/assets/boss-flight-sprite.png'].map(file => [file, hash(path.join(root, file))])) },
       source_scope: 'COMPILED_BUILD_SNAPSHOT', artifact_sha256: artifacts,
       visual: 'NOT_RUN' };

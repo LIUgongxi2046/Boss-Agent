@@ -9,11 +9,10 @@ import { createHash } from "node:crypto";
 const upstream = process.env.BOSS_UPSTREAM_WEBUI;
 if (!upstream) throw new Error("需要指定已核查的上游前端源码路径");
 const project = path.resolve("../../..");
-const nativeZoom = process.env.BOSS_T27_BUILD_VARIANT === "native-zoom";
-const reviewVariant = process.env.BOSS_T27_BUILD_VARIANT === "review-flight" ? "review-flight" : "review";
-const review = process.env.BOSS_T27_BUILD_VARIANT === reviewVariant;
-const isolatedBuild = nativeZoom || review;
-const zoomDirectory = path.join(project, nativeZoom ? ".work/t27-native-zoom" : `.work/t27-${reviewVariant}`);
+const variant = process.env.BOSS_T27_BUILD_VARIANT ?? "default";
+if (!["default", "native-zoom", "review", "review-flight", "review-natural"].includes(variant)) throw new Error("构建目标无效");
+const isolatedBuild = variant !== "default";
+const zoomDirectory = path.join(project, `.work/t27-${variant}`);
 const inputs = [path.join(project, "app/webui/BossLogin.tsx"), path.join(project, "app/webui/boss-login.css"),
   path.resolve("main.tsx"), path.join(upstream, "src/App.tsx"), path.join(upstream, "src/boss-agent/BossDesktop.tsx")];
 const digest = (file: string) => createHash("sha256").update(fs.readFileSync(file)).digest("hex");

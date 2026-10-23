@@ -13,10 +13,10 @@
 .boss-login-welcome h1{font-size:clamp(28px,3vw,40px)}
 .boss-v6.boss-login{position:relative;isolation:isolate}
 .boss-login-content{position:relative;z-index:2}
-.boss-login-flight{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.boss-login-flight{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
 .boss-login-flying-bird{position:absolute;left:0;top:0;width:clamp(120px,16vw,200px);aspect-ratio:1;offset-anchor:50% 50%;offset-rotate:0deg;will-change:offset-distance}
-.boss-login-bird-depth{width:100%;height:100%;will-change:scale}
-.boss-login-bird-facing{width:100%;height:100%;will-change:transform}
+.boss-login-bird-depth{position:relative;width:100%;height:100%;isolation:isolate;will-change:scale}
+.boss-login-bird-facing,.boss-login-bird-turn{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:plus-lighter;will-change:transform,opacity}
 .boss-login-bird-frame{width:100%;height:100%;overflow:hidden}
 .boss-login-bird-frame img{display:block;max-width:none;width:400%;height:200%;animation:boss-login-wingbeat .96s steps(1,end) infinite;animation-play-state:var(--boss-wing-play-state,running)}
 @keyframes boss-login-wingbeat{0%,100%{transform:translate(0,0)}12.5%{transform:translate(-25%,0)}25%{transform:translate(-50%,0)}37.5%{transform:translate(-75%,0)}50%{transform:translate(0,-50%)}62.5%{transform:translate(-25%,-50%)}75%{transform:translate(-50%,-50%)}87.5%{transform:translate(-75%,-50%)}}

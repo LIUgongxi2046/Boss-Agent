@@ -28,20 +28,20 @@
     "sha256": "c78e73133875870b6e1af3e2214fd625c13acfc57aee00d8a8f06f27503e9782"
   },
   "repository_files_checked": 5056,
-  "audit_files_checked": 4,
+  "audit_files_checked": 5,
   "source_sha256": {
-    "app/webui/BossLogin.tsx": "45af64a84c05374f0ec431bc671a997cd26122414017a9f2101a60830867518c",
-    "app/webui/boss-login.css": "76d44b4237803035bc01afa194e530473339aa547d6e53f121cf256ea2370a90",
+    "app/webui/BossLogin.tsx": "7bd7ed92859ed291252f777b7a3a0d678072601c2012044af3659a9ea5e00b8e",
+    "app/webui/boss-login.css": "c2572f06a2d14dea2c6edf87a25ec3bb18171196fa827ab2c0a18549ccb1bbef",
     "validation/boss_account_auth.py": "83d50c78fbc9a4c4f97823ca6fc9581e119cb94a5a95921e8e43631dba103f4f",
     "validation/desktop/branding.cjs": "3292dce1a14e0788318295d6db8115875a2d1069b080bcd6b39688aef735d710",
     "design/T27/harness/main.tsx": "2c4e33c03e29424c17004349b8a2936b9da91d3d861065047401a4906b638091",
-    "design/T27/harness/vite.config.ts": "cd18302cffb5c9661341965b29e34aba6af76b236afffd6b741f672346f12bfd",
-    "design/T27/server.py": "fb64c6dcecab1984749e342e477fc3c70ad90c8b779ae4e9e9dece5ca032bf97",
+    "design/T27/harness/vite.config.ts": "5b4adbb85a885e93fb817380e8110de144853dbaba152563f6b08f4c5e8f1329",
+    "design/T27/server.py": "1ea9f8fec3ceb0012336eb5b6e6d887ceaa5057c85b8815c72c4c1c7331c9bb5",
     "design/T27/check-native-zoom.cjs": "52790a96d9e05567a43be3001710f720b6e19a276567d9b3732d02441711d26d",
     "design/T27/zoom-host.cjs": "36c5c35a857217b7070508073d5775b4761b7883455d12637c8af0dd391e24ae",
-    "design/T27/check-flight.cjs": "add8abcbec91b82c72ff8acd32dbf4fe723ad4293a75cfe78823f5d55b917194",
-    "design/T27/open-review.cjs": "901d865a0f4361552d6911a30518b377082454741d6d967ce44ee0b2c1ec709a",
-    "design/T27/review-host.cjs": "d285003bede65d63a3baeb0cee43d81ec293986d9b60618d9cd3b282e976a753",
+    "design/T27/check-flight.cjs": "2402c6f2b8cbd3961e540f21d6a255baf7c2e870701ded2386ad3a35f3139a44",
+    "design/T27/open-review.cjs": "b58b3f7a069f2bef37c8da00d4f850407ccc442f747e24687b36d5284d4b132e",
+    "design/T27/review-host.cjs": "768a5ac1bd7890dc24a6b896c02211d20ecd5728d76aec7292da999d1a0d3cf8",
     "validation/desktop/check-login-polish.cjs": "d2c6993a490470fd48ac17f83cf6198d36fc8cbd442f8158ef085ebe177c4a0b"
   },
   "visual": "NOT_RUN"

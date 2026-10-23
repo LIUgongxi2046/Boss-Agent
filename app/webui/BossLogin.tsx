@@ -75,19 +75,23 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
     if (!facing) throw new Error("飞行方向容器缺失");
     const depth = image.querySelector<HTMLElement>(".boss-login-bird-depth");
     if (!depth) throw new Error("飞行远近容器缺失");
+    const turn = image.querySelector<HTMLElement>(".boss-login-bird-turn");
+    if (!turn) throw new Error("飞行转弯容器缺失");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     let animation: Animation | null = null;
-    let depthAnimation: Animation | null = null;
     let frame = 0;
     let stopped = false;
     let completed = 0;
     let pathLength = 0;
+    let nearScale = 0.9;
+    let pitch = 0;
+    let previousFrame = 0;
     const random = (minimum: number, maximum: number) => minimum + Math.random() * (maximum - minimum);
     const speed = random(70, 84);
     const clamp = (value: number, minimum: number, maximum: number) => Math.max(minimum, Math.min(maximum, value));
-    function orient() {
+    function orient(now: number) {
       frame = 0;
-      if (stopped || !image || !facing || !animation || document.hidden) return;
+      if (stopped || !image || !facing || !depth || !turn || !animation || document.hidden) return;
       const progress = animation.effect?.getComputedTiming().progress;
       if (progress === null || progress === undefined) throw new Error("飞行动画进度缺失");
       const distance = progress * pathLength;
@@ -97,9 +101,21 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
       const dy = after.y - before.y;
       const heading = Math.atan2(dy, dx);
       const direction = dx >= 0 ? 1 : -1;
-      const pitch = clamp(Math.atan2(dy, Math.abs(dx)) * direction, -0.55, 0.55);
-      const yaw = Math.acos(clamp(dx / Math.hypot(dx, dy) * 4, -1, 1));
+      const targetPitch = clamp(Math.atan2(dy, Math.abs(dx)) * direction, -0.3, 0.3);
+      const elapsed = previousFrame ? Math.min((now - previousFrame) / 1000, 0.1) : 0;
+      pitch = previousFrame ? pitch + clamp(targetPitch - pitch, -elapsed * Math.PI / 4, elapsed * Math.PI / 4) : targetPitch;
+      previousFrame = now;
+      const yaw = Math.acos(clamp(dx / Math.hypot(dx, dy), -1, 1));
+      const turnBlend = Math.sin(yaw) ** 2;
+      const bank = Math.sin(heading) * Math.cos(heading) * 0.3;
       facing.style.transform = `rotate(${pitch}rad) rotateY(${yaw}rad)`;
+      facing.style.opacity = String(1 - turnBlend);
+      turn.style.transform = `rotate(${bank}rad)`;
+      turn.style.opacity = String(turnBlend);
+      // 透视距离连续变化，接近与远离的连接位置保持平滑。
+      const approach = (1 - Math.cos(progress * Math.PI * 2)) / 2;
+      const distanceToCamera = 1 / 0.62 + (1 / nearScale - 1 / 0.62) * approach;
+      depth.style.scale = String(1 / distanceToCamera);
       image.dataset.heading = String(heading);
       frame = requestAnimationFrame(orient);
     }
@@ -119,27 +135,24 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
       path.setAttribute("d", route);
       pathLength = path.getTotalLength();
       const duration = pathLength / speed * 1000;
-      const targetDepth = random(0.86, 1);
+      nearScale = random(0.86, 0.94);
       if (animation) { animation.onfinish = null; animation.cancel(); }
-      depthAnimation?.cancel();
       image.style.offsetPath = `path("${route}")`;
       animation = image.animate([{ offsetDistance: "0%" }, { offsetDistance: "100%" }], { duration, easing: "linear", fill: "forwards" });
-      depthAnimation = depth.animate([{ scale: 0.5, opacity: 0.89 }, { scale: targetDepth, opacity: 1 }, { scale: 0.5, opacity: 0.89 }],
-        { duration, easing: "ease-in-out", fill: "forwards" });
       image.dataset.flight = "active";
       image.dataset.flightLeg = String(++completed);
-      image.dataset.depthTarget = String(targetDepth);
+      image.dataset.depthTarget = String(nearScale);
       animation.onfinish = fly;
       image.style.setProperty("--boss-wing-play-state", document.hidden ? "paused" : "running");
-      if (document.hidden) { animation.pause(); depthAnimation.pause(); }
+      if (document.hidden) animation.pause();
       else if (!frame) frame = requestAnimationFrame(orient);
     }
     function visibility() {
       image?.style.setProperty("--boss-wing-play-state", document.hidden ? "paused" : "running");
       if (document.hidden) {
-        animation?.pause(); depthAnimation?.pause(); cancelAnimationFrame(frame); frame = 0;
+        animation?.pause(); cancelAnimationFrame(frame); frame = 0; previousFrame = 0;
       } else {
-        animation?.play(); depthAnimation?.play();
+        animation?.play();
         if (!frame) frame = requestAnimationFrame(orient);
       }
     }
@@ -151,7 +164,6 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
       observer.disconnect();
       document.removeEventListener("visibilitychange", visibility);
       cancelAnimationFrame(frame);
-      depthAnimation?.cancel();
       if (animation) { animation.onfinish = null; animation.cancel(); }
     };
   }, [reducedMotion]);
@@ -195,7 +207,10 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
   return <main ref={surface} className="boss-v6 boss-login" aria-busy={busy}>
     {!reducedMotion && <div className="boss-login-flight" aria-hidden="true">
       <div ref={mascot} className="boss-login-flying-bird" data-motion="animated">
-        <div className="boss-login-bird-depth"><div className="boss-login-bird-facing"><div className="boss-login-bird-frame"><img src="/boss-brand/boss-flight-sprite.png" data-flap="eight-frame" alt="" onError={() => setAssetError(true)}/></div></div></div>
+        <div className="boss-login-bird-depth">
+          <div className="boss-login-bird-facing"><div className="boss-login-bird-frame"><img src="/boss-brand/boss-flight-sprite.png" data-flap="eight-frame" alt="" onError={() => setAssetError(true)}/></div></div>
+          <div className="boss-login-bird-turn"><div className="boss-login-bird-frame"><img src="/boss-brand/boss-flight-sprite.png" data-flap="turn-frame" alt="" onError={() => setAssetError(true)}/></div></div>
+        </div>
       </div>
     </div>}
     <div className="boss-login-content">

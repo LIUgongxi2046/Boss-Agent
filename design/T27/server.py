@@ -24,9 +24,9 @@ REVIEW = os.environ.get("BOSS_T27_REVIEW") == "1"
 if NATIVE_ZOOM and REVIEW:
     raise ValueError("验证环境与查看环境必须分别启动")
 REVIEW_REVISION = os.environ.get("BOSS_T27_REVIEW_REVISION", "")
-if REVIEW_REVISION not in ("", "flight"):
+if REVIEW_REVISION not in ("", "flight", "natural"):
     raise ValueError("查看窗口版本无效")
-REVIEW_NAME = "t27-review-flight" if REVIEW_REVISION == "flight" else "t27-review"
+REVIEW_NAME = f"t27-review-{REVIEW_REVISION}" if REVIEW_REVISION else "t27-review"
 WORK = ROOT / ("validation/.work/t27-native-zoom/service" if NATIVE_ZOOM else
                f"validation/.work/{REVIEW_NAME}/service" if REVIEW else
                "validation/.work/t27-preview" if os.environ.get("BOSS_T27_PREVIEW") == "1" else "validation/.work/t27")

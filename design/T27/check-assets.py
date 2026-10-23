@@ -36,7 +36,7 @@ for value in paths:
     assert all(account["password"].encode() not in content for account in accounts), "文件包含账号秘密"
     checked += 1
 audits = [ROOT / "validation/.work" / name / "audit.jsonl" for name in
-          ("t27", "t27-native-zoom/service", "t27-review/service", "t27-review-flight/service")]
+          ("t27", "t27-native-zoom/service", "t27-review/service", "t27-review-flight/service", "t27-review-natural/service")]
 audits = [file for file in audits if file.exists()]
 for file in audits:
     assert all(account["password"].encode() not in file.read_bytes() for account in accounts), "认证审计包含秘密"
