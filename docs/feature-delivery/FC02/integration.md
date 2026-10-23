@@ -18,7 +18,7 @@ Runtime 保存 FC02、明确 SIMULATED 事件、真实工具摘要、查询编�
 
 GET /api/boss/ui/bi/dimensions 返回当前来源提供的维度、期间、指标定义和未知范围；GET /bi/query、/bi/receipt、/bi/history 分别读取已有查询、原请求及本人请求列表。全部需要 BOSS 身份，严格拒绝额外参数、重复字段和未登记路径。原始依据入口为 GET /api/boss/ui/metrics-evidence?query_id=...，实际明细与来源由持久查询读取。
 
-F03/N03 使用 BossBIView，覆盖指标、地区/地区范围、产品、法人、当前与比较期间、币种、数量单位、交易范围、定义/目标版本、业务口径、结算、客户及资产/成本归属。可选未知信息保持 null。比较期间可以逐项明确指定业务条件，其余条件继承当前范围。继续追问显示父查询、明确覆盖字段及继承条件；修改问题或范围后清理旧结果和旧依据响应。
+F03/N03 使用 BossBIView，覆盖指标、地区/地区范围、产品、法人、当前与比较期间、币种、数量单位、交易范围、定义/目标版本、业务口径、结算、客户及资产/成本归属。可选未知信息保持 null。比较期间可以逐项明确指定业务条件，其余条件继承当前范围。继续追问显示父查询、明确覆盖字段及继承条件；修改问题或范围后清理旧结果和旧依据响应。当前来源、历史列表及原请求各自展示状态；来源410时仍可读取合法历史，HISTORICAL_REQUIRES_REQUERY明确显示且停止失效正文采用。实际401/403清理受保护内容并阻止其他响应恢复，具体实现和验证见history-recovery.md。
 
 结果展示 BASE/CURRENT/CHANGE、对应单位、原始 Decimal 字符串、公式/定义与展示规则、可比性、覆盖及延迟/未同步未知、来源和更新时间、实际原始明细及资料缺口。来源入口使用当前查询返回的 source_id。刷新与重新登录后从持久原请求恢复范围和查询，不重新执行；当前来源变化后的历史结果进入重新查询状态。
 
@@ -28,13 +28,13 @@ specs/product-bi.openapi.yaml 0.2.0 登记全部公开输入、输出和 WebSock
 
 ## 验证与准确制品
 
-当前必要组合回归78 passed，13.80秒；证据 evidence/feature-delivery/FC02/integrated-final.xml。范围包含领域与Agent、实际SDK与共享Provider/Recorder、公开权限/来源、SQLite回执、FC01受影响准备消费者和Runtime配置。最终请求编号检查另见 public-runtime-green.xml。测试 basetemp 全部位于 validation/.work，没有采用 mock 或伪造业务返回。
+当前必要公开增量检查PASS，见evidence/feature-delivery/FC02/fc02-history-e57dfd21-2416-4c3d-a46a-7d64b1973079.json及history-recovery.md。覆盖正常查询/追问、来源撤销后同库重启、历史及原请求、刷新、自然身份失效/重认证、退出、维护403、12组受影响DOM尺寸和键盘。只修改公开BI组件；领域、Agent、Runtime和共享消费者复用N4对9026c8a的对应证据，未重复74项全量。78项组合及4项请求编号证据分别保存在integrated-final.xml和public-runtime-green.xml，适用原记录的实现及未变化消费者。
 
 标准 OpenAPI3.1 与 YAML 重复字段检查通过：.work/openapi-venv/bin/python validation/check_bi_public_spec.py。git diff --check 通过。没有复验无变化FC01业务全量或启用暂停的STT。
 
-独立制品 fc02-n3-scoped-dist，TypeScript/Vite构建通过，15.42秒；在 .work/product/nanobot/webui 执行 npm run build -- --outDir ../../../../fc02-n3-scoped-dist。manifest SHA256为03ea8a455e7cdc5c49d6a30b57ca385bac575acc24fda23e64b2510a5c7413bc，index.html SHA256为68f2f03188c1dd44242c28b06e067ca0035275e0bf6dbb1984000747e2ccb08a。BossBIView、BossDesktop、CSS的正式源码与构建输入摘要分别一致。已有用户预览和FC01制品保持。
+独立制品fc02-n3-history-dist，TypeScript/Vite构建通过，13.70秒；在.work/product/nanobot/webui执行npm run build -- --outDir ../../../../fc02-n3-history-dist。manifest SHA256为b1445dca6829bd7471c9748c14854a05bc0e4a1ac8865f69c03c6a8a124ecdb6，index.html SHA256为cd603631720b544566e1ac44b8e917d9c2d36eea4c9fd6367263970d154b81cf。BossBIView正式源码与构建输入SHA256均为d755c43bc2711fcee6f999d19da1a6c122d52deec94c8518fb77913d4a93a9a2；BossDesktop及CSS没有变更。已有用户预览和其他候选制品保持。
 
-实际公开账号桌面检查 PASS：evidence/feature-delivery/FC02/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5.json。运行命令为设置 BOSS_PRODUCT_FRONTEND_DIR 到本目录 fc02-n3-scoped-dist 的绝对路径后执行 node validation/desktop/check-fc02-scoped.cjs；使用独立9681/9682/19681端口、账号和SQLite。检查基线变化、product-1追问/4条明细、新比较条件不可比、实际两项工具及查询关联、刷新/重新登录恢复、401/403、文字Token、Enter/Tab和F03/N03/D01共18组窗口尺寸/缩放组合；renderer异常为零。
+当前公开账号检查使用独立9761/9762/19761、账号和SQLite，具体证据见history-recovery.md。原18组F03/N03/D01公开组合记录为evidence/feature-delivery/FC02/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5.json，适用其记录的制品；当前受影响F03/N03历史状态已执行12组尺寸复验，D01及CSS保持原接收代码。
 
 外部API和模型事件全部SIMULATED_FIRST，本地认证、权限、SQLite、确定性业务、实际SDK与工具执行。视觉、真实模型质量、外部投递和设备安装未执行。测试数量不计入FC02二十项分数。
 

@@ -6,6 +6,7 @@
 |---|---|---|
 | FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
 | FC02-N3 | [BI连续查询公共集成](../feature-delivery/FC02/integration.md) | 完整FR-03及二十项检查点，当前工单为原始项目docs/FC02经营查询工单.md |
+| FC02-N4-UI-HISTORY-01 | [来源失效后的历史查询与原请求恢复](../feature-delivery/FC02/history-recovery.md) | C12/C14公共恢复、来源有效性、身份与持久请求；状态引用原始功能来源 |
 | FC02-N1 | [BI范围、比较与持久恢复](../feature-delivery/FC02/backend.md) | 已接收正式领域提交，完整功能状态引用原始项目功能记录 |
 | FC02-N2 | [BI可信工具与实际Runtime](../feature-delivery/FC02/agent.md) | 已接收正式Agent及领域组合证据，完整判定等待N4 |
 | FC01-N4-001 | [实际正文Token](../feature-delivery/FC01/body-tokens.md) | C15共享正文、实际段落、尺寸及键盘；状态引用同一功能来源 |
