@@ -9,6 +9,7 @@ dependencies = [
   "pytest==8.4.2",
   "playwright==1.55.0",
   "markdown-it-py==4.2.0",
+  "packaging==26.3",
 ]
 
 [tool.pytest.ini_options]

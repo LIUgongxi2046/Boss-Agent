@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "0.6.0-draft",
+  "version": "0.6.1-draft",
   "task_id": "T07",
   "status": "PENDING_A06_A07_ACCEPTANCE",
   "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
@@ -64,6 +64,22 @@
     "unavailable_source_policy": "WITHDRAWN或EXPIRED返回410，其他非当前状态409，范围或类型错误403",
     "automatic_business_replay": false,
     "unknown_result_policy": "查询原请求回执与业务对象"
+  },
+  "native_sops": {
+    "documents": "agent/skills/boss-sop01..boss-sop13/SKILL.md",
+    "catalog": "boss_native_skills.BossSkillCatalog",
+    "configuration_source": "native workspace skills and agents.defaults.disabled_skills",
+    "metadata_parser": "nanobot.agent.skills.parse_skill_metadata",
+    "tool_reference_parser": "MarkdownIt links with tool scheme",
+    "activation_policy": "NEXT_CONTEXT_LOAD",
+    "enable_permission": "MAINTAINER",
+    "context_permission": "BOSS",
+    "human_only_operations": ["assignmentSourcesConfirm"],
+    "local_lifecycle_evidence": "evidence/T19/w2-20261023-native-sop-catalog.json",
+    "local_native_context_verified": true,
+    "live_model_adoption": "PENDING_TECHNICAL_CONTENT_AUTHORIZATION",
+    "public_runtime_registration": "PENDING_W3",
+    "method_draft_save_and_version_history": "NOT_IMPLEMENTED"
   },
   "sops": [
     {"sop_id":"SOP01","version":"0.1.0","requirement_id":"FR-01","input":"本人目标、日历、承诺、有效事件与次序","output":"有依据的今日事项","tool_mapping_status":"READ_ADAPTER_AVAILABLE_REMAINING_RUNTIME_PENDING","acceptance_ids":["A07","A18"]},

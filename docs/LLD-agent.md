@@ -1,6 +1,6 @@
 # 老板 Agent 运行设计
 
-版本：0.6.0-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_A06_A07_ACCEPTANCE。代码为W2提交f97789d及本轮规范接收和读取Adapter修改，正式规范引用W1提交f854b07a66a153fc4a92c95c86cce788d009cffe的T05/T06 1.5.0。输入SHA256由T07检查报告保存。五项业务Tool、会议、事件及来源读取独立检查已使用当前确定版本；公共应用接收、独立审查者签署及完整设计验收保持未完成。
+版本：0.6.1-draft。日期：2026-10-23。任务T07 / A07。状态PENDING_A06_A07_ACCEPTANCE。代码基线0c62568及本轮原生SOP方法修改，正式规范引用W1提交f854b07a66a153fc4a92c95c86cce788d009cffe的T05/T06 1.5.0。输入SHA256由T07检查报告保存。五项业务Tool、会议、事件及来源读取独立检查已使用当前确定版本；公共应用接收、独立审查者签署及完整设计验收保持未完成。
 
 ## 主体与治理
 
@@ -68,6 +68,10 @@ sequenceDiagram
 ```
 
 ## 十三类秘书 SOP
+
+实际方法文件为agent/skills/boss-sop01至boss-sop13/SKILL.md，原生metadata.boss保存sop_id、version及requirement_id。正文完整保留触发、输入、步骤、工具引用、授权、输出与结束条件，工具引用使用Markdown链接的tool方案，MarkdownIt解析后的集合必须与sop_backend_bindings一致。BossSkillCatalog复用实际SkillsLoader和ToolRegistry，维护投影只提供技术字段；模型上下文仅允许BOSS选择当前启用、原生依赖可用且工具引用完整的方法。
+
+启停沿用原生agents.defaults.disabled_skills，维护调用检查当前内容SHA256并写入同一配置，下一上下文读取当前状态。当前五项Tool仅满足SOP03的全部引用；其余方法报告缺少工具并拒绝进入上下文。assignmentSourcesConfirm属于本人明确操作，不注册为模型工具。正文与工具配置读取期间发生可观察变化时明确拒绝。文件摘要能够定位当前载入内容；原生方法草稿保存、版本历史、公共入口和实际模型采用继续待实现或验证，不能根据本地载入登记完整AD06通过。实现与证据沿用T19主记录。
 
 所有方法遵循输入完整性检查、当前资料查询、必要本人决定、获准执行、结果重读和后续复查。缺少必要条件进入等待，不能猜测授权或专业结论。
 
