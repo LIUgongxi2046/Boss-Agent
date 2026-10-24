@@ -1,85 +1,96 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-NATIVE-20261024；decision_id=D-MENU-DELIVERY-20261024。当前一般原生规划、可信读取、原意图与Runtime模块版本1.1.0，限定检查通过。非图像附件的实际SDK保存引用仍有必要领域接收条件。N02完整26项及正式状态由N3维护，本记录不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-CONSUMER-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
 
-## 依据与当前公共采用
+## 当前依据与准确依赖
 
-已重新完整读取适用AGENTS、原始N02完整26项工单、PRD最前当前决定、FR-08/24/29及相应BR/AC、共同BR-C01—C07/E01—E06；读取原N02 HTML及其配置、原始提示词线索和实际design-v6-panels.js的chat区域。设计要求包括历史会话、当前事项/版本、连续输入、执行/任务/产物、依据及异常；暂停语音保持独立。LLD的当前请求、来源/版本、配置、同一Runtime和技术日志规则继续采用。
+本次PRODUCT准确候选为2260000b89414727afcf2720bfa993fc7a601296，包含已接收的N2原生模块b1eb8ed及N1附件修复6164aac401712f397072fdfac788d04ffd91488a的公共采用eb9a4fe。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
-当前PRODUCT准确候选为e5724eb。F01 NativeMorningAdapter、公共Registry采用、同会话连续讨论及原生停止已经接收。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel和application由N3唯一维护，一般原生请求需要采用本文明确接口并完成公共候选验证。
+已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、backend.md、boss_conversation.py、boss_conversation_attachments.py和conversation.schema.json 1.1.0，核查实际SDK命令生命周期、Session保存、Fc02Tool、bind_query、bind_scoped_followup、BIQueryAPI和范围Schema。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
-当前已采用N1准确5f2138234353c5c224b3d0034d4c1565e6e8939b及PRODUCT接收e5724eb，完整读取backend.md、boss_conversation.py、boss_conversation_attachments.py及conversation.schema.json 1.0.0。会话/运行/产物、本人消息历史及媒体元数据使用这些正式接口；不建立另一份消息状态或第二个模型循环。现有本人草稿/明确发送/回复及任务共享流程保持。D-UI-FIDELITY-20261024由N3恢复当前N02设计，F01设计返修继续作为进入N03前必要工作，原业务证据保留。
+会话、运行、业务产物、本人消息历史与附件采用正式领域接口，实际原生历史、未发送输入和传输继续使用同一Nanobot。没有另一份消息状态或第二个模型循环。本人草稿、明确发送、回复及任务共享入口继续使用既有业务服务。
 
-## 当前模块与明确接口
+## 模块及正式接口
 
-模块为validation/conversation_agent；检查为app/tests/conversation_agent。当前正式读取集合为bossDashboardRead、bossTasksRead、bossMeetingsRead、bossEvidenceRead、bossWorkspaceRead和conversationRead，均要求同库_BossPageReadTool及read_only=true。conversationRead的严格projection为runs/messages/attachments/artifact/record；artifact使用N1的run_id/kind/id，record仅按实际本人任务或消息历史中已有的task/message/message_draft编号读取。未加入发送、审批、本人确认或授权签发工具；本人消息写入与任务变更采用现有合法共享入口。
+代码为validation/conversation_agent，检查为app/tests/conversation_agent。READ_TOOLS保持bossDashboardRead、bossTasksRead、bossMeetingsRead、bossEvidenceRead、bossWorkspaceRead和conversationRead六项同库正式只读工具，_BossPageReadTool及read_only=true要求继续适用。CONVERSATION_TOOLS=READ_TOOLS加query_metrics，共七项。query_metrics使用同库实际Fc02Tool，产生正式查询记录；没有发送、审批、本人确认或授权签发工具。
 
-| 构造器或方法 | 当前明确输入与行为 |
+conversationRead严格projection为runs/messages/attachments/artifact/record；artifact使用N1正式run_id/kind/id，record按当前本人任务或消息历史中已有的task/message/message_draft编号读取。消息记录分别核查message_outbox与交办outbox。
+
+| 构造器或方法 | 当前明确输入及行为 |
 |---|---|
 | ConversationContext | frozen dataclass；role/owner_id/namespace/dataset_id/dataset_version/request_id/session_id/chat_id/turn_id/active/input_sha256/allowed_tools/allowed_calls/references |
-| ConversationScope(store, context_provider, context_validator) | context_provider(request)从服务端当前身份与原生请求生产ConversationContext；context_validator(context)必须通过实际领域核查并返回True，不能使用客户端字段或固定True代替当前资料检查 |
-| scope.current(request=None, *, require_runtime=True) | 核查BOSS、当前active、规范websocket会话、原文摘要、本人资料范围、当前引用和实际RuntimeBinding；来源/身份变化在当前步骤终止 |
-| ConversationReadTool(delegate, scope) | delegate必须为同库正式只读工具；保持实际Schema和参数类型，执行前要求(tool_id,checksum(params))属于本次allowed_calls，执行后重新核查当前范围 |
-| register_conversation_reads(registry, delegates, scope) | 注册独立读取集合；名称重复或不合法时在任何Registry修改之前拒绝。公共同名工具的兼容分支由N3接收 |
-| ConversationSimulatedProvider(event_producer, scope) | event_producer为async(messages,tools)->真实LLMResponse；只接收当前真实Registry集合，消费实际工具结果，调用前后重新核查scope；没有网络客户端 |
-| ConversationRuntimeRecorder(scope, registry, runtime_snapshot, *, intent_adapter=None) | runtime_snapshot()读取当前实际启用配置；context(request)建立真实RuntimeBinding及技术引用，hook_factory(context)返回ConversationRuntimeHook；NativeConversationAgent自动采用intent_adapter |
-| NativeConversationAgent(store, registry, runtime_snapshot, attachments) | attachments为N1的ConversationAttachments，使用同一个实际SessionManager及获准媒体目录；提供scope/provider/recorder/delegates及tools()实际读取适配集合 |
-| agent.admit(role, chat_id, turn_id, content, *, media_sha256, attached, active) | media_sha256为实际原生media字段的checksum；attached(chat_id)与active()由当前连接生产；返回enqueue及原编号回执；/stop和已有晨间绑定返回None |
-| agent.record_media(role, key, accepted_media, accepted_paths, *, active) | 原生上传成功后的内部调用，复用N1.record_upload保存实际元信息；不作为接收客户端路径的公开动作，不注册模型工具 |
-| agent.native_context(request) / scope_context(request) | 规范websocket身份、当次原文/媒体摘要及连接证明通过后规划实际工具；采用当前六项FEATURE_SCOPE；配置轮次不足时就地拒绝 |
-| agent.receipt(role, key, *, active) | 原编号只读；RECORDED或NOT_FOUND_IN_CURRENT_STORE；返回request_state/run_id/chat_id/session_id/turn_id，write_performed_by_lookup=false；不重放原意图 |
-| agent.guard_context(provider) / finish(key, *, status="FAILED") | 包装公共provider的前置失败清理；未运行的明确取消可以使用CANCELED，已经运行的终态沿用实际Runtime，不伪造原生停止 |
+| ConversationScope(store, context_provider, context_validator) | 从服务端实际请求生产上下文，核查BOSS、active、规范websocket身份、原文摘要、当前资料范围和正式来源；核查器必须实际采用当前领域，不能固定返回True |
+| scope.current(request=None, *, require_runtime=True) | require_runtime时要求同库、同namespace/request/session的实际RuntimeBinding；模型和工具每次继续采用之前重新核查 |
+| ConversationReadTool(delegate, scope) | 同库正式只读delegate；保留实际Schema及参数类型，执行前核查(tool_id,checksum(params))属于本次allowed_calls，执行后重新检查当前范围 |
+| register_conversation_reads(registry, delegates, scope) | 名称重复或工具不合法时，在Registry修改之前拒绝；用于独立正式读取注册 |
+| ConversationSimulatedProvider(event_producer, scope) | 实际LLMResponse事件生产者，核查真实Registry范围，消费实际工具消息，调用前后核查当前范围；没有网络客户端 |
+| ConversationRuntimeRecorder(scope, registry, runtime_snapshot, *, intent_adapter=None) | 使用实际配置、RuntimeBinding和Hook；NativeConversationAgent自动采用intent_adapter；重复同一RequestContext复用原运行 |
+| NativeConversationAgent(store, registry, runtime_snapshot, attachments) | attachments为N1 ConversationAttachments，与AgentLoop共享实际SessionManager及获准媒体目录；提供scope/provider/recorder/delegates及tools() |
+| agent.admit(role, chat_id, turn_id, content, *, media_sha256, attached, active) | 实际原生media字段checksum、当前连接attach和active证明；返回enqueue及原回执。SDK判断不进入Agent轮次的命令及已有晨间绑定返回None |
+| agent.record_media(role, key, accepted_media, accepted_paths, *, active) | 仅原生实际上传成功后内部调用；重新核查接收证明和当前连接、成功上传数据与本轮摘要一致，再调用N1.record_upload |
+| agent.native_context(request) / scope_context(request) | 当前身份、输入、媒体和连接证明通过后生成ConversationGrant及正式规划，核查七项工具配置和实际轮次要求；设置本次FEATURE_SCOPE |
+| agent.query_context() | 从当前实际RequestContext及RuntimeBinding生成Fc02Context，query_bindings仅来自当前可信规划 |
+| ConversationQueries(store, conversation).plan(text, query, pending_scope=None) | 采用正式维度与同会话查询产物，完整条件生成QueryBinding；条件不足返回required_inputs及已识别的安全条件 |
+| ConversationQueryTool(Fc02Tool(..., agent.query_context, "query_metrics"), scope) | ConversationReadTool子类；核查同库、正式Schema、当前参数摘要与Fc02绑定，执行后重新检查范围 |
+| agent.receipt(role, key, *, active) | 原编号只读；RECORDED或NOT_FOUND_IN_CURRENT_STORE，返回实际request_state/run_id/chat_id/session_id/turn_id；不重放原意图 |
+| agent.guard_context(provider) / finish(key, *, status="FAILED") | 后续provider前置失败清理；明确运行前取消可以使用CANCELED，已有运行终态采用实际Runtime，不伪造停止 |
 
-allowed_tools为frozenset工具名；allowed_calls为frozenset((tool_id,parameters_sha256))；references为tuple((kind,id,version))，其中version可为None。引用使用现有正式对象标识与版本，不接受正文。input_sha256取自当前request.original_user_text；请求/会话/轮次标识必须来自实际原生消息和当前服务端身份。request_id在实际RuntimeBinding存在时使用其request_id，建立记录前使用当前request.message_id或request.turn_id，与现有Recorder规则一致。上下文不由模型参数反向签发。
+allowed_tools为frozenset工具名，allowed_calls为frozenset((tool_id,parameters_sha256))，references为tuple((kind,id,version))，version可为None。input_sha256来自request.original_user_text；request_id使用实际RuntimeBinding.request_id，建立记录前使用request.message_id或request.turn_id。session/chat/turn来自实际原生请求和服务端身份，不能由模型参数或客户端归属字段签发。
 
-NativeConversationAgent提供当前可信生产者与核查器。ConversationPlanner根据本次实际输入和当前正式资料目录选择来源、概览、任务、会议、消息、运行、附件或已有产物；来源ID/名称及任务/消息/产物编号均从实际资料或正式结果采用。连续来源讨论保留最后一次实际选择，历史来源在后续模型步骤继续核查。支持的读取条件改变实际参数；经营计算条件、消息写入、任务变更或不明确对象返回具体required_inputs并采用现有共享入口，没有预设业务成功。附件元数据保持独立，不能作为业务来源授权。
+## 当前输入、正式条件与连续追问
 
-## Runtime、原编号、取消与隐私
+ConversationPlanner根据当次输入和实际目录选择来源、概览、任务、会议、消息、运行、附件、已有产物或经营查询。来源ID/名称及任务/消息/产物编号均从正式资料采用。连续来源讨论保留最后实际选择，后续步骤核查当前版本。来源、对象不明确时返回具体required_inputs；消息写入和任务变更使用现有合法共享入口。附件元信息不授予业务来源资格。
 
-Recorder复用当前RuntimeRecorder/Fc01RuntimeRecorder的实际配置版本、Prompt、工具Schema及实现摘要、run_id/request_id/session_id/chat_id/turn_id和真实终态。feature_id=N02，RuntimeContextBlock来源boss-conversation-context，business_authority_granted=false。conversation_context保存input_sha256、allowed_call_refs、references，以及client_request_id/media_sha256/attachment_refs/required_input_count。attachment_refs仅含attachment_id/content_sha256/processing_state；不包含名称、路径或正文。工具结果记录实际tool_call_id、source_id/version、parameters_sha256和result_sha256；正式产物按真实存储核查后记录query_id/task_id/list_id/message_id/draft_id及适用版本。
+queries.py通过BIQueryAPI.dimensions和dimension_options取得获准维度、已保存期间、指标定义和来源。支持六项现有指标的中文名称及英文identifier、实际维度编号、明确日期范围、全部当前产品/全部区域、币种、单位、交易范围、结算状态及明确的正式口径字段。只有本人明确选择“使用当前获准口径”时，才采用相应单一正式维度值；区域、产品、指标和两组期间仍需要明确输入。相对期间要求实际起止日期。
 
-真实Nanobot继续保存本人原生会话历史；同一会话的新问题形成新的实际运行。稳定client_request_id由chat_id/原生turn_id摘要生成，conversation_intent保存文字与实际media字段的摘要、正式引用及运行关联。相同轮次同内容enqueue=false，不再进入SDK；文字或媒体变化拒绝。新服务只能读取原回执，不能凭session_id恢复进程内认证证明。重复解析同一实际RequestContext复用原RuntimeBinding；已有完成运行不会重新记为RUNNING。公开重连与Native客户端的实际接收仍由N3验证。
+完整条件使用bind_query与实际Fc02Tool.parameters校验后调用query_metrics。缺少条件逐项返回中文required_inputs，只将已识别的正式字段保存在conversation_intent.pending_query_scope，没有原始问题；后续补充可继承这些已明确条件。当前不支持的明确指标/产品保持等待，不调用旧范围替代当前要求。
 
-Hook在实际工具错误时只记录工具/调用编号与异常类型并终止，失败、取消、超时保留原运行和已保存对象；未知usage/cost_total/price_version保持null。required_inputs存在时运行记为WAITING_INPUT、stop_reason=required_input并保存finished_at，允许本人提交下一条真实输入。Provider释放结果前及下一步骤核查身份、来源、实际媒体及历史产物当前资格；产物摘要采用实际业务data，依据每次继续由正式API重新核查。原生/stop直接返回既有命令路径，没有额外意图、业务查询或模拟取消运行。
+追问按照本人明确query_id或同会话最后实际查询选择正式父产物，通过ConversationAPI.artifact重新核查，再调用bind_scoped_followup继承正式context_snapshot，仅覆盖本次明确字段。实际参数包含parent_query_id，参数摘要与绑定一致。查询期间、比较期间、产品和指标变化均由实际SDK检查。已有正式查询产物使用相同语义；来源、定义、明细及产物变化后停止当前采用。没有开发N03完整菜单。
 
-## N3公共接收与实际依赖
+presentation.py根据实际工具消息产生中文说明，包含查询期间/范围/指标值、来源及版本、对象编号、当前状态、资料缺口和待补充条件。数值直接采用正式Decimal字符串，null保持无法确定，比较限制与未解释原因采用实际结果。助手消息不序列化整份工具JSON，完整内容继续通过正式会话、来源或产物投影读取。该能力明确SIMULATED，没有真实外部模型调用或预设业务答案。
 
-RoleChannel/application中的当前本人连接、attach、token与过期检查继续负责原生请求采用。先处理原生/stop，再保留NativeMorningAdapter优先路径；晨间已绑定会话不建立N02意图。一般message在原生router之前调用agent.admit，media_sha256取自实际envelope.media。返回enqueue=false时只读恢复并核查原生历史，禁止再次入队。N2的CONVERSATION_REQUEST仅由native_context生成，不能从客户端JSON或模型参数建立。其他已交付专有SDK请求保持当前合法分支。
+## 原生媒体与SDK命令
 
-原生上传成功后，在webui_dispatch_message将实际媒体入队之前，使用本轮admission、原始已接受media及原生返回paths调用record_media。N3可以在当前原生入口的ContextVar中暂存该帧已接受数据；失败/取消或未实际入队时调用finish。原始数据和路径不进入普通日志、URL或回执。实际SessionManager必须与AgentLoop相同，ConversationAttachments使用当前获准媒体目录；检查中显式指定独立sessions_root。
+文字为空时，admit要求media_sha256区别于checksum([])；native_context必须具有本轮实际成功上传及record_media证明。无文字且无媒体拒绝。成功上传数据必须与接收摘要一致，实际路径仅来自原生gateway成功结果。仅附件输入读取真实元信息并返回待补充用途，运行结束为WAITING_INPUT；后续本人说明目的可以继续采用原附件。元信息保存不宣称已经分析正文、完成经营计算或建立业务来源。
 
-FeatureToolRegistry在Recorder之前按本次allowed_tools设置FEATURE_SCOPE。公共同名读取需要保留既有路径：可以由N3以ConversationReadTool子类接收当前实际只读delegate，并在非N02请求明确转给现有正式工具；新N02范围需要实际执行该读取适配，不能只修改工具名称。Recorder要求实际Registry.get返回ConversationReadTool实例或其子类，且真实集合等于当前allowed_tools。运行时Provider只采用该集合。
+ConversationAttachments Schema 1.1.0保存可信上传的内部引用。实际SDK将普通文档转换为文本文件引用且user.media为空时，附件仍可从同一真实Session的上传记录读取；本模块不解析该文本或添加media。当前及recorded大小/摘要、nullable stored_name/user_message_index、STORED/MISSING/CHANGED/REFERENCE_UNAVAILABLE均采用N1正式字段。所有已采用附件必须保持STORED和本轮摘要；变化、删除或无法确认引用时在当前位置停止，原编号及已有运行保持可读。该普通文档引用已经通过当前限定检查。
 
-FeatureProvider/FeatureRecorder在agent.handles(request)时分别委托agent.provider和agent.recorder.context，使用同一个AgentLoop和现有原生传输。公共context顺序为晨间native_context、一般agent.native_context、现有配置/Skills/Memory、各专有scope、agent.scope_context及对应Recorder；后续provider由agent.guard_context包装以清理运行前失败。agent.provider读取当前真实规划与本轮实际工具消息后产生回答，不能同时调用ProductMorning.execute或另建第二轮SDK。
+admit和native_context调用正式SDK builtin_command_starts_agent_turn。/help、/new、无参数/goal、/model及/stop等非Agent轮次没有conversation_intent或额外Runtime。原生认证、命令接收与/stop取消仍由原路径处理。NativeMorningAdapter保持优先，已有晨间绑定不建立一般会话意图。
 
-公共runtime-records.schema.json需要接收feature_id=N02及可选conversation_context。该对象字段为input_sha256、allowed_call_refs、references，以及可选client_request_id/media_sha256/attachment_refs/required_input_count；参数和媒体摘要均为SHA256，attachment_refs中content_sha256可为null，processing_state为N1正式状态。工具结果采用现有实际产物编号字段并追加parameters_sha256。intent回执严格字段为source_type/client_request_id/outcome/request_state/run_id/chat_id/session_id/turn_id/write_performed_by_lookup/business_authority_granted，admit另有enqueue。公共Schema、配置、实际注册和运行/产物投影由N3维护。
+## Runtime、回执与隐私
 
-本人发送与任务决定继续采用已有正式共享入口，当前有效授权是否匹配由原领域判断，模型不代签。新模块只从正式返回结果保存产物编号；message_outbox和交办outbox分别核查，消息状态、送达、回复和业务任务独立。当前没有新增消息写入动作。原生交接、阅读位置/焦点、公开原编号端点和实际停止、全部异常、UI及完整26项仍需N3准确候选验证。
+Recorder复用当前RuntimeRecorder/Fc01RuntimeRecorder的实际配置、Prompt、工具Schema及实现摘要、run_id/request_id/session_id/chat_id/turn_id和真实终态。feature_id=N02，RuntimeContextBlock来源boss-conversation-context，business_authority_granted=false。conversation_context包含input_sha256/allowed_call_refs/references，以及client_request_id/media_sha256/attachment_refs/required_input_count；attachment_refs仅含attachment_id/content_sha256/processing_state，没有名称、路径或正文。
 
-### 非图像附件的必要领域接收条件
+工具结果记录实际tool_call_id、parameters_sha256/result_sha256及来源标识。正式存储核查后记录query_id/task_id/list_id/message_id/draft_id与适用版本。query_metrics追加QueryBinding.visible的bi_query_context、source_refs、definition_versions和detail_refs，排除原始问题。当前实际查询产物在后续模型步骤及结果释放前通过正式API重新核查并比较实际结果摘要。本人消息状态、任务状态和运行终态保持独立。
 
-实际SDK的_restore_turn调用reference_non_image_attachments，将非图像附件转为文本引用并保留image_paths。当前N1 ConversationAttachments.read仅遍历已保存user.media。实际成功上传JSON文件后，N1保存的原名/MIME/大小/摘要存在，原生用户media集合为空；该路径当前在模型步骤之前触发媒体引用冲突，运行保留FAILED及原编号，没有工具采用或业务变更。
+稳定client_request_id由chat_id及原生turn_id摘要生成。conversation_intent保存文字/媒体摘要、正式引用和运行关联；相同轮次相同内容enqueue=false，文字或媒体不同拒绝。新服务只能读取原回执，不能恢复进程内连接证明。receipt字段为source_type/client_request_id/outcome/request_state/run_id/chat_id/session_id/turn_id/write_performed_by_lookup/business_authority_granted，admit另有enqueue；write_performed_by_lookup=false。未知结果只读取原编号，不重新执行。
 
-N1/N3需要通过可信原生保存流程保留非图像附件的实际引用，使正式附件投影能够同时读取SDK的文件引用和图像media；必须采用真实上传结果、实际Session、获准媒体目录与字节摘要，继续排除任意客户端路径。本模块没有向Session伪造media或跳过当前核查。必要复现为test_non_image_sdk_without_saved_media_reference_fails_without_claiming_processed_source；当前原生检查对已保存图像媒体元数据有效，非图像路径需要接收新的准确领域版本。该项属于当前N02.C06/C22必要依赖，不能据全部模块检查通过登记菜单完成。
+Hook在实际工具错误时保存工具/调用编号和异常类型并终止。失败、取消、超时保留原运行与已保存对象，未知usage/cost_total/price_version保持null。存在required_inputs时，成功结束的运行记为WAITING_INPUT、stop_reason=required_input并保留finished_at，允许下一条本人输入。模型不能签发本人授权；本人写入/发送的匹配资格由正式共享领域判断。
 
-## 限定检查与证据
+## N3公共接收要求
 
-隔离候选validation/.work/n02-agent-public为准确d0e6326，N2模块从当前自己目录导入；使用真实ControlStore.initialize的批准selection资料、BossPageAPI、BossEvidenceReadTool、ToolRegistry、Nanobot/AgentLoop和RuntimeRecorder。技术配置仅启用实际bossEvidenceRead。检查事件生产者处理自然文本中明确提供的真实来源ID，并将变化后的ID传给实际source参数，再从实际工具消息产生回答；该限定用例不代表完整自然语言规划能力。
+1. RoleChannel/application保持当前本人连接、attach、token与过期检查。原生/stop及SDK非Agent命令保留原路径；NativeMorningAdapter优先。一般message在router之前调用admit，摘要取自实际envelope.media。enqueue=false时只读取原编号及实际历史，禁止重复入队。
+2. 原生上传实际成功后，在webui_dispatch_message发布本轮消息之前，传递实际已接受media和gateway返回paths调用record_media。可使用当前请求的ContextVar传递可信帧数据；失败、取消或没有入队时finish。媒体原始数据及路径不进入普通日志、URL或回执。
+3. Context顺序采用晨间native_context、一般agent.native_context、现有配置/Skills/Memory与专有scope、agent.scope_context及对应Recorder。后续provider使用agent.guard_context处理准备失败。CONVERSATION_REQUEST只能由native_context建立。
+4. FeatureProvider/FeatureRecorder在agent.handles(request)时分别委托agent.provider和agent.recorder.context，采用同一AgentLoop、SessionManager、实际Registry和原生传输；不另行调用bot.run。
+5. 当前一般范围为CONVERSATION_TOOLS七项。六项只读的公共同名工具保留既有正式分支；query_metrics使用agent.tools()返回的ConversationQueryTool及其实际Fc02上下文。公共同名适配必须保持ConversationReadTool子类，且提供当前实际delegate，不能仅修改名称。其他业务请求继续进入原有合法工具分支。
+6. 配置实际启用全部七项，max_tool_rounds至少为本次plan.calls数量加一。Recorder核查Registry实际集合与当前allowed_tools完全一致，模型只能看到该集合。query_metrics已存在于公共配置名称集合；本模块没有新增本人写入工具。
+7. 公共runtime-records.schema.json接收feature_id=N02、conversation_context以及实际tool_results的parameters_sha256和已有Fc02的bi_query_context/source_refs/definition_versions/detail_refs。附件投影采用Schema1.1.0的四状态、nullable字段与recorded_*字段。公共Schema、配置、注册及实际候选检查由N3完成。
 
-BDD：Given当前本人、有效来源及明确读取对象；When在同一原生会话连续提出读取不同实际资料的问题；Then参数和结果版本随输入变化，真实工具调用及摘要对应当前run，原始输入保留在本人会话，技术日志没有问题或原文。Given维护/伪造范围/不同模型参数/来源或身份撤销；When当前步骤继续；Then模型和工具拒绝采用不符范围，失败/取消/超时原记录可重读且无业务写入。
+公开原编号端点、实际WebSocket接收/重连/停止、阅读位置与焦点、UI完整设计及全部26项由N3对准确候选验证。本人草稿/发送/回复及任务共享流程需要完整产品消费证据，本模块检查不代替这些验收。复杂或不明确自然条件明确保持待补充；未支持的其他业务动作仍需相应正式输入及领域能力。F01设计返修、STT暂停及用户验收状态继续保持独立。
+
+## 当前限定验证
+
+依赖候选为validation/.work/n02-consumer-public，准确2260000b89414727afcf2720bfa993fc7a601296。附件模块blob=045e78b53a1c1eb8dce78edcec07c26ff37692ea；conversation.schema.json blob=6595d986b7bf47a540899c973be9086b0c010f10；Fc02Tool blob=4b3ce9f0ab422bbca5e3c2e28b5eb8de932b62fa；boss_bi_queries.py blob=70a667719797634bfcb0989c07a90da33cfeb85b。
+
+conftest.py使用标准importlib加载当前N2被测package，其余领域、工具与SDK来自准确候选，没有替代依赖。检查使用实际ControlStore.initialize批准selection资料、WebUIMediaGateway、Nanobot/AgentLoop、SessionManager、Fc02Tool和RuntimeRecorder。SessionManager均显式指定独立sessions_root；SQLite、媒体和会话位于本目录已忽略validation/.work。测试文件采用仓库已有真实文件字节，没有虚构企业事实或业务值。
+
+BDD：Given当前本人、正式来源与明确范围；When连续输入不同来源、补充缺失条件或改变查询期间/产品/指标；Then实际工具参数、正式快照、父查询与结果随输入变化，实际query_id可从当前会话产物重读。Given仅附件输入及实际成功上传；When SDK保存普通文档且user.media为空；Then正式元信息保持可读，等待用途，后续输入继续；文件变化或缺失停止采用。Given SDK非Agent命令、晨间绑定、参数越界、失效连接或来源撤销；When进入相应路径；Then无额外一般意图、无越权查询或结果释放，原编号与真实终态可读。
+
+当前consumer-runtime.xml为41 passed、15.28秒，模块状态MODULE_CHECKS_PASSED；覆盖上述行为及受影响的可信读取、Runtime、原意图幂等、同键异内容、维护拒绝、重建服务回执、取消/超时、本人实际草稿和明确模拟发送后的正确消息编号。既有read-runtime.xml及native-runtime.xml分别保留原限定范围，不将数量相加登记菜单完成。
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-agent-public validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_runtime.py -q -p no:cacheprovider --basetemp=validation/.work/n02-agent-delivery --junitxml=docs/menu-delivery/N02/read-runtime.xml
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-consumer-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-consumer-receive --tb=short --junitxml=docs/menu-delivery/N02/consumer-runtime.xml
 ```
 
-原读取阶段为12 passed、10.69秒，证据read-runtime.xml保留其d0e6326范围。当前原生组合validation/.work/n02-native-public为准确e5724eb，boss_conversation.py blob=24fabc547c2cb07ed53a0c864fb383ae7a720039，boss_conversation_attachments.py blob=1ebe75e83a56574a6c65f06748010b438d5ec622，conversation.schema.json blob=44e45d664b359f10c725cc8a8d449a7b78609b14。
-
-当前native-runtime.xml覆盖一般原生及受影响读取检查：连续不同来源与最后选择、正式消息/联系人、真实上传元信息及业务来源等待、原意图重复与异内容、同会话新输入、晨间优先、零额外/stop意图、维护/失效连接拒绝、重建服务原回执、取消/超时、实际SDK查询产物与撤销、本人实际草稿/发送后的正确存储编号、运行前明确取消，以及非图像路径的准确停止。查询由真实Fc02Tool与SDK产生，消息由实际本人BossCommandAPI保存/发送，模型读取没有新增授权或发送记录。产物均可由N1 ConversationAPI重读。
-
-测试使用标准importlib加载当前N2被测package，其余领域、工具和SDK来自准确候选；没有替代依赖。所有SessionManager均使用显式独立sessions_root，不使用用户会话。媒体检查只读取仓库已有资产的字节及元数据，没有执行图像查看或视觉判断。
-
-```bash
-env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-native-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-native-accepted --tb=short --junitxml=docs/menu-delivery/N02/native-runtime.xml
-```
-
-当前结果为28 passed、17.94秒，native-runtime.xml记录对应结果。没有启动产品服务、读取凭据或用户体验资料，没有外部请求，socket.connect由检查审计拒绝。中间目录已由validation/.work忽略。MVP996x、UI02104xx、F01106xx及其制品/数据保持；FR-27/STT/F27/FC28暂停，视觉及用户验收未执行。
+所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。

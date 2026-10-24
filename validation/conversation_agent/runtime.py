@@ -70,10 +70,15 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
         self.recorder.scope.current()
 
     async def after_execute_tool(self, context, tool_call, tool, params, result):
-        await RuntimeRecordHook.after_execute_tool(self, context, tool_call, tool, params, result)
         output = json.loads(result)
         safe = {key: output[key] for key in ("source_type", "source_id", "version", "review_sha256") if key in output}
         safe.update(parameters_sha256=checksum(params), result_sha256=checksum(output))
+        if tool_call.name == "query_metrics":
+            matches = [item for item in tool.delegate.context().query_bindings
+                       if checksum(json.loads(item.parameters_json)) == checksum(params)]
+            require(len(matches) == 1, "当前查询结果缺少唯一正式输入范围")
+            safe.update(bi_query_context=matches[0].visible(), source_refs=[{key: source[key] for key in ("source_id", "version")} for source in output["sources"]],
+                definition_versions=sorted({item["definition_version"] for item in output["values"]}), detail_refs=output["detail_refs"])
         if output.get("kind") in {"query", "task", "morning_list", "message", "message_draft"} and "data" in output:
             kind, identifier, data = output["kind"], output["id"], output["data"]
             storage = {"query": "query", "task": "task", "morning_list": "morning_list", "message_draft": "message_draft"}
@@ -87,6 +92,7 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
             safe[field] = identifier
             if kind in {"task", "message_draft"} and "version" in data:
                 safe["task_version" if kind == "task" else "version"] = data["version"]
+        await RuntimeRecordHook.after_execute_tool(self, context, tool_call, tool, params, result)
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)

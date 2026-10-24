@@ -11,6 +11,7 @@ from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
 from nanobot.agent.tools.context import current_request_context
 from runtime_page_read_tools import _BossPageReadTool
+from conversation_agent.queries import ConversationQueries
 
 
 def branch(projection, properties=None):
@@ -81,6 +82,8 @@ class ConversationPlan:
     references: tuple[tuple[str, str, str | None], ...]
     required_inputs: tuple[str, ...]
     artifact_checks: tuple[tuple[str, str], ...] = ()
+    query_bindings: tuple = ()
+    pending_query_scope: str | None = None
 
 
 class ConversationPlanner:
@@ -88,7 +91,7 @@ class ConversationPlanner:
         self.store, self.api = store, ConversationAPI(store)
         self.pages = BossPageAPI(store)
 
-    def plan(self, text, query, previous_references, previous_artifacts=(), last_source_id=None):
+    def plan(self, text, query, previous_references, previous_artifacts=(), last_source_id=None, *, has_media=False, pending_query_scope=None):
         lowered = text.casefold()
         calls, references, required, checks = [], list(previous_references), [], list(previous_artifacts)
         def add(name, params):
@@ -97,6 +100,16 @@ class ConversationPlanner:
                 calls.append(call)
         if any(word in lowered for word in ("不要", "不用", "不需要", "别执行")):
             return ConversationPlan((), tuple(references), ("请明确当前需要执行的读取动作",), tuple(checks))
+        query_plan = ConversationQueries(self.store, self.api).plan(text, query, pending_query_scope)
+        if query_plan.binding is not None:
+            add("query_metrics", json.loads(query_plan.binding.parameters_json))
+            references.extend(ref for ref in query_plan.references if ref not in references)
+            if query_plan.parent is not None:
+                parent = query_plan.parent
+                check = (encode({key: parent[key] for key in ("run_id", "kind", "id")}), artifact_digest(parent))
+                if check not in checks:
+                    checks.append(check)
+        required.extend(query_plan.required_inputs)
         if any(word in lowered for word in ("发送", "发信", "保存草稿", "拟消息", "写消息")):
             add("conversationRead", {"projection": "messages"})
             required.append("消息写入请采用当前本人消息编辑入口中的正式草稿、收件人、内容版本及有效授权")
@@ -144,8 +157,10 @@ class ConversationPlanner:
                 add("conversationRead", {"projection": "messages"})
         if any(word in lowered for word in ("运行", "执行过程", "进度")):
             add("conversationRead", {"projection": "runs"})
-        if any(word in lowered for word in ("附件", "文件", "上传")):
+        if has_media or any(word in lowered for word in ("附件", "文件", "上传")):
             add("conversationRead", {"projection": "attachments"})
+            if not text.strip():
+                required.append("请补充当前附件的用途或需要核查的事项")
             if any(word in lowered for word in ("计算", "分析", "作为依据")):
                 required.append("附件需要另行建立有效正式业务来源引用，保存元数据不表示已处理正文")
         if any(word in lowered for word in ("概览", "目标", "今天有哪些", "今日工作")):
@@ -169,9 +184,8 @@ class ConversationPlanner:
                 add("conversationRead", {"projection": "artifact", **parameters})
             else:
                 required.append("请明确当前会话中已经生成的产物编号；没有正式产物时不创建引用")
-        if any(word in lowered for word in ("计算", "比较", "毛利", "期间", "本周", "本月")):
-            required.append("经营计算需要当前明确期间、范围与指标，请采用现有经营查询共享入口")
         if not calls and not required:
             required.append("请明确需要读取的当前事项、来源、消息、运行或附件；其他业务动作需要相应正式输入")
         require(len(calls) <= 10, "本次读取范围超过已验证轮次，请明确需要的对象", web.HTTPBadRequest)
-        return ConversationPlan(tuple(calls), tuple(references), tuple(dict.fromkeys(required)), tuple(checks))
+        return ConversationPlan(tuple(calls), tuple(references), tuple(dict.fromkeys(required)), tuple(checks),
+            (query_plan.binding,) if query_plan.binding is not None else (), query_plan.pending_scope)

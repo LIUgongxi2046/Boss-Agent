@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from aiohttp import web
 from nanobot.agent.tools.context import current_request_context
+from nanobot.command.builtin import builtin_command_starts_agent_turn
 from nanobot.providers.base import LLMResponse, ToolCallRequest
 from nanobot.webui.session_identity import is_valid_webui_chat_id, webui_session_key
 from nanobot.webui.transcript import normalize_webui_turn_id
@@ -15,9 +16,12 @@ from boss_simulation_api import _context
 from boss_source_access import require_current_business_source
 from runtime_page_read_tools import BossDashboardReadTool, BossEvidenceReadTool, BossMeetingsReadTool
 from runtime_sop_read_tools import BossTasksReadTool, BossWorkspaceReadTool
-from conversation_agent import CONVERSATION_REQUEST, READ_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
+from conversation_agent import CONVERSATION_REQUEST, CONVERSATION_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
 from conversation_agent.domain import ConversationPlanner, ConversationDomainReadTool, artifact_digest
 from conversation_agent.runtime import ConversationRuntimeRecorder, ConversationSimulatedProvider
+from conversation_agent.queries import ConversationQueryTool
+from conversation_agent.presentation import render_conversation
+from fc02_agent import Fc02Context, Fc02Tool
 
 
 @dataclass(frozen=True)
@@ -77,20 +81,22 @@ class NativeConversationAgent:
             return db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='morning_native_binding' AND json_extract(body,'$.chat_id')=?", (chat_id,)).fetchone() is not None
 
     def tools(self):
-        return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates]
+        return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates] + [
+            ConversationQueryTool(Fc02Tool(self.store, self.query_context, "query_metrics"), self.scope)]
 
     def admit(self, role, chat_id, turn_id, content, *, media_sha256, attached, active):
-        if isinstance(content, str) and content.strip().casefold() == "/stop":
+        if isinstance(content, str) and not builtin_command_starts_agent_turn(content):
             return None
         if self.morning_claimed(chat_id):
             return None
         self._authorize(role, active)
         require(callable(attached) and attached(chat_id), "当前连接未采用该会话", web.HTTPForbidden)
         key = self.turn_key(chat_id, turn_id)
-        require(isinstance(content, str) and len(content.encode("utf-8")) <= 65536 and bool(content.strip()),
-                "当前会话输入为空或超过实际文字限制", web.HTTPBadRequest)
+        require(isinstance(content, str) and len(content.encode("utf-8")) <= 65536,
+                "当前会话文字超过实际限制", web.HTTPBadRequest)
         require(isinstance(media_sha256, str) and len(media_sha256) == 64
                 and all(value in "0123456789abcdef" for value in media_sha256), "实际媒体输入摘要无效", web.HTTPBadRequest)
+        require(bool(content.strip()) or media_sha256 != checksum([]), "当前会话没有文字或附件", web.HTTPBadRequest)
         digest = checksum({"text": content, "media_sha256": media_sha256})
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -135,10 +141,12 @@ class NativeConversationAgent:
     def record_media(self, role, key, accepted_media, accepted_paths, *, active):
         self._authorize(role, active)
         require(key in self.proofs, "实际上传缺少当前会话接收证明", web.HTTPForbidden)
+        self._authorize(role, self.proofs[key][0])
         with self.store.connect() as db:
             row = self.store.get(db, "ui-check", "conversation_intent", key)
             self._owner(row, self._identity(db))
             require(row["status"] == "ADMITTED", "当前原意图已经开始运行", web.HTTPConflict)
+            require(checksum(accepted_media) == row["media_sha256"], "成功上传内容与本轮原生媒体摘要不符", web.HTTPConflict)
         result = self.attachments.record_upload(role, {"session_id": row["session_id"], "chat_id": row["chat_id"]},
                                                 accepted_media, accepted_paths)
         snapshot = self.attachments.sessions.read_session_snapshot(row["session_id"])
@@ -147,7 +155,7 @@ class NativeConversationAgent:
         return result
 
     async def native_context(self, request):
-        if request.channel != "websocket" or (request.original_user_text or "").strip().casefold() == "/stop" or self.morning_claimed(request.chat_id):
+        if request.channel != "websocket" or not builtin_command_starts_agent_turn(request.original_user_text or "") or self.morning_claimed(request.chat_id):
             return None
         require(request.sender_id == "boss-1" and request.session_key == webui_session_key(request.chat_id),
                 "一般原生请求身份或会话不符", web.HTTPForbidden)
@@ -163,8 +171,8 @@ class NativeConversationAgent:
                 self._owner(row, identity)
                 require(row["status"] == "ADMITTED" and row["text_sha256"] == checksum(request.original_user_text)
                         and row["input_sha256"] == proof[1], "会话输入或原编号已变化", web.HTTPConflict)
-                previous = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? ORDER BY json_extract(body,'$.created_at')", (request.session_key,))]
-            refs, artifacts, last_source_id = [], [], None
+                previous = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND id<>? ORDER BY json_extract(body,'$.created_at')", (request.session_key, key))]
+            refs, artifacts, last_source_id, pending_query_scope = [], [], None, None
             for old in previous:
                 self._owner(old, identity)
                 for ref in old.get("references", []):
@@ -175,12 +183,15 @@ class NativeConversationAgent:
                         artifacts.append(tuple(check))
                 if old.get("last_source_id"):
                     last_source_id = old["last_source_id"]
+                pending_query_scope = old.get("pending_query_scope")
             query = {"session_id": request.session_key, "chat_id": request.chat_id}
             media = self._media_refs(self.attachments.read("BOSS", query))
+            require(all(state == "STORED" for _, _, state in media), "当前附件已变化或无法读取，请核查原附件", web.HTTPConflict)
             require(row["media_sha256"] == checksum([]) or key in self.pending_media,
                     "本轮媒体尚无原生成功上传的正式元信息", web.HTTPConflict)
             media = tuple(sorted(set(media) | set(self.pending_media.get(key, ()))))
-            plan = self.planner.plan(request.original_user_text, query, tuple(refs), tuple(artifacts), last_source_id)
+            plan = self.planner.plan(request.original_user_text, query, tuple(refs), tuple(artifacts), last_source_id,
+                has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope)
             self.validate_artifacts(plan, query)
             grant = ConversationGrant(key, request.chat_id, row["turn_id"], row["text_sha256"], proof[0], plan, media,
                 row["owner_id"], row["dataset_id"], row["dataset_version"])
@@ -192,6 +203,7 @@ class NativeConversationAgent:
                 row = self.store.get(db, "ui-check", "conversation_intent", key)
                 current_sources = [json.loads(parameters)["source"] for name, parameters in plan.calls if name == "bossEvidenceRead"]
                 row.update(references=plan.references, attachment_refs=media, artifact_checks=plan.artifact_checks,
+                           pending_query_scope=plan.pending_query_scope,
                            last_source_id=current_sources[-1] if current_sources else last_source_id,
                            plan_sha256=checksum({"calls": plan.calls, "required_inputs": plan.required_inputs}))
                 self.store.put(db, "ui-check", "conversation_intent", key, row)
@@ -209,7 +221,7 @@ class NativeConversationAgent:
         binding = request.attributes.get(ATTRIBUTE)
         return ConversationContext("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else request.message_id or request.turn_id, request.session_key,
-            request.chat_id, request.turn_id, bool(grant.key in self.proofs and grant.active()), grant.text_sha256, READ_TOOLS,
+            request.chat_id, request.turn_id, bool(grant.key in self.proofs and grant.active()), grant.text_sha256, CONVERSATION_TOOLS,
             frozenset((name, checksum(json.loads(params))) for name, params in grant.plan.calls), grant.plan.references)
 
     def validate_context(self, context):
@@ -223,7 +235,16 @@ class NativeConversationAgent:
             grant = request.attributes[CONVERSATION_REQUEST]
             media = self.attachments.read("BOSS", {"session_id": context.session_id, "chat_id": context.chat_id})
             require(self._media_refs(media) == grant.attachment_refs, "本轮实际媒体元信息已变化", web.HTTPConflict)
+            require(all(item["processing_state"] == "STORED" for item in media["attachments"]), "当前附件版本不可继续采用", web.HTTPConflict)
             self.validate_artifacts(grant.plan, {"session_id": context.session_id, "chat_id": context.chat_id})
+            binding = request.attributes[ATTRIBUTE]
+            with self.store.connect() as db:
+                run = self.store.get(db, "ui-check", "runtime_run", binding.run_id)
+            for step in run["tool_results"]:
+                if step["tool_id"] == "query_metrics":
+                    actual = self.planner.api.artifact("BOSS", {"session_id": context.session_id, "chat_id": context.chat_id,
+                        "run_id": binding.run_id, "kind": "query", "id": step["query_id"]})
+                    require(checksum(actual["data"]) == step["result_sha256"], "当前运行查询产物已经变化", web.HTTPConflict)
         return True
 
     def validate_artifacts(self, plan, query):
@@ -234,10 +255,17 @@ class NativeConversationAgent:
     async def scope_context(self, request):
         if self.handles(request):
             configured = getattr(self.registry, "configured_tool_names", self.registry.tool_names)
-            require(READ_TOOLS <= set(configured), "当前配置未启用一般会话六项正式读取工具", web.HTTPConflict)
+            require(CONVERSATION_TOOLS <= set(configured), "当前配置未启用一般会话七项正式工具", web.HTTPConflict)
             require(self.recorder.runtime_snapshot()["max_tool_rounds"] >= len(request.attributes[CONVERSATION_REQUEST].plan.calls) + 1,
                     "当前实际轮次配置不足以执行本次正式读取", web.HTTPConflict)
-            request.attributes["product_feature_tool_scope"] = READ_TOOLS
+            request.attributes["product_feature_tool_scope"] = CONVERSATION_TOOLS
+
+    def query_context(self):
+        request = current_request_context()
+        context = self.scope.current(request)
+        grant = request.attributes[CONVERSATION_REQUEST]
+        return Fc02Context(context.role, context.owner_id, context.namespace, context.dataset_id, context.dataset_version,
+            context.request_id, context.session_id, context.active, grant.plan.query_bindings, frozenset())
 
     async def events(self, messages, tools):
         request = current_request_context()
@@ -249,8 +277,7 @@ class NativeConversationAgent:
         if len(outputs) < len(grant.plan.calls):
             name, params = grant.plan.calls[len(outputs)]
             return LLMResponse(content=None, tool_calls=[ToolCallRequest(id=str(uuid4()), name=name, arguments=json.loads(params))], usage=None)
-        return LLMResponse(content=encode({"source_type": "SIMULATED", "outcome": "WAITING_INPUT" if grant.plan.required_inputs else "READ_RESULT",
-            "results": outputs, "required_inputs": grant.plan.required_inputs, "business_authority_granted": False}), usage=None)
+        return LLMResponse(content=render_conversation(grant.plan.calls, outputs, grant.plan.required_inputs), usage=None)
 
     def runtime_reference(self, request):
         grant = request.attributes[CONVERSATION_REQUEST]

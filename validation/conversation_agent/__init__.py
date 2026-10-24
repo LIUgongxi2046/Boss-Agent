@@ -13,9 +13,10 @@ from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_page_read_tools import _BossPageReadTool
 
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 CONVERSATION_REQUEST = "product_conversation_request"
 READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead", "conversationRead"})
+CONVERSATION_TOOLS = READ_TOOLS | {"query_metrics"}
 
 
 @dataclass(frozen=True)
@@ -54,7 +55,7 @@ class ConversationScope:
                 and context.turn_id == request.turn_id and context.input_sha256 == checksum(request.original_user_text),
                 "会话输入、身份或关联不符", web.HTTPForbidden)
         require(isinstance(context.allowed_tools, frozenset) and bool(context.allowed_tools)
-                and context.allowed_tools <= READ_TOOLS and isinstance(context.allowed_calls, frozenset)
+                and context.allowed_tools <= CONVERSATION_TOOLS and isinstance(context.allowed_calls, frozenset)
                 and all(isinstance(call, tuple) and len(call) == 2 and call[0] in context.allowed_tools
                         and isinstance(call[1], str) and len(call[1]) == 64 for call in context.allowed_calls),
                 "会话工具或当前参数范围无效", web.HTTPForbidden)
