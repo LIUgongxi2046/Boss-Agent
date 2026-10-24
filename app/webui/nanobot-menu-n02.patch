@@ -250,4 +250,22 @@
                            composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
 +                          composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}
 +                          composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}
+*** Update File: webui/src/App.tsx
+@@
+   const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const windowCloseGuard=useRef<((close:()=>void)=>void)|null>(null);
++  const registerWindowCloseGuard=useCallback((guard:((close:()=>void)=>void)|null)=>{windowCloseGuard.current=guard;},[]);
++  useEffect(()=>{
++    const bridge=(window as Window&{bossDesktop?:{onCloseRequested?:(listener:()=>void)=>()=>void;confirmClose?:()=>Promise<unknown>}}).bossDesktop;
++    if(!bridge?.onCloseRequested||!bridge.confirmClose)return;
++    const confirm=bridge.confirmClose;
++    return bridge.onCloseRequested(()=>{
++      const close=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{void confirm();}));
++      const guard=windowCloseGuard.current;
++      if(guard)guard(close);else close();
++    });
++  },[]);
+@@
+       <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onRegisterCloseGuard={registerWindowCloseGuard}
 *** End Patch

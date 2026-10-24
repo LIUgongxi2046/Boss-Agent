@@ -45,6 +45,9 @@ let child;
 let quitting = false;
 let window;
 let microphoneAuthorized = false;
+let closeHandlerReady = false;
+let closeRequested = false;
+let closeConfirmed = false;
 let serviceStartupElapsedMs = null;
 const eventNotifications = new Map();
 const origin = 'http://127.0.0.1:' + ports.webui;
@@ -60,6 +63,7 @@ if (!app.requestSingleInstanceLock()) {
   app.on('before-quit', async (event) => {
     if (quitting || !child || child.exitCode !== null) return;
     event.preventDefault();
+    if (window && !window.isDestroyed()) { window.close(); return; }
     quitting = true;
     record('stop_service_requested', { service_pid: child.pid });
     child.kill('SIGTERM');
@@ -69,8 +73,29 @@ if (!app.requestSingleInstanceLock()) {
   });
   app.on('quit', () => record('quit'));
 
+  function requireWindowFrame(event) {
+    if (!window || event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame || new URL(event.senderFrame.url).origin !== new URL(window.webContents.getURL()).origin) throw new Error('IPC 发送方无权访问');
+  }
+  function requireMainFrame(event) {
+    requireWindowFrame(event);
+    if (new URL(event.senderFrame.url).origin !== origin) throw new Error('IPC 页面来源无权访问业务能力');
+  }
+  ipcMain.on('boss-desktop:close-handler', (event, enabled) => {
+    requireWindowFrame(event);
+    if (typeof enabled !== 'boolean') throw new Error('关闭处理器状态无效');
+    closeHandlerReady = enabled;
+    if (!enabled) closeRequested = false;
+  });
+  ipcMain.handle('boss-desktop:confirm-close', event => {
+    requireWindowFrame(event);
+    if (!closeHandlerReady || !closeRequested || closeConfirmed) throw new Error('当前没有待确认的窗口关闭请求');
+    closeConfirmed = true;
+    window.close();
+    return { closing: true };
+  });
+
   async function authorize(event, token) {
-    if (!window || event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame || new URL(event.senderFrame.url).origin !== origin) throw new Error('IPC 发送方无权访问');
+    requireMainFrame(event);
     if (typeof token !== 'string' || token.length > 200) throw new Error('IPC 身份凭据无效');
     const response = await fetch(origin + '/api/boss/identity', { headers: { Authorization: 'Bearer ' + token } });
     if (!response.ok) throw new Error('IPC 未认证');
@@ -183,6 +208,15 @@ if (!app.requestSingleInstanceLock()) {
     serviceStartupElapsedMs = Date.now() - startedAt;
     record('service_started', { service_pid: child.pid, elapsed_ms: serviceStartupElapsedMs });
     window = new BrowserWindow({ ...branding.windowOptions(), show: process.env.BOSS_DESKTOP_TEST_WINDOW_HIDDEN !== '1', width: 1280, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, preload: path.join(__dirname, 'preload.cjs') } });
+    window.on('close', event => {
+      if (closeHandlerReady && !closeConfirmed) {
+        event.preventDefault();
+        closeRequested = true;
+        window.webContents.send('boss-desktop:close-requested');
+      }
+    });
+    window.webContents.on('did-navigate', () => { closeHandlerReady = false; closeRequested = false; closeConfirmed = false; });
+    window.webContents.on('will-prevent-unload', () => { closeConfirmed = false; });
     branding.attachWindow(window);
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, address) => { if (new URL(address).origin !== origin) event.preventDefault(); });

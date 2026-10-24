@@ -1,17 +1,37 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-20261025",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-af4db94a-30ea-450f-8c57-d6cb3481f186",
   "ports": {
     "business": 10791,
     "webui": 10792,
     "gateway": 20791
   },
   "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
-  "manifest_sha256": "7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5",
+  "manifest_sha256": "0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
+    {
+      "check": "fresh_isolated_initializer_uses_actual_registered_tools",
+      "configuration_version": "2",
+      "tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossSupplyQualityPrepare",
+        "bossSupplyQualityQuery",
+        "bossSupplyQualityRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "morningDetailRead",
+        "morningListRead",
+        "morningSourceRead",
+        "query_metrics",
+        "todayRead"
+      ]
+    },
     {
       "check": "controlled_main_window_role_account_fill_requires_explicit_login",
       "role": "BOSS",

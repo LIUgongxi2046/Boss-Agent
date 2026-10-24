@@ -140,6 +140,7 @@ type Props = {
   children: (role: Role, visible: boolean, actions:ConversationActions) => ReactNode;
   onOpenNative: (role: Role) => void;
   onBeforeLeaveNative: (leave: () => void) => void;
+  onRegisterCloseGuard: (guard: ((close: () => void) => void) | null) => void;
 };
 
 const pages = pageMeta as Record<string, DesignPage>;
@@ -246,7 +247,7 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
   </div>;
 }
 
-export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onNewConversation, children, onOpenNative, onBeforeLeaveNative }: Props) {
+export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onNewConversation, children, onOpenNative, onBeforeLeaveNative,onRegisterCloseGuard }: Props) {
   const { client, token } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [mvpScope,setMvpScope]=useState(false);
@@ -286,6 +287,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
   const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
+  const [pendingWindowClose,setPendingWindowClose]=useState<(()=>void)|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -415,6 +417,17 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     setError("");
     setDirectoryOpen(false);
   }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,supplyDirty,importDirty,directoryOpen,mvpScope,priorityScope,onOpenNative,onBeforeLeaveNative]);
+
+  useEffect(()=>{
+    onRegisterCloseGuard(close=>{
+      if(["NATIVE","N02"].includes(page)){onBeforeLeaveNative(close);return;}
+      if(assignmentDirty||sourceReviewDirty||settingsDirty||workDirty||supplyDirty||importDirty){
+        navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
+        setPendingWindowClose(()=>close);
+      }else close();
+    });
+    return()=>onRegisterCloseGuard(null);
+  },[page,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,supplyDirty,importDirty,onBeforeLeaveNative,onRegisterCloseGuard]);
 
   const sopChanged = useCallback((sopId: string) => {
     setSelectedSop(sopId);
@@ -1004,7 +1017,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
         </main>
       </div>
     </div>
-    <DialogPrimitive.Root open={pendingNavigation !== null} onOpenChange={(open) => {if (!open) setPendingNavigation(null);}}>
+    <DialogPrimitive.Root open={pendingNavigation !== null||pendingWindowClose!==null} onOpenChange={(open) => {if (!open){setPendingNavigation(null);setPendingWindowClose(null);}}}>
       <DialogPrimitive.Portal container={shellRef.current}>
         <DialogPrimitive.Overlay className="boss-confirm-backdrop"/>
         <DialogPrimitive.Content className="boss-confirm boss-navigation-confirm" onCloseAutoFocus={(event) => {
@@ -1024,7 +1037,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <DialogPrimitive.Close asChild><button type="button" className="boss-btn">返回继续编辑</button></DialogPrimitive.Close>
           <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
             const destination=pendingNavigation;
-            if (!destination) throw new Error("离开页面缺少目标");
+            const close=pendingWindowClose;
+            if (!destination&&!close) throw new Error("离开页面缺少目标");
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
             setSourceReviewDirty(false);
@@ -1033,7 +1047,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             if(["F14","F21"].includes(page)&&!supplyEditor.pending&&!supplyEditor.pendingPreparation)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
             if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);
-            navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
+            setPendingWindowClose(null);
+            if(close)close();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
           }}>放弃草稿并离开</button>
         </div>
         </DialogPrimitive.Content>

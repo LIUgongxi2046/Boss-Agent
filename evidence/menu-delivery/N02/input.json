@@ -1,13 +1,13 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_INPUT_AND_FILE_SELECTION",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-8b3c4bea-af64-45c0-b663-809bc08a0c9e",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-0f77b680-53f7-48c4-8344-36ebe1f7b74d",
   "ports": {
     "business": 10781,
     "webui": 10782,
     "gateway": 20781
   },
-  "manifest_sha256": "7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5",
+  "manifest_sha256": "0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "external_api_mode": "SIMULATED_FIRST",
@@ -21,11 +21,27 @@
     {
       "check": "actual_source_text_exceeds_current_advertised_limit",
       "source": "app/webui/BossDesktop.tsx",
-      "source_sha256": "354570e91cb12a5646d2a9782237c44c3c2ed5346abc6b8209fd9430d3c2df27",
-      "actual_bytes": 73531,
+      "source_sha256": "1e8f1b504eda0b41293b51abe8bcace0df0f283a938ea61e0408e1f84cffd819",
+      "actual_bytes": 74486,
       "max_text_bytes": 65536,
       "submission_count": 0,
       "input_retained": true
+    },
+    {
+      "check": "actual_source_export_exceeds_advertised_file_limit_without_padding",
+      "source_file_count": 708,
+      "actual_bytes": 8523725,
+      "sha256": "1b5def9705fae6d0c90999cb5833dde4b35dccde433fd9a7fc8e68a3e31ce517",
+      "max_file_bytes": 6291456,
+      "input_retained": true,
+      "submission_count": 0
+    },
+    {
+      "check": "actual_file_read_permission_failure_preserves_existing_text_and_file",
+      "previous_file_retained": true,
+      "input_retained": true,
+      "error_file_not_submitted": true,
+      "submission_count": 0
     },
     {
       "check": "actual_file_selection_cancel_and_advertised_attachment_count",

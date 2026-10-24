@@ -17,8 +17,8 @@ CURRENT；decision_id=D-UI-FIDELITY-20261024；MENU-N02.C01/C02/C25/C26；责任
 | N02-D09 | 可观察步骤、实际产物、来源/交办/原执行结果入口和右侧进展 | 当前真实Runtime步骤/产物及重读采用；实际Dialog关闭及查询来源原文/交办详情返回后，同一会话、运行选择、滚动和触发按钮焦点保持 | BossConversationWorkspace.tsx、public_conversation.py、native.json；完整C07—C23待继续 | RETURN_CHECKED_REVIEW_PENDING |
 | N02-D10 | stage gap11、1440 padding4px 23px 22px 28px | 18组stage间距/内距匹配；正文起点1440为y243，不包含设计预览工具 | boss-n02.css、BossDesktop.tsx、App.tsx；正文内部完整密度待复核 | FRAMEWORK_CHECKED |
 | N02-D11 | Panel h2 17/26/760/#163052、正文16/24、辅助14/22、主操作84×44/14、背景#0969E8、焦点offset2；输入最小88/字重600 | 18组输入横向位置/宽度/88px高度与原稿相同；主操作五种状态84×44、字体14/690/24、键盘焦点offset2；真实label本次消息、主操作提交需求、附件入口添加附件；交办消息/步骤采用h2及完整Panel边框/圆角/内距/阴影 | boss-n02.css及原生Composer采用处；运行停止、长内容和全部状态仍需完整复核 | CONTROLS_CHECKED_REVIEW_PENDING |
-| N02-D12 | S00—S10、D06/D07/D08、选择/展开/滚动/历史返回及200% | 实际产物Dialog/Escape/焦点、草稿/附件/排队保护通过；完整状态、权限、异常和历史阅读仍待运行 | 当前N02组件及独立行为检查；完整26项尚未通过 | INTERACTION_PENDING |
+| N02-D12 | S00—S10、D06/D07/D08、选择/展开/滚动/历史返回及200% | 实际产物Dialog/Escape/焦点、草稿/附件/排队保护和后续输出保持历史位置通过；窗口关闭/app.quit的D06继续编辑及明确放弃、六组视口的44px目标和键盘焦点通过 | 当前N02组件、native-privacy.json、close.json；其他必要状态及完整26项继续核查 | INTERACTION_PENDING |
 
 动态内容采用正式数据，比较继续记录数量、文字长度、选中与展开状态；自然高度变化单独说明。框架尺寸检查不代表正文和全部控件已完成设计复核。当前样式按N02作用范围采用，F01必要设计返修保持独立未完成。
 
-N4对b3de8ea3788629f977f02f182e74a18ea430dc85和7fd1制品的指定SVG、子Panel、标签/输入/附件/提交操作、五状态、历史展开及详情返回增量已给出APPROVED/TARGETED_CLOSED；记录SHA256为30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca。该范围没有未处理必要缺陷。随后实际IME、输入限制、文件选择、长文件名及D06、语音暂停/快捷键、搜索和历史阅读位置证据见input.json、framework-current.json、native-privacy.json。完整26项、关闭与迟到文件等其他必要路径、任务进入会话的版本绑定及用户验收继续保留。
+N4对b3de8ea3788629f977f02f182e74a18ea430dc85和7fd1制品的指定SVG、子Panel、标签/输入/附件/提交操作、五状态、历史展开及详情返回增量已给出APPROVED/TARGETED_CLOSED；记录SHA256为30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca。该范围没有未处理必要缺陷。当前关闭增量构建manifest=0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c，真实IME、输入与文件大小限制、文件读取失败、长文件名/D06、语音暂停/快捷键及真实关闭六组视口见input.json、close.json；搜索及历史阅读位置见各自准确版本framework-current.json、native-privacy.json。完整26项、迟到文件等其他必要路径、任务进入会话的版本绑定及用户验收继续保留。

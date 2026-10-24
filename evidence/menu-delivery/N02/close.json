@@ -1,0 +1,383 @@
+{
+  "status": "PASS",
+  "scope": "N02_REAL_WINDOW_AND_APPLICATION_CLOSE_D06",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-close-7f1aed05-2f13-40c4-891c-109645323e91",
+  "ports": {
+    "business": 10801,
+    "webui": 10802,
+    "gateway": 20801
+  },
+  "manifest_sha256": "0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_close_dialog_six_viewports_and_keyboard_focus",
+      "layouts": [
+        {
+          "width": 1440,
+          "height": 1024,
+          "zoom": 1,
+          "viewport": {
+            "width": 1440,
+            "height": 1024
+          },
+          "dialog": {
+            "x": 464,
+            "y": 431,
+            "width": 512,
+            "height": 162,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 670,
+              "y": 525,
+              "width": 130,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 808,
+              "y": 525,
+              "width": 144,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 922,
+              "y": 441,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        },
+        {
+          "width": 1440,
+          "height": 1024,
+          "zoom": 2,
+          "viewport": {
+            "width": 720,
+            "height": 512
+          },
+          "dialog": {
+            "x": 104,
+            "y": 175,
+            "width": 512,
+            "height": 162,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 310,
+              "y": 269,
+              "width": 130,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 448,
+              "y": 269,
+              "width": 144,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 562,
+              "y": 185,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        },
+        {
+          "width": 1280,
+          "height": 800,
+          "zoom": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "dialog": {
+            "x": 384,
+            "y": 319,
+            "width": 512,
+            "height": 162,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 590,
+              "y": 413,
+              "width": 130,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 728,
+              "y": 413,
+              "width": 144,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 842,
+              "y": 329,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        },
+        {
+          "width": 1280,
+          "height": 800,
+          "zoom": 2,
+          "viewport": {
+            "width": 640,
+            "height": 400
+          },
+          "dialog": {
+            "x": 64,
+            "y": 119,
+            "width": 512,
+            "height": 162,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 270,
+              "y": 213,
+              "width": 130,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 408,
+              "y": 213,
+              "width": 144,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 522,
+              "y": 129,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        },
+        {
+          "width": 1024,
+          "height": 768,
+          "zoom": 1,
+          "viewport": {
+            "width": 1024,
+            "height": 768
+          },
+          "dialog": {
+            "x": 256,
+            "y": 303,
+            "width": 512,
+            "height": 162,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 462,
+              "y": 397,
+              "width": 130,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 600,
+              "y": 397,
+              "width": 144,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 714,
+              "y": 313,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        },
+        {
+          "width": 1024,
+          "height": 768,
+          "zoom": 2,
+          "viewport": {
+            "width": 512,
+            "height": 384
+          },
+          "dialog": {
+            "x": 16,
+            "y": 85,
+            "width": 480,
+            "height": 214,
+            "font_size": "16px",
+            "line_height": "24px",
+            "outline": "rgb(23, 43, 77) none 3px",
+            "outline_offset": "0px"
+          },
+          "buttons": [
+            {
+              "label": "返回继续编辑",
+              "focused": true,
+              "x": 40,
+              "y": 231,
+              "width": 432,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            },
+            {
+              "label": "放弃输入并离开",
+              "focused": false,
+              "x": 40,
+              "y": 179,
+              "width": 432,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgb(255, 255, 255) none 3px",
+              "outline_offset": "0px"
+            },
+            {
+              "label": "关闭",
+              "focused": false,
+              "x": 442,
+              "y": 95,
+              "width": 44,
+              "height": 44,
+              "font_size": "16px",
+              "line_height": "24px",
+              "outline": "rgba(0, 0, 0, 0) solid 2px",
+              "outline_offset": "2px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "check": "actual_window_close_native_draft_continue_keeps_window_service_text_and_file",
+      "text_retained": true,
+      "file_count": 1,
+      "service_alive": true
+    },
+    {
+      "check": "actual_application_quit_cancel_keeps_backend_and_native_draft",
+      "service_alive": true,
+      "text_retained": true,
+      "file_count": 1
+    },
+    {
+      "check": "actual_shared_message_close_uses_existing_d06_without_saving_or_sending",
+      "input_retained": true,
+      "service_alive": true
+    },
+    {
+      "check": "explicit_d06_discard_closes_actual_window_and_application",
+      "application_exit_code": 0
+    }
+  ]
+}

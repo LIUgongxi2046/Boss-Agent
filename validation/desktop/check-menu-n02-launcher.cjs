@@ -1,18 +1,19 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const {createHash}=require('node:crypto');
+const {createHash,randomUUID}=require('node:crypto');
 const {execFileSync}=require('node:child_process');
 const {_electron:electron}=require('playwright');
 const {expect:baseExpect}=require('@playwright/test');
 const expect=baseExpect.configure({timeout:15000});
-const root=path.resolve(__dirname,'../..'),validation=path.join(root,'validation'),directory=path.join(validation,'.work/menu-n02-launcher-check-20261025');
+const root=path.resolve(__dirname,'../..'),validation=path.join(root,'validation'),directory=path.join(validation,'.work','menu-n02-launcher-check-'+randomUUID());
 const frontend=path.join(root,'menu-n02-n3-dist'),ports={business:10791,webui:10792,gateway:20791},origin='http://127.0.0.1:'+ports.webui;
 const output=path.join(root,'evidence/menu-delivery/N02/launcher.json'),records=[];
 function save(status){fs.writeFileSync(output,JSON.stringify({status,scope:'N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL',application_directory:directory,ports,frontend_directory:frontend,manifest_sha256:createHash('sha256').update(fs.readFileSync(path.join(frontend,'asset-manifest.json'))).digest('hex'),visual:'NOT_RUN',user_acceptance:'NOT_RUN',records},null,2)+'\n');}
 async function main(){let desktop;
   try{
-    const setup=JSON.parse(fs.readFileSync(path.join(directory,'setup.json')));assert.equal(setup.feature_id,'MENU-N02');assert.equal(setup.status,'READY');assert.deepEqual(setup.ports,ports);
+    const initialization=JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(root,'scripts/prepare_menu_n02.py'),'--directory',directory,'--frontend',frontend,'--ports',JSON.stringify(ports)],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(validation,'.work/tmp')},encoding:'utf8'}));assert.equal(initialization.existing_data_reused,false);
+    const setup=JSON.parse(fs.readFileSync(path.join(directory,'setup.json')));assert.equal(setup.feature_id,'MENU-N02');assert.equal(setup.status,'READY');assert.deepEqual(setup.ports,ports);records.push({check:'fresh_isolated_initializer_uses_actual_registered_tools',configuration_version:setup.configuration_version,tool_scope:setup.runtime_configuration_values.tool_scope});save('IN_PROGRESS');
     const credentialFile=path.join(directory,'accounts/credentials.json'),beforeCredential=fs.statSync(credentialFile),digest=()=>JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(validation,'fc04_state_digest.py'),directory],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(directory,'tmp')},encoding:'utf8'}));const before=digest();
     desktop=await electron.launch({executablePath:path.join(root,'scripts/run_menu_n02.command'),args:[],cwd:root,timeout:120000,env:{...process.env,BOSS_DESKTOP_TEST_WINDOW_HIDDEN:'1',BOSS_MENU_N02_WORK_DIRECTORY:directory,BOSS_MENU_N02_PORTS:JSON.stringify(ports),PYTHONDONTWRITEBYTECODE:'1'}});
     const page=await desktop.firstWindow({timeout:120000});await page.waitForURL(origin+'/?bossPage=N02');

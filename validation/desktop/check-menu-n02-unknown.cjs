@@ -36,8 +36,7 @@ async function main(){let desktop,proxy,page;
     const storage=await page.evaluate(()=>JSON.stringify({url:location.href,local:Object.fromEntries(Object.entries(localStorage)),session:Object.fromEntries(Object.entries(sessionStorage))}));assert(!storage.includes(source.content));const finalTrace=await trace();assert.equal(finalTrace.requests.filter(item=>item.action==='boss.message.draft.save').length,1);assert.equal(finalTrace.requests.filter(item=>item.action==='boss.message.send').length,1);
     await page.getByRole('button',{name:'返回原会话',exact:true}).click();await page.waitForURL(/bossPage=N02/);await expect(page.getByRole('region',{name:'聊天交办内容',exact:true})).toBeVisible();records.push({check:'actual_sent_response_interrupted_reload_preserves_original_readonly_request',draft_id:sent.receipt.result.draft_id,message_id:sent.receipt.result.message_id,client_request_id:sent.dropped.client_request_id,transaction_response_sha256:sent.dropped.response_sha256,submission_count:1,send_state:sent.receipt.result.send_state,delivery_state:sent.receipt.result.delivery_state,lookup_replayed:false,refresh_preserved_original_id:true,private_body_in_ordinary_storage:false,refresh_preserved_conversation_return:true});save('PASS');
   }finally{
-    if(page&&!page.isClosed()){await page.keyboard.press('Escape');const reset=page.getByRole('button',{name:'新建草稿',exact:true});if(await reset.isVisible())await reset.click();}
-    if(desktop)await desktop.close();if(proxy)proxy.kill('SIGTERM');
+    if(desktop){await desktop.evaluate(({BrowserWindow})=>{for(const window of BrowserWindow.getAllWindows())window.destroy();});await desktop.close();}if(proxy)proxy.kill('SIGTERM');
   }
 }
 main().then(()=>console.log(JSON.stringify({status:'PASS',report:output})),failure=>{records.push({check:'failure',stage,error_type:failure.name});save('FAIL');console.error(JSON.stringify({status:'FAIL',report:output,stage,error_type:failure.name}));process.exitCode=1;});
