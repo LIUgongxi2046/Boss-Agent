@@ -451,6 +451,10 @@ class BossCommandAPI:
             require(isinstance(payload["source_refs"], list) and bool(payload["source_refs"])
                     and set(payload["source_refs"]) <= {ref["id"] for ref in item["source_refs"] if ref["kind"] == "document"},
                     "交办来源必须属于选中晨间事项", web.HTTPConflict)
+            require(payload["related_meeting_id"] is None or payload["related_meeting_id"] in {ref["id"] for ref in item.get("related_meetings", [])},
+                    "关联会议必须属于选中晨间事项", web.HTTPConflict)
+            require(isinstance(payload["related_event_ids"], list) and set(payload["related_event_ids"]) <= {ref["id"] for ref in item["source_refs"] if ref["kind"] == "event"},
+                    "关联事件必须属于选中晨间事项", web.HTTPConflict)
         require(_is_text(payload["purpose"]), "交办内容不能为空或过长", web.HTTPBadRequest)
         require(payload["content_version"] == "1", "当前只接受演示内容版本 1", web.HTTPBadRequest)
         require(payload["coordinator_id"] in {c["contact_id"] for c in data["contacts"]},
@@ -463,12 +467,13 @@ class BossCommandAPI:
                            if c["contact_id"] == payload["coordinator_id"])
         require(coordinator["valid_from"] <= today <= coordinator["valid_until"],
                 "负责人在当前模拟业务时钟下已失效", web.HTTPForbidden)
-        require(payload["related_meeting_id"] == data["meeting"]["meeting_id"],
-                "关联会议不符", web.HTTPBadRequest)
-        require(payload["related_event_ids"] == [data["event"]["event_id"]],
-                "关联事项不符", web.HTTPBadRequest)
+        if morning_reference is None:
+            require(payload["related_meeting_id"] == data["meeting"]["meeting_id"],
+                    "关联会议不符", web.HTTPBadRequest)
+            require(payload["related_event_ids"] == [data["event"]["event_id"]],
+                    "关联事项不符", web.HTTPBadRequest)
         refs = payload["source_refs"]
-        require(isinstance(refs, list) and refs == ["finance-note"],
+        require(isinstance(refs, list) and bool(refs) and len(refs) == len(set(refs)) and (morning_reference is not None or refs == ["finance-note"]),
                 "当前交办资料范围不符", web.HTTPBadRequest)
         for source_id in refs:
             self._require_current_source(db, data, source_id)

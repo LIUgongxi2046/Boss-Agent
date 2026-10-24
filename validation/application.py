@@ -154,7 +154,7 @@ async def serve():
     recovery = RecoveryCoordinator(sessions=sessions, bus=bus, unified_session=False)
     delivery = TurnDeliveryFactory(bus, route_policy=WebuiTurnRoutePolicy(sessions))
     loop = AgentLoop.from_config(config, bus, provider=provider, tool_registry=registry, hooks=[audit],
-                                 hook_factories=[runtime_recorder.hook_factory] if runtime_recorder is not None else [],
+                                 hook_factories=[runtime_recorder.hook_factory, morning.native.hook_factory] if runtime_recorder is not None else [],
                                  session_manager=sessions, turn_delivery_factory=delivery, recovery_admission=recovery)
     audit.runtime_snapshot = lambda: {"provider": "deepseek", "model_id": loop.model, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "config_sha256": effective_config_sha256}
     coordinator = WebuiTurnCoordinator(bus=bus, sessions=sessions, schedule_background=loop.schedule_background, recovery=recovery)
@@ -270,17 +270,18 @@ async def serve():
                     "confirmed_owner_goals": record_runtime_goal_context_load(store, "ui-check"),
                     "guidance_authority_boundary": "Technical prompts do not grant BOSS rights or authorize business writes.",
                 }))
-            bot.runtime.add_context_provider(runtime_control.context)
-            bot.runtime.add_context_provider(skills.context)
-            bot.runtime.add_context_provider(OwnerMemoryContext(store))
-            bot.runtime.add_context_provider(owner_goals_context)
+            bot.runtime.add_context_provider(morning.native.native_context)
+            bot.runtime.add_context_provider(morning.guard_context(runtime_control.context))
+            bot.runtime.add_context_provider(morning.guard_context(skills.context))
+            bot.runtime.add_context_provider(morning.guard_context(OwnerMemoryContext(store)))
+            bot.runtime.add_context_provider(morning.guard_context(owner_goals_context))
             if mvp_mode:
-                bot.runtime.add_context_provider(fc01.scope_context)
-            bot.runtime.add_context_provider(bi.scope_context)
-            bot.runtime.add_context_provider(morning.scope_context)
-            bot.runtime.add_context_provider(assignment.scope_context)
-            bot.runtime.add_context_provider(reminders.scope_context)
-            bot.runtime.add_context_provider(runtime_recorder.context)
+                bot.runtime.add_context_provider(morning.guard_context(fc01.scope_context))
+            bot.runtime.add_context_provider(morning.guard_context(bi.scope_context))
+            bot.runtime.add_context_provider(morning.guard_context(morning.scope_context))
+            bot.runtime.add_context_provider(morning.guard_context(assignment.scope_context))
+            bot.runtime.add_context_provider(morning.guard_context(reminders.scope_context))
+            bot.runtime.add_context_provider(morning.guard_context(runtime_recorder.context))
         else:
             bot.runtime.add_context_provider(context)
         await cron.start()

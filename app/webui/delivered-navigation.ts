@@ -3,7 +3,8 @@ type Entry={title:string;feature:string;directory:boolean};
 export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
   BOSS:{
     NATIVE:{title:"大鹏会话",feature:"UI02",directory:true},
-    F01:{title:"采购成本协调",feature:"MVP01",directory:true},
+    F01:{title:"今日工作",feature:"MENU-F01",directory:true},
+    MVP01:{title:"采购成本协调",feature:"MVP01",directory:true},
     F03:{title:"经营查询与追问",feature:"FC02",directory:true},
     F14:{title:"原料与饲料报告",feature:"FC01",directory:true},
     F21:{title:"食品与品质报告",feature:"FC01",directory:true},

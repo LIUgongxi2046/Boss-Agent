@@ -149,3 +149,36 @@ def test_public_morning_explicit_scope_and_actual_request_cancellation(product_m
 def test_morning_registration_preserves_actual_fc01_shared_dispatch(product_morning):
     store, _, runtime, recorder, config = product_morning
     verify_fc01_shared_dispatch((store, runtime.provider.bi, runtime, recorder, config))
+
+
+def test_selected_morning_item_reaches_public_runtime(product_morning):
+    store, morning, runtime, recorder, config = product_morning
+    enable(morning, runtime)
+    async def execute():
+        async with Nanobot(runtime.loop, config=config) as bot:
+            morning.bot = bot
+            for provider in (runtime.context, morning.scope_context, recorder.context):
+                bot.runtime.add_context_provider(provider)
+            first = await morning.execute("BOSS", payload("menu-f01-initial", date="2026-10-23"), lambda: True)
+            list_id = first["receipt"]["result"]["list_id"]
+            view = morning.api.read_list("BOSS", list_id)["result"]
+            item = next(item for item in view["items"] if any(ref["kind"] == "document" for ref in item["source_refs"]))
+            selected = payload("menu-f01-selected", date="2026-10-23", list_id=list_id, item_id=item["item_id"])
+            result = await morning.execute("BOSS", selected, lambda: True)
+            assert await morning.execute("BOSS", selected, lambda: True) == result
+            with pytest.raises(web.HTTPConflict):
+                morning._request("BOSS", {**selected, "item_id": "unrelated-item"}, lambda: True)
+            return result, item, list_id
+    result, item, list_id = asyncio.run(execute())
+    assert result["request_state"] == "SUCCEEDED"
+    with store.connect() as db:
+        run = store.get(db, "ui-check", "runtime_run", result["run_id"])
+        assert db.execute("SELECT count(*) FROM objects WHERE kind='morning_list'").fetchone()[0] == 1
+        assert db.execute("SELECT count(*) FROM objects WHERE kind IN ('authorization','task','outbox')").fetchone()[0] == 0
+    reference = run["morning_context"]["selected_item_ref"]
+    assert reference["list_id"] == list_id and reference["item_id"] == item["item_id"]
+    assert reference["source_refs"] == item["source_refs"]
+    details = [result for result in run["tool_results"] if result["tool_id"] == "morningDetailRead"]
+    assert len(details) == 1 and details[0]["item_refs"][0]["item_id"] == item["item_id"]
+    schema = json.loads((Path(__file__).resolve().parents[2] / "specs/runtime-records.schema.json").read_text())
+    Draft202012Validator({**schema, "$ref": "#/$defs/CurrentRuntimeRun"}, format_checker=FormatChecker()).validate(run)

@@ -194,3 +194,21 @@ BossDesktop 的 children(role, visible)、onOpenNative(role)、onBeforeLeaveNati
 页面目录共用已交付映射与 Radix 焦点约束；Meta/Control+K 打开唯一目录，Escape 关闭并恢复焦点。原生快捷键仅在原生页面生效，会话搜索保留明确按钮。所有页面复用当前 v6 字体、蓝绿白颜色及共享语义 Token；正文 16px/24px，卡片 14px，输入 9px，键盘焦点 2px。短窗口采用紧凑标题和原生内容内滚动，输入与分类保持可操作。原生默认语言为 zh-CN，已有语言选择继续保存。
 
 UI02 的上游增量保存在 app/webui/nanobot-ui02-shell.patch，适用于 UI01 预备源码，通过文件编辑工具维护；准备目录与正式 BossDesktop/CSS 必须一致。当前构建输出 ui02-n3-dist，来源及静态制品摘要由 UI02 inventory 核查。独立启动器 run_ui02.command 使用 ui02-experience 和 10411/10412/20411，不操作当前体验资料。全部外部 SIMULATED_FIRST，STT 暂停，视觉与用户验收独立登记。当前结果及准确版本引用 UI02 主记录与原始正式状态。
+
+## MENU-F01 今日工作
+
+CURRENT，2026-10-24，需求为 D-MENU-DELIVERY-20261024 及完整 MENU-F01.C01—C18。F01 使用 BossMorningView；采购成本协调继续使用独立 MVP01 入口。Shell、可信 identity、认证、原生 ClientProvider 和 Electron 宿主权限沿用 UI02。同一 authenticated client 的 token 续期保留当前输入及编辑；退出与新身份清除私人状态。
+
+布局采用原 v6 实际加载 home：主列日期范围、三类事项及本人表格、自然语言；右列选中详情、会议与承诺、冲突、来源及覆盖。三类计数与筛选使用同一 View，表格每页10项，保存始终提交完整事项集合。宽屏右列310px，≤1250px为260px，≤1050px单列；区域间距14px、列内13px，Panel 内距18px/20px，≤700px为15px。卡片采用 Token 14px。设计区域映射、原脚本与 Token 数值依据见 docs/menu-delivery/F01/design.md；视觉验收独立。
+
+Morning View 1.1.0 的 input_coverage、category_counts、source_statuses[].data_as_of、risk_evaluations、related_meetings、timezone/location 及 current_order.state 贯穿公开读取和组件类型。provided_count 仅表示已提供范围，reported_total 未知保留 null。业务日期、对象时区、资料截至和读取时间分别呈现；非法日期或 IANA 时区显示当前输入错误，数量保持待读取。原保存清单保留查询版本，当前本人排序使用 current_order 的独立版本与撤销状态。
+
+MorningConversationRequest 将 question、date/timezone、可选成对 list_id/item_id 交给原生 App。新会话由现有 new_chat 创建；boss.morning.bind 通过已认证 WebSocket、当前连接附加会话和稳定 client_request_id 建立服务端绑定。每次发送前重新核查连接、当前快照、来源和本人排序版本；原生消息仍由既有传输进入同一 AgentLoop。NativeMorningAdapter 将当前 message_id、输入摘要和可信会话绑定为一次公开晨间请求，Provider 与生命周期采用同一 MorningRequest，实际工具保持 todayRead/morningListRead/morningDetailRead/morningSourceRead。本人确认、排序保存和业务写入不进入模型工具。
+
+绑定写入加入原生 Client 禁止重放清单。响应未知时只读取 /api/boss/ui/morning/binding 的原编号回执；读取不恢复授权、不记录上下文采用、不自动发送保留问题。本人明确提交后才使用恢复绑定进入原生会话。后续讨论保留同一 chat/session，选中事项变化建立独立绑定；Runtime 与工具结果保留 list/item/source 版本和 run_id。技术记录只含编号、版本、状态和摘要。question、私人正文及账号不进入 URL、静态资源、普通持久缓存或技术日志。
+
+详情和来源读取以 generation、AbortController、当前 list/item/source/版本共同判定。较早响应不能覆盖新选择。关联会议只读取当前详情明确提供的同版本 meeting 引用，通过现有 Radix Dialog 提供当前必要共享入口，关闭恢复触发焦点。prepare 传递 MorningReference 与实际 source_ids/meeting_id/event_ids；F06 重新核查当前正式详情，只有现有受支持业务输入才能采用。缺少必要输入明确阻止创建。本人核对具体内容、勾选确认并提交后才正常保存交办，发送仍是独立操作。
+
+F01 在跨页时保持挂载，date/timezone、分类、选择及来源安全标识写入 URL；正文保存在当前进程。返回重新读取当前正式对象，恢复滚动和可用触发焦点；D06 的关闭焦点与异步详情完成共同触发恢复。排序使用实际 CAS，失败保留编辑；未知回执只读当前原编号。已保存历史结果不会作为当前完整资料使用。适用失败、取消、超时、来源撤销与保存事务结果分别在当前 Runtime、领域和公开消费者核查。
+
+源码增量保存在 app/webui/nanobot-menu-f01.patch；准备目录的 BossDesktop 与正式源码必须相同。独立制品 menu-f01-n3-dist、启动入口 scripts/run_menu_f01.command、数据目录 validation/.work/menu-f01-experience 使用10611/10612/20611，不操作现有 UI02 或 MVP 体验。初次准备采用获准 SIMULATED 输入及既有业务初始化，后续启动使用同一 SQLite 和 credentials，不重新配置或清空。显式本机模式的受控账号填充仅填写表单，手动登录仍使用正常服务认证。准确来源、实际安装 Nanobot、制品及证据摘要由当前 inventory 登记。

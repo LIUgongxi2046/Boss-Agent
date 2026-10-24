@@ -4,6 +4,7 @@ import json
 import os
 import time
 import uuid
+from contextvars import ContextVar
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from nanobot.channels.websocket.runtime import WebSocketChannel
@@ -33,6 +34,7 @@ class RoleChannel(WebSocketChannel):
         self.mvp = None
         self.assignment = None
         self.reminders = None
+        self.morning_admission = ContextVar("morning_native_admission", default=None)
         self.bi_responses = set()
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
@@ -133,7 +135,7 @@ class RoleChannel(WebSocketChannel):
                         status, body = failure.status, {"error": failure.text}
                     self.record(role, address.path, status)
                     return connection.respond(status, json.dumps(body, ensure_ascii=False))
-                if address.path in {"/api/boss/ui/morning/request", "/api/boss/ui/morning/history"}:
+                if address.path in {"/api/boss/ui/morning/request", "/api/boss/ui/morning/history", "/api/boss/ui/morning/binding"}:
                     try:
                         if self.morning is None:
                             raise web.HTTPServiceUnavailable(text="晨间服务尚未就绪")
@@ -145,7 +147,11 @@ class RoleChannel(WebSocketChannel):
                         else:
                             if set(parameters) != {"client_request_id"} or len(parameters["client_request_id"]) != 1 or not parameters["client_request_id"][0]:
                                 raise web.HTTPBadRequest(text="晨间原请求编号无效")
-                            body = self.morning.receipt(role, parameters["client_request_id"][0])
+                            if address.path.endswith("/binding"):
+                                body = self.morning.native.binding_receipt(role, parameters["client_request_id"][0],
+                                    active=lambda: self.token_roles.get(token) == "BOSS" and self.gateway.tokens.check_api_token(request))
+                            else:
+                                body = self.morning.receipt(role, parameters["client_request_id"][0])
                         status = 200
                     except web.HTTPException as failure:
                         status, body = failure.status, {"error": failure.text}
@@ -194,7 +200,7 @@ class RoleChannel(WebSocketChannel):
             self.bi_responses.add(task)
             task.add_done_callback(self.bi_responses.discard)
             return
-        if kind == "webui_request" and action in {"boss.morning.query", "boss.morning.cancel"}:
+        if kind == "webui_request" and action in {"boss.morning.query", "boss.morning.cancel", "boss.morning.bind"}:
             task = asyncio.create_task(self._morning_response(connection, role, envelope))
             self.bi_responses.add(task)
             task.add_done_callback(self.bi_responses.discard)
@@ -308,7 +314,37 @@ class RoleChannel(WebSocketChannel):
             event = {"event": "webui_response", "request_id": envelope.get("request_id"), "ok": False, "error": {"status": 403, "message": "身份权限不足"}} if kind == "webui_request" else {"event": "error", "detail": "access_denied", "reason": "身份权限不足"}
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
-        await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
+        admitted = None
+        if kind == "message" and self.morning is not None:
+            try:
+                admitted = self.morning.native.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
+                    attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
+                    active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
+                if admitted is not None and not admitted["enqueue"]:
+                    await connection.send(json.dumps({"event":"error","detail":"morning_turn_already_recorded","reason":"本轮已经接收，请读取原会话记录。","chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}))
+                    return
+            except web.HTTPException as failure:
+                self.record(role, "boss.morning.native.message", failure.status)
+                await connection.send(json.dumps({"event":"error","detail":"morning_scope_rejected","reason":failure.text,"chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}, ensure_ascii=False))
+                return
+        admission = {"request": admitted, "enqueued": False} if admitted is not None else None
+        admission_token = self.morning_admission.set(admission)
+        try:
+            await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
+        finally:
+            self.morning_admission.reset(admission_token)
+            if admission is not None and not admission["enqueued"]:
+                self.morning.native.finish(admitted["client_request_id"])
+
+    async def webui_dispatch_message(self, *, sender_id, chat_id, content, media, metadata, is_dm, session_key, require_existing_session):
+        await super().webui_dispatch_message(sender_id=sender_id, chat_id=chat_id, content=content, media=media,
+            metadata=metadata, is_dm=is_dm, session_key=session_key, require_existing_session=require_existing_session)
+        admission = self.morning_admission.get()
+        if admission is not None:
+            accepted = admission["request"]
+            if accepted["chat_id"] != chat_id or accepted["turn_id"] != metadata.get("webui_turn_id"):
+                raise web.HTTPForbidden(text="原生入队对象与晨间证明不符")
+            admission["enqueued"] = True
 
     async def _reminder_response(self, connection, role, envelope):
         request_id = envelope.get("request_id")
@@ -379,7 +415,12 @@ class RoleChannel(WebSocketChannel):
             if self.morning is None:
                 raise web.HTTPServiceUnavailable(text="晨间Runtime尚未就绪")
             payload = envelope.get("payload")
-            if action == "boss.morning.cancel":
+            if action == "boss.morning.bind":
+                if not isinstance(payload, dict) or not {"client_request_id", "chat_id", "date", "timezone"} <= set(payload) <= {"client_request_id", "chat_id", "date", "timezone", "list_id", "item_id"}:
+                    raise web.HTTPBadRequest(text="原生晨间绑定字段无效")
+                result = self.morning.native.bind(role, payload["client_request_id"], {key:value for key,value in payload.items() if key != "client_request_id"},
+                    attached=lambda chat_id: chat_id in self.webui_connection_chats(connection), active=active)
+            elif action == "boss.morning.cancel":
                 if not isinstance(payload, dict) or set(payload) != {"client_request_id"}:
                     raise web.HTTPBadRequest(text="取消请求字段无效")
                 result = self.morning.cancel(role, payload["client_request_id"], active)

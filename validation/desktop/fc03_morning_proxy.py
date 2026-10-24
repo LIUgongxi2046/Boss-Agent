@@ -9,7 +9,10 @@ UPSTREAM = "http://127.0.0.1:" + sys.argv[1]
 PORT = int(sys.argv[2])
 HOP = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailer", "transfer-encoding", "upgrade", "content-length"}
 ACTIONS = {"boss.morning.query", "boss.today.reorder", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.assignment.send", "boss.assignment.sources.confirm", "boss.commitment.create", "boss.reminder.ack", "boss.reminder.snooze", "boss.reminder.close", "boss.owner.notice.save", "boss.owner.notice.confirm", "boss.owner.plan.pause", "boss.scheduler.draft.save", "boss.alert.ack", "boss.alert.snooze", "boss.alert.close", "boss.alert.meeting.link", "boss.alert.assignment.create", "boss.alert.rule.save", "boss.simulation.alert.load"}
-STATE = {"events": [], "connections": 0, "armed": None, "dropped_actions": []}
+ACTIONS.add("boss.morning.bind")
+ACTIONS.add("boss.assignment.create")
+STATE = {"events": [], "connections": 0, "armed": None, "dropped_actions": [], "delayed_read": None}
+DELAY = {"selection": None, "release": None}
 
 
 async def start(app):
@@ -31,6 +34,20 @@ async def arm(request):
     return web.json_response({"armed": STATE["armed"]})
 
 
+async def delay_read(request):
+    body = await request.json()
+    assert set(body) == {"path", "field", "value"} and body["path"] in {"/api/boss/ui/morning/detail", "/api/boss/ui/morning/source"}
+    assert body["field"] in {"item_id", "source_id"} and isinstance(body["value"], str) and DELAY["selection"] is None
+    DELAY.update(selection=body, release=asyncio.Event())
+    return web.json_response({"armed": body})
+
+
+async def release_read(request):
+    assert DELAY["release"] is not None
+    DELAY["release"].set()
+    return web.json_response({"released": True})
+
+
 async def proxy(request):
     client, target = request.app["client"], UPSTREAM + request.raw_path
     headers = {key: value for key, value in request.headers.items() if key.lower() not in HOP}
@@ -47,6 +64,8 @@ async def proxy(request):
                     body = json.loads(frame.data)
                     if body.get("action") in ACTIONS:
                         reference = {"request_id": body["request_id"], "action": body["action"], "client_request_id": body["payload"]["client_request_id"]}
+                        if body["action"] == "boss.assignment.create" and "morning_reference" in body["payload"]:
+                            reference["morning_reference"] = body["payload"]["morning_reference"]
                         requests[body["request_id"]] = reference
                         STATE["events"].append({"event": "actual_request_forwarded", **reference})
                     await upstream.send_str(frame.data)
@@ -68,7 +87,15 @@ async def proxy(request):
             await asyncio.gather(incoming(), outgoing())
         return downstream
     async with client.request(request.method, target, headers=headers, data=await request.read(), allow_redirects=False) as upstream:
-        return web.Response(status=upstream.status, body=await upstream.read(), headers={key: value for key, value in upstream.headers.items() if key.lower() not in HOP})
+        body = await upstream.read()
+        selection = DELAY["selection"]
+        if selection and request.path == selection["path"] and request.query.get(selection["field"]) == selection["value"]:
+            STATE["delayed_read"] = {**selection, "actual_status": upstream.status, "response_sha256": hashlib.sha256(body).hexdigest()}
+            await DELAY["release"].wait()
+            STATE["events"].append({"event": "actual_read_released", **STATE["delayed_read"]})
+            DELAY.update(selection=None, release=None)
+            STATE["delayed_read"] = None
+        return web.Response(status=upstream.status, body=body, headers={key: value for key, value in upstream.headers.items() if key.lower() not in HOP})
 
 
 app = web.Application()
@@ -76,5 +103,7 @@ app.on_startup.append(start)
 app.on_cleanup.append(close)
 app.router.add_get("/_morning/state", state)
 app.router.add_post("/_morning/arm", arm)
+app.router.add_post("/_morning/delay", delay_read)
+app.router.add_post("/_morning/release", release_read)
 app.router.add_route("*", "/{path:.*}", proxy)
 web.run_app(app, host="127.0.0.1", port=PORT, access_log=None)

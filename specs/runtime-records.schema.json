@@ -86,7 +86,11 @@
       "properties": {
         "date": {"type": "string", "format": "date"}, "timezone": {"type": "string", "minLength": 1},
         "snapshot_sha256": {"$ref": "#/$defs/Sha256"}, "order_version": {"$ref": "#/$defs/Version"},
-        "parameters_sha256": {"$ref": "#/$defs/Sha256"}, "client_request_id": {"type": ["string", "null"]}
+        "parameters_sha256": {"$ref": "#/$defs/Sha256"}, "client_request_id": {"type": ["string", "null"]},
+        "selected_item_ref": {"type":"object","additionalProperties":false,"required":["list_id","list_version","item_id","object_id","version","source_refs"],
+          "properties":{"list_id":{"$ref":"#/$defs/Identifier"},"list_version":{"$ref":"#/$defs/Version"},
+            "item_id":{"$ref":"#/$defs/Identifier"},"object_id":{"$ref":"#/$defs/Identifier"},"version":{"type":["string","null"]},
+            "source_refs":{"$ref":"#/$defs/MorningItemReference/properties/source_refs"}}}
       }
     },
     "MorningItemReference": {

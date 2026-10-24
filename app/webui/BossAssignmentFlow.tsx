@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {MorningReference} from "./BossMorningView";
+import type {MorningPreparationContext} from "./BossMorningPreparation";
 import {
   AlertCircle, ArrowRight, CheckCircle2, Clock3, ClipboardCheck,
   FileSearch, Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
@@ -247,7 +248,7 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
   draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker,
-  onViewMessages, onMessageDraftCreated, morningReference, morningReady=true, messagesEnabled=true }: {
+  onViewMessages, onMessageDraftCreated, morningReference, morningReady=true, morningContext, messagesEnabled=true }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string, bypassDirty?:boolean) => void; onReload: () => void;
   onViewSource: (id?:string) => void; context: AssignmentContext | null;
@@ -257,7 +258,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   onOpenCoordinatorPicker: () => void; onOpenDuePicker: () => void;
   onViewMessages: () => void;
   onMessageDraftCreated: (id: string) => void;
-  morningReference?:MorningReference;morningReady?:boolean;
+  morningReference?:MorningReference;morningReady?:boolean;morningContext?:MorningPreparationContext|null;
   messagesEnabled?:boolean;
 }) {
   const { propose, dialog, recovery, notice, busy } = useTransaction(()=>{onDraftSaved();onReload();}, id => {
@@ -292,10 +293,12 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   },[current?.task_id,current?.version,getToken,token]);
   const safe=(fn:()=>void)=>{setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
   const prepareCreate=()=>safe(()=>{
-    if(morningReference&&!morningReady)throw new Error("请重新核查当前晨间事项与来源版本");
-    if(!context?.meeting?.meeting_id||!context.event?.event_id||
-      !context.assignment_source_ids?.includes("finance-note"))
+    if(morningReference&&(!morningReady||!morningContext?.source_ids.length))throw new Error("请重新核查当前晨间事项与来源版本");
+    if(!context||!morningReference&&(!context.meeting?.meeting_id||!context.event?.event_id||!context.assignment_source_ids?.includes("finance-note")))
       throw new Error("未取得关联会议、事件或有效资料，拒绝创建。");
+    const meetingId=morningReference?morningContext!.meeting_id:context.meeting!.meeting_id;
+    const eventIds=morningReference?morningContext!.event_ids:[context.event!.event_id];
+    const sourceIds=morningReference?morningContext!.source_ids:["finance-note"];
     const purposeText=required(purpose,"交办目的"),proof=required(evidence,"证据要求");
     if(!coordinator||!context.contacts.some(c=>c.contact_id===coordinator))
       throw new Error("请选择获准的唯一负责人");
@@ -303,14 +306,14 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
     propose("boss.assignment.create",{
       purpose:purposeText,coordinator_id:coordinator,due_at:dueAt,
       timezone:"Asia/Shanghai",evidence_requirements:[proof],
-      related_meeting_id:context.meeting.meeting_id,
-      related_event_ids:[context.event.event_id],
-      source_refs:["finance-note"],content_version:"1",
+      related_meeting_id:meetingId,
+      related_event_ids:eventIds,
+      source_refs:sourceIds,content_version:"1",
       ...(morningReference?{morning_reference:morningReference}:{}),
     },"核对并创建交办",[
       "目的："+purposeText,"负责人："+coordinator,"期限："+dueAt,
-      "证据："+proof,"会议："+context.meeting.meeting_id,
-      "关联事件："+context.event.event_id,"资料来源：finance-note",
+      "证据："+proof,"会议："+(meetingId??"没有关联会议"),
+      "关联事件："+(eventIds.join("、")||"没有关联事件"),"资料来源："+sourceIds.join("、"),
     ]);
   });
   const prepareSend=()=>safe(()=>{
@@ -410,7 +413,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>创建交办</h2><small>F06 · 当前老板授权</small></div>
           <div className="boss-form-grid">
-            <label>唯一负责人<select value={coordinator} onChange={e=>onDraftChange("coordinator",e.target.value)}>
+            <label htmlFor="assignment-coordinator"><span id="assignment-coordinator-label">唯一负责人</span><select id="assignment-coordinator" aria-labelledby="assignment-coordinator-label" value={coordinator} onChange={e=>onDraftChange("coordinator",e.target.value)}>
               <option value="">请选择</option>
               {(context?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
                 {c.name} · {c.organization} · {c.responsibility}
@@ -422,13 +425,13 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
             <button type="button" className="boss-btn" onClick={onOpenCoordinatorPicker}>选择负责人（D04）</button>
             <button type="button" className="boss-btn" onClick={onOpenDuePicker}>选择时间与时区（D05）</button>
           </div>
-          <label className="boss-label">交办目的</label>
-          <textarea rows={3} value={purpose} onChange={e=>onDraftChange("purpose",e.target.value)}
+          <label className="boss-label" htmlFor="assignment-purpose">交办目的</label>
+          <textarea id="assignment-purpose" rows={3} value={purpose} onChange={e=>onDraftChange("purpose",e.target.value)}
             placeholder="说明目的、范围、要求与应交付的产物"/>
-          <label className="boss-label">证据要求</label>
-          <input className="boss-single-input" value={evidence} onChange={e=>onDraftChange("evidence",e.target.value)}/>
-          <p className="boss-helper">会议：{context?.meeting?.meeting_id||"待读取"} ·
-            关联事件：{context?.event?.event_id||"待读取"} · 资料：{context?.assignment_source_ids?.join("、")||"待读取"}</p>
+          <label className="boss-label" htmlFor="assignment-evidence">证据要求</label>
+          <input id="assignment-evidence" className="boss-single-input" value={evidence} onChange={e=>onDraftChange("evidence",e.target.value)}/>
+          <p className="boss-helper">会议：{morningReference?morningContext?.meeting_id??"没有关联会议":context?.meeting?.meeting_id||"待读取"} ·
+            关联事件：{morningReference?morningContext?.event_ids.join("、")||"没有关联事件":context?.event?.event_id||"待读取"} · 资料：{morningReference?morningContext?.source_ids.join("、")||"依据尚待核查":context?.assignment_source_ids?.join("、")||"待读取"}</p>
           <div className="boss-actions">
             <button className="boss-btn boss-btn-primary" type="button" onClick={prepareCreate} disabled={busy||Boolean(morningReference&&!morningReady)}>
               <ShieldCheck size={15}/> 核对并创建</button>

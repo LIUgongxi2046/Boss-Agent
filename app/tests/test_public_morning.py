@@ -8,6 +8,22 @@ from test_boss_command_api import create_input
 from test_product_morning_runtime import validate_output
 
 
+def test_morning_preparation_does_not_require_unselected_business_links(store):
+    morning, commands = MorningAPI(store), BossCommandAPI(store)
+    view = query(morning, date="2026-10-23")
+    item = next(item for item in view["items"] if item["kind"] == "meeting")
+    reference = {field: view[field] for field in ("list_id", "list_version", "snapshot_sha256")}
+    reference["item_id"] = item["item_id"]
+    payload = create_input("menu-f01-create-current", morning_reference=reference,
+        related_meeting_id=None, related_event_ids=[])
+    code, created = commands.execute("BOSS", "boss.assignment.create", payload)
+    assert code == 200, created
+    with store.connect() as db:
+        task = store.get(db, "ui-check", "task", created["task_id"])
+        assert task["related_meeting_id"] is None and task["related_event_ids"] == []
+        assert store.get(db, "ui-check", "morning_assignment_reference", created["task_id"])["morning_reference"] == reference
+
+
 def test_public_morning_day_preview_is_actual_and_strict(store):
     pages = BossPageAPI(store)
     days = [{"date": "2026-10-23", "timezone": "Asia/Shanghai"}, DAY]

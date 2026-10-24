@@ -1,8 +1,19 @@
 openapi: 3.1.0
 info:
   title: 晨间事项公共请求与读取
-  version: 1.0.0
+  version: 1.1.0
 paths:
+  /api/boss/ui/morning/binding:
+    get:
+      operationId: morningNativeBindingReceipt
+      x-role: BOSS
+      x-required-query: [client_request_id]
+      responses:
+        '200':
+          description: 原生会话绑定与最后一轮原编号，仅提供只读元信息
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NativeBindingReceipt'}
   /api/boss/ui/morning/preview:
     get:
       operationId: morningPreview
@@ -70,6 +81,12 @@ paths:
             application/json:
               schema: {$ref: './morning.schema.json#/$defs/SourceDetail'}
 x-websocket-actions:
+  boss.morning.bind:
+    role: BOSS
+    payload: {$ref: '#/components/schemas/NativeBindingRequest'}
+    response: {$ref: '#/components/schemas/NativeBindingReceipt'}
+    x-current-connection-check: 规范chat_id由原生new_chat生产且当前已认证连接已经attach；绑定不调用模型或授予业务写入
+    x-recovery: 结果未知时只读取同一client_request_id，不重放绑定动作
   boss.assignment.create:
     role: BOSS
     x-existing-confirmation-flow: BR-C02
@@ -92,6 +109,45 @@ x-websocket-actions:
     payload: {$ref: './morning.schema.json#/$defs/CoverageLoad'}
 components:
   schemas:
+    NativeBindingRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, chat_id, date, timezone]
+      dependentRequired: {list_id: [item_id], item_id: [list_id]}
+      properties:
+        client_request_id: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+        chat_id: {type: string, pattern: '^[A-Za-z0-9_:-]{1,64}$'}
+        date: {type: string, format: date}
+        timezone: {type: string, minLength: 1, maxLength: 100}
+        list_id: {type: string, minLength: 1, maxLength: 200}
+        item_id: {type: string, minLength: 1, maxLength: 200}
+    NativeBinding:
+      type: object
+      additionalProperties: false
+      required: [binding_id, chat_id, session_id, date, timezone, snapshot_sha256, order_version, list_id, item_id, last_request_id]
+      properties:
+        binding_id: {type: string}
+        chat_id: {type: string, pattern: '^[A-Za-z0-9_:-]{1,64}$'}
+        session_id: {type: string}
+        date: {type: string, format: date}
+        timezone: {type: string}
+        snapshot_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        order_version: {type: string}
+        list_id: {type: [string, 'null']}
+        item_id: {type: [string, 'null']}
+        last_request_id: {type: [string, 'null']}
+    NativeBindingReceipt:
+      type: object
+      additionalProperties: false
+      required: [source_type, client_request_id, outcome, result, adoption_state, write_performed_by_lookup, business_authority_granted]
+      properties:
+        source_type: {const: SIMULATED}
+        client_request_id: {type: string}
+        outcome: {enum: [RECORDED, NOT_FOUND_IN_CURRENT_STORE]}
+        result: {anyOf: [{$ref: '#/components/schemas/NativeBinding'}, {type: 'null'}]}
+        adoption_state: {const: NOT_REVALIDATED_BY_LOOKUP}
+        write_performed_by_lookup: {const: false}
+        business_authority_granted: {const: false}
     MorningReference:
       type: object
       additionalProperties: false
@@ -111,12 +167,14 @@ components:
       type: object
       additionalProperties: false
       required: [client_request_id, date, timezone, question]
+      dependentRequired: {item_id: [list_id]}
       properties:
         client_request_id: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
         date: {type: string, format: date}
         timezone: {type: string, minLength: 1, maxLength: 100}
         question: {type: string, minLength: 1, maxLength: 4000}
         list_id: {type: string, minLength: 1, maxLength: 200}
+        item_id: {type: string, minLength: 1, maxLength: 200}
     PublicReceipt:
       type: object
       additionalProperties: false

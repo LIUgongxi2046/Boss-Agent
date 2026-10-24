@@ -17,8 +17,9 @@ sys.path.insert(0, str(ROOT / "validation"))
 from application_paths import application_work_directory, application_ports
 from boss_account_auth import provision_accounts
 
+MVP_RUNTIME_TOOLS = ("bossSupplyQualityRead", "bossSupplyQualityQuery", "bossEvidenceRead", "bossSupplyQualityPrepare")
 
-async def prepare(directory, frontend, ports):
+async def prepare(directory, frontend, ports, *, runtime_tools=MVP_RUNTIME_TOOLS):
     manifest = hashlib.sha256((frontend / "asset-manifest.json").read_bytes()).hexdigest()
     marker = directory / "setup.json"
     if directory.exists():
@@ -73,13 +74,13 @@ async def prepare(directory, frontend, ports):
                     async with session.get(origin + "/api/boss/ui/admin/runtime-configuration", headers={"Authorization": "Bearer " + auth["api_token"]}) as response:
                         response.raise_for_status()
                         state = await response.json(content_type=None)
-                    values = {"max_tool_rounds": 6, "max_output_tokens": 700, "tool_scope": ["bossSupplyQualityRead", "bossSupplyQualityQuery", "bossEvidenceRead", "bossSupplyQualityPrepare"]}
+                    values = {"max_tool_rounds": 6, "max_output_tokens": 700, "tool_scope": list(runtime_tools)}
                     draft = await command("boss.runtime.save", {"client_request_id": "mvp01-runtime-save-v1", "expected_version": state["draft"]["version"] if state["draft"] else "0", "values": values})
                     checked = await command("boss.runtime.validate", {"client_request_id": "mvp01-runtime-validate-v1", "expected_version": draft["version"], "expected_content_sha256": draft["content_sha256"]})
                     active = await command("boss.runtime.activate", {"client_request_id": "mvp01-runtime-activate-v1", "expected_version": checked["version"], "expected_content_sha256": checked["content_sha256"], "expected_active_version": state["current"]["version"]})
             result = {"scope_id": "BOSS-MVP-1", "status": "READY", "ports": ports, "frontend": str(frontend), "manifest_sha256": manifest,
                 "initial_import_records": initial["record_count"], "existing_cost_report_records": costs["record_count"], "configuration_version": active["version"],
-                "source_inputs": ["data/simulation/supply-quality-v1.yaml", "validation/fc01_cost_token_input.py"], "external_api_mode": "SIMULATED_FIRST"}
+                "source_inputs": ["data/simulation/supply-quality-v1.yaml", "validation/fc01_cost_token_input.py"], "runtime_tool_scope": list(runtime_tools), "external_api_mode": "SIMULATED_FIRST"}
             marker.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
             marker.chmod(0o600)
             print(json.dumps({"status": "READY", "directory": str(directory), "credentials": str(directory / "accounts/credentials.json")}, ensure_ascii=False))

@@ -15,6 +15,7 @@ from boss_simulation_api import _context
 from fc03_agent import Fc03Context
 from fc03_agent.formal import FORMAL_TOOLS
 from fc03_agent.runtime import Fc03RuntimeRecorder, Fc03SimulatedProvider
+from fc03_agent.native import NativeMorningAdapter
 from product_bi import FEATURE_SCOPE, PREPARING_REQUEST
 
 MORNING_REQUEST = "product_morning_request"
@@ -22,7 +23,8 @@ REQUEST_SCHEMA = {"type": "object", "additionalProperties": False, "$defs": SCHE
     "required": ["client_request_id", "date", "timezone", "question"],
     "properties": {"client_request_id": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9_.-]+$"},
         "date": SCHEMA["$defs"]["Day"]["properties"]["date"], "timezone": SCHEMA["$defs"]["Day"]["properties"]["timezone"],
-        "question": {"type": "string", "minLength": 1, "maxLength": 4000}, "list_id": {"$ref": "#/$defs/Id"}}}
+        "question": {"type": "string", "minLength": 1, "maxLength": 4000}, "list_id": {"$ref": "#/$defs/Id"},
+        "item_id": {"$ref": "#/$defs/Id"}}, "dependentRequired": {"item_id": ["list_id"]}}
 
 
 @dataclass(frozen=True)
@@ -37,6 +39,7 @@ class MorningRequest:
     snapshot_sha256: str
     order_version: str
     list_id: str | None
+    item_id: str | None
     active: object
 
 
@@ -46,6 +49,7 @@ class ProductMorning:
         self.provider = Fc03SimulatedProvider(self.events, allowed_tools=FORMAL_TOOLS)
         self.bot = self.runtime = None
         self.active_runs = {}
+        self.native = NativeMorningAdapter(self)
 
     @staticmethod
     def handles(request):
@@ -64,14 +68,29 @@ class ProductMorning:
         return Fc03Context("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
             runtime.request_id if runtime is not None else grant.key, runtime.session_id if runtime is not None else grant.session_id,
             True, json.dumps({"date": grant.date, "timezone": grant.timezone}), grant.date, grant.timezone,
-            grant.snapshot_sha256, grant.order_version, grant.key, frozenset({grant.list_id}) if grant.list_id else frozenset())
+            grant.snapshot_sha256, grant.order_version, grant.key, frozenset({grant.list_id}) if grant.list_id else frozenset(),
+            grant.list_id if grant.item_id else None, grant.item_id)
 
     async def scope_context(self, request):
         if not self.handles(request):
             return None
         self._grant(request)
-        require(FORMAL_TOOLS <= set(self.runtime.registry.tool_names), "当前配置未启用四项正式晨间读取工具", web.HTTPConflict)
+        require(FORMAL_TOOLS <= set(self.runtime.registry.tool_names) and self.runtime.loop.max_iterations >= 5,
+                "当前配置需要四项正式晨间读取工具和至少五轮调用", web.HTTPConflict)
         request.attributes[FEATURE_SCOPE] = FORMAL_TOOLS
+
+    def guard_context(self, provider):
+        async def guarded(request):
+            ready = False
+            try:
+                result = await provider(request)
+                ready = True
+                return result
+            finally:
+                grant = request.attributes.get(MORNING_REQUEST)
+                if not ready and grant is not None and grant.key in self.native.proofs:
+                    self.native.finish(grant.key)
+        return guarded
 
     def recorder(self, registry, snapshot):
         return PublicMorningRecorder(self, registry, snapshot)
@@ -100,12 +119,17 @@ class ProductMorning:
         if not any("adoption_state" in output for output in outputs):
             return call("morningListRead", {"list_id": view["list_id"]})
         if view["items"] and not any("item" in output for output in outputs):
-            return call("morningDetailRead", {"list_id": view["list_id"], "item_id": view["items"][0]["item_id"]})
-        sources = [source for source in view["source_statuses"] if source["status"] == "VALID"]
+            return call("morningDetailRead", {"list_id": view["list_id"], "item_id": grant.item_id or view["items"][0]["item_id"]})
+        detail = next((output for output in outputs if "item" in output), None)
+        source_ids = {ref["id"] for ref in detail["item"]["source_refs"] if ref["kind"] == "document"} if grant.item_id and detail else None
+        sources = [source for source in view["source_statuses"] if source["status"] == "VALID" and (source_ids is None or source["source_id"] in source_ids)]
         if sources and not any("document" in output for output in outputs):
             return call("morningSourceRead", {"list_id": view["list_id"], "source_id": sources[0]["source_id"]})
         content = "SIMULATED · 晨间清单 " + view["list_id"] + " · 版本 " + view["list_version"]
-        content += "\n" + "\n".join(item["title"] + "：" + item["reason"] for item in view["items"])
+        discussed = [detail["item"]] if grant.item_id and detail else view["items"]
+        content += "\n" + "\n".join(item["title"] + "：" + item["reason"] for item in discussed)
+        documents = [output["document"] for output in outputs if "document" in output]
+        content += "\n" + ("\n".join(document["source_id"] + " · v" + document["version"] + "：" + document["content"] for document in documents) if documents else "当前事项没有已读取的原文依据。")
         content += "\n覆盖 " + view["coverage_state"] + "；缺少资料 " + "、".join(view["missing_sources"])
         return LLMResponse(content=content, usage=None)
 
@@ -129,6 +153,8 @@ class ProductMorning:
         if selected is not None:
             current = self.api.read_list(role, selected)
             require(all(current["result"][field] == preview[field] for field in ("date", "timezone", "snapshot_sha256")), "所选清单与当前日期范围不符", web.HTTPConflict)
+            if payload.get("item_id") is not None:
+                self.api.detail(role, selected, payload["item_id"])
             with self.store.connect() as db:
                 stored = self.store.get(db, "ui-check", "morning_list", selected)
                 domain_key = stored["client_request_id"]
@@ -140,9 +166,9 @@ class ProductMorning:
             require(db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='morning_public_request' AND id=?", (key,)).fetchone() is None, "原晨间请求正在准备，请查询原编号", web.HTTPConflict)
             self.store.put(db, "ui-check", "morning_public_request", key, {"request_id": key, "payload_sha256": checksum(payload),
                 "owner_id": context["owner_id"], "dataset_id": context["dataset_id"], "dataset_version": context["dataset_version"],
-                **day, "session_id": session_id, "domain_client_request_id": domain_key, "selected_list_id": selected, "status": "PREPARED", "created_at": now()})
+                **day, "session_id": session_id, "domain_client_request_id": domain_key, "selected_list_id": selected, "selected_item_id": payload.get("item_id"), "status": "PREPARED", "created_at": now()})
         return MorningRequest(key, context["owner_id"], context["dataset_id"], context["dataset_version"], session_id,
-            preview["date"], preview["timezone"], preview["snapshot_sha256"], preview["order_version"], selected, active)
+            preview["date"], preview["timezone"], preview["snapshot_sha256"], preview["order_version"], selected, payload.get("item_id"), active)
 
     async def execute(self, role, payload, active):
         require(self.bot is not None and self.runtime is not None, "晨间运行尚未准备", web.HTTPServiceUnavailable)
