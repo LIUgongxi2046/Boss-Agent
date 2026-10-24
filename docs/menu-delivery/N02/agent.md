@@ -1,12 +1,12 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-TASK-ENTRY-CONSUMER-20261025；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.3.0，包含正式任务入口消费、原请求只读列表、本轮必要引用及实际配置截止。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-25。主记录路径及既有索引引用保持。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-TASK-ENTRY-RUNTIME-SCHEMA-20261025；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.3.0、Runtime Schema版本1.13.0，包含正式任务入口消费、原请求只读列表、本轮必要引用及实际配置截止。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-25。主记录路径及既有索引引用保持。
 
 ## 当前依据与准确依赖
 
-正式任务入口消费采用PRODUCT 4d7038dc7e5accb2e0123a3f3a28392e2a8c2385，包含N1的5fb1def3cfd17e895691ccd8c52d1effed441886及记录9bc80e2fad33e08d9944be76e388d1189eff7cbc，公共接收为5919fd3和4d7038d。独立依赖目录validation/.work/n02-task-entry-public采用该准确提交的validation、specs、data/simulation与仓库资产；既有conftest加载当前N2被测模块，其余生产依赖保持原值。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
+当前Schema消费采用PRODUCT 6d620bb3a2c1ec587af1e4f3437cdeb03065c0cd，已接收本模块e2d76dceb354d50781fd13f0100d2979a74f3c7a。独立依赖目录validation/.work/n02-task-entry-schema-public使用该提交的validation、specs、data/simulation与仓库资产；既有conftest加载当前N2被测模块，针对性Schema检查读取本目录specs/runtime-records.schema.json，其余生产依赖保持原值。Runtime Schema以准确PRODUCT 1.12.0完整原文为依据，版本1.13.0仅追加task_entry声明及其严格定义。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application和App由N3维护。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
-已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、N1任务入口记录、boss_conversation_task_entry.py、boss_conversation.py、正式任务入口用例和conversation.schema.json 1.3.0，核查实际SessionManager、任务版本及来源摘要的采用要求。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
+已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录及索引、准确PRODUCT runtime-records.schema.json 1.12.0完整原文、正式任务入口字段与已交付消费者用例，核查实际SessionManager、任务版本及来源摘要的采用要求。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
 会话、运行、业务产物、本人消息历史与附件采用正式领域接口，实际原生历史、未发送输入和传输继续使用同一Nanobot。没有另一份消息状态或第二个模型循环。本人草稿、明确发送、回复及任务共享入口继续使用既有业务服务。
 
@@ -56,7 +56,7 @@ context_provider每次通过正式read核查当前选择，并与Grant中的原�
 
 取消沿用正式SDK终态及finish，仅清理本轮proof、pending_media和对应截止。conversation_task_preparation、conversation_task_binding、已保存原生历史、conversation_intent及完成的工具结果保留。准备及绑定操作由正式本人入口负责；模型工具集合仍为七项，没有增加创建、发送、确认或授权操作。
 
-### N3需要接收的Runtime字段
+### Runtime字段与Schema 1.13.0
 
 runtime_reference在BOUND时追加conversation_context.task_entry。该可选对象严格包含下表六项；UNBOUND省略整个对象。外层conversation_context.client_request_id属于当前会话原意图，内层task_entry.client_request_id属于原任务入口准备请求，两者保留各自原编号。
 
@@ -71,7 +71,9 @@ runtime_reference在BOUND时追加conversation_context.task_entry。该可选对
 
 该对象用于把实际运行关联到原始准备摘要，并保留来源摘要及返回引用。它只含技术编号、摘要和正式引用，没有问题、来源正文、路径或本人授权。既有conversation_context.references同时保存task及document的kind/id/version，用于当前资格核查和正式产物读取。
 
-准确候选的runtime-records.schema.json对ConversationContext采用additionalProperties=false，尚未声明task_entry；N3需要接收上述可选字段并执行公共Schema、投影与界面检查。本模块没有修改公共Schema或投影，也没有将模块检查登记为完整产品验收。
+specs/runtime-records.schema.json 1.13.0在ConversationContext.properties追加可选task_entry，引用ConversationTaskEntry。该对象要求上述全部六项字段；对象本身、task_reference、source_references逐项对象及return_reference均为additionalProperties=false。kind分别固定task/document，page_id固定F06；source_references至少一项，全部编号及版本为1至200字符，client_request_id为8至128字符且符合正式入口字符范围，两个摘要使用已有Sha256定义。UNBOUND继续省略task_entry，null和空对象均不接受。
+
+严格字段范围拒绝question、body、path、business_authorization_granted、confirmed、role等额外输入，不增加正文、路径或本人授权字段。当前生产者与正式领域继续负责引用归属及当前资格，Schema校验已有生产记录的准确结构。N3接收1.13.0并维护公共投影与界面验证，本模块检查不代表完整产品验收。
 
 ### C07/C20本轮必要依据与明确沿用
 
@@ -146,7 +148,7 @@ SDK控制采用Nanobot.run_streamed返回的正式RunStream.cancel()。外部取
 7. 公共runtime-records.schema.json接收feature_id=N02、conversation_context以及实际tool_results的parameters_sha256和已有Fc02的bi_query_context/source_refs/definition_versions/detail_refs。附件投影采用Schema1.1.0的四状态、nullable字段与recorded_*字段。公共Schema、配置、注册及实际候选检查由N3完成。
 8. 当前会话原请求读取调用agent.requests(role, chat_id, attached=当前连接采用核查, active=当前本人有效认证核查)。返回数组逐项保持上述receipt字段；公共Schema、路由和前端读取由N3接收。本接口不注册为模型工具，不恢复或执行列表中的原请求。
 9. 当前实际配置截止由同一ConversationRuntimeRecorder/Hook/Provider执行，N3现有注册接口继续接收本模块；每个实际运行采用其已保存timeout。截止内部状态没有公开字段，也不恢复为可执行原请求。公开停止入口与完整菜单证据由N3维护。
-10. 正式任务入口消费要求当前ConversationAPI.task_entry及同一attachments.sessions。公共Runtime Schema与采用投影需要接收上述conversation_context.task_entry六项字段；任务及document引用保留原值。当前模块读取正式绑定，不承担准备、绑定或恢复未知请求的公共操作。N3维护实际任务入口、会话切换、返回引用、公开停止和完整26项消费证据。
+10. 正式任务入口消费要求当前ConversationAPI.task_entry及同一attachments.sessions。公共接收采用Runtime Schema 1.13.0及上述conversation_context.task_entry六项字段；任务及document引用保留原值。当前模块读取正式绑定，不承担准备、绑定或恢复未知请求的公共操作。N3维护实际任务入口、会话切换、返回引用、公开停止和完整26项消费证据。
 
 公开原编号端点、实际WebSocket接收/重连/停止、阅读位置与焦点、UI完整设计及全部26项由N3对准确候选验证。本人草稿/发送/回复及任务共享流程需要完整产品消费证据，本模块检查不代替这些验收。复杂或不明确自然条件明确保持待补充；未支持的其他业务动作仍需相应正式输入及领域能力。F01设计返修、STT暂停及用户验收状态继续保持独立。
 
@@ -204,10 +206,30 @@ Given当前绑定已经完成实际SDK读取；When正式本人通过boss.assign
 
 Given实际query_metrics已经保存查询；When后续模型步骤期间任务、来源或会话实例变化；Then运行FAILED，原query_id和已保存tool_results保持，后续任务工具没有执行。工具前后核查用例调用原正式delegate，分别在实际调用之前或实际结果返回之后执行正式来源撤销，原结果保持实际来源；Scope拒绝继续释放失效结果，真实HTTPGone记录为工具错误。没有替换LLMResponse、工具输出或领域异常。
 
-Given当前绑定的实际任务工具已经完成；When正式RunStream.cancel执行；Then运行CANCELED，原任务结果、准备及绑定、原生user历史均可读取，只有本轮进程内证明和截止被清理。同库重建服务可以读取原client_request_id和run_id以及正式任务产物，没有恢复执行证明。公开任务入口、Runtime Schema新增字段、公共投影和完整26项继续由N3接收验证。
+Given当前绑定的实际任务工具已经完成；When正式RunStream.cancel执行；Then运行CANCELED，原任务结果、准备及绑定、原生user历史均可读取，只有本轮进程内证明和截止被清理。同库重建服务可以读取原client_request_id和run_id以及正式任务产物，没有恢复执行证明。公开任务入口、公共投影和完整26项继续由N3接收验证。
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-task-entry-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n02-task-entry-delivery --tb=short --junitxml=docs/menu-delivery/N02/task-entry-consumer.xml
 ```
 
-本次git diff --check通过。docs/menu-delivery/index.md及N02/index.md继续指向本主记录；按照本次分工，公共索引与正式菜单状态由N3维护。所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。
+### Runtime Schema限定检查
+
+本次准确依赖为6d620bb3a2c1ec587af1e4f3437cdeb03065c0cd，原runtime-records.schema.json 1.12.0的blob为1f26bfc860afcd596895944d47354738a0b48ba4。当前1.13.0的blob为7d9ed6d282dc1c7853bc2e2e2690fc99f1697b66。对完整JSON逐项比较时，仅移除本次新增task_entry属性及ConversationTaskEntry、TaskEntryIdentifier两个定义并恢复原$id后，全部内容与准确PRODUCT原文相同。
+
+app/tests/conversation_agent/test_task_entry_schema.py使用既有正式任务、准备及绑定服务，经同一实际Nanobot/AgentLoop完成任务读取。检查从实际SQLite重新读取已保存Runtime，对完整CurrentRuntimeRun采用Draft202012Validator及FormatChecker，不投影、不移除字段、不填写替代Runtime。实际记录为SIMULATED，external_model_invoked=false；验证前后的记录相同。UNBOUND实际来源读取记录沿用可选字段语义。
+
+受限字段检查以已经通过校验的真实记录为依据，仅修改内存副本提交给校验器；原记录和数据库保持。58项拒绝检查包括四类对象的额外字段、六项必填字段及各引用必填字段缺少、错误kind/page_id、无效摘要、编号空值或长度越界、无效client_request_id、空来源数组以及task_entry为null或数组。每项均要求校验器产生实际拒绝，不构造模型响应、业务结果或异常。
+
+定向报告validation/.work/n02-task-entry-schema-targeted.xml为4 passed、8.10秒，记录rejected_task_entry_input_count=58。该报告与本次运行数据保存在已忽略的验证目录；本次提交严格限定Schema、针对性测试和本主记录，Native消费者、公共适配器及界面代码保持。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-task-entry-schema-public validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_task_entry_schema.py -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n02-task-entry-schema-green --tb=short --junitxml=validation/.work/n02-task-entry-schema-targeted.xml
+```
+
+完整报告validation/.work/n02-task-entry-schema-runtime.xml为85 passed、160.79秒，状态MODULE_CHECKS_PASSED。包含本次4项Schema检查及既有81项，完整执行实际120秒deadline、SDK取消、绑定任务版本与来源变化、会话实例变化、媒体、原请求及可观察失败路径。该证据仅登记准确producer与Schema消费范围；界面、公共投影、完整26项及F01保持N3负责。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-task-entry-schema-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n02-task-entry-schema-delivery --tb=short --junitxml=validation/.work/n02-task-entry-schema-runtime.xml
+```
+
+本次git diff --check通过。docs/menu-delivery/index.md及N02/index.md继续指向本主记录；按照本次分工，公共索引与正式菜单状态由N3维护。所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。本次交付范围为Runtime Schema及准确producer记录消费验证，完整26项及F01状态由N3维护。

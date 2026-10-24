@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.12.0",
+  "$id": "urn:boss-agent:runtime-records:1.13.0",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {
@@ -80,6 +80,30 @@
         "parameters_sha256":{"$ref":"#/$defs/Sha256"}
       }
     },
+    "TaskEntryIdentifier": {"type": "string", "minLength": 1, "maxLength": 200},
+    "ConversationTaskEntry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["preparation_id", "client_request_id", "preparation_sha256", "task_reference", "source_references", "return_reference"],
+      "properties": {
+        "preparation_id": {"$ref": "#/$defs/TaskEntryIdentifier"},
+        "client_request_id": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9_.-]+$"},
+        "preparation_sha256": {"$ref": "#/$defs/Sha256"},
+        "task_reference": {
+          "type": "object", "additionalProperties": false, "required": ["kind", "id", "version"],
+          "properties": {"kind": {"const": "task"}, "id": {"$ref": "#/$defs/TaskEntryIdentifier"}, "version": {"$ref": "#/$defs/TaskEntryIdentifier"}}
+        },
+        "source_references": {
+          "type": "array", "minItems": 1,
+          "items": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version", "content_sha256"],
+            "properties": {"kind": {"const": "document"}, "id": {"$ref": "#/$defs/TaskEntryIdentifier"},
+              "version": {"$ref": "#/$defs/TaskEntryIdentifier"}, "content_sha256": {"$ref": "#/$defs/Sha256"}}}
+        },
+        "return_reference": {
+          "type": "object", "additionalProperties": false, "required": ["page_id", "task_id", "task_version"],
+          "properties": {"page_id": {"const": "F06"}, "task_id": {"$ref": "#/$defs/TaskEntryIdentifier"}, "task_version": {"$ref": "#/$defs/TaskEntryIdentifier"}}
+        }
+      }
+    },
     "ConversationContext": {
       "type": "object", "additionalProperties": false,
       "required": ["input_sha256", "allowed_call_refs", "references"],
@@ -88,6 +112,7 @@
         "client_request_id": {"$ref": "#/$defs/Identifier"},
         "media_sha256": {"$ref": "#/$defs/Sha256"},
         "required_input_count": {"type": "integer", "minimum": 0},
+        "task_entry": {"$ref": "#/$defs/ConversationTaskEntry"},
         "attachment_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
           "required": ["attachment_id", "content_sha256", "processing_state"],
           "properties": {"attachment_id": {"$ref": "#/$defs/Identifier"},
