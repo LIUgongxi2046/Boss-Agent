@@ -315,7 +315,8 @@ class RoleChannel(WebSocketChannel):
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
         admitted = None
-        if kind == "message" and self.morning is not None:
+        native_stop = kind == "message" and isinstance(envelope.get("content"), str) and envelope["content"].strip() == "/stop"
+        if kind == "message" and self.morning is not None and not native_stop:
             try:
                 admitted = self.morning.native.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
                     attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),

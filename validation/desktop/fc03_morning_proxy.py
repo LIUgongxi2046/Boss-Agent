@@ -11,8 +11,10 @@ HOP = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization", 
 ACTIONS = {"boss.morning.query", "boss.today.reorder", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.assignment.send", "boss.assignment.sources.confirm", "boss.commitment.create", "boss.reminder.ack", "boss.reminder.snooze", "boss.reminder.close", "boss.owner.notice.save", "boss.owner.notice.confirm", "boss.owner.plan.pause", "boss.scheduler.draft.save", "boss.alert.ack", "boss.alert.snooze", "boss.alert.close", "boss.alert.meeting.link", "boss.alert.assignment.create", "boss.alert.rule.save", "boss.simulation.alert.load"}
 ACTIONS.add("boss.morning.bind")
 ACTIONS.add("boss.assignment.create")
-STATE = {"events": [], "connections": 0, "armed": None, "dropped_actions": [], "delayed_read": None}
+ACTIONS.add("boss.morning.cancel")
+STATE = {"events": [], "connections": 0, "armed": None, "dropped_actions": [], "delayed_read": None, "held_binding": None}
 DELAY = {"selection": None, "release": None}
+BINDING_RELEASE = None
 
 
 async def start(app):
@@ -48,6 +50,19 @@ async def release_read(request):
     return web.json_response({"released": True})
 
 
+async def hold_binding(request):
+    global BINDING_RELEASE
+    assert BINDING_RELEASE is None
+    BINDING_RELEASE = asyncio.Event()
+    return web.json_response({"armed": True})
+
+
+async def release_binding(request):
+    assert BINDING_RELEASE is not None and STATE["held_binding"] is not None
+    BINDING_RELEASE.set()
+    return web.json_response({"released": True})
+
+
 async def proxy(request):
     client, target = request.app["client"], UPSTREAM + request.raw_path
     headers = {key: value for key, value in request.headers.items() if key.lower() not in HOP}
@@ -71,10 +86,17 @@ async def proxy(request):
                     await upstream.send_str(frame.data)
                 await upstream.close()
             async def outgoing():
+                global BINDING_RELEASE
                 async for frame in upstream:
                     assert frame.type == WSMsgType.TEXT
                     body = json.loads(frame.data)
                     reference = requests.get(body.get("request_id"))
+                    if reference and body.get("ok") is True and reference["action"] == "boss.morning.bind" and BINDING_RELEASE is not None:
+                        STATE["held_binding"] = {**reference, "response_sha256": hashlib.sha256(frame.data.encode()).hexdigest()}
+                        await BINDING_RELEASE.wait()
+                        STATE["events"].append({"event": "actual_binding_response_released", **STATE["held_binding"]})
+                        STATE["held_binding"] = None
+                        BINDING_RELEASE = None
                     if reference and body.get("ok") is True and STATE["armed"] == reference["action"]:
                         STATE["armed"] = None
                         STATE["dropped_actions"].append(reference["action"])
@@ -105,5 +127,7 @@ app.router.add_get("/_morning/state", state)
 app.router.add_post("/_morning/arm", arm)
 app.router.add_post("/_morning/delay", delay_read)
 app.router.add_post("/_morning/release", release_read)
+app.router.add_post("/_morning/hold-binding", hold_binding)
+app.router.add_post("/_morning/release-binding", release_binding)
 app.router.add_route("*", "/{path:.*}", proxy)
 web.run_app(app, host="127.0.0.1", port=PORT, access_log=None)

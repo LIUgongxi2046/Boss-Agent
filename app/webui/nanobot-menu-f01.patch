@@ -8,23 +8,27 @@
      setPendingAutomationMessage((current) => current?.id === id ? null : current);
    }, []);
 +
-+  const onStartMorningChat=useCallback(async(value:MorningConversationRequest):Promise<MorningBindingReceipt>=>{
++  const onStartMorningChat=useCallback(async(value:MorningConversationRequest,signal:AbortSignal):Promise<MorningBindingReceipt>=>{
++    if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
 +    let binding:MorningBindingReceipt;
 +    if(value.binding_id){
 +      const response=await fetch("/api/boss/ui/morning/binding?"+new URLSearchParams({client_request_id:value.binding_id}),{headers:{Authorization:"Bearer "+getToken()},cache:"no-store"});
 +      if(!response.ok)throw new Error("晨间原生绑定读取失败，HTTP "+response.status);
 +      binding=await response.json();
 +      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.date!==value.date||binding.result.timezone!==value.timezone||binding.result.item_id!==(value.item_id??null))throw new Error("当前问题与原生绑定不符");
-+      navigate({view:"chat",activeKey:binding.result.session_id,settingsSection:"overview"},{sending:true});
 +    }else{
 +      const chatId=await onCreateChat(undefined,value.question);
++      if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
 +      if(!chatId)throw new Error("原生会话尚未创建，问题保留在今日工作。");
 +      const {question:submittedQuestion,binding_id:existingBinding,...scope}=value;
 +      void submittedQuestion;void existingBinding;
 +      binding=await client.requestMutation<MorningBindingReceipt>("boss.morning.bind",{...scope,chat_id:chatId});
 +      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.chat_id!==chatId)throw new Error("原生晨间绑定尚未取得有效回执");
 +    }
-+    setPendingAutomationMessage({id:crypto.randomUUID(),chatId:binding.result.chat_id,content:value.question});
++    if(!signal.aborted){
++      if(value.binding_id)navigate({view:"chat",activeKey:binding.result.session_id,settingsSection:"overview"},{sending:true});
++      setPendingAutomationMessage({id:crypto.randomUUID(),chatId:binding.result.chat_id,content:value.question});
++    }
 +    return binding;
 +  },[client,getToken,navigate,onCreateChat]);
 @@

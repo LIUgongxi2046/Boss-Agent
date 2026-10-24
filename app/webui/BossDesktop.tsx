@@ -124,7 +124,7 @@ type Props = {
   getToken: () => string;
   onLogout: () => void;
   onStartChat: (content: string) => Promise<boolean | void>;
-  onStartMorning:(value:MorningConversationRequest)=>Promise<MorningBindingReceipt>;
+  onStartMorning:(value:MorningConversationRequest,signal:AbortSignal)=>Promise<MorningBindingReceipt>;
   onOpenMorning:(chatId:string)=>void;
   children: (role: Role, visible: boolean) => ReactNode;
   onOpenNative: (role: Role) => void;
@@ -617,7 +617,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </section>
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-morning-content" hidden={page!=="F01"}>
               <BossMorningView refreshVersion={requestVersion} visible={page==="F01"} onDirtyChange={setWorkDirty}
-                onStartConversation={async value=>{const result=await onStartMorning(value);navigate("NATIVE","",true);return result;}}
+                onStartConversation={async(value,signal)=>{const result=await onStartMorning(value,signal);if(!signal.aborted)navigate("NATIVE","",true);return result;}}
                 onOpenConversation={chatId=>{onOpenMorning(chatId);navigate("NATIVE","",true);}}
                 onNavigate={(target,objectId)=>target==="F06"?selectTask(objectId):navigate(target,objectId)}
                 onPrepare={(item,reference)=>{setMorningOrigin(reference);setMorningReady(false);if(item.page_id==="F06")selectTask(item.object_id);else{updateAssignmentDraft("purpose",item.title);navigate("F06",item.object_id,false,"");}}}/>

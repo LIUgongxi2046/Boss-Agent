@@ -205,10 +205,10 @@ Morning View 1.1.0 的 input_coverage、category_counts、source_statuses[].data
 
 MorningConversationRequest 将 question、date/timezone、可选成对 list_id/item_id 交给原生 App。新会话由现有 new_chat 创建；boss.morning.bind 通过已认证 WebSocket、当前连接附加会话和稳定 client_request_id 建立服务端绑定。每次发送前重新核查连接、当前快照、来源和本人排序版本；原生消息仍由既有传输进入同一 AgentLoop。NativeMorningAdapter 将当前 message_id、输入摘要和可信会话绑定为一次公开晨间请求，Provider 与生命周期采用同一 MorningRequest，实际工具保持 todayRead/morningListRead/morningDetailRead/morningSourceRead。本人确认、排序保存和业务写入不进入模型工具。
 
-绑定写入加入原生 Client 禁止重放清单。响应未知时只读取 /api/boss/ui/morning/binding 的原编号回执；读取不恢复授权、不记录上下文采用、不自动发送保留问题。本人明确提交后才使用恢复绑定进入原生会话。后续讨论保留同一 chat/session，选中事项变化建立独立绑定；Runtime 与工具结果保留 list/item/source 版本和 run_id。技术记录只含编号、版本、状态和摘要。question、私人正文及账号不进入 URL、静态资源、普通持久缓存或技术日志。
+绑定写入加入原生 Client 禁止重放清单。响应未知时只读取 /api/boss/ui/morning/binding 的原编号回执；读取不恢复授权、不记录上下文采用、不自动发送保留问题。本人明确提交后才使用恢复绑定进入原生会话。会话交接通过独立 AbortSignal 保护未发送问题；本人取消后，原绑定响应仍可核查，App 和 Shell 不自动提交问题或打开会话。原生正在运行的轮次使用既有停止响应操作，/stop 交给原生命令处理，不创建晨间查询。后续讨论保留同一 chat/session，选中事项变化建立独立绑定；Runtime 与工具结果保留 list/item/source 版本和 run_id。技术记录只含编号、版本、状态和摘要。question、私人正文及账号不进入 URL、静态资源、普通持久缓存或技术日志。
 
 详情和来源读取以 generation、AbortController、当前 list/item/source/版本共同判定。较早响应不能覆盖新选择。关联会议只读取当前详情明确提供的同版本 meeting 引用，通过现有 Radix Dialog 提供当前必要共享入口，关闭恢复触发焦点。prepare 传递 MorningReference 与实际 source_ids/meeting_id/event_ids；F06 重新核查当前正式详情，只有现有受支持业务输入才能采用。缺少必要输入明确阻止创建。本人核对具体内容、勾选确认并提交后才正常保存交办，发送仍是独立操作。
 
-F01 在跨页时保持挂载，date/timezone、分类、选择及来源安全标识写入 URL；正文保存在当前进程。返回重新读取当前正式对象，恢复滚动和可用触发焦点；D06 的关闭焦点与异步详情完成共同触发恢复。排序使用实际 CAS，失败保留编辑；未知回执只读当前原编号。已保存历史结果不会作为当前完整资料使用。适用失败、取消、超时、来源撤销与保存事务结果分别在当前 Runtime、领域和公开消费者核查。
+F01 在跨页时保持挂载，date/timezone、选择及来源安全标识写入 URL；分类和正文保存在当前进程。返回重新读取当前正式对象，恢复分类、滚动和可用触发焦点；D06 的关闭焦点与异步详情完成共同触发恢复。刷新按安全标识恢复当前对象，分类采用默认全部事项。排序使用实际 CAS，失败保留编辑；未知回执只读当前原编号。已保存历史结果不会作为当前完整资料使用。适用失败、取消、超时、来源撤销与保存事务结果分别在当前 Runtime、领域和公开消费者核查。
 
 源码增量保存在 app/webui/nanobot-menu-f01.patch；准备目录的 BossDesktop 与正式源码必须相同。独立制品 menu-f01-n3-dist、启动入口 scripts/run_menu_f01.command、数据目录 validation/.work/menu-f01-experience 使用10611/10612/20611，不操作现有 UI02 或 MVP 体验。初次准备采用获准 SIMULATED 输入及既有业务初始化，后续启动使用同一 SQLite 和 credentials，不重新配置或清空。显式本机模式的受控账号填充仅填写表单，手动登录仍使用正常服务认证。准确来源、实际安装 Nanobot、制品及证据摘要由当前 inventory 登记。
