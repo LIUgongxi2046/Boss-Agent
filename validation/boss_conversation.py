@@ -29,6 +29,11 @@ def optional(db, ns, kind, identifier):
     return json.loads(row[0]) if row else None
 
 
+def recorded_conversation_context(run):
+    return validate("RecordedConversationContext", {field: run["conversation_context"][field]
+        for field in ("input_sha256", "allowed_call_refs", "references")})
+
+
 def references(run):
     found = {}
     selected = run.get("morning_context", {}).get("selected_item_ref", {})
@@ -42,7 +47,9 @@ def references(run):
 
 class ConversationAPI:
     def __init__(self, store):
+        from boss_conversation_references import ConversationReferences
         self.store = store
+        self.context_references = ConversationReferences(store)
 
     def _run(self, db, context, query):
         run = self.store.get(db, context["namespace"], "runtime_run", query["run_id"])
@@ -66,10 +73,13 @@ class ConversationAPI:
             run = self._run(db, context, {**query, "run_id": identifier})
             record = {field: run[field] for field in ("run_id", "session_id", "request_id", "chat_id", "turn_id", "configuration_version", "configuration_id", "status", "stop_reason", "started_at", "finished_at")}
             record["runtime"] = {field: run["runtime"][field] for field in ("provider", "model_id", "api_type", "max_tool_rounds", "max_output_tokens", "timeout", "config_sha256")}
-            record["tool_steps"] = [{field: step[field] for field in ("tool_id", "tool_call_id", "iteration", "status", "task_status", "version", "task_version") if field in step} for step in run["tool_results"]]
+            record["tool_steps"] = [{field: step[field] for field in ("tool_id", "tool_call_id", "iteration", "status", "task_status", "version", "task_version", "source_id") if field in step} for step in run["tool_results"]]
             record["tool_errors"] = [{field: step[field] for field in ("tool_id", "tool_call_id", "error_type") if field in step} for step in run.get("tool_errors", [])]
             record["artifacts"] = references(run)
             record["origin_references"] = {}
+            record["context_references"] = self.context_references.project_in_transaction(db, context, run)
+            if "conversation_context" in run:
+                record["origin_references"]["conversation_context"] = recorded_conversation_context(run)
             for field, allowed in (("morning_context", ("date", "timezone", "snapshot_sha256", "order_version")),
                                    ("assignment_context", ("task_id", "task_version", "review_sha256")),
                                    ("reminder_context", ("projection", "projection_sha256"))):
@@ -93,7 +103,8 @@ class ConversationAPI:
             db.execute("BEGIN")
             context = _context(db)
             run = self._run(db, context, query)
-            require(any(ref["kind"] == query["kind"] and ref["id"] == query["id"] for ref in references(run)), "产物没有关联当前会话及运行", web.HTTPForbidden)
+            recorded_context = recorded_conversation_context(run)["references"] if "conversation_context" in run else []
+            require(any(ref["kind"] == query["kind"] and ref["id"] == query["id"] for ref in references(run) + recorded_context), "产物没有关联当前会话及运行", web.HTTPForbidden)
             ns, identifier, kind = context["namespace"], query["id"], query["kind"]
             initial = self.store.get(db, ns, "initial", "snapshot")
             evidence = None

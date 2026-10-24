@@ -1,8 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:conversation:1.1.0",
+  "$id": "urn:boss-agent:conversation:1.2.0",
   "$defs": {
     "Id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "Sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "RecordedContextReference": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version"], "properties": {
+      "kind": {"$ref": "#/$defs/Id"}, "id": {"$ref": "#/$defs/Id"}, "version": {"type": ["string", "null"], "minLength": 1}}},
+    "RecordedConversationContext": {"type": "object", "additionalProperties": false, "required": ["input_sha256", "allowed_call_refs", "references"], "properties": {
+      "input_sha256": {"$ref": "#/$defs/Sha256"}, "allowed_call_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+        "required": ["tool_id", "parameters_sha256"], "properties": {"tool_id": {"$ref": "#/$defs/Id"}, "parameters_sha256": {"$ref": "#/$defs/Sha256"}}}},
+      "references": {"type": "array", "items": {"$ref": "#/$defs/RecordedContextReference"}}}},
+    "ContextSourceMetadata": {"type": "object", "additionalProperties": false,
+      "required": ["source_type", "version", "author_contact_id", "author_kind", "author_display_name", "generator_version", "published_at", "observed_at", "business_as_of", "valid_from", "valid_until", "coverage", "business_basis", "business_basis_description", "allowed_use"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "version": {"$ref": "#/$defs/Id"}, "author_contact_id": {"type": ["string", "null"]},
+      "author_kind": {"type": ["string", "null"]}, "author_display_name": {"type": ["string", "null"]}, "generator_version": {"type": ["string", "null"]},
+      "published_at": {"type": ["string", "null"]}, "observed_at": {"type": ["string", "null"]}, "business_as_of": {"type": ["string", "null"]},
+      "valid_from": {"type": ["string", "null"]}, "valid_until": {"type": ["string", "null"]}, "coverage": {"type": ["string", "null"]},
+      "business_basis": {"type": ["string", "null"]}, "business_basis_description": {"type": ["string", "null"]}, "allowed_use": {"type": ["string", "null"]}}},
+    "ContextSourceReference": {"type": "object", "additionalProperties": false, "required": ["source_id", "version", "current_version", "status"], "properties": {
+      "source_id": {"$ref": "#/$defs/Id"}, "version": {"type": ["string", "null"]}, "current_version": {"type": ["string", "null"]}, "status": {"$ref": "#/$defs/Id"}}},
+    "ContextReference": {"type": "object", "additionalProperties": false,
+      "required": ["kind", "id", "recorded_version", "current_version", "reference_state", "adoption_state", "current_validity", "current_object_state", "source_metadata", "source_refs", "support"], "properties": {
+      "kind": {"$ref": "#/$defs/Id"}, "id": {"$ref": "#/$defs/Id"}, "recorded_version": {"type": ["string", "null"]}, "current_version": {"type": ["string", "null"]},
+      "reference_state": {"enum": ["CURRENT", "VERSION_CHANGED", "VERSION_UNRECORDED", "NEEDS_REVIEW", "INACTIVE", "MISSING_OR_FORBIDDEN", "UNSUPPORTED_KIND"]},
+      "adoption_state": {"enum": ["CURRENT", "NEEDS_REVIEW", "UNAVAILABLE"]},
+      "current_validity": {"type": ["string", "null"], "enum": [null, "RECEIVED", "VALID", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED"]},
+      "current_object_state": {"type": ["string", "null"]}, "source_metadata": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/ContextSourceMetadata"}]},
+      "source_refs": {"type": "array", "items": {"$ref": "#/$defs/ContextSourceReference"}},
+      "support": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false,
+        "required": ["origin", "tool_id", "tool_call_id"], "properties": {"origin": {"enum": ["CONVERSATION_CONTEXT", "TOOL_RESULT"]},
+        "tool_id": {"type": ["string", "null"]}, "tool_call_id": {"type": ["string", "null"]}}}}}},
     "Context": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id"], "properties": {
       "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"], "minLength": 1, "maxLength": 200}}},
     "ArtifactInput": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id", "run_id", "kind", "id"], "properties": {
@@ -13,7 +40,10 @@
       "recorded_version": {"type": ["string", "null"]}, "adoption_state": {"const": "REQUIRES_CURRENT_READ"}}},
     "View": {"type": "object", "additionalProperties": false, "required": ["projection", "source_type", "session_id", "chat_id", "runs", "coverage_state", "missing_sources", "business_authorization_granted", "business_mutation_performed"], "properties": {
       "projection": {"const": "conversation"}, "source_type": {"const": "RUNTIME_RECORD"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"]},
-      "runs": {"type": "array", "items": {"type": "object"}}, "coverage_state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "missing_sources": {"type": "array", "items": {"type": "string"}},
+      "runs": {"type": "array", "items": {"type": "object", "required": ["context_references"], "properties": {
+        "context_references": {"type": "array", "items": {"$ref": "#/$defs/ContextReference"}},
+        "origin_references": {"type": "object", "properties": {"conversation_context": {"$ref": "#/$defs/RecordedConversationContext"}}}}}},
+      "coverage_state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "missing_sources": {"type": "array", "items": {"type": "string"}},
       "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}}},
     "ArtifactResult": {"type": "object", "additionalProperties": false, "required": ["source_type", "run_id", "session_id", "chat_id", "kind", "id", "data", "evidence", "business_authorization_granted", "business_mutation_performed"], "properties": {
       "source_type": {"const": "SIMULATED"}, "run_id": {"$ref": "#/$defs/Id"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"]},
