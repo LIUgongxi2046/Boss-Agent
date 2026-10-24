@@ -6,6 +6,8 @@
 |---|---|---|
 | MVP01-N3 | [采购成本连续体验](../feature-delivery/MVP01/integration.md) | BOSS-MVP-1、MVP.C01—C12；同一采购报告、实际SDK/原文/本人确认/持久恢复和可启动体验；状态引用原始feature-delivery.json |
 | FC07-N3 | [交办与承诺公共集成](../feature-delivery/FC07/integration.md) | FR-06、FC07.C01—C12；F06/N05、发送/催办/反馈/延期/证据/本人结束、SDK、保存恢复；状态引用原始feature-delivery.json |
+| FC04-N3 | [经营提醒公共集成](../feature-delivery/FC04/integration.md) | FR-02、FC04.C01—C20；提醒规则、唯一Cron、本人处理与后续调度、桌面通知、原编号恢复；状态引用原始feature-delivery.json |
+| FC07-N2 | [交办限定读取与实际Runtime](../feature-delivery/FC07/agent.md) | Fc07Context、两项读取、可信对象及来源版本、实际SDK、认证撤销；当前接收见FC07交付记录 |
 | FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
 | FC02-N3 | [BI连续查询公共集成](../feature-delivery/FC02/integration.md) | 完整FR-03及二十项检查点，当前工单为原始项目docs/FC02经营查询工单.md |
 | FC03-N3 | [晨间事项公共集成](../feature-delivery/FC03/integration.md) | FR-01/BR-01/AC-01-S/E；完整22项；MorningAPI、ProductMorning、BossMorningView、日期/清单/来源/排序/原回执及实际SDK；状态引用原始功能来源 |
