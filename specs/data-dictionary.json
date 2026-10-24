@@ -8,7 +8,7 @@
   "field_policy": {
     "compatibility": "1.8.0保留既有动作和五项Tool名称、原initial与21条模拟输入；新增material_cost_report与SI09.supply.cost_reports。入库和实际领用按明确范围、口径及可比期间计算，报价/合同/计划假设与完整企业成本分别表达。当前Tool Schema由business.SPEC提供，原selection-probe.json保持。既有回执保持原结果；当前消费者接收相同版本的结果Schema。",
     "external_business_storage": "simulation_definition=si09-si10-business-v1的记录统一使用external_business_record，业务字段位于data，其严格类型由simulated-supply-quality.schema.json的x-entity-config与同名$defs决定。对应同名实体中的planned定义保留完整业务设计范围；当前模拟服务覆盖由该版本化Schema明确。",
-    "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划和忙碌分享的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
+    "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划、忙碌分享、经营提醒规则/暂缓和本人事项次序的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
     "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
     "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
     "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
@@ -74,11 +74,26 @@
       "storage": "objects/today_order", "access": "BOSS_ONLY", "version": "1",
       "fields": {
         "date": {"type": "string", "format": "date", "meaning": "本人时区的业务日期"},
+        "timezone": {"type": "string", "optional": true, "meaning": "正式逐日排序使用IANA时区；既有日期键保留"},
+        "list_id": {"type_ref": "identifier", "optional": true}, "list_version": {"type_ref": "version", "optional": true},
+        "snapshot_sha256": {"type": "string", "optional": true},
         "version": {"type_ref": "version"},
         "item_ids": {"type": "array", "uniqueItems": true, "meaning": "当前完整事项集合的本人次序"},
         "authorization_id": {"type_ref": "identifier", "relation": "authorization.authorization_id"}
       },
-      "write_preconditions": ["snapshot_sha256 matches current projection", "expected_version matches current order", "exact item set"]
+      "write_preconditions": ["snapshot_sha256 matches current projection", "expected_version matches current order", "exact item set"],
+      "adoption": "当前读取核查本人/空间/动作/对象/版本与完整事项次序确认。撤销后停止采用并保留原记录、回执与CAS版本。"
+    },
+    "morning_list": {
+      "storage": "objects/morning_list", "access": "BOSS_ONLY", "version": "1.1.0",
+      "fields": {"owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
+        "execution_namespace": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "client_request_id": {"type_ref": "identifier"},
+        "result": {"type": "object", "schema_ref": "morning.schema.json#/$defs/View"}, "binding": {"type": "object", "meaning": "同一事务的获准对象和原文快照；私人内容仅本人可以采用"}},
+      "read_policy": "当前对象、来源、目标、经营规则及关联变化使原清单需要重新查询；历史保持编号版本，失效正文、分类计数和覆盖内容隐藏。"
+    },
+    "morning_sequence": {
+      "storage": "objects/morning_sequence", "access": "SERVER", "version": "1.1.0",
+      "fields": {"version": {"type_ref": "version"}}, "meaning": "按业务日期和IANA时区递增清单版本；查询回执与清单同一事务保存。"
     },
     "authorization": {
       "storage": "objects/authorization", "access": "BOSS_BODY_MAINTAINER_METADATA", "version": "1",
@@ -574,7 +589,7 @@
   },
   "pending_entities": [],
   "requirement_entities": {
-    "R01": ["today_order", "meeting", "task", "self_commitment", "event", "owner_goals"],
+    "R01": ["morning_list", "morning_sequence", "today_order", "meeting", "task", "self_commitment", "event", "owner_goals", "application", "private_calendar", "travel_plan", "document"],
     "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification", "business_alert_rule", "business_alert_observation", "business_alert_tracking", "business_alert_recovery", "business_alert_summary", "business_alert_delivery", "business_alert_action", "dispatch_history", "notification_revision", "reminder_revision", "notification_meeting_link", "notification_assignment_reference"],
     "R03": ["query", "query_source_binding", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
     "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],

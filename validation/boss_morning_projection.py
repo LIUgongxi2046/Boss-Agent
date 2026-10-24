@@ -20,6 +20,20 @@ def order_key(day, initial):
     return day["date"] if day["timezone"] == initial["boss_profile"]["timezone"] else day["date"] + "|" + day["timezone"]
 
 
+def saved_order(db, namespace, initial, day):
+    preference = object_at(db, namespace, "today_order", order_key(day, initial))
+    if preference is None:
+        return None, "0", "NOT_SET"
+    auth = object_at(db, namespace, "authorization", preference["authorization_id"])
+    require(auth is not None and auth["owner_id"] == initial["owner_id"] and auth["scope"] == namespace
+            and auth["issuer_identity"] == "BOSS" and auth["issuer"] == initial["owner_id"] and auth["action"] == "today.reorder"
+            and auth["content_version"] == preference["version"] and auth["payload"]["item_ids"] == preference["item_ids"]
+            and auth["target_id"] == preference.get("list_id", preference["date"]) and preference["date"] == day["date"]
+            and preference.get("timezone", initial["boss_profile"]["timezone"]) == day["timezone"], "本人次序缺少匹配的有效确认", web.HTTPForbidden)
+    # 已保存设置持续采用当前本人确认；撤销后保留原版本供下一次CAS使用。
+    return (None if auth["revoked"] else preference), preference["version"], "REVOKED" if auth["revoked"] else "SAVED"
+
+
 def _instant(value):
     if value is None:
         return None
@@ -60,6 +74,17 @@ def project(store, db, context, day):
     event = initial["event"]
     if ("event", event["event_id"]) not in rows:
         rows["event", event["event_id"]] = {**event, "state": event["status"]}
+    from boss_alert_policy import GENERATOR, material
+    alert_views = {identifier: material(store, db, ns, initial, row) for (kind, identifier), row in rows.items()
+                   if kind == "event" and row.get("generated_by") == GENERATOR}
+    meeting_links = {identifier: json.loads(body) for identifier, body in db.execute(
+        "SELECT id,body FROM objects WHERE namespace=? AND kind='notification_meeting_link' ORDER BY id", (ns,)).fetchall()}
+    source_cutoffs = {"finance-note": datetime.combine(date.fromisoformat(initial["periods"]["CURRENT"][1]), time(23, 59, 59),
+                                                       ZoneInfo(initial["boss_profile"]["timezone"])).isoformat()}
+    for identifier, view in alert_views.items():
+        for ref in rows["event", identifier]["source_refs"]:
+            if view["adoption_state"] == "CURRENT":
+                source_cutoffs[ref["source_id"]] = view["data_as_of"]
     items, excluded, sources, source_documents, preparation, measure_objects = [], [], {}, {}, [], {}
     missing = {"REGIONAL_COVERAGE_NOT_PROVIDED", "COMPLETE_EXTERNAL_CALENDAR_NOT_VERIFIED", "SOURCE_REFRESH_COVERAGE_NOT_PROVIDED"}
     if profile["owner_confirmation"] != "CONFIRMED":
@@ -77,7 +102,7 @@ def project(store, db, context, day):
             return sources[identifier]
         metadata = db.execute("SELECT json_extract(body,'$.access_scope'),json_extract(body,'$.version') FROM objects WHERE namespace=? AND kind='document' AND id=?", (ns, identifier)).fetchone()
         if metadata is None or metadata[0] != owner:
-            result = {"source_id": identifier, "version": None, "status": "MISSING" if metadata is None else "FORBIDDEN", "author_contact_id": None, "published_at": None, "observed_at": None, "locator": None}
+            result = {"source_id": identifier, "version": None, "status": "MISSING" if metadata is None else "FORBIDDEN", "author_contact_id": None, "published_at": None, "observed_at": None, "data_as_of": None, "locator": None}
         else:
             document = store.get(db, ns, "document", identifier)
             status = source_validity(document, clock["at"])
@@ -90,11 +115,22 @@ def project(store, db, context, day):
             result = {"source_id": identifier, "version": document["version"], "status": status,
                       "source_type": document.get("source_type"), "valid_from": document.get("valid_from"), "valid_until": document.get("valid_until"),
                       "author_contact_id": document.get("author_contact_id"), "published_at": document.get("published_at"),
-                      "observed_at": document.get("observed_at"), "locator": document.get("original_locator")}
+                      "observed_at": document.get("observed_at"), "data_as_of": source_cutoffs.get(identifier, document.get("data_as_of")) if status == "VALID" else None,
+                      "locator": document.get("original_locator")}
         sources[identifier] = result
         if result["status"] != "VALID":
             missing.add("SOURCE_" + result["status"] + ":" + identifier)
         return result
+
+    def event_priority(identifier, row):
+        if row.get("state") != "OPEN":
+            return False
+        if identifier in alert_views:
+            view = alert_views[identifier]
+            return view["adoption_state"] == "CURRENT" and view["rule_state"] == "ACTIVE" and view["evaluation"]["phase"] in ("BREACH", "IMMEDIATE")
+        return bool(rule_valid and rules["important_escalation"] and row.get("impact") == "IMPORTANT" and all(
+            source(ref if isinstance(ref, str) else ref["source_id"])["status"] == "VALID"
+            and (isinstance(ref, str) or ref.get("version") == source(ref["source_id"])["version"]) for ref in row.get("source_refs", [])))
 
     def append(kind, identifier, row):
         state = row.get("status", row.get("state", "ACTIVE" if kind == "private_calendar" else "DRAFT"))
@@ -110,13 +146,10 @@ def project(store, db, context, day):
         if kind == "meeting":
             due = preparation_due or begin
         urgent = False
-        if rule_valid and rules["important_escalation"]:
-            for (event_kind, event_id), candidate in rows.items():
-                if event_kind == "event" and candidate["state"] == "OPEN" and candidate.get("impact") == "IMPORTANT":
-                    linked = candidate.get("task_id", candidate.get("commitment_id"))
-                    valid_refs = all(source(ref if isinstance(ref, str) else ref["source_id"])["status"] == "VALID"
-                                     and (isinstance(ref, str) or ref.get("version") == source(ref["source_id"])["version"]) for ref in candidate.get("source_refs", []))
-                    urgent = urgent or valid_refs and (event_id == identifier and kind == "event" or linked == identifier and kind in ("task", "historical_task", "self_commitment"))
+        for (event_kind, event_id), candidate in rows.items():
+            if event_kind == "event" and event_priority(event_id, candidate):
+                linked = candidate.get("task_id", candidate.get("commitment_id"))
+                urgent = urgent or event_id == identifier and kind == "event" or (linked == identifier or event_id in row.get("related_event_ids", [])) and kind in ("task", "historical_task", "self_commitment")
         if kind == "travel_plan":
             details = row.get("current")
             if details is None or state != "CONFIRMED":
@@ -137,8 +170,16 @@ def project(store, db, context, day):
             excluded.append({"kind": kind, "id": identifier, "version": version, "reason": reason})
             return
         category = "DECIDE" if kind == "application" or state == "RESULT_SUBMITTED" else "INFORM" if kind in ("event", "private_calendar") else "COORDINATE"
+        if kind == "event" and identifier in alert_views and event_priority(identifier, row):
+            category = "COORDINATE"
         participation = {"task": "交办仍需本人跟进负责人和期限", "historical_task": "本人需要核查历史承诺", "self_commitment": "本人承诺需要履行及证据核查", "application": "当前申请需要本人决定或补充材料", "meeting": "本人需要核查会议安排与准备材料", "private_calendar": "本人需要协调私人占用与工作时间", "event": "本人需要了解当前经营事件及已有措施", "travel_plan": "本人需要协调出行时间与会议"}[kind]
+        if kind == "event" and identifier in alert_views and alert_views[identifier]["facts"]:
+            participation = alert_views[identifier]["facts"]["participation_reason"]
         raw_refs = list(row.get("source_refs", row.get("attachment_refs", [])))
+        if kind == "travel_plan":
+            raw_refs.extend(row["current"]["transport_refs"])
+            if not row["current"]["transport_refs"]:
+                missing.add("TRANSPORT_SOURCE_NOT_PROVIDED:" + identifier)
         if row.get("source_id") and not any((ref if isinstance(ref, str) else ref["source_id"]) == row["source_id"] for ref in raw_refs):
             raw_refs.append({"source_id": row["source_id"], "version": row.get("source_version")})
         documents, object_refs = [], []
@@ -169,8 +210,10 @@ def project(store, db, context, day):
         goal_matches = [goal for goal in profile["goals"] if goal in title]
         item = {"item_id": kind + ":" + identifier, "kind": kind, "object_id": identifier, "version": version,
                 "title": title, "category": category, "state": state, "reason": participation,
-                "coordinator_id": row.get("coordinator_id", owner if kind in ("self_commitment", "private_calendar", "travel_plan", "application", "meeting") else None),
+                "coordinator_id": row.get("coordinator_id", row.get("facts", {}).get("handler_id", owner if kind in ("self_commitment", "private_calendar", "travel_plan", "application", "meeting") else None)),
                 "due_at": due, "starts_at": begin, "ends_at": finish, "important": False,
+                "timezone": row.get("current", {}).get("timezone") if kind == "travel_plan" else row.get("timezone"),
+                "location": row.get("location"), "related_meetings": [], "risk_evaluations": [],
                 "source_refs": [{"kind": kind, "id": identifier, "version": version}] + object_refs + [{"kind": "document", "id": item["source_id"], "version": item["version"]} for item in documents],
                 "sorting_reasons": ["CATEGORY:" + category], "goal_matches": goal_matches,
                 "existing_measures": [],
@@ -195,6 +238,10 @@ def project(store, db, context, day):
     for (kind, identifier), row in rows.items():
         if kind != "event":
             continue
+        if identifier in alert_views and alert_views[identifier]["adoption_state"] != "CURRENT":
+            excluded.append({"kind": kind, "id": identifier, "version": row["version"], "reason": "SOURCE_NOT_CURRENT"})
+            missing.add("SOURCE_NOT_CURRENT:" + identifier)
+            continue
         event_sources = row.get("source_refs", [])
         if any(source(ref if isinstance(ref, str) else ref["source_id"])["status"] != "VALID"
                or isinstance(ref, dict) and ref.get("version") != source(ref["source_id"])["version"] for ref in event_sources):
@@ -204,15 +251,34 @@ def project(store, db, context, day):
         if identifier == initial["event"]["event_id"]:
             related = initial["event"].get("task_id")
         target = next((item for item in items if item["object_id"] == related and item["kind"] in ("task", "historical_task", "self_commitment")), None)
+        if target is None:
+            # 使用正式交办中的事件关联，不根据标题或联系人合并事项。
+            target = next((item for item in items if item["kind"] in ("task", "self_commitment")
+                           and identifier in rows[item["kind"], item["object_id"]].get("related_event_ids", [])), None)
         if target is not None and row["state"] == "OPEN":
             target["source_refs"].append({"kind": "event", "id": identifier, "version": row["version"]})
+            target["source_refs"].extend({"kind": "document", "id": ref if isinstance(ref, str) else ref["source_id"],
+                                          "version": source(ref if isinstance(ref, str) else ref["source_id"])["version"]} for ref in event_sources)
+            target["sorting_reasons"].append("LINKED_EVENT:" + identifier)
         else:
             append(kind, identifier, row)
             target = next((item for item in items if item["item_id"] == "event:" + identifier), None)
-        if target is not None and row["state"] == "OPEN" and row.get("impact") == "IMPORTANT" and rule_valid and rules["important_escalation"]:
+        if target is not None and event_priority(identifier, row):
             target["important"] = True
-            target["sorting_reasons"].append("CURRENT_IMPORTANT_EVENT_RULE:" + rules["version"])
+            target["sorting_reasons"].append("CURRENT_BUSINESS_ALERT_RULE:" + alert_views[identifier]["business_rule"]["version"]
+                                             if identifier in alert_views else "CURRENT_IMPORTANT_EVENT_RULE:" + rules["version"])
         if target is not None:
+            if identifier in alert_views:
+                alert = alert_views[identifier]
+                target["risk_evaluations"].append({"event_id": identifier, "event_version": row["version"], "rule_state": alert["rule_state"],
+                    "rule_version": alert["business_rule"]["version"] if alert["business_rule"] else None, **alert["evaluation"]})
+                if alert["evaluation"]["phase"] == "UNKNOWN":
+                    missing.add("RISK_REQUIRES_REVIEW:" + identifier)
+                for measure in alert["existing_measures"]:
+                    if measure["kind"] == "task":
+                        current = next((item for item in items if item["kind"] == "task" and item["object_id"] == measure["task_id"]), None)
+                        target["existing_measures"].append({"kind": "task", "id": measure["task_id"], "version": measure["version"],
+                            "state": measure["status"], "adoption_state": "CURRENT" if current else "NEEDS_REVIEW"})
             for measure_kind, measure_id in (("owner_plan", row.get("owner_plan_id")), ("reminder", identifier)):
                 measure = object_at(db, ns, measure_kind, measure_id) if measure_id is not None else None
                 if measure is None:
@@ -223,6 +289,43 @@ def project(store, db, context, day):
                 target["existing_measures"].append({**ref, "state": measure["state"], "authorization_revoked": auth.get("revoked") if auth else None})
                 target["source_refs"].append(ref)
                 measure_objects[measure_kind + ":" + measure_id] = measure
+    for item in items:
+        related_ids = set()
+        for ref in list(item["source_refs"]):
+            row = rows.get((ref["kind"], ref["id"]))
+            if row:
+                related_ids.update(identifier for identifier in (row.get("related_meeting_id"), row.get("meeting_id")) if identifier)
+                if (ref["kind"] == "historical_task" and ref["id"] == initial.get("historical_task", {}).get("task_id")) or (ref["kind"] == "event" and ref["id"] == initial["event"]["event_id"]):
+                    related_ids.add(initial["meeting"]["meeting_id"])
+                for link_id, link in meeting_links.items():
+                    if ref["kind"] == "event" and link["event_id"] == ref["id"]:
+                        meeting = rows.get(("meeting", link["meeting_id"]))
+                        if link["event_version"] == ref["version"] and meeting and link["meeting_version"] == meeting.get("version", "1"):
+                            related_ids.add(link["meeting_id"])
+                            measure_objects["notification_meeting_link:" + link_id] = link
+                        else:
+                            missing.add("MEETING_LINK_REQUIRES_REVIEW:" + ref["id"])
+        for meeting_id in sorted(related_ids):
+            meeting = rows.get(("meeting", meeting_id))
+            if meeting is None or meeting.get("status", meeting.get("state")) in FINAL:
+                missing.add("RELATED_MEETING_NOT_CURRENT:" + meeting_id)
+                continue
+            refs = list(meeting.get("source_refs", []))
+            refs.extend({"source_id": identifier, "version": source(identifier)["version"]} for identifier in meeting.get("material_ids", [])
+                        if not any(object_id == identifier for _, object_id in rows) and not any(ref["source_id"] == identifier for ref in refs))
+            if any(source(ref["source_id"])["status"] != "VALID" or source(ref["source_id"])["version"] != ref["version"] for ref in refs):
+                missing.add("RELATED_MEETING_SOURCES_REQUIRE_REVIEW:" + meeting_id)
+                continue
+            reference = {"kind": "meeting", "id": meeting_id, "version": meeting.get("version", "1")}
+            item["related_meetings"].append(reference)
+            item["source_refs"].append(reference)
+            item["source_refs"].extend({"kind": "document", "id": ref["source_id"], "version": ref["version"]} for ref in refs)
+            if item["target_id"] is None:
+                item["target_id"] = meeting_id
+        item["source_refs"] = list({(ref["kind"], ref["id"]): ref for ref in item["source_refs"]}.values())
+    preparation = [{"item_id": item["item_id"], "documents": [sources[ref["id"]] for ref in item["source_refs"] if ref["kind"] == "document"],
+                    "requirements": list(dict.fromkeys(value for ref in item["source_refs"] for value in rows.get((ref["kind"], ref["id"]), {}).get("evidence_requirements", []))),
+                    "preparation_due_at": rows[item["kind"], item["object_id"]].get("preparation_due_at")} for item in items]
     priority = {"DECIDE": 0, "COORDINATE": 1, "INFORM": 2}
     coverage = object_at(db, ns, "morning_coverage", order_key(day, initial))
     regions = []
@@ -236,8 +339,10 @@ def project(store, db, context, day):
             missing.update("REGION_" + row["state"] + ":" + row["region_id"] for row in regions if row["state"] != "CURRENT")
     items.sort(key=lambda item: (not item["important"], priority[item["category"]], not bool(item["goal_matches"]), _instant(item["due_at"]).timestamp() if item["due_at"] else float("inf"), item["item_id"]))
     snapshot = checksum({"day": day, "clock": clock, "profile": profile, "rules": rules, "items": items, "excluded": excluded,
-                         "source_statuses": sources, "source_documents": source_documents, "coverage": coverage, "measures": measure_objects, "objects": {kind + ":" + identifier: row for (kind, identifier), row in rows.items()}})
-    preference = object_at(db, ns, "today_order", order_key(day, initial))
+                         "source_statuses": sources, "source_documents": source_documents, "coverage": coverage, "measures": measure_objects, "meeting_links": meeting_links,
+                         "business_alert_rules": {identifier: {field: view[field] for field in ("business_rule", "rule_state", "evaluation", "adoption_state")} for identifier, view in alert_views.items()},
+                         "objects": {kind + ":" + identifier: row for (kind, identifier), row in rows.items()}})
+    preference, order_version, order_state = saved_order(db, ns, initial, day)
     if preference:
         positions = {identifier: index for index, identifier in enumerate(preference["item_ids"])}
         items.sort(key=lambda item: (not item["important"], positions.get(item["item_id"], len(positions))))
@@ -252,11 +357,24 @@ def project(store, db, context, day):
             if begin < finish:
                 conflicts.append({"item_ids": [left["item_id"], right["item_id"]], "starts_at": begin.astimezone(zone).isoformat(), "ends_at": finish.astimezone(zone).isoformat(), "scope": "PROVIDED_RANGES_ONLY"})
     unknown = any(item["starts_at"] and item["ends_at"] is None for item in items)
+    input_coverage = [{"kind": "owner_goals", "state": "CONFIRMED" if profile["owner_confirmation"] == "CONFIRMED" else "NOT_SET",
+                       "provided_count": len(profile["goals"]), "included_count": len(profile["goals"]), "excluded_count": 0,
+                       "reported_total": None, "scope": "CURRENT_APPROVED_RECORDS_ONLY"}]
+    for kind in kinds:
+        members = {"task", "historical_task"} if kind == "task" else {kind}
+        provided = {(row_kind, identifier) for row_kind, identifier in rows if row_kind in members}
+        included = {(ref["kind"], ref["id"]) for item in items for ref in item["source_refs"] if (ref["kind"], ref["id"]) in provided}
+        omitted = [row for row in excluded if row["kind"] in members]
+        state = "NEEDS_REVIEW" if any("SOURCE" in row["reason"] for row in omitted) else "PARTIAL" if provided else "NO_RECORDS_IN_PROVIDED_SCOPE"
+        input_coverage.append({"kind": kind, "state": state, "provided_count": len(provided), "included_count": len(included),
+                               "excluded_count": len(omitted), "reported_total": None, "scope": "CURRENT_APPROVED_RECORDS_ONLY"})
+    cutoffs = [info["data_as_of"] for info in sources.values() if info["status"] == "VALID" and info["data_as_of"]]
     result = {"source_type": "SIMULATED", **day, "day_start": start.isoformat(), "day_end": end.isoformat(), "business_clock": clock["at"], "read_at": now(),
-              "data_as_of": max((item["observed_at"] for item in sources.values() if item["observed_at"]), default=None) if all(item["observed_at"] for item in sources.values()) else None,
-              "items": items, "excluded_items": excluded, "snapshot_sha256": snapshot, "order_version": preference["version"] if preference else "0",
+              "data_as_of": min(cutoffs, key=_instant) if cutoffs and len(cutoffs) == len(sources) else None,
+              "items": items, "excluded_items": excluded, "snapshot_sha256": snapshot, "order_version": order_version, "order_state": order_state,
               "ordering_reason": "当前有效重要风险优先；其余采用本人日期及IANA时区内的次序，新增事项按分类、目标及期限排列",
               "coverage_state": "PARTIAL" if items else "UNAVAILABLE", "missing_sources": sorted(missing), "profile": profile,
               "conflict_state": "PARTIAL" if conflicts and unknown else "CONFLICTS_FOUND" if conflicts else "INSUFFICIENT_EVIDENCE" if unknown else "NO_CONFLICT_IN_PROVIDED_RANGES",
-              "conflicts": conflicts, "source_statuses": list(sources.values()), "source_coverage": regions, "preparation_materials": preparation, "list_id": None, "list_version": None}
+              "conflicts": conflicts, "source_statuses": list(sources.values()), "source_coverage": regions, "preparation_materials": preparation, "list_id": None, "list_version": None,
+              "input_coverage": input_coverage, "category_counts": {category: sum(item["category"] == category for item in items) for category in priority}}
     return result, {"objects": {**{kind + ":" + identifier: row for (kind, identifier), row in rows.items()}, **measure_objects}, "documents": source_documents}

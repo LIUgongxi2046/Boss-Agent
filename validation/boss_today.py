@@ -91,14 +91,14 @@ class TodayAPI:
         priority = {"DECIDE": 0, "COORDINATE": 1, "INFORM": 2}
         items.sort(key=lambda i: (not i["important"], priority[i["category"]], i["due_at"] or "9999", i["item_id"]))
         snapshot = checksum({"date": date, "clock": clock, "items": items, "profile": owner_profile(db, data)})
-        rows = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='today_order' AND id=?", (NS, date)).fetchone()
-        preference = json.loads(rows[0]) if rows else None
+        from boss_morning_projection import saved_order
+        preference, order_version, order_state = saved_order(db, NS, data, {"date": date, "timezone": zone})
         if preference:
             positions = {identifier: index for index, identifier in enumerate(preference["item_ids"])}
             items.sort(key=lambda i: (not i["important"], positions.get(i["item_id"], len(positions))))
         return {"source_type": "SIMULATED", "date": date, "timezone": zone,
                 "business_clock": clock["at"], "items": items, "snapshot_sha256": snapshot,
-                "order_version": preference["version"] if preference else "0",
+                "order_version": order_version, "order_state": order_state,
                 "ordering_reason": "重要事项优先，其余采用本人已保存次序；新增事项按分类和期限排列",
                 "coverage_state": "PARTIAL", "missing_sources": ["完整日历结束时间与冲突范围", "未提供区域和农业专题资料"],
                 "profile": owner_profile(db, data), "conflict_state": "INSUFFICIENT_EVIDENCE"}

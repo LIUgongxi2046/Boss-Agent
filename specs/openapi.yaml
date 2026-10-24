@@ -48,7 +48,7 @@ x-fc07-assignment-extension:
   legacy: boss.assignment.extend remains; records actual request reason and null owner reason when absent; cannot reverse decided feedback
   source: new commitments require at least one current versioned source; expiry/withdrawal return 410; cancellation remains available
 x-fc03-morning:
-  schema_version: 1.0.0
+  schema_version: 1.1.0
   schema_extension: morning.schema.json
   day_schema: morning.schema.json#/$defs/Day
   query_schema: morning.schema.json#/$defs/Query
@@ -77,9 +77,15 @@ x-fc03-morning:
   coverage_action: boss.simulation.morning_coverage.load
   coverage_definition: morning-coverage.json; FC03-COVERAGE-1; seed=20261024; SIMULATED_GENERATOR
   scope: authenticated role and active owner/dataset/namespace supplied by server; explicit date and IANA timezone required
-  persistence: morning_list and morning_sequence; exact request digest; versioned object/source/profile/rules/clock binding
+  persistence: morning_list and morning_sequence; exact request digest; versioned object/source/profile/rules/clock/business-alert-rules/meeting-links binding
   ordering: complete current item set plus date/timezone/snapshot/CAS; only owner confirmation may save; model cannot invoke
-  compatibility: no-argument TodayAPI.read and legacy TodayAPI.reorder unchanged; default owner timezone shares legacy date key
+  compatibility: existing TodayAPI signatures retained; default owner timezone shares legacy date key; current owner order authorization checked by both read interfaces
+  input_coverage: per approved input kind; provided/included/excluded counts; complete reported total remains null
+  category_counts: same current item projection; null for stale redacted history
+  source_cutoff: source_statuses.data_as_of is distinct from observed_at and read_at; unknown cutoff stays null
+  business_risk: current FC04 domain evaluation and active rule; unknown or stale observation does not raise priority
+  item_relations: explicit event/task links merge references; related_meetings preserves current meeting id/version and source references
+  order_state: NOT_SET or SAVED or REVOKED; revocation stops future adoption and preserves original result and CAS version
   stale_history: identifiers and versions remain; stale private content and derived intervals hidden; current use requires requery
   unknown_receipt: NOT_FOUND_IN_CURRENT_STORE is not evidence of no execution; never replay a write automatically
   public_integration: PENDING_N2_N3
@@ -119,7 +125,7 @@ x-operation-defaults:
   receipt_policy: 已提交业务结果在模型或界面后续失败后保持；取消只停止尚未执行动作。
 x-revocation-policy:
   implementation: boss_owner_authorizations.authorization_can_revoke
-  continuing_use_actions: [memory.confirm, owner_goals.confirm, owner_notice.confirm, owner_plan.save, owner_plan.resume, calendar.share, business_alert.rule.activate, business_alert.snooze]
+  continuing_use_actions: [memory.confirm, owner_goals.confirm, owner_notice.confirm, owner_plan.save, owner_plan.resume, calendar.share, business_alert.rule.activate, business_alert.snooze, today.reorder]
   confirmation_window: 原确认窗口到期后仍允许本人停止持续采用；当前对象状态、业务期限和已撤销状态继续有效。
   single_action_policy: 一次性授权到期后不再接受新提交，不以撤销改写已执行结果。
   projection_adoption: W3在授权列表can_revoke采用同一服务规则；维护身份不能撤销本人确认。

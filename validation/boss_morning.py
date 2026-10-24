@@ -107,10 +107,11 @@ class MorningAPI:
                 # 历史保留编号与版本；失效私人内容及派生时间不重新呈现。
                 result = {**saved, "items": [], "preparation_materials": [], "conflicts": [], "profile": {"owner_confirmation": "REQUIRES_REQUERY"}, "source_statuses": [],
                           "excluded_items": [], "source_coverage": [], "missing_sources": ["HISTORICAL_CONTENT_REQUIRES_REQUERY"], "data_as_of": None,
+                          "input_coverage": [], "category_counts": None,
                           "conflict_state": "INSUFFICIENT_EVIDENCE", "coverage_state": "UNAVAILABLE", "ordering_reason": "历史内容需要重新核查"}
             return validate("ReadList", {"adoption_state": "CURRENT" if valid else "HISTORICAL_REQUIRES_REQUERY", "result": result,
                     "binding_references": list({encode(ref): ref for item in saved["items"] for ref in item["source_refs"]}.values()),
-                    "current_order": {"version": current["order_version"], "item_ids": [item["item_id"] for item in current["items"]]} if valid else None})
+                    "current_order": {"version": current["order_version"], "state": current["order_state"], "item_ids": [item["item_id"] for item in current["items"]]} if valid else None})
 
     def detail(self, role, list_id, item_id):
         self._role(role)

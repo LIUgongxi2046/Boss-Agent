@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:morning:1.0.0",
+  "$id": "urn:boss-agent:morning:1.1.0",
   "$defs": {
     "Id": {"type": "string", "minLength": 1, "maxLength": 200},
     "Version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"},
@@ -15,6 +15,15 @@
       "client_request_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}, "snapshot_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
       "item_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/Id"}}}},
     "Ref": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version"], "properties": {"kind": {"$ref": "#/$defs/Id"}, "id": {"$ref": "#/$defs/Id"}, "version": {"type": ["string", "null"]}}},
+    "InputCoverage": {"type": "object", "additionalProperties": false, "required": ["kind", "state", "provided_count", "included_count", "excluded_count", "reported_total", "scope"], "properties": {
+      "kind": {"enum": ["owner_goals", "task", "self_commitment", "application", "meeting", "event", "private_calendar", "travel_plan"]},
+      "state": {"enum": ["CONFIRMED", "NOT_SET", "PARTIAL", "NO_RECORDS_IN_PROVIDED_SCOPE", "NEEDS_REVIEW"]},
+      "provided_count": {"type": "integer", "minimum": 0}, "included_count": {"type": "integer", "minimum": 0}, "excluded_count": {"type": "integer", "minimum": 0},
+      "reported_total": {"type": "null"}, "scope": {"const": "CURRENT_APPROVED_RECORDS_ONLY"}}},
+    "RiskEvaluation": {"type": "object", "additionalProperties": false, "required": ["event_id", "event_version", "rule_state", "rule_version", "phase", "reason", "duration_seconds"], "properties": {
+      "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"}, "rule_state": {"enum": ["ACTIVE", "RULE_NOT_ENABLED", "RULE_AUTHORIZATION_REVOKED"]},
+      "rule_version": {"type": ["string", "null"]}, "phase": {"enum": ["UNKNOWN", "WAITING", "SUMMARY", "IMMEDIATE", "BREACH", "RECOVERY"]},
+      "reason": {"type": "string"}, "duration_seconds": {"type": ["integer", "null"], "minimum": 0}, "condition_since": {"type": "string", "format": "date-time"}}},
     "ReadList": {"type": "object", "additionalProperties": false, "required": ["adoption_state", "result", "binding_references", "current_order"], "properties": {
       "adoption_state": {"enum": ["CURRENT", "HISTORICAL_REQUIRES_REQUERY"]}, "result": {"$ref": "#/$defs/View"},
       "binding_references": {"type": "array", "items": {"$ref": "#/$defs/Ref"}}, "current_order": {"type": ["object", "null"]}}},
@@ -37,6 +46,8 @@
       "properties": {"item_id": {"$ref": "#/$defs/Id"}, "kind": {"$ref": "#/$defs/Id"}, "object_id": {"$ref": "#/$defs/Id"}, "version": {"type": ["string", "null"]},
         "title": {"type": "string"}, "category": {"enum": ["DECIDE", "COORDINATE", "INFORM"]}, "state": {"type": "string"}, "reason": {"type": "string"},
         "coordinator_id": {"type": ["string", "null"]}, "due_at": {"type": ["string", "null"]}, "starts_at": {"type": ["string", "null"]}, "ends_at": {"type": ["string", "null"]},
+        "timezone": {"type": ["string", "null"]}, "location": {"type": ["string", "null"]}, "related_meetings": {"type": "array", "items": {"$ref": "#/$defs/Ref"}},
+        "risk_evaluations": {"type": "array", "items": {"$ref": "#/$defs/RiskEvaluation"}},
         "important": {"type": "boolean"}, "source_refs": {"type": "array", "items": {"$ref": "#/$defs/Ref"}}, "sorting_reasons": {"type": "array", "items": {"type": "string"}},
         "goal_matches": {"type": "array", "items": {"type": "string"}}, "existing_measures": {"type": "array", "items": {"type": "object"}}, "page_id": {"type": "string"}, "target_id": {"type": ["string", "null"]}, "read_only": {"type": "boolean"}}},
     "View": {"type": "object", "additionalProperties": false,
@@ -44,7 +55,11 @@
       "properties": {"source_type": {"const": "SIMULATED"}, "date": {"type": "string", "format": "date"}, "timezone": {"type": "string"},
         "day_start": {"type": "string", "format": "date-time"}, "day_end": {"type": "string", "format": "date-time"}, "business_clock": {"type": "string", "format": "date-time"}, "read_at": {"type": "string", "format": "date-time"},
         "data_as_of": {"type": ["string", "null"]}, "items": {"type": "array", "items": {"$ref": "#/$defs/Item"}}, "excluded_items": {"type": "array", "items": {"type": "object"}},
+        "input_coverage": {"type": "array", "items": {"$ref": "#/$defs/InputCoverage"}},
+        "category_counts": {"type": ["object", "null"], "additionalProperties": false, "required": ["DECIDE", "COORDINATE", "INFORM"], "properties": {
+          "DECIDE": {"type": "integer", "minimum": 0}, "COORDINATE": {"type": "integer", "minimum": 0}, "INFORM": {"type": "integer", "minimum": 0}}},
         "snapshot_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "order_version": {"$ref": "#/$defs/Version"}, "ordering_reason": {"type": "string"},
+        "order_state": {"enum": ["NOT_SET", "SAVED", "REVOKED"]},
         "coverage_state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "missing_sources": {"type": "array", "items": {"type": "string"}}, "profile": {"type": "object"},
         "conflict_state": {"enum": ["INSUFFICIENT_EVIDENCE", "PARTIAL", "CONFLICTS_FOUND", "NO_CONFLICT_IN_PROVIDED_RANGES"]}, "conflicts": {"type": "array", "items": {"type": "object"}},
         "source_statuses": {"type": "array", "items": {"type": "object"}}, "source_coverage": {"type": "array", "items": {"type": "object"}}, "preparation_materials": {"type": "array", "items": {"type": "object"}},

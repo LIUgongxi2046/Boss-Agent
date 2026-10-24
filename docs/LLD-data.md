@@ -213,11 +213,15 @@ ControlStore的正式反馈核查已发送前提、作者、当前任务版本�
 
 ### FC03 晨间清单与逐日次序
 
-正式Schema为specs/morning.schema.json 1.0.0。MorningAPI在当前唯一active空间读取服务端确定的owner/dataset/version/namespace；输入只包含日期、IANA时区和正式请求/session编号。所选日期使用ZoneInfo计算本地零时至次日零时，夏令时与跨日区间按实际边界处理。未结束承诺、交办、待决定申请与事件保持持续待办；会议、私人安排和出行采用实际起止区间，会议准备期限另外参与当日范围。目标只采用当前获准且明确适用的本人确认设置。缺少来源、目标或完整日历时保留明确缺口。
+正式Schema为specs/morning.schema.json 1.1.0。MorningAPI在当前唯一active空间读取服务端确定的owner/dataset/version/namespace；输入只包含日期、IANA时区和正式请求/session编号。所选日期使用ZoneInfo计算本地零时至次日零时，夏令时与跨日区间按实际边界处理。未结束承诺、交办、待决定申请与事件保持持续待办；会议、私人安排和出行采用实际起止区间，会议准备期限另外参与当日范围。目标只采用当前获准且明确适用的本人确认设置。缺少来源、目标或完整日历时保留明确缺口。
 
 query在BEGIN IMMEDIATE中保存morning_list、morning_sequence、原请求回执和元信息审计。morning_list保存list_id/list_version、日期/时区、request/session、本人范围、原View和完整对象/文档绑定；相同请求同内容只产生一个清单。snapshot_sha256包含当前对象、文档原文及版本、覆盖、目标、规则和业务时钟。详情和来源读取在同一只读事务重新核查；来源更新、撤销、到期、范围变化或删除后停止当前采用。historical读取保留原编号与版本引用，失效正文及私人派生区间不再呈现；不会用当前原文重建历史内容。
 
 排序继续使用boss.today.reorder；新输入同时包含清单编号、日期、时区、完整事项集合、快照和expected_version。本人明确保存后，在同一事务写入仅限次序的授权、today_order和原回执，不改变任务、审批、事件、日历或发送状态。默认本人时区继续读取既有日期键，其他时区使用date|timezone；当前有效重要风险保持优先，新事项依分类、明确目标和期限排列。清单原版本保持，read_list.current_order单独返回当前已保存次序。重启使用同库读取；未知结果只查询原编号，不能自动重发。
+
+MENU-F01采用同一投影返回input_coverage及category_counts。前者逐类说明当前确认目标、任务/历史承诺、本人承诺、申请、会议、事件、私人日历与出行的provided_count/included_count/excluded_count；reported_total保持null，不把已读取数量写成完整覆盖数量。分类计数只计算当前合并后的items；失效历史内容的category_counts为null。来源data_as_of保留实际业务期间或已提供截至时间，与observed_at、read_at分别表达；所有来源当前且截至均已知时采用最早截至，存在未知则保持null。私人地点与对象原时区按本人权限提供。
+
+FC04事件采用boss_alert_policy.material的当前经营规则、资料与连续观察判断；risk_evaluations保留事件/规则版本及原phase/reason。UNKNOWN或失效规则不提升排序。正式任务related_event_ids合并同一事件，source_refs合并同版本事件和来源，已有措施单独保留真实状态。related_meetings按明确对象关联与当前notification_meeting_link提供会议编号/版本及原文；版本变化要求复核。快照同时绑定经营规则与会议关联。today.reorder属于持续设置，两类今日读取共同核查本人授权；order_state表达NOT_SET/SAVED/REVOKED，撤销后停止采用，原回执及CAS版本继续保留。新增输出字段允许旧清单缺少，历史不会补造新字段的业务内容。
 
 晨间覆盖资料由MorningInputAPI的明确维护动作载入，定义FC03-COVERAGE-1、seed20261024、用途FC03_PROGRAM_BEHAVIOR。生成作者、参数摘要、来源版本、访问范围、有效期限、地区原始as_of和未同步状态均保存；获准初始selection/1不变，真实企业资料、第三方授权与本人业务授权均为false。维护读取只返回定义和回执元信息，不读取本人晨间清单。新增对象kind复用当前objects，无DDL迁移；正式公共读取/命令、模型工具与界面由N2/N3接收。
 

@@ -24,6 +24,7 @@
 | FC01-N4-001 | [实际正文Token](../feature-delivery/FC01/body-tokens.md) | C15共享正文、实际段落、尺寸及键盘；状态引用同一功能来源 |
 | FC01-N1 | [采购成本品质领域接收](../feature-delivery/FC01/backend.md) | 领域1.8.0及期间归属筛选，完整功能状态引用同一功能来源 |
 | FC01-N2 | [采购成本品质Agent接收](../feature-delivery/FC01/agent.md) | 明确模拟Provider、实际Runtime与工具，独立结果保持限定范围 |
+| MENU-F01-N1 | [今日工作领域](../menu-delivery/F01/backend.md) | 完整获准来源、三分类、同事项关联、当前风险、日期/来源截至、排序与原回执；正式状态读取N3的feature-delivery.json |
 | FC04-N1 | [经营提醒领域](../feature-delivery/FC04/backend.md) | 规则、来源、连续判断、唯一Cron、本人处理、恢复/抑制历史；正式状态读取N3的feature-delivery.json |
 | FC07-N1 | [交办与承诺领域](../feature-delivery/FC07/backend.md) | ControlStore、延期决定、本人承诺来源、CAS与原回执；执行状态读取N3的feature-delivery.json |
 | T02 | [选型验证开发记录](T02.md) | ACCEPTED；A02 PASS（选型可行性）；后续产品验证见交接 |
