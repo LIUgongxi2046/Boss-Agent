@@ -286,16 +286,17 @@ class PublicBIRecorder(Fc02RuntimeRecorder):
 
 
 class FeatureProvider(LLMProvider):
-    def __init__(self, fc01, bi):
+    def __init__(self, fc01, bi, morning=None):
         super().__init__(provider_name="deepseek")
         self.fc01, self.bi = fc01, bi
+        self.morning = morning
 
     def get_default_model(self):
         return "deepseek-flash"
 
     async def chat(self, messages, tools=None, model=None, **kwargs):
         request = current_request_context()
-        provider = self.bi.provider if request is not None and BI_REQUEST in request.attributes else self.fc01.provider
+        provider = self.morning.provider if self.morning is not None and self.morning.handles(request) else self.bi.provider if request is not None and BI_REQUEST in request.attributes else self.fc01.provider
         return await provider.chat(messages, tools, model, **kwargs)
 
     async def chat_with_retry(self, messages, tools=None, model=None, **kwargs):
@@ -309,12 +310,14 @@ class FeatureProvider(LLMProvider):
 
 
 class FeatureRecorder:
-    def __init__(self, store, registry, snapshot, bi):
+    def __init__(self, store, registry, snapshot, bi, morning=None):
         self.fc01 = Fc01RuntimeRecorder(store,"ui-check",registry,snapshot)
         self.bi = PublicBIRecorder(bi,registry,snapshot)
+        self.morning_service = morning
+        self.morning = morning.recorder(registry,snapshot) if morning is not None else None
 
     async def context(self, request):
-        recorder = self.bi if BI_REQUEST in request.attributes else self.fc01
+        recorder = self.morning if self.morning_service is not None and self.morning_service.handles(request) else self.bi if BI_REQUEST in request.attributes else self.fc01
         return await recorder.context(request)
 
     def hook_factory(self, context):

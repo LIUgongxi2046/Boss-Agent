@@ -26,7 +26,7 @@ contract.py的interface_contract(...,formal=True)返回四项实际Tool Schema�
 
 ## 限定验证
 
-19 passed，4.49秒；原始XML为check.xml。使用获准selection数据，经实际ControlStore.initialize创建隔离空间；没有伪造来源、替换业务记录或外部请求。网络socket.connect审计拒绝所有外部连接。技术配置只为实际Registry启用todayRead，未签发本人业务授权。
+19 passed，4.49秒；N3接收文件为agent-check.xml，N2生产目录的原始路径为check.xml。使用获准selection数据，经实际ControlStore.initialize创建隔离空间；没有伪造来源、替换业务记录或外部请求。网络socket.connect审计拒绝所有外部连接。技术配置只为实际Registry启用todayRead，未签发本人业务授权。
 
 Given 当前正式晨间投影及可信范围；When 通过实际Registry读取并由Nanobot消费结果；Then 模型返回的items与领域实际items相同，缺少资料保留，运行引用在独立ControlStore重建后可查。覆盖维护/失效身份/错误owner/空间/dataset/日期/快照拒绝、模型额外参数与Runtime请求伪造拒绝、重复注册、正式本人排序后旧绑定拒绝、模型失败/取消/超时、认证撤销后停止后续步骤、费用null和私人正文排除。排序前置仅通过明确BOSS的TodayAPI.reorder形成，模型没有该入口。
 

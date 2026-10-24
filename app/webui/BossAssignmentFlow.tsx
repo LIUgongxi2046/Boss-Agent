@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type {MorningReference} from "./BossMorningView";
 import {
   AlertCircle, ArrowRight, CheckCircle2, Clock3, ClipboardCheck,
   FileSearch, Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
@@ -198,7 +199,7 @@ function useTransaction(onReload: () => void, onCreated?: (id: string) => void, 
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
   draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker,
-  onViewMessages, onMessageDraftCreated }: {
+  onViewMessages, onMessageDraftCreated, morningReference, morningReady=true }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string) => void; onReload: () => void;
   onViewSource: () => void; context: AssignmentContext | null;
@@ -208,6 +209,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   onOpenCoordinatorPicker: () => void; onOpenDuePicker: () => void;
   onViewMessages: () => void;
   onMessageDraftCreated: (id: string) => void;
+  morningReference?:MorningReference;morningReady?:boolean;
 }) {
   const { propose, dialog, notice, busy } = useTransaction(onReload, id => {
     onSelectTask(id); onDraftSaved();
@@ -227,6 +229,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const extension=[...feedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST");
   const safe=(fn:()=>void)=>{setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
   const prepareCreate=()=>safe(()=>{
+    if(morningReference&&!morningReady)throw new Error("请重新核查当前晨间事项与来源版本");
     if(!context?.meeting?.meeting_id||!context.event?.event_id||
       !context.assignment_source_ids?.includes("finance-note"))
       throw new Error("未取得关联会议、事件或有效资料，拒绝创建。");
@@ -240,6 +243,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       related_meeting_id:context.meeting.meeting_id,
       related_event_ids:[context.event.event_id],
       source_refs:["finance-note"],content_version:"1",
+      ...(morningReference?{morning_reference:morningReference}:{}),
     },"核对并创建交办",[
       "目的："+purposeText,"负责人："+coordinator,"期限："+dueAt,
       "证据："+proof,"会议："+context.meeting.meeting_id,
@@ -358,7 +362,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
           <p className="boss-helper">会议：{context?.meeting?.meeting_id||"待读取"} ·
             关联事件：{context?.event?.event_id||"待读取"} · 资料：{context?.assignment_source_ids?.join("、")||"待读取"}</p>
           <div className="boss-actions">
-            <button className="boss-btn boss-btn-primary" type="button" onClick={prepareCreate} disabled={busy}>
+            <button className="boss-btn boss-btn-primary" type="button" onClick={prepareCreate} disabled={busy||Boolean(morningReference&&!morningReady)}>
               <ShieldCheck size={15}/> 核对并创建</button>
             <button className="boss-btn" type="button" onClick={onViewSource}>查看来源</button>
           </div>

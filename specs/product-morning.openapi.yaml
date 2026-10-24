@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: 晨间事项公共请求与读取
+  version: 1.0.0
+paths:
+  /api/boss/ui/morning/preview:
+    get:
+      operationId: morningPreview
+      x-role: BOSS
+      x-query-schema: './morning.schema.json#/$defs/Day'
+      responses:
+        '200':
+          description: 当前日期预览，不创建清单
+          content:
+            application/json:
+              schema: {$ref: './morning.schema.json#/$defs/View'}
+  /api/boss/ui/morning/request:
+    get:
+      operationId: morningPublicReceipt
+      x-role: BOSS
+      x-required-query: [client_request_id]
+      responses:
+        '200':
+          description: 原请求、实际运行终态及原清单回执，只读查询
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PublicReceipt'}
+  /api/boss/ui/morning/history:
+    get:
+      operationId: morningPublicHistory
+      x-role: BOSS
+      responses:
+        '200':
+          description: 当前本人资料范围的历史请求元信息
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/History'}
+  /api/boss/ui/morning/list:
+    get:
+      operationId: morningList
+      x-role: BOSS
+      x-required-query: [list_id]
+      x-optional-query: [historical]
+      responses:
+        '200':
+          description: 保存版本及当前采用状态
+          content:
+            application/json:
+              schema: {$ref: './morning.schema.json#/$defs/ReadList'}
+  /api/boss/ui/morning/detail:
+    get:
+      operationId: morningDetail
+      x-role: BOSS
+      x-required-query: [list_id, item_id]
+      responses:
+        '200':
+          description: 同一清单绑定的当前对象
+          content:
+            application/json:
+              schema: {$ref: './morning.schema.json#/$defs/Detail'}
+  /api/boss/ui/morning/source:
+    get:
+      operationId: morningSource
+      x-role: BOSS
+      x-required-query: [list_id, source_id]
+      responses:
+        '200':
+          description: 同一清单绑定的当前有效原文
+          content:
+            application/json:
+              schema: {$ref: './morning.schema.json#/$defs/SourceDetail'}
+x-websocket-actions:
+  boss.assignment.create:
+    role: BOSS
+    x-existing-confirmation-flow: BR-C02
+    x-optional-public-field:
+      morning_reference: {$ref: '#/components/schemas/MorningReference'}
+    x-current-check: 同一创建事务核查清单、事项、来源及版本，保存晨间引用与新任务的关联
+  boss.morning.query:
+    role: BOSS
+    payload: {$ref: '#/components/schemas/QueryRequest'}
+    response: {$ref: '#/components/schemas/PublicReceipt'}
+    x-runtime-tools: [todayRead, morningListRead, morningDetailRead, morningSourceRead]
+  boss.morning.cancel:
+    role: BOSS
+    payload: {$ref: '#/components/schemas/OriginalRequest'}
+  boss.today.reorder:
+    role: BOSS
+    payload: {$ref: './morning.schema.json#/$defs/Reorder'}
+  boss.simulation.morning_coverage.load:
+    role: MAINTAINER
+    payload: {$ref: './morning.schema.json#/$defs/CoverageLoad'}
+components:
+  schemas:
+    MorningReference:
+      type: object
+      additionalProperties: false
+      required: [list_id, list_version, item_id, snapshot_sha256]
+      properties:
+        list_id: {type: string, minLength: 1, maxLength: 200}
+        list_version: {type: string, pattern: '^(0|[1-9][0-9]*)$'}
+        item_id: {type: string, minLength: 1, maxLength: 200}
+        snapshot_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    OriginalRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 200}
+    QueryRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, date, timezone, question]
+      properties:
+        client_request_id: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+        date: {type: string, format: date}
+        timezone: {type: string, minLength: 1, maxLength: 100}
+        question: {type: string, minLength: 1, maxLength: 4000}
+        list_id: {type: string, minLength: 1, maxLength: 200}
+    PublicReceipt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, request_state, run_id, receipt, write_performed_by_lookup]
+      properties:
+        client_request_id: {type: string}
+        request_state: {enum: [PREPARED, QUEUED, RUNNING, WAITING_INPUT, SUCCEEDED, FAILED, CANCELED, TIMED_OUT]}
+        run_id: {type: [string, 'null']}
+        receipt: {$ref: './morning.schema.json#/$defs/Receipt'}
+        write_performed_by_lookup: {const: false}
+    History:
+      type: object
+      additionalProperties: false
+      required: [source_type, requests]
+      properties:
+        source_type: {const: SIMULATED}
+        requests:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [request_id, date, timezone, created_at, run_id, selected_list_id]
+            properties:
+              request_id: {type: string}
+              date: {type: string, format: date}
+              timezone: {type: string}
+              created_at: {type: string, format: date-time}
+              run_id: {type: [string, 'null']}
+              selected_list_id: {type: [string, 'null']}

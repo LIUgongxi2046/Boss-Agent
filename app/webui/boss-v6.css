@@ -961,3 +961,24 @@
 .boss-login-assistance p{margin:8px 0;overflow-wrap:anywhere}
 @media(max-width:1020px){.boss-login-layout{gap:24px;grid-template-columns:minmax(0,1fr) minmax(340px,440px)}.boss-login-welcome{padding:16px}.boss-login-card{padding:24px}}
 @media(max-width:760px){.boss-login-content{padding:24px 16px}.boss-login-layout{grid-template-columns:1fr;max-width:480px;gap:24px;min-height:0}.boss-login-welcome{gap:16px}.boss-login-welcome>img{height:120px;width:120px;align-self:flex-start}.boss-login-welcome h1{font-size:28px}.boss-login-brand{flex-wrap:wrap;margin-bottom:16px}.boss-login-choices{grid-template-columns:1fr 1fr}}
+.boss-morning-view { min-width: 0; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+.boss-morning-view > .boss-panel, .boss-morning-view > .boss-columns { margin-bottom: 16px; }
+.boss-morning-view .boss-columns, .boss-morning-view .boss-column { gap: 16px; }
+.boss-morning-view .boss-panel { border-radius: 14px; padding: 24px; }
+.boss-morning-view .boss-panel-head { gap: 8px; margin-bottom: 16px; }
+.boss-morning-view .boss-form-grid, .boss-morning-view .boss-form-grid label { gap: 8px; }
+.boss-morning-view .boss-actions { gap: 8px; margin-top: 16px; }
+.boss-morning-view .boss-workspace-item { padding: 24px; margin: 8px 0; border-radius: 14px; }
+.boss-morning-view .boss-workspace-item strong { font-size: 16px; line-height: 24px; }
+.boss-morning-view summary { min-height: 44px; padding-block: 8px; cursor: pointer; }
+.boss-morning-view textarea { border-radius: 9px; }
+.boss-morning-view small, .boss-morning-view .boss-helper, .boss-morning-view label { font-size: 14px; line-height: 22px; }
+.boss-morning-view .boss-btn, .boss-morning-view input { min-height: 44px; }
+.boss-morning-view input, .boss-morning-view textarea { width: 100%; min-width: 0; box-sizing: border-box; }
+.boss-v6 .boss-morning-view input, .boss-v6 .boss-morning-view textarea, .boss-v6 .boss-morning-view button { font-size: 16px; line-height: 24px; }
+.boss-morning-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.boss-morning-history { padding-left: 20px; display: grid; gap: 8px; }
+.boss-morning-history .boss-btn { white-space: normal; text-align: left; }
+.boss-morning-view blockquote { margin-inline: 0; padding: 16px; border-left: 3px solid var(--boss-accent, #14b8a6); white-space: pre-wrap; }
+@media (max-width: 1100px) { .boss-morning-view .boss-columns { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .boss-morning-fields { grid-template-columns: minmax(0, 1fr); } }

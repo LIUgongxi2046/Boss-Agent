@@ -29,6 +29,7 @@ from boss_assignment_sources import AssignmentSourcesAPI
 from boss_simulation_api import SimulationAPI
 from boss_bi_scenarios import BIScenarioAPI
 from public_bi_scenarios import maintainer_catalog
+from public_morning import morning_read, morning_coverage_read
 from boss_supply_quality import SupplyQualityAPI
 
 DEMO_NAMESPACE = "ui-check"
@@ -474,6 +475,10 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path.startswith("/api/boss/ui/morning/"):
+                return 200, morning_read(self.store,role,path,query_string)
+            if path in {"/api/boss/ui/admin/morning-coverage","/api/boss/ui/admin/morning-coverage-receipt"}:
+                return 200, morning_coverage_read(self.store,role,path,query_string)
             if path in {"/api/boss/ui/admin/bi-scenarios","/api/boss/ui/admin/bi-scenario-receipt"}:
                 if role != "MAINTAINER":
                     return 403, {"error":"FORBIDDEN"}

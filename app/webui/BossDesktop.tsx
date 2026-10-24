@@ -41,9 +41,11 @@ import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
 import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
-import { BossToday, type TodayProjection, type TodayOrderReceipt } from "./BossToday";
+import { BossMorningView, type MorningReference } from "./BossMorningView";
+import { BossMorningPreparation } from "./BossMorningPreparation";
 import { BossBIView } from "./BossBIView";
 import { MaintainerBIScenarios } from "./MaintainerBIScenarios";
+import { MaintainerMorningCoverage } from "./MaintainerMorningCoverage";
 import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
 import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
@@ -153,12 +155,6 @@ const PRODUCT_PAGES = new Set<string>([
   "F01", "N02", "N03", "F03", "N04", "N05", "F11", "F10", "F26", "N07", "N08", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
-const ANIMATIONS: Record<Animation, string> = {
-  idle: "/boss-brand/01-待机悬浮.webp",
-  thinking: "/boss-brand/03-思考分析.webp",
-  complete: "/boss-brand/05-完成确认.webp",
-  notice: "/boss-brand/06-通知提醒.webp",
-};
 function allowed(page: string, role: Role) {
   if (page === "NATIVE") return true;
   if (!pages[page]) return false;
@@ -209,7 +205,6 @@ function Quiet({ message }: { message: string }) {
     <div><strong>暂无可核查记录</strong><p>{message}</p></div>
   </div>;
 }
-function waitText(value?: string | null) { return value === undefined || value === null || value === "" ? "待核查" : value; }
 function localTime(value?: string) {
   if (!value) return "待核查";
   // Keep the original business-local timezone/offset visible. Never silently use host time.
@@ -238,12 +233,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [pageFilter, setPageFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
   const [question, setQuestion] = useState("");
   const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
+  const [morningOrigin,setMorningOrigin]=useState<MorningReference|null>(null);
+  const [morningReady,setMorningReady]=useState(false);
+  useEffect(()=>{setMorningOrigin(null);setMorningReady(false);},[token]);
   const [supplyEditors, setSupplyEditors] = useState({client,token,SI09:{...EMPTY_SUPPLY_EDITOR},SI10:{...EMPTY_SUPPLY_EDITOR},import:{...EMPTY_IMPORT_EDITOR}});
   useEffect(()=>{
     setSupplyEditors({client,token,SI09:{...EMPTY_SUPPLY_EDITOR},SI10:{...EMPTY_SUPPLY_EDITOR},import:{...EMPTY_IMPORT_EDITOR}});
@@ -279,7 +276,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
   const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
   const [promptTechnicalView, setPromptTechnicalView] = useState<PromptTechnicalView | null>(null);
-  const [today, setToday] = useState<TodayProjection | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
   const [runtimeTask, setRuntimeTask] = useState<{taskId: string; runId: string} | null>(null);
@@ -301,7 +297,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputError, setInputError] = useState("");
-  const [animate, setAnimate] = useState<Animation>("idle");
+  const [, setAnimate] = useState<Animation>("idle");
   const nextRequest = useRef(0);
   const [requestVersion, setRequestVersion] = useState(0);
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
@@ -392,7 +388,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       }));
     };
     if (role === "BOSS") {
-      if (page === "F01") read<TodayProjection>("/api/boss/ui/today", setToday);
       if (page === "N09") read<OwnerPlanProjection>("/api/boss/ui/owner-plans", setOwnerPlans);
       if (page === "F04") read<MeetingArrangementProjection>("/api/boss/ui/meeting-arrangement", setMeetingArrangement);
       if (["F01", "F06", "D04", "D05", "N03", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
@@ -454,8 +449,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
        p.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role]);
   const refresh = () => setRequestVersion((v) => v + 1);
-  const readTodayOrder=useCallback((requestId:string,signal?:AbortSignal)=>jsonRequest<TodayOrderReceipt>(
-    "/api/boss/ui/operation-status?action=boss.today.reorder&client_request_id="+encodeURIComponent(requestId),getToken,signal),[getToken]);
   const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
     if (typeof payload.client_request_id !== "string") throw new Error("业务请求缺少原请求编号");
     const receipt = await jsonRequest<{outcome: string}>(
@@ -553,8 +546,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               <button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "N06" : "N12")}><Bell size={18}/></button>
               <button type="button" className="boss-user" onClick={onLogout} title="退出当前身份">
-                <span className="boss-user-avatar">{role === "BOSS" ? "张" : "技"}</span>
-                <span>{role === "BOSS" ? "张总" : "技术维护"}<small>{role === "BOSS" ? "演示老板身份" : "维护身份"}</small></span>
+                <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
+                <span>{role === "BOSS" ? "本人" : "技术维护"}<small>{role === "BOSS" ? "已认证本人" : "维护身份"}</small></span>
               </button>
             </div>
           </header>
@@ -562,7 +555,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             <div className={"boss-hero " + (page === "F01" ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
                 <div className="boss-eyebrow">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
-                <h1>{page === "F01" ? "早上好，张总 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
+                <h1>{page === "F01" ? "早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{metadata?.summary || "按照 PRD 查看真实执行过程和资料来源。"}</p>
               </div>
               <img src={["F05","F13","F24","F29"].includes(page) ? "/boss-brand/dapeng-think.png" : ["F06","F07","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"].includes(page) ? "/boss-brand/dapeng-execute.png" : "/boss-brand/dapeng-front.png"} className="boss-hero-mascot" alt="大鹏吉祥物" />
@@ -585,101 +578,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
               {loading && <StatusLine text="正在从本机业务服务读取有权数据和当前状态…" />}
               {role === "BOSS" ? (
-                page === "F01" ? <>
-                  <BossToday data={today} loading={loading} error={error} onReload={refresh}
-                    onDirtyChange={setWorkDirty} onReorder={payload => client.requestMutation("boss.today.reorder",payload).then(()=>undefined)} onReadOrder={readTodayOrder}
-                    onNavigate={(target, objectId) => target === "F06" ? selectTask(objectId) : navigate(target, objectId)}/>
-                  <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="业务日期与资料范围" note="F01 · 今日工作">
-                      <div className="boss-form-grid boss-grid-3">
-                        <label>业务日期<input type="date" value={dateFilter || (dashboard?.business_clock.slice(0,10) || "")}
-                          onChange={(e) => setDateFilter(e.target.value)} /></label>
-                        <label>IANA 时区<input readOnly value={dashboard?.profile.timezone || "等待读取"} /></label>
-                        <label>资料截至时间<input readOnly value={dashboard?.source_coverage.periods.CURRENT?.[1] || "等待读取"} /></label>
-                      </div>
-                      <div className="boss-actions"><GlassButton primary onClick={refresh}><RefreshCw size={15}/> 更新当前事项</GlassButton></div>
-                      <StatusLine variant="warn" text="目前仅连接 T02 模拟数据集；业务日期筛选尚未接入正式逐日聚合。资料覆盖和时效以服务返回为准。" />
-                    </Panel>
-                    <Panel title="已创建交办与历史承诺" note="正式状态与历史记录">
-                      <div className="boss-tabs"><button className="active">待决定</button><button onClick={() => navigate("N05")}>待协调</button><button onClick={() => navigate("N06")}>需要知晓</button></div>
-                      {dashboard?.tasks.length ? dashboard.tasks.map((t) =>
-                        <button type="button" className="boss-task-row" key={t.task_id} onClick={() => selectTask(t.task_id)}>
-                          <span className="boss-task-icon"><ClipboardCheck size={18}/></span>
-                          <span><strong>{waitText(t.purpose)}</strong>
-                            <small>当前处理人：{waitText(t.coordinator_id)} · 期限：{localTime(t.due_at)} · 状态：{t.status}</small>
-                            <small>排序理由与本人参与原因：需结合正式业务资料确认</small>
-                          </span><ChevronRight size={17}/>
-                        </button>
-                      ) : <Quiet message="当前没有已创建的模拟交办任务。不会将设计稿中的示例事项作为正式任务。" />}
-                      {dashboard?.historical_commitment && <div className="boss-history-card">
-                        <Tag tone="amber">已有历史承诺（模拟）</Tag>
-                        <strong>{dashboard.historical_commitment.task_id}</strong>
-                        <span>状态：{dashboard.historical_commitment.status} · 期限：{localTime(dashboard.historical_commitment.due_at)}</span>
-                      </div>}
-                      <div className="boss-actions"><GlassButton onClick={() => navigate("N05")}>查看全部任务 <ArrowRight size={15}/></GlassButton></div>
-                    </Panel>
-                    <Panel title="现在就交给大鹏" note="真实 DeepSeek 会话与 Tool 执行">
-                      <form onSubmit={(event) => void sendQuestion(event)}>
-                        <label className="boss-label" htmlFor="boss-question">输入本次工作需求</label>
-                        <textarea id="boss-question" ref={draftRef} value={question} onChange={(e) => setQuestion(e.target.value)}
-                          placeholder="例如：查看当前区域饲料外销毛利变化，读取依据，再帮我准备给负责人的交办。" rows={3}/>
-                        {inputError && <p className="boss-validation-error">{inputError}</p>}
-                        <div className="boss-actions">
-                          <GlassButton onClick={() => navigate("N02")}><MessageCircle size={15}/> 聊天交办</GlassButton>
-                          <button type="submit" className="boss-btn boss-btn-primary"><Send size={15}/> 提交需求</button>
-                        </div>
-                      </form>
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="本人目标与阅读要求" note="N07 当前有效本人版本 · FR-01 / FR-13">
-                      <Value label="确认状态" value={dashboard?.profile.owner_confirmation==="CONFIRMED"?
-                        "本人确认 · 后续适用":"尚无在当前有效期的本人确认目标"}/>
-                      <Value label="有效版本" value={dashboard?.profile.active_version||"无"}/>
-                      {(dashboard?.profile.goals||[]).map((goal,i)=>
-                        <div className="boss-workspace-item" key={i}>
-                          <strong>{i+1}. {goal}</strong>
-                        </div>)}
-                      {(dashboard?.profile.topics||[]).length>0&&
-                        <Value label="关注主题" value={dashboard?.profile.topics?.join("、")}/>}
-                      {dashboard?.profile.reading_requirement&&
-                        <div className="boss-workspace-item">
-                          <strong>已确认的阅读要求</strong>
-                          <p>{dashboard.profile.reading_requirement}</p>
-                        </div>}
-                      <div className="boss-actions">
-                        <GlassButton onClick={() => navigate("N07")}>
-                          <Settings size={15}/> 管理本人目标与阅读要求
-                        </GlassButton>
-                      </div>
-                    </Panel>
-                    <Panel title="会议与本人承诺">
-                      {dashboard?.meeting ? <>
-                        <Value label="关联会议" value={dashboard.meeting.meeting_id}/>
-                        <Value label="会议时间" value={localTime(dashboard.meeting.starts_at)}/>
-                        <Value label="参会人数" value={dashboard.meeting.participant_ids.length.toString()}/>
-                        <div className="boss-actions"><GlassButton onClick={() => navigate("N04")}>查看会议资料</GlassButton></div>
-                      </> : <Quiet message="会议资料未连接或当前范围为空。" />}
-                    </Panel>
-                    <Panel title="数据与来源状态">
-                      <Value label="来源类型" value={dashboard?.source_type}/>
-                      <Value label="执行空间" value={dashboard?.namespace}/>
-                      <Value label="数据集版本" value={dashboard?.dataset_version}/>
-                      <Value label="业务时钟" value={localTime(dashboard?.business_clock)}/>
-                      <Value label="当前资料覆盖" value={dashboard ? (dashboard.source_coverage.region + " / " + dashboard.source_coverage.trade_scope) : undefined}/>
-                      <div className="boss-actions"><GlassButton onClick={() => goSource("finance-note")}>查看原始依据</GlassButton></div>
-                    </Panel>
-                    <Panel title="大鹏的工作状态">
-                      <div className="boss-mascot-work">
-                        <img src={ANIMATIONS[loading || animate === "thinking" ? "thinking" : animate]} alt="" />
-                        <div><strong>{loading ? "正在读取资料" : "待命 · 随时开始"}</strong>
-                          <p>只有真实模型和业务接口返回后才显示执行结果；动画不会代替任务状态。</p>
-                        </div>
-                      </div>
-                    </Panel>
-                  </div>
-                </div></> :
+                page === "F01" ? <BossMorningView refreshVersion={requestVersion} onDirtyChange={setWorkDirty}
+                  onNavigate={(target,objectId)=>target==="F06"?selectTask(objectId):navigate(target,objectId)}
+                  onPrepare={(item,reference)=>{setMorningOrigin(reference);setMorningReady(false);if(item.page_id==="F06")selectTask(item.object_id);else{updateAssignmentDraft("purpose",item.title);navigate("F06",item.object_id,false,"");}}}/> :
                 page === "N02" ? <div className="boss-columns">
                   <div className="boss-column">
                     <Panel title="大鹏 · 连续对话" note="连接 nanobot 原生 WebSocket 会话">
@@ -707,7 +608,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onSubmit={onStartChat}
                   onOpenConversation={() => navigate("NATIVE")}
                 /> :
-                page === "F06" ? <><BossAssignmentFlow
+                page === "F06" ? <>{morningOrigin&&<BossMorningPreparation reference={morningOrigin} onReady={setMorningReady} onReturn={()=>navigate("F01")} refreshVersion={requestVersion}/>}<BossAssignmentFlow
+                  morningReference={morningOrigin??undefined} morningReady={morningReady}
                   tasks={tasks} selectedTaskId={selectedTaskId}
                   onSelectTask={selectTask} onReload={refresh}
                   onViewSource={() => goSource("finance-note")} context={dashboard}
@@ -959,6 +861,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               </div></>
               : page === "A04" ? <>
               <MaintainerBIScenarios/>
+              <MaintainerMorningCoverage/>
               <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>

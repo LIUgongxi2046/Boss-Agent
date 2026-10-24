@@ -6,7 +6,7 @@
 |---|---|---|
 | FC01-N3 | [采购成本品质公共集成](../feature-delivery/FC01/integration.md) | 当前功能与独立验收引用原始项目 specs/feature-delivery.json |
 | FC02-N3 | [BI连续查询公共集成](../feature-delivery/FC02/integration.md) | 完整FR-03及二十项检查点，当前工单为原始项目docs/FC02经营查询工单.md |
-| FC03-N3 | [晨间事项公共集成](../feature-delivery/FC03/integration.md) | FR-01/BR-01/AC-01-S/E；完整22项、F01与真实晨间请求/排序/持久恢复；状态引用原始功能来源 |
+| FC03-N3 | [晨间事项公共集成](../feature-delivery/FC03/integration.md) | FR-01/BR-01/AC-01-S/E；完整22项；MorningAPI、ProductMorning、BossMorningView、日期/清单/来源/排序/原回执及实际SDK；状态引用原始功能来源 |
 | FC02-N3-FOLLOWUP-RECOVERY | [默认父查询切换正式场景的公共验证](../feature-delivery/FC02/followup-recovery.md) | C03/C16、父子来源与持久回执、实际公共SDK；状态引用原始功能来源 |
 | FC02-N3-BOUNDARY-ADOPTION | [正式经营边界与双方口径的公共采用](../feature-delivery/FC02/boundary-adoption.md) | C05/C08/C11，维护载入、本人场景与来源、双口径及实际Runtime；状态引用原始功能来源 |
 | FC02-N4-UI-HISTORY-01 | [来源失效后的历史查询与原请求恢复](../feature-delivery/FC02/history-recovery.md) | C12/C14公共恢复、来源有效性、身份与持久请求；状态引用原始功能来源 |

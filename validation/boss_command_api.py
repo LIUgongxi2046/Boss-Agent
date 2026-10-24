@@ -43,6 +43,9 @@ from boss_meetings import MeetingAPI, meeting_materials
 from boss_source_access import require_current_business_source
 from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQualityAPI
 from boss_bi_scenarios import BIScenarioAPI, LOAD_ACTION as BI_SCENARIO_LOAD
+from boss_morning_inputs import MorningInputAPI, LOAD_ACTION as MORNING_COVERAGE_LOAD
+from boss_morning import MorningAPI
+from boss_simulation_api import _context
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -99,6 +102,7 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        MORNING_COVERAGE_LOAD: "MAINTAINER",
         BI_SCENARIO_LOAD: "MAINTAINER",
         **{action: definition[0] for action, definition in SUPPLY_QUALITY_ACTIONS.items()},
         **{"boss.sop." + action: "MAINTAINER" for action in ("save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel")},
@@ -192,7 +196,9 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action == BI_SCENARIO_LOAD:
+            if action == MORNING_COVERAGE_LOAD:
+                result = MorningInputAPI(self.store).load(role,payload)
+            elif action == BI_SCENARIO_LOAD:
                 result = BIScenarioAPI(self.store).execute(role,action,payload)
             elif action in SUPPLY_QUALITY_ACTIONS:
                 result = SupplyQualityAPI(self.store).execute(role, action, payload)
@@ -411,11 +417,24 @@ class BossCommandAPI:
             return result
 
     def _create(self, db, data, payload, key):
+        morning_reference = payload.get("morning_reference")
         self._exact(payload, {
             "client_request_id", "purpose", "coordinator_id", "due_at",
             "timezone", "evidence_requirements", "related_meeting_id",
             "related_event_ids", "source_refs", "content_version",
-        })
+        } | ({"morning_reference"} if "morning_reference" in payload else set()))
+        if "morning_reference" in payload:
+            require(isinstance(morning_reference, dict) and set(morning_reference) == {"list_id", "list_version", "item_id", "snapshot_sha256"},
+                    "晨间交办引用字段无效", web.HTTPBadRequest)
+            morning = MorningAPI(self.store)
+            stored, _, _ = morning._current(db, _context(db), morning_reference["list_id"])
+            view = stored["result"]
+            require(all(morning_reference[field] == view[field] for field in ("list_id", "list_version", "snapshot_sha256")), "晨间清单版本已变化")
+            item = next((item for item in view["items"] if item["item_id"] == morning_reference["item_id"]), None)
+            require(item is not None, "事项不属于当前晨间清单", web.HTTPForbidden)
+            require(isinstance(payload["source_refs"], list) and bool(payload["source_refs"])
+                    and set(payload["source_refs"]) <= {ref["id"] for ref in item["source_refs"] if ref["kind"] == "document"},
+                    "交办来源必须属于选中晨间事项", web.HTTPConflict)
         require(_is_text(payload["purpose"]), "交办内容不能为空或过长", web.HTTPBadRequest)
         require(payload["content_version"] == "1", "当前只接受演示内容版本 1", web.HTTPBadRequest)
         require(payload["coordinator_id"] in {c["contact_id"] for c in data["contacts"]},
@@ -444,7 +463,7 @@ class BossCommandAPI:
         require(isinstance(evidence, list) and 1 <= len(evidence) <= 8 and
                 all(_is_text(t, 160) for t in evidence),
                 "证据要求缺少或无效", web.HTTPBadRequest)
-        bound = {k: v for k, v in payload.items() if k != "client_request_id"}
+        bound = {k: v for k, v in payload.items() if k not in {"client_request_id", "morning_reference"}}
         auth_id = self._authorize(db, "create_assignment", bound, "new-assignment", "1")
         tool_input = {
             **bound, "authorization_id": auth_id, "idempotency_key": key,
@@ -460,6 +479,10 @@ class BossCommandAPI:
         persisted = self.store.get(db, NAMESPACE, "task", result["task_id"])
         persisted["source_versions"] = pinned_versions
         self.store.put(db, NAMESPACE, "task", result["task_id"], persisted)
+        if morning_reference is not None:
+            self.store.put(db, NAMESPACE, "morning_assignment_reference", result["task_id"], {
+                "owner_id": data["owner_id"], "morning_reference": morning_reference,
+                "task_id": result["task_id"], "task_version": result["version"], "authorization_id": auth_id})
         return {**result, "source_type": "SIMULATED",
                 "authorization_scope": "BOSS_CONFIRMED"}
 

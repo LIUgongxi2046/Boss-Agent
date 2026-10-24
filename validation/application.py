@@ -42,6 +42,8 @@ from product_read_tools import product_read_tools
 from product_skills import ProductSkills
 from product_fc01 import ProductFc01
 from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
+from product_morning import ProductMorning
+from fc03_agent.formal import FormalMorningTool, FORMAL_TOOLS
 from sop_write_tools.fc01 import Fc01Tool, TOOLS as FC01_TOOLS
 from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder
 from service import application as business_application
@@ -127,10 +129,11 @@ async def serve():
         output.chmod(0o700)
     fc01 = ProductFc01(store) if product_mode else None
     bi = ProductBI(store) if product_mode else None
-    provider = FeatureProvider(fc01, bi) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
+    morning = ProductMorning(store) if product_mode else None
+    provider = FeatureProvider(fc01, bi, morning) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = FeatureToolRegistry() if product_mode else ToolRegistry()
-    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi) if product_mode else None
+    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi, morning) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -163,6 +166,10 @@ async def serve():
                 registry.register(tool)
         for name in sorted(FC01_TOOLS - set(OPERATIONS)):
             registry.register(Fc01Tool(store, fc01.context_provider, name))
+        for name in sorted(FORMAL_TOOLS):
+            if name in registry.tool_names:
+                registry.unregister(name)
+            registry.register(FormalMorningTool(store, morning.context_provider, name))
     else:
         registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None
@@ -172,6 +179,7 @@ async def serve():
                                          [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages)
         fc01.runtime = runtime_control
         bi.runtime = runtime_control
+        morning.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
@@ -206,6 +214,7 @@ async def serve():
     if fc01 is not None:
         channels.channels["websocket"].fc01 = fc01
         channels.channels["websocket"].bi = bi
+        channels.channels["websocket"].morning = morning
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -216,6 +225,7 @@ async def serve():
         if fc01 is not None:
             fc01.bot = bot
             bi.bot = bot
+            morning.bot = bot
         async def context(request):
             current = store.context("ui-check")
             selected_prompts = load_runtime_prompts(store, "ui-check")
@@ -243,6 +253,7 @@ async def serve():
             bot.runtime.add_context_provider(OwnerMemoryContext(store))
             bot.runtime.add_context_provider(owner_goals_context)
             bot.runtime.add_context_provider(bi.scope_context)
+            bot.runtime.add_context_provider(morning.scope_context)
             bot.runtime.add_context_provider(runtime_recorder.context)
         else:
             bot.runtime.add_context_provider(context)

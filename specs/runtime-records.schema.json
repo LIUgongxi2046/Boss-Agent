@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.8.0",
+  "$id": "urn:boss-agent:runtime-records:1.9.0",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {
@@ -80,6 +80,24 @@
         "parameters_sha256":{"$ref":"#/$defs/Sha256"}
       }
     },
+    "MorningContext": {
+      "type": "object", "additionalProperties": false,
+      "required": ["date", "timezone", "snapshot_sha256", "order_version", "parameters_sha256", "client_request_id"],
+      "properties": {
+        "date": {"type": "string", "format": "date"}, "timezone": {"type": "string", "minLength": 1},
+        "snapshot_sha256": {"$ref": "#/$defs/Sha256"}, "order_version": {"$ref": "#/$defs/Version"},
+        "parameters_sha256": {"$ref": "#/$defs/Sha256"}, "client_request_id": {"type": ["string", "null"]}
+      }
+    },
+    "MorningItemReference": {
+      "type": "object", "additionalProperties": false, "required": ["item_id", "object_id", "version", "source_refs"],
+      "properties": {
+        "item_id": {"$ref": "#/$defs/Identifier"}, "object_id": {"$ref": "#/$defs/Identifier"},
+        "version": {"type": ["string", "null"]},
+        "source_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+          "required": ["kind", "id", "version"], "properties": {"kind": {"type": "string"}, "id": {"type": "string"}, "version": {"type": ["string", "null"]}}}}
+      }
+    },
     "ToolResultReference": {
       "type": "object", "additionalProperties": false, "required": ["tool_id", "tool_call_id", "iteration"],
       "properties": {
@@ -89,6 +107,12 @@
         "status": {"type": "string"}, "task_status": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Identifier"},
         "source_type": {"const":"SIMULATED"}, "source_id":{"$ref":"#/$defs/Identifier"},
         "bi_query_context":{"$ref":"#/$defs/BIQueryContext"},
+        "date": {"type": "string", "format": "date"}, "timezone": {"type": "string", "minLength": 1},
+        "snapshot_sha256": {"$ref": "#/$defs/Sha256"}, "order_version": {"$ref": "#/$defs/Version"},
+        "business_clock": {"type": "string", "format": "date-time"},
+        "list_id": {"$ref": "#/$defs/Identifier"}, "list_version": {"$ref": "#/$defs/Version"},
+        "item_refs": {"type": "array", "items": {"$ref": "#/$defs/MorningItemReference"}},
+        "document_ref": {"$ref": "#/$defs/SourceReference"},
         "definition_versions":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "detail_refs":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "review_sha256":{"$ref":"#/$defs/Sha256"}, "preparation_sha256":{"$ref":"#/$defs/Sha256"},
@@ -119,7 +143,8 @@
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
         "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
-        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02"]},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03"]},
+        "morning_context": {"$ref": "#/$defs/MorningContext"},
         "bi_query_context":{"type":"array","items":{"$ref":"#/$defs/BIQueryContext"}},
         "bi_readable_query_ids":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "simulated_model_events":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["event_id","state","source_type","request_sha256","usage","cost_total"],"properties":{"event_id":{"type":"string"},"state":{"enum":["REQUESTED","RESPONSE_RECEIVED","FAILED","CANCELED","TIMED_OUT"]},"source_type":{"const":"SIMULATED"},"request_sha256":{"$ref":"#/$defs/Sha256"},"usage":{"type":"null"},"cost_total":{"type":"null"},"finish_reason":{"type":["string","null"]},"tool_call_ids":{"type":"array","items":{"type":"string"}}}}},
