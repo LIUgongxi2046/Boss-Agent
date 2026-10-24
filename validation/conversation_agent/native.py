@@ -120,18 +120,45 @@ class NativeConversationAgent:
     def receipt(self, role, key, *, active):
         self._authorize(role, active)
         with self.store.connect() as db:
-            identity = self._identity(db)
-            found = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND id=?", (key,)).fetchone()
-            row = json.loads(found[0]) if found else None
-            if row is not None:
-                self._owner(row, identity)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row and row["run_id"] else None
+            result = self._receipt(db, self._identity(db), key)
         self._authorize(role, active)
+        return result
+
+    def _receipt(self, db, identity, key):
+        found = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND id=?", (key,)).fetchone()
+        row = json.loads(found[0]) if found else None
+        if row is not None:
+            self._owner(row, identity)
+        run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row and row["run_id"] else None
         return {"source_type": "RUNTIME_RECORD", "client_request_id": key,
             "outcome": "RECORDED" if row else "NOT_FOUND_IN_CURRENT_STORE", "request_state": run["status"] if run else row["status"] if row else "UNKNOWN",
             "run_id": row["run_id"] if row else None, "chat_id": row["chat_id"] if row else None,
             "session_id": row["session_id"] if row else None, "turn_id": row["turn_id"] if row else None,
             "write_performed_by_lookup": False, "business_authority_granted": False}
+
+    def requests(self, role, chat_id, *, attached, active):
+        self._authorize(role, active)
+        require(isinstance(chat_id, str) and is_valid_webui_chat_id(chat_id), "原请求读取会话编号无效", web.HTTPBadRequest)
+        require(callable(attached) and attached(chat_id), "当前连接未采用该会话", web.HTTPForbidden)
+        with self.store.connect() as db:
+            db.execute("PRAGMA query_only=ON")
+            db.execute("BEGIN")
+            identity = self._identity(db)
+            identifiers = db.execute("SELECT id FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' "
+                "AND json_extract(body,'$.chat_id')=? ORDER BY json_extract(body,'$.created_at'),id", (chat_id,)).fetchall()
+            results = [self._receipt(db, identity, identifier) for identifier, in identifiers]
+            for result in results:
+                require(result["outcome"] == "RECORDED" and result["chat_id"] == chat_id
+                    and result["session_id"] == webui_session_key(chat_id)
+                    and result["client_request_id"] == self.turn_key(chat_id, result["turn_id"]),
+                    "原请求记录不属于当前规范会话及轮次", web.HTTPForbidden)
+        self._authorize(role, active)
+        require(attached(chat_id), "原请求读取期间连接已停止采用该会话", web.HTTPForbidden)
+        with self.store.connect() as db:
+            current = self._identity(db)
+        require(all(current[field] == identity[field] for field in ("namespace", "owner_id", "dataset_id", "dataset_version")),
+                "原请求读取期间本人资料范围已经变化", web.HTTPForbidden)
+        return results
 
     @staticmethod
     def _media_refs(view):

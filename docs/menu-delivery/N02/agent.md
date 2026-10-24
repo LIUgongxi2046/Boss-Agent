@@ -1,10 +1,10 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-CONSUMER-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-REQUEST-HISTORY-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表扩展。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
 
 ## 当前依据与准确依赖
 
-本次PRODUCT准确候选为2260000b89414727afcf2720bfa993fc7a601296，包含已接收的N2原生模块b1eb8ed及N1附件修复6164aac401712f397072fdfac788d04ffd91488a的公共采用eb9a4fe。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
+本次原请求扩展的PRODUCT准确候选为1b7a7fa0c72e176df746ca3d3e0e90993604e6e0，包含N2消费模块cd1a5b0的公共接收、N1上下文引用66fc44d/c9dada0及附件Schema1.1读取。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
 已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、backend.md、boss_conversation.py、boss_conversation_attachments.py和conversation.schema.json 1.1.0，核查实际SDK命令生命周期、Session保存、Fc02Tool、bind_query、bind_scoped_followup、BIQueryAPI和范围Schema。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
@@ -33,6 +33,7 @@ conversationRead严格projection为runs/messages/attachments/artifact/record；a
 | ConversationQueries(store, conversation).plan(text, query, pending_scope=None) | 采用正式维度与同会话查询产物，完整条件生成QueryBinding；条件不足返回required_inputs及已识别的安全条件 |
 | ConversationQueryTool(Fc02Tool(..., agent.query_context, "query_metrics"), scope) | ConversationReadTool子类；核查同库、正式Schema、当前参数摘要与Fc02绑定，执行后重新检查范围 |
 | agent.receipt(role, key, *, active) | 原编号只读；RECORDED或NOT_FOUND_IN_CURRENT_STORE，返回实际request_state/run_id/chat_id/session_id/turn_id；不重放原意图 |
+| agent.requests(role, chat_id, *, attached, active) | 当前本人及连接采用的规范chat；返回实际conversation_intent的安全回执数组，包含尚无Runtime、准备失败、已取消及已运行请求；无记录返回空数组 |
 | agent.guard_context(provider) / finish(key, *, status="FAILED") | 后续provider前置失败清理；明确运行前取消可以使用CANCELED，已有运行终态采用实际Runtime，不伪造停止 |
 
 allowed_tools为frozenset工具名，allowed_calls为frozenset((tool_id,parameters_sha256))，references为tuple((kind,id,version))，version可为None。input_sha256来自request.original_user_text；request_id使用实际RuntimeBinding.request_id，建立记录前使用request.message_id或request.turn_id。session/chat/turn来自实际原生请求和服务端身份，不能由模型参数或客户端归属字段签发。
@@ -55,6 +56,8 @@ presentation.py根据实际工具消息产生中文说明，包含查询期间/�
 
 ConversationAttachments Schema 1.1.0保存可信上传的内部引用。实际SDK将普通文档转换为文本文件引用且user.media为空时，附件仍可从同一真实Session的上传记录读取；本模块不解析该文本或添加media。当前及recorded大小/摘要、nullable stored_name/user_message_index、STORED/MISSING/CHANGED/REFERENCE_UNAVAILABLE均采用N1正式字段。所有已采用附件必须保持STORED和本轮摘要；变化、删除或无法确认引用时在当前位置停止，原编号及已有运行保持可读。该普通文档引用已经通过当前限定检查。
 
+当前准确RoleChannel与SDK _dispatch_message已核查：仅附件原生帧仍应提供content=""、实际turn_id及非空media，当前本人连接需已attach目标chat。SDK保持该空文字，仅在content.strip()与成功上传的media_paths同时为空时拒绝。RoleChannel使用原始media计算接收摘要，将gateway实际路径及同一原始media传给record_media，之后发布原生消息；这些已有模块要求保持。本次没有新增上传或输入处理代码，没有启动公开产品；实际仅附件普通文档与后续用途的SDK用例在当前组合继续通过。
+
 admit和native_context调用正式SDK builtin_command_starts_agent_turn。/help、/new、无参数/goal、/model及/stop等非Agent轮次没有conversation_intent或额外Runtime。原生认证、命令接收与/stop取消仍由原路径处理。NativeMorningAdapter保持优先，已有晨间绑定不建立一般会话意图。
 
 ## Runtime、回执与隐私
@@ -64,6 +67,12 @@ Recorder复用当前RuntimeRecorder/Fc01RuntimeRecorder的实际配置、Prompt�
 工具结果记录实际tool_call_id、parameters_sha256/result_sha256及来源标识。正式存储核查后记录query_id/task_id/list_id/message_id/draft_id与适用版本。query_metrics追加QueryBinding.visible的bi_query_context、source_refs、definition_versions和detail_refs，排除原始问题。当前实际查询产物在后续模型步骤及结果释放前通过正式API重新核查并比较实际结果摘要。本人消息状态、任务状态和运行终态保持独立。
 
 稳定client_request_id由chat_id及原生turn_id摘要生成。conversation_intent保存文字/媒体摘要、正式引用和运行关联；相同轮次相同内容enqueue=false，文字或媒体不同拒绝。新服务只能读取原回执，不能恢复进程内连接证明。receipt字段为source_type/client_request_id/outcome/request_state/run_id/chat_id/session_id/turn_id/write_performed_by_lookup/business_authority_granted，admit另有enqueue；write_performed_by_lookup=false。未知结果只读取原编号，不重新执行。
+
+### C18/C19/C22原请求只读列表
+
+requests在同一SQLite BEGIN快照中按ui-check和实际chat_id选择conversation_intent，连接启用query_only；逐项复用receipt的_receipt及_owner检查。输出与receipt具有相同安全字段，按实际created_at及id排序，client_request_id和turn_id保留原值。每项要求当前owner/dataset/version、规范session/chat和稳定轮次编号相符；返回前重新核查active、attach及当前资料身份。没有读取原生会话正文、来源正文或问题内容，没有创建Runtime、业务对象、审计或进程内proof。
+
+合法但尚无记录的已attach会话返回[]，不创建Session或原请求。非法chat_id返回400，匿名/维护/过期认证拒绝，未attach或记录归属/资料版本不符拒绝；当前namespace无效沿用正式范围错误。列表包含实际ADMITTED、FAILED、CANCELED及Runtime状态；run_id尚不存在时保持null，不能据此推断已经入队或未执行。服务重建后沿用原编号读取，不恢复连接证明，不重新提交未知结果。公共调用必须使用当前服务端role、attached、active，不能采用客户端声明的身份或资料字段。
 
 Hook在实际工具错误时保存工具/调用编号和异常类型并终止。失败、取消、超时保留原运行与已保存对象，未知usage/cost_total/price_version保持null。存在required_inputs时，成功结束的运行记为WAITING_INPUT、stop_reason=required_input并保留finished_at，允许下一条本人输入。模型不能签发本人授权；本人写入/发送的匹配资格由正式共享领域判断。
 
@@ -76,12 +85,13 @@ Hook在实际工具错误时保存工具/调用编号和异常类型并终止。
 5. 当前一般范围为CONVERSATION_TOOLS七项。六项只读的公共同名工具保留既有正式分支；query_metrics使用agent.tools()返回的ConversationQueryTool及其实际Fc02上下文。公共同名适配必须保持ConversationReadTool子类，且提供当前实际delegate，不能仅修改名称。其他业务请求继续进入原有合法工具分支。
 6. 配置实际启用全部七项，max_tool_rounds至少为本次plan.calls数量加一。Recorder核查Registry实际集合与当前allowed_tools完全一致，模型只能看到该集合。query_metrics已存在于公共配置名称集合；本模块没有新增本人写入工具。
 7. 公共runtime-records.schema.json接收feature_id=N02、conversation_context以及实际tool_results的parameters_sha256和已有Fc02的bi_query_context/source_refs/definition_versions/detail_refs。附件投影采用Schema1.1.0的四状态、nullable字段与recorded_*字段。公共Schema、配置、注册及实际候选检查由N3完成。
+8. 当前会话原请求读取调用agent.requests(role, chat_id, attached=当前连接采用核查, active=当前本人有效认证核查)。返回数组逐项保持上述receipt字段；公共Schema、路由和前端读取由N3接收。本接口不注册为模型工具，不恢复或执行列表中的原请求。
 
 公开原编号端点、实际WebSocket接收/重连/停止、阅读位置与焦点、UI完整设计及全部26项由N3对准确候选验证。本人草稿/发送/回复及任务共享流程需要完整产品消费证据，本模块检查不代替这些验收。复杂或不明确自然条件明确保持待补充；未支持的其他业务动作仍需相应正式输入及领域能力。F01设计返修、STT暂停及用户验收状态继续保持独立。
 
 ## 当前限定验证
 
-依赖候选为validation/.work/n02-consumer-public，准确2260000b89414727afcf2720bfa993fc7a601296。附件模块blob=045e78b53a1c1eb8dce78edcec07c26ff37692ea；conversation.schema.json blob=6595d986b7bf47a540899c973be9086b0c010f10；Fc02Tool blob=4b3ce9f0ab422bbca5e3c2e28b5eb8de932b62fa；boss_bi_queries.py blob=70a667719797634bfcb0989c07a90da33cfeb85b。
+consumer-runtime.xml对应依赖validation/.work/n02-consumer-public，准确2260000b89414727afcf2720bfa993fc7a601296。附件模块blob=045e78b53a1c1eb8dce78edcec07c26ff37692ea；conversation.schema.json blob=6595d986b7bf47a540899c973be9086b0c010f10；Fc02Tool blob=4b3ce9f0ab422bbca5e3c2e28b5eb8de932b62fa；boss_bi_queries.py blob=70a667719797634bfcb0989c07a90da33cfeb85b。
 
 conftest.py使用标准importlib加载当前N2被测package，其余领域、工具与SDK来自准确候选，没有替代依赖。检查使用实际ControlStore.initialize批准selection资料、WebUIMediaGateway、Nanobot/AgentLoop、SessionManager、Fc02Tool和RuntimeRecorder。SessionManager均显式指定独立sessions_root；SQLite、媒体和会话位于本目录已忽略validation/.work。测试文件采用仓库已有真实文件字节，没有虚构企业事实或业务值。
 
@@ -91,6 +101,14 @@ BDD：Given当前本人、正式来源与明确范围；When连续输入不同�
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-consumer-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-consumer-receive --tb=short --junitxml=docs/menu-delivery/N02/consumer-runtime.xml
+```
+
+本次request-history.xml为54 passed、17.80秒，包含13项原请求定向用例和受影响的原41项。依赖validation/.work/n02-requests-public准确1b7a7fa0c72e176df746ca3d3e0e90993604e6e0；boss_conversation.py blob=334de8f8f188dc342188447606380283e6fbe34d，boss_conversation_references.py blob=2164498b428c1e59595358c8b09e16764c1bbec3，conversation.schema.json blob=22aa46f993b76f3db618fc063ea81fc3d88a46af，role_channel.py blob=456f1cd1748425dfb3e7b64d219cdf11b83d8d86。N1领域及公共文件仅作为只读依赖，当前扩展没有修改这些文件。
+
+Given真实SDK已运行、实际admit后准备失败、明确运行前取消及尚未运行原请求；When当前本人读取同一chat列表并重建同库服务再次读取；Then原client_request_id/turn_id及真实状态相同，尚无运行保持null，其他chat不混入，进程内proof没有恢复。Given匿名/维护、未attach、过期或技术归属被篡改；When请求列表；Then正式拒绝。所有对象按namespace/kind计数、spaces、idempotency及audit数量在成功、空集合、拒绝及重建读取前后保持相同；技术归属拒绝使用实际admit产生的记录，没有虚构Runtime或替代生产依赖。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-requests-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-requests-delivery --tb=short --junitxml=docs/menu-delivery/N02/request-history.xml
 ```
 
 所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。
