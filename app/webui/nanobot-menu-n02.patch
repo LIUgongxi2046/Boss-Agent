@@ -273,4 +273,183 @@
          onNewConversation={onNewChat}
 +        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
 +        onOpenTaskConversation={chatId=>onSelectChat("websocket:"+chatId)}
+*** Update File: webui/src/components/thread/ThreadViewport.tsx
+@@
+-export interface ThreadViewportHandle {
++export interface ThreadReadingPosition {conversationKey:string;promptId:string;offsetTop:number}
++export interface ThreadReadingController {
++  captureReadingPosition:()=>ThreadReadingPosition|null;
++  restoreReadingPosition:(position:ThreadReadingPosition,signal:AbortSignal)=>Promise<void>;
++}
++interface PendingReadingPosition {
++  position:ThreadReadingPosition;resolve:()=>void;reject:(error:Error)=>void;cleanup:()=>void;
++  loading:boolean;lastBoundary:string|null;
++}
++export interface ThreadViewportHandle extends ThreadReadingController {
+@@
+   const historyScrollAnchorRef = useRef<HistoryScrollAnchor | null>(null);
++  const pendingReadingPosition=useRef<PendingReadingPosition|null>(null);
++  const [readingRevision,setReadingRevision]=useState(0);
+@@
+   const yieldCameraToUser = useCallback(() => {
++    const pending=pendingReadingPosition.current;
++    if(pending){pendingReadingPosition.current=null;pending.cleanup();pending.reject(new DOMException("本人已经调整阅读位置","AbortError"));}
+     threadMotionRef.current?.takeUserControl();
+@@
+   const cancelAutoScroll = useCallback(() => {
+     threadMotionRef.current?.takeUserControl();
+   }, []);
++
++  const captureReadingPosition=useCallback(()=>{
++    const scroller=scrollRef.current;
++    if(!conversationReady||!conversationKey||!scroller||!hasMessages)return null;
++    const prompts=Array.from(scroller.querySelectorAll<HTMLElement>("[data-user-prompt-id]"));
++    if(!prompts.length)return null;
++    const top=scroller.getBoundingClientRect().top;
++    const prompt=prompts.filter(element=>element.getBoundingClientRect().top<=top).at(-1)??prompts[0];
++    const promptId=prompt.dataset.userPromptId;
++    if(!promptId)throw new Error("原消息缺少稳定标识");
++    threadMotionRef.current?.takeUserControl();
++    return {conversationKey,promptId,offsetTop:prompt.getBoundingClientRect().top-top};
++  },[conversationKey,conversationReady,hasMessages]);
++  const finishReading=useCallback((pending:PendingReadingPosition,error?:Error)=>{
++    if(pendingReadingPosition.current!==pending)return;
++    pendingReadingPosition.current=null;pending.cleanup();
++    if(error)pending.reject(error);else pending.resolve();
++  },[]);
++  const restoreReadingPosition=useCallback((position:ThreadReadingPosition,signal:AbortSignal)=>{
++    if(position.conversationKey!==conversationKey||!position.promptId||!Number.isFinite(position.offsetTop))return Promise.reject(new Error("原阅读位置不属于当前会话"));
++    if(signal.aborted)return Promise.reject(new DOMException("阅读位置恢复已经取消","AbortError"));
++    const previous=pendingReadingPosition.current;
++    if(previous)finishReading(previous,new DOMException("阅读位置恢复已经替换","AbortError"));
++    return new Promise<void>((resolve,reject)=>{
++      const pending:PendingReadingPosition={position,resolve,reject,cleanup:()=>signal.removeEventListener("abort",abort),loading:false,lastBoundary:null};
++      const abort=()=>finishReading(pending,new DOMException("阅读位置恢复已经取消","AbortError"));
++      pendingReadingPosition.current=pending;signal.addEventListener("abort",abort,{once:true});setReadingRevision(value=>value+1);
++    });
++  },[conversationKey,finishReading]);
+@@
+       cancelAutoScroll,
++      captureReadingPosition,
++      restoreReadingPosition,
+     }),
+-    [cancelAutoScroll, jumpToUserPrompt],
++    [cancelAutoScroll, jumpToUserPrompt,captureReadingPosition,restoreReadingPosition],
+@@
+   useLayoutEffect(() => {
+     threadMotionRef.current?.invalidateGeometry();
+   }, [composer, hasMessages, visibleMessages.length]);
++
++  useLayoutEffect(()=>{
++    const pending=pendingReadingPosition.current;
++    if(!pending)return;
++    if(pending.position.conversationKey!==conversationKey){finishReading(pending,new DOMException("当前会话已经变化","AbortError"));return;}
++    if(!conversationReady)return;
++    const index=messages.findIndex(message=>message.role==="user"&&message.id===pending.position.promptId);
++    if(index<0){
++      if(loadingOlder||pending.loading)return;
++      if(!hasMoreBefore||!onLoadOlder){finishReading(pending,new Error("原消息当前无法读取，请核查原会话历史"));return;}
++      const boundary=messages[0]?.id??"EMPTY";
++      if(pending.lastBoundary===boundary){finishReading(pending,new Error("原会话历史读取没有前进"));return;}
++      pending.lastBoundary=boundary;pending.loading=true;
++      void Promise.resolve(onLoadOlder()).then(()=>{if(pendingReadingPosition.current===pending){pending.loading=false;setReadingRevision(value=>value+1);}}).catch(error=>finishReading(pending,error instanceof Error?error:new Error(String(error))));
++      return;
++    }
++    const scroller=scrollRef.current,prompt=scroller?findPromptElement(scroller,pending.position.promptId):null;
++    if(!scroller||!prompt){setVisibleMessageCount(count=>Math.max(count,messages.length-index));return;}
++    const key=prompt.dataset.threadDisplayUnit;
++    if(!key){finishReading(pending,new Error("原消息缺少原生显示标识"));return;}
++    pendingConversationScrollRef.current=false;pendingPromptJumpRef.current=null;
++    threadMotionRef.current?.takeUserControl();setAtBottom(false);
++    historyScrollAnchorRef.current={key,offsetTop:pending.position.offsetTop};
++    if(!reconcileHistoryScrollAnchor()){finishReading(pending,new Error("原消息阅读位置未能恢复"));return;}
++    finishReading(pending);
++  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
++  useEffect(()=>()=>{const pending=pendingReadingPosition.current;if(pending)finishReading(pending,new DOMException("原生阅读视图已经退出","AbortError"));},[finishReading]);
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+-import { ThreadViewport, type ThreadViewportHandle } from "@/components/thread/ThreadViewport";
++import { ThreadViewport, type ThreadViewportHandle,type ThreadReadingController } from "@/components/thread/ThreadViewport";
+@@
+   onDraftController?: (controller:ComposerDraftController|null)=>void;
++  onReadingController?: (controller:ThreadReadingController|null)=>void;
+@@
+   onDraftController,
++  onReadingController,
+@@
+   const viewportRef = useRef<ThreadViewportHandle | null>(null);
++  useEffect(()=>{
++    onReadingController?.({
++      captureReadingPosition:()=>viewportRef.current?.captureReadingPosition()??null,
++      restoreReadingPosition:(position,signal)=>{
++        if(!viewportRef.current)return Promise.reject(new Error("当前原生阅读视图尚未就绪"));
++        return viewportRef.current.restoreReadingPosition(position,signal);
++      },
++    });
++    return()=>onReadingController?.(null);
++  },[historyKey,onReadingController]);
+*** Update File: webui/src/App.tsx
+@@
+ import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
++import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
+@@
+   const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const nativeReading=useRef(new Map<string,ThreadReadingController>());
++  const registerNativeReading=useCallback((key:string,controller:ThreadReadingController|null)=>{
++    if(controller)nativeReading.current.set(key,controller);else nativeReading.current.delete(key);
++  },[]);
+@@
+       <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        captureReadingPosition={()=>nativeReading.current.get(activeKey??"new-conversation")?.captureReadingPosition()??null}
++        restoreReadingPosition={(position,signal)=>{
++          const reader=nativeReading.current.get(position.conversationKey);
++          if(!reader)return Promise.reject(new Error("当前原生会话阅读服务尚未就绪"));
++          return reader.restoreReadingPosition(position,signal);
++        }}
+@@
+                             onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
++                            onReadingController={controller=>registerNativeReading(activeKey??"new-conversation",controller)}
+@@
+                           onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
++                          onReadingController={controller=>registerNativeReading(paneSession.key,controller)}
+*** Update File: webui/src/App.tsx
+@@
+ import {BossConversationWorkspace} from "./boss-agent/BossConversationWorkspace";
++import {writeConversationPosition} from "./boss-agent/BossConversationPosition";
+@@
+   const onNewChat = useCallback(() => {
++    writeConversationPosition(null);
+     navigate(defaultShellRoute());
+@@
+   const onSelectChat = useCallback(
+     (key: string) => {
++      writeConversationPosition(null);
+       const selectedTemporary = temporarySessionsRef.current[key];
+*** Update File: webui/src/components/thread/ThreadViewport.tsx
+@@
+   onLoadOlder?: () => Promise<void> | void;
++  readingHistoryPending?: boolean;
++  readingHistoryError?: string|null;
+@@
+   onLoadOlder,
++  readingHistoryPending = false,
++  readingHistoryError = null,
+@@
+     const index=messages.findIndex(message=>message.role==="user"&&message.id===pending.position.promptId);
+     if(index<0){
+-      if(loadingOlder||pending.loading)return;
++      if(readingHistoryError){finishReading(pending,new Error(readingHistoryError));return;}
++      if(readingHistoryPending||loadingOlder||pending.loading)return;
+@@
+-  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
++  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingHistoryPending,readingHistoryError,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   const displayMessages = useMemo(() => projectWebuiThreadMessages(messages), [messages]);
++  const readingMessageIds=useMemo(()=>new Set(displayMessages.map(message=>message.id)),[displayMessages]);
++  const readingHistoryPending=loadingOlder||historical.some(message=>message.role==="user"&&!readingMessageIds.has(message.id));
+@@
+             onLoadOlder={loadOlder}
++            readingHistoryPending={readingHistoryPending}
++            readingHistoryError={historyError}
 *** End Patch

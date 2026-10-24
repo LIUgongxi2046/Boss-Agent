@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "scope": "N02_ACTUAL_MESSAGE_POSITION_AFTER_UNKNOWN_SEND_REFRESH",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-return-position-a8a3ba8c-2b77-49f2-872d-fa0f6d46d743",
+  "ports": {
+    "business": 10831,
+    "webui": 10832,
+    "gateway": 20831
+  },
+  "proxy_port": 10833,
+  "manifest_sha256": "eae01bafd2cb015f6000a7eb59cbc49932fb225fdaaa260689d04926119a4228",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_history_reading_captured_as_identifiers_and_coordinates",
+      "chat_id": "b2e157e4-3501-4c72-913e-5995e73028a3",
+      "run_id": "run-fbfca48f-4431-408e-a7ae-afc37959d227",
+      "reading": {
+        "conversationKey": "websocket:b2e157e4-3501-4c72-913e-5995e73028a3",
+        "promptId": "u-8d12576b17c0ffcc",
+        "offsetTop": -77
+      },
+      "workspace_top": 35,
+      "thread": {
+        "scrollTop": 93,
+        "scrollHeight": 15698,
+        "clientHeight": 147
+      },
+      "actual_runtime_count": 32
+    },
+    {
+      "check": "unknown_send_refresh_return_restores_original_message_run_scroll_and_focus",
+      "chat_id": "b2e157e4-3501-4c72-913e-5995e73028a3",
+      "run_id": "run-fbfca48f-4431-408e-a7ae-afc37959d227",
+      "client_request_id": "boss-66947d42-1f2e-4480-8cb0-02a360b49003",
+      "reading": {
+        "conversationKey": "websocket:b2e157e4-3501-4c72-913e-5995e73028a3",
+        "promptId": "u-8d12576b17c0ffcc",
+        "offsetTop": -77
+      },
+      "restored": {
+        "promptFound": true,
+        "offsetTop": -77,
+        "scrollTop": 93,
+        "scrollHeight": 15521,
+        "clientHeight": 147
+      },
+      "workspace_top": 35,
+      "focus_restored": true,
+      "actual_older_history_reads": 1,
+      "simulation_send_count": 1,
+      "additional_runtime_count": 0,
+      "private_body_or_password_in_ordinary_storage": false
+    }
+  ]
+}
