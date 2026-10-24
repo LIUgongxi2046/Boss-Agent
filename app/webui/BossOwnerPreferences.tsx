@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
+import {deliveredPage} from "./delivered-navigation";
 
 type GoalSettings = {
   goals: string[]; topics: string[]; reading_requirement: string;
@@ -448,17 +449,17 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
               <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>
                 <FileClock size={15}/> 查看晨间工作
               </button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
-                查看会前材料</button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F13")}>
-                个人记忆</button>
+              {deliveredPage("F04","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
+                查看会前材料</button>}
+              {deliveredPage("F13","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F13")}>
+                个人记忆</button>}
             </>:<>
               <button type="button" className="boss-btn" onClick={()=>onNavigate("N06")}>
                 <BellRing size={15}/> 查看通知记录</button>
               <button type="button" className="boss-btn" onClick={()=>onNavigate("N09")}>
                 查看本人计划</button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
-                查看私人日程授权</button>
+              {deliveredPage("F12","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
+                查看私人日程授权</button>}
             </>}
           </div>
         </Panel>

@@ -5,13 +5,16 @@
 .boss-login-account{margin:0}
 .boss-login-card form .boss-login-status,.boss-login-card form .boss-login-error{margin:0}
 .boss-login-account input{padding-right:16px}
-.boss-login-footer{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:24px;border-top:1px solid var(--boss-border);padding-top:16px;align-items:start}
-.boss-login-footer .boss-login-assistance{border:0;padding:0;min-width:0}
-.boss-login-maintenance{display:flex;align-items:center;min-height:44px;border:0;background:transparent;color:var(--boss-blue);padding:0;font-size:14px;cursor:pointer}
+.boss-login-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;border-top:1px solid var(--boss-border);padding-top:16px;align-items:start}
+.boss-login-secondary{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;height:44px;border:1px solid var(--boss-border);border-radius:9px;background:#FFFFFF;color:var(--boss-blue);padding:10px 12px;font-size:14px;line-height:22px;cursor:pointer;white-space:nowrap}
+.boss-login-card>.boss-login-assistance{border:0;padding:0;margin-top:16px;min-width:0}
 .boss-login button:focus-visible,.boss-login input:focus-visible,.boss-login summary:focus-visible{outline:2px solid #0A64E8;outline-offset:2px}
 .boss-login button:disabled{cursor:wait;opacity:.65}
 .boss-login-welcome h1{font-size:clamp(28px,3vw,40px)}
-.boss-v6.boss-login{position:relative;isolation:isolate}
+.boss-v6.boss-login{position:relative;isolation:isolate;background:radial-gradient(ellipse at 12% 18%,#D9EDFF 0,transparent 48%),radial-gradient(ellipse at 85% 78%,#DDF8ED 0,transparent 44%),linear-gradient(135deg,#F2F8FF 0%,#FFFFFF 48%,#EDF9F4 100%)}
+.boss-login::before,.boss-login::after{content:"";position:absolute;pointer-events:none;z-index:0;border:1px solid rgba(93,169,209,.14);border-radius:50%;width:560px;height:560px}
+.boss-login::before{left:-240px;top:22%;background:radial-gradient(circle,rgba(203,231,251,.3),transparent 65%)}
+.boss-login::after{right:-280px;top:-240px;border-color:rgba(60,175,140,.14);background:radial-gradient(circle,rgba(213,245,231,.25),transparent 65%)}
 .boss-login-content{position:relative;z-index:2}
 .boss-login-flight{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
 .boss-login-flying-bird{position:absolute;left:0;top:0;width:clamp(120px,16vw,200px);aspect-ratio:1;offset-anchor:50% 50%;offset-rotate:0deg;will-change:offset-distance}

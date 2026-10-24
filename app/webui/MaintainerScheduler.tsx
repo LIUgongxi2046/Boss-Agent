@@ -6,6 +6,7 @@ import {
 import { useClient } from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
 import {BossBusinessAlertAdministration} from "./BossBusinessAlerts";
+import {deliveredPage} from "./delivered-navigation";
 
 type Schedule = {
   schedule_id:string;version:string;schedule_version:string;timezone:string;
@@ -299,8 +300,8 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
           <div className="boss-actions">
             <button type="button" className="boss-btn" onClick={()=>onNavigate("A04")}>
               查看获准事件与模拟业务时间</button>
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("A14")}>
-              查看脱敏授权与操作记录</button>
+            {deliveredPage("A14","MAINTAINER")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("A14")}>
+              查看脱敏授权与操作记录</button>}
           </div>
         </section>
       </div>

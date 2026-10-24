@@ -32,6 +32,7 @@ app.setPath('temp', path.join(work, 'tmp'));
 app.setPath('logs', path.join(work, 'logs'));
 app.setPath('crashDumps', path.join(work, 'crash-dumps'));
 const productMode = process.env.BOSS_PRODUCT_UI === '1';
+const demoAccountInjection = productMode && process.env.BOSS_EXECUTION_SCOPE === 'BOSS-PRIORITY-ITERATION' && process.env.BOSS_DEMO_ACCOUNT_INJECTION === '1';
 const diagnostics = productMode ? path.join(work, 'diagnostics') : path.join(root, '..', 'evidence', 'T02');
 fs.mkdirSync(diagnostics, { recursive: true, mode: productMode ? 0o700 : 0o755 });
 if (productMode) fs.chmodSync(diagnostics, 0o700);
@@ -78,12 +79,25 @@ if (!app.requestSingleInstanceLock()) {
   }
 
   ipcMain.handle('boss-desktop:capability', async (event, request) => {
-    if (!request || typeof request !== 'object' || Object.keys(request).some(key => !['action', 'token', 'url', 'event_id', 'event_version'].includes(key))) throw new Error('IPC 参数无效');
+    if (!request || typeof request !== 'object' || Object.keys(request).some(key => !['action', 'token', 'url', 'event_id', 'event_version', 'role'].includes(key))) throw new Error('IPC 参数无效');
     const action = request.action;
-    const allowed = ['status', 'microphone_status', 'request_microphone', 'select_file', 'open_source', 'notify', 'notify_event', 'retry_notification', 'notification_status', 'quit'];
+    const allowed = ['status', 'microphone_status', 'request_microphone', 'select_file', 'open_source', 'notify', 'notify_event', 'retry_notification', 'notification_status', 'quit', ...(demoAccountInjection ? ['test_account'] : [])];
     if (!allowed.includes(action)) { record('ipc_denied', { action }); throw new Error('IPC 能力未授权'); }
     if (!window || event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame || new URL(event.senderFrame.url).origin !== origin) throw new Error('IPC 发送方无权访问');
-    if (action === 'status') return { versions: process.versions, service_pid: child.pid, service_startup_ms: serviceStartupElapsedMs, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported() };
+    if (action === 'test_account') {
+      if (Object.keys(request).sort().join(',') !== 'action,role' || !['BOSS', 'MAINTAINER'].includes(request.role)) throw new Error('测试账号入口身份无效');
+      const accountPath = path.join(applicationWork, 'accounts', 'credentials.json');
+      const stat = fs.lstatSync(accountPath);
+      if (!stat.isFile() || stat.isSymbolicLink() || fs.realpathSync(accountPath) !== accountPath || (stat.mode & 0o077) !== 0 || stat.uid !== process.getuid() || stat.size > 65536) throw new Error('当前测试账号来源不符合本机读取条件');
+      const accounts = JSON.parse(fs.readFileSync(accountPath, 'utf8'));
+      if (!Array.isArray(accounts)) throw new Error('测试账号文件格式无效');
+      const matches = accounts.filter(account => account.role === request.role);
+      if (matches.length !== 1 || typeof matches[0].username !== 'string' || !matches[0].username || typeof matches[0].password !== 'string' || !matches[0].password) throw new Error('当前入口没有唯一有效测试账号');
+      record('demo_account_filled', { role: request.role });
+      return { role: request.role, username: matches[0].username, password: matches[0].password };
+    }
+    if ('role' in request) throw new Error('当前能力不接受入口身份字段');
+    if (action === 'status') return { versions: process.versions, service_pid: child.pid, service_startup_ms: serviceStartupElapsedMs, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported(), demo_account_injection_supported: demoAccountInjection };
     await authorize(event, request.token);
     record('ipc_authorized', { action });
     if (action === 'notify_event' || action === 'retry_notification' || action === 'notification_status') {

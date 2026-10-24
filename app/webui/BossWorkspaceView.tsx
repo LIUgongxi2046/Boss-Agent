@@ -7,6 +7,7 @@ import {BossNativeNotification} from "./BossDesktopNotifications";
 import {useTransaction} from "./BossAssignmentFlow";
 import {BossReminderPreparation} from "./BossReminderPreparation";
 import {BossBusinessAlerts,type BusinessAlertRead} from "./BossBusinessAlerts";
+import {deliveredPage} from "./delivered-navigation";
 
 // Only these routes have real, role-scoped read projections. Routes absent
 // from this map still show the original transparent "not implemented" panel.
@@ -458,7 +459,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
           </div>)}
           <Notice message="当前仅有可核查的会议、联系人和原始资料关系。会前简报的模型生成、会后纪要分类及审批仍需专业逻辑。"/>
           <div className="boss-actions">
-            <button className="boss-btn" type="button" onClick={()=>onNavigate("N04")}>打开会议资料 <ArrowRight size={15}/></button>
+            {deliveredPage("N04",role)&&<button className="boss-btn" type="button" onClick={()=>onNavigate("N04")}>打开会议资料 <ArrowRight size={15}/></button>}
           </div>
         </Layer>}
         {route==="outbox"&&<Layer title="已授权模拟发件箱" description="FR-08 · 发送与送达分开">
@@ -659,12 +660,12 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
         </Layer>}
         {["organization","knowledge","sources","outbox"].includes(route)&&<Layer title="后续有权操作">
           <div className="boss-workspace-next">
-            <button type="button" onClick={()=>onNavigate("N02")} className="boss-btn">
+            {deliveredPage("N02",role)&&<button type="button" onClick={()=>onNavigate("N02")} className="boss-btn">
               <Sparkles size={15}/> 进入真正的 Agent 会话
-            </button>
-            <button type="button" onClick={()=>onNavigate("F06")} className="boss-btn">
+            </button>}
+            {deliveredPage("F06",role)&&<button type="button" onClick={()=>onNavigate("F06")} className="boss-btn">
               <CheckCircle2 size={15}/> 查看当前交办与授权
-            </button>
+            </button>}
           </div>
         </Layer>}
         {["tool-catalog","metric-definitions","source-index","scheduler","system"].includes(route)&&

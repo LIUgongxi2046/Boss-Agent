@@ -4,13 +4,14 @@ import {
 } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
-  Activity, AlertCircle, ArrowLeft, ArrowRight, Bell, CalendarDays,
+  Activity, AlertCircle, ArrowLeft, ArrowRight, Bell,
   ChartNoAxesCombined, CheckCircle2, ChevronRight, ClipboardCheck,
   Clock3, Database, FileSearch, FolderOpen, LayoutDashboard, Loader2,
   Menu, MessageCircle, RefreshCw, Search, Send, Settings,
   ShieldCheck, X,
 } from "lucide-react";
 import pageMeta from "./page-meta.json";
+import {deliveredPage} from "./delivered-navigation";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import {BossNotificationReturn} from "./BossDesktopNotifications";
@@ -128,12 +129,16 @@ type Props = {
 
 const pages = pageMeta as Record<string, DesignPage>;
 const BOSS_NAV = [
-  ["F01", "今日工作", LayoutDashboard],
-  ["N02", "聊天交办", MessageCircle],
-  ["N03", "经营关注", ChartNoAxesCombined],
-  ["N04", "会议与资料", CalendarDays],
+  ["F01", "采购成本协调", LayoutDashboard],
+  ["F03", "经营查询与追问", ChartNoAxesCombined],
+  ["F14", "原料与饲料报告", FolderOpen],
+  ["F21", "食品与品质报告", FileSearch],
+  ["F02", "经营提醒", Bell],
+  ["F06", "交办管理", ClipboardCheck],
   ["N05", "任务与承诺", ClipboardCheck],
-  ["N06", "通知与设置", Bell],
+  ["N06", "通知中心", Bell],
+  ["N08", "本人通知设置", Settings],
+  ["N09", "本人计划", Clock3],
 ] as const;
 const MAINT_NAV = [
   ["A01", "档案与访问", ShieldCheck],
@@ -153,22 +158,12 @@ const MAINT_NAV = [
   ["A15", "运行记录", Activity],
   ["A16", "评测管理", ClipboardCheck],
 ] as const;
-const PRODUCT_PAGES = new Set<string>([
-  "F01", "N02", "N03", "F03", "N04", "N05", "F11", "F10", "F26", "N07", "N08", "F05", "F06", "F07", "F08", "F12", "D01", "F24", "D03", "A04", "A05", "A06", "A08", "A15", "F30", "N12",
-  ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
-]);
-function allowed(page: string, role: Role, mvp=false, priority=false) {
-  if(priority)return role==="BOSS"?["F01","F02","N06","N08","N09","F06","N05","D01","D04","D05","D06","D07"].includes(page):["A03","A04","A08","A13","A15"].includes(page);
-  if(mvp)return role==="BOSS"?page==="F01":["A03","A08","A15"].includes(page);
-  if (page === "NATIVE") return true;
-  if (!pages[page]) return false;
-  if (["N01", "D08"].includes(page)) return false; // N01/D08由BossLogin认证入口承接。
-  if (["D06", "D07"].includes(page)) return true;
-  return pages[page].technical ? role === "MAINTAINER" : role === "BOSS";
+function allowed(page: string, role: Role, mvp=false, _priority=false) {
+  return deliveredPage(page,role,mvp)!==undefined;
 }
 function initialPage(role: Role, mvp=false, priority=false): string {
   const selected = new URLSearchParams(window.location.search).get("bossPage") || "";
-  return allowed(selected, role,mvp,priority) ? selected : role === "BOSS" ? "F01" : "A08";
+  return selected ? allowed(selected,role,mvp,priority)?selected:"UNAVAILABLE" : role === "BOSS" ? "F01" : "A08";
 }
 async function jsonRequest<T>(path: string, getToken: () => string, signal?: AbortSignal): Promise<T> {
   const token = getToken();
@@ -450,13 +445,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     return () => abort.abort();
   }, [getToken, page, role, selectedTaskId, requestVersion]);
 
-  const userNav = (role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>!(mvpScope||priorityScope)||role!==null&&allowed(id,role,mvpScope,priorityScope));
+  const userNav = (role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>role!==null&&allowed(id,role,mvpScope,priorityScope));
   const metadata = pages[page];
   const isNative = page === "NATIVE";
   const searchablePages = useMemo(() => {
-    return Object.entries(pages).filter(([id, p]) => role && allowed(id, role,mvpScope,priorityScope) &&
+    return Object.entries(pages).filter(([id, p]) => role && deliveredPage(id,role,mvpScope)?.directory &&
       (id.toLowerCase().includes(pageFilter.toLowerCase()) ||
-       p.title.includes(pageFilter) || p.module.includes(pageFilter)));
+       deliveredPage(id,role,mvpScope)?.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role,mvpScope,priorityScope]);
   const refresh = () => setRequestVersion((v) => v + 1);
   const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
@@ -506,6 +501,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     </div> : <Loader2 size={22} className="boss-spin" aria-hidden="true" />}
   </div>;
 
+  if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前入口尚未交付</h1><p>当前版本没有开放此功能。请返回已经交付的功能入口。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回可用入口</button><button className="boss-btn" onClick={onLogout}>退出当前身份</button></div></section></div>;
   if (isNative) return <div className="boss-native-view">
     <div className="boss-native-return">
       <button type="button" onClick={() => navigate(role === "BOSS" ? "F01" : "A08")}>
@@ -530,14 +526,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           <nav className="boss-sidebar-nav">
             {userNav.map(([id, label, Icon]) =>
               <button type="button" key={id} className={"boss-nav-item " + (page === id ? "active" : "")}
-                onClick={() => navigate(id)} title={label} aria-current={page === id ? "page" : undefined}>
+                onClick={() => navigate(id)} title={deliveredPage(id,role,mvpScope)?.title??label} aria-current={page === id ? "page" : undefined}>
                 <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
-                {sidebarOpen && <span>{(mvpScope||priorityScope)&&id==="F01"?"采购成本协调":label}</span>}
+                {sidebarOpen && <span>{deliveredPage(id,role,mvpScope)?.title??label}</span>}
               </button>
             )}
           </nav>
           <div className="boss-sidebar-bottom">
-            <button type="button" onClick={() => setDirectoryOpen(true)} title="全部设计页面">
+            <button type="button" onClick={() => setDirectoryOpen(true)} title="已交付功能目录">
               <FolderOpen size={17} aria-hidden="true" />{sidebarOpen && ((mvpScope||priorityScope)?"当前可用入口":"全部页面")}
             </button>
             <button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
@@ -555,8 +551,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             <div className="boss-topright">
               <Tag tone="blue">本地桌面开发版</Tag>
               <Tag tone="amber">模拟业务资料</Tag>
-              <button type="button" className="boss-icon-button" disabled={mvpScope||priorityScope&&role!=="BOSS"} title={mvpScope?"后续需求暂未开放":"通知中心"}
+              {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}><Bell size={18}/></button>
+              }
               <button type="button" className="boss-user" onClick={onLogout} title="退出当前身份">
                 <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
                 <span>{role === "BOSS" ? "本人" : "技术维护"}<small>{role === "BOSS" ? "已认证本人" : "维护身份"}</small></span>
@@ -575,8 +572,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             <div className="boss-content" key={page}>
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
-                  <Tag tone={PRODUCT_PAGES.has(page) ? "green" : "muted"}>
-                    {priorityScope?"经营提醒 · 待共同验收":mvpScope?"采购成本体验 · 待共同验收":PRODUCT_PAGES.has(page) ? "部分功能已接入 · 待验收" : "已映射 · 未实现"}
+                  <Tag tone="green">
+                    已交付 · 可使用
                   </Tag>
                   <span>{metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
@@ -875,11 +872,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               </div></>
               : page === "A04" ? <>
               <MaintainerBIScenarios/>
-              <MaintainerMorningCoverage/>
+              {!priorityScope&&!mvpScope&&allowed("F04","BOSS")&&<MaintainerMorningCoverage/>}
               <div className="boss-columns">
                 <div className="boss-column">
                   <MaintainerFeedback tasks={maintenance?.task_refs || []} onReload={refresh}/>
-                  <MaintainerMessageReply/>
+                  {allowed("F08","BOSS")&&<MaintainerMessageReply/>}
                 </div>
                 <div className="boss-column">
                   <Panel title="当前模拟资料与角色">
@@ -930,7 +927,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
                 <div className="boss-workspace-extra">
                   <MaintainerSupplyQuality editor={importEditor} onEditorChange={updateImportEditor}/>
-                  <MaintainerApplicationSeed/>
+                  {allowed("F10","BOSS")&&<MaintainerApplicationSeed/>}
                 </div>
               </> : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                 key={page} role={role} pageId={page}
@@ -1016,18 +1013,18 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           <button type="button" onClick={() => setDirectoryOpen(false)} aria-label="关闭目录"><X size={19}/></button></header>
         <label className="boss-directory-search"><Search size={17}/><input autoFocus value={pageFilter}
           onChange={(e) => setPageFilter(e.target.value)} placeholder="搜索页面编号或名称"/></label>
-        <p>仅列出当前身份可见页面，开发中页面不会执行伪写入。</p>
+        <p>当前身份可使用的已交付功能。</p>
         <div className="boss-directory-list">
           {searchablePages.map(([id,p])=>
             <button type="button" key={id} onClick={() => navigate(id)} className={page===id?"selected":""}>
-              <span>{id} · {p.title}</span>
-              <Tag tone={PRODUCT_PAGES.has(id)?"green":"muted"}>{PRODUCT_PAGES.has(id)?"部分开发":"待实现"}</Tag>
+              <span>{id} · {deliveredPage(id,role,mvpScope)?.title??p.title}</span>
+              <Tag tone="green">可使用</Tag>
             </button>)}
           {searchablePages.length === 0 && <Quiet message="当前身份下无匹配页面。"/>}
         </div>
-        <footer><button type="button" onClick={() => navigate("NATIVE")}>
+        {allowed("NATIVE",role,mvpScope,priorityScope)&&<footer><button type="button" onClick={() => navigate("NATIVE")}>
           <MessageCircle size={16}/> 进入 nanobot 原生工作区
-        </button></footer>
+        </button></footer>}
       </section>
     </div>}
   </div>;

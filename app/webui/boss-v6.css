@@ -936,7 +936,6 @@
 .boss-login-welcome h1{font-size:clamp(32px,3.5vw,48px);line-height:1.3;letter-spacing:.02em;color:var(--boss-deep);margin:0}
 .boss-login-welcome p{margin:0;color:var(--boss-muted);max-width:380px}
 .boss-login-welcome>img{width:min(240px,70%);height:230px;object-fit:contain;align-self:center}
-.boss-login-local{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--boss-muted)}
 .boss-login-card{background:#FFFFFF;border:1px solid var(--boss-border);border-radius:14px;box-shadow:var(--boss-shadow);padding:32px;min-width:0}
 .boss-login-eyebrow{font-size:14px;color:var(--boss-blue);margin:0 0 8px}
 .boss-login-card h2{font-size:28px;line-height:36px;color:var(--boss-deep);margin:0 0 16px}
@@ -1010,6 +1009,7 @@
 .boss-v6 .boss-alert-records > summary { min-height: 44px; cursor: pointer; font-size: 16px; line-height: 24px; }
 .boss-v6 .boss-alert-source { white-space: pre-wrap; overflow-wrap: anywhere; }
 .boss-v6 .boss-alert-detail fieldset { display: grid; gap: 16px; }
+.boss-v6 .boss-unavailable { margin: 32px; max-width: 640px; font-size: 16px; line-height: 24px; }
 .boss-v6 .boss-fc04-reminders article[aria-current="true"] { outline: 2px solid var(--boss-focus); outline-offset: 2px; }
 .boss-v6 .boss-assignment-scope .boss-label,
 .boss-v6 .boss-assignment-scope label,

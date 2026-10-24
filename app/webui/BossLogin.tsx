@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ArrowRight, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import "./boss-v6.css";
 import "./boss-login.css";
 import { BootstrapAuthRequiredError, clearSavedSecret } from "@/lib/bootstrap";
 import type { BootstrapResponse } from "@/lib/types";
+import {deliveredPage} from "./delivered-navigation";
 
 let requestedRole: Role | null = null;
 
@@ -36,6 +37,7 @@ export function bossClearSavedSecret() {
 }
 
 type Role = "BOSS" | "MAINTAINER";
+type DesktopBridge={invoke:(request:Record<string,unknown>)=>Promise<Record<string,unknown>>};
 type Props = {
   mode?: "auth" | "loading" | "error";
   failed?: boolean; expired?: boolean; message?: string;
@@ -51,14 +53,25 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
   const [validation, setValidation] = useState("");
   const [assetError, setAssetError] = useState(false);
   const [pending, setPending] = useState(false);
+  const [helpOpen,setHelpOpen]=useState(false),[demoEnabled,setDemoEnabled]=useState(false),[injecting,setInjecting]=useState(false);
+  const accountEpoch=useRef(0);
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const input = useRef<HTMLInputElement>(null);
   const surface = useRef<HTMLElement>(null);
   const mascot = useRef<HTMLDivElement>(null);
   const submitted = useRef(false);
-  const busy = mode === "loading" || pending;
+  const busy = mode === "loading" || pending || injecting;
   const error = validation || (failed ? "登录状态已失效，请重新认证。" :
     mode === "error" ? message.includes("身份范围") ? "账号身份与当前入口不符。" : "无法完成认证连接，请检查本机服务后重新尝试。" : "");
+
+  useEffect(()=>{const epoch=++accountEpoch.current;const desktop=(window as Window&{bossDesktop?:DesktopBridge}).bossDesktop;if(desktop)void desktop.invoke({action:"status"}).then(status=>{if(epoch===accountEpoch.current)setDemoEnabled(status.demo_account_injection_supported===true);}).catch(()=>{if(epoch===accountEpoch.current)setValidation("无法核查本机测试入口，请使用手动输入。");});return()=>{accountEpoch.current++;};},[role]);
+  async function injectAccount(){
+    if(!demoEnabled||busy)return;const desktop=(window as Window&{bossDesktop?:DesktopBridge}).bossDesktop;
+    if(!desktop){setValidation("当前入口没有本机账号填充能力。");return;}
+    const epoch=accountEpoch.current;setInjecting(true);setValidation("");
+    await desktop.invoke({action:"test_account",role}).then(account=>{if(epoch!==accountEpoch.current)return;if(account.role!==role||typeof account.username!=="string"||typeof account.password!=="string"||!account.username||!account.password)throw new Error("测试账号返回范围无效");setUsername(account.username);setValue(account.password);setVisible(false);input.current?.focus();}).catch(failure=>{if(epoch===accountEpoch.current)setValidation(failure.message);});
+    if(epoch===accountEpoch.current)setInjecting(false);
+  }
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -225,7 +238,6 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
         <div className="boss-login-mascot-space">
           {reducedMotion && <img src="/boss-brand/dapeng-front.png" data-motion="reduced" alt="大鹏吉祥物" onError={() => setAssetError(true)}/>}
         </div>
-        <span className="boss-login-local"><ShieldCheck size={18} aria-hidden="true"/>本机桌面 · 身份分别核验</span>
       </section>
       <section className="boss-login-card" aria-labelledby="boss-login-title">
         <p className="boss-login-eyebrow">{expired ? "重新认证" : "欢迎使用"}</p>
@@ -252,6 +264,7 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
           </div>
           </div>
           {error && <p id="boss-login-error" role="alert" className="boss-login-error">{error}</p>}
+          {demoEnabled&&<button className="boss-login-secondary boss-login-test" type="button" disabled={busy} onClick={()=>void injectAccount()}>测试账号注入</button>}
           <button className="boss-login-submit" type="submit" disabled={busy}>
             {busy ? <Loader2 className="boss-spin" size={19}/> : <ArrowRight size={19}/>}
             {busy ? "正在登录…" : expired ? "重新认证" : "登录"}
@@ -260,15 +273,17 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
           {expired && <button className="boss-btn" type="button" onClick={() => window.location.reload()}>返回登录</button>}
         </form>
         <div className="boss-login-footer">
-        <button type="button" className="boss-login-maintenance" disabled={busy} onClick={() => {
-          setRole(current => current === "BOSS" ? "MAINTAINER" : "BOSS"); requestedRole = null;
+        <button type="button" className="boss-login-secondary boss-login-maintenance" disabled={busy} onClick={() => {
+          const nextRole=role==="BOSS"?"MAINTAINER":"BOSS";setRole(nextRole);requestedRole=null;
+          const url=new URL(window.location.href),selected=url.searchParams.get("bossPage");if(selected&&deliveredPage(selected,role)&&!deliveredPage(selected,nextRole)){url.searchParams.delete("bossPage");window.history.replaceState(null,"",url);}
           setValue(""); setUsername(""); setValidation(""); setVisible(false); input.current?.focus();
         }}>{role === "BOSS" ? "技术维护" : "返回本人登录"}</button>
-        <details className="boss-login-assistance"><summary>认证帮助</summary>
+        <button type="button" className="boss-login-secondary" disabled={busy} aria-expanded={helpOpen} aria-controls="boss-login-assistance" onClick={()=>setHelpOpen(current=>!current)}>认证帮助</button>
+        </div>
+        {helpOpen&&<section id="boss-login-assistance" className="boss-login-assistance" aria-label="认证帮助内容">
           <p>请使用本机初始化时提供的账号和密码。账号所属身份由服务端核验。</p>
           <p>本机服务需要保持运行。模型与语音服务需要相应网络连接。</p>
-        </details>
-        </div>
+        </section>}
         {assetError && <p role="alert" className="boss-login-error">品牌资源加载失败，请检查本机产品构建。</p>}
       </section>
     </div>
