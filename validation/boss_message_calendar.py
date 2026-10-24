@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from aiohttp import web
 
@@ -48,7 +49,7 @@ def _contact(api, db, data, contact_id):
     person = matches[0]
     # Current simulation business time, never a frozen historical meeting.
     business_clock = api.store.get(db, NS, "clock", "current")
-    today = datetime.fromisoformat(business_clock["at"]).date().isoformat()
+    today = datetime.fromisoformat(business_clock["at"]).astimezone(ZoneInfo(data["boss_profile"]["timezone"])).date().isoformat()
     require(person["valid_from"] <= today <= person["valid_until"],
             "当前资料未确认联系人仍然有效", web.HTTPForbidden)
     return person

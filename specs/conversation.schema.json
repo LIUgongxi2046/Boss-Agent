@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:conversation:1.0.0",
+  "$defs": {
+    "Id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "Context": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id"], "properties": {
+      "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"], "minLength": 1, "maxLength": 200}}},
+    "ArtifactInput": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id", "run_id", "kind", "id"], "properties": {
+      "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"], "minLength": 1, "maxLength": 200},
+      "run_id": {"$ref": "#/$defs/Id"}, "kind": {"enum": ["query", "task", "morning_list", "message", "message_draft"]}, "id": {"$ref": "#/$defs/Id"}}},
+    "Reference": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "recorded_version", "adoption_state"], "properties": {
+      "kind": {"enum": ["query", "task", "morning_list", "message", "message_draft"]}, "id": {"$ref": "#/$defs/Id"},
+      "recorded_version": {"type": ["string", "null"]}, "adoption_state": {"const": "REQUIRES_CURRENT_READ"}}},
+    "View": {"type": "object", "additionalProperties": false, "required": ["projection", "source_type", "session_id", "chat_id", "runs", "coverage_state", "missing_sources", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "projection": {"const": "conversation"}, "source_type": {"const": "RUNTIME_RECORD"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"]},
+      "runs": {"type": "array", "items": {"type": "object"}}, "coverage_state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "missing_sources": {"type": "array", "items": {"type": "string"}},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}}},
+    "ArtifactResult": {"type": "object", "additionalProperties": false, "required": ["source_type", "run_id", "session_id", "chat_id", "kind", "id", "data", "evidence", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "run_id": {"$ref": "#/$defs/Id"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"type": ["string", "null"]},
+      "kind": {"enum": ["query", "task", "morning_list", "message", "message_draft"]}, "id": {"$ref": "#/$defs/Id"}, "data": {"type": "object"}, "evidence": {"type": ["object", "null"]},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}}},
+    "Messages": {"type": "object", "additionalProperties": false, "required": ["projection", "source_type", "scope", "drafts", "sent_messages", "replies", "contacts", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "projection": {"const": "conversation-messages"}, "source_type": {"const": "SIMULATED"}, "scope": {"const": "OWNER_MESSAGE_HISTORY"},
+      "drafts": {"type": "array", "items": {"type": "object"}}, "sent_messages": {"type": "array", "items": {"type": "object"}}, "replies": {"type": "array", "items": {"type": "object"}}, "contacts": {"type": "array", "items": {"type": "object"}},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}}},
+    "Attachments": {"type": "object", "additionalProperties": false, "required": ["source_type", "session_id", "chat_id", "session_state", "attachments", "business_authorization_granted"], "properties": {
+      "source_type": {"const": "RUNTIME_RECORD"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"$ref": "#/$defs/Id"}, "session_state": {"enum": ["SAVED", "NO_SAVED_SESSION"]},
+      "attachments": {"type": "array", "items": {"$ref": "#/$defs/Attachment"}}, "business_authorization_granted": {"const": false}}},
+    "UploadMetadataResult": {"type": "object", "additionalProperties": false, "required": ["session_id", "attachment_ids", "metadata_saved", "business_authorization_granted"], "properties": {
+      "session_id": {"$ref": "#/$defs/Id"}, "attachment_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}}, "metadata_saved": {"const": true}, "business_authorization_granted": {"const": false}}},
+    "Attachment": {"type": "object", "additionalProperties": false, "required": ["attachment_id", "stored_name", "original_name", "mime_type", "size_bytes", "content_sha256", "processing_state", "user_message_index"], "properties": {
+      "attachment_id": {"$ref": "#/$defs/Id"}, "stored_name": {"type": "string"}, "original_name": {"type": ["string", "null"]}, "mime_type": {"type": ["string", "null"]},
+      "size_bytes": {"type": ["integer", "null"], "minimum": 0}, "content_sha256": {"type": ["string", "null"]}, "processing_state": {"enum": ["STORED", "MISSING"]},
+      "user_message_index": {"type": "integer", "minimum": 0}}}
+  }
+}

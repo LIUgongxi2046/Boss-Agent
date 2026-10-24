@@ -225,6 +225,14 @@ FC04事件采用boss_alert_policy.material的当前经营规则、资料与连�
 
 晨间覆盖资料由MorningInputAPI的明确维护动作载入，定义FC03-COVERAGE-1、seed20261024、用途FC03_PROGRAM_BEHAVIOR。生成作者、参数摘要、来源版本、访问范围、有效期限、地区原始as_of和未同步状态均保存；获准初始selection/1不变，真实企业资料、第三方授权与本人业务授权均为false。维护读取只返回定义和回执元信息，不读取本人晨间清单。新增对象kind复用当前objects，无DDL迁移；正式公共读取/命令、模型工具与界面由N2/N3接收。
 
+### MENU-N02 会话及消息读取
+
+conversation.schema.json 1.0.0定义当前Context、ArtifactInput、View、ArtifactResult、Messages及Attachments。ConversationAPI从同一读取事务的实际runtime_run按session_id/chat_id核查当前执行空间和数据集，只提取已保存工具结果及owner_task_links中的真实对象编号；普通运行投影不返回产物数值、问题正文或工具原始参数。读取产物前再次核查当前运行关联，并复用查询原文、任务来源和Morning清单的既有领域检查；取消或运行失败保持实际引用，来源失效不能重新采用原缓存正文。
+
+OWNER_MESSAGE_HISTORY表示本人消息历史范围，不自动宣称与当前会话关联。草稿、模拟发件箱、送达、回复及当前任务版本分别读取；附件在SQL访问范围核查后检查实际版本、有效性及传递依赖，失效时正文隐藏并保留历史状态。收件人仍使用稳定联系人ID；有效日期按本人业务IANA时区计算。原本人保存/发送与原编号回执机制保持，不新增授权或模型确认能力。
+
+ConversationAttachments只从原生SessionManager已保存user media读取获准媒体目录中的实际文件元信息，不解析正文，不接收客户端路径。attachment_id在会话及同一文件内保持，当前原生位置以user_message_index表达；文件缺少时保留引用且大小/摘要为null，目录外文件或符号链接拒绝。原生入口上传实际成功后，record_upload将实际选择的原名、MIME、文件大小和摘要保存至同一会话的boss_attachment_metadata；历史记录缺少原名时original_name保持null，元信息与文件内容变化时拒绝当前采用。该内部方法不开放任意路径请求或模型工具。STORED只说明文件存在，不能据此视为已处理的业务来源。没有DDL迁移或新的业务执行者，当前身份与原生会话归属由N3公开入口核查。
+
 ### FC02 正式经营边界场景
 
 FC02-BI-1 使用 specs/bi-scenarios.json 的固定参数与seed=20261024生成六类明确SIMULATED输入。维护通过BIScenarioAPI载入独立bi_scenario对象，不替换selection/1初始八条明细。场景保存owner、dataset、namespace、版本、生成参数摘要、用途、来源ID及严格Schema记录；资料作者明确为本地确定性生成器，没有真实企业或第三方授权声明。来源使用独立document及版本历史、访问范围、有效期与原文，只有当前允许资料进入新查询。query_source_binding为场景查询保存scenario_id、全部采用的document_snapshots及明细摘要；当前来源、明细或定义变化后拒绝采用，历史结果与原回执保持。不同财务/业务口径可以使用同期间、指标与单位分别查询准确来源，不根据职位选择数值。载入、CAS、幂等回执、来源历史与FTS更新在同一事务保存；普通审计仅记录动作和版本元信息。公开注册、维护界面及场景选择由N3接收。

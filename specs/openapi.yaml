@@ -8,6 +8,25 @@ security:
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
+x-menu-n02-conversation:
+  schema_version: 1.0.0
+  schema_extension: conversation.schema.json
+  read: ConversationAPI.read(BOSS, Context)
+  shared_transaction_read: ConversationAPI.project_in_transaction(BOSS, db, Context)
+  artifact: ConversationAPI.artifact(BOSS, ArtifactInput)
+  messages: ConversationAPI.messages(BOSS)
+  attachments: ConversationAttachments(native_sessions, approved_media_root).read(BOSS, Context)
+  accepted_upload_metadata: ConversationAttachments.record_upload(BOSS, Context, accepted_media, accepted_paths); internal native adapter only after successful upload; not a model tool or public path-input command
+  context: session_id and chat_id only; native authenticated session ownership checked by public adapter before domain call
+  run_binding: actual runtime_run namespace/dataset/session/chat and persisted tool_results or owner_task_links
+  artifact_references: query_id/task_id/list_id/message_id/draft_id from actual producer; current read required before adopting business content
+  source_adoption: existing query/evidence/task/morning domain checks; message attachment permission/version/validity and transitive dependencies
+  message_scope: OWNER_MESSAGE_HISTORY; not automatically assigned to the selected chat
+  message_states: existing draft/send/delivery/reply/task states retained independently; current invalid attachments hide body and keep historical identifiers
+  attachment_scope: native saved user media inside approved media root; real size/hash; no client filesystem path input; STORED is not business source authorization
+  original_filename: actual accepted original name/MIME/file hash stored in native session metadata; absent historical metadata remains null; file change rejects current read
+  mutation_policy: only accepted upload metadata stored in native session; no business writes or owner authorization; original message commands and original operation-status lookup reused
+  public_integration: PENDING_N2_N3
 x-fc04-business-alerts:
   schema_version: 1.0.0
   schema_extension: business-alert.schema.json
