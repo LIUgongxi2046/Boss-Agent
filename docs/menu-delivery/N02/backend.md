@@ -2,7 +2,7 @@
 
 task_id=MENU-N02-N1，当前附件工单MENU-N02-N1-NATIVE-FILE-20261024；来源为原始docs/menu-delivery/N02.md完整26项工单及D-MENU-DELIVERY-20261024。正式状态由N3维护specs/feature-delivery.json，本记录只登记领域阶段。当前PRODUCT核查HEAD为484dda57eeed3fe5e545eb91de21419b5a2bef81；PRODUCT仅作只读依赖，未运行其公开检查或预览。
 
-领域实施提交5f2138234353c5c224b3d0034d4c1565e6e8939b，分支codex/business，包含12份领域、规范、检查和记录文件。N2/N3按该准确增量接收，本记录的模块证据不代表公开注册、完整26项或用户验收通过。
+附件实施提交6164aac401712f397072fdfac788d04ffd91488a，分支codex/business，包含8份领域、Schema、对应检查和记录文件；已有领域基础提交5f2138234353c5c224b3d0034d4c1565e6e8939b。N3按本次准确附件增量接收，本记录的模块证据不代表完整26项或用户验收通过。原五项未提交内容继续保持。
 
 ## 当前依据与检索
 
