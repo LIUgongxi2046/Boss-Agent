@@ -90,6 +90,10 @@ check-menu-n02-task-entry.cjs及task-entry-ui.json在独立10811/10812/20811和1
 
 N4对def38c666c6b653aa939062540e692ba2dbd0e5a的关闭和文件指定增量结论为APPROVED/TARGETED_CLOSED，qa.md摘要79adf404cef54765f43ac94aa4ca9501dadf54f709d4d7ec1504aef45b3dfd07；完整菜单证据继续保持未完成。
 
+当前957c制品的native.json和close.json近邻回归通过，公共14条运行/15条原请求及同库重开、完整1.13.0 Schema、真实窗口关闭和app.quit保护均采用当前消费者。check-menu-n02-shared-layout.cjs及shared-layout.json同时通过：关联任务状态、共享F08编辑及业务D06各六组，尺寸1440×1000、1280×800、1024×768及200%缩放，实际按钮至少44×44、操作滚动后位于视口内、没有页面横向超出。D06键盘焦点实际为solid 3px、rgb(23,91,165)，未聚焦时outlineStyle为none；实际正文编辑保持，未发送消息。
+
+N4对73d40071b2cd0a88b6b7fa9f4fdd2d543daf3125和957c的任务入口及刷新关联指定增量结论为APPROVED，未发现该范围确定的必要实现缺陷；qa.md摘要32e92be87bdfc0a9472e4e4107b7c0120ac165194d1bddc2124903447f93797a。消息位置恢复、其他未验证路径及完整26项继续保留，不将限定审查转换为完整验收。
+
 ## 资料与运行
 
 保护原 UI02/MVP 及当前已交付 F01 的制品、账号、SQLite、会话、端口与用户窗口。新候选使用独立目录、制品和端口，不自动退出、重启、覆盖或热替换已有体验。受控账号注入仅填写当前角色表单，手动登录仍经正常认证。全部外部 SIMULATED_FIRST，无新增真实外部请求；STT/F27/FC28暂停。禁止主动视觉、截图、图像、/tmp、Git恢复和程序化修改源码。

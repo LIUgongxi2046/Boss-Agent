@@ -1,0 +1,1235 @@
+{
+  "status": "PASS",
+  "scope": "N02_BOUND_TASK_AND_SHARED_F08_D06_DOM",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-shared-layout-69f06d9c-3a71-4736-a2e3-504ec5d41ecc",
+  "ports": {
+    "business": 10821,
+    "webui": 10822,
+    "gateway": 20821
+  },
+  "manifest_sha256": "957cbd051c48adad90831a7753381f7db75beecdea54e1530c143045733fe823",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_bound_task_six_viewports",
+      "task_id": "a61f3a02-a678-4cac-b455-ba53ac655f95",
+      "task_version": "1",
+      "measurements": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 1,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 1440,
+            "innerHeight": 1000,
+            "documentWidth": 1440,
+            "bodyWidth": 1440
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 271,
+              "y": 366,
+              "width": 783,
+              "height": 44,
+              "right": 1054,
+              "bottom": 410,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 1110,
+              "y": 916,
+              "width": 268,
+              "height": 44,
+              "right": 1378,
+              "bottom": 960,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            },
+            {
+              "label": "查看最新进展",
+              "x": 1266,
+              "y": 439,
+              "width": 112,
+              "height": 44,
+              "right": 1378,
+              "bottom": 483,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 2,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 720,
+            "innerHeight": 500,
+            "documentWidth": 720,
+            "bodyWidth": 720
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 104.6328125,
+              "y": 323.6328125,
+              "width": 570.734375,
+              "height": 44,
+              "right": 675.3671875,
+              "bottom": 367.6328125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 104.6328125,
+              "y": 343.6328125,
+              "width": 570.734375,
+              "height": 44,
+              "right": 675.3671875,
+              "bottom": 387.6328125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            },
+            {
+              "label": "查看最新进展",
+              "x": 406.3671875,
+              "y": 343.6328125,
+              "width": 112,
+              "height": 44,
+              "right": 518.3671875,
+              "bottom": 387.6328125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 1280,
+            "innerHeight": 800,
+            "documentWidth": 1280,
+            "bodyWidth": 1280
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 269.359375,
+              "y": 364.359375,
+              "width": 626.28125,
+              "height": 44,
+              "right": 895.640625,
+              "bottom": 408.359375,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 951.640625,
+              "y": 479.359375,
+              "width": 268,
+              "height": 44,
+              "right": 1219.640625,
+              "bottom": 523.359375,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            },
+            {
+              "label": "查看最新进展",
+              "x": 1107.640625,
+              "y": 449.359375,
+              "width": 112,
+              "height": 44,
+              "right": 1219.640625,
+              "bottom": 493.359375,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 640,
+            "innerHeight": 400,
+            "documentWidth": 640,
+            "bodyWidth": 640
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 99,
+              "y": 332,
+              "width": 502,
+              "height": 44,
+              "right": 601,
+              "bottom": 376,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 99,
+              "y": 343.5,
+              "width": 502,
+              "height": 44,
+              "right": 601,
+              "bottom": 387.5,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            },
+            {
+              "label": "查看最新进展",
+              "x": 332,
+              "y": 343.5,
+              "width": 112,
+              "height": 44,
+              "right": 444,
+              "bottom": 387.5,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 1024,
+            "innerHeight": 768,
+            "documentWidth": 1024,
+            "bodyWidth": 1024
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 108.28125,
+              "y": 339.28125,
+              "width": 867.4375,
+              "height": 44,
+              "right": 975.71875,
+              "bottom": 383.28125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 108.28125,
+              "y": 505.28125,
+              "width": 867.4375,
+              "height": 44,
+              "right": 975.71875,
+              "bottom": 549.28125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            },
+            {
+              "label": "查看最新进展",
+              "x": 706.71875,
+              "y": 457.28125,
+              "width": 112,
+              "height": 44,
+              "right": 818.71875,
+              "bottom": 501.28125,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "name": "BOUND_TASK",
+          "layout": {
+            "innerWidth": 512,
+            "innerHeight": 384,
+            "documentWidth": 512,
+            "bodyWidth": 512
+          },
+          "bounds": [
+            {
+              "label": "返回关联任务",
+              "x": 99,
+              "y": 340,
+              "width": 374,
+              "height": 44,
+              "right": 473,
+              "bottom": 384,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            },
+            {
+              "label": "核查任务来源原文",
+              "x": 99,
+              "y": 340,
+              "width": 374,
+              "height": 44,
+              "right": 473,
+              "bottom": 384,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            },
+            {
+              "label": "查看最新进展",
+              "x": 204,
+              "y": 340,
+              "width": 112,
+              "height": 44,
+              "right": 316,
+              "bottom": 384,
+              "fontSize": "14px",
+              "lineHeight": "22px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(22, 88, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "check": "actual_shared_f08_six_viewports",
+      "source_id": "finance-note",
+      "source_version": "1",
+      "measurements": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 1,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 1440,
+            "innerHeight": 1000,
+            "documentWidth": 1440,
+            "bodyWidth": 1440
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 1077,
+              "y": 212,
+              "width": 98,
+              "height": 44,
+              "right": 1175,
+              "bottom": 256,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 352,
+              "y": 769.1875,
+              "width": 146,
+              "height": 46,
+              "right": 498,
+              "bottom": 815.1875,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            },
+            {
+              "label": " 重新读取",
+              "x": 1287,
+              "y": 288,
+              "width": 114,
+              "height": 46,
+              "right": 1401,
+              "bottom": 334,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 2,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 720,
+            "innerHeight": 500,
+            "documentWidth": 720,
+            "bodyWidth": 720
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 366.0078125,
+              "y": 210,
+              "width": 98,
+              "height": 44,
+              "right": 464.0078125,
+              "bottom": 254,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 194,
+              "y": 322.2265625,
+              "width": 146,
+              "height": 46,
+              "right": 340,
+              "bottom": 368.2265625,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            },
+            {
+              "label": " 重新读取",
+              "x": 576,
+              "y": 286,
+              "width": 114,
+              "height": 46,
+              "right": 690,
+              "bottom": 332,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 1280,
+            "innerHeight": 800,
+            "documentWidth": 1280,
+            "bodyWidth": 1280
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 917,
+              "y": 212,
+              "width": 98,
+              "height": 44,
+              "right": 1015,
+              "bottom": 256,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 352,
+              "y": 733.1875,
+              "width": 146,
+              "height": 46,
+              "right": 498,
+              "bottom": 779.1875,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            },
+            {
+              "label": " 重新读取",
+              "x": 1127,
+              "y": 252,
+              "width": 114,
+              "height": 46,
+              "right": 1241,
+              "bottom": 298,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "rgba(18, 107, 203, 0.08) 0px 2.11853px 7.06176px 0px",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 640,
+            "innerHeight": 400,
+            "documentWidth": 640,
+            "bodyWidth": 640
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 201,
+              "y": 189,
+              "width": 98,
+              "height": 44,
+              "right": 299,
+              "bottom": 233,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 129,
+              "y": 265.7265625,
+              "width": 146,
+              "height": 46,
+              "right": 275,
+              "bottom": 311.7265625,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            },
+            {
+              "label": " 重新读取",
+              "x": 506,
+              "y": 265.5,
+              "width": 114,
+              "height": 46,
+              "right": 620,
+              "bottom": 311.5,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 1024,
+            "innerHeight": 768,
+            "documentWidth": 1024,
+            "bodyWidth": 1024
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 670,
+              "y": 210,
+              "width": 98,
+              "height": 44,
+              "right": 768,
+              "bottom": 254,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 194,
+              "y": 456.1875,
+              "width": 146,
+              "height": 46,
+              "right": 340,
+              "bottom": 502.1875,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            },
+            {
+              "label": " 重新读取",
+              "x": 880,
+              "y": 286,
+              "width": 114,
+              "height": 46,
+              "right": 994,
+              "bottom": 332,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            }
+          ]
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "name": "SHARED_F08",
+          "layout": {
+            "innerWidth": 512,
+            "innerHeight": 384,
+            "documentWidth": 512,
+            "bodyWidth": 512
+          },
+          "bounds": [
+            {
+              "label": "返回原会话",
+              "x": 21,
+              "y": 234.25,
+              "width": 98,
+              "height": 44,
+              "right": 119,
+              "bottom": 278.25,
+              "fontSize": "11px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(45, 98, 151)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            },
+            {
+              "label": " 保存当前草稿",
+              "x": 129,
+              "y": 257.4765625,
+              "width": 146,
+              "height": 46,
+              "right": 275,
+              "bottom": 303.4765625,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            },
+            {
+              "label": " 重新读取",
+              "x": 378,
+              "y": 257.25,
+              "width": 114,
+              "height": 46,
+              "right": 492,
+              "bottom": 303.25,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "check": "actual_shared_d06_six_viewports_visible_focus",
+      "measurements": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 1,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 1440,
+            "innerHeight": 1000,
+            "documentWidth": 1440,
+            "bodyWidth": 1440
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 461,
+              "y": 527,
+              "width": 124,
+              "height": 46,
+              "right": 585,
+              "bottom": 573,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(23, 91, 165)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 594,
+              "y": 527,
+              "width": 140,
+              "height": 46,
+              "right": 734,
+              "bottom": 573,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1440,
+              "innerHeight": 1000
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "3px",
+            "outlineColor": "rgb(23, 91, 165)",
+            "outlineOffset": "0px",
+            "boxShadow": "none"
+          }
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 1000
+          },
+          "zoom": 2,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 720,
+            "innerHeight": 500,
+            "documentWidth": 720,
+            "bodyWidth": 720
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 101,
+              "y": 277,
+              "width": 124,
+              "height": 46,
+              "right": 225,
+              "bottom": 323,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "solid",
+              "outlineWidth": "2px",
+              "outlineColor": "rgb(14, 97, 212)",
+              "outlineOffset": "2px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 234,
+              "y": 277,
+              "width": 140,
+              "height": 46,
+              "right": 374,
+              "bottom": 323,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 720,
+              "innerHeight": 500
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "outlineColor": "rgb(10, 100, 231)",
+            "outlineOffset": "2.5px",
+            "boxShadow": "none"
+          }
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 1280,
+            "innerHeight": 800,
+            "documentWidth": 1280,
+            "bodyWidth": 1280
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 381,
+              "y": 427,
+              "width": 124,
+              "height": 46,
+              "right": 505,
+              "bottom": 473,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "solid",
+              "outlineWidth": "2px",
+              "outlineColor": "rgb(12, 98, 220)",
+              "outlineOffset": "2px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 514,
+              "y": 427,
+              "width": 140,
+              "height": 46,
+              "right": 654,
+              "bottom": 473,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1280,
+              "innerHeight": 800
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "outlineColor": "rgb(10, 100, 231)",
+            "outlineOffset": "2px",
+            "boxShadow": "none"
+          }
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 640,
+            "innerHeight": 400,
+            "documentWidth": 640,
+            "bodyWidth": 640
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 51,
+              "y": 227,
+              "width": 124,
+              "height": 46,
+              "right": 175,
+              "bottom": 273,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "solid",
+              "outlineWidth": "2px",
+              "outlineColor": "rgb(14, 97, 212)",
+              "outlineOffset": "2px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 184,
+              "y": 227,
+              "width": 140,
+              "height": 46,
+              "right": 324,
+              "bottom": 273,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 640,
+              "innerHeight": 400
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "outlineColor": "rgb(10, 100, 231)",
+            "outlineOffset": "2.5px",
+            "boxShadow": "none"
+          }
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 1024,
+            "innerHeight": 768,
+            "documentWidth": 1024,
+            "bodyWidth": 1024
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 253,
+              "y": 411,
+              "width": 124,
+              "height": 46,
+              "right": 377,
+              "bottom": 457,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "solid",
+              "outlineWidth": "2px",
+              "outlineColor": "rgb(14, 97, 212)",
+              "outlineOffset": "2px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 386,
+              "y": 411,
+              "width": 140,
+              "height": 46,
+              "right": 526,
+              "bottom": 457,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 1024,
+              "innerHeight": 768
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "outlineColor": "rgb(10, 100, 231)",
+            "outlineOffset": "2px",
+            "boxShadow": "none"
+          }
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "name": "D06",
+          "layout": {
+            "innerWidth": 512,
+            "innerHeight": 384,
+            "documentWidth": 512,
+            "bodyWidth": 512
+          },
+          "bounds": [
+            {
+              "label": "返回继续编辑",
+              "x": 36,
+              "y": 219,
+              "width": 124,
+              "height": 46,
+              "right": 160,
+              "bottom": 265,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "solid",
+              "outlineWidth": "2px",
+              "outlineColor": "rgb(14, 97, 212)",
+              "outlineOffset": "2px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            },
+            {
+              "label": "放弃草稿并离开",
+              "x": 169,
+              "y": 219,
+              "width": 140,
+              "height": 46,
+              "right": 309,
+              "bottom": 265,
+              "fontSize": "16px",
+              "lineHeight": "24px",
+              "outlineStyle": "none",
+              "outlineWidth": "3px",
+              "outlineColor": "rgb(255, 255, 255)",
+              "outlineOffset": "0px",
+              "boxShadow": "none",
+              "innerWidth": 512,
+              "innerHeight": 384
+            }
+          ],
+          "keyboard_focus": {
+            "label": "返回继续编辑",
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "outlineColor": "rgb(11, 100, 229)",
+            "outlineOffset": "2.5px",
+            "boxShadow": "none"
+          }
+        }
+      ]
+    }
+  ]
+}
