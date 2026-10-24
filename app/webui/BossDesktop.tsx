@@ -65,6 +65,7 @@ const navigationGraphics:Record<string,ReactNode>={
   N06:<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/>,
 };
 function ReferenceNavigationIcon({id}:{id:string}){const graphic=navigationGraphics[id];if(!graphic)throw new Error("当前聊天导航缺少原稿图形");return <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{graphic}</svg>;}
+function ReferenceHeaderIcon({kind}:{kind:"search"|"notification"}){return <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind==="search"?<><circle cx="11" cy="11" r="7"/><path d="m16.4 16.4 5 5"/></>:navigationGraphics.N06}</svg>;}
 type DesignPage = {
   title: string; summary: string; technical: boolean; module: string;
   filters: string[]; fields: string[]; sections: string[];
@@ -608,14 +609,14 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             <button className="boss-mobile-menu" type="button" onClick={openDirectory}
               aria-label="打开页面目录"><Menu size={19}/></button>
             <button className="boss-search" type="button" onClick={openDirectory}>
-              <Search size={17}/><span>{(mvpScope||priorityScope)?"查找当前可用入口":"搜索页面、经营专题、任务入口…"}</span><kbd>⌘ K</kbd>
+              {page==="F01"&&referenceMenu?<ReferenceHeaderIcon kind="search"/>:<Search size={17}/>}<span>{(mvpScope||priorityScope)?"查找当前可用入口":"搜索页面、经营专题、任务入口…"}</span><kbd>⌘ K</kbd>
             </button>
             {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(page==="F01")guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
               {!referenceMenu&&<Tag tone="blue">本地桌面开发版</Tag>}
               <Tag tone="amber">模拟业务资料</Tag>
               {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
-                onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}><Bell size={18}/></button>
+                onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}>{page==="F01"&&referenceMenu?<ReferenceHeaderIcon kind="notification"/>:<Bell size={18}/>}</button>
               }
               <button type="button" className="boss-user" onClick={requestLogout} title="退出当前身份">
                 <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>

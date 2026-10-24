@@ -37,15 +37,22 @@ def main():
     ids = {f"MENU-F01.C{index:02}" for index in range(1, 19)}
     if set(delivery["checkpoint_development_evidence"]) != ids:
         raise ValueError("今日工作检查点范围不符")
-    if delivery["development_covered_checkpoints"] != 18 or delivery["user_verified_checkpoints"] is not None:
+    if delivery["status"] != "DEVELOPED_PENDING_USER_ACCEPTANCE" or delivery["development_covered_checkpoints"] != 18 or delivery["user_verified_checkpoints"] is not None:
         raise ValueError("开发与用户验收计数不符")
     if any(row["status"] != "COVERED" for row in delivery["checkpoint_development_evidence"].values()):
         raise ValueError("必要开发证据尚未完整登记")
+    if state["development_covered_checkpoints"] != 18 or state["verified_checkpoints"] is not None or {row["id"] for row in state["checkpoints"]} != ids or any(row["development_status"] != "COVERED" or row["status"] != "PENDING_USER_ACCEPTANCE" for row in state["checkpoints"]):
+        raise ValueError("正式18项与交付记录不一致")
+    review = delivery["directed_review"]
+    if review["status"] != "CLOSED_IN_SPECIFIED_SCOPE" or review["remaining_ids"] or review["full_menu_independent_pass_required"] is not False or review["independent_product_run"] is not False:
+        raise ValueError("必要设计复核范围或关闭状态不符")
+    if digest(Path(review["record"])) != review["sha256"]:
+        raise ValueError("必要设计复核记录摘要不符")
     manifest = digest(DIST / "asset-manifest.json")
     if delivery["manifest_sha256"] != manifest or delivery["index_sha256"] != digest(DIST / "index.html"):
         raise ValueError("今日工作交付记录没有采用当前制品")
     reports = {}
-    for name in ("rework-design.json", "rework-behavior.json", "rework-native.json", "rework-launcher.json"):
+    for name in ("rework-design.json", "rework-header.json", "rework-dialogs.json", "rework-behavior.json", "rework-native.json", "rework-launcher.json"):
         report = json.loads((EVIDENCE / name).read_text())
         if report["status"] != "PASS" or report["manifest_sha256"] != manifest:
             raise ValueError("当前必要检查没有采用准确制品：" + name)

@@ -225,8 +225,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
       </BossToday>
       <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>交给 Boss Agent</h2></div></header>
-        <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-sr-only" htmlFor="morning-question">晨间问题</label>
-          <textarea id="morning-question" aria-label="晨间问题" placeholder="今天有哪些事项需要本人决定、协调或知晓？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
+        <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-f01-entry-label" htmlFor="morning-question">本次需求</label>
+          <textarea id="morning-question" placeholder="今天有哪些事项需要本人决定、协调或知晓？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
           <div className="boss-f01-entry-actions"><button className="boss-btn" type="button" disabled title="语音输入暂停">语音输入</button><button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
           <p className="boss-helper">当前入口整理晨间事项。交办创建、发送与确认分别由本人决定。</p>
           {busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消会话交接</button>}
