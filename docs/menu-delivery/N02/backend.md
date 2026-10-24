@@ -1,6 +1,6 @@
 # MENU-N02-N1 聊天交办领域
 
-task_id=MENU-N02-N1，当前任务引用工单MENU-N02-N1-TASK-REFERENCES-20261024；来源为原始docs/menu-delivery/N02.md完整26项工单及D-MENU-DELIVERY-20261024，当前增量对应C07/C10/C11。正式状态由N3维护specs/feature-delivery.json，本记录只登记领域阶段。当前准确PRODUCT依赖提交为9c3caf80651fc74e1c0286fa5f946b96fc6d360e；PRODUCT仅作只读依赖，未运行其公开检查或预览。
+task_id=MENU-N02-N1，当前任务入口工单MENU-N02-N1-TASK-ENTRY-CONTEXT-20261025；来源为原始docs/menu-delivery/N02.md完整26项工单及D-MENU-DELIVERY-20261024，当前增量对应C07及相关C10/C11/C20—C22。正式状态由N3维护specs/feature-delivery.json，本记录只登记领域阶段。当前准确PRODUCT接口依据为ba1fbde64ebe0a5ccf28f6515bd61dd63324dd05，检查时HEAD为bd0f88766dcd7d9aac160803ff0772045d35fc09，相关正式依赖与ba1fbde相同；PRODUCT仅作只读依赖，未运行其公开检查或预览。
 
 附件实施提交6164aac401712f397072fdfac788d04ffd91488a，主记录提交e8bf27c591e0b1210e5ac952e2023d2b1ef10b75；已有领域基础提交5f2138234353c5c224b3d0034d4c1565e6e8939b。分支codex/business，本记录的模块证据不代表完整26项或用户验收通过。原五项未提交内容继续保持。
 
@@ -13,6 +13,8 @@ task_id=MENU-N02-N1，当前任务引用工单MENU-N02-N1-TASK-REFERENCES-202610
 已完整读取适用AGENTS、N02工单、PRD当前决定、完整产品FR-08/24/29及BR/AC、原N02页面与原始提示词、实际chat面板。共同BR-C01—C07/E01—E06及交互规范沿用本轮当前读取内容。S008任务记录、执行规则及接口改动检查继续采用。检索现有消息/联系人/草稿/发送/回复、任务/来源/授权、runtime_run与原生会话/附件代码，读取T18-message-calendar及相关字段规范。记忆索引没有相关命中。
 
 当前任务引用增量核查了9c3caf8的正式NativeConversationAgent、ConversationPlanner、ConversationDomainReadTool、ConversationRuntimeHook和已有本人任务创建/来源采用服务。实际Planner读取指定任务时调用conversationRead record(task)，正式Hook保存task_id/task_version；这些真实工具结果进入context_references的TOOL_RESULT关系。来源规则直接采用source_validity、external_adoption以及SimulationAPI的当前对象/传递引用保护。只投影input_sha256/allowed_call_refs/references三项获准上下文元信息，其他意图字段不进入本接口。当前索引docs/development/index.md已具有本主记录的唯一条目，路径保持。
+
+本次读取PRODUCT的F06任务入口、现有原生晨间绑定及一般Native会话采用链路，核查当前本人任务创建、assignment_source_binding、来源完整摘要/时间/传递采用检查、原生SessionManager快照及会话生命周期。任务入口固定当前展示任务版本及当前正式来源；身份、原生附着和实际新会话由N3在公共入口验证，领域不接收客户端owner/namespace/dataset。采用已有ConversationAPI和Store的同一任务/来源核查，新建记录仅限上下文准备与绑定。
 
 当前PRODUCT的boss_message_calendar.py与本目录相同。正确的版本化草稿、稳定联系人ID、独立模拟发送、原回执和reply_to回复继续复用，不创建第二份消息状态。当前消息正文及附件由本人入口处理，技术维护不能代签。未触及原五项未提交授权消费内容，也不编辑公共Page/Command/RoleChannel/Shell/认证。
 
@@ -28,17 +30,38 @@ ConversationAPI提供当前会话/运行/业务产物及消息来源的只读投
 
 ## 正式接口及字段
 
-规范为specs/conversation.schema.json 1.2.0，当前任务引用直接复用已有字段，本次没有修改Schema。领域只更新boss_conversation_references.py的真实任务工具结果采用，并更新对应用例、检查证据及本记录。ConversationAPI、ConversationReferences和附件接口签名保持。公开适配仍采用PRODUCT的PublicConversation，公开Schema、页面字段及正式接收状态由N3维护。没有新增消息写入动作、授权、调度或DDL迁移，没有模型本人确认工具。
+规范为specs/conversation.schema.json 1.3.0，新增严格TaskEntry输入、准备、绑定读取及原回执定义，既有1.2.0投影字段保持。新增boss_conversation_task_entry.py，ConversationAPI增加task_entry(native_sessions)工厂及内部task_in_transaction读取；既有artifact的任务分支复用该读取。ConversationAPI(store)、ConversationReferences及附件已有签名保持。公开适配、页面字段及正式接收状态由N3维护。没有新增消息写入动作、授权、调度或DDL迁移，没有模型本人确认工具。
 
 | 签名 | 输入及输出 | 当前边界 |
 |---|---|---|
 | ConversationAPI(store).read(BOSS,query) | Context={session_id,chat_id}；View={projection,source_type,session_id,chat_id,runs,coverage_state,missing_sources,business_authorization_granted,business_mutation_performed} | 只读取实际runtime_run，同一namespace/dataset/session/chat；没有实际运行时UNAVAILABLE，原生历史和未发送内容仍由原生系统维护 |
 | ConversationAPI.project_in_transaction(BOSS,db,query) | 相同Context和View | 公共Page已持有只读事务时调用，保持当前快照；不会另开写入事务 |
+| ConversationAPI(store).task_entry(native_sessions) | 返回ConversationTaskEntry(conversation,native_sessions) | native_sessions必须为实际原生会话服务，领域不创建第二会话或AgentLoop |
+| ConversationAPI.task_in_transaction(db,trusted_context,task_id,version=None) | 内部当前任务读取 | 同一事务检查任务编号、namespace、现有owner/dataset及assignment_source_binding；显式version必须相符，来源时间/版本/摘要/传递采用仍由现有Store核查 |
 | ConversationReferences(store).project_in_transaction(db,trusted_context,run) | 领域内部构造器；返回ContextReference数组 | 仅由已核查会话归属的ConversationAPI调用，输入来自当前正式空间及实际Runtime；没有公开任意对象ID入口 |
 | ConversationAPI.artifact(BOSS,query) | ArtifactInput=Context+run_id/kind/id；kind=query/task/morning_list/message/message_draft。ArtifactResult返回实际data/evidence及false授权/变更标记 | 先核查实际运行引用，再读取当前正式对象；不从模型正文、标题、任意ID或客户端归属建立关联 |
 | ConversationAPI.messages(BOSS) | Messages={projection,source_type,scope=OWNER_MESSAGE_HISTORY,drafts,sent_messages,replies,contacts,false授权/变更标记} | 本人消息历史抽屉，不自动表示与当前会话关联。草稿、发件箱、送达、reply_to、当前任务状态分别读取 |
 | ConversationAttachments(native_sessions,approved_media_root).read(BOSS,query) | 原生websocket Context；Attachments={source_type,session_id,chat_id,session_state,attachments,false授权标记} | 读取可信上传引用及实际已保存user.media；目录及符号链接检查后读取实际大小和摘要，不接收客户端路径或解析正文 |
 | ConversationAttachments.record_upload(BOSS,query,accepted_media,accepted_paths) | Context及原生上传实际成功的输入/返回路径；UploadMetadataResult={session_id,attachment_ids,metadata_saved=true,business_authorization_granted=false} | 仅可信原生入口内部调用，保存真实原名/MIME/大小/摘要至同一Session.metadata；不注册模型工具或接收客户端路径的公共命令 |
+
+### 当前任务进入会话的领域接口
+
+服务构造为entry=ConversationAPI(store).task_entry(native_sessions)。四个操作的role参数只由公共可信认证主体提供；payload不包含身份、执行空间、任意来源或文件路径。新增Schema均在conversation.schema.json的$defs中。
+
+| 精确签名 | 输入Schema与字段 | 输出Schema及职责 |
+|---|---|---|
+| entry.prepare(BOSS,payload) | TaskEntryPrepare={client_request_id,task_id,task_version} | TaskEntryPreparation；核查当前展示版本及正式来源后，固定本次选择。client_request_id为8—128位[A-Za-z0-9_.-]，重复相同原请求返回原记录，异内容409 |
+| entry.bind(BOSS,payload) | TaskEntryBind={client_request_id,preparation_id,preparation_sha256,chat_id} | TaskEntryPreparation；client_request_id使用prepare的原编号，session_id由原生webui_session_key计算。只绑定实际存在且尚未保存消息/运行/原意图/其他入口的会话；原准备只对应一个会话，一个会话只对应一个入口 |
+| entry.read(BOSS,query) | TaskEntryNativeContext={session_id,chat_id} | TaskEntryContext；没有该入口绑定时UNBOUND、entry=null、references=[]；BOUND时在当前事务重新核查固定任务、来源及实际原生会话实例，提供Native可采用引用 |
+| entry.receipt(BOSS,payload) | TaskEntryReceiptInput={client_request_id} | TaskEntryReceipt；只读原请求结果，outcome=RECORDED或NOT_FOUND_IN_CURRENT_STORE，保存的entry.current_use_verified恒为false，来源过期或对象变化后仍可核查历史选择 |
+
+TaskEntryPreparation严格包含source_type=RUNTIME_RECORD、preparation_id、client_request_id、preparation_sha256、prepared_at、bound_at、binding_state=PREPARED/BOUND、context、task_reference、source_references、return_reference、current_use_verified及false业务授权/业务变更标记。PREPARED的context/bound_at为null，BOUND保存真实{session_id,chat_id}和实际绑定时间。task_reference={kind:task,id,version}保留选定版本；source_references逐项为{kind:document,id,version,content_sha256}，摘要使用business.checksum(document)，覆盖完整正式document对象，包含纪要原始依据时也固定该引用。return_reference={page_id:F06,task_id,task_version}供公共页面返回原选定任务；原文仍按来源ID通过已有本人入口重验。
+
+TaskEntryContext严格包含source_type、session_id、chat_id、binding_state=UNBOUND/BOUND、entry、references、current_use_verified及false业务授权/业务变更标记。references为原task_reference及source_references的kind/id/version数组，可直接转换为Native可信上下文引用。current_use_verified只表示本次读取事务的检查结果；每轮采用及执行步骤需要重新读取，不提供后续业务动作授权。TaskEntryReceipt包含原client_request_id、outcome及可空entry；回执不重新核查当前采用资格，返回历史记录时明确current_use_verified=false。
+
+内部objects新增conversation_task_preparation和conversation_task_binding两类记录。准备按当前namespace及原请求编号确定唯一ID，保存服务端owner/dataset、原输入摘要、完整任务摘要、assignment_source_binding摘要和来源固定引用；preparation_sha256覆盖这些不可改变内容。绑定与准备状态在同一BEGIN IMMEDIATE事务中写入，固定实际chat/session及SDK会话created_at。原生会话被删除或同名重建后，原绑定停止当前采用，原回执继续存在。新的明确选择需要新原请求及新原生会话，已有绑定不被覆盖。
+
+任务版本变化、来源换版、同版本内容或采用绑定变化返回409；来源撤销/到期沿用正式410；匿名401、维护403、额外字段400、错误归属403；实际原生会话缺少404，已承接其他事项或会话实例变化409。失败不改写原固定引用，不自动采用新版本。prepare/bind只写上述上下文记录，read/receipt不写入；任务、发件箱、审批、授权、业务审计及业务幂等记录保持。
 
 runs逐项包含实际run_id/session_id/request_id/chat_id/turn_id、configuration_id/configuration_version、status/stop_reason/started_at/finished_at；runtime仅保留provider/model_id/api_type/max_tool_rounds/max_output_tokens/timeout/config_sha256。tool_steps保留tool_id/tool_call_id/iteration/status/task_status/version/task_version及实际存在的source_id，tool_errors仅保留工具引用及error_type。没有问题正文、原始工具参数、文件路径、内部推理或预设百分比。运行source_type及external_model_invoked按实际记录提供，未知保持null。
 
@@ -70,6 +93,16 @@ artifact在原有实际结果关系之外，允许读取同一实际Runtime已�
 STORED说明当前文件存在且已保存摘要与大小一致；仅有原生media且没有上传元信息时，不声称已知上传版本。CHANGED表示当前文件与已保存上传版本不同，size_bytes/content_sha256提供当前值，recorded_size_bytes/recorded_content_sha256保留上传时值。MISSING用于已知引用对应文件缺失，当前大小和摘要为null，原名、类型、编号及上传记录继续可读。REFERENCE_UNAVAILABLE用于历史记录无法确认文件引用，stored_name、当前位置和当前摘要均为null，原名、类型、编号及上传记录保持。读取期间文件变化在当前位置抛出错误。输出不包含本地路径或文件正文，全部状态均不授予业务来源资格。
 
 ## 当前证据
+
+2026-10-25，任务入口及受影响领域检查18项通过，用时8.32秒，证据task-entry-check.xml。14项覆盖当前准备/绑定/持久读取、实际SDK采用、任务和来源变化、已存在原生晨间入口、会话删除重建、原请求与绑定并发及角色/注入边界；4项核查原有任务详情、会话/运行/身份、来源投影及完整Schema。N1基点2f7c48ea0a17e5b114583067cfa7f35b28b6a04d，数据及SDK会话均在已忽略.work/pytest-menu-n02-task-entry-delivery，显式独立sessions_root。没有运行用户实例或PRODUCT公共检查。
+
+本人通过正式BossCommandAPI创建真实任务，领域准备固定当前版本和来源，绑定原生SessionManager实际保存的空会话，再由全新Store/SessionManager重读。既有真实Nanobot/AgentLoop及ConversationRuntimeRecorder消费read.references，运行保存的conversation_context.references与绑定返回完全相同，SDK消息保存于同一目标原生会话；再次绑定同一原请求仍复用原结果。业务对象、audit及idempotency在准备、绑定和读取前后保持一致，SDK只按原职责新增真实Runtime技术记录。没有手工写入运行对象或编造来源事实。
+
+来源时效和换版使用获准supply-quality-v1.yaml的正式导入、本人协调Command服务及原始来源更新；原任务版本和完整固定引用在失败后保持，当前采用停止，历史回执仍可读取。任务版本变化使用本人正式模拟发送；新选择必须明确提交新版本和原请求。实际晨间绑定阻止任务入口接管同一会话；SessionManager真实删除及同名重建阻止沿用旧绑定。并发准备返回同一原记录，并发不同准备绑定同一会话仅允许一个结果；匿名、维护、owner/namespace等额外字段及错误请求/摘要被拒绝。git diff --check通过。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 MENU_N02_PRODUCT_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent PYTHONPATH=/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation validation/.venv/bin/python -m pytest -q app/tests/test_menu_n02_task_entry.py app/tests/test_menu_n02_context_references.py::test_current_task_context_uses_formal_object_and_source_versions app/tests/test_menu_n02_context_references.py::test_context_projection_rejects_roles_injection_and_other_session_or_run app/tests/test_menu_n02_context_references.py::test_actual_sdk_source_context_preserves_history_and_current_metadata app/tests/test_menu_n02_domain.py::test_conversation_schema_and_read_operations_grant_no_business_authority --basetemp=.work/pytest-menu-n02-task-entry-delivery -p no:cacheprovider --junitxml=docs/menu-delivery/N02/task-entry-check.xml --tb=short
+```
 
 2026-10-25，本次任务引用限定检查6项通过，用时8.17秒，正式证据task-reference-check.xml。其中3项使用准确9c3caf8的NativeConversationAgent、原始Planner、七项正式工具、原事件生产者及实际Nanobot/AgentLoop读取真实任务；另外3项验证既有任务上下文、会话/运行/身份及来源投影。N1代码基点d8be22994d972c5c44ff254eaa7dcece2a89333f，全部数据与SDK会话位于已忽略.work/pytest-menu-n02-task-reference-sdk-final；没有运行PRODUCT服务或公开检查，没有采用运行中的未提交模块。
 
@@ -109,7 +142,7 @@ native-file-snapshot-check.json记录对N1实际SDK已保存历史快照的只�
 
 2026-10-24，PRODUCT消费检查6项通过、1项有意不在该组执行，用时5.85秒，原始证据product-domain-check.xml。N1本地和既有消息/日历消费者17项通过、2项Runtime消费不在该组执行，用时1.84秒，证据message-domain-check.xml。两组共享部分边界用例，数量不相加作为菜单完成分子。当前附件原名/类型保存及输出Schema另由2项定向检查通过，用时1.97秒，证据source-attachment-check.xml；运行原型证据保存在已忽略.work，正式结果分别保存。git diff --check通过。
 
-PRODUCT依赖目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，只读；十八项上下文检查采用2260000b89414727afcf2720bfa993fc7a601296。本次六项任务引用检查固定采用9c3caf80651fc74e1c0286fa5f946b96fc6d360e的原始Conversation模块，其他正式依赖与该提交相同，没有采用未提交的Native/Planner内容。没有修改该目录。PYTHONDONTWRITEBYTECODE=1禁止在依赖目录生成缓存。当前Nanobot来自N1 validation/.venv的已安装版本，使用真实AgentLoop/ToolRegistry、ConversationRuntimeRecorder、Fc02Tool/Fc02RuntimeRecorder及明确SIMULATED生产者，实际调用正式读取或查询工具并消费其结果；socket.connect审计拒绝外部连接，没有读取凭据或调用真实模型。
+PRODUCT依赖目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，只读；上下文检查采用2260000b89414727afcf2720bfa993fc7a601296，任务工具引用检查固定采用9c3caf80651fc74e1c0286fa5f946b96fc6d360e，当前任务入口检查采用与ba1fbde64ebe0a5ccf28f6515bd61dd63324dd05相同的正式依赖。没有修改该目录或采用运行中的未提交模块。PYTHONDONTWRITEBYTECODE=1禁止在依赖目录生成缓存。当前Nanobot来自N1 validation/.venv的已安装版本，使用真实AgentLoop/ToolRegistry、ConversationRuntimeRecorder、Fc02Tool/Fc02RuntimeRecorder及明确SIMULATED生产者，实际调用正式读取或查询工具并消费其结果；socket.connect审计拒绝外部连接，没有读取凭据或调用真实模型。
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 MENU_N02_PRODUCT_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent PYTHONPATH=/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation validation/.venv/bin/python -m pytest -q app/tests/test_menu_n02_native_files.py app/tests/test_menu_n02_domain.py::test_native_attachment_metadata_uses_saved_session_and_actual_file app/tests/test_menu_n02_domain.py::test_native_attachment_symlink_cannot_read_outside_approved_media app/tests/test_menu_n02_domain.py::test_conversation_schema_and_read_operations_grant_no_business_authority app/tests/test_menu_n02_domain.py::test_current_conversation_adopts_only_actual_run_references_and_current_source --basetemp=.work/pytest-menu-n02-native-file-delivery -p no:cacheprovider --junitxml=docs/menu-delivery/N02/native-file-check.xml --tb=short
@@ -135,9 +168,11 @@ env PYTHONDONTWRITEBYTECODE=1 validation/.venv/bin/python -m pytest -q app/tests
 
 ## N2/N3接收及未完成范围
 
-当前任务引用增量只需接收boss_conversation_references.py及对应证据。构造器、读取签名、Schema 1.2.0和字段结构保持。N3继续消费runs[].context_references中的kind=task、support.origin=TOOL_RESULT、实际tool_id/tool_call_id、历史/当前版本及source_refs；conversationRead表示读取既有任务，不增加任务创建声明。当前唯一菜单仍为N02，全部26项、F01必要设计返修及用户验收继续由N3维护，本次不编辑正式状态。
+本次N3需要接收boss_conversation.py、新增boss_conversation_task_entry.py及conversation.schema.json 1.3.0。N3从F06当前选定task_id和实际展示版本调用prepare，保存原请求编号及准确准备结果；随后使用现有原生服务创建并保存本次实际新会话，核查当前本人认证及附着后调用bind。绑定完成后进入该真实N02会话，返回任务采用return_reference，来源返回使用固定source_references。公共入口不得把客户端role/owner/namespace作为可信输入；需在操作前后检查认证及附着，并在首次会话提交前完成绑定。
 
-本次N3需要接收boss_conversation.py、boss_conversation_references.py、conversation.schema.json 1.2.0，构建必须包含新增领域模块。ConversationAPI构造器和公开read/artifact输入签名保持，当前View增加runs[].context_references、origin_references.conversation_context及实际tool_steps.source_id。N3按上述严格字段展示历史版本、当前可访问版本、采用状态和实际支持关系，来源失效时保留历史运行及引用，来源正文继续使用现有本人来源入口。仅上下文明确关联的受支持对象可使用现有artifact详情入口。公开Page/Command/RoleChannel/App、公开Runtime Schema及唯一菜单状态由N3维护，本次没有编辑这些文件。
+N2后续在该精确chat/session读取entry.read，检查BOUND/current_use_verified后，将references中的固定任务和document版本加入本轮可信上下文，并在每轮、模型步骤及工具采用前后重新核查；现有Native对任务种类的采用由N2按准确接口接收。UNBOUND不从其他会话寻找旧准备；固定引用失效时停止当前采用，使用receipt核查原编号，不自动重绑定或更换版本。本次领域没有修改公共入口、RoleChannel、App、认证、公开Runtime Schema或正式状态；N3公共路径和N2 Native消费者仍待接收，完整26项、F01必要设计返修及用户验收保持原范围。
+
+当前构建需要包含全部Conversation领域模块及conversation.schema.json 1.3.0。既有read/artifact输入签名及runs[].context_references、origin_references.conversation_context、实际tool_steps.source_id保持；N3继续展示历史版本、当前可访问版本、采用状态和TOOL_RESULT支持关系。conversationRead表示读取既有任务，来源失效时保留历史运行及引用，原文和对象详情继续通过已有本人入口重新核查。公开Page/Command/RoleChannel/App、公开Runtime Schema及唯一菜单状态由N3维护。
 
 N2继续维护当前原生会话/本次意图与实际Runtime。新工具若实际产生message_id或draft_id，记录器必须从正式返回结果核查正确存储种类后保存对应引用，不能把message_outbox误认为交办outbox；没有实际产物不添加引用。F01选中事项、来源及返回绑定继续用现有正式生产者。当前会话读取仅消费Context匹配的runs，原始正文及未发送输入使用原生会话，不能由本投影推断另一会话目标。当前工具、源截至、原文、对象及版本由相应正式领域验证，不把工具返回引用当作新的本人授权。
 

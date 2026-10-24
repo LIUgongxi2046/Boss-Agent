@@ -51,6 +51,21 @@ class ConversationAPI:
         self.store = store
         self.context_references = ConversationReferences(store)
 
+    def task_entry(self, native_sessions):
+        from boss_conversation_task_entry import ConversationTaskEntry
+        return ConversationTaskEntry(self, native_sessions)
+
+    def task_in_transaction(self, db, context, identifier, version=None):
+        ns = context["namespace"]
+        initial = self.store.get(db, ns, "initial", "snapshot")
+        task = self.store.get(db, ns, "task", identifier)
+        require(task["task_id"] == identifier and task["execution_namespace"] == ns
+                and task.get("owner_id", initial["owner_id"]) == context["owner_id"], "关联交办归属不符", web.HTTPForbidden)
+        require(all(task.get(field, context[field]) == context[field] for field in ("dataset_id", "dataset_version")), "关联交办资料范围不符", web.HTTPForbidden)
+        require(version is None or task["version"] == version, "当前展示的任务版本已经变化", web.HTTPConflict)
+        self.store.require_current_assignment_sources(db, ns, initial, task)
+        return task
+
     def _run(self, db, context, query):
         run = self.store.get(db, context["namespace"], "runtime_run", query["run_id"])
         require(run["namespace"] == context["namespace"] and all(run[field] == context[field] for field in ("dataset_id", "dataset_version"))
@@ -114,9 +129,7 @@ class ConversationAPI:
                         and result["envelope"]["execution_namespace"] == ns, "查询产物归属不符", web.HTTPForbidden)
                 evidence = self.store.read_evidence(db, ns, initial, {"query_id": identifier, "source_ids": [row["source_id"] for row in result["sources"]], "detail_refs": result["detail_refs"]})
             elif kind == "task":
-                result = self.store.get(db, ns, "task", identifier)
-                require(result["execution_namespace"] == ns and result.get("owner_id", initial["owner_id"]) == initial["owner_id"], "关联交办归属不符", web.HTTPForbidden)
-                self.store.require_current_assignment_sources(db, ns, initial, result)
+                result = self.task_in_transaction(db, context, identifier)
             elif kind == "morning_list":
                 from boss_morning import MorningAPI
                 stored, current, _ = MorningAPI(self.store)._current(db, context, identifier)

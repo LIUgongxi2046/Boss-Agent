@@ -1,9 +1,54 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:conversation:1.2.0",
+  "$id": "urn:boss-agent:conversation:1.3.0",
   "$defs": {
     "Id": {"type": "string", "minLength": 1, "maxLength": 200},
     "Sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "TaskEntryRequestId": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9_.-]+$"},
+    "TaskEntryNativeContext": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id"], "properties": {
+      "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"$ref": "#/$defs/Id"}}},
+    "TaskEntryPrepare": {"type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "task_id", "task_version"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/TaskEntryRequestId"}, "task_id": {"$ref": "#/$defs/Id"}, "task_version": {"$ref": "#/$defs/Id"}}},
+    "TaskEntryBind": {"type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "preparation_id", "preparation_sha256", "chat_id"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/TaskEntryRequestId"}, "preparation_id": {"$ref": "#/$defs/Id"},
+      "preparation_sha256": {"$ref": "#/$defs/Sha256"}, "chat_id": {"$ref": "#/$defs/Id"}}},
+    "TaskEntryReceiptInput": {"type": "object", "additionalProperties": false, "required": ["client_request_id"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/TaskEntryRequestId"}}},
+    "TaskEntryTaskReference": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version"], "properties": {
+      "kind": {"const": "task"}, "id": {"$ref": "#/$defs/Id"}, "version": {"$ref": "#/$defs/Id"}}},
+    "TaskEntrySourceReference": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version", "content_sha256"], "properties": {
+      "kind": {"const": "document"}, "id": {"$ref": "#/$defs/Id"}, "version": {"$ref": "#/$defs/Id"}, "content_sha256": {"$ref": "#/$defs/Sha256"}}},
+    "TaskEntryReturnReference": {"type": "object", "additionalProperties": false, "required": ["page_id", "task_id", "task_version"], "properties": {
+      "page_id": {"const": "F06"}, "task_id": {"$ref": "#/$defs/Id"}, "task_version": {"$ref": "#/$defs/Id"}}},
+    "TaskEntryPreparation": {"type": "object", "additionalProperties": false,
+      "required": ["source_type", "preparation_id", "client_request_id", "preparation_sha256", "prepared_at", "bound_at", "binding_state", "context", "task_reference", "source_references", "return_reference", "current_use_verified", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "source_type": {"const": "RUNTIME_RECORD"}, "preparation_id": {"$ref": "#/$defs/Id"}, "client_request_id": {"$ref": "#/$defs/TaskEntryRequestId"},
+      "preparation_sha256": {"$ref": "#/$defs/Sha256"}, "prepared_at": {"type": "string", "minLength": 1}, "bound_at": {"type": ["string", "null"]},
+      "binding_state": {"enum": ["PREPARED", "BOUND"]}, "context": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/TaskEntryNativeContext"}]},
+      "task_reference": {"$ref": "#/$defs/TaskEntryTaskReference"}, "source_references": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/TaskEntrySourceReference"}},
+      "return_reference": {"$ref": "#/$defs/TaskEntryReturnReference"}, "current_use_verified": {"type": "boolean"},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}},
+      "allOf": [{"if": {"properties": {"binding_state": {"const": "PREPARED"}}}, "then": {"properties": {"context": {"type": "null"}, "bound_at": {"type": "null"}}},
+        "else": {"properties": {"context": {"$ref": "#/$defs/TaskEntryNativeContext"}, "bound_at": {"type": "string", "minLength": 1}}}}]},
+    "TaskEntryContext": {"type": "object", "additionalProperties": false,
+      "required": ["source_type", "session_id", "chat_id", "binding_state", "entry", "references", "current_use_verified", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "source_type": {"const": "RUNTIME_RECORD"}, "session_id": {"$ref": "#/$defs/Id"}, "chat_id": {"$ref": "#/$defs/Id"},
+      "binding_state": {"enum": ["UNBOUND", "BOUND"]}, "entry": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/TaskEntryPreparation"}]},
+      "references": {"type": "array", "items": {"$ref": "#/$defs/RecordedContextReference"}}, "current_use_verified": {"type": "boolean"},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}},
+      "allOf": [{"if": {"properties": {"binding_state": {"const": "UNBOUND"}}}, "then": {"properties": {"entry": {"type": "null"}, "references": {"maxItems": 0}, "current_use_verified": {"const": false}}},
+        "else": {"properties": {"entry": {"allOf": [{"$ref": "#/$defs/TaskEntryPreparation"}, {"properties": {"binding_state": {"const": "BOUND"}, "current_use_verified": {"const": true}}}]},
+          "references": {"minItems": 2}, "current_use_verified": {"const": true}}}}]},
+    "TaskEntryReceipt": {"type": "object", "additionalProperties": false,
+      "required": ["source_type", "client_request_id", "outcome", "entry", "business_authorization_granted", "business_mutation_performed"], "properties": {
+      "source_type": {"const": "RUNTIME_RECORD"}, "client_request_id": {"$ref": "#/$defs/TaskEntryRequestId"},
+      "outcome": {"enum": ["RECORDED", "NOT_FOUND_IN_CURRENT_STORE"]}, "entry": {"oneOf": [{"type": "null"},
+        {"allOf": [{"$ref": "#/$defs/TaskEntryPreparation"}, {"properties": {"current_use_verified": {"const": false}}}]}]},
+      "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}},
+      "allOf": [{"if": {"properties": {"outcome": {"const": "NOT_FOUND_IN_CURRENT_STORE"}}}, "then": {"properties": {"entry": {"type": "null"}}},
+        "else": {"properties": {"entry": {"$ref": "#/$defs/TaskEntryPreparation"}}}}]},
     "RecordedContextReference": {"type": "object", "additionalProperties": false, "required": ["kind", "id", "version"], "properties": {
       "kind": {"$ref": "#/$defs/Id"}, "id": {"$ref": "#/$defs/Id"}, "version": {"type": ["string", "null"], "minLength": 1}}},
     "RecordedConversationContext": {"type": "object", "additionalProperties": false, "required": ["input_sha256", "allowed_call_refs", "references"], "properties": {
