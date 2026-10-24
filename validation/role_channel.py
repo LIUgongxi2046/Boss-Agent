@@ -36,6 +36,7 @@ class RoleChannel(WebSocketChannel):
         self.assignment = None
         self.reminders = None
         self.morning_admission = ContextVar("morning_native_admission", default=None)
+        self.conversation_upload = ContextVar("conversation_native_upload", default=None)
         self.bi_responses = set()
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
@@ -335,14 +336,24 @@ class RoleChannel(WebSocketChannel):
                 return
         admission = {"request": admitted, "enqueued": False} if admitted is not None else None
         admission_token = self.morning_admission.set(admission)
+        upload_token = self.conversation_upload.set({"role": role, "connection": connection, "chat_id": envelope.get("chat_id"), "media": envelope.get("media")} if kind == "message" and envelope.get("media") else None)
         try:
             await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
         finally:
             self.morning_admission.reset(admission_token)
+            self.conversation_upload.reset(upload_token)
             if admission is not None and not admission["enqueued"]:
                 self.morning.native.finish(admitted["client_request_id"])
 
     async def webui_dispatch_message(self, *, sender_id, chat_id, content, media, metadata, is_dm, session_key, require_existing_session):
+        upload = self.conversation_upload.get()
+        if media and upload is not None and session_key in (None, "websocket:" + chat_id):
+            connection = upload["connection"]
+            if self.conversation is None or sender_id != "boss-1" or upload["chat_id"] != chat_id:
+                raise web.HTTPForbidden(text="原生附件与当前本人会话不符")
+            self.conversation.record_upload(upload["role"], chat_id, upload["media"], media,
+                attached=lambda selected: selected in self.webui_connection_chats(connection),
+                active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
         await super().webui_dispatch_message(sender_id=sender_id, chat_id=chat_id, content=content, media=media,
             metadata=metadata, is_dm=is_dm, session_key=session_key, require_existing_session=require_existing_session)
         admission = self.morning_admission.get()

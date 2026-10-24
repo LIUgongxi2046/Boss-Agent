@@ -16,6 +16,14 @@ class PublicConversation:
         self.api = ConversationAPI(store)
         self.attachments = ConversationAttachments(sessions, media_root)
 
+    def record_upload(self, role, chat_id, accepted_media, accepted_paths, *, attached, active):
+        owner_role(role)
+        require(active(), "当前本人认证已经失效", web.HTTPUnauthorized)
+        require(is_valid_webui_chat_id(chat_id) and attached(chat_id), "原生上传不属于当前已订阅会话", web.HTTPForbidden)
+        result = self.attachments.record_upload(role, {"session_id": webui_session_key(chat_id), "chat_id": chat_id}, accepted_media, accepted_paths)
+        require(active() and attached(chat_id), "原生上传期间当前身份或会话发生变化", web.HTTPForbidden)
+        return result
+
     def read(self, role, action, payload, *, attached, active):
         owner_role(role)
         require(active(), "当前本人认证已经失效", web.HTTPUnauthorized)

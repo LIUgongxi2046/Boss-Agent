@@ -10,6 +10,7 @@ from uuid import uuid4
 import pytest
 from aiohttp import web
 from loguru import logger
+from jsonschema import Draft202012Validator
 from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.context import current_request_context
@@ -125,6 +126,10 @@ def test_actual_questions_change_actual_tool_parameters_and_preserve_versions(co
     runs = runtime_records(conversation[0], "MAINTAINER")["runs"]
     assert len(runs) == 2 and {row["session_id"] for row in runs} == {"websocket:n02-current"}
     assert all(row["status"] == "SUCCEEDED" and row["feature_id"] == "N02" for row in runs)
+    schema = json.loads((ROOT / "specs/runtime-records.schema.json").read_text())
+    validator = Draft202012Validator({**schema, "$ref": "#/$defs/CurrentRuntimeRun"})
+    for run in runs:
+        validator.validate(run)
     for source in sources:
         row = next(row for row in runs if row["tool_results"][0]["source_id"] == source["source_id"])
         reference = row["tool_results"][0]

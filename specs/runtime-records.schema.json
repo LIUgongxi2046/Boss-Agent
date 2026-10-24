@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.9.0",
+  "$id": "urn:boss-agent:runtime-records:1.10.0",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {
@@ -80,6 +80,19 @@
         "parameters_sha256":{"$ref":"#/$defs/Sha256"}
       }
     },
+    "ConversationContext": {
+      "type": "object", "additionalProperties": false,
+      "required": ["input_sha256", "allowed_call_refs", "references"],
+      "properties": {
+        "input_sha256": {"$ref": "#/$defs/Sha256"},
+        "allowed_call_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+          "required": ["tool_id", "parameters_sha256"],
+          "properties": {"tool_id": {"$ref": "#/$defs/Identifier"}, "parameters_sha256": {"$ref": "#/$defs/Sha256"}}}},
+        "references": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+          "required": ["kind", "id", "version"],
+          "properties": {"kind": {"$ref": "#/$defs/Identifier"}, "id": {"$ref": "#/$defs/Identifier"}, "version": {"type": ["string", "null"], "minLength": 1}}}}
+      }
+    },
     "MorningContext": {
       "type": "object", "additionalProperties": false,
       "required": ["date", "timezone", "snapshot_sha256", "order_version", "parameters_sha256", "client_request_id"],
@@ -120,7 +133,7 @@
         "definition_versions":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "detail_refs":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "review_sha256":{"$ref":"#/$defs/Sha256"}, "preparation_sha256":{"$ref":"#/$defs/Sha256"},
-        "result_sha256":{"$ref":"#/$defs/Sha256"}, "owner_decision_required":{"const":true},
+        "result_sha256":{"$ref":"#/$defs/Sha256"}, "parameters_sha256":{"$ref":"#/$defs/Sha256"}, "owner_decision_required":{"const":true},
         "projection":{"const":"notifications"},
         "rule_versions":{"type":"array","items":{"$ref":"#/$defs/Version"}},
         "business_alert_refs":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["event_id","event_version","adoption_state","business_rule_version","rule_state","technical_rule_version","owner_notice_version","review_sha256","evaluation","sources"],"properties":{"event_id":{"$ref":"#/$defs/Identifier"},"event_version":{"$ref":"#/$defs/Version"},"adoption_state":{"enum":["CURRENT","NEEDS_REVIEW"]},"business_rule_version":{"oneOf":[{"$ref":"#/$defs/Version"},{"type":"null"}]},"rule_state":{"type":"string"},"technical_rule_version":{"type":["string","null"]},"owner_notice_version":{"type":["string","null"]},"review_sha256":{"$ref":"#/$defs/Sha256"},"evaluation":{"type":"object","additionalProperties":false,"required":["phase","reason","duration_seconds"],"properties":{"phase":{"type":"string"},"reason":{"type":"string"},"duration_seconds":{"type":["integer","null"],"minimum":0}}},"sources":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"source_id":{"type":"string"},"version":{"type":["string","null"]},"status":{"type":"string"},"sha256":{"type":["string","null"]}}}}}}},
@@ -152,7 +165,8 @@
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
         "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
-        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03","FC04","FC07"]},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03","FC04","FC07","N02"]},
+        "conversation_context":{"$ref":"#/$defs/ConversationContext"},
         "reminder_context":{"type":"object","additionalProperties":false,"required":["projection","projection_sha256"],"properties":{"projection":{"const":"notifications"},"projection_sha256":{"$ref":"#/$defs/Sha256"}}},
         "assignment_context":{"type":"object","additionalProperties":false,"required":["task_id","task_version","review_sha256"],"properties":{"task_id":{"$ref":"#/$defs/Identifier"},"task_version":{"$ref":"#/$defs/Version"},"review_sha256":{"$ref":"#/$defs/Sha256"}}},
         "morning_context": {"$ref": "#/$defs/MorningContext"},

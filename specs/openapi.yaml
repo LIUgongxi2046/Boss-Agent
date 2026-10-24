@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-menu-n02-conversation:
-  schema_version: 1.0.0
+  schema_version: 1.1.0
   schema_extension: conversation.schema.json
   read: ConversationAPI.read(BOSS, Context)
   shared_transaction_read: ConversationAPI.project_in_transaction(BOSS, db, Context)
@@ -24,7 +24,8 @@ x-menu-n02-conversation:
   message_scope: OWNER_MESSAGE_HISTORY; not automatically assigned to the selected chat
   message_states: existing draft/send/delivery/reply/task states retained independently; current invalid attachments hide body and keep historical identifiers
   attachment_scope: native saved user media inside approved media root; real size/hash; no client filesystem path input; STORED is not business source authorization
-  original_filename: actual accepted original name/MIME/file hash stored in native session metadata; absent historical metadata remains null; file change rejects current read
+  original_filename: actual accepted original name/MIME/file hash stored in native session metadata; absent historical metadata remains null; file change reports CHANGED and stops adopting the recorded file content
+  attachment_version_state: current and recorded size/hash returned separately; STORED/MISSING/CHANGED/REFERENCE_UNAVAILABLE; nullable stored_name and user_message_index; internal relative_path never exposed
   mutation_policy: only accepted upload metadata stored in native session; no business writes or owner authorization; original message commands and original operation-status lookup reused
   authenticated_read_transport: webui_request boss.conversation.read/artifact/messages/attachments; current BOSS connection and attached chat checked by RoleChannel; session_id derived by SDK mapping
   public_read_payload: read/attachments use chat_id only; artifact adds run_id/kind/id; messages accepts empty object and retains OWNER_MESSAGE_HISTORY

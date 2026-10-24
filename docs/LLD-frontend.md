@@ -212,3 +212,19 @@ MorningConversationRequest 将 question、date/timezone、可选成对 list_id/i
 F01 在跨页时保持挂载，date/timezone、选择及来源安全标识写入 URL；分类和正文保存在当前进程。返回重新读取当前正式对象，恢复分类、滚动和可用触发焦点；D06 的关闭焦点与异步详情完成共同触发恢复。刷新按安全标识恢复当前对象，分类采用默认全部事项。排序使用实际 CAS，失败保留编辑；未知回执只读当前原编号。已保存历史结果不会作为当前完整资料使用。适用失败、取消、超时、来源撤销与保存事务结果分别在当前 Runtime、领域和公开消费者核查。
 
 源码增量保存在 app/webui/nanobot-menu-f01.patch；准备目录的 BossDesktop 与正式源码必须相同。独立制品 menu-f01-n3-dist、启动入口 scripts/run_menu_f01.command、数据目录 validation/.work/menu-f01-experience 使用10611/10612/20611，不操作现有 UI02 或 MVP 体验。初次准备采用获准 SIMULATED 输入及既有业务初始化，后续启动使用同一 SQLite 和 credentials，不重新配置或清空。显式本机模式的受控账号填充仅填写表单，手动登录仍使用正常服务认证。准确来源、实际安装 Nanobot、制品及证据摘要由当前 inventory 登记。
+
+## MENU-N02 聊天交办
+
+CURRENT；2026-10-24；D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及完整26项工单。当前N02实施中，F01设计部分仍需必要返修，已有业务证据按未变依赖保留。当前Shell或原生默认样式不作为设计差距的批准依据；视觉与用户验收独立。
+
+BossDesktop的children(role,visible,ConversationActions)提供当前本人/维护身份、可见性及原有共享导航。ConversationActions包含onOpenTask/onOpenSource/onOpenMessages/onReturn，调用仍经过既有未保存输入保护。N02为本人会话入口，原NATIVE地址兼容；维护NATIVE继续为Settings。BossConversationWorkspace使用真实topicSessions及原生新建/选择/搜索，连续消息和输入由同一ThreadShell处理；业务切换保持原生组件挂载，ThreadVisibilityContext跟随实际可见性。
+
+N02使用原稿外框、204/174/60导航宽度、64px顶部区域、146/124标题区、主列与310/260右列及≤1050单列。原稿六项主导航、今日/开始对话/语音/通知快捷操作均保留；未交付入口不可用，语音暂停，已交付业务继续从目录访问。当前事项三项、对话/执行、进展及可打开来源/附件分区采用实际领域投影。原HTML的历史区域参考213px，当前使用可展开列表；与loaded chat组合、正文及全部控件仍需独立设计复核。18组框架尺寸、具体设计项和剩余工作见N02/design-gaps.md，不能据框架检查登记完整还原通过。
+
+四项只读webui_request为boss.conversation.read/artifact/messages/attachments。服务端核查当前BOSS认证连接与订阅chat，session_id由原生映射产生；消息读取明确为OWNER_MESSAGE_HISTORY。产物根据原run_id及真实kind/id重读。当前界面Run仅采用实际状态/步骤/产物与正式origin_references，未知保持说明；一般N02来源/对象上下文及完整Native规划仍待准确模块接收。异步读取由当前client/token/chat和代次共同限制；身份、会话或选择变化后不采用迟到结果，读取失败显示错误并允许明确重读。
+
+Conversation附件Schema1.1.0包含可空stored_name/original_name/mime_type、当前size_bytes/content_sha256、上传时recorded_size_bytes/recorded_content_sha256、processing_state及可空user_message_index。位置只有在唯一原生user.media能够确认时提供，不能充当稳定消息ID。STORED仅表示文件保存；MISSING、CHANGED与REFERENCE_UNAVAILABLE分别呈现，当前内容未经业务来源核查不能采用。可信record_upload仅在原生实际上传成功后内部调用，没有模型/客户端路径入口；内部文件引用和正文不进入公开元信息。
+
+ComposerDraftController由原生ThreadComposer注册到当前会话，hasDraft包括文字、实际附件、引用及排队输入。继续编辑保留内容，明确放弃调用控制器清除；beforeunload覆盖仅附件及队列。本人会话persistQueuedPrompts=false，排队正文只保存在当前进程。原生组件及App增量保存在app/webui/nanobot-menu-n02.patch，正式BossDesktop/BossConversationWorkspace/boss-n02.css与准备源码一致；新构建使用独立menu-n02-n3-dist，不覆盖任何F01/UI02/MVP体验资料或制品。
+
+当前实际SDK/严格Runtime Schema、实际上传与重新读取、产物Dialog/Escape/焦点、草稿/附件/队列及18组框架检查的必要证据见N02主记录。完整消息授权、一般意图/原编号恢复、全部状态与26项尚未完成；正式状态由原始specs/feature-delivery.json维护。

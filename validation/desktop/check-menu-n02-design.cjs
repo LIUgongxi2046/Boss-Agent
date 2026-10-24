@@ -14,7 +14,7 @@ async function main(){
     const samples=[...[[1440,1024],[1280,800],[1024,768]].flatMap(([width,height])=>[1,2].map(zoom=>({width,height,zoom}))),...[1251,1250,1249,1051,1050,1049,701,700,699,691,690,689].map(width=>({width,height:800,zoom:1}))];
     for(const {width,height,zoom} of samples){
       await app.evaluate(({BrowserWindow},{width,height,zoom})=>{const window=BrowserWindow.getAllWindows()[0];window.setContentSize(width,height);window.webContents.setZoomFactor(zoom);},{width,height,zoom});
-      await page.waitForFunction(({width,zoom})=>Math.abs(innerWidth-width/zoom)<=1,{width,zoom});
+      await page.waitForFunction(({width,height,zoom})=>Math.abs(innerWidth-width/zoom)<0.1&&Math.abs(innerHeight-height/zoom)<0.1,{width,height,zoom});
       result.layouts.push({width,height,zoom,...await page.evaluate(()=>{
         const grid=document.querySelector('.v6-grid'),panel=document.querySelector('.v6-panel'),style=getComputedStyle(grid),rect=node=>({x:node.getBoundingClientRect().x,y:node.getBoundingClientRect().y,width:node.getBoundingClientRect().width,height:node.getBoundingClientRect().height});
         const selectors={screen:'.screen',shell:'.shell',sidebar:'.sidebar',topbar:'.topbar',stage:'.stage',hero:'.hero',title:'.hero h1',description:'.hero p',body:'.stage-body',selected_navigation:'.navitem.on',brand:'.brand',panel:'.v6-panel',primary_action:'.v6-btn.primary',message_input:'[data-persist="本次消息"]'};

@@ -104,4 +104,37 @@
                            transcriptionEnabled={false}
 +                          persistQueuedPrompts={false}
 +                          onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
+*** Update File: webui/src/App.tsx
+@@
+ import { BossDesktop } from "./boss-agent/BossDesktop";
++import {BossConversationWorkspace} from "./boss-agent/BossConversationWorkspace";
+@@
+       <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onNewConversation={onNewChat}
+@@
+-      {(role,nativeVisible) => <>
+-      <div className="boss-native-toolbar" aria-label={role === "BOSS" ? "会话操作" : "设置分类"}>
+-        {role === "BOSS" ? <>
+-          <label>当前会话<select aria-label="当前会话" value={activeKey ?? ""} onChange={event => event.target.value ? onSelectChat(event.target.value) : onNewChat()}>
+-            <option value="">新会话</option>{topicSessions.map(session => <option key={session.key} value={session.key}>{displayTitle(session,sidebarState.title_overrides,t("chat.newChat"))}</option>)}
+-          </select></label>
+-          <button className="boss-btn" onClick={onNewChat}>新建会话</button>
+-          <button className="boss-btn" onClick={onOpenSessionSearch}>搜索会话</button>
+-          {view !== "chat" && <button className="boss-btn" onClick={onBackToChat}>返回当前会话</button>}
+-        </> : <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
++      {(role,nativeVisible,conversationActions) => <>
++      {role === "MAINTAINER" && <div className="boss-native-toolbar" aria-label="设置分类">
++        <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
+           {SETTINGS_SECTION_KEYS.filter(section => section !== "voice").map(section => <option key={section} value={section}>{t(`settings.nav.${section}`)}</option>)}
+-        </select></label>}
+-      </div>
++        </select></label>
++      </div>}
++      <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        sessions={topicSessions.map(session=>({key:session.key,chatId:session.chatId,title:displayTitle(session,sidebarState.title_overrides,t("chat.newChat")),updatedAt:session.updatedAt??"更新时间未知"}))}
++        onNewChat={onNewChat} onSelectChat={onSelectChat} onSearch={onOpenSessionSearch} actions={conversationActions}>
+@@
+-      </>}
++      </BossConversationWorkspace>
++      </>}
 *** End Patch
