@@ -6,9 +6,9 @@ task_id=MENU-F01-N2；decision_id=D-MENU-DELIVERY-20261024；marker=MENU-F01-STA
 
 已读取原始PRD最前当前决定、菜单总计划、menu-plan.json、F01完整18项及完整产品PRD的FR-01/BR-01/AC-01-S/E、BR-C02和E01—E06；核查当前LLD适用的Runtime、身份、工具、日志和返回上下文规则，复用FC03实际SDK、正式MorningAPI及既有开发记录。当前工作只修改N2晨间工具、Runtime、专有检查与记录；页面、公开请求、认证、公共Schema及唯一正式状态由N3维护。
 
-只读核查的公共基点为b7fdc76c81ef693da75511d736db60d92550784c。ProductMorning已通过Nanobot和实际Registry执行todayRead、morningListRead、morningDetailRead、morningSourceRead；当前公共请求的选择字段为list_id。公共文件validation/product_morning.py所属提交9bc99903988baafc1f61bedd1be88133fcde5cc6，读取时blob为efe5b62713e42ff0ed659513ec3ef6bee7bcd276。完整当前事项选择、输入保留、原生会话续接和页面返回须由N3在最终候选补齐并验证。
+当前ProductMorning通过Nanobot和实际Registry执行todayRead、morningListRead、morningDetailRead、morningSourceRead，公开请求支持list_id/item_id。N2的原生适配器消费N3当前准确内容c441a4eec001612238f34941bf02d746af71d7bd及24f5c64领域组合。公共原生会话注册、输入保留与页面返回由N3在最终候选接收并验证。
 
-正式领域采用既有准确提交e3faa5dcd90831d5e84e42c6ca66b418f85b767c；MorningAPI及morning.schema.json 1.0.0继续作为正式接口。N1本菜单记录当前提供完整范围核查，尚无本菜单新增准确提交供接收；未来公开字段和语义变化只消费N1准确提交，不推测字段。全量资料范围、分类、关联合并、时间冲突、排序和来源有效性仍由正式领域确定。
+事项选择适配的十五项限定证据采用e3faa5dcd90831d5e84e42c6ca66b418f85b767c及morning.schema.json 1.0.0。当前原生适配器采用N3准确组合24f5c64及其接收的N1 89d26855，正式Schema为morning.schema.json 1.1.0。全量资料范围、分类、关联合并、时间冲突、排序和来源有效性仍由正式领域确定，公开字段只按准确接口消费。
 
 ## 当前可信事项与实际工具
 
@@ -52,9 +52,9 @@ ProductMorning.events从当前可信选择读取详情及该事项实际document
 
 本人独立确认、准备内容持久化、选中事项与日期/筛选/位置/焦点返回、原生会话保留、公开请求鉴权及当前菜单完整18项仍依赖N3准确集成。模拟必须消费实际工具结果；失败终止当前依赖步骤，未知请求查询原编号。N2独立Registry与SDK证据不代替公共采用，不增加完整菜单或用户验收数量。
 
-## 原生会话接续核查
+## 原生会话接续适配器
 
-marker=MENU-F01-N2-NATIVE-READ-20261024；来源为N3指定的只读核查。当前只读取公共基点b7fdc76、N3现有原生源码及已安装nanobot，不修改公共实现、不执行产品或旧检查。下列接口方案需要N3实施与验证，当前没有新增运行通过证据。既有15项检查仍限定于前述独立SDK组合。
+marker=MENU-F01-N2-NATIVE-IMPLEMENT-20261024；N3要求N2实现可信原生绑定与逐轮上下文，公共ProductMorning、RoleChannel、application、App、Client及Schema由N3维护。当前validation/fc03_agent/native.py版本1.0.0，使用现有实际SDK与正式领域，没有另建模型循环或注册本人决定工具。源码核查依据包括N3公共基点b7fdc76、当前24f5c64组合及N3当前ProductMorning；公共传输与页面采用仍等待N3准确候选。
 
 原生源码位于N3的.work/product/nanobot，读取时HEAD=1bb712d3488915ca4ed9ccc1a93067ff722f5ab9；App.tsx读取时blob=64becd36c55afdb80d9a7a23367e6bf918552537，nanobot-client.ts blob=a2f133d1c6c415b9fe894baaa5d787b1b2ba2675。已安装nanobot/webui/inbound_commands.py blob=4e17136a8f04664f4f824edf8671636b2c249f0a，nanobot/channels/websocket/runtime.py blob=1105e4a7c023887063f067fd927d5b6446e9c57d。这些摘要描述本次实际读取内容，后续公共候选应当使用其自身准确版本。
 
@@ -67,28 +67,47 @@ marker=MENU-F01-N2-NATIVE-READ-20261024；来源为N3指定的只读核查。当
 | 原生消息处理 | nanobot/webui/inbound_commands.py:476/607/655/681；校验输入，构建受控metadata，保存用户原文，调用webui_dispatch_message，再广播user_message/message_accepted；envelope的任意metadata或attributes没有直接传递入口 |
 | 原生会话与身份 | session_identity.py提供webui_session_key(chat_id)=websocket:chat_id；RoleChannel._dispatch_active_envelope将已认证本人连接的sender_id设置为boss-1；WebSocketChannel.webui_connection_chats(connection)提供当前连接已经attach的会话 |
 | 实际Runtime上下文 | AgentLoop._request_context_for_turn在loop.py:731形成channel/chat_id/session_key/original_user_text/metadata/attributes；resolve_runtime_context按注册顺序逐项调用provider，attributes随后进入实际工具请求 |
-| 晨间采用 | ProductMorning._grant读取MORNING_REQUEST；FeatureProvider.chat和FeatureRecorder.context已有该分支；scope_context设置FEATURE_SCOPE，FeatureToolRegistry据此限制真实工具。当前普通原生消息没有建立MORNING_REQUEST的生产者 |
+| 晨间采用 | ProductMorning._grant读取MORNING_REQUEST；FeatureProvider.chat和FeatureRecorder.context已有该分支；scope_context设置FEATURE_SCOPE，FeatureToolRegistry据此限制真实工具。N2的native_context生产该上下文，公共注册由N3接收 |
 
-### N3实施的连续路径
+### 已实现方法与严格输入
 
-使用现有原生new_chat、ThreadShell及message传输。F01调用专有晨间入口，将原始question、正式date/timezone及适用list_id/item_id交给App；App等待现有onCreateChat返回服务端chat_id，再通过client.requestMutation完成晨间范围绑定，成功后才设置pendingAutomationMessage。后续输入继续由同一ThreadShell发送到同一chat_id，已有原生转发、流事件、历史保存和读取路径继续负责显示与保存。晨间路径不另行调用一次ProductMorning.execute；每条原生用户消息只进入一次现有AgentLoop。
+NativeMorningAdapter(service, *, request_attribute="product_morning_request")接收当前真实ProductMorning实例。模块不导入公共ProductMorning类型，N3可以直接组合该适配器；service._request产生的实际MorningRequest通过dataclasses.replace仅采用规范原生session_id，正式数据、选择及认证回调保持真实来源。
 
-需要N3新增的公开动作可以命名boss.morning.bind，payload严格限定client_request_id、chat_id、date、timezone及适用list_id/item_id；响应提供绑定编号、chat_id、规范session_id和当前正式引用，不返回凭据或正文。该名称及字段是本次建议新增接口，当前源码尚未提供。RoleChannel在本人有效连接内校验角色、token、过期、当前连接attach状态及当前owner/namespace/dataset，拒绝客户端指定owner、namespace、session_id、active、confirmed或授权字段。chat_id只用于关联已认证请求。绑定通过当前MorningAPI读取核查清单、事项、日期、快照和次序；新建原生会话尚无持久历史不能直接判定为不存在，需核查其服务端创建与当前连接attach记录。首条输入之前失败时不发送pendingFirstMessage，不执行模型。
+| 方法签名 | 输入与返回行为 |
+|---|---|
+| bind(role, client_request_id, payload, *, attached, active) | client_request_id独立来自原公开请求编号，payload只接受chat_id/date/timezone及成对可选list_id/item_id。attached(chat_id)与active()必须由当前连接生产；规范session_id由webui_session_key生成。返回binding_receipt |
+| binding_receipt(role, client_request_id, *, active) | 只读原绑定；返回source_type、client_request_id、outcome、result、adoption_state、write_performed_by_lookup=false、business_authority_granted=false。未知编号为NOT_FOUND_IN_CURRENT_STORE，result=null |
+| admit(role, chat_id, turn_id, content, *, attached, active) | 原生message提交前调用。未绑定会话返回None且不限制其既有输入；已绑定会话严格核查当前认证、attach、原生有效turn_id及原文。返回enqueue和turn_receipt；重复原轮次enqueue=false，原文变化拒绝 |
+| native_context(request) | 第一个应用context provider；核查可信本轮证明、原文摘要、规范websocket身份/会话、当前本人资料、快照、次序及来源，向attributes写入实际MorningRequest；没有当前证明的已绑定会话拒绝进入模型 |
+| turn_receipt(role, chat_id, turn_id, *, active) | 只读当前轮次原请求，返回ProductMorning.receipt的client_request_id/request_state/run_id/receipt/write_performed_by_lookup，并追加chat_id/turn_id/session_id/binding_id |
+| hook_factory(context) / finish(client_request_id) | hook_factory为真实NativeMorningHook，on_finally清理本轮进程内证明。finish也用于未进入Runtime的已准备轮次，状态记为FAILED；已有run_id时保留实际Runtime终态 |
 
-绑定在SQLite保存当前本人/资料范围、规范原生session_id、日期/时区、当前清单/事项及正式快照/次序版本；不保存active回调、token、问题或正文。同编号同内容返回原结果，内容变化拒绝。绑定不授予业务写入权限。新的事项选择建立明确的新绑定；进行中轮次使用其接收时固定的绑定版本，旧响应不能改变后续选择。新增动作同样使用原编号只读恢复，需要接入nanobot-client.ts:1074的已有中断处理，结果未知时不依赖默认mutation重放。配套建议新增GET /api/boss/ui/morning/binding?client_request_id，由当前本人认证读取该编号的绑定元信息或NOT_FOUND_IN_CURRENT_STORE，write_performed_by_lookup=false；此读取接口同样需要N3登记严格Schema，当前尚不存在。
+绑定在当前SQLite的morning_native_binding保存owner/资料范围、规范会话、日期、快照/次序及选择标识，不保存token、active回调、问题或来源正文。每个chat_id只能存在一个明确绑定；新的事项选择使用新的原生会话与绑定，避免把同一会话历史关联到另一事项。原编号同内容可重读，内容变化拒绝。查询回执标记NOT_REVALIDATED_BY_LOOKUP，不把原元信息当作当前采用证明。
 
-### 每轮可信采用与请求关联
+每轮稳定编号由chat_id和原生turn_id摘要形成。admit复用实际service._request建立morning_public_request，保存native_binding_id/native_chat_id/native_turn_id/native_content_sha256；将实际请求和grant的session_id关联到规范原生会话。原始问题只进入SDK原生会话，技术行仅有摘要。当前轮次尚未终止时拒绝并发新输入，重复同一轮仅恢复原回执。绑定last_request_id通过SQLite事务检查；其他服务抢先采用轮次时，本轮拒绝进入Runtime。
 
-RoleChannel在已认证message进入上游router之前，按chat_id及规范有效turn_id保存本轮服务端记录，包含绑定版本、原始内容摘要、当前连接身份和可重新检查的active回调。需要使用原生normalize_webui_turn_id保证原始turn_id与metadata.webui_turn_id一致，不能允许缺少编号后在两个位置生成不同编号。记录只在服务端创建；任意session_id、模型文本或客户端metadata不能创建该记录。上游仍构建原生metadata并保存原文。
+首轮没有清单时，由实际todayRead创建正式清单；下一轮从上一实际公共回执取出已保存list_id并核查日期、快照和来源，后续采用morningListRead/detail/source。模型失败后已经保存的清单及原回执保持，下一轮仍按真实当前资格处理。运行期间每次读取grant.active都重新核查连接、当前本人/资料范围、正式快照、次序及来源，资料撤销或范围变化不会继续消费旧依据。active回调及本轮证明只存在进程内，服务重新建立适配器后不会凭session_id恢复执行权限。
 
-新增ProductMorning.native_context(request)作为第一个应用context provider，位于runtime_control.context、Skills/Memory、晨间scope及FeatureRecorder之前。该provider从服务端保存的本轮记录找到绑定，逐项核查request.channel=websocket、sender_id=boss-1、chat_id、session_key、metadata.webui_turn_id、原始输入摘要、绑定版本及当前active；随后重新读取当前资料范围、正式清单/事项/来源和order_version，生成本轮MorningRequest并写入request.attributes[MORNING_REQUEST]。这些步骤失败必须终止本轮。已经绑定晨间的会话如果缺少当前连接证明、授权失效或服务重开后尚未建立本轮记录，同样拒绝进入模型，不能进入其他FeatureProvider分支。
+### N3公共接入位置
 
-每轮独立创建morning_public_request和Runtime运行，保留同一原生session_id，以及当前客户端turn_id、runtime_request_id和run_id。不能重复使用已经RUNNING/SUCCEEDED的首轮公共请求记录，因为现有bind_runtime只允许PREPARED进入RUNNING。原意图编号需要稳定关联chat_id/turn_id，内容摘要包括原始输入、绑定编号/版本和当前选择；重复同一轮只读取已有结果或原生历史，不再次入队。已有正式清单的domain_client_request_id继续指向创建该清单的原编号，后续讨论复用morningListRead/detail/source，不重新执行todayRead。轮次终止后清理进程内连接证明；持久请求及历史只保留获准标识和结果状态，不恢复active回调。
+application.py在同一个ProductMorning上建立一个NativeMorningAdapter实例，将native_context注册为第一个应用provider，位于runtime_control.context、Skills/Memory、晨间scope及FeatureRecorder之前；现有FORMAL_TOOLS、FeatureProvider、FeatureRecorder及真实Runtime继续使用。将adapter.hook_factory加入当前AgentLoop的hook_factories，沿用现有Recorder生成独立request_id/run_id，每轮保留同一规范原生session_id。晨间scope在公共注册中继续核查四项正式工具已启用及至少五轮，与独立query的当前配置要求一致。此适配器不调用bot.run，不注册模型授权工具。
 
-第一条自然问题没有已有清单时，可以通过本轮todayRead产生正式清单；清单关联只从本轮实际工具结果及运行记录取得并保存，下一轮读取该正式清单。原生RuntimeContextBlock和技术记录继续由已有Fc03RuntimeRecorder形成。FeatureProvider/FeatureRecorder现有MORNING_REQUEST分支和FORMAL_TOOLS继续使用，当前没有建立第二个模型循环的必要。ProductMorning.events只消费最近用户输入之后的本轮工具结果，并根据可信当前选择读取实际详情及对应document。持久历史中的旧依据不能替代当前来源检查；来源失效时在模型调用之前拒绝本轮，历史保留只读标识。
+RoleChannel新增boss.morning.bind，直接将当前envelope.request_id作为bind的client_request_id，payload不接受另一编号或身份字段。attached必须查询当前连接的webui_connection_chats，active复用现有token/角色/过期/连接检查。新增GET /api/boss/ui/morning/binding?client_request_id读取binding_receipt；新增动作及严格响应字段由N3接收Schema。客户端将绑定动作加入现有中断后原编号恢复范围，禁止默认mutation重放。刚创建但尚无持久历史的原生会话，凭服务端new_chat与当前attach记录核查。
 
-### 返回、重连与必要验证
+RoleChannel在已认证message交给原生router之前调用admit。返回None时继续既有普通会话处理；enqueue=true时才允许原生处理一次，enqueue=false时只读恢复并重新读取原生历史。turn_id必须原样通过原生normalize_webui_turn_id校验，随后metadata.webui_turn_id保持相同编号。原生router仍负责内容、媒体、workspace校验及保存用户原文，不接受客户端提供的attributes作为证明。
 
-App与BossDesktop继续使用同一原生会话和现有NATIVE页面；F01返回记录需要包含原生chat_id及原始morningRequest、morningItem、morningDate、morningTimezone和页面已有筛选/位置/焦点。URL仅存放获准标识，原始问题留在原生历史。返回F01重新读取当前正式对象，重新打开讨论时选择已绑定chat_id；通用onStartAutomationChat每次创建新会话的行为不能直接作为继续讨论。退出/身份失效沿用clearPrivateNativeState，并撤销本轮active证明；重新认证及服务重开后需要当前已认证连接重新建立本轮证明，单独读取会话历史不构成继续执行授权。
+上游处理可能在实际webui_dispatch_message之前拒绝输入，RoleChannel需要在未成功入队时调用finish(client_request_id)，不能把super返回直接当作已入队。已入队后由NativeMorningHook清理；在其他应用provider失败且尚未生成运行hook的路径，同样调用finish以保存准确未执行状态。适配器自己的native_context校验失败已经执行该清理。服务重开后缺少证明的旧轮次仅查询原编号，不自动重新入队。
 
-N3最终候选需要定向验证：F01原问题只提交一次且在原生历史可见；第二条自然问题进入同一websocket会话、新run和同一正式事项；工具结果与来源当前版本一致；返回并重新进入恢复事项和会话；伪造chat_id/turn_id/metadata、维护身份、撤销、来源变化及无当前证明的服务恢复均在模型调用前拒绝；中断后原编号核查不重复查询或业务变更。当前只读核查没有执行这些公共路径，不登记C11/C13/C16/C17通过。
+App先通过现有onCreateChat创建原生会话，等待bind成功后设置pendingAutomationMessage，后续自然输入继续走同一ThreadShell。F01返回记录包括原生chat_id、morningRequest、morningItem、morningDate、morningTimezone及已有筛选/位置/焦点；原始输入保存在原生历史，URL只有获准标识。继续已有讨论时重新选择已绑定chat_id。页面、真实WebSocket交接、返回状态及公开Schema仍由N3验证。
+
+### 原生适配器限定证据
+
+隔离候选validation/.work/menu-f01-native-public来自N3已提交24f5c64，包含N1 89d26855及N2事项选择接口。ProductMorning使用N3本次已读取内容，隔离文件blob=c441a4eec001612238f34941bf02d746af71d7bd；boss_morning.py blob=84b0097e20be7a620c2edbf91dd58e1fb9243180，morning.schema.json blob=3b77ff3a85dd1947a2be2a815a313a5ee32b06db。N3该公共文件尚未提交时以准确blob记录依赖，不将其称为已提交生产者。N2只在自己的隔离候选使用同内容，没有修改N3文件。
+
+app/tests/fc03_agent/test_native.py明确从当前N2的validation/fc03_agent/native.py导入待测模块，并检查实际源码位置；其余接口从上述准确隔离候选导入。真实Nanobot/AgentLoop、FeatureProvider/FeatureRecorder、FormalMorningTool、MorningAPI和SQLite共同执行。检查配置只采用实际四项正式读取工具，未知usage/cost保持null。批准selection资料由ControlStore.initialize生成，模型回复消费实际工具结果；失败事件明确SIMULATED。没有读取凭据、启动服务、建立网络连接、执行视觉功能或触碰用户UI02/MVP。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 FC03_NATIVE_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/menu-f01-native-public validation/.venv/bin/python -m pytest app/tests/fc03_agent/test_native.py -q -p no:cacheprovider --basetemp=validation/.work/menu-f01-native-current --junitxml=docs/menu-delivery/F01/native-check.xml
+```
+
+native-check.xml保存24 passed、20.01秒的当前实际结果。BDD覆盖两轮原始输入及历史、同一原生会话的独立run、第一轮实际清单复用、明确选中事项、严格绑定参数、当前角色/连接、身份与路由伪造、并发与重复、改变原文、来源在调用之前及模型步骤之间撤销、模型失败/取消/超时及原回执、证明清理、普通会话不受晨间限制和重建适配器后只读恢复。实际原生WebSocket与页面返回尚未执行；这些限定SDK证据不登记完整C11/C13/C16/C17或菜单通过。
