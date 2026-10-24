@@ -103,14 +103,20 @@ class TodayAPI:
                 "coverage_state": "PARTIAL", "missing_sources": ["完整日历结束时间与冲突范围", "未提供区域和农业专题资料"],
                 "profile": owner_profile(db, data), "conflict_state": "INSUFFICIENT_EVIDENCE"}
 
-    def read(self, role):
+    def read(self, role, day=None):
         self._role(role)
+        if day is not None:
+            from boss_morning import MorningAPI
+            return MorningAPI(self.store).read(role, day)
         with self.store.connect() as db:
             return self._read(db)
 
     def reorder(self, role, payload):
         self._role(role)
         require(isinstance(payload, dict), "排序输入必须为对象", web.HTTPBadRequest)
+        if "list_id" in payload:
+            from boss_morning import MorningAPI
+            return MorningAPI(self.store).reorder(role, payload)
         self.commands._exact(payload, {"client_request_id", "expected_version", "snapshot_sha256", "item_ids"})
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")

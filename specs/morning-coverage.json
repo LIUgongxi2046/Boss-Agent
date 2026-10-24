@@ -1,0 +1,11 @@
+{
+  "source_type": "SIMULATED",
+  "generator_version": "FC03-COVERAGE-1",
+  "seed": 20261024,
+  "allowed_use": "FC03_PROGRAM_BEHAVIOR",
+  "description": "用户授权的晨间覆盖状态程序验证，由本地确定性生成器生成，没有真实企业资料或第三方授权声明，不产生任何本人业务授权。",
+  "regions": [
+    {"region_id": "sim-morning-region-1", "state": "NOT_UPDATED", "as_of_days_before_clock": 1},
+    {"region_id": "sim-morning-region-2", "state": "UNSYNCHRONIZED", "as_of_days_before_clock": null}
+  ]
+}

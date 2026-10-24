@@ -8,6 +8,42 @@ security:
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
+x-fc03-morning:
+  schema_version: 1.0.0
+  schema_extension: morning.schema.json
+  day_schema: morning.schema.json#/$defs/Day
+  query_schema: morning.schema.json#/$defs/Query
+  result_schema: morning.schema.json#/$defs/View
+  list_schema: morning.schema.json#/$defs/ReadList
+  detail_schema: morning.schema.json#/$defs/Detail
+  source_schema: morning.schema.json#/$defs/SourceDetail
+  reorder_schema: morning.schema.json#/$defs/Reorder
+  reorder_result_schema: morning.schema.json#/$defs/OrderResult
+  receipt_schema: morning.schema.json#/$defs/Receipt
+  preview: MorningAPI.read(BOSS, day) / TodayAPI.read(BOSS, day)
+  query: MorningAPI.query(BOSS, payload)
+  query_action: boss.morning.query
+  current: MorningAPI.read_list(BOSS, list_id, historical=false)
+  history: MorningAPI.read_list(BOSS, list_id, historical=true)
+  detail: MorningAPI.detail(BOSS, list_id, item_id)
+  source: MorningAPI.source(BOSS, list_id, source_id)
+  reorder: MorningAPI.reorder(BOSS, payload) / TodayAPI.reorder(BOSS, payload)
+  reorder_action: boss.today.reorder
+  receipt: MorningAPI.receipt(BOSS, action, client_request_id)
+  coverage_input_schema: morning.schema.json#/$defs/CoverageLoad
+  coverage_result_schema: morning.schema.json#/$defs/CoverageResult
+  coverage_catalog: MorningInputAPI.catalog(MAINTAINER)
+  coverage_load: MorningInputAPI.load(MAINTAINER, payload)
+  coverage_receipt: MorningInputAPI.receipt(MAINTAINER, client_request_id)
+  coverage_action: boss.simulation.morning_coverage.load
+  coverage_definition: morning-coverage.json; FC03-COVERAGE-1; seed=20261024; SIMULATED_GENERATOR
+  scope: authenticated role and active owner/dataset/namespace supplied by server; explicit date and IANA timezone required
+  persistence: morning_list and morning_sequence; exact request digest; versioned object/source/profile/rules/clock binding
+  ordering: complete current item set plus date/timezone/snapshot/CAS; only owner confirmation may save; model cannot invoke
+  compatibility: no-argument TodayAPI.read and legacy TodayAPI.reorder unchanged; default owner timezone shares legacy date key
+  stale_history: identifiers and versions remain; stale private content and derived intervals hidden; current use requires requery
+  unknown_receipt: NOT_FOUND_IN_CURRENT_STORE is not evidence of no execution; never replay a write automatically
+  public_integration: PENDING_N2_N3
 x-fc02-bi-query:
   scenario_catalog: BIScenarioAPI.catalog(MAINTAINER)
   scenario_load: BIScenarioAPI.execute(MAINTAINER, boss.simulation.bi_scenario.load, payload)

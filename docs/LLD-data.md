@@ -57,7 +57,9 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 技术调度 | schedule、rules、scheduler_draft | 维护配置保存/校验/启用分别记录；CronService 唯一执行 |
 | 本人计划 | owner_plan、owner_plan_revision | ACTIVE/PAUSED/CANCELED；event_ids 与 event_versions 绑定；取消保留历史 |
 | 事件与通知 | event、reminder、dispatch、delivery、notification | 业务事件状态、提醒处理与内部通知保存分别维护；去重按 event_id/version |
-| 今日次序 | today_order，以业务日期为 ID | 完整当前事项 ID 集合；snapshot_sha256 和 expected_version 同时校验；重启后采用 |
+| 今日次序 | today_order，默认本人时区以业务日期为 ID，其他时区使用日期与IANA时区 | 完整当前事项 ID 集合；date/timezone、snapshot_sha256 和 expected_version 同时校验；重启后采用 |
+| 晨间清单 | morning_list、morning_sequence | 清单编号稳定，按日期与IANA时区递增版本；当前采用核查本人范围、对象、来源、目标、规则与业务时钟 |
+| 晨间覆盖 | morning_coverage、独立document及document_history | 明确SIMULATED生成版本及用途；地区未更新/未同步分别表达，不声明完整覆盖或业务授权 |
 | 查询 | query | 公式版本、明细引用、参数、原始精度和来源时效；参数改变重新查询 |
 | 查询来源绑定 | query_source_binding，以query_id为ID | 与query同一事务保存owner/dataset、来源版本/完整JSON摘要及每项明细摘要；读取当前原文前逐项验证 |
 | 交办来源绑定 | assignment_source_binding，以task_id为ID | 与交办同一事务保存owner/dataset、来源版本和完整摘要；纪要产生的交办另保存原始纪要来源摘要，发送或完成前重验 |
@@ -186,6 +188,16 @@ flowchart LR
 业务使用责任：BOSS命令产生任务/授权/本人设置，后续页面、工具及Cron按当前版本读取；MAINTAINER只产生获准模拟资料、反馈与技术配置；资料换版或撤销使会前材料、纪要引用、研究、人员会面和计划需要复核；通知知晓、关闭与暂缓不改变任务期限及完成状态。具体接收动作与acceptance_id分别见T06、T12—T18及T21—T24。
 
 ## 事务、重置与恢复
+
+### FC03 晨间清单与逐日次序
+
+正式Schema为specs/morning.schema.json 1.0.0。MorningAPI在当前唯一active空间读取服务端确定的owner/dataset/version/namespace；输入只包含日期、IANA时区和正式请求/session编号。所选日期使用ZoneInfo计算本地零时至次日零时，夏令时与跨日区间按实际边界处理。未结束承诺、交办、待决定申请与事件保持持续待办；会议、私人安排和出行采用实际起止区间，会议准备期限另外参与当日范围。目标只采用当前获准且明确适用的本人确认设置。缺少来源、目标或完整日历时保留明确缺口。
+
+query在BEGIN IMMEDIATE中保存morning_list、morning_sequence、原请求回执和元信息审计。morning_list保存list_id/list_version、日期/时区、request/session、本人范围、原View和完整对象/文档绑定；相同请求同内容只产生一个清单。snapshot_sha256包含当前对象、文档原文及版本、覆盖、目标、规则和业务时钟。详情和来源读取在同一只读事务重新核查；来源更新、撤销、到期、范围变化或删除后停止当前采用。historical读取保留原编号与版本引用，失效正文及私人派生区间不再呈现；不会用当前原文重建历史内容。
+
+排序继续使用boss.today.reorder；新输入同时包含清单编号、日期、时区、完整事项集合、快照和expected_version。本人明确保存后，在同一事务写入仅限次序的授权、today_order和原回执，不改变任务、审批、事件、日历或发送状态。默认本人时区继续读取既有日期键，其他时区使用date|timezone；当前有效重要风险保持优先，新事项依分类、明确目标和期限排列。清单原版本保持，read_list.current_order单独返回当前已保存次序。重启使用同库读取；未知结果只查询原编号，不能自动重发。
+
+晨间覆盖资料由MorningInputAPI的明确维护动作载入，定义FC03-COVERAGE-1、seed20261024、用途FC03_PROGRAM_BEHAVIOR。生成作者、参数摘要、来源版本、访问范围、有效期限、地区原始as_of和未同步状态均保存；获准初始selection/1不变，真实企业资料、第三方授权与本人业务授权均为false。维护读取只返回定义和回执元信息，不读取本人晨间清单。新增对象kind复用当前objects，无DDL迁移；正式公共读取/命令、模型工具与界面由N2/N3接收。
 
 ### FC02 正式经营边界场景
 
