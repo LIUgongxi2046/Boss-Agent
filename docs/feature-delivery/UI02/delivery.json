@@ -4,7 +4,7 @@
   "decision_id": "D-UI-INTEGRATION-20261024",
   "baseline_id": "boss-ui02-coverage-20261024-v1",
   "status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
-  "implementation_commit": null,
+  "implementation_commit": "00f10d386dfb9a2ac4743310f6a64951c7779de9",
   "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/candidate_commit",
   "ui01_base_candidate": "386c577b67b2b53fc1989f258095547035750ad3",
   "development_covered_checkpoints": 8,
