@@ -383,14 +383,25 @@ class BossWorkspaceAPI:
                 "owner_plan_events": [],
                 "plan_event_tracking_implemented": False}
         if key == "notifications":
+            from boss_business_alerts import BusinessAlertsAPI
+
+            if self.namespace != "ui-check":
+                raise web.HTTPConflict(text="当前经营提醒执行空间不匹配")
             events = _object_list(db, self.namespace, "event")
+            operating_ids = {event["event_id"] for event in events if event.get("generated_by") == "BUSINESS_ALERT_INPUT"}
+            events = [event for event in events if event["event_id"] not in operating_ids]
             sent = _object_list(db, self.namespace, "notification")
             reminders = _object_list(db, self.namespace, "reminder")
             deliveries = _object_list(db, self.namespace, "delivery")
             rules = _object_list(db, self.namespace, "rules")
             active_notice = effective_owner_notice(db, data)
             dispatches = _object_list(db, self.namespace, "dispatch")
+            sent = [row for row in sent if row.get("event_id") not in operating_ids]
+            reminders = [row for row in reminders if row.get("event_id") not in operating_ids]
+            deliveries = [row for row in deliveries if row.get("event_id") not in operating_ids]
+            dispatches = [row for row in dispatches if row.get("event_id") not in operating_ids]
             return {
+                "business_alerts": BusinessAlertsAPI(self.store).project_in_transaction(role, db),
                 "events": [{k: row[k] for k in (
                     "event_id", "version", "state", "impact", "due_at", "task_id"
                 ) if k in row} for row in events],

@@ -30,6 +30,8 @@ from boss_simulation_api import SimulationAPI
 from boss_bi_scenarios import BIScenarioAPI
 from public_bi_scenarios import maintainer_catalog
 from public_morning import morning_read, morning_coverage_read
+from public_notification_target import notification_target
+from public_business_alerts import read_alerts, read_rules, input_catalog
 from boss_supply_quality import SupplyQualityAPI, external_adoption
 
 DEMO_NAMESPACE = "ui-check"
@@ -564,6 +566,12 @@ class BossPageAPI:
                 if query_string:
                     return 400, {"error": "INVALID_INPUT"}
                 return 200, memory_technical_status(self.store, role, self.namespace)
+            if path == "/api/boss/ui/business-alert-rules":
+                return 200, read_rules(self.store, role, self.namespace, query_string)
+            if path == "/api/boss/ui/admin/business-alert-input":
+                return 200, input_catalog(self.store, role, self.namespace, query_string)
+            if path == "/api/boss/ui/business-alerts":
+                return 200, read_alerts(self.store, role, self.namespace, query_string)
             if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview", "/api/boss/ui/calendar-conflict"):
                 return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
@@ -585,6 +593,8 @@ class BossPageAPI:
                 return 200, self._model_runtime(role)
             if role != "BOSS":
                 return 403, {"error": "FORBIDDEN"}
+            if path == "/api/boss/ui/notification-target":
+                return 200, notification_target(self.store, role, self.namespace, query_string)
             if path in ("/api/boss/ui/today", "/api/boss/ui/owner-plans", "/api/boss/ui/meeting-arrangement"):
                 if query_string:
                     return 400, {"error": "INVALID_INPUT"}

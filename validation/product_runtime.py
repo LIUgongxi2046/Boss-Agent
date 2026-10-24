@@ -32,13 +32,15 @@ class RuntimeValues(BaseModel):
 
 
 class ProductRuntime:
-    def __init__(self, store, config_path, loop, registry, available_tools, provider, *, workspace_api=None):
+    def __init__(self, store, config_path, loop, registry, available_tools, provider, *, workspace_api=None, workspace_tool_factory=None):
         self.store, self.loop, self.registry, self.provider = store, loop, registry, provider
         self.config = WebUISettingsConfig(config_path)
         self.available = {tool.name: tool for tool in available_tools}
         require(workspace_api is None or workspace_api.store is store and workspace_api.namespace == NS,
                 "工作投影接口必须绑定当前业务数据库及执行空间")
         self.workspace_api = workspace_api
+        self.workspace_tool_factory = BossWorkspaceReadTool if workspace_tool_factory is None else workspace_tool_factory
+        require(callable(self.workspace_tool_factory), "工作投影工具生产者不可用")
         self.skill_readiness = None
         self.skill_pending = None
         require(len(self.available) == len(available_tools), "工具目录包含重复标识")
@@ -107,7 +109,7 @@ class ProductRuntime:
             records.append({"name": name, "schema": tool.to_schema(),
                             "implementation_sha256": hashlib.sha256(Path(source).read_bytes()).hexdigest()})
         if self.workspace_api is not None:
-            projection_tool = BossWorkspaceReadTool(self.workspace_api, "BOSS", allowed_projections=sorted(SOP_WORKSPACE_PROJECTIONS))
+            projection_tool = self.workspace_tool_factory(self.workspace_api, "BOSS", allowed_projections=sorted(SOP_WORKSPACE_PROJECTIONS))
             source = inspect.getsourcefile(type(projection_tool))
             require(source is not None, "工作投影实现缺少可核查来源")
             records.append({"name": projection_tool.name, "mode": "WORKSPACE_PROJECTIONS", "schema": projection_tool.to_schema(),
@@ -130,7 +132,7 @@ class ProductRuntime:
             self.registry.unregister(name)
         for name in scope:
             if name == "bossWorkspaceRead" and workspace["workspace_read_mode"] == "WORKSPACE_PROJECTIONS":
-                self.registry.register(BossWorkspaceReadTool(self.workspace_api, "BOSS", allowed_projections=workspace["workspace_projections"]))
+                self.registry.register(self.workspace_tool_factory(self.workspace_api, "BOSS", allowed_projections=workspace["workspace_projections"]))
             else:
                 self.registry.register(self.available[name])
         self.workspace_policy = workspace

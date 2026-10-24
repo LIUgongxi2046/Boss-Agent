@@ -3,6 +3,10 @@ import { AlertCircle, ArrowRight, CheckCircle2, Clock3,
   FileSearch, FolderOpen, Loader2, RefreshCw,
   ShieldCheck, Sparkles } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import {BossNativeNotification} from "./BossDesktopNotifications";
+import {useTransaction} from "./BossAssignmentFlow";
+import {BossReminderPreparation} from "./BossReminderPreparation";
+import {BossBusinessAlerts,type BusinessAlertRead} from "./BossBusinessAlerts";
 
 // Only these routes have real, role-scoped read projections. Routes absent
 // from this map still show the original transparent "not implemented" panel.
@@ -75,6 +79,7 @@ type Workspace = {
   steps?:{step_id:string;actor:string;action:string}[];coverage?:string;
   simulated_business_time?: string;
   installed_mac_app_verified?: boolean;
+  business_alerts?:BusinessAlertRead;
   model_connection_verified_here?: boolean;
 };
 
@@ -126,13 +131,15 @@ const ROLES: Record<string,Role> = {
   scheduler:"MAINTAINER",audit:"MAINTAINER",system:"MAINTAINER",evaluation:"MAINTAINER",
 };
 
-export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
+export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpenTask,onDirtyChange}: {
   pageId:string; role:Role;
   onNavigate:(id:string)=>void;
   onViewSource:(id:string)=>void;
+  onOpenTask?:(taskId:string)=>void;
+  onDirtyChange?:(dirty:boolean)=>void;
 }) {
   const route = WORKSPACE_PAGE_ROUTES[pageId];
-  const {client,getToken} = useClient();
+  const {client,getToken,token} = useClient();
   const [data,setData] = useState<Workspace|null>(null);
   const [revision,setRevision] = useState(0);
   const [loading,setLoading] = useState(false);
@@ -149,6 +156,9 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
   const [timeInput,setTimeInput] = useState("");
   const [dirty,setDirty] = useState(false);
   const [revokeReason,setRevokeReason] = useState("");
+  const [selectedEvent,setSelectedEvent]=useState(()=>new URLSearchParams(window.location.search).get("bossEvent")??"");
+  useEffect(()=>{const changed=()=>setSelectedEvent(new URLSearchParams(window.location.search).get("bossEvent")??"");window.addEventListener("boss-notification-target-changed",changed);window.addEventListener("popstate",changed);return()=>{window.removeEventListener("boss-notification-target-changed",changed);window.removeEventListener("popstate",changed);};},[]);
+  useEffect(()=>{if(route!=="notifications"||!data||!selectedEvent)return;const target=document.getElementById("boss-notification-"+encodeURIComponent(selectedEvent));target?.scrollIntoView({block:"center"});target?.focus();},[route,data,selectedEvent]);
 
   useEffect(()=>{
     if(!route || ROLES[route]!==role) {setError("当前角色不允许访问该业务投影");return;}
@@ -175,7 +185,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         setError(e instanceof Error?e.message:String(e));setLoading(false);
       });
     return ()=>controller.abort();
-  },[route,role,revision,searched,getToken]);
+  },[route,role,revision,searched,getToken,token]);
 
   useEffect(()=>{
     if(!pending)return;
@@ -197,6 +207,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
   },[pending?.id,busy]);
 
   function reload(){setRevision(x=>x+1);}
+  const reminderTx=useTransaction(reload,undefined,undefined,"reminder");
   function propose(action:string, fields:Record<string,unknown>, title:string, scope:string[]){
     if(busy)return;
     setNotice("");setError("");
@@ -273,6 +284,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
       ]);
   }
   function actOnReminder(event:Event, action:"ack"|"close"|"snooze"){
+    if(reminderTx.busy)return;
     const current=(data?.reminders||[]).find(x=>x.event_id===event.event_id);
     if(current?.state==="CLOSED"){setError("已关闭的提醒不能重新开启");return;}
     const fields:Record<string,unknown>={
@@ -284,7 +296,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         setError(e instanceof Error?e.message:String(e));return;
       }
     }
-    propose("boss.reminder."+action,fields,
+    reminderTx.propose(("boss.reminder."+action) as "boss.reminder.ack"|"boss.reminder.snooze"|"boss.reminder.close",fields,
       action==="ack"?"确认知晓":action==="close"?"确认关闭":"确认暂缓提醒",
       [
         "源事件："+event.event_id,
@@ -348,7 +360,9 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
     {loading&&<Notice message="正在向本机受权限控制的业务服务读取数据与版本…"/>}
     {error&&<Notice error message={error}/>}
     {notice&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={17}/>{notice}</div>}
-    {w&&<div className="boss-columns">
+    {route==="notifications"&&<BossReminderPreparation revision={revision}/>}
+    {route==="notifications"&&w?.business_alerts&&<BossBusinessAlerts projection={w.business_alerts} revision={revision} onReload={reload} onNavigate={onNavigate} onOpenTask={onOpenTask} onDirtyChange={onDirtyChange}/>}
+    {w&&<div className={"boss-columns "+(route==="notifications"?"boss-fc04-reminders":"")}>
       <div className="boss-column">
         {route==="memory"&&<Layer title="长期决定与个人记忆" description="仅本人可修改 · FR-13">
           <Fact label="业务状态">{v(w.memory?.confirmation_state)}</Fact>
@@ -380,7 +394,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
         {route==="notifications"&&<Layer title="经营通知与提醒" description="FR-02 · 持续按真实事件版本读取">
           {(w.events||[]).length? (w.events||[]).map(event=>{
             const reminder=w.reminders?.find(r=>r.event_id===event.event_id);
-            return <article className="boss-workspace-item" key={event.event_id}>
+            return <article className="boss-workspace-item" id={"boss-notification-"+encodeURIComponent(event.event_id)} tabIndex={-1} aria-current={selectedEvent===event.event_id?"true":undefined} key={event.event_id}>
               <div className="boss-workspace-item-top">
                 <strong>{event.event_id}</strong>
                 <span className="boss-tag boss-tag-blue">{event.state}</span>
@@ -389,12 +403,13 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
               <Fact label="事件到期">{date(event.due_at)}</Fact>
               <Fact label="当前提醒决定">{reminder?.state||"尚未处理"}</Fact>
               <Fact label="已交付通知">{(w.notifications||[]).filter(n=>n.event_id===event.event_id).length}</Fact>
+              <BossNativeNotification eventId={event.event_id} eventVersion={event.version}/>
               <div className="boss-actions">
-                <button className="boss-btn" type="button" disabled={reminder?.state==="CLOSED"}
+                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
                   onClick={()=>actOnReminder(event,"ack")}>已知晓</button>
-                <button className="boss-btn" type="button" disabled={reminder?.state==="CLOSED"}
+                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
                   onClick={()=>actOnReminder(event,"snooze")}>暂缓</button>
-                <button className="boss-btn" type="button" disabled={reminder?.state==="CLOSED"}
+                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
                   onClick={()=>actOnReminder(event,"close")}>关闭</button>
               </div>
             </article>;
@@ -658,6 +673,9 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource}: {
           </Layer>}
       </div>
     </div>}
+    {route==="notifications"&&reminderTx.notice&&<Notice message={reminderTx.notice}/>}
+    {route==="notifications"&&reminderTx.dialog}
+    {route==="notifications"&&reminderTx.recovery}
     {pending&&<div className="boss-confirm-backdrop">
       <section className="boss-confirm" role="dialog" aria-modal="true"
         aria-labelledby="boss-workspace-confirm" tabIndex={-1} ref={modalRef}>

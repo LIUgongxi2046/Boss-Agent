@@ -43,6 +43,7 @@ from product_skills import ProductSkills
 from product_fc01 import ProductFc01
 from product_mvp import ProductMVP
 from product_assignment import ProductAssignment, AssignmentReadTool
+from product_reminders import ProductReminders
 from fc07_agent import TOOLS as ASSIGNMENT_TOOLS
 from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
 from product_morning import ProductMorning
@@ -137,10 +138,11 @@ async def serve():
     bi = ProductBI(store) if product_mode else None
     morning = ProductMorning(store) if product_mode else None
     assignment = ProductAssignment(store) if product_mode else None
-    provider = FeatureProvider(fc01, bi, morning, assignment) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
+    reminders = ProductReminders(store) if product_mode else None
+    provider = FeatureProvider(fc01, bi, morning, assignment, reminders) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = FeatureToolRegistry() if product_mode else ToolRegistry()
-    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi, morning, assignment) if product_mode else None
+    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi, morning, assignment, reminders) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -189,11 +191,12 @@ async def serve():
     skills = None
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,
-                                         [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages)
+                                         [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages, workspace_tool_factory=reminders.workspace_tool)
         fc01.runtime = runtime_control
         bi.runtime = runtime_control
         morning.runtime = runtime_control
         assignment.runtime = runtime_control
+        reminders.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
@@ -231,6 +234,7 @@ async def serve():
         channels.channels["websocket"].morning = morning
         channels.channels["websocket"].mvp = fc01 if mvp_mode else None
         channels.channels["websocket"].assignment = assignment
+        channels.channels["websocket"].reminders = reminders
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -243,6 +247,7 @@ async def serve():
             bi.bot = bot
             morning.bot = bot
             assignment.bot = bot
+            reminders.bot = bot
         async def context(request):
             current = store.context("ui-check")
             selected_prompts = load_runtime_prompts(store, "ui-check")
@@ -274,6 +279,7 @@ async def serve():
             bot.runtime.add_context_provider(bi.scope_context)
             bot.runtime.add_context_provider(morning.scope_context)
             bot.runtime.add_context_provider(assignment.scope_context)
+            bot.runtime.add_context_provider(reminders.scope_context)
             bot.runtime.add_context_provider(runtime_recorder.context)
         else:
             bot.runtime.add_context_provider(context)

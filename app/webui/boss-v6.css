@@ -990,6 +990,27 @@
 .boss-mvp-view .boss-column ul { padding-left: 16px; }
 .boss-mvp-view .boss-column li { margin-block: 8px; }
 .boss-assignment-scope { min-width: 0; font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-fc04-reminders { min-width: 0; font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-fc04-reminders .boss-kv strong,
+.boss-v6 .boss-native-notification p,
+.boss-v6 .boss-native-notification label { font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+.boss-v6 .boss-fc04-reminders .boss-kv > span { font-size: 14px; line-height: 22px; }
+.boss-v6 .boss-fc04-reminders .boss-btn { min-height: 44px; }
+.boss-v6 .boss-fc04-reminders input,
+.boss-v6 .boss-fc04-reminders select,
+.boss-v6 .boss-fc04-reminders textarea,
+.boss-v6 .boss-fc04-reminders label,
+.boss-v6 .boss-fc04-reminders p:not(.boss-helper) { font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-fc04-reminders .boss-helper { font-size: 14px; line-height: 22px; }
+.boss-v6 .boss-owner-setting-fields { border: 0; margin: 0; padding: 0; min-width: 0; }
+.boss-v6 .boss-fc04-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.boss-v6 .boss-alert-detail { margin-block: 24px; padding-block: 16px; border-top: 1px solid var(--boss-border); overflow-wrap: anywhere; }
+.boss-v6 .boss-alert-detail > h3 { font-size: 18px; line-height: 28px; }
+.boss-v6 .boss-alert-records { margin-block: 12px; overflow-wrap: anywhere; }
+.boss-v6 .boss-alert-records > summary { min-height: 44px; cursor: pointer; font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-alert-source { white-space: pre-wrap; overflow-wrap: anywhere; }
+.boss-v6 .boss-alert-detail fieldset { display: grid; gap: 16px; }
+.boss-v6 .boss-fc04-reminders article[aria-current="true"] { outline: 2px solid var(--boss-focus); outline-offset: 2px; }
 .boss-v6 .boss-assignment-scope .boss-label,
 .boss-v6 .boss-assignment-scope label,
 .boss-v6 .boss-assignment-scope input,

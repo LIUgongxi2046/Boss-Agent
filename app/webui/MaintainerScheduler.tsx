@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertCircle, CheckCircle2, Clock3, FileCheck2, Loader2,
   PauseCircle, PlayCircle, RefreshCw, ShieldCheck, XCircle,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import {useTransaction} from "./BossAssignmentFlow";
+import {BossBusinessAlertAdministration} from "./BossBusinessAlerts";
 
 type Schedule = {
   schedule_id:string;version:string;schedule_version:string;timezone:string;
@@ -28,14 +30,11 @@ type Scheduler = {
   manual_dispatch_supported_here:boolean;external_delivery_verified:false;
   available_manual_events:{event_id:string;version:string;due_at:string;state:string}[];
 };
-type Result = {version?:string;validation_state?:string;
-  enabled?:boolean;canceled?:boolean;schedule_activated?:boolean};
-type Pending = {action:string;payload:Record<string,unknown>;title:string;
-  id:string;detail:string[]};
+type SchedulerAction="boss.scheduler.draft.save"|"boss.scheduler.draft.validate"|"boss.scheduler.activate"|"boss.scheduler.manual_run"|"boss.scheduler.pause"|"boss.scheduler.resume"|"boss.scheduler.cancel";
 
 const DEFAULT:Configuration = {
   trigger:"EVENT_OR_TIME",timezone:"Asia/Shanghai",
-  quiet_start:22,quiet_end:7,cooldown_seconds:3600,
+  quiet_start:22,quiet_end:7,cooldown_seconds:1800,
   important_escalation:false,
 };
 function Kv({label,value}:{label:string;value:string|number|boolean|null|undefined}) {
@@ -44,23 +43,20 @@ function Kv({label,value}:{label:string;value:string|number|boolean|null|undefin
   }</strong></div>;
 }
 
-export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void}) {
-  const {client,getToken}=useClient();
+export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page:string)=>void;onDirtyChange?:(dirty:boolean)=>void}) {
+  const {getToken,token}=useClient();
   const [data,setData]=useState<Scheduler|null>(null);
   const [cfg,setCfg]=useState<Configuration>(DEFAULT);
   const [dirty,setDirty]=useState(false);
   const [revision,setRevision]=useState(0);
   const [loading,setLoading]=useState(false);
-  const [busy,setBusy]=useState(false);
-  const [checkBusy,setCheckBusy]=useState(false);
   const [error,setError]=useState("");
-  const [notice,setNotice]=useState("");
   const [selectedEvent,setSelectedEvent]=useState("");
-  const [pending,setPending]=useState<Pending|null>(null);
-  const [checked,setChecked]=useState(false);
-  const dialog=useRef<HTMLElement|null>(null);
-  const busyRef=useRef(false);busyRef.current=busy||checkBusy;
+  const [alertDirty,setAlertDirty]=useState(false);
   const reload=()=>setRevision(v=>v+1);
+  const transaction=useTransaction(()=>{setDirty(false);onDirtyChange?.(false);reload();},undefined,undefined,"scheduler");
+  const busy=transaction.busy,notice=transaction.notice;
+  useEffect(()=>{onDirtyChange?.(dirty||busy||alertDirty);},[dirty,busy,alertDirty,onDirtyChange]);
   useEffect(()=>{
     const abort=new AbortController();
     const token=getToken();
@@ -93,77 +89,14 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
       setError(e instanceof Error?e.message:String(e));setLoading(false);
     });
     return ()=>abort.abort();
-  },[revision,getToken]);
-
-  useEffect(()=>{
-    if(!pending)return;
-    const origin=document.activeElement instanceof HTMLElement?document.activeElement:null;
-    dialog.current?.focus();
-    const keyboard=(e:KeyboardEvent)=>{
-      if(e.key==="Escape"&&!busyRef.current){setPending(null);setChecked(false);return;}
-      if(e.key!=="Tab"||!dialog.current)return;
-      const nodes=Array.from(dialog.current.querySelectorAll<HTMLElement>(
-        "button:not([disabled]),input:not([disabled])"
-      )).filter(n=>n.getClientRects().length>0);
-      if(!nodes.length)return;
-      if(e.shiftKey&&document.activeElement===nodes[0]){
-        e.preventDefault();nodes[nodes.length-1].focus();
-      }else if(!e.shiftKey&&document.activeElement===nodes[nodes.length-1]){
-        e.preventDefault();nodes[0].focus();
-      }
-    };
-    document.addEventListener("keydown",keyboard);
-    return ()=>{document.removeEventListener("keydown",keyboard);origin?.focus();};
-  },[pending?.id]);
+  },[revision,getToken,token]);
 
   function edit<K extends keyof Configuration>(field:K,value:Configuration[K]){
     setCfg(old=>({...old,[field]:value}));setDirty(true);
   }
   function propose(action:string,payload:Record<string,unknown>,title:string,detail:string[]){
     if(busy||loading)return;
-    setPending({action,payload,title,detail,id:"boss-"+crypto.randomUUID()});
-    setChecked(false);setError("");setNotice("");
-  }
-  async function execute(){
-    if(!pending||!checked||busy||checkBusy)return;
-    setBusy(true);setError("");
-    try{
-      const result=await client.requestMutation<Result>(pending.action,{
-        ...pending.payload,client_request_id:pending.id,
-      });
-      setNotice("已从实际 SQLite 确认技术操作结果；版本 "+
-        (result.version||"待核查")+"；状态 "+
-        (result.validation_state||(result.canceled?"CANCELED":result.enabled?"ENABLED":"PAUSED"))+
-        "。正在重读调度与草稿状态。");
-      setDirty(false);setPending(null);setChecked(false);reload();
-    }catch(e){
-      setError((e instanceof Error?e.message:String(e))+
-        "。执行回执不确定时请核查原请求编号，不要更换编号重试。");
-    }finally{setBusy(false);}
-  }
-  async function reconcile(){
-    if(!pending||busy||checkBusy)return;
-    const token=getToken();
-    if(!token){setError("维护身份已失效");return;}
-    setCheckBusy(true);setError("");
-    try{
-      const q=new URLSearchParams({action:pending.action,client_request_id:pending.id});
-      const res=await fetch("/api/boss/ui/operation-status?"+q.toString(),{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
-      });
-      if(!res.ok)throw Error("原操作回执查询失败");
-      const result=await res.json() as {outcome:string;action:string;client_request_id:string};
-      if(result.action!==pending.action||result.client_request_id!==pending.id)
-        throw Error("回执标识不一致");
-      if(result.outcome==="RECORDED"){
-        setNotice("原请求已在SQLite持久化，正在重新读取当前配置。");
-        setDirty(false);setPending(null);setChecked(false);reload();
-      }else if(result.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
-        setError("未检出回执不证明未执行。请核对真实配置后使用相同请求编号重试。");
-        reload();
-      }else throw Error("无法识别原执行结果");
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setCheckBusy(false);}
+    setError("");transaction.propose(action as SchedulerAction,payload,title,detail);
   }
 
   function save(){
@@ -259,7 +192,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
       <div className="boss-column">
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>时间与事件触发配置</h2><small>保存、校验和启用各自独立</small></div>
-          <div className="boss-form-grid">
+          <fieldset className="boss-fc04-fieldset" disabled={busy||loading}><div className="boss-form-grid">
             <label>计划对象<input readOnly value={data?.schedule.schedule_id||"待加载"}/></label>
             <label>当前技术版本<input readOnly value={data?.schedule.version||"待加载"}/></label>
             <label>触发条件<select value={cfg.trigger}
@@ -282,7 +215,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
                 <option value="false">关闭（默认）</option><option value="true">允许 IMPORTANT 事件升级</option>
               </select>
             </label>
-          </div>
+          </div></fieldset>
           <div className="boss-actions">
             <button type="button" className="boss-btn" disabled={!data||busy}
               onClick={save}><FileCheck2 size={16}/> 保存草稿</button>
@@ -372,29 +305,7 @@ export function MaintainerScheduler({onNavigate}:{onNavigate:(page:string)=>void
         </section>
       </div>
     </div>
-    {pending&&<div className="boss-confirm-backdrop">
-      <section className="boss-confirm" role="dialog" aria-modal="true"
-        aria-labelledby="boss-scheduler-confirm" tabIndex={-1} ref={dialog}>
-        <h3 id="boss-scheduler-confirm"><ShieldCheck size={19}/>{pending.title}</h3>
-        <p>当前只是有界模拟技术调度配置。没有老板业务授权，操作通过同一持久事务和原请求编号执行。</p>
-        <dl>{pending.detail.map((row,i)=><div key={i}><dd>{row}</dd></div>)}</dl>
-        <label className="boss-confirm-check">
-          <input type="checkbox" checked={checked} disabled={busy||checkBusy}
-            onChange={e=>setChecked(e.target.checked)}/>
-          <span>我已核实配置版本、操作类型以及对当前计划的影响。</span>
-        </label>
-        {error&&<p className="boss-validation-error" role="alert">{error}</p>}
-        <div className="boss-actions">
-          <button type="button" className="boss-btn" disabled={busy||checkBusy}
-            onClick={()=>{setPending(null);setChecked(false);}}>取消</button>
-          <button type="button" className="boss-btn" disabled={busy||checkBusy}
-            onClick={()=>void reconcile()}>
-            {checkBusy&&<Loader2 size={15} className="boss-spin"/>} 查询原请求回执</button>
-          <button type="button" className="boss-btn boss-btn-primary"
-            disabled={!checked||busy||checkBusy} onClick={()=>void execute()}>
-            {busy&&<Loader2 size={15} className="boss-spin"/>} 确认并提交</button>
-        </div>
-      </section>
-    </div>}
+    <BossBusinessAlertAdministration onDirtyChange={setAlertDirty}/>
+    {transaction.dialog}{transaction.recovery}
   </>;
 }

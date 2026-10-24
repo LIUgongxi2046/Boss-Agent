@@ -286,17 +286,20 @@ class PublicBIRecorder(Fc02RuntimeRecorder):
 
 
 class FeatureProvider(LLMProvider):
-    def __init__(self, fc01, bi, morning=None, assignment=None):
+    def __init__(self, fc01, bi, morning=None, assignment=None, reminders=None):
         super().__init__(provider_name="deepseek")
         self.fc01, self.bi = fc01, bi
         self.morning = morning
         self.assignment = assignment
+        self.reminders = reminders
 
     def get_default_model(self):
         return "deepseek-flash"
 
     async def chat(self, messages, tools=None, model=None, **kwargs):
         request = current_request_context()
+        if self.reminders is not None and self.reminders.handles(request):
+            return await self.reminders.provider.chat(messages, tools, model, **kwargs)
         if self.assignment is not None and self.assignment.handles(request):
             return await self.assignment.provider.chat(messages, tools, model, **kwargs)
         provider = self.morning.provider if self.morning is not None and self.morning.handles(request) else self.bi.provider if request is not None and BI_REQUEST in request.attributes else self.fc01.provider
@@ -313,15 +316,19 @@ class FeatureProvider(LLMProvider):
 
 
 class FeatureRecorder:
-    def __init__(self, store, registry, snapshot, bi, morning=None, assignment=None):
+    def __init__(self, store, registry, snapshot, bi, morning=None, assignment=None, reminders=None):
         self.fc01 = Fc01RuntimeRecorder(store,"ui-check",registry,snapshot)
         self.bi = PublicBIRecorder(bi,registry,snapshot)
         self.morning_service = morning
         self.morning = morning.recorder(registry,snapshot) if morning is not None else None
         self.assignment_service = assignment
         self.assignment = assignment.recorder(registry,snapshot) if assignment is not None else None
+        self.reminder_service = reminders
+        self.reminders = reminders.recorder(registry,snapshot) if reminders is not None else None
 
     async def context(self, request):
+        if self.reminder_service is not None and self.reminder_service.handles(request):
+            return await self.reminders.context(request)
         if self.assignment_service is not None and self.assignment_service.handles(request):
             return await self.assignment.context(request)
         recorder = self.morning if self.morning_service is not None and self.morning_service.handles(request) else self.bi if BI_REQUEST in request.attributes else self.fc01

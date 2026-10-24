@@ -102,6 +102,9 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        "boss.simulation.alert.load": "MAINTAINER",
+        **{"boss.alert." + action: "BOSS" for action in ("ack", "snooze", "close", "meeting.link", "assignment.create")},
+        **{prefix + action: role for prefix, role in (("boss.alert.rule.", "BOSS"), ("boss.simulation.alert.rule.", "MAINTAINER")) for action in ("save", "validate", "activate", "disable")},
         MORNING_COVERAGE_LOAD: "MAINTAINER",
         BI_SCENARIO_LOAD: "MAINTAINER",
         **{action: definition[0] for action, definition in SUPPLY_QUALITY_ACTIONS.items()},
@@ -197,7 +200,16 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action == MORNING_COVERAGE_LOAD:
+            if action == "boss.simulation.alert.load":
+                from boss_alert_rules import BusinessAlertInputAPI
+                result = BusinessAlertInputAPI(self.store).load(role, payload)
+            elif action.startswith(("boss.alert.rule.", "boss.simulation.alert.rule.")):
+                from boss_alert_rules import BusinessAlertRulesAPI
+                result = BusinessAlertRulesAPI(self.store).execute(role, action.rsplit(".", 1)[-1], payload)
+            elif action.startswith("boss.alert."):
+                from boss_business_alerts import BusinessAlertsAPI
+                result = BusinessAlertsAPI(self.store).execute(role, action.removeprefix("boss.alert."), payload)
+            elif action == MORNING_COVERAGE_LOAD:
                 result = MorningInputAPI(self.store).load(role,payload)
             elif action == BI_SCENARIO_LOAD:
                 result = BIScenarioAPI(self.store).execute(role,action,payload)
@@ -762,6 +774,7 @@ class BossCommandAPI:
             keys.add("until")
         self._exact(payload, keys)
         event = self.store.get(db, NAMESPACE, "event", payload["event_id"])
+        require(event.get("generated_by") != "BUSINESS_ALERT_INPUT", "经营提醒需要当前依据摘要与独立经营决定入口")
         require(event["version"] == payload["event_version"],
                 "事件版本变化，须重新核查")
         require(event["state"] != "CANCELED",

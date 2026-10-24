@@ -21,7 +21,7 @@ export function BossPersonalCommitments({items,businessClock,onReload,onDirtyCha
   const active=currentId?items.find(item=>item.commitment_id===currentId):items.find(item=>item.status==="ACTIVE")??items[0];
   function saved(){setPurpose("");setDue("");setRequiredProof("");setSourceId("");setSourceVersion("");setProofId("");setProofVersion("");setNewDue("");setReason("");setDocument(null);onReload();}
   function select(id:string){setCurrentId(id);const url=new URL(window.location.href);url.searchParams.set("bossCommitment",id);window.history.replaceState(null,"",url);}
-  const {propose,dialog,notice,busy}=useTransaction(saved,select,undefined,"commitment");
+  const {propose,dialog,recovery,notice,busy}=useTransaction(saved,select,undefined,"commitment");
   useEffect(()=>{epoch.current++;sourceRequest.current?.abort();setDocument(null);return()=>{epoch.current++;sourceRequest.current?.abort();};},[token,active?.commitment_id,sourceId,sourceVersion,proofId,proofVersion]);
   useEffect(()=>{onDirtyChange(Boolean(purpose||due||requiredProof||sourceId||sourceVersion||proofId||proofVersion||newDue||reason||busy));},[purpose,due,requiredProof,sourceId,sourceVersion,proofId,proofVersion,newDue,reason,busy,onDirtyChange]);
   async function readSource(kind:"create"|"complete"){
@@ -80,5 +80,5 @@ export function BossPersonalCommitments({items,businessClock,onReload,onDirtyCha
     </>}
     {document&&<article className="boss-document-source"><h3>{document.value.source_id} · v{document.value.version}</h3><p>发布 {document.value.published_at??"未知"} · 原文位置 {JSON.stringify(document.value.original_locator??"尚未提供")}</p><blockquote>{document.value.content}</blockquote></article>}
     {error&&<p className="boss-status boss-status-error" role="alert">{error}</p>}{notice&&<p className="boss-status boss-status-ok" role="status">{notice}</p>}
-  </section>{dialog}</>;
+  </section>{dialog}{recovery}</>;
 }

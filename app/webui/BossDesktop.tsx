@@ -13,6 +13,7 @@ import {
 import pageMeta from "./page-meta.json";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
+import {BossNotificationReturn} from "./BossDesktopNotifications";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import { BossSupplyQualityView } from "./BossSupplyQualityView";
 import { EMPTY_SUPPLY_EDITOR, type SupplyQualityEditor } from "./BossSupplyQualityPanel";
@@ -157,7 +158,7 @@ const PRODUCT_PAGES = new Set<string>([
   ...Object.keys(WORKSPACE_PAGE_ROUTES), ...SECTOR_PAGE_IDS,
 ]);
 function allowed(page: string, role: Role, mvp=false, priority=false) {
-  if(priority)return role==="BOSS"?["F01","F06","N05","D01","D04","D05","D06","D07"].includes(page):["A03","A04","A08","A15"].includes(page);
+  if(priority)return role==="BOSS"?["F01","F02","N06","N08","N09","F06","N05","D01","D04","D05","D06","D07"].includes(page):["A03","A04","A08","A13","A15"].includes(page);
   if(mvp)return role==="BOSS"?page==="F01":["A03","A08","A15"].includes(page);
   if (page === "NATIVE") return true;
   if (!pages[page]) return false;
@@ -332,7 +333,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) || (page==="F06"&&changingTask&&assignmentDirty)||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
           (["N07","N08"].includes(page) && settingsDirty) ||
-          (["F01","F04","N05","N09","A08","A06"].includes(page) && workDirty)||supplyDirty||importDirty)))) {
+          (["F01","F02","N06","F04","N05","N09","A08","A06","A13"].includes(page) && workDirty)||supplyDirty||importDirty)))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       if(directoryOpen){
         const trigger=shellRef.current?.querySelector<HTMLButtonElement>('button.boss-search');
@@ -345,7 +346,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     }
     if (id !== page) setPreviousPage(page);
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
-    if (id !== page && ["F01","F04","N05","N09","A08"].includes(page)) setWorkDirty(false);
+    if (id !== page && ["F01","F02","N06","F04","N05","N09","A08","A13"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -516,6 +517,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   </div>;
 
   return <div className="boss-v6" data-role={role} ref={shellRef}>
+    <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);window.history.replaceState(null,"",url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
       <div className={"boss-layout " + (!sidebarOpen ? "boss-layout-slim" : "")}>
         <aside className="boss-sidebar" aria-label={role === "BOSS" ? "老板工作区" : "技术维护工作区"}>
@@ -553,8 +555,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             <div className="boss-topright">
               <Tag tone="blue">本地桌面开发版</Tag>
               <Tag tone="amber">模拟业务资料</Tag>
-              <button type="button" className="boss-icon-button" disabled={mvpScope||priorityScope} title={(mvpScope||priorityScope)?"后续需求暂未开放":"通知中心"}
-                onClick={() => navigate(role === "BOSS" ? "N06" : "N12")}><Bell size={18}/></button>
+              <button type="button" className="boss-icon-button" disabled={mvpScope||priorityScope&&role!=="BOSS"} title={mvpScope?"后续需求暂未开放":"通知中心"}
+                onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}><Bell size={18}/></button>
               <button type="button" className="boss-user" onClick={onLogout} title="退出当前身份">
                 <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
                 <span>{role === "BOSS" ? "本人" : "技术维护"}<small>{role === "BOSS" ? "已认证本人" : "维护身份"}</small></span>
@@ -574,7 +576,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
                   <Tag tone={PRODUCT_PAGES.has(page) ? "green" : "muted"}>
-                    {priorityScope?"交办与承诺 · 待共同验收":mvpScope?"采购成本体验 · 待共同验收":PRODUCT_PAGES.has(page) ? "部分功能已接入 · 待验收" : "已映射 · 未实现"}
+                    {priorityScope?"经营提醒 · 待共同验收":mvpScope?"采购成本体验 · 待共同验收":PRODUCT_PAGES.has(page) ? "部分功能已接入 · 待验收" : "已映射 · 未实现"}
                   </Tag>
                   <span>{metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
@@ -810,6 +812,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onReload={refresh} onDirtyChange={setWorkDirty} onCommand={scopedCommand}/> :
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
+                onOpenTask={selectTask} onDirtyChange={setWorkDirty}
                   onNavigate={id=>navigate(id)} onViewSource={goSource}
                 /> :
                 <div className="boss-columns">
@@ -892,7 +895,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
               </div>
               </> : page === "A13" ? <MaintainerScheduler
-                key="A13" onNavigate={id=>navigate(id)}
+                key="A13" onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}
               /> : page === "A05" ? <>
                 <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/>
                 <Panel title="当前来源与采用条件" note="技术状态检查不执行模型任务">

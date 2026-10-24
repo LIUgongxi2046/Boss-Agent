@@ -32,6 +32,7 @@ class RoleChannel(WebSocketChannel):
         self.morning = None
         self.mvp = None
         self.assignment = None
+        self.reminders = None
         self.bi_responses = set()
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
@@ -96,6 +97,19 @@ class RoleChannel(WebSocketChannel):
                 self.record(role, address.path, 200)
                 return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE")}))
             if address.path.startswith("/api/boss/ui/"):
+                if address.path == "/api/boss/ui/reminder-preparation":
+                    try:
+                        if self.reminders is None:
+                            raise web.HTTPServiceUnavailable(text="当前提醒读取服务尚未就绪")
+                        values = parse_qs(address.query, keep_blank_values=True)
+                        if set(values) != {"client_request_id"} or len(values["client_request_id"]) != 1 or not values["client_request_id"][0]:
+                            raise web.HTTPBadRequest(text="提醒原请求字段无效")
+                        body = self.reminders.receipt(role, values["client_request_id"][0], lambda: True)
+                        status = 200
+                    except web.HTTPException as failure:
+                        status, body = failure.status, {"error": failure.text}
+                    self.record(role, address.path, status)
+                    return connection.respond(status, json.dumps(body, ensure_ascii=False))
                 if address.path == "/api/boss/ui/assignment-preparation":
                     try:
                         if self.assignment is None:
@@ -165,6 +179,11 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action == "boss.reminder.prepare":
+            task = asyncio.create_task(self._reminder_response(connection, role, envelope))
+            self.bi_responses.add(task)
+            task.add_done_callback(self.bi_responses.discard)
+            return
         if kind == "webui_request" and action == "boss.assignment.prepare":
             task = asyncio.create_task(self._assignment_response(connection, role, envelope))
             self.bi_responses.add(task)
@@ -290,6 +309,23 @@ class RoleChannel(WebSocketChannel):
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
         await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
+
+    async def _reminder_response(self, connection, role, envelope):
+        request_id = envelope.get("request_id")
+        if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+            raise ValueError("提醒读取缺少有效请求编号")
+        def active():
+            return self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+        try:
+            if self.reminders is None:
+                raise web.HTTPServiceUnavailable(text="当前提醒读取服务尚未就绪")
+            result = await self.reminders.prepare(role, envelope.get("payload"), active)
+            status, response = 200, {"result": result}
+        except web.HTTPException as failure:
+            status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
+        self.record(role, "boss.reminder.prepare", status)
+        if connection.close_code is None:
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": status == 200, **response}, ensure_ascii=False))
 
     async def _assignment_response(self, connection, role, envelope):
         request_id = envelope.get("request_id")

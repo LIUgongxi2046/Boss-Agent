@@ -7,6 +7,7 @@ import {
 import { useClient } from "@/providers/ClientProvider";
 import type { AssignmentDraft } from "./BossAssignmentPicker";
 import {BossAssignmentPreparation} from "./BossAssignmentPreparation";
+import {BossOriginalReceipt} from "./BossOriginalReceipt";
 
 export interface AssignmentTask {
   task_id: string; status: string; version?: string; purpose?: string;
@@ -62,10 +63,17 @@ type Action =
   | "boss.assignment.cancel" | "boss.assignment.nudge" | "boss.simulation.feedback"
   | "boss.assignment.extension.decide"
   | "boss.commitment.create" | "boss.commitment.extend" | "boss.commitment.cancel" | "boss.commitment.complete"
+  | "boss.reminder.ack" | "boss.reminder.snooze" | "boss.reminder.close"
+  | "boss.owner.notice.save" | "boss.owner.notice.confirm"
+  | "boss.owner.plan.save" | "boss.owner.plan.pause" | "boss.owner.plan.resume" | "boss.owner.plan.cancel"
+  | "boss.scheduler.draft.save" | "boss.scheduler.draft.validate" | "boss.scheduler.activate" | "boss.scheduler.manual_run" | "boss.scheduler.pause" | "boss.scheduler.resume" | "boss.scheduler.cancel"
+  | "boss.alert.ack" | "boss.alert.snooze" | "boss.alert.close" | "boss.alert.meeting.link" | "boss.alert.assignment.create"
+  | "boss.alert.rule.save" | "boss.alert.rule.validate" | "boss.alert.rule.activate" | "boss.alert.rule.disable"
+  | "boss.simulation.alert.rule.save" | "boss.simulation.alert.rule.validate" | "boss.simulation.alert.rule.activate" | "boss.simulation.alert.rule.disable" | "boss.simulation.alert.load"
   | "boss.message.draft.save";
 type Result = {
   task_id?: string; task?: { task_id: string; status: string; version: string };
-  status?: string; version?: string; feedback_id?: string; draft_id?: string; commitment_id?:string;
+  status?: string; state?:string;version?: string; feedback_id?: string; draft_id?: string; commitment_id?:string;event_id?:string;plan_id?:string;
 };
 type Pending = {
   action: Action; payload: Record<string, unknown>;
@@ -83,19 +91,30 @@ function required(value: string, field: string): string {
 }
 function displayTime(value?: string) { return value ? value.replace("T", " ") : "待核查"; }
 
-export function useTransaction(onReload: () => void, onCreated?: (id: string) => void, onMessageDraftCreated?: (id: string) => void, scope="assignment") {
+type TransactionScope="assignment"|"feedback"|"commitment"|"reminder"|"ownerNotice"|"ownerGoalsReadonly"|"plan"|"scheduler"|"alerts"|"alertRules"|"alertInput";
+const TRANSACTION_ACTIONS:Record<TransactionScope,Action[]>={
+  assignment:["boss.assignment.create","boss.assignment.send","boss.assignment.nudge","boss.assignment.extend","boss.assignment.extension.decide","boss.assignment.cancel","boss.assignment.complete","boss.message.draft.save"],
+  feedback:["boss.simulation.feedback"],commitment:["boss.commitment.create","boss.commitment.extend","boss.commitment.cancel","boss.commitment.complete"],
+  reminder:["boss.reminder.ack","boss.reminder.snooze","boss.reminder.close"],ownerNotice:["boss.owner.notice.save","boss.owner.notice.confirm"],ownerGoalsReadonly:[],
+  plan:["boss.owner.plan.save","boss.owner.plan.pause","boss.owner.plan.resume","boss.owner.plan.cancel"],
+  scheduler:["boss.scheduler.draft.save","boss.scheduler.draft.validate","boss.scheduler.activate","boss.scheduler.manual_run","boss.scheduler.pause","boss.scheduler.resume","boss.scheduler.cancel"],
+  alerts:["boss.alert.ack","boss.alert.snooze","boss.alert.close","boss.alert.meeting.link","boss.alert.assignment.create"],
+  alertRules:["boss.alert.rule.save","boss.alert.rule.validate","boss.alert.rule.activate","boss.alert.rule.disable","boss.simulation.alert.rule.save","boss.simulation.alert.rule.validate","boss.simulation.alert.rule.activate","boss.simulation.alert.rule.disable"],
+  alertInput:["boss.simulation.alert.load"],
+};
+export function useTransaction(onReload: () => void, onCreated?: (id: string) => void, onMessageDraftCreated?: (id: string) => void, scope:TransactionScope="assignment") {
   const { client, getToken, token } = useClient();
   const [lookupBusy,setLookupBusy] = useState(false);
   const dialogRef = useRef<HTMLElement | null>(null);
   const busyRef = useRef(false);
   const [pending, setPending] = useState<Pending | null>(()=>{
     const values=new URLSearchParams(window.location.search),id=values.get(scope+"Request"),action=values.get(scope+"Action"),target=values.get(scope+"Target")??"";
-    const actions:Action[]=scope==="feedback"?["boss.simulation.feedback"]:scope==="commitment"?["boss.commitment.create","boss.commitment.extend","boss.commitment.cancel","boss.commitment.complete"]:["boss.assignment.create","boss.assignment.send","boss.assignment.nudge","boss.assignment.extend","boss.assignment.extension.decide","boss.assignment.cancel","boss.assignment.complete","boss.message.draft.save"];
+    const actions=TRANSACTION_ACTIONS[scope];
     return id&&action&&actions.includes(action as Action)?{id,action:action as Action,target,payload:{},restored:true,title:"核查原请求结果",preview:["原请求："+id,"动作："+action,"对象："+(target||"创建对象待原回执核查")]}:null;
   });
   const [uncertain,setUncertain]=useState(Boolean(pending?.restored));
   const epoch=useRef(0),identity=useRef(token);
-  useEffect(()=>{epoch.current++;if(identity.current!==token){identity.current=token;setPending(null);setApproved(false);setNotice("");setError("");setUncertain(false);}return()=>{epoch.current++;};},[token]);
+  useEffect(()=>{epoch.current++;if(identity.current!==token){identity.current=token;setPending(null);setApproved(false);setNotice("");setError("");setUncertain(false);setBusy(false);setLookupBusy(false);}return()=>{epoch.current++;};},[token]);
   const remember=useCallback((value:Pending|null)=>{const url=new URL(window.location.href);for(const key of ["Request","Action","Target"]){if(value){const content=key==="Request"?value.id:key==="Action"?value.action:value.target??"";url.searchParams.set(scope+key,content);}else url.searchParams.delete(scope+key);}window.history.replaceState(null,"",url);},[scope]);
   const [approved, setApproved] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -132,10 +151,11 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
     return () => { document.removeEventListener("keydown", onKeyDown); previous?.focus(); };
   }, [pending?.id]);
   const propose = useCallback((action: Action, payload: Record<string, unknown>, title: string, preview: string[]) => {
-    setPending({ action, payload, id: "boss-" + crypto.randomUUID(), title, preview, target:typeof payload.task_id==="string"?payload.task_id:typeof payload.commitment_id==="string"?payload.commitment_id:"" });
+    if(new URLSearchParams(window.location.search).has(scope+"Request")){setError("当前原请求仍需核查，请查询同一编号。");return;}
+    setPending({ action, payload, id: "boss-" + crypto.randomUUID(), title, preview, target:typeof payload.task_id==="string"?payload.task_id:typeof payload.commitment_id==="string"?payload.commitment_id:typeof payload.event_id==="string"?payload.event_id:typeof payload.plan_id==="string"?payload.plan_id:"" });
     setUncertain(false);
     setApproved(false); setError(""); setNotice("");
-  }, []);
+  }, [scope]);
   const submit = useCallback(async () => {
     if (!pending || !approved || busy || uncertain || pending.restored) return;
     const current=epoch.current;remember(pending);setUncertain(true);setBusy(true); setError("");
@@ -147,8 +167,8 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
       if (pending.action === "boss.assignment.create" && result.task_id) onCreated?.(result.task_id);
       if (pending.action === "boss.commitment.create" && result.commitment_id) onCreated?.(result.commitment_id);
       if (pending.action === "boss.message.draft.save" && result.draft_id) onMessageDraftCreated?.(result.draft_id);
-      setNotice("实际模拟业务已保存。状态：" + (result.status || result.task?.status || "已记录") +
-        "；交办：" + (result.task_id || result.task?.task_id || "未知") + "。请重读当前状态。");
+      setNotice("实际模拟业务已保存。状态：" + (result.status || result.state || result.task?.status || "已记录") +
+        "；对象：" + (result.task_id || result.task?.task_id || result.commitment_id || result.event_id || result.plan_id || "未知") + "。请重读当前状态。");
       remember(null);setUncertain(false);setPending(null); setApproved(false); onReload();
     } catch (e) {
       if(current!==epoch.current)return;
@@ -181,8 +201,8 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
       if(body.action!==pending.action||body.client_request_id!==pending.id)
         throw new Error("操作回执身份与本次动作不匹配");
       if(body.outcome==="RECORDED"&&body.result){
-        const target=body.result.task_id??body.result.task?.task_id??body.result.commitment_id;
-        if(pending.target&&target&&pending.target!==target)throw new Error("原请求回执不属于当前业务对象");
+        const target=pending.action.startsWith("boss.alert.")?body.result.event_id:body.result.task_id??body.result.task?.task_id??body.result.commitment_id??body.result.event_id??body.result.plan_id;
+        if(pending.target&&pending.target!==target)throw new Error("原请求回执不属于当前业务对象");
         if(pending.action==="boss.assignment.create"&&body.result.task_id)
           onCreated?.(body.result.task_id);
         if(pending.action==="boss.commitment.create"&&body.result.commitment_id)onCreated?.(body.result.commitment_id);
@@ -220,7 +240,9 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
       </footer>
     </section>
   </div> : null;
-  return { propose, dialog, notice, busy:busy||uncertain||lookupBusy };
+  const unresolved=new URLSearchParams(window.location.search).has(scope+"Request");
+  const recovery=!pending&&unresolved?<BossOriginalReceipt scope={scope} actions={TRANSACTION_ACTIONS[scope]} onRecorded={onReload}/>:null;
+  return { propose, dialog, recovery, notice, busy:busy||uncertain||lookupBusy||(!pending&&unresolved) };
 }
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
@@ -238,7 +260,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   morningReference?:MorningReference;morningReady?:boolean;
   messagesEnabled?:boolean;
 }) {
-  const { propose, dialog, notice, busy } = useTransaction(()=>{onDraftSaved();onReload();}, id => {
+  const { propose, dialog, recovery, notice, busy } = useTransaction(()=>{onDraftSaved();onReload();}, id => {
     onSelectTask(id,true); onDraftSaved();
   }, onMessageDraftCreated);
   const {purpose,coordinator,due,evidence,body,newDue,reason}=draft;
@@ -566,13 +588,14 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       </div>
     </div>
     {dialog}
+    {recovery}
   </div>;
 }
 
 export function MaintainerFeedback({tasks,onReload}:{
   tasks:MaintenanceTaskRef[];onReload:()=>void;
 }) {
-  const {propose,dialog,notice}=useTransaction(onReload,undefined,undefined,"feedback");
+  const {propose,dialog,recovery,notice}=useTransaction(onReload,undefined,undefined,"feedback");
   const [selected,setSelected]=useState("");
   const [kind,setKind]=useState<"PROGRESS"|"EXTENSION_REQUEST"|"RESULT_SUBMITTED">("PROGRESS");
   const [text,setText]=useState("");
@@ -630,5 +653,6 @@ export function MaintainerFeedback({tasks,onReload}:{
       {current?.status==="CANCELED"&&<p role="status">当前交办已经取消，反馈仅保留历史，不恢复任务或催办。</p>}
     </section>
     {dialog}
+    {recovery}
   </>;
 }
