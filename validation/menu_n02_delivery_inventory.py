@@ -44,7 +44,8 @@ def main():
     if row is None:
         raise ValueError("当前实际Runtime没有启用配置")
     configuration = json.loads(row[0])
-    if configuration["version"] != setup["configuration_version"] or any(configuration[field] != value for field, value in VALUES.items()):
+    expected_values = {**VALUES, "tool_scope": sorted(VALUES["tool_scope"]), "workspace_projections": sorted(VALUES["workspace_projections"])}
+    if configuration["version"] != setup["configuration_version"] or any(configuration[field] != value for field, value in expected_values.items()):
         raise ValueError("实际启用配置与当前启动声明不一致")
     reports = {}
     for name in ("native.json", "task-entry-ui.json", "morning-entry.json", "return-position.json", "unknown.json", "input.json", "close.json", "native-privacy.json", "shared-layout.json", "launcher.json", "framework-current.json"):
