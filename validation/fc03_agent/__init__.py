@@ -9,7 +9,7 @@ from business import checksum, require
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_owner_read_tools import BossTodayReadTool
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 TOOLS = frozenset({"todayRead"})
 
 
@@ -30,6 +30,8 @@ class Fc03Context:
     order_version: str
     client_request_id: str | None = None
     allowed_list_ids: frozenset[str] = frozenset()
+    selected_list_id: str | None = None
+    selected_item_id: str | None = None
 
 
 def register_fc03_tools(registry, store, context_provider, *, formal=False):

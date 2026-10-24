@@ -31,11 +31,19 @@ class Fc03RuntimeRecorder(Fc01RuntimeRecorder):
         require(context.owner_id == request.sender_id and context.namespace == self.namespace,
                 "晨间运行与可信本人范围不符")
         require(not tool.validate_params(json.loads(context.read_parameters_json)), "晨间可信输入不符合当前Schema")
+        selected = None
+        if context.selected_list_id is not None or context.selected_item_id is not None:
+            from fc03_agent.formal import FormalMorningTool
+            require(isinstance(tool, FormalMorningTool), "当前事项讨论需要正式晨间工具")
+            selected = tool.selected_reference(context)
+            require(tool.context(require_runtime=False) == context, "当前事项准备期间认证范围已经变化")
         block = await super().context(request)
         binding = request.attributes[ATTRIBUTE]
         reference = {key: getattr(context, key) for key in ("date", "timezone", "snapshot_sha256", "order_version")}
         reference["parameters_sha256"] = checksum(json.loads(context.read_parameters_json))
         reference["client_request_id"] = context.client_request_id
+        if selected is not None:
+            reference["selected_item_ref"] = selected
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self._read(db, binding.run_id)

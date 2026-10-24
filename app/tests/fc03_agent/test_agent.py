@@ -96,7 +96,7 @@ def test_model_runtime_requires_matching_server_request(scope):
         asyncio.run(registry(scope).get("todayRead").execute())
 
 
-def run(scope, tmp_path, producer, *, formal=False):
+def run(scope, tmp_path, producer, *, formal=False, question="今天有哪些事情需要我处理"):
     store, current, _ = scope
     logger.remove()
     logger.add(sys.stderr, level="WARNING", diagnose=False, backtrace=False)
@@ -130,7 +130,7 @@ def run(scope, tmp_path, producer, *, formal=False):
                 binding = request.attributes["boss_runtime_binding"]
                 current[0] = replace(current[0], request_id=binding.request_id, session_id=binding.session_id)
             bot.runtime.add_context_provider(authenticated_request)
-            return await bot.run("今天有哪些事情需要我处理", session_key=current[0].session_id, sender_id="boss-1")
+            return await bot.run(question, session_key=current[0].session_id, sender_id="boss-1")
     return asyncio.run(execute())
 
 
