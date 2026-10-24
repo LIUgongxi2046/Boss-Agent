@@ -1,4 +1,8 @@
+import json
+from pathlib import Path
+
 from aiohttp import web
+from jsonschema import Draft202012Validator
 from nanobot.webui.session_identity import is_valid_webui_chat_id, webui_session_key
 
 from business import require
@@ -8,6 +12,12 @@ from boss_conversation_attachments import ConversationAttachments
 CONVERSATION_READ_ACTIONS = frozenset({
     "boss.conversation.read", "boss.conversation.artifact", "boss.conversation.messages", "boss.conversation.attachments",
 })
+REQUESTS_SCHEMA=json.loads((Path(__file__).resolve().parents[1]/"specs/conversation-requests.schema.json").read_text())
+
+
+def validate_request_result(result, *, history=False):
+    Draft202012Validator({**REQUESTS_SCHEMA,"$ref":"#/$defs/History" if history else "#/$defs/Receipt"}).validate(result)
+    return result
 
 
 class PublicConversation:

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.11.0",
+  "$id": "urn:boss-agent:runtime-records:1.12.0",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {
@@ -125,12 +125,17 @@
     },
     "ToolResultReference": {
       "type": "object", "additionalProperties": false, "required": ["tool_id", "tool_call_id", "iteration"],
+      "allOf": [{"if": {"required": ["source_type"], "properties": {"source_type": {"const": "RUNTIME_RECORD"}}},
+        "then": {"properties": {"tool_id": {"const": "conversationRead"}}, "not": {"anyOf": [
+          {"required": ["source_id"]}, {"required": ["query_id"]}, {"required": ["task_id"]},
+          {"required": ["message_id"]}, {"required": ["draft_id"]}, {"required": ["authorization_id"]},
+          {"required": ["source_refs"]}, {"required": ["bi_query_context"]}]}}}],
       "properties": {
         "tool_id": {"$ref": "#/$defs/Identifier"}, "tool_call_id": {"$ref": "#/$defs/Identifier"}, "iteration": {"type": "integer", "minimum": 0},
         "query_id": {"$ref": "#/$defs/Identifier"}, "task_id": {"$ref": "#/$defs/Identifier"}, "message_id": {"$ref": "#/$defs/Identifier"}, "draft_id": {"$ref": "#/$defs/Identifier"},
         "version": {"$ref": "#/$defs/Version"}, "task_version": {"$ref": "#/$defs/Version"},
         "status": {"type": "string"}, "task_status": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Identifier"},
-        "source_type": {"const":"SIMULATED"}, "source_id":{"$ref":"#/$defs/Identifier"},
+        "source_type": {"enum":["SIMULATED","RUNTIME_RECORD"]}, "source_id":{"$ref":"#/$defs/Identifier"},
         "bi_query_context":{"$ref":"#/$defs/BIQueryContext"},
         "date": {"type": "string", "format": "date"}, "timezone": {"type": "string", "minLength": 1},
         "snapshot_sha256": {"$ref": "#/$defs/Sha256"}, "order_version": {"$ref": "#/$defs/Version"},

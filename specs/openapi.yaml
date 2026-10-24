@@ -9,7 +9,7 @@ x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
 x-menu-n02-conversation:
-  schema_version: 1.1.0
+  schema_version: 1.2.0
   schema_extension: conversation.schema.json
   read: ConversationAPI.read(BOSS, Context)
   shared_transaction_read: ConversationAPI.project_in_transaction(BOSS, db, Context)
@@ -29,7 +29,11 @@ x-menu-n02-conversation:
   mutation_policy: only accepted upload metadata stored in native session; no business writes or owner authorization; original message commands and original operation-status lookup reused
   authenticated_read_transport: webui_request boss.conversation.read/artifact/messages/attachments; current BOSS connection and attached chat checked by RoleChannel; session_id derived by SDK mapping
   public_read_payload: read/attachments use chat_id only; artifact adds run_id/kind/id; messages accepts empty object and retains OWNER_MESSAGE_HISTORY
-  public_integration: READ_ADAPTER_CHECKED_GENERAL_NATIVE_ADOPTION_AND_COMPLETE_MENU_PENDING
+  context_references: actual conversation_context.references and tool_results source_id/version; recorded/current version, current validity, authorized author/time/scope and support relation; historical records retained when current adoption stops
+  native_request_schema: conversation-requests.schema.json
+  native_receipt: webui_request boss.conversation.request accepts chat_id/turn_id; HTTP GET /api/boss/ui/conversation/request accepts client_request_id; original identifiers only and no replay
+  native_request_history: webui_request boss.conversation.requests accepts chat_id only; attached current BOSS connection and current dataset checked; actual safe receipt array includes pre-runtime failure and cancellation; zero writes and no body
+  public_integration: GENERAL_NATIVE_READ_AND_QUERY_CHECKED_COMPLETE_MENU_IN_PROGRESS
 x-fc04-business-alerts:
   schema_version: 1.0.0
   schema_extension: business-alert.schema.json

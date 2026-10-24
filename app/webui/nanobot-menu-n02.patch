@@ -137,4 +137,8 @@
 -      </>}
 +      </BossConversationWorkspace>
 +      </>}
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full transition-transform",
++                "thread-composer-action thread-composer-submit-action thread-composer-round-action touch-target rounded-full transition-transform",
 *** End Patch

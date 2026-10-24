@@ -11,7 +11,8 @@
 .boss-v6[data-page="N02"] .boss-nav-item.active{background:#e5f1ff;color:#0866ea;font-weight:720;box-shadow:none}
 .boss-v6[data-page="N02"] .boss-nav-item.active::before{content:"";position:absolute;left:-14px;width:3px;height:24px;background:#0c6bfa;border-radius:9px}
 .boss-v6[data-page="N02"] .boss-nav-item svg{stroke-width:1.75}
-.boss-v6[data-page="N02"] .boss-topbar{height:64px;min-height:64px;gap:18px;padding:8px 22px 8px 28px}
+.boss-v6[data-page="N02"] .boss-main,.boss-v6[data-page="N02"] .boss-stage{background:transparent}
+.boss-v6[data-page="N02"] .boss-topbar{height:64px;min-height:64px;gap:18px;padding:8px 22px 8px 28px;background:transparent;border-bottom:0}
 .boss-v6[data-page="N02"] .boss-search{min-height:44px;max-width:450px;width:46%;min-width:300px;background:linear-gradient(100deg,#f3f7fd,#eef6fc);border:0;font-size:11px}
 .boss-n02-quicknav{display:flex;align-items:center;gap:7px;padding-left:4px;white-space:nowrap}
 .boss-n02-quicknav button{min-height:44px;border-radius:9px;border:1px solid transparent;background:transparent;color:#365d88;padding:7px 10px;font-size:13px;font-weight:650;display:inline-flex;align-items:center;gap:5px}
@@ -50,14 +51,21 @@
 .boss-n02-history small{display:block;font-size:12px;color:#627b96;line-height:20px}
 .boss-n02-session-select{display:grid;gap:5px;font-size:14px;color:#2d4a67}
 .boss-n02-session-select select{min-height:44px;min-width:0;width:100%;padding:8px;border:1px solid #d8e4f1;border-radius:9px;background:#fbfdff}
+.boss-n02-message-column{min-width:0}
 .boss-n02-thread{height:clamp(380px,48vh,560px);min-width:0;position:relative;overflow:hidden}
 .boss-n02-thread>.relative{height:100%}
 .boss-n02-thread .thread-composer-surface{background:transparent;border-radius:0;max-width:none}
-.boss-n02-thread textarea{min-height:88px;padding:10px 12px;border:1px solid #d8e4f1;border-radius:9px;background:#fbfdff;color:#1d3a5a;font-size:16px;line-height:24px}
+.boss-n02-thread textarea{min-height:88px;padding:10px 12px;border:1px solid #d8e4f1;border-radius:9px;background:#fbfdff;color:#1d3a5a;font-size:16px;line-height:24px;font-weight:600}
 .boss-n02-thread .thread-composer-footer{padding-top:10px}
-.boss-n02-thread .thread-composer-action{width:auto;min-width:44px;min-height:44px;padding:8px 13px;border:1px solid #0969E8;border-radius:10px;background:#0969E8;color:#fff;box-shadow:none;gap:6px}
-.boss-n02-thread .thread-composer-action::after{content:attr(aria-label);font-size:14px;line-height:22px;font-weight:690;white-space:nowrap}
-.boss-n02-thread .thread-composer-action[type="button"]{background:#fff6f6;color:#ad3737;border-color:#f2d4d4}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-action{height:44px;min-width:44px;min-height:44px;margin:0}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action{width:auto;min-width:84px;padding:8px 13px;border:1px solid #0969E8;border-radius:10px;background:#0969E8;color:#fff;box-shadow:none;gap:6px;font-size:14px;font-weight:690;line-height:22px}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action::before{content:none}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action{transform:none;scale:1}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action::after{content:attr(aria-label);font:inherit;white-space:nowrap}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action[type="submit"]::after{content:"发送"}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action[type="button"]{background:#fff6f6;color:#ad3737;border-color:#f2d4d4}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action:hover:not(:disabled){background:#085dce}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action:disabled{opacity:.5}
 .boss-n02-progress{margin-top:13px;padding:18px 20px;border:1px solid #e0ebf7;border-radius:15px;background:#fff}
 .boss-n02-note{background:#f0f7ff;border:1px solid #dcebf9;border-radius:10px;padding:12px 14px;color:#496986;font-size:14px;line-height:22px;margin:10px 0}
 .boss-n02-note.warn{background:#fff9ee;border-color:#f0dfbb;color:#88601c}
@@ -73,6 +81,10 @@
 .boss-n02-dialog h2{font-size:20px;font-weight:760;margin:0 28px 11px 0}.boss-n02-dialog>p{margin:10px 0;font-size:14px;line-height:22px;color:#52647A}
 .boss-n02-dialog>.boss-icon-button{position:absolute;right:12px;top:10px}
 .boss-n02-dialog-overlay{position:fixed;inset:0;z-index:101;background:rgba(20,42,69,.28)}
+.boss-n02-query-table{overflow:auto;max-width:100%;margin:16px 0}
+.boss-n02-query-table table{border-collapse:collapse;min-width:620px;font-size:14px;line-height:22px;text-align:left}
+.boss-n02-query-table th,.boss-n02-query-table td{padding:10px;border:1px solid #dcebf9;overflow-wrap:anywhere}
+.boss-n02-query-table thead{background:#f0f7ff}
 @media(max-width:1250px){
  .boss-v6[data-page="N02"] .boss-layout{grid-template-columns:174px minmax(0,1fr)}
  .boss-v6[data-page="N02"] .boss-sidebar{padding-left:6px;padding-right:6px}

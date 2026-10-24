@@ -186,8 +186,8 @@ class ProductRuntime:
             self.store.active(db, NS)
             current = self.store.get(db, NS, "configuration", "current")
             draft = obj(db, "configuration_draft", "current")
-            active_runs = sum(json.loads(item[0])["status"] in {"QUEUED", "RUNNING", "WAITING_INPUT"}
-                              for item in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='runtime_run'", (NS,)))
+            active_runs = sum(row["status"] in {"QUEUED", "RUNNING", "WAITING_INPUT"} and row["finished_at"] is None
+                              for row in (json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='runtime_run'", (NS,))))
             skill_pending = bool(self.skill_pending(db)) if self.skill_pending is not None else False
         fields = ("config_id", "version", "provider", "model_id", "api_type", "tool_scope", "max_tool_rounds", "timeout", "enabled")
         workspace = self._workspace(current)
@@ -258,7 +258,7 @@ class ProductRuntime:
                     require(draft["validation_status"] == "VALIDATED_STATIC_ONLY", "必须校验当前配置草稿")
                     active = [json.loads(item[0]) for item in db.execute(
                         "SELECT body FROM objects WHERE namespace=? AND kind='runtime_run'", (NS,))]
-                    require(not any(row["status"] in {"QUEUED", "RUNNING", "WAITING_INPUT"} for row in active),
+                    require(not any(row["status"] in {"QUEUED", "RUNNING", "WAITING_INPUT"} and row["finished_at"] is None for row in active),
                             "当前存在运行任务，请等待结束后启用配置")
                     values = RuntimeValues.model_validate(draft["values"])
                     def update(config):

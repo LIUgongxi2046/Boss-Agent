@@ -17,7 +17,7 @@ from aiohttp import web
 from business import checksum, now
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
-from public_conversation import CONVERSATION_READ_ACTIONS, PublicConversation
+from public_conversation import CONVERSATION_READ_ACTIONS, PublicConversation, validate_request_result
 
 
 class RoleChannel(WebSocketChannel):
@@ -207,7 +207,7 @@ class RoleChannel(WebSocketChannel):
         if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS:
             await self._conversation_response(connection, role, envelope)
             return
-        if kind == "webui_request" and action == "boss.conversation.request":
+        if kind == "webui_request" and action in {"boss.conversation.request", "boss.conversation.requests"}:
             await self._conversation_receipt_response(connection, role, envelope)
             return
         if kind == "webui_request" and action == "boss.reminder.prepare":
@@ -421,12 +421,19 @@ class RoleChannel(WebSocketChannel):
             if self.native_conversation is None:
                 raise web.HTTPServiceUnavailable(text="当前会话接收服务尚未就绪")
             payload = envelope.get("payload")
-            if not isinstance(payload, dict) or set(payload) != {"chat_id", "turn_id"}:
+            history=envelope["action"]=="boss.conversation.requests"
+            if not isinstance(payload, dict) or set(payload) != ({"chat_id"} if history else {"chat_id", "turn_id"}):
                 raise web.HTTPBadRequest(text="原会话读取字段无效")
+            if not isinstance(payload["chat_id"],str):
+                raise web.HTTPBadRequest(text="原请求读取需要有效会话编号")
             if payload["chat_id"] not in self.webui_connection_chats(connection):
                 raise web.HTTPForbidden(text="当前连接尚未订阅所选会话")
-            key = self.native_conversation.turn_key(payload["chat_id"], payload["turn_id"])
-            result = self.native_conversation.receipt(role, key, active=active)
+            if history:
+                result=self.native_conversation.requests(role,payload["chat_id"],attached=lambda chat_id:chat_id in self.webui_connection_chats(connection),active=active)
+            else:
+                key = self.native_conversation.turn_key(payload["chat_id"], payload["turn_id"])
+                result = self.native_conversation.receipt(role, key, active=active)
+            validate_request_result(result,history=history)
             status, response = 200, {"result": result}
         except web.HTTPException as failure:
             status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}

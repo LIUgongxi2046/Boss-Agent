@@ -247,6 +247,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [page, setPage] = useState("F01");
   const [previousPage, setPreviousPage] = useState(()=>new URLSearchParams(window.location.search).get("bossReturn")??"F01");
   const businessPage = useRef<string | null>(null);
+  const conversationReturn=useRef(false);
+  useEffect(()=>{conversationReturn.current=false;},[client]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [pageFilter, setPageFilter] = useState("");
@@ -368,7 +370,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) || (page==="F06"&&changingTask&&assignmentDirty)||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
           (["N07","N08"].includes(page) && settingsDirty) ||
-          (["F01","MVP01","F02","N06","F04","N05","N09","A08","A06","A13"].includes(page) && workDirty)||supplyDirty||importDirty)))) {
+          (["F01","MVP01","F02","N06","F04","N05","N09","F08","A08","A06","A13"].includes(page) && workDirty)||supplyDirty||importDirty)))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       if(directoryOpen){
         const trigger=shellRef.current?.querySelector<HTMLButtonElement>('button.boss-search');
@@ -385,7 +387,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       onOpenNative(role);
     }
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
-    if (id !== page && ["F01","MVP01","F02","N06","F04","N05","N09","A08","A13"].includes(page)) setWorkDirty(false);
+    if (id !== page && ["F01","MVP01","F02","N06","F04","N05","N09","F08","A08","A13"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
@@ -601,7 +603,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </div>
             <section className="boss-native-surface" hidden={!isNative} aria-label={role === "BOSS" ? "聊天交办内容" : "应用设置内容"}>
               {role==="MAINTAINER"&&<div className="boss-native-context"><button className="boss-btn" type="button" onClick={() => navigate(businessPage.current??"A08")}><ArrowLeft size={16}/>返回业务页面</button><span>当前身份：技术维护</span></div>}
-              {children(role,isNative,{onOpenTask:selectTask,onOpenSource:goSource,onOpenMessages:()=>navigate("F08",page),onReturn:()=>navigate(businessPage.current??(previousPage!=="NATIVE"&&previousPage!=="N02"&&allowed(previousPage,role,mvpScope,priorityScope)?previousPage:role==="BOSS"?"F01":"A08"))})}
+              {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenSource:id=>{conversationReturn.current=true;goSource(id);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onReturn:()=>navigate(businessPage.current??(previousPage!=="NATIVE"&&previousPage!=="N02"&&allowed(previousPage,role,mvpScope,priorityScope)?previousPage:role==="BOSS"?"F01":"A08"))})}
             </section>
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-morning-content" hidden={page!=="F01"}>
               <BossMorningView refreshVersion={requestVersion} visible={page==="F01"} onDirtyChange={setWorkDirty}
@@ -614,11 +616,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
                   <Tag tone="green">
-                    已交付 · 可使用
+                    {role==="BOSS"&&conversationReturn.current?"当前会话共享操作":"已交付 · 可使用"}
                   </Tag>
                   <span>{metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
                 <div className="boss-meta-actions">
+                  {role==="BOSS"&&conversationReturn.current&&<button className="boss-btn" type="button" onClick={()=>navigate("N02")}><ArrowLeft size={15}/>返回原会话</button>}
                   <span>来源：Desktop v6 · {page}</span>
                   <button type="button" onClick={refresh} disabled={loading} aria-label="重新读取业务数据">
                     <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> 重新读取
@@ -790,6 +793,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 (page === "F08" || page === "F12") ? <BossCommunicationCalendar
                   key={page} pageId={page} onViewSource={goSource}
                   onNavigate={id=>navigate(id)} focusDraftId={draftToReview}
+                  onDirtyChange={page==="F08"?setWorkDirty:undefined}
                   onFocusDraftConsumed={()=>setDraftToReview("")}
                 /> :
                 page === "F26" ? <BossSettingsHub
@@ -1003,6 +1007,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
           page === "A06" ? "当前方法有未保存内容。离开不会修改已经保存的草稿或当前原生方法。" :
           page === "F04" ? "当前会议草稿有未保存内容。离开不会修改已经保存的会议安排。" :
+          page === "F08" ? "当前消息正文、收件人或附件有未保存内容。请选择继续编辑或明确放弃；已保存草稿与模拟发送记录继续保留。" :
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
           "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p></DialogPrimitive.Description>
         <div className="boss-actions">

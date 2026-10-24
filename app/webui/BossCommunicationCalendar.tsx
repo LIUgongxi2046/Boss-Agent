@@ -66,7 +66,7 @@ type Pending = {
   action:string;payload:Record<string,unknown>;key:string;
   title:string;lines:string[];
 };
-type Props = {pageId:"F08"|"F12";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;focusDraftId?:string;onFocusDraftConsumed?:()=>void};
+type Props = {pageId:"F08"|"F12";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;focusDraftId?:string;onFocusDraftConsumed?:()=>void;onDirtyChange?:(dirty:boolean)=>void};
 
 function Block({title,note,children}: {title:string;note?:string;children:ReactNode}) {
   return <section className="boss-panel">
@@ -198,7 +198,7 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
   return {propose,dialog,status,error,busy};
 }
 
-export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusDraftId,onFocusDraftConsumed}:Props) {
+export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusDraftId,onFocusDraftConsumed,onDirtyChange}:Props) {
   const {getToken}=useClient();
   const isMessage=pageId==="F08";
   const [state,setState]=useState<Outbox|CalendarData|null>(null);
@@ -212,6 +212,8 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusD
   const [attachmentId,setAttachmentId]=useState("");
   const [attachmentVersion,setAttachmentVersion]=useState("1");
   const [dirty,setDirty]=useState(false);
+  useEffect(()=>{onDirtyChange?.(dirty);},[dirty,onDirtyChange]);
+  useEffect(()=>()=>onDirtyChange?.(false),[onDirtyChange]);
   const [start,setStart]=useState("");
   const [end,setEnd]=useState("");
   const [title,setTitle]=useState("");
