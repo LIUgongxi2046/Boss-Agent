@@ -1,10 +1,10 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-CANCEL-DEADLINE-20261025；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表、本轮必要引用及实际配置截止。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-25。主记录路径及既有索引引用保持。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-OBSERVABLE-FAILURE-20261025；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表、本轮必要引用及实际配置截止；本次只增加可观察字段与失败行为的限定用例及记录。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-25。主记录路径及既有索引引用保持。
 
 ## 当前依据与准确依赖
 
-本次SDK取消及截止的PRODUCT准确候选为490ba0b041d91229bdf37a8e3c285d94c05b2069，包含N2当前必要引用3259f2a的公共接收、实际N1与Fc02接口及当前Runtime配置。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件，也没有启动产品或预览。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
+本次可观察字段及失败行为的准确候选为PRODUCT e31370e9c9cac27187016ebb736b9c9cf889ed1b，包含4836527的公共接收及当前实际N1与Fc02接口。独立依赖目录validation/.work/n02-observable-public从该准确提交检出正式validation、specs与仓库资产；使用既有conftest加载当前N2被测模块，生产依赖保持原值。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件，也没有启动产品或预览。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
 已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、backend.md、boss_conversation.py、boss_conversation_attachments.py和conversation.schema.json 1.1.0，核查实际SDK命令生命周期、Session保存、Fc02Tool、bind_query、bind_scoped_followup、BIQueryAPI和范围Schema。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
@@ -84,6 +84,18 @@ requests在同一SQLite BEGIN快照中按ui-check和实际chat_id选择conversat
 
 Hook在实际工具错误时保存工具/调用编号和异常类型并终止。失败、取消、超时保留原运行与已保存对象，未知usage/cost_total/price_version保持null。存在required_inputs时，成功结束的运行记为WAITING_INPUT、stop_reason=required_input并保留finished_at，允许下一条本人输入。模型不能签发本人授权；本人写入/发送的匹配资格由正式共享领域判断。
 
+### C09/C19可观察步骤与真实失败
+
+当前NativeConversationAgent.events只产生实际正文与正式工具调用，LLMResponse没有reasoning_content载荷。实际SDK虽然提供推理事件接口，本次核查只检查当前生产者是否具有该字段载荷及事件类型，不索取、构造、注入或保存内部推理内容。实际RunStream事件集合为run.started/run.completed、tool.started/tool.completed、text.delta/text.completed；原生on_progress的实际工具开始/结束字段没有reasoning或reasoning_end标记。已保存Session消息和实际工具结果按SDK定义字段核查，没有reasoning_content载荷。该结论限于当前N02生产者和本次实际SDK会话，不代表所有SDK Provider。
+
+工具保存后的后续输出失败由真实关闭的OS管道触发：同一Nanobot/AgentLoop通过正式AgentLoop.process_direct(on_stream=...)产生真实回答，接收端已关闭，实际os.write产生BrokenPipeError。回调进入前，正式query_metrics结果及query_id已经保存。SDK沿实际异常路径结束为FAILED、stop_reason=error；tool_results保留已完成一步，没有业务工具失败记录，原查询和原请求可在同库重建服务后读取。没有替换LLMResponse、工具结果、业务数据或成功文案。这份证据属于SDK输出回调路径，公开WebSocket与界面接收由N3维护。
+
+正式工具失败使用获准资料中实际期间的反向起止作为明确无效输入。Fc02Tool采用当前合法绑定并调用正式query_metrics，领域产生HTTPBadRequest；记录器保存实际tool_id/tool_call_id/error_type/source_type后终止，运行FAILED、stop_reason=error，当前tool_results为空，没有新查询或替代结果。前一轮已经完成的查询、运行和正式产物保持原值并可重读。
+
+轮次限制使用RuntimeValues正式校验的隔离配置max_tool_rounds=1，测试Config、实际AgentLoop与当前配置快照保持一致，并保存原配置版本。需要一次工具及最终回答时，scope_context在Runtime建立前正式拒绝，guard_context将原意图记为FAILED、run_id=null；前一轮已保存查询与运行保持可读。没有把准备阶段拒绝登记为SDK max_iterations运行中耗尽。合法Native规划为有限的plan.calls加最终回答，入口要求实际配置至少为len(plan.calls)+1；当前没有构造额外模型响应来强行进入轮次耗尽路径。该SDK路径本次未执行。
+
+本次没有修改生产模块、字段、签名或公共注册。实际采用接口为Nanobot.run_streamed/RunStream.stream_events、AgentLoop.process_direct(on_progress/on_stream)、既有NativeConversationAgent和RuntimeRecorder。失败仍使用既有status/stop_reason/tool_results/tool_errors，以及原请求request_state/run_id/client_request_id；没有新增状态或恢复执行入口。
+
 ### C17/C19正式SDK取消与实际配置截止
 
 当前ProductRuntime._apply和公开配置将timeout固定为120秒，RuntimeRecorder在采用时核查启用配置与snapshot一致，并将timeout保存在本轮runtime记录。ConversationRuntimeHook.before_run在实际状态进入RUNNING后，从该记录取得有限正数timeout，以事件循环单调时钟固定本轮截止点。ConversationSimulatedProvider使用asyncio.timeout_at约束真实事件等待，各模型步骤共用该截止点；后续步骤不重新获得120秒。截止只保存在Recorder内部按run_id区分，终态后清理对应记录，不增加公开参数、模型工具或Schema字段。
@@ -142,6 +154,14 @@ Given同一实际Nanobot/AgentLoop中两个当前ConversationGrant和已完成�
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-cancel-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n02-cancel-delivery --tb=short --junitxml=docs/menu-delivery/N02/sdk-cancel-deadline.xml
+```
+
+本次observable-failure.xml为64 passed、1 deselected、26.72秒；包含4项可观察字段/失败场景及受影响检查。既有实际120秒截止用例没有本次代码影响，沿用sdk-cancel-deadline.xml及已接收的4836527范围，本组明确不重复该计时。当前没有修改conversation_agent生产代码。准确e31370e依赖中，conversation_agent/runtime.py blob=7745e5646cf3a029d427e13a07c5e3c1d63c81e5，boss_conversation_references.py blob=f6865ddeb97fd6106e17204884fc8b1aa7f1b890，boss_bi_queries.py blob=70a667719797634bfcb0989c07a90da33cfeb85b，product_runtime.py blob=de258204d4334c1b641de37dfdc7fc957d7a0eec。
+
+Given实际当前Native生产者与正式工具；When通过RunStream及原生进度/正文回调执行；Then仅观察当前事件类型、字段和实际工具结果，历史无推理载荷，检查仅保存字段存在性的布尔值及可观察事件名称。Given正式查询已保存；When实际输出管道关闭；ThenFAILED并保留原query_id与工具结果。Given正式领域输入期间无效；When实际Fc02工具执行；Then保存真实HTTPBadRequest类型并停止，没有新增查询，原查询可读。Given隔离的正式轮次配置不足；When进入原生准备；Then原意图FAILED且run_id=null，旧运行及查询保持。四项均使用真实SQLite、SessionManager、Nanobot/AgentLoop、Registry与正式业务API；没有mock、人工抛出测试异常、伪造Runtime或替代依赖。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-observable-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider -o junit_family=xunit1 -k 'not actual_configured_deadline' --basetemp=validation/.work/n02-observable-delivery --tb=short --junitxml=docs/menu-delivery/N02/observable-failure.xml
 ```
 
 所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。
