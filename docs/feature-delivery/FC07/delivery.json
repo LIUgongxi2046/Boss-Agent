@@ -1,0 +1,53 @@
+{
+  "feature_id": "FC07",
+  "scope_id": "BOSS-PRIORITY-ITERATION",
+  "decision_id": "D-ITERATION-20261024",
+  "baseline_id": "boss-fc07-coverage-20261024-v1",
+  "status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
+  "implementation_commit": "465bcc6817e5e854dcce70f83e062ac6893b3ce0",
+  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/historical_fc07/candidate_commit",
+  "development_covered_checkpoints": 12,
+  "total_checkpoints": 12,
+  "user_verified_checkpoints": null,
+  "user_acceptance": "PENDING_USER_ACCEPTANCE",
+  "independent_verdict": "NOT_RUN",
+  "development_record": "docs/feature-delivery/FC07/integration.md",
+  "experience_instructions": "docs/feature-delivery/FC07/experience.md",
+  "launcher": "scripts/run_fc07.command",
+  "origin": "http://127.0.0.1:9962",
+  "credential_file": "validation/.work/mvp01-experience/accounts/credentials.json",
+  "business_directory": "validation/.work/mvp01-experience",
+  "business_database_preserved": true,
+  "frontend_directory": "fc07-n3-dist",
+  "manifest_sha256": "b67076ef5343ab3f824e4afbc9635c0621422325adc4c6c4538fbe0e8b7b6c6f",
+  "index_sha256": "55cde8ee46f466ec5299ae6da3310282b2b20fbd382d3b6376c4d3dee5ccd0b7",
+  "inventory": "evidence/feature-delivery/FC07/candidate-inventory.json",
+  "build": {"command": "npm run build -- --outDir ../../../../fc07-n3-dist", "workdir": ".work/product/nanobot/webui", "status": "PASS", "seconds": 14.07, "checks": ["strict TypeScript", "Vite"], "log": ".work/fc07-build.log"},
+  "received": [
+    {"owner": "N1", "producer_commit": "c13996a43ec663fef639a375ff16c38f5f9d5774", "integration_commit": "2a845771f89852ae2c235edae7a42622f00cdfae", "record": "docs/feature-delivery/FC07/backend.md", "evidence": "docs/feature-delivery/FC07/domain-check.xml", "passed": 56},
+    {"owner": "N2", "producer_commit": "c6834f96376d18f14793bc2a4c3e6c4ca568f282", "integration_commit": "198ae569c5ddbe881d26badd54569127b8272aa3", "record": "docs/feature-delivery/FC07/agent.md", "evidence": ["docs/feature-delivery/FC07/check.xml", "docs/feature-delivery/FC07/revocation.xml"], "passed": [14, 1]}
+  ],
+  "evidence": {
+    "public_sdk_schema": "evidence/feature-delivery/FC07/public-sdk-schema.xml",
+    "public_sdk_schema_passed": 5,
+    "desktop_journey": "evidence/feature-delivery/FC07/fc07-journey-becc3cf8-9fc8-4e08-b8c0-7049328a7bf5.json",
+    "original_receipt_recovery": "evidence/feature-delivery/FC07/fc07-recovery-a002cae9-f1e9-4315-873f-84233f270cde.json",
+    "launcher": "evidence/feature-delivery/FC07/launcher.json"
+  },
+  "checkpoint_development_evidence": [
+    {"id": "FC07.C01", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey"]},
+    {"id": "FC07.C02", "status": "COVERED", "evidence": ["desktop_journey#owner_commitment_current_source_and_completion", "N1#domain-check.xml"]},
+    {"id": "FC07.C03", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey", "original_receipt_recovery"]},
+    {"id": "FC07.C04", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey", "public_sdk_schema", "N1#domain-check.xml"]},
+    {"id": "FC07.C05", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey", "public_sdk_schema", "N1#domain-check.xml"]},
+    {"id": "FC07.C06", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey", "N1#domain-check.xml"]},
+    {"id": "FC07.C07", "status": "COVERED", "evidence": ["desktop_journey#procurement_task_complete_journey", "N1#domain-check.xml"]},
+    {"id": "FC07.C08", "status": "COVERED", "evidence": ["desktop_journey#canceled_task_late_feedback", "public_sdk_schema", "N1#domain-check.xml"]},
+    {"id": "FC07.C09", "status": "COVERED", "evidence": ["public_sdk_schema", "N1#domain-check.xml", "N2#check.xml", "N2#revocation.xml"]},
+    {"id": "FC07.C10", "status": "COVERED", "evidence": ["original_receipt_recovery", "desktop_journey#same_database_relogin_and_restart", "N1#domain-check.xml"]},
+    {"id": "FC07.C11", "status": "COVERED", "evidence": ["public_sdk_schema", "N2#check.xml", "N2#revocation.xml"]},
+    {"id": "FC07.C12", "status": "COVERED", "evidence": ["desktop_journey#current_dom_bounds", "desktop_journey#current_body_typography", "launcher", "inventory", "build"]}
+  ],
+  "constraints": {"external_api_mode": "SIMULATED_FIRST", "new_real_external_requests": false, "external_delivery_verified": false, "usage_cost_when_unknown": null, "STT": "PAUSED_BY_USER", "visual": "NOT_RUN", "platform": "CURRENT_MACOS_LOCAL_DEPENDENCIES", "standalone_installer": "NOT_PROVIDED"},
+  "history": {"mvp_candidate_commit": "931c8dd5a4b9c39c5044b940be057b683b0bc49a", "mvp_acceptance": "PENDING_USER_ACCEPTANCE", "mvp_manifest_sha256": "279dfb0372e8abd63ae079cadf66ec6137deb6aabbb10da87c211afce5aae8cd", "mvp_index_sha256": "34a0b8f52ba9fe06d9a0479db6a6f59d5b3ff21163ae39bbd803a10612a4cbd0"}
+}

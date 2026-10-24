@@ -113,5 +113,5 @@ x-task-projection:
   task_fields: [source_versions, result_evidence_requires_resubmission]
   feedback_fields: [evidence_versions, evidence_states, historical_only, task_version]
   linked_message_fields: [body, authorization_id]
-  commitment_fields: [source_state, source_versions]
+  commitment_fields: [source_reference_state, source_refs, completion_evidence]
   related_collections: [self_due_events, self_commitment_revisions]
