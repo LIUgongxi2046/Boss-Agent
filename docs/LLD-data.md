@@ -58,6 +58,9 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 技术调度 | schedule、rules、scheduler_draft | 维护配置保存/校验/启用分别记录；CronService 唯一执行 |
 | 本人计划 | owner_plan、owner_plan_revision | ACTIVE/PAUSED/CANCELED；event_ids 与 event_versions 绑定；取消保留历史 |
 | 事件与通知 | event、reminder、dispatch、delivery、notification | 业务事件状态、提醒处理与内部通知保存分别维护；去重按 event_id/version |
+| 经营关注规则 | business_alert_rule_draft/rule/revision | 保存、验证和有效版本分开；维护仅固定演示参数，本人关注启停具有独立确认 |
+| 经营观察与跟踪 | business_alert_observation/tracking/summary/recovery/delivery/action | 当前来源、连续观察、参与条件及每次投递/恢复分别保留；未知不外推 |
+| 提醒历史与关联 | dispatch_history、notification_revision、reminder_revision、notification_meeting_link、notification_assignment_reference | 保留实际旧版本及抑制原因；关联记录同时绑定双方版本，同一episode不重复交办 |
 | 今日次序 | today_order，默认本人时区以业务日期为 ID，其他时区使用日期与IANA时区 | 完整当前事项 ID 集合；date/timezone、snapshot_sha256 和 expected_version 同时校验；重启后采用 |
 | 晨间清单 | morning_list、morning_sequence | 清单编号稳定，按日期与IANA时区递增版本；当前采用核查本人范围、对象、来源、目标、规则与业务时钟 |
 | 晨间覆盖 | morning_coverage、独立document及document_history | 明确SIMULATED生成版本及用途；地区未更新/未同步分别表达，不声明完整覆盖或业务授权 |
@@ -189,6 +192,16 @@ flowchart LR
 业务使用责任：BOSS命令产生任务/授权/本人设置，后续页面、工具及Cron按当前版本读取；MAINTAINER只产生获准模拟资料、反馈与技术配置；资料换版或撤销使会前材料、纪要引用、研究、人员会面和计划需要复核；通知知晓、关闭与暂缓不改变任务期限及完成状态。具体接收动作与acceptance_id分别见T06、T12—T18及T21—T24。
 
 ## 事务、重置与恢复
+
+### FC04 经营关注与提醒
+
+正式Schema为business-alert.schema.json，获准演示定义FC04-ALERT-1/seed20261024。独立原文保存作者、来源/版本、原始获准明细、公式与恢复计算、真实接收时间及业务观察时间，不改selection/1。规则草稿、校验和启用分开；维护只能采用完整工单的固定参数，本人自定义规则启停各自确认。business_alert_rule.activate与business_alert.snooze属于持续采用，原确认窗口届满仍可撤销，实际采用重新核查当前撤销和范围。
+
+唯一ControlStore调度函数在同一事务核查技术计划、经营规则、本人通知、计划/授权、当前来源与实际连续观察；一般进展汇总，符合参与条件才即时提醒。冷却、免打扰、同事件合并和恢复分别存储dispatch_history及独立恢复/投递记录。通知中心条目按event_id合并，真实旧版本存notification_revision；恢复不改变任务完成，关闭只改变提醒。暂缓到期按当前资料重新判断，过期或撤销不复活已停止对象。实际系统通知状态由宿主独立观察，不以内部DELIVERED证明送达。
+
+本人处理绑定event_version、reminder_version和review_sha256；后者包含来源、规则、本人设置、当前会议/材料、计划、授权、业务时钟和当前事项。知晓、暂缓、关闭、会议关联和交办各自签发限定授权并与对象/回执同事务保存；会议不自动安排或发送，交办创建OPEN后继续独立发送。相同事件和episode只产生一个关联任务，新事件阶段可以明确确认另一项，旧任务保持。会议关联同时保留事件和会议版本。普通审计/运行只记安全元信息，不含原文或本人正文。
+
+新增kind复用objects，无DDL迁移，不补造旧观察和派发历史。原生SQLite backup/integrity_check用于必要旧库副本验证。公共投影对BUSINESS_ALERT_INPUT使用BusinessAlertsAPI同事务读取，失效源文及派生facts隐藏；不能继续序列化原始event.body。领域、受限工具、公共显示及宿主通知的接收分别记录，不把模块检查登记完整功能通过。
 
 ### FC07 交办、延期决定与本人承诺
 

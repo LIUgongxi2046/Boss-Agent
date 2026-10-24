@@ -183,10 +183,12 @@ class Store:
         clock = self.get(db, ns, "clock", "current")["at"]
         documents = {source_id: require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
                      for source_id in source_ids}
-        from boss_supply_quality import DEFINITION, require_external_source_dependencies
+        from boss_supply_quality import DEFINITION, require_external_source_dependencies, external_adoption
         for document in documents.values():
             if document.get("simulation_definition") == DEFINITION:
                 require_external_source_dependencies(self, db, ns, data, document)
+            elif document.get("simulation_definition") == "FC04-ALERT-1":
+                require(external_adoption(db, ns, data, clock, document)["state"] == "CURRENT", "经营报告的原始依据已变化，需要重新载入当前资料")
         return documents
 
     def require_current_assignment_sources(self, db, ns, data, task):
@@ -209,7 +211,7 @@ class Store:
     def require_current_coordinator(self, db, ns, data, coordinator_id):
         contacts = [contact for contact in data["contacts"] if contact["contact_id"] == coordinator_id]
         require(len(contacts) == 1, "负责人不在当前获准资料内", web.HTTPForbidden)
-        today = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]).date()
+        today = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]).astimezone(ZoneInfo(data["boss_profile"]["timezone"])).date()
         require(date.fromisoformat(contacts[0]["valid_from"]) <= today <= date.fromisoformat(contacts[0]["valid_until"]),
                 "负责人在当前业务时间已经失效", web.HTTPForbidden)
 
@@ -296,7 +298,7 @@ class Store:
             # 正式维护事件从当前namespace继承本人；显式归属仍必须一致。
             require(event["event_id"] == identifier and event.get("owner_id", data["owner_id"]) == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
         documents = self.assignment_sources(db, ns, data, p["source_refs"])
-        require(all(identifier == "finance-note" or document.get("simulation_definition") == DEFINITION for identifier, document in documents.items()),
+        require(all(identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1") for identifier, document in documents.items()),
                 "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
         self.require_current_coordinator(db, ns, data, p["coordinator_id"])
         due = datetime.fromisoformat(p["due_at"])

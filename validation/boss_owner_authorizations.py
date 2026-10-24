@@ -9,7 +9,8 @@ from business import checksum, now, require
 
 NS = "ui-check"
 CONTINUING_USE_ACTIONS = frozenset({"memory.confirm", "owner_goals.confirm", "owner_notice.confirm",
-                                   "owner_plan.save", "owner_plan.resume", "calendar.share"})
+                                   "owner_plan.save", "owner_plan.resume", "calendar.share",
+                                   "business_alert.rule.activate", "business_alert.snooze"})
 
 
 def authorization_can_revoke(authorization, owner_id, namespace):

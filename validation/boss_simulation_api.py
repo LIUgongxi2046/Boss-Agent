@@ -313,7 +313,7 @@ class SimulationAPI:
     @staticmethod
     def _source(db, context, source_id):
         row = db.execute("SELECT json_object('source_id',json_extract(body,'$.source_id'),'version',json_extract(body,'$.version'),"
-                         "'source_type',json_extract(body,'$.source_type'),'access_scope',json_extract(body,'$.access_scope'),"
+                         "'source_type',json_extract(body,'$.source_type'),'access_scope',json_extract(body,'$.access_scope'),'simulation_definition',json_extract(body,'$.simulation_definition'),"
                          "'withdrawn',CASE WHEN json_type(body,'$.withdrawn')='true' THEN 1 ELSE 0 END,"
                          "'validity_state',CASE WHEN json_type(body,'$.validity_state') IS NULL THEN 'VALID' ELSE json_extract(body,'$.validity_state') END,"
                          "'published_at',json_extract(body,'$.published_at'),'valid_from',json_extract(body,'$.valid_from'),"
@@ -436,6 +436,12 @@ class SimulationAPI:
             require(isinstance(ref, dict) and isinstance(ref.get("source_id"), str), "来源引用字段不完整")
             source = self._source(db, context, ref["source_id"])
             status = "MISSING" if source is None else "FORBIDDEN" if source["source_id"] != ref["source_id"] or source["source_type"] != "SIMULATED" or source["access_scope"] != context["owner_id"] else source_validity(source, context["clock"])
+            if status == "VALID" and source.get("simulation_definition") == "FC04-ALERT-1":
+                from boss_alert_policy import report_adoption
+                actual = _object(db, namespace, "document", ref["source_id"])
+                initial = _object(db, namespace, "initial", "snapshot")
+                if report_adoption(db, namespace, initial, context["clock"], actual)["state"] != "CURRENT":
+                    status = "CHANGED"
             current_version = source["version"] if source and status != "FORBIDDEN" else None
             if status == "VALID":
                 current = _object(db, namespace, "document", ref["source_id"])

@@ -8,6 +8,31 @@ security:
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
+x-fc04-business-alerts:
+  schema_version: 1.0.0
+  schema_extension: business-alert.schema.json
+  input_definition: business-alert-input.json; FC04-ALERT-1; seed=20261024; explicitly SIMULATED
+  read: BusinessAlertsAPI.read(BOSS, event_id=None)
+  shared_transaction_read: BusinessAlertsAPI.project_in_transaction(BOSS, db, event_id=None)
+  read_schema: business-alert.schema.json#/$defs/Read
+  owner_actions: [boss.alert.ack, boss.alert.snooze, boss.alert.close, boss.alert.meeting.link, boss.alert.assignment.create]
+  owner_inputs: [Decision, Snooze, Decision, MeetingLink, Assignment]
+  action_result: business-alert.schema.json#/$defs/ActionResult
+  rule_read: BusinessAlertRulesAPI.read(role)
+  owner_rule_actions: [boss.alert.rule.save, boss.alert.rule.validate, boss.alert.rule.activate, boss.alert.rule.disable]
+  simulation_rule_actions: [boss.simulation.alert.rule.save, boss.simulation.alert.rule.validate, boss.simulation.alert.rule.activate, boss.simulation.alert.rule.disable]
+  rule_execute: BusinessAlertRulesAPI.execute(role, action, payload)
+  rule_inputs: [RuleSave, RuleVersion, RuleActivate, RuleVersion]
+  load_action: boss.simulation.alert.load
+  load: BusinessAlertInputAPI.load(MAINTAINER, payload)
+  load_input: business-alert.schema.json#/$defs/Load
+  load_result: business-alert.schema.json#/$defs/LoadResult
+  receipts: role-scoped original client_request_id through each API receipt; no replay
+  execution_owner: existing ControlStore.dispatch_due_in_transaction through unique CronService
+  public_projection: notifications.business_alerts; exclude raw BUSINESS_ALERT_INPUT events and use current adopted projection
+  source_policy: current owner/source version/hash/validity; invalid bodies and derived facts hidden
+  authorization: actual owner confirmation only; no model decision tools; maintenance limited to approved fixed demonstration rules
+  public_integration: PENDING_N2_N3
 x-fc07-assignment-extension:
   schema_extension: assignment-extension.schema.json
   input_schema: assignment-extension.schema.json#/$defs/DecisionInput
@@ -94,7 +119,7 @@ x-operation-defaults:
   receipt_policy: 已提交业务结果在模型或界面后续失败后保持；取消只停止尚未执行动作。
 x-revocation-policy:
   implementation: boss_owner_authorizations.authorization_can_revoke
-  continuing_use_actions: [memory.confirm, owner_goals.confirm, owner_notice.confirm, owner_plan.save, owner_plan.resume, calendar.share]
+  continuing_use_actions: [memory.confirm, owner_goals.confirm, owner_notice.confirm, owner_plan.save, owner_plan.resume, calendar.share, business_alert.rule.activate, business_alert.snooze]
   confirmation_window: 原确认窗口到期后仍允许本人停止持续采用；当前对象状态、业务期限和已撤销状态继续有效。
   single_action_policy: 一次性授权到期后不再接受新提交，不以撤销改写已执行结果。
   projection_adoption: W3在授权列表can_revoke采用同一服务规则；维护身份不能撤销本人确认。

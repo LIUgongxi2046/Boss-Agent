@@ -225,7 +225,7 @@ def manual_run(api, db, data, payload):
             "当前事件版本变化，禁止按旧版本触发")
     # Technical operation never edits or creates arbitrary business events.
     allowed = identifier == data["event"]["event_id"] or event.get("generated_by") in (
-        "BOSS_AUTHORIZED_TASK", "BOSS_OWN_COMMITMENT",
+        "BOSS_AUTHORIZED_TASK", "BOSS_OWN_COMMITMENT", "BUSINESS_ALERT_INPUT",
     )
     require(allowed and event.get("source_type") == "SIMULATED",
             "事件并非获准模拟数据或已授权业务范围", web.HTTPForbidden)

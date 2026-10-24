@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:business-alert:1.0.0",
+  "$defs": {
+    "Id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "Version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"},
+    "Number": {"type": ["string", "null"], "pattern": "^-?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?$"},
+    "Facts": {"type": "object", "additionalProperties": false,
+      "required": ["metric_id", "base_value", "current_value", "change_pp", "unit", "change_unit", "comparison_periods", "scope", "metric_data_as_of", "complete", "confidence", "handler_id", "impact", "impact_amount", "impact_currency", "participation", "participation_reason", "frame", "source_type"],
+      "properties": {"metric_id": {"const": "gross_margin"}, "base_value": {"$ref": "#/$defs/Number"}, "current_value": {"$ref": "#/$defs/Number"}, "change_pp": {"$ref": "#/$defs/Number"},
+        "unit": {"const": "%"}, "change_unit": {"const": "百分点"}, "comparison_periods": {"type": "object", "required": ["BASE", "CURRENT"], "additionalProperties": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "format": "date"}}},
+        "scope": {"type": "string"}, "metric_data_as_of": {"type": "string", "format": "date-time"}, "complete": {"type": "boolean"}, "confidence": {"enum": ["HIGH", "LOW"]}, "handler_id": {"type": ["string", "null"]},
+        "impact": {"enum": ["NORMAL", "IMPORTANT"]}, "impact_amount": {"$ref": "#/$defs/Number"}, "impact_currency": {"type": ["string", "null"]},
+        "participation": {"enum": ["INFORM_ONLY", "CROSS_FUNCTION_RESOURCE_SHORTAGE", "THRESHOLD_ESCALATION"]}, "participation_reason": {"type": "string"}, "frame": {"$ref": "#/$defs/Load/properties/frame"}, "source_type": {"const": "SIMULATED"}}},
+    "Evaluation": {"type": "object", "additionalProperties": false, "required": ["phase", "reason", "duration_seconds"], "properties": {
+      "phase": {"enum": ["UNKNOWN", "SUMMARY", "IMMEDIATE", "BREACH", "RECOVERY", "WAITING"]}, "reason": {"type": "string"}, "duration_seconds": {"type": ["integer", "null"], "minimum": 0}, "condition_since": {"type": "string", "format": "date-time"}}},
+    "Configuration": {"type": "object", "additionalProperties": false,
+      "required": ["threshold_pp", "duration_seconds", "recovery_seconds", "check_interval_seconds", "cooldown_seconds", "timezone", "quiet_start", "quiet_end", "important_escalation", "notify_recovery"],
+      "properties": {
+        "threshold_pp": {"type": "string", "pattern": "^(?:[0-9]|[1-9][0-9])(?:\\.[0-9]{1,4})?$"},
+        "duration_seconds": {"type": "integer", "minimum": 0, "maximum": 86400}, "recovery_seconds": {"type": "integer", "minimum": 0, "maximum": 86400},
+        "check_interval_seconds": {"type": "integer", "minimum": 1, "maximum": 3600}, "cooldown_seconds": {"type": "integer", "minimum": 0, "maximum": 86400},
+        "timezone": {"const": "Asia/Shanghai"}, "quiet_start": {"type": "integer", "minimum": 0, "maximum": 23}, "quiet_end": {"type": "integer", "minimum": 0, "maximum": 23},
+        "important_escalation": {"type": "boolean"}, "notify_recovery": {"type": "boolean"}
+      }},
+    "RuleSave": {"type": "object", "additionalProperties": false, "required": ["client_request_id", "expected_version", "configuration"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}, "configuration": {"$ref": "#/$defs/Configuration"}}},
+    "RuleVersion": {"type": "object", "additionalProperties": false, "required": ["client_request_id", "expected_version"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}}},
+    "RuleActivate": {"type": "object", "additionalProperties": false, "required": ["client_request_id", "expected_version", "expected_active_version"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}, "expected_active_version": {"$ref": "#/$defs/Version"}}},
+    "Load": {"type": "object", "additionalProperties": false, "required": ["client_request_id", "expected_version", "mode", "definition_version", "seed", "frame"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "expected_version": {"$ref": "#/$defs/Version"}, "mode": {"const": "SIMULATED"},
+      "definition_version": {"const": "FC04-ALERT-1"}, "seed": {"const": 20261024},
+      "frame": {"enum": ["MARGIN_DROP", "RESOURCE_SHORTAGE", "PROGRESS", "RECOVERY", "LOW_CONFIDENCE", "MISSING_HANDLER", "CANCELED"]}}},
+    "Decision": {"type": "object", "additionalProperties": false, "required": ["client_request_id", "event_id", "event_version", "expected_version", "review_sha256"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"},
+      "expected_version": {"$ref": "#/$defs/Version"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "Snooze": {"allOf": [{"$ref": "#/$defs/DecisionBase"}, {"required": ["until"], "properties": {"until": {"type": "string", "format": "date-time"}}}], "unevaluatedProperties": false},
+    "DecisionBase": {"type": "object", "required": ["client_request_id", "event_id", "event_version", "expected_version", "review_sha256"], "properties": {
+      "client_request_id": {"$ref": "#/$defs/Id"}, "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"},
+      "expected_version": {"$ref": "#/$defs/Version"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "MeetingLink": {"allOf": [{"$ref": "#/$defs/DecisionBase"}, {"required": ["meeting_id", "meeting_version"], "properties": {
+      "meeting_id": {"$ref": "#/$defs/Id"}, "meeting_version": {"$ref": "#/$defs/Version"}}}], "unevaluatedProperties": false},
+    "Assignment": {"allOf": [{"$ref": "#/$defs/DecisionBase"}, {"required": ["purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements"], "properties": {
+      "purpose": {"type": "string", "minLength": 1, "maxLength": 1600}, "coordinator_id": {"$ref": "#/$defs/Id"},
+      "due_at": {"type": "string", "format": "date-time"}, "timezone": {"const": "Asia/Shanghai"},
+      "evidence_requirements": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 160}}}}], "unevaluatedProperties": false},
+    "LoadResult": {"type": "object", "additionalProperties": false, "required": ["source_type", "event_id", "event_version", "source_id", "source_version", "definition_version", "business_authorization_granted", "external_service_invoked"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"}, "source_id": {"$ref": "#/$defs/Id"}, "source_version": {"$ref": "#/$defs/Version"},
+      "definition_version": {"const": "FC04-ALERT-1"}, "business_authorization_granted": {"const": false}, "external_service_invoked": {"const": false}}},
+    "View": {"type": "object", "required": ["source_type", "event_id", "event_version", "episode", "state", "facts", "observed_at", "data_as_of", "adoption_state", "sources", "documents", "evaluation", "business_rule", "rule_state", "technical_rule_version", "owner_notice_version", "reminder", "reminder_version", "notification", "summary", "existing_measures", "meeting_reference", "review_sha256", "missing_fields", "execution_owner", "external_delivery_verified"],
+      "properties": {"source_type": {"const": "SIMULATED"}, "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"}, "episode": {"type": "integer", "minimum": 0}, "facts": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/Facts"}]},
+        "evaluation": {"$ref": "#/$defs/Evaluation"}, "data_as_of": {"type": ["string", "null"], "format": "date-time"}, "observed_at": {"type": "string", "format": "date-time"},
+        "adoption_state": {"enum": ["CURRENT", "NEEDS_REVIEW"]}, "sources": {"type": "array", "items": {"type": "object"}}, "documents": {"type": "array", "items": {"type": "object"}},
+        "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "execution_owner": {"const": "CronService"}, "external_delivery_verified": {"const": false}}},
+    "Read": {"type": "object", "additionalProperties": false, "required": ["source_type", "business_clock", "items", "coverage_state", "missing_sources", "execution_owner"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "business_clock": {"type": "string", "format": "date-time"}, "items": {"type": "array", "items": {"$ref": "#/$defs/View"}},
+      "coverage_state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "missing_sources": {"type": "array", "items": {"type": "string"}}, "execution_owner": {"const": "CronService"}}},
+    "ActionResult": {"type": "object", "required": ["source_type", "event_id", "event_version", "version", "action", "authorization_id", "external_message_sent", "state", "until"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "event_id": {"$ref": "#/$defs/Id"}, "event_version": {"$ref": "#/$defs/Version"}, "version": {"$ref": "#/$defs/Version"},
+      "action": {"enum": ["ack", "snooze", "close", "meeting.link", "assignment.create"]}, "authorization_id": {"$ref": "#/$defs/Id"}, "external_message_sent": {"const": false},
+      "state": {"enum": ["DELIVERED", "ACKNOWLEDGED", "SNOOZED", "CLOSED"]}, "until": {"type": ["string", "null"], "format": "date-time"}}},
+    "RuleResult": {"type": "object", "additionalProperties": false, "required": ["source_type", "version", "state"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "version": {"$ref": "#/$defs/Version"}, "state": {"enum": ["DRAFT", "VALIDATED", "ACTIVE", "DISABLED"]}, "authorization_id": {"$ref": "#/$defs/Id"}}},
+    "RuleRecord": {"type": "object", "required": ["source_type", "version", "state", "configuration", "owner_id", "namespace", "created_by_role", "definition_version"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "version": {"$ref": "#/$defs/Version"}, "state": {"enum": ["DRAFT", "VALIDATED", "ACTIVE", "DISABLED"]}, "configuration": {"$ref": "#/$defs/Configuration"},
+      "owner_id": {"$ref": "#/$defs/Id"}, "namespace": {"$ref": "#/$defs/Id"}, "created_by_role": {"enum": ["BOSS", "MAINTAINER"]}, "definition_version": {"const": "FC04-ALERT-1"}, "authorization_id": {"type": ["string", "null"]},
+      "last_action_authorization_id": {"$ref": "#/$defs/Id"}, "draft_version": {"$ref": "#/$defs/Version"}, "validated_sha256": {"type": "string"}, "activated_at": {"type": "string", "format": "date-time"}}},
+    "RuleRead": {"type": "object", "additionalProperties": false, "required": ["source_type", "definition", "draft", "active", "active_version", "business_authorization_granted"], "properties": {
+      "source_type": {"const": "SIMULATED"}, "definition": {"type": "object"}, "draft": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/RuleRecord"}]}, "active": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/RuleRecord"}]},
+      "active_version": {"$ref": "#/$defs/Version"}, "business_authorization_granted": {"const": false}}},
+    "Receipt": {"type": "object", "additionalProperties": false, "required": ["action", "client_request_id", "outcome", "result"], "properties": {
+      "action": {"type": "string"}, "client_request_id": {"$ref": "#/$defs/Id"}, "outcome": {"enum": ["RECORDED", "NOT_FOUND_IN_CURRENT_STORE"]},
+      "result": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/RuleResult"}, {"$ref": "#/$defs/LoadResult"}, {"$ref": "#/$defs/ActionResult"}]}}}
+  }
+}

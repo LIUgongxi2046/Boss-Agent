@@ -81,7 +81,7 @@ def project(store, db, context, day):
         else:
             document = store.get(db, ns, "document", identifier)
             status = source_validity(document, clock["at"])
-            if document.get("simulation_definition") == "si09-si10-business-v1":
+            if document.get("simulation_definition") in ("si09-si10-business-v1", "FC04-ALERT-1"):
                 from boss_supply_quality import external_adoption
                 adoption = external_adoption(db, ns, initial, clock["at"], document)
                 if adoption["state"] != "CURRENT":

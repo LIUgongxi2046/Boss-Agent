@@ -270,6 +270,62 @@
       "storage": "objects/rules/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",
       "fields": {"version": {"type_ref": "version"}, "cooldown_seconds": {"type": "integer", "unit": "second", "minimum": 0, "maximum": 86400}, "quiet_start": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "quiet_end": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "timezone": {"type": "string", "const": "Asia/Shanghai"}, "important_escalation": {"type": "boolean"}}
     },
+    "business_alert_rule": {
+      "storage": "objects/business_alert_rule/current; business_alert_rule_draft/current; business_alert_rule_revision/<version>", "access": "BOSS_ONLY_WITH_MAINTAINER_OWN_DEMONSTRATION_RULES", "version": "1",
+      "fields": {"version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT", "VALIDATED", "ACTIVE", "DISABLED"]}, "configuration": {"type": "object", "schema": "business-alert.schema.json#/$defs/Configuration"},
+        "owner_id": {"type_ref": "identifier"}, "namespace": {"type_ref": "identifier"}, "created_by_role": {"type": "string", "enum": ["BOSS", "MAINTAINER"]}, "definition_version": {"type": "string", "const": "FC04-ALERT-1"},
+        "validated_sha256": {"type": "string", "optional": true}, "authorization_id": {"type": ["string", "null"], "optional": true}, "last_action_authorization_id": {"type_ref": "identifier", "optional": true},
+        "draft_version": {"type_ref": "version", "optional": true}, "activated_at": {"type_ref": "instant", "clock": "WALL", "optional": true}},
+      "policy": "保存与启用分开；维护仅固定获准参数且不能修改本人规则。本人启停分别确认，持续采用允许撤销，技术计划与本人通知继续独立限制。"
+    },
+    "business_alert_observation": {
+      "storage": "objects/business_alert_observation/<event_id>:v<version>; current body in objects/event", "access": "BOSS_CURRENT_SOURCE_ADOPTION_ONLY", "version": "1", "inherits": "event",
+      "fields": {"owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"},
+        "facts": {"type": "object", "schema": "business-alert.schema.json#/$defs/Facts"},
+        "observed_at": {"type_ref": "instant", "clock": "BUSINESS"}, "data_as_of": {"type_ref": "instant", "clock": "BUSINESS"}, "basis_sha256": {"type": "string"},
+        "source_refs": {"type": "array", "items": "source_reference"}, "source_fingerprints": {"type": "object", "values": "SHA256"}},
+      "policy": "FC04-ALERT-1明确模拟输入，原始selection保持。每次观察与原文/版本同事务保存，连续依据不包含单纯时钟外推；来源失效隐藏派生事实。"
+    },
+    "business_alert_tracking": {
+      "storage": "objects/business_alert_tracking/<event_id>", "access": "SERVER_ONLY", "version": "1",
+      "fields": {"episode": {"type": "integer"}, "incident_open": {"type": "boolean"}, "sent_episode": {"type": "integer", "optional": true}, "sent_mode": {"type": "string", "enum": ["ALERT", "RECOVERY"], "optional": true},
+        "last_impact": {"type": "string", "optional": true}, "delivered_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "last_snooze_until": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}}
+    },
+    "business_alert_recovery": {
+      "storage": "objects/business_alert_recovery/<event_id>:<episode>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "owner_id": {"type_ref": "identifier"}, "episode": {"type": "integer"}, "rule_version": {"type_ref": "version"},
+        "condition_since": {"type_ref": "instant", "clock": "BUSINESS"}, "recovered_at": {"type_ref": "instant", "clock": "BUSINESS"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"},
+        "source_refs": {"type": "array", "items": "source_reference"}, "task_completed": {"type": "boolean", "const": false}}
+    },
+    "business_alert_summary": {
+      "storage": "objects/business_alert_summary/<event_id>", "access": "BOSS_ONLY", "version": "1", "inherits": "dispatch",
+      "fields": {"observed_at": {"type_ref": "instant", "clock": "BUSINESS"}}, "policy": "一般进展进入可查询汇总，不冒充即时通知。"
+    },
+    "business_alert_delivery": {
+      "storage": "objects/business_alert_delivery/<result_sha256>", "access": "BOSS_ONLY", "version": "1", "inherits": "notification", "fields": {},
+      "policy": "每次实际通知中心保存独立保留，当前通知按event_id合并；不证明系统或外部送达。"
+    },
+    "business_alert_action": {
+      "storage": "objects/business_alert_action/<operation>:<client_request_id>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "action": {"type": "string"}, "authorization_id": {"type_ref": "identifier"},
+        "previous_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}, "payload_sha256": {"type": "string"}}
+    },
+    "dispatch_history": {
+      "storage": "objects/dispatch_history/<result_sha256>", "access": "BOSS_WITH_SAFE_TECHNICAL_METADATA", "version": "1", "inherits": "dispatch",
+      "fields": {"dispatch_id": {"type_ref": "identifier"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}}, "policy": "同一结果只保存一次，实际不同抑制/允许理由全部保留。"
+    },
+    "notification_revision": {"storage": "objects/notification_revision/<notification_id>:<version>", "access": "BOSS_ONLY", "version": "1", "inherits": "notification", "fields": {}},
+    "reminder_revision": {"storage": "objects/reminder_revision/<event_id>:<version>", "access": "BOSS_ONLY", "version": "1", "inherits": "reminder", "fields": {}},
+    "notification_meeting_link": {
+      "storage": "objects/notification_meeting_link/<event_id>:<event_version>:<meeting_id>:<meeting_version>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "source_refs": {"type": "array", "items": "source_reference"}, "created_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
+    "notification_assignment_reference": {
+      "storage": "objects/notification_assignment_reference/<event_id>:<episode>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "episode": {"type": "integer"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "reminder_authorization_id": {"type_ref": "identifier"}, "created_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
     "event": {
       "storage": "objects/event", "access": "BOSS_WITH_MAINTAINER_SIMULATION_WRITE", "version": "1",
       "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["OPEN", "RECOVERED", "CANCELED"]}, "impact": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "task_id": {"type_ref": "identifier", "optional": true}, "task_version": {"type_ref": "version", "optional": true}, "commitment_id": {"type_ref": "identifier", "optional": true}, "commitment_version": {"type_ref": "version", "optional": true}, "generated_by": {"type": "string", "optional": true}, "updated_at": {"type_ref": "instant", "optional": true}, "transition_reason": {"type": "string", "optional": true}, "automatic_external_delivery": {"type": "boolean", "const": false, "optional": true}, "external_delivery_created": {"type": "boolean", "const": false, "optional": true}}
@@ -278,11 +334,11 @@
       "storage": "objects/reminder", "access": "BOSS_ONLY", "version": "1",
       "prd_state_enum": ["PENDING", "DELIVERED", "ACKNOWLEDGED", "SNOOZED", "CLOSED", "CANCELED", "FAILED"],
       "state_mapping": "本人处理使用reminder.state；内部投递使用dispatch/delivery/notification；完整系统投递FAILED与待发送状态仍待验证",
-      "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version", "optional": true}, "state": {"type": "string", "enum": ["SNOOZED", "CLOSED", "ACKNOWLEDGED"]}, "until": {"type": ["string", "null"], "clock": "BUSINESS"}}
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version", "optional": true}, "version": {"type_ref": "version", "optional": true}, "state": {"type": "string", "enum": ["DELIVERED", "SNOOZED", "CLOSED", "ACKNOWLEDGED"]}, "until": {"type": ["string", "null"], "clock": "BUSINESS"}, "authorization_id": {"type_ref": "identifier", "optional": true}, "last_action_authorization_id": {"type_ref": "identifier", "optional": true}}
     },
     "dispatch": {
       "storage": "objects/dispatch", "access": "BOSS_WITH_MAINTAINER_TECHNICAL_METADATA", "version": "1",
-      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SUPPRESSED", "DELIVERED"]}, "reason": {"type": ["string", "null"]}, "rule_version": {"type_ref": "version"}, "schedule_version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "owner_notice_version": {"type_ref": "version", "optional": true}}
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SUPPRESSED", "DELIVERED"]}, "reason": {"type": ["string", "null"]}, "rule_version": {"type_ref": "version", "nullable": true}, "schedule_version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "owner_notice_version": {"type_ref": "version", "optional": true, "nullable": true}}
     },
     "notification": {
       "storage": "objects/notification and objects/delivery", "access": "BOSS_WITH_REDACTED_SYSTEM_NOTIFICATION", "version": "1", "inherits": "dispatch",
@@ -519,7 +575,7 @@
   "pending_entities": [],
   "requirement_entities": {
     "R01": ["today_order", "meeting", "task", "self_commitment", "event", "owner_goals"],
-    "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification"],
+    "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification", "business_alert_rule", "business_alert_observation", "business_alert_tracking", "business_alert_recovery", "business_alert_summary", "business_alert_delivery", "business_alert_action", "dispatch_history", "notification_revision", "reminder_revision", "notification_meeting_link", "notification_assignment_reference"],
     "R03": ["query", "query_source_binding", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
     "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
     "R06": ["task", "assignment_source_binding", "assignment_source_binding_revision", "self_commitment", "feedback", "outbox", "event"],

@@ -256,6 +256,7 @@ class ControlStore(Store):
 
     def control_reminder(self, db, ns, p):
         event = self.get(db, ns, "event", p["event_id"])
+        require(event.get("generated_by") != "BUSINESS_ALERT_INPUT", "经营提醒需要核查当前详情与确认摘要")
         require(p["state"] in {"SNOOZED", "CLOSED", "ACKNOWLEDGED"}, "提醒状态无效", web.HTTPBadRequest)
         current = {"state": p["state"], "until": p.get("until"), "event_id": event["event_id"]}
         if p["state"] == "SNOOZED":
@@ -283,18 +284,25 @@ class ControlStore(Store):
         Caller must own BEGIN IMMEDIATE; no external messaging occurs here.
         """
         self.active(db, ns)
+        from boss_alert_dispatch import dispatch
+        from boss_alert_policy import record_dispatch
+        from boss_owner_preferences import effective_owner_notice
+        alert_results = dispatch(self, db, ns, only_event_id)
         schedule = self.get(db, ns, "schedule", "current")
         rules_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'", (ns,)).fetchone()
         if rules_row is None:
-            return []
+            return alert_results
         rules = json.loads(rules_row[0])
         clock = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"])
         local = clock.astimezone(ZoneInfo(rules["timezone"]))
         from boss_owner_preferences import owner_notification_suppression
         data = self.get(db, ns, "initial", "snapshot")
+        owner_notice = effective_owner_notice(db, data, ns)
         results = []
         for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
             event = json.loads(row[0])
+            if event.get("generated_by") == "BUSINESS_ALERT_INPUT":
+                continue
             if only_event_id is not None and event["event_id"] != only_event_id:
                 continue
             if datetime.fromisoformat(event["due_at"]) > clock:
@@ -331,7 +339,7 @@ class ControlStore(Store):
                     start, end = rules["quiet_start"], rules["quiet_end"]
                     quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
                     escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
-                    if quiet and not escalation:
+                    if quiet and not (escalation and owner_notice is not None and owner_notice["content"]["important_during_quiet"]):
                         reason = "QUIET_HOURS"
                     elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
                         reason = "COOLDOWN"
@@ -340,10 +348,10 @@ class ControlStore(Store):
                 result["owner_plan_id"] = event["owner_plan_id"]
             if owner_notice_version is not None:
                 result["owner_notice_version"] = owner_notice_version
-            self.put(db, ns, "dispatch", event["event_id"], result)
+            record_dispatch(self, db, ns, result)
             if reason is None:
                 delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
                 self.put(db, ns, "delivery", event["event_id"], delivery)
                 self.put(db, ns, "notification", event["event_id"] + ":" + event["version"], delivery)
             results.append(result)
-        return results
+        return alert_results + results

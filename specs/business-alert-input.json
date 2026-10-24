@@ -1,0 +1,8 @@
+{
+  "definition_version": "FC04-ALERT-1", "seed": 20261024, "source_type": "SIMULATED", "event_id": "business-alert-1",
+  "author_kind": "SIMULATED_GENERATOR", "allowed_use": "FC04_PROGRAM_BEHAVIOR", "real_enterprise_data": false, "third_party_authorization": false,
+  "description": "使用获准selection/1完整BASE/CURRENT明细计算毛利率；恢复帧按BASE成本率计算CURRENT模拟成本。各帧明确声明演示条件，不代表企业事实或本人业务授权。",
+  "frames": ["MARGIN_DROP", "RESOURCE_SHORTAGE", "PROGRESS", "RECOVERY", "LOW_CONFIDENCE", "MISSING_HANDLER", "CANCELED"],
+  "configuration": {"threshold_pp": "1.5", "duration_seconds": 600, "recovery_seconds": 600, "check_interval_seconds": 300,
+    "cooldown_seconds": 1800, "timezone": "Asia/Shanghai", "quiet_start": 22, "quiet_end": 7, "important_escalation": false, "notify_recovery": false}
+}

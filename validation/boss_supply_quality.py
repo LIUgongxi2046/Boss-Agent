@@ -134,6 +134,9 @@ def require_external_source_dependencies(store, db, namespace, initial, document
 
 
 def external_adoption(db, namespace, initial, clock, document):
+    if document is not None and document.get("simulation_definition") == "FC04-ALERT-1":
+        from boss_alert_policy import report_adoption
+        return report_adoption(db, namespace, initial, clock, document)
     if document is None or document.get("simulation_definition") != DEFINITION:
         return {"state": "NOT_APPLICABLE", "dependencies": []}
     kind, identifier = document["external_entity_type"], document["external_record_id"]
