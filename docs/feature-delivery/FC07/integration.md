@@ -41,7 +41,7 @@ N1正式c13996a43ec663fef639a375ff16c38f5f9d5774以2a845771f89852ae2c235edae7a42
 | C09 | 公共角色拒绝、严格Schema、日志正文排除；领域与Agent覆盖对象/空间/资料/confirmed注入及认证撤销；未注册本人决定工具 |
 | C10 | 实际发送、来源确认、承诺创建成功后中断响应，每项原编号仅一次实际转发；刷新仅查询原回执，未知Escape关闭被拒绝、Tab焦点保持；重登/重启保持对象；恢复与journey报告 |
 | C11 | 实际SDK/Registry读取当前任务/来源，Runtime通过当前Schema；同一Runtime后续MVP仅四项工具；Agent覆盖失败/取消/超时和撤销；public-sdk-schema.xml |
-| C12 | 严格TypeScript/Vite通过；F06/N05三个窗口与100%/200%缩放无整页横向溢出，正文16/24；当前启动文件实际登录并核查已有业务记录保持；journey、launcher.json、inventory |
+| C12 | 严格TypeScript/Vite通过；F06/N05三个窗口与100%/200%缩放无整页横向溢出；启动文件实际登录并核查已有业务记录保持；journey、launcher.json、inventory。FC07冻结候选的正文样式单独为NOT_VERIFIED；当前FC04制品的F06九项正文16/24见evidence/feature-delivery/FC04/fc04-public-b4bc799d-3b32-402b-8db0-0600b3fc83ee.json，范围不扩展至冻结制品 |
 
 当前公共检查5 passed，11.14秒，原始public-sdk-schema.xml。生产者领域56项和Agent14项加认证撤销证据保持限定范围，没有换算用户验收数量。全部前置来自正式API、实际SDK、获准selection/1和正常导入；故障检查仅中断真实成功响应，不伪造响应或直接改写业务记录。准确当前报告由delivery.json关联。
 

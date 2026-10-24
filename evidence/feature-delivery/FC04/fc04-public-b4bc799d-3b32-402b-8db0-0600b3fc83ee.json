@@ -1,0 +1,145 @@
+{
+  "status": "PASS",
+  "scope": "FC04_TARGET_AND_RECOVERY_ONLY",
+  "run_id": "fc04-public-b4bc799d-3b32-402b-8db0-0600b3fc83ee",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-public-b4bc799d-3b32-402b-8db0-0600b3fc83ee",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc04-n3-dist",
+  "manifest_sha256": "d5d2a2954ed7ffc59ca56b403c3bccf4f169d1075956979ba7c9cfa295312ce7",
+  "ports": {
+    "business": 10111,
+    "webui": 10112,
+    "gateway": 20111
+  },
+  "proxy_port": 10113,
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "external_api_mode": "SIMULATED_FIRST",
+  "records": [
+    {
+      "check": "public_actual_sdk_current_reminder",
+      "client_request_id": "fc04-read-26d6b8a7-a7d3-4651-9860-fec4c2a843e3",
+      "run_id": "run-aa5223f1-1ee5-4030-b3a0-a6656d3df621",
+      "rule_versions": [
+        "1"
+      ],
+      "tools": [
+        "bossWorkspaceRead"
+      ],
+      "business_authority_granted": false
+    },
+    {
+      "check": "native_current_target_and_owner_boundary",
+      "event_id": "event-1",
+      "event_version": "1",
+      "observed": {
+        "supported": true,
+        "permission": "DENIED_BY_SYSTEM",
+        "state": "FAILED",
+        "failure_reason": "Notifications are not allowed for this application",
+        "external_delivery_verified": false
+      },
+      "duplicate_request_reused": true,
+      "maintainer_denied": true,
+      "old_version_denied": true,
+      "system_click": "NOT_RUN"
+    },
+    {
+      "check": "original_reminder_receipt_after_actual_delivery_interruption",
+      "client_request_id": "boss-32466552-72b0-4701-83dc-e801c3c45277",
+      "event_id": "event-1",
+      "reminder_state": "ACKNOWLEDGED",
+      "version": "1",
+      "forwarded_once": true,
+      "transport": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "a4c838cd-9f03-40f6-93e1-945421b106fc",
+          "action": "boss.reminder.ack",
+          "client_request_id": "boss-32466552-72b0-4701-83dc-e801c3c45277"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "a4c838cd-9f03-40f6-93e1-945421b106fc",
+          "action": "boss.reminder.ack",
+          "client_request_id": "boss-32466552-72b0-4701-83dc-e801c3c45277",
+          "response_sha256": "c09bcf560fe028385c8778d4938da5e990e50faa4d77231f8ba5592fe5a142ba"
+        }
+      ]
+    },
+    {
+      "check": "owner_notice_separate_adoption_and_original_receipt",
+      "client_request_id": "boss-be2a36ab-bf71-4b0f-9c16-0a98a089c471",
+      "active_version": "1",
+      "draft_did_not_activate": true,
+      "explicit_owner_confirmation": true,
+      "forwarded_once": true
+    },
+    {
+      "check": "owner_plan_pause_recovery_and_cancel",
+      "plan_id": "86645863-3824-4bb1-a063-e8c5c7788d77",
+      "client_request_id": "boss-2b2a7faa-3648-4dce-911d-0597e1c3a759",
+      "final_state": "CANCELED",
+      "final_version": "3",
+      "queued_dispatch_suppressed": true,
+      "forwarded_once": true
+    },
+    {
+      "check": "current_f06_body_typography",
+      "task_id": "0d89f33a-b1b6-4985-9a84-8b49e55bc68e",
+      "values": [
+        {
+          "text": "0d89f33a-b1b6-4985-9a84-8b49e55bc68e",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "核查当前经营原文及提醒关联依据",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "coordinator-1",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "1",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "Asia/Shanghai",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "OPEN",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "2026-10-25 17:00:00+08:00",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "当前经营原文",
+          "font": "16px",
+          "line": "24px"
+        },
+        {
+          "text": "CURRENT",
+          "font": "16px",
+          "line": "24px"
+        }
+      ]
+    },
+    {
+      "check": "technical_scheduler_separate_save_validate_activate_and_recovery",
+      "client_request_id": "boss-9c88ca30-3e28-43d8-b589-f577d5c77ac3",
+      "schedule_version": "2",
+      "rules_version": "2",
+      "forwarded_once": true
+    }
+  ]
+}
