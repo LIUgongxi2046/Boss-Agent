@@ -182,3 +182,15 @@ BossBusinessAlerts显示当前事实、比较期间、参与条件、来源版�
 CURRENT，2026-10-24。delivered-navigation.ts从FC01/FC02限定签收及MVP01/FC07/FC04开发交付派生当前可用页面；侧栏、目录、搜索、移动目录、通知和快捷入口共用该映射。未交付直接链接进入UNAVAILABLE，保留返回与退出操作。流程依赖只按当前完成能力可达，目录不以组件存在推断完成。
 
 登录采用原Token及Logo/大鹏，CSS增加蓝绿白层次；两个触发按钮共用同一尺寸样式，帮助正文独立。明确授权的run_ui01.command本机演示模式才能显示测试账号注入，Electron主进程同时核查窗口/主frame/来源/模式/角色及受控文件范围、所有者和权限。仅填充表单，密码仍经原服务认证；入口变化清空输入，异步返回核查代次。普通模式拒绝该能力，凭据不进入静态制品、日志、URL或浏览器持久存储。必要DOM/实际认证/权限与资料保持证据见UI01交付记录，视觉与用户验收单独登记。
+
+## UI02 公共框架与原生功能
+
+当前范围依据 D-UI-INTEGRATION-20261024 和 UI02 八项工单。BossDesktop 同时承载已交付业务页面、本人“大鹏会话”和维护“应用设置”；原生 App 不显示第二组主侧栏、窗口工具区和页面标题。会话选择、新建和搜索使用原生 sessions、onCreateChat、onSelectChat；Settings 分类使用原生控制器，保留保存、校验及原有错误。角色由同一服务端 identity 确定，维护不渲染本人 ThreadShell，/api/sessions 和本人业务继续由原服务拒绝。
+
+BossDesktop 的 children(role, visible)、onOpenNative(role)、onBeforeLeaveNative(leave) 传递已核查身份、页面可见性和离开保护。原生组件保持挂载，切换业务页面保留未发送输入及当前会话；ThreadVisibilityContext 跟随实际页面。业务对象继续使用 bossTask 等安全标识，会话使用原生 hash，刷新仍读取正式服务结果。退出及身份过期通过 clearPrivateNativeState 清除私人界面、进程内 WebuiThreadCache 和原生待发送队列的浏览器记录；正常刷新保留同一认证的原生恢复规则。既有认证与传输不变，transcriptionEnabled=false 保持当前原生语音输入及其快捷键暂停。
+
+未保存业务输入采用 D06，原生会话切换及 Settings 编辑采用同一 Radix Dialog。Settings 先核查编辑和保存状态，再改变分类或离开；明确保留编辑离开后返回仍有输入。实际提交首条会话消息时，sending 仅区分当前输入已经提交的页面移动，不影响业务授权。刷新保护使用 beforeunload。未知业务写入继续按原 client_request_id 查询，页面切换不重新执行写入。
+
+页面目录共用已交付映射与 Radix 焦点约束；Meta/Control+K 打开唯一目录，Escape 关闭并恢复焦点。原生快捷键仅在原生页面生效，会话搜索保留明确按钮。所有页面复用当前 v6 字体、蓝绿白颜色及共享语义 Token；正文 16px/24px，卡片 14px，输入 9px，键盘焦点 2px。短窗口采用紧凑标题和原生内容内滚动，输入与分类保持可操作。原生默认语言为 zh-CN，已有语言选择继续保存。
+
+UI02 的上游增量保存在 app/webui/nanobot-ui02-shell.patch，适用于 UI01 预备源码，通过文件编辑工具维护；准备目录与正式 BossDesktop/CSS 必须一致。当前构建输出 ui02-n3-dist，来源及静态制品摘要由 UI02 inventory 核查。独立启动器 run_ui02.command 使用 ui02-experience 和 10411/10412/20411，不操作当前体验资料。全部外部 SIMULATED_FIRST，STT 暂停，视觉与用户验收独立登记。当前结果及准确版本引用 UI02 主记录与原始正式状态。

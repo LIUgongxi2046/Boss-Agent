@@ -1,6 +1,6 @@
 # UI01 菜单与登录页
 
-task_id=UI01-N3；CURRENT；2026-10-24；DEVELOPED_PENDING_USER_ACCEPTANCE。原始docs/UI01菜单与登录页调整工单.md及D-UI-PAUSE-20261024明确完整七项，当前七项开发覆盖，用户验收未执行。FC04准确候选dd5c9e5e78f6035c05278465304ecbc6fbe9bca0保持开发覆盖20项、用户待验收。业务队列暂停，UI01完成后等待用户，不开发FC06。
+task_id=UI01-N3；CURRENT；2026-10-24；DEVELOPED_PENDING_USER_ACCEPTANCE。原始docs/UI01菜单与登录页调整工单.md明确完整七项，七项开发覆盖，用户验收未执行。FC04准确候选dd5c9e5e78f6035c05278465304ecbc6fbe9bca0保持开发覆盖20项、用户待验收。后续公共框架按 D-UI-INTEGRATION-20261024 接续 UI02，其他业务暂停，不开发FC06。
 
 采用S008，接续同一N3目录和公共组件。已读取当前BossDesktop导航/页面目录/快捷入口、BossLogin与CSS、Electron/preload和既有受控账号机制，以及FC01/FC02限定签收、MVP/FC07/FC04交付记录。功能入口必须依据这些准确记录和当前实现，不能用PRODUCT_PAGES推定完成。当前用户体验窗口、进程和资料不操作；检查使用独立端口、SQLite、构建及隐藏桌面，不执行视觉。
 
@@ -26,4 +26,4 @@ BossLogin保留原品牌、Logo、大鹏运动和减少动效规则，增加浅�
 | C06 | 指定说明和专用元素均不存在，原品牌/欢迎/表单及错误状态保留 |
 | C07 | 六组桌面窗口/缩放与移动目录无整页横向溢出；实际启动/认证及相关已交付路径通过，原52项业务记录和账号文件保持，准确制品清单核查160项业务依赖摘要未改变 |
 
-candidate-inventory.json核对正式源码与构建输入、当前成功报告及制品摘要，并核查FC04业务依赖。launcher不自动修改配置、规则、事件或账号，既有凭据仅在明确点击时读取；新入口不操作用户当前窗口。体验步骤见experience.md。外部SIMULATED_FIRST，STT暂停；视觉、独立安装与用户共同验收未执行，FC04原系统拒绝通知状态继续保持。七项开发覆盖与用户分子null分别登记，当前停止开发并等待用户。
+candidate-inventory.json核对正式源码与构建输入、当前成功报告及制品摘要，并核查FC04业务依赖。launcher不自动修改配置、规则、事件或账号，既有凭据仅在明确点击时读取；新入口不操作用户当前窗口。体验步骤见experience.md。外部SIMULATED_FIRST，STT暂停；视觉、独立安装与用户共同验收未执行，FC04原系统拒绝通知状态继续保持。七项开发覆盖与用户分子null分别登记，后续统一界面及交付入口见UI02主记录。

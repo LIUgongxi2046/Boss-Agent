@@ -124,7 +124,9 @@ type Props = {
   getToken: () => string;
   onLogout: () => void;
   onStartChat: (content: string) => Promise<boolean | void>;
-  children: ReactNode;
+  children: (role: Role, visible: boolean) => ReactNode;
+  onOpenNative: (role: Role) => void;
+  onBeforeLeaveNative: (leave: () => void) => void;
 };
 
 const pages = pageMeta as Record<string, DesignPage>;
@@ -139,6 +141,7 @@ const BOSS_NAV = [
   ["N06", "通知中心", Bell],
   ["N08", "本人通知设置", Settings],
   ["N09", "本人计划", Clock3],
+  ["NATIVE", "大鹏会话", MessageCircle],
 ] as const;
 const MAINT_NAV = [
   ["A01", "档案与访问", ShieldCheck],
@@ -157,6 +160,7 @@ const MAINT_NAV = [
   ["A14", "动作授权记录", ShieldCheck],
   ["A15", "运行记录", Activity],
   ["A16", "评测管理", ClipboardCheck],
+  ["NATIVE", "应用设置", Settings],
 ] as const;
 function allowed(page: string, role: Role, mvp=false, _priority=false) {
   return deliveredPage(page,role,mvp)!==undefined;
@@ -222,7 +226,7 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
   </div>;
 }
 
-export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props) {
+export function BossDesktop({ getToken, onLogout, onStartChat, children, onOpenNative, onBeforeLeaveNative }: Props) {
   const { client, token } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [mvpScope,setMvpScope]=useState(false);
@@ -231,6 +235,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const [authAttempt, setAuthAttempt] = useState(0);
   const [page, setPage] = useState("F01");
   const [previousPage, setPreviousPage] = useState(()=>new URLSearchParams(window.location.search).get("bossReturn")??"F01");
+  const businessPage = useRef<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [pageFilter, setPageFilter] = useState("");
@@ -304,6 +309,27 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const navigationFocus = useRef<HTMLElement | null>(null);
+  const currentLocation = useRef(window.location.href);
+  const openDirectory = useCallback(() => {
+    navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    setDirectoryOpen(true);
+  }, []);
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      if (!role || event.repeat || event.isComposing || event.altKey || !(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      event.preventDefault();openDirectory();
+    };
+    window.addEventListener("keydown",shortcut,true);
+    return () => window.removeEventListener("keydown",shortcut,true);
+  }, [role,openDirectory]);
+  useEffect(() => {currentLocation.current=window.location.href;});
+  useEffect(() => {
+    if (!(assignmentDirty || sourceReviewDirty || settingsDirty || workDirty || supplyDirty || importDirty)) return;
+    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
+    window.addEventListener("beforeunload",protect);
+    return () => window.removeEventListener("beforeunload",protect);
+  }, [assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,supplyDirty,importDirty]);
   const [originFocus, setOriginFocus] = useState("");
 
   useEffect(() => {
@@ -324,6 +350,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
 
   const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string, sopId?: string) => {
     if (!role || !allowed(id, role,mvpScope,priorityScope)) return;
+    if (page === "NATIVE" && id !== page && !bypassDirty) {
+      onBeforeLeaveNative(() => navigate(id, focus, true, taskId, sopId));
+      return;
+    }
     const changingTask = taskId !== undefined && taskId !== selectedTaskId;
     if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) || (page==="F06"&&changingTask&&assignmentDirty)||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
@@ -340,11 +370,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
       return;
     }
     if (id !== page) setPreviousPage(page);
+    if (id === "NATIVE" && page !== "NATIVE") {
+      businessPage.current = page;
+      onOpenNative(role);
+    }
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
     if (id !== page && ["F01","F02","N06","F04","N05","N09","A08","A13"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
+    if (id === "NATIVE") url.searchParams.set("bossReturn", page);
     if (taskId ?? selectedTaskId) url.searchParams.set("bossTask", taskId ?? selectedTaskId);
     if(id==="D01")url.searchParams.set("bossReturn",page);
     const sopReference = id === "A06" ? selectedSop : id === "A15" ? sopId ?? "" : "";
@@ -357,7 +392,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     setPage(id);
     setError("");
     setDirectoryOpen(false);
-  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,supplyDirty,importDirty,directoryOpen,mvpScope,priorityScope]);
+  }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,supplyDirty,importDirty,directoryOpen,mvpScope,priorityScope,onOpenNative,onBeforeLeaveNative]);
 
   const sopChanged = useCallback((sopId: string) => {
     setSelectedSop(sopId);
@@ -371,6 +406,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     const onBack = () => {
       if (!role) return;
       const selected = initialPage(role,mvpScope,priorityScope);
+      if (selected !== page && selected !== "UNAVAILABLE" &&
+          (page === "NATIVE" || assignmentDirty || sourceReviewDirty || settingsDirty || workDirty || supplyDirty || importDirty)) {
+        const targetTask = new URLSearchParams(window.location.search).get("bossTask")??"";
+        window.history.replaceState(null,"",currentLocation.current);
+        navigate(selected,"",false,targetTask);
+        return;
+      }
       setSelectedTaskId(new URLSearchParams(window.location.search).get("bossTask")??"");
       setSourceId(new URLSearchParams(window.location.search).get("bossSource")??"finance-note");
       const reference = new URLSearchParams(window.location.search).get("bossSop") ?? "";
@@ -380,7 +422,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
     };
     window.addEventListener("popstate", onBack);
     return () => window.removeEventListener("popstate", onBack);
-  }, [role,mvpScope,priorityScope]);
+  }, [role,mvpScope,priorityScope,page,navigate,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,supplyDirty,importDirty]);
 
   useEffect(() => {
     if (!role || page === "NATIVE") return;
@@ -446,10 +488,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   }, [getToken, page, role, selectedTaskId, requestVersion]);
 
   const userNav = (role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>role!==null&&allowed(id,role,mvpScope,priorityScope));
-  const metadata = pages[page];
+  const metadata = page === "NATIVE" ? {
+    ...pages.N01,
+    title: role === "BOSS" ? "大鹏会话" : "应用设置",
+    module: role === "BOSS" ? "会话" : "应用设置",
+    summary: role === "BOSS" ? "继续当前会话，核查回复与工具结果。" : "使用当前维护身份管理应用设置。",
+    initial_state: "当前身份与原生连接保持",
+  } : pages[page];
   const isNative = page === "NATIVE";
   const searchablePages = useMemo(() => {
-    return Object.entries(pages).filter(([id, p]) => role && deliveredPage(id,role,mvpScope)?.directory &&
+    return Object.entries({...pages,NATIVE:{...pages.N01,module:"会话与应用设置"}}).filter(([id, p]) => role && deliveredPage(id,role,mvpScope)?.directory &&
       (id.toLowerCase().includes(pageFilter.toLowerCase()) ||
        deliveredPage(id,role,mvpScope)?.title.includes(pageFilter) || p.module.includes(pageFilter)));
   }, [pageFilter, role,mvpScope,priorityScope]);
@@ -502,16 +550,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
   </div>;
 
   if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前入口尚未交付</h1><p>当前版本没有开放此功能。请返回已经交付的功能入口。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回可用入口</button><button className="boss-btn" onClick={onLogout}>退出当前身份</button></div></section></div>;
-  if (isNative) return <div className="boss-native-view">
-    <div className="boss-native-return">
-      <button type="button" onClick={() => navigate(role === "BOSS" ? "F01" : "A08")}>
-        <ArrowLeft size={16} /> 返回 Boss-Agent 工作台
-      </button>
-      <span>nanobot 原生会话 / Settings · 实际模型与配置操作</span>
-    </div>
-    <div className="boss-native-content">{children}</div>
-  </div>;
-
   return <div className="boss-v6" data-role={role} ref={shellRef}>
     <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);window.history.replaceState(null,"",url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
@@ -533,7 +571,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
             )}
           </nav>
           <div className="boss-sidebar-bottom">
-            <button type="button" onClick={() => setDirectoryOpen(true)} title="已交付功能目录">
+            <button type="button" onClick={openDirectory} title="已交付功能目录">
               <FolderOpen size={17} aria-hidden="true" />{sidebarOpen && ((mvpScope||priorityScope)?"当前可用入口":"全部页面")}
             </button>
             <button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
@@ -543,9 +581,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         </aside>
         <main className="boss-main" id="boss-main">
           <header className="boss-topbar">
-            <button className="boss-mobile-menu" type="button" onClick={() => setDirectoryOpen(true)}
+            <button className="boss-mobile-menu" type="button" onClick={openDirectory}
               aria-label="打开页面目录"><Menu size={19}/></button>
-            <button className="boss-search" type="button" onClick={() => setDirectoryOpen(true)}>
+            <button className="boss-search" type="button" onClick={openDirectory}>
               <Search size={17}/><span>{(mvpScope||priorityScope)?"查找当前可用入口":"搜索页面、经营专题、任务入口…"}</span><kbd>⌘ K</kbd>
             </button>
             <div className="boss-topright">
@@ -563,13 +601,17 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           <section className="boss-stage">
             <div className={"boss-hero " + (page === "F01" ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
-                <div className="boss-eyebrow">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
+                <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
                 <h1>{page === "F01" ? (mvpScope||priorityScope)?"今日采购成本事项":"早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{(mvpScope||priorityScope)&&page==="F01"?"核查同一采购报告的成本变化、原文与本人协调记录。":metadata?.summary || "按照 PRD 查看真实执行过程和资料来源。"}</p>
               </div>
               <img src={["F05","F13","F24","F29"].includes(page) ? "/boss-brand/dapeng-think.png" : ["F06","F07","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"].includes(page) ? "/boss-brand/dapeng-execute.png" : "/boss-brand/dapeng-front.png"} className="boss-hero-mascot" alt="大鹏吉祥物" />
             </div>
-            <div className="boss-content" key={page}>
+            <section className="boss-native-surface" hidden={!isNative} aria-label={role === "BOSS" ? "大鹏会话内容" : "应用设置内容"}>
+              <div className="boss-native-context"><button className="boss-btn" type="button" onClick={() => navigate(businessPage.current ?? (previousPage !== "NATIVE" && allowed(previousPage,role,mvpScope,priorityScope) ? previousPage : role === "BOSS" ? "F01" : "A08"))}><ArrowLeft size={16}/>返回业务页面</button><span>当前身份：{role === "BOSS" ? "本人" : "技术维护"}</span></div>
+              {children(role,isNative)}
+            </section>
+            {!isNative && <div className="boss-content" key={page}>
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
                   <Tag tone="green">
@@ -967,7 +1009,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
                 Boss Agent × 大鹏 · Desktop v6 视觉基线 · {page} ·
                 所有模拟资料均标注来源，页面导航不代表功能或验收通过。
               </div>
-            </div>
+            </div>}
           </section>
         </main>
       </div>
@@ -1005,11 +1047,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
-    {directoryOpen && <div className="boss-directory-backdrop" role="presentation" onMouseDown={(e) => {
-      if(e.target === e.currentTarget) setDirectoryOpen(false);
-    }}>
-      <section className="boss-directory" role="dialog" aria-modal="true" aria-label="全部页面导航">
-        <header><strong>页面目录 · Desktop v6</strong>
+    <DialogPrimitive.Root open={directoryOpen} onOpenChange={setDirectoryOpen}><DialogPrimitive.Portal container={shellRef.current}>
+      <DialogPrimitive.Overlay className="boss-directory-backdrop">
+      <DialogPrimitive.Content className="boss-directory" aria-label="全部页面导航" aria-labelledby={undefined} aria-describedby={undefined} onCloseAutoFocus={event=>{event.preventDefault();if(navigationFocus.current?.isConnected)navigationFocus.current.focus();}}>
+        <header><DialogPrimitive.Title asChild><strong>页面目录 · Desktop v6</strong></DialogPrimitive.Title>
           <button type="button" onClick={() => setDirectoryOpen(false)} aria-label="关闭目录"><X size={19}/></button></header>
         <label className="boss-directory-search"><Search size={17}/><input autoFocus value={pageFilter}
           onChange={(e) => setPageFilter(e.target.value)} placeholder="搜索页面编号或名称"/></label>
@@ -1023,9 +1064,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, children }: Props
           {searchablePages.length === 0 && <Quiet message="当前身份下无匹配页面。"/>}
         </div>
         {allowed("NATIVE",role,mvpScope,priorityScope)&&<footer><button type="button" onClick={() => navigate("NATIVE")}>
-          <MessageCircle size={16}/> 进入 nanobot 原生工作区
+          <MessageCircle size={16}/>{role === "BOSS" ? "大鹏会话" : "应用设置"}
         </button></footer>}
-      </section>
-    </div>}
+      </DialogPrimitive.Content></DialogPrimitive.Overlay>
+    </DialogPrimitive.Portal></DialogPrimitive.Root>
   </div>;
 }

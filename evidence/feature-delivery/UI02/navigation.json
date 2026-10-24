@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-journey-363ffb4f-9bd0-4add-bd26-c3ba02fd78af",
+  "ports": {
+    "business": 10211,
+    "webui": 10212,
+    "gateway": 20211
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui02-n3-dist",
+  "manifest_sha256": "2b95fb287e88aef5bf3aadbca0ae416262ed077ca3555ac4346616ffbc885523",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "all_delivered_routes_directory_and_single_shell",
+      "role": "BOSS",
+      "routes": [
+        "F01",
+        "F03",
+        "F14",
+        "F21",
+        "F02",
+        "F06",
+        "N05",
+        "N06",
+        "N08",
+        "N09",
+        "NATIVE"
+      ],
+      "same_window": true
+    },
+    {
+      "check": "all_delivered_routes_directory_and_single_shell",
+      "role": "MAINTAINER",
+      "routes": [
+        "A03",
+        "A04",
+        "A08",
+        "A13",
+        "A15",
+        "NATIVE"
+      ],
+      "same_window": true
+    }
+  ]
+}

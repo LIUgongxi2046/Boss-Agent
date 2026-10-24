@@ -4,6 +4,28 @@
  * 1440×1024 master. All selectors are scoped to .boss-v6/.boss-native-view.
  * This stylesheet never overrides nanobot's original authenticated controls.
  */
+:root:has(.boss-v6) {
+  --background: 216 33.33333% 97.05882%;
+  --foreground: 217.77778 54% 19.60784%;
+  --card: 0 0% 100%;
+  --card-foreground: var(--foreground);
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--foreground);
+  --primary: 214.66667 92.59259% 47.64706%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 216 33.33333% 97.05882%;
+  --muted-foreground: 213 19.60784% 40%;
+  --border: 211.76471 32.07547% 89.60784%;
+  --input: var(--border);
+  --ring: 215.67568 91.73554% 47.45098%;
+  --destructive: 4.23077 76.47059% 40%;
+  --settings-canvas: var(--background);
+  --settings-surface: var(--card);
+  --radius-control: 9px;
+  --radius-panel: 14px;
+  --radius-modal: 14px;
+  color-scheme: light;
+}
 .boss-v6 {
   --boss-blue: #005BAC;
   --boss-deep: #073B70;
@@ -312,6 +334,36 @@
 .boss-native-return button{display:flex;align-items:center;gap:6px;border:1px solid #b9d9f6;border-radius:9px;
   padding:7px 11px;min-height:33px;background:#fff;color:#185a9d;font-size:12px;font-weight:700}
 .boss-native-content{min-height:0;flex:1;overflow:hidden}
+.boss-native-surface {display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--boss-border);border-radius:14px;background:#fff}
+.boss-native-surface[hidden] {display:none}
+.boss-native-context,.boss-native-toolbar {display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 16px;border-bottom:1px solid var(--boss-border);flex-shrink:0}
+.boss-native-context {font-size:14px;line-height:22px;color:var(--boss-muted)}
+.boss-native-toolbar label {display:flex;align-items:center;gap:8px;min-width:0;flex:1;max-width:680px}
+.boss-native-toolbar select {min-width:0;max-width:100%;flex:1;min-height:44px;padding:8px 12px;border:1px solid var(--boss-border);border-radius:9px;background:#fff;color:var(--boss-text)}
+.boss-native-surface > .relative {flex:1;min-height:0}
+.boss-native-surface :is(p,textarea,input,select,[role="status"],[role="alert"],.markdown-content) {font-size:16px;line-height:24px}
+.boss-native-surface :is(button,[role="button"]) {min-height:44px;min-width:44px}
+.boss-native-surface button[role="switch"][aria-checked="true"] {background:var(--boss-action)}
+.boss-native-surface .settings-feature-header {display:none}
+.boss-native-surface [data-testid="hero-greeting"] {display:none}
+.boss-native-surface .settings-grid {padding:18px 24px;max-width:1100px}
+.boss-native-surface pre {overflow-x:auto;max-width:100%}
+.boss-native-surface :is(p,li,td) {overflow-wrap:anywhere}
+.boss-native-dialog {font-family:"PingFang SC","Noto Sans CJK SC",sans-serif;color:#172B4D;font-size:16px;line-height:24px}
+.boss-native-dialog button {min-height:44px;min-width:44px;border-radius:9px;font:inherit}
+@media(max-height:650px) {
+  .boss-v6:has(.boss-native-surface:not([hidden])) .boss-hero-compact {height:72px;min-height:72px;flex-basis:72px;padding:8px 14px}
+  .boss-v6:has(.boss-native-surface:not([hidden])) .boss-hero-copy p {display:none}
+  .boss-v6:has(.boss-native-surface:not([hidden])) .boss-hero-compact h1 {font-size:22px;line-height:28px}
+  .boss-v6:has(.boss-native-surface:not([hidden])) .boss-hero-mascot {width:64px;height:64px;top:0;right:8px}
+  .boss-native-surface {overflow-y:auto}
+  .boss-native-surface > .relative {flex:0 0 360px;height:360px;min-height:360px}
+}
+@media(max-width:640px) {
+  .boss-native-context,.boss-native-toolbar {padding:8px;gap:8px}
+  .boss-native-toolbar label {flex-basis:100%}
+  .boss-native-surface .settings-grid {padding:16px 12px}
+}
 .boss-spin{animation:boss-rotate .7s linear infinite}
 @keyframes boss-rotate{to{transform:rotate(360deg)}}
 @keyframes boss-flight{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}

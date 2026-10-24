@@ -1,0 +1,387 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-journey-363ffb4f-9bd0-4add-bd26-c3ba02fd78af",
+  "ports": {
+    "business": 10211,
+    "webui": 10212,
+    "gateway": 20211
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui02-n3-dist",
+  "manifest_sha256": "2b95fb287e88aef5bf3aadbca0ae416262ed077ca3555ac4346616ffbc885523",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "shared_shell_native_entry",
+      "same_window": true,
+      "single_navigation": true
+    },
+    {
+      "check": "native_model_configuration",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "has_api_key": true,
+      "provider_status": [
+        {
+          "name": "custom",
+          "configured": false
+        },
+        {
+          "name": "azure_openai",
+          "configured": false
+        },
+        {
+          "name": "bedrock",
+          "configured": false
+        },
+        {
+          "name": "openrouter",
+          "configured": false
+        },
+        {
+          "name": "orcarouter",
+          "configured": false
+        },
+        {
+          "name": "edenai",
+          "configured": false
+        },
+        {
+          "name": "opencode",
+          "configured": false
+        },
+        {
+          "name": "opencode_go",
+          "configured": false
+        },
+        {
+          "name": "huggingface",
+          "configured": false
+        },
+        {
+          "name": "skywork",
+          "configured": false
+        },
+        {
+          "name": "aihubmix",
+          "configured": false
+        },
+        {
+          "name": "siliconflow",
+          "configured": false
+        },
+        {
+          "name": "novita",
+          "configured": false
+        },
+        {
+          "name": "volcengine",
+          "configured": false
+        },
+        {
+          "name": "volcengine_coding_plan",
+          "configured": false
+        },
+        {
+          "name": "byteplus",
+          "configured": false
+        },
+        {
+          "name": "byteplus_coding_plan",
+          "configured": false
+        },
+        {
+          "name": "anthropic",
+          "configured": false
+        },
+        {
+          "name": "openai",
+          "configured": false
+        },
+        {
+          "name": "openai_codex",
+          "configured": true
+        },
+        {
+          "name": "xai_grok",
+          "configured": false
+        },
+        {
+          "name": "github_copilot",
+          "configured": false
+        },
+        {
+          "name": "deepseek",
+          "configured": true
+        },
+        {
+          "name": "gemini",
+          "configured": false
+        },
+        {
+          "name": "zhipu",
+          "configured": false
+        },
+        {
+          "name": "dashscope",
+          "configured": false
+        },
+        {
+          "name": "modelscope",
+          "configured": false
+        },
+        {
+          "name": "moonshot",
+          "configured": false
+        },
+        {
+          "name": "kimi_coding",
+          "configured": false
+        },
+        {
+          "name": "minimax",
+          "configured": false
+        },
+        {
+          "name": "minimax_anthropic",
+          "configured": false
+        },
+        {
+          "name": "mistral",
+          "configured": false
+        },
+        {
+          "name": "stepfun",
+          "configured": false
+        },
+        {
+          "name": "xiaomi_mimo",
+          "configured": false
+        },
+        {
+          "name": "longcat",
+          "configured": false
+        },
+        {
+          "name": "ant_ling",
+          "configured": false
+        },
+        {
+          "name": "vllm",
+          "configured": false
+        },
+        {
+          "name": "ollama",
+          "configured": false
+        },
+        {
+          "name": "lm_studio",
+          "configured": false
+        },
+        {
+          "name": "atomic_chat",
+          "configured": false
+        },
+        {
+          "name": "ovms",
+          "configured": false
+        },
+        {
+          "name": "nvidia",
+          "configured": false
+        },
+        {
+          "name": "groq",
+          "configured": false
+        },
+        {
+          "name": "assemblyai",
+          "configured": false
+        },
+        {
+          "name": "qianfan",
+          "configured": false
+        }
+      ],
+      "buttons": [
+        "添加文件",
+        "工作区访问权限: 默认权限",
+        "发送消息",
+        "选择项目"
+      ]
+    },
+    {
+      "check": "retained_native_draft_business_context_and_six_layouts",
+      "selected_task_retained": true,
+      "typography": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 1,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 2,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "measured": {
+            "font": "\"PingFang SC\", \"Noto Sans CJK SC\", \"Microsoft Yahei\", sans-serif",
+            "size": "16px",
+            "line": "24px",
+            "color": "rgb(23, 43, 77)"
+          },
+          "horizontal_overflow": false
+        }
+      ]
+    },
+    {
+      "check": "native_session_switch_guard",
+      "preserved_input": true,
+      "existing_session_count": 35
+    },
+    {
+      "check": "actual_native_transport_response_and_persisted_reload",
+      "external_api_mode": "SIMULATED_FIRST",
+      "new_external_requests": false,
+      "conversation_hash_preserved": true
+    },
+    {
+      "check": "same_session_history_back_forward",
+      "same_window": true
+    },
+    {
+      "check": "native_settings_unsaved_guard_and_retained_edit",
+      "unsubmitted_configuration_changed": false,
+      "continue_editing_preserved": true,
+      "leave_and_return_preserved": true
+    },
+    {
+      "check": "actual_settings_local_save_reload_role_and_layouts",
+      "role": "MAINTAINER",
+      "settings_section": "appearance",
+      "private_chat_absent": true,
+      "private_endpoints_denied": true,
+      "layouts": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 1,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 2,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "horizontal_overflow": false
+        }
+      ]
+    },
+    {
+      "check": "old_link_unavailable_and_existing_business_credentials_preserved",
+      "business_rows": 54,
+      "credentials_unchanged": true
+    }
+  ]
+}

@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--directory", type=Path, default=ROOT / "validation/.work/mvp01-experience")
     parser.add_argument("--frontend", type=Path, default=ROOT / "fc04-n3-dist")
     parser.add_argument("--ports", default='{"business":9961,"webui":9962,"gateway":19961}')
-    parser.add_argument("--feature-id", choices=("FC04", "UI01"), default="FC04")
+    parser.add_argument("--feature-id", choices=("FC04", "UI01", "UI02"), default="FC04")
     args = parser.parse_args()
     directory = application_work_directory(ROOT / "validation", str(args.directory))
     frontend = application_frontend_directory(ROOT / "validation", str(args.frontend))

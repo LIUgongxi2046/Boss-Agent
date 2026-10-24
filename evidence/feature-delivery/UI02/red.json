@@ -1,0 +1,19 @@
+{
+  "status": "FAIL",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-journey-363ffb4f-9bd0-4add-bd26-c3ba02fd78af",
+  "ports": {
+    "business": 10211,
+    "webui": 10212,
+    "gateway": 20211
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui01-n3-dist",
+  "manifest_sha256": "fb3e415625b7dbc7bbf3721dbc68db05e8a513b5a8115d329ce52259e2d9c8a1",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "failure",
+      "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '大鹏会话', exact: true })\u001b[22m\n"
+    }
+  ]
+}

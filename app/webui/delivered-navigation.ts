@@ -2,6 +2,7 @@ type Role="BOSS"|"MAINTAINER";
 type Entry={title:string;feature:string;directory:boolean};
 export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
   BOSS:{
+    NATIVE:{title:"大鹏会话",feature:"UI02",directory:true},
     F01:{title:"采购成本协调",feature:"MVP01",directory:true},
     F03:{title:"经营查询与追问",feature:"FC02",directory:true},
     F14:{title:"原料与饲料报告",feature:"FC01",directory:true},
@@ -20,6 +21,7 @@ export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
     D07:{title:"访问权限",feature:"SHARED_DELIVERED",directory:false},
   },
   MAINTAINER:{
+    NATIVE:{title:"应用设置",feature:"UI02",directory:true},
     A03:{title:"模拟业务资料",feature:"FC01_MVP01",directory:true},
     A04:{title:"查询场景与交办反馈",feature:"FC02_FC07_FC04",directory:true},
     A08:{title:"模型运行配置",feature:"SHARED_DELIVERED",directory:true},

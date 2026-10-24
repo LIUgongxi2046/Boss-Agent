@@ -1,0 +1,213 @@
+*** Begin Patch
+*** Update File: webui/src/App.tsx
+@@
+ import { NanobotClient } from "@/lib/nanobot-client";
++import { webuiThreadCache } from "@/lib/webui-thread-cache";
+@@
+ import { Input } from "@/components/ui/input";
++import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+@@
+-export default function App() {
++function clearPrivateNativeState(): void {
++  webuiThreadCache.clear();
++  for (const key of Object.keys(window.localStorage)) {
++    if (key.startsWith("nanobot.webui.composerQueuedGuidance.v1:")) window.localStorage.removeItem(key);
++  }
++}
++
++export default function App() {
+@@
+   const [state, setState] = useState<BootState>({ status: "loading" });
++  useEffect(() => {if (state.status === "auth") clearPrivateNativeState();}, [state.status]);
+@@
+     const expire = () => {
+       state.client.close();
++      clearPrivateNativeState();
+@@
+     } finally {
+       state.client.close();
++      clearPrivateNativeState();
+@@
+ function Shell({
+-  runtimeSurface,
+@@
+-  const effectiveRuntimeSurface =
+-    settingsSnapshot?.surface ?? settingsSnapshot?.runtime_surface ?? runtimeSurface;
+-  const showHostChrome = isNativeRuntime(effectiveRuntimeSurface);
+-  const showMainSidebar = view !== "settings";
++  const showHostChrome = false;
++  const showMainSidebar = false;
++  const [pendingNativeNavigation, setPendingNativeNavigation] = useState<(() => void) | null>(null);
+@@
+-    (route: ShellRoute, options?: { replace?: boolean }) => {
++    (route: ShellRoute, options?: { replace?: boolean; sending?: boolean }) => {
+@@
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      if (!options?.sending && currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
++        setPendingNativeNavigation(() => leave);
++      } else if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
+@@
+     const applyRoute = () => {
+       const route = readShellRoute();
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      if (currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
++        writeShellRoute(currentShellRouteRef.current, true);
++        setPendingNativeNavigation(() => () => {
++          setActiveKey(route.activeKey);setView(route.view);setSettingsInitialSection(route.settingsSection);
++          writeShellRoute(route,true);
++        });
++        return;
++      }
++      if (currentShellRouteRef.current.view === "settings" &&
++          (route.view !== "settings" || route.settingsSection !== currentShellRouteRef.current.settingsSection) && settingsExitGuardRef.current) {
+@@
+       pendingCreatedSessionKeyRef.current = key;
+       navigate({
+         view: "chat",
+         activeKey: key,
+         settingsSection: "overview",
+-      });
++      }, {sending: Boolean(_initialMessage?.trim())});
+@@
+       const action = matchSidebarShortcut(event);
+       if (!action) return;
++      if (new URLSearchParams(window.location.search).get("bossPage") !== "NATIVE" || action === "search") return;
+@@
+   const onSettingsSectionChange = useCallback(
+     (section: SettingsSectionKey) => {
+-      navigate({
++      const leave = () => navigate({
+         view: shellViewForSettingsSection(section),
+         activeKey,
+         settingsSection: section,
+       });
++      if (settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++      else leave();
+@@
+-      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat}>
++      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat}
++        onOpenNative={role => {
++          if (role === "BOSS" && view !== "chat") onBackToChat();
++          if (role === "MAINTAINER" && view === "chat") onOpenSettings(settingsInitialSection);
++        }}
++        onBeforeLeaveNative={leave => {
++          if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++          else leave();
++        }}>
++      {(role,nativeVisible) => <>
++      <div className="boss-native-toolbar" aria-label={role === "BOSS" ? "会话操作" : "设置分类"}>
++        {role === "BOSS" ? <>
++          <label>当前会话<select aria-label="当前会话" value={activeKey ?? ""} onChange={event => event.target.value ? onSelectChat(event.target.value) : onNewChat()}>
++            <option value="">新会话</option>{topicSessions.map(session => <option key={session.key} value={session.key}>{displayTitle(session,sidebarState.title_overrides,t("chat.newChat"))}</option>)}
++          </select></label>
++          <button className="boss-btn" onClick={onNewChat}>新建会话</button>
++          <button className="boss-btn" onClick={onOpenSessionSearch}>搜索会话</button>
++          {view !== "chat" && <button className="boss-btn" onClick={onBackToChat}>返回当前会话</button>}
++        </> : <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
++          {SETTINGS_SECTION_KEYS.filter(section => section !== "voice").map(section => <option key={section} value={section}>{t(`settings.nav.${section}`)}</option>)}
++        </select></label>}
++      </div>
++      <Dialog open={pendingNativeNavigation !== null} onOpenChange={open => {if (!open) setPendingNativeNavigation(null);}}>
++        <DialogContent className="boss-native-dialog">
++          <DialogTitle>未保存会话输入</DialogTitle><DialogDescription>当前输入尚未发送。请选择继续编辑，或者明确放弃当前输入。</DialogDescription>
++          <DialogFooter><Button variant="outline" onClick={() => setPendingNativeNavigation(null)}>返回继续编辑</Button><Button onClick={() => {const leave=pendingNativeNavigation;setPendingNativeNavigation(null);leave?.();}}>放弃输入并离开</Button></DialogFooter>
++        </DialogContent>
++      </Dialog>
+@@
+-        <main
++        {role === "BOSS" && view !== "chat" && <div role="status" className="boss-status boss-status-warn">当前身份没有应用维护权限，请返回当前会话。</div>}
++        <div
+@@
+-                view !== "chat" && "hidden",
++                (view !== "chat" || role !== "BOSS") && "hidden",
+@@
+-              <ThreadVisibilityContext.Provider value={view === "chat"}>
++              {role === "BOSS" && <ThreadVisibilityContext.Provider value={nativeVisible && view === "chat"}>
+@@
+-                            hideHeader={false}
++                            hideHeader
++                            transcriptionEnabled={false}
+@@
+                           hideHeaderTitle
++                          hideHeader
++                          transcriptionEnabled={false}
+@@
+-              </ThreadVisibilityContext.Provider>
++              </ThreadVisibilityContext.Provider>}
+@@
+-            {view !== "chat" && (
++            {role === "MAINTAINER" && (
+@@
+-                    showSidebar={view === "settings"}
++                    showSidebar={false}
+@@
+-          </main>
++          </div>
+@@
+-      </BossDesktop>
++      </>}
++      </BossDesktop>
+*** Update File: webui/src/components/settings/SettingsPage.tsx
+@@
+   const [pendingExit, setPendingExit] = useState<(() => void) | null>(null);
++  const [pendingUnsavedExit, setPendingUnsavedExit] = useState<(() => void) | null>(null);
+@@
+   const restartInProgress = isRestarting || hostEngineApplying;
++  const unsaved = modelDirty || imageGenerationDirty || transcriptionDirty || networkSafetyDirty ||
++    RUNTIME_CONFIG_FIELDS.some(controller.runtimeConfigState.dirty) || controller.runtimeConfigState.saving !== null;
++  useEffect(() => {
++    if (!unsaved) return;
++    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return () => window.removeEventListener("beforeunload",protect);
++  }, [unsaved]);
+   const requestExit = useCallback<SettingsExitGuard>((leave) => {
+-    if (settings?.requires_restart && !restartInProgress) setPendingExit(() => leave);
++    if (unsaved) setPendingUnsavedExit(() => leave);
++    else if (settings?.requires_restart && !restartInProgress) setPendingExit(() => leave);
+     else leave();
+-  }, [settings?.requires_restart, restartInProgress]);
++  }, [settings?.requires_restart, restartInProgress, unsaved]);
+@@
+     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-settings-canvas lg:flex-row">
++      <Dialog open={pendingUnsavedExit !== null} onOpenChange={open => {if (!open) setPendingUnsavedExit(null);}}>
++        <DialogContent className="boss-native-dialog"><DialogHeader><DialogTitle>未保存应用设置</DialogTitle><DialogDescription>当前设置仍有编辑或保存过程。请选择继续编辑，或者保留编辑并离开。已提交的保存请求保持原处理规则。</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => setPendingUnsavedExit(null)}>返回继续编辑</Button><Button onClick={() => {const leave=pendingUnsavedExit;setPendingUnsavedExit(null);leave?.();}}>保留编辑并离开</Button></DialogFooter></DialogContent>
++      </Dialog>
+*** Update File: webui/src/components/settings/useSettingsController.ts
+@@
+     (section: SettingsSectionKey) => {
+-      setActiveSection(section);
+-      onSectionChange?.(section);
++      if (onSectionChange) onSectionChange(section);
++      else setActiveSection(section);
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+   const [value, setValue] = useState("");
++  useEffect(() => {
++    if (!value.trim()) return;
++    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return () => window.removeEventListener("beforeunload",protect);
++  }, [value]);
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   hideHeader?: boolean;
++  transcriptionEnabled?: boolean;
+@@
+   hideHeader = false,
++  transcriptionEnabled = true,
+@@
+-          onTranscribeAudio={transcribeAudio}
++          onTranscribeAudio={transcriptionEnabled ? transcribeAudio : undefined}
+@@
+-          onTranscribeAudio={transcribeAudio}
++          onTranscribeAudio={transcriptionEnabled ? transcribeAudio : undefined}
+*** Update File: webui/src/i18n/config.ts
+@@
+-export const defaultLocale: SupportedLocale = "en";
++export const defaultLocale: SupportedLocale = "zh-CN";
+*** End Patch
