@@ -1,14 +1,14 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-af4db94a-30ea-450f-8c57-d6cb3481f186",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-2ea7b5ce-d9c5-4ed2-9bbb-29249a03b832",
   "ports": {
     "business": 10791,
     "webui": 10792,
     "gateway": 20791
   },
   "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
-  "manifest_sha256": "0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c",
+  "manifest_sha256": "eae01bafd2cb015f6000a7eb59cbc49932fb225fdaaa260689d04926119a4228",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
@@ -31,6 +31,43 @@
         "query_metrics",
         "todayRead"
       ]
+    },
+    {
+      "check": "actual_launcher_active_fourteen_tools_and_native_scope_seven",
+      "status": "PASS",
+      "schema_id": "urn:boss-agent:runtime-records:1.13.0",
+      "runtime_count": 1,
+      "tool_scopes": [
+        [
+          "bossDashboardRead",
+          "bossEvidenceRead",
+          "bossMeetingsRead",
+          "bossTasksRead",
+          "bossWorkspaceRead",
+          "conversationRead",
+          "query_metrics"
+        ]
+      ],
+      "configuration_versions": [
+        "2"
+      ],
+      "active_tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossSupplyQualityPrepare",
+        "bossSupplyQualityQuery",
+        "bossSupplyQualityRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "morningDetailRead",
+        "morningListRead",
+        "morningSourceRead",
+        "query_metrics",
+        "todayRead"
+      ],
+      "active_configuration_version": "2"
     },
     {
       "check": "controlled_main_window_role_account_fill_requires_explicit_login",

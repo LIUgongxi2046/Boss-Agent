@@ -13,6 +13,7 @@ MESSAGES = []
 REQUESTS = []
 DROP = {"action": None, "request_id": None, "client_request_id": None, "dropped": None}
 ACTION_GATE = {"action": None, "request_id": None, "release": None, "held": None}
+HISTORY_GATE = {"chat_id": None, "release": None, "held": None, "released_count": 0}
 
 
 async def start(app):
@@ -24,7 +25,21 @@ async def close(app):
 
 
 async def state(request):
-    return web.json_response({"held": GATE["held"], "action_held": ACTION_GATE["held"], "messages": MESSAGES, "requests": REQUESTS, "dropped": DROP["dropped"]})
+    return web.json_response({"held": GATE["held"], "action_held": ACTION_GATE["held"], "history_held": HISTORY_GATE["held"], "history_released_count": HISTORY_GATE["released_count"], "messages": MESSAGES, "requests": REQUESTS, "dropped": DROP["dropped"]})
+
+
+async def hold_history(request):
+    body = await request.json()
+    assert set(body) == {"chat_id"} and isinstance(body["chat_id"], str) and body["chat_id"]
+    assert HISTORY_GATE["release"] is None
+    HISTORY_GATE.update(chat_id=body["chat_id"], release=asyncio.Event(), held=None)
+    return web.json_response({"armed": True})
+
+
+async def release_history(request):
+    assert HISTORY_GATE["release"] is not None and HISTORY_GATE["held"] is not None
+    HISTORY_GATE["release"].set()
+    return web.json_response({"released": True})
 
 
 async def hold_action(request):
@@ -115,7 +130,13 @@ async def proxy(request):
             await asyncio.gather(incoming(), outgoing())
         return downstream
     async with client.request(request.method, target, headers=headers, data=await request.read(), allow_redirects=False) as upstream:
-        return web.Response(status=upstream.status, body=await upstream.read(), headers={key: value for key, value in upstream.headers.items() if key.lower() not in HOP})
+        body = await upstream.read()
+        if HISTORY_GATE["release"] is not None and request.path == "/api/sessions/websocket:" + HISTORY_GATE["chat_id"] + "/webui-thread" and request.query.get("before"):
+            assert upstream.status == 200
+            HISTORY_GATE["held"] = {"chat_id": HISTORY_GATE["chat_id"], "status": upstream.status, "response_bytes": len(body)}
+            await HISTORY_GATE["release"].wait()
+            HISTORY_GATE.update(chat_id=None, release=None, held=None, released_count=HISTORY_GATE["released_count"] + 1)
+        return web.Response(status=upstream.status, body=body, headers={key: value for key, value in upstream.headers.items() if key.lower() not in HOP})
 
 
 app = web.Application()
@@ -127,5 +148,7 @@ app.router.add_post("/_n02/release", release)
 app.router.add_post("/_n02/drop-response", drop_response)
 app.router.add_post("/_n02/hold-action", hold_action)
 app.router.add_post("/_n02/release-action", release_action)
+app.router.add_post("/_n02/hold-history", hold_history)
+app.router.add_post("/_n02/release-history", release_history)
 app.router.add_route("*", "/{path:.*}", proxy)
 web.run_app(app, host="127.0.0.1", port=PORT, access_log=None)

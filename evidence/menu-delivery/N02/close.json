@@ -1,13 +1,13 @@
 {
   "status": "PASS",
   "scope": "N02_REAL_WINDOW_AND_APPLICATION_CLOSE_D06",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-close-2eb08686-e3db-497f-bd42-95eb7a519473",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-close-862b2282-c798-40a3-acb0-18c537927b60",
   "ports": {
     "business": 10801,
     "webui": 10802,
     "gateway": 20801
   },
-  "manifest_sha256": "957cbd051c48adad90831a7753381f7db75beecdea54e1530c143045733fe823",
+  "manifest_sha256": "b266ef1a0d27310f98a1f23515397493baa6a27f23220e31806a2a6eb101784d",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
@@ -372,6 +372,11 @@
     },
     {
       "check": "actual_shared_message_close_uses_existing_d06_without_saving_or_sending",
+      "input_retained": true,
+      "service_alive": true
+    },
+    {
+      "check": "actual_shared_message_logout_keeps_current_identity_and_unsaved_input_after_d06_continue",
       "input_retained": true,
       "service_alive": true
     },

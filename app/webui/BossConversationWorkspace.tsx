@@ -99,7 +99,9 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const latest=view?.runs.find(run=>run.run_id===selectedRunId)??view?.runs.at(-1),origin=latest?.origin_references.morning_context,selected=origin?.selected_item_ref as {object_id?:string;version?:string;source_refs?:{kind:string;id:string;version:string|null}[]}|undefined;
   const contextRefs=latest?.context_references??[],taskRefs=contextRefs.filter(ref=>ref.kind==="task"),documentRefs=contextRefs.filter(ref=>ref.kind==="document");
   const taskEntry=taskContext?.entry;
-  return <div className="boss-n02" aria-label="聊天交办工作区" ref={workspace} onPointerDownCapture={cancelForInteraction} onWheelCapture={cancelForInteraction} onKeyDownCapture={cancelForInteraction}>
+  return <div className="boss-n02" aria-label="聊天交办工作区" ref={workspace}
+    onPointerDownCapture={event=>{if(!(event.target instanceof Element&&event.target.closest("button,a,input,select,textarea")))cancelForInteraction();}}
+    onClickCapture={cancelForInteraction} onWheelCapture={cancelForInteraction} onKeyDownCapture={cancelForInteraction}>
     <div className="boss-n02-main">
       <section className="boss-n02-panel boss-n02-context" aria-labelledby="boss-n02-context-title">
         <header className="boss-n02-heading"><h2 id="boss-n02-context-title">当前会话与关联事项</h2></header>

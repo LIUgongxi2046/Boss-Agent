@@ -1,24 +1,24 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_MESSAGE_POSITION_AFTER_UNKNOWN_SEND_REFRESH",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-return-position-a8a3ba8c-2b77-49f2-872d-fa0f6d46d743",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-return-position-f904153f-e561-4c89-afef-16ade0e72a08",
   "ports": {
     "business": 10831,
     "webui": 10832,
     "gateway": 20831
   },
   "proxy_port": 10833,
-  "manifest_sha256": "eae01bafd2cb015f6000a7eb59cbc49932fb225fdaaa260689d04926119a4228",
+  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
     {
       "check": "actual_history_reading_captured_as_identifiers_and_coordinates",
-      "chat_id": "b2e157e4-3501-4c72-913e-5995e73028a3",
-      "run_id": "run-fbfca48f-4431-408e-a7ae-afc37959d227",
+      "chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "run_id": "run-e6dc3f09-9232-43cb-94b9-f62e4fc9cbbd",
       "reading": {
-        "conversationKey": "websocket:b2e157e4-3501-4c72-913e-5995e73028a3",
+        "conversationKey": "websocket:3962fd9f-4a9e-4a52-ae34-9876f937619e",
         "promptId": "u-8d12576b17c0ffcc",
         "offsetTop": -77
       },
@@ -32,11 +32,11 @@
     },
     {
       "check": "unknown_send_refresh_return_restores_original_message_run_scroll_and_focus",
-      "chat_id": "b2e157e4-3501-4c72-913e-5995e73028a3",
-      "run_id": "run-fbfca48f-4431-408e-a7ae-afc37959d227",
-      "client_request_id": "boss-66947d42-1f2e-4480-8cb0-02a360b49003",
+      "chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "run_id": "run-e6dc3f09-9232-43cb-94b9-f62e4fc9cbbd",
+      "client_request_id": "boss-4b016460-a6ed-4525-95c8-5f713bc51710",
       "reading": {
-        "conversationKey": "websocket:b2e157e4-3501-4c72-913e-5995e73028a3",
+        "conversationKey": "websocket:3962fd9f-4a9e-4a52-ae34-9876f937619e",
         "promptId": "u-8d12576b17c0ffcc",
         "offsetTop": -77
       },
@@ -53,6 +53,19 @@
       "simulation_send_count": 1,
       "additional_runtime_count": 0,
       "private_body_or_password_in_ordinary_storage": false
+    },
+    {
+      "check": "actual_older_history_response_does_not_replace_explicit_new_conversation_or_input",
+      "original_chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "actual_response_bytes": 7279,
+      "request_terminals": [
+        "requestfailed"
+      ],
+      "original_position_intent_cleared": true,
+      "new_input_retained": true,
+      "old_messages_in_new_conversation": false,
+      "additional_runtime_count": 0,
+      "additional_send_count": 0
     }
   ]
 }

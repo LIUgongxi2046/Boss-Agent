@@ -421,16 +421,18 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     setDirectoryOpen(false);
   }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,supplyDirty,importDirty,directoryOpen,mvpScope,priorityScope,onOpenNative,onBeforeLeaveNative]);
 
+  const guardLeave=useCallback((leave:()=>void)=>{
+    if(["NATIVE","N02"].includes(page)){onBeforeLeaveNative(leave);return;}
+    if(assignmentDirty||sourceReviewDirty||settingsDirty||workDirty||supplyDirty||importDirty){
+      navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
+      setPendingLeaveAction(()=>leave);
+    }else leave();
+  },[page,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,supplyDirty,importDirty,onBeforeLeaveNative]);
+  const requestLogout=useCallback(()=>guardLeave(onLogout),[guardLeave,onLogout]);
   useEffect(()=>{
-    onRegisterCloseGuard(close=>{
-      if(["NATIVE","N02"].includes(page)){onBeforeLeaveNative(close);return;}
-      if(assignmentDirty||sourceReviewDirty||settingsDirty||workDirty||supplyDirty||importDirty){
-        navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
-        setPendingLeaveAction(()=>close);
-      }else close();
-    });
+    onRegisterCloseGuard(guardLeave);
     return()=>onRegisterCloseGuard(null);
-  },[page,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,supplyDirty,importDirty,onBeforeLeaveNative,onRegisterCloseGuard]);
+  },[guardLeave,onRegisterCloseGuard]);
 
   const sopChanged = useCallback((sopId: string) => {
     setSelectedSop(sopId);
@@ -564,11 +566,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     <p>{authError || "正在通过 nanobot 校验当前身份与访问范围…"}</p>
     {authError ? <div className="boss-actions">
       <GlassButton onClick={() => { setAuthError(""); setAuthAttempt((v) => v + 1); }}>重新核验</GlassButton>
-      <GlassButton onClick={onLogout}>返回登录</GlassButton>
+      <GlassButton onClick={requestLogout}>返回登录</GlassButton>
     </div> : <Loader2 size={22} className="boss-spin" aria-hidden="true" />}
   </div>;
 
-  if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前入口尚未交付</h1><p>当前版本没有开放此功能。请返回已经交付的功能入口。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回可用入口</button><button className="boss-btn" onClick={onLogout}>退出当前身份</button></div></section></div>;
+  if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前入口尚未交付</h1><p>当前版本没有开放此功能。请返回已经交付的功能入口。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回可用入口</button><button className="boss-btn" onClick={requestLogout}>退出当前身份</button></div></section></div>;
   return <div className="boss-v6" data-role={role} data-page={page} ref={shellRef}>
     <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);window.history.replaceState(null,"",url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
@@ -612,7 +614,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
               {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}><Bell size={18}/></button>
               }
-              <button type="button" className="boss-user" onClick={onLogout} title="退出当前身份">
+              <button type="button" className="boss-user" onClick={requestLogout} title="退出当前身份">
                 <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
                 <span>{role === "BOSS" ? "本人" : "技术维护"}<small>{role === "BOSS" ? "已认证本人" : "维护身份"}</small></span>
               </button>
@@ -830,7 +832,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onFocusDraftConsumed={()=>setDraftToReview("")}
                 /> :
                 page === "F26" ? <BossSettingsHub
-                  key={page} onNavigate={id=>navigate(id)} onLogout={onLogout}
+                  key={page} onNavigate={id=>navigate(id)} onLogout={requestLogout}
                 /> :
                 (page === "N07" || page === "N08") ? <BossOwnerPreferences
                   key={page} pageId={page} onNavigate={id=>navigate(id)}

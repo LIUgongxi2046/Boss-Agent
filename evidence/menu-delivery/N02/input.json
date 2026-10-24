@@ -1,13 +1,13 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_INPUT_AND_FILE_SELECTION",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-0f77b680-53f7-48c4-8344-36ebe1f7b74d",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-281af9cd-5a86-455c-92a1-a304e2cb6df1",
   "ports": {
     "business": 10781,
     "webui": 10782,
     "gateway": 20781
   },
-  "manifest_sha256": "0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c",
+  "manifest_sha256": "3abcbcacd6bbecf3ac95384530d36512a51f6b66c7c0626222d80392f6dc962b",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "external_api_mode": "SIMULATED_FIRST",
@@ -21,20 +21,36 @@
     {
       "check": "actual_source_text_exceeds_current_advertised_limit",
       "source": "app/webui/BossDesktop.tsx",
-      "source_sha256": "1e8f1b504eda0b41293b51abe8bcace0df0f283a938ea61e0408e1f84cffd819",
-      "actual_bytes": 74486,
+      "source_sha256": "73e5530be107388f21b96dc9bcf35b5a8c88a3166f29b6e690963a895fa2c34d",
+      "actual_bytes": 75478,
       "max_text_bytes": 65536,
       "submission_count": 0,
       "input_retained": true
     },
     {
       "check": "actual_source_export_exceeds_advertised_file_limit_without_padding",
-      "source_file_count": 708,
-      "actual_bytes": 8523725,
-      "sha256": "1b5def9705fae6d0c90999cb5833dde4b35dccde433fd9a7fc8e68a3e31ce517",
+      "source_file_count": 710,
+      "actual_bytes": 8556881,
+      "sha256": "ba0f91a01ddad026f52515bda3b2d9fcda8bb8f0e6303d307bb41f4dad5c0ce9",
       "max_file_bytes": 6291456,
       "input_retained": true,
       "submission_count": 0
+    },
+    {
+      "check": "actual_source_excerpt_at_advertised_text_limit_is_submittable",
+      "source": "validation/.venv/lib/python3.12/site-packages/nanobot/webui/transcript.py",
+      "excerpt_bytes": 65536,
+      "excerpt_sha256": "1a605f541e670090ceb58ab6cfab0f6f200a6887f07cfbbfbc479bb933de3389",
+      "max_text_bytes": 65536,
+      "submission_count": 0
+    },
+    {
+      "check": "actual_source_export_excerpt_at_advertised_file_limit_is_read_and_submittable",
+      "actual_bytes": 6291456,
+      "sha256": "f29e97733f1dc1c2d5c6f6f77cb33c94c8d89366715e8cdf86d06af80ffeaa3a",
+      "max_file_bytes": 6291456,
+      "submission_count": 0,
+      "uploaded_to_server": false
     },
     {
       "check": "actual_file_read_permission_failure_preserves_existing_text_and_file",
@@ -48,7 +64,7 @@
       "source_files": [
         {
           "path": "specs/conversation.schema.json",
-          "sha256": "d4660f762a70ece6d58837fdfb96b8298d714688aa91fe34e8f4682fcca89ac5"
+          "sha256": "03da6d449c0b658db37ebcc010ec866dfbf6058a3a1e0de0a8a9c3ebf28832d9"
         },
         {
           "path": "specs/conversation-requests.schema.json",
@@ -60,7 +76,7 @@
         },
         {
           "path": "specs/runtime-records.schema.json",
-          "sha256": "db84a1a5baa6a6471a7127d488eadff952bc5f5552c4f215d724ccbd0db6999c"
+          "sha256": "6824462df968a41a35fcbd26af50a2866d3965757cafcaa2b587414c9fe65c90"
         }
       ],
       "advertised_limits": {
@@ -75,7 +91,7 @@
     {
       "check": "unsupported_real_file_preserves_selection_and_real_schema_long_filename_readable",
       "unsupported_file": "validation/desktop/check-menu-n02-input.cjs",
-      "selected_file_sha256": "d4660f762a70ece6d58837fdfb96b8298d714688aa91fe34e8f4682fcca89ac5",
+      "selected_file_sha256": "03da6d449c0b658db37ebcc010ec866dfbf6058a3a1e0de0a8a9c3ebf28832d9",
       "long_filename_characters": 88,
       "long_filename_utf8_bytes": 192,
       "submission_count": 0
@@ -91,6 +107,15 @@
       "voice_control_disabled": true,
       "pause_notice": true,
       "transcription_request_count": 0,
+      "submission_count": 0
+    },
+    {
+      "check": "actual_logout_d06_keep_discard_maintenance_and_boss_relogin_isolation",
+      "kept_text": true,
+      "kept_file_count": 1,
+      "explicit_discard_before_logout": true,
+      "maintenance_inherited_private_files": false,
+      "boss_relogin_restored_discarded_input": false,
       "submission_count": 0
     }
   ]

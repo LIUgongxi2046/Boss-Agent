@@ -4,6 +4,7 @@ const path=require('node:path');
 const {once}=require('node:events');
 const {spawn}=require('node:child_process');
 const {randomUUID,createHash}=require('node:crypto');
+const {parseArgs}=require('node:util');
 const {_electron:electron}=require('playwright');
 const {expect:baseExpect}=require('@playwright/test');
 const access=require('./account-access.cjs');
@@ -11,7 +12,10 @@ const expect=baseExpect.configure({timeout:20000});
 const root=path.resolve(__dirname,'../..'),validation=path.join(root,'validation'),frontend=path.join(root,'menu-n02-n3-dist');
 function requireFreeSpace(){const space=fs.statfsSync(root),available=space.bavail*space.bsize;assert(available>=200*1024*1024,'检查需要至少200MiB可用空间');return available;}
 requireFreeSpace();
-const directory=path.join(validation,'.work','menu-n02-return-position-'+randomUUID()),accounts=access.provision(directory);
+const options=parseArgs({options:{'existing-history':{type:'string'}}}).values;
+const directory=options['existing-history']?path.resolve(options['existing-history']):path.join(validation,'.work','menu-n02-return-position-'+randomUUID());
+assert.equal(path.dirname(directory),path.join(validation,'.work'));assert(path.basename(directory).startsWith('menu-n02-return-position-'));assert(!fs.existsSync(directory)||!fs.lstatSync(directory).isSymbolicLink());
+const accounts=options['existing-history']?Object.fromEntries(JSON.parse(fs.readFileSync(path.join(directory,'accounts/credentials.json'))).map(account=>[account.role,account])):access.provision(directory);
 const ports={business:10831,webui:10832,gateway:20831},proxyPort=10833,origin='http://127.0.0.1:'+proxyPort;
 const output=path.join(root,'evidence/menu-delivery/N02/return-position.json'),records=[],sockets=[];
 let stage='START';
@@ -27,8 +31,10 @@ async function main(){let desktop,proxy,page;
     async function trace(){return (await fetch(origin+'/_n02/state')).json();}
     const configuration=await read('/api/boss/ui/admin/runtime-configuration',maintainer),values={max_tool_rounds:12,max_output_tokens:700,tool_scope:['bossDashboardRead','bossTasksRead','bossMeetingsRead','bossEvidenceRead','bossWorkspaceRead','conversationRead','query_metrics'],workspace_read_mode:'WORKSPACE_PROJECTIONS',workspace_projections:['notifications','travel','calendar','research']};
     const saved=await maintainer.command('boss.runtime.save',{client_request_id:randomUUID(),expected_version:configuration.draft?.version??'0',values}),checked=await maintainer.command('boss.runtime.validate',{client_request_id:randomUUID(),expected_version:saved.version,expected_content_sha256:saved.content_sha256});await maintainer.command('boss.runtime.activate',{client_request_id:randomUUID(),expected_version:checked.version,expected_content_sha256:checked.content_sha256,expected_active_version:configuration.current.version});
-    boss.socket.send(JSON.stringify({type:'new_chat'}));await expect.poll(()=>boss.events.some(event=>event.event==='attached')).toBe(true);const chatId=boss.events.find(event=>event.event==='attached').chat_id,runs=[],questions=[];
-    for(let index=0;index<32;index++){
+    const existing=options['existing-history']?(await read('/api/boss/ui/runtime-records',maintainer)).runs.filter(run=>run.feature_id==='N02').sort((left,right)=>left.started_at.localeCompare(right.started_at)):[];
+    if(options['existing-history']){assert.equal(existing.length,32);assert.equal(new Set(existing.map(run=>run.session_id)).size,1);assert(existing.every(run=>run.status==='SUCCEEDED'));boss.socket.send(JSON.stringify({type:'attach',chat_id:existing[0].session_id.slice(10)}));}else boss.socket.send(JSON.stringify({type:'new_chat'}));
+    await expect.poll(()=>boss.events.some(event=>event.event==='attached')).toBe(true);const chatId=boss.events.find(event=>event.event==='attached').chat_id,runs=existing.map(run=>run.run_id),questions=['读取 finance-note','读取 meeting-minutes'];
+    for(let index=0;index<(options['existing-history']?0:32);index++){
       requireFreeSpace();
       const turn_id=randomUUID(),content='读取 '+(index%2?'meeting-minutes':'finance-note');questions.push(content);boss.socket.send(JSON.stringify({type:'message',webui:true,chat_id:chatId,turn_id,content}));let receipt;
       await expect.poll(async()=>{receipt=await boss.command('boss.conversation.request',{chat_id:chatId,turn_id});return receipt.request_state;},{timeout:60000}).toBe('SUCCEEDED');runs.push(receipt.run_id);
@@ -52,7 +58,13 @@ async function main(){let desktop,proxy,page;
     assert.equal(restored.promptFound,true);assert(Math.abs(restored.offsetTop-position.reading.offsetTop)<1,JSON.stringify({expected:position.reading.offsetTop,actual:restored.offsetTop}));assert(Math.abs(restored.scrollTop-originalThread.scrollTop)<1);assert(Math.abs((await region.locator('.boss-n02').evaluate(element=>element.scrollTop))-position.workspaceTop)<1);
     const storage=await page.evaluate(()=>JSON.stringify({url:location.href,local:Object.fromEntries(Object.entries(localStorage)),session:Object.fromEntries(Object.entries(sessionStorage))}));assert(!storage.includes(source.content));for(const question of questions)assert(!storage.includes(question));for(const account of Object.values(accounts))assert(!storage.includes(account.password));
     assert.equal((await read('/api/boss/ui/runtime-records',maintainer)).runs.length,runs.length);assert.equal((await trace()).requests.filter(request=>request.action==='boss.message.send').length,1);
-    assert(historyReads.some(read=>read.before));records.push({check:'unknown_send_refresh_return_restores_original_message_run_scroll_and_focus',chat_id:chatId,run_id:runs[1],client_request_id:dropped.client_request_id,reading:position.reading,restored,workspace_top:position.workspaceTop,focus_restored:true,actual_older_history_reads:historyReads.filter(read=>read.before).length,simulation_send_count:1,additional_runtime_count:0,private_body_or_password_in_ordinary_storage:false});save('PASS');
+    assert(historyReads.some(read=>read.before));records.push({check:'unknown_send_refresh_return_restores_original_message_run_scroll_and_focus',chat_id:chatId,run_id:runs[1],client_request_id:dropped.client_request_id,reading:position.reading,restored,workspace_top:position.workspaceTop,focus_restored:true,actual_older_history_reads:historyReads.filter(read=>read.before).length,simulation_send_count:1,additional_runtime_count:0,private_body_or_password_in_ordinary_storage:false});save('IN_PROGRESS');
+    stage='ACTUAL_HISTORY_RESPONSE_AFTER_NEW_SELECTION';await messages.click();await page.waitForURL(/bossPage=F08/);await page.reload();await expect(page.getByRole('heading',{name:'消息编辑',level:1,exact:true})).toBeVisible();
+    const terminals=[];for(const event of ['requestfinished','requestfailed'])page.on(event,request=>{const url=new URL(request.url());if(url.pathname.endsWith('/webui-thread')&&url.searchParams.has('before'))terminals.push(event);});
+    const held=await fetch(origin+'/_n02/hold-history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId})});assert.equal(held.status,200);await page.getByRole('button',{name:'返回原会话',exact:true}).click();await page.waitForURL(/bossPage=N02/);await expect.poll(async()=>(await trace()).history_held?.chat_id).toBe(chatId);const heldHistory=(await trace()).history_held;assert.equal(heldHistory.status,200);
+    await region.getByRole('button',{name:'新建会话',exact:true}).click();await page.waitForURL(/#\/new$/);const newInput=region.locator('textarea');await expect(newInput).toHaveValue('');await expect(region.locator('.boss-n02-context')).toContainText('尚未关联');await newInput.fill('核查当前资料');assert.equal(new URL(page.url()).hash,'#/new');assert.equal(new URL(page.url()).searchParams.has('conversationPosition'),false);
+    const released=await fetch(origin+'/_n02/release-history',{method:'POST'});assert.equal(released.status,200);await expect.poll(async()=>(await trace()).history_released_count).toBe(1);await expect.poll(()=>terminals.length).toBeGreaterThan(0);await expect(newInput).toHaveValue('核查当前资料');await expect(region.getByTestId('thread-message-region')).toHaveCount(0);assert.equal((await read('/api/boss/ui/runtime-records',maintainer)).runs.length,runs.length);assert.equal((await read('/api/boss/ui/workspace/outbox')).sent_messages.length,sent.length);
+    records.push({check:'actual_older_history_response_does_not_replace_explicit_new_conversation_or_input',original_chat_id:chatId,actual_response_bytes:heldHistory.response_bytes,request_terminals:terminals,original_position_intent_cleared:true,new_input_retained:true,old_messages_in_new_conversation:false,additional_runtime_count:0,additional_send_count:0});save('PASS');
   }catch(failure){
     if(page&&!page.isClosed()){
       const context=page.locator('.boss-n02-context');records.push({check:'failure_dom_state',url:page.url(),context_text:await context.count()?await context.textContent():null,prompt_count:await page.locator('[data-user-prompt-id]').count()});

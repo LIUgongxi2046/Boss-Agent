@@ -447,7 +447,7 @@
 @@
    const displayMessages = useMemo(() => projectWebuiThreadMessages(messages), [messages]);
 +  const readingMessageIds=useMemo(()=>new Set(displayMessages.map(message=>message.id)),[displayMessages]);
-+  const readingHistoryPending=loadingOlder||historical.some(message=>message.role==="user"&&!readingMessageIds.has(message.id));
++  const readingHistoryPending=loading||loadingOlder||historical.some(message=>message.role==="user"&&!readingMessageIds.has(message.id));
 @@
              onLoadOlder={loadOlder}
 +            readingHistoryPending={readingHistoryPending}
