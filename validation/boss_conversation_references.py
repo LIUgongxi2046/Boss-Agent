@@ -35,6 +35,9 @@ class ConversationReferences:
             if "source_id" in step:
                 add("document", step["source_id"], step.get("version"),
                     {"origin": "TOOL_RESULT", "tool_id": step["tool_id"], "tool_call_id": step["tool_call_id"]})
+            if "task_id" in step:
+                add("task", step["task_id"], step.get("task_version"),
+                    {"origin": "TOOL_RESULT", "tool_id": step["tool_id"], "tool_call_id": step["tool_call_id"]})
         rows = []
         for (kind, identifier, version), support in found.items():
             row = {"kind": kind, "id": identifier, "recorded_version": version, "current_version": None,

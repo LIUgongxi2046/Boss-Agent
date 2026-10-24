@@ -21,6 +21,8 @@ from nanobot.session.manager import SessionManager
 ROOT = Path(__file__).resolve().parents[2]
 PRODUCT = Path(os.environ["MENU_N02_PRODUCT_ROOT"])
 sys.path.insert(0, str(PRODUCT / "validation"))
+if os.environ.get("MENU_N02_CONVERSATION_ROOT"):
+    sys.path.insert(0, str(Path(os.environ["MENU_N02_CONVERSATION_ROOT"]).resolve() / "validation"))
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
 from boss_runtime_records import runtime_records
