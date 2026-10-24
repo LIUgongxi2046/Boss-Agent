@@ -17,6 +17,7 @@ from nanobot.agent.tools.context import current_request_context
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.schema import Config
 from nanobot.providers.base import LLMResponse, ToolCallRequest
+from nanobot.session.manager import SessionManager
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "validation"))
@@ -88,7 +89,9 @@ def execute(conversation, tmp_path, questions, *, event_producer=None, before_co
     recorder = ConversationRuntimeRecorder(scope, registry, lambda: snapshot)
     provider = ConversationSimulatedProvider(event_producer or actual_source_events, scope)
     provider.generation = config.resolve_preset().to_generation_settings()
-    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry, hook_factories=[recorder.hook_factory])
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry, session_manager=sessions,
+        hook_factories=[recorder.hook_factory])
     for name in list(registry.tool_names):
         registry.unregister(name)
     register_conversation_reads(registry, [BossEvidenceReadTool(api, "BOSS")], scope)

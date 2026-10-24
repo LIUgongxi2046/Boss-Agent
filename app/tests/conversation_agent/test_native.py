@@ -1,0 +1,303 @@
+import asyncio
+import base64
+from dataclasses import replace
+import json
+import sys
+from pathlib import Path
+from uuid import uuid4
+
+import pytest
+from aiohttp import web
+from loguru import logger
+from nanobot import Nanobot
+from nanobot.agent.loop import AgentLoop
+from nanobot.agent.tools.context import RequestContext
+from nanobot.agent.tools.registry import ToolRegistry
+from nanobot.providers.base import LLMResponse, ToolCallRequest
+from nanobot.config.schema import Config
+from nanobot.session.manager import SessionManager
+from nanobot.webui.media_gateway import WebUIMediaGateway
+
+from conftest import DOMAIN
+from business import checksum
+from controls import ControlStore
+from boss_conversation import ConversationAPI
+from boss_conversation_attachments import ConversationAttachments
+from boss_command_api import BossCommandAPI
+from conversation_agent import READ_TOOLS
+from conversation_agent.native import NativeConversationAgent
+from product_bi import FeatureToolRegistry
+
+
+CHAT = "n02-native-current"
+
+
+@pytest.fixture
+def native(tmp_path):
+    logger.remove()
+    logger.add(sys.stderr, level="WARNING", diagnose=False, backtrace=False)
+    store = ControlStore(tmp_path / "native.sqlite")
+    store.initialize("ui-check")
+    config = Config.model_validate({"agents": {"defaults": {"workspace": str(tmp_path / "workspace"),
+        "provider": "deepseek", "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 700,
+        "maxToolResultChars": 200000, "dream": {"enabled": False}, "idleCompactAfterMinutes": 0}}})
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    media_root = tmp_path / "media"
+    media_root.mkdir()
+    attachments = ConversationAttachments(sessions, media_root)
+    registry = FeatureToolRegistry()
+    snapshot = {"provider": "deepseek", "model_id": "deepseek-flash", "api_type": "chat_completions",
+        "max_tool_rounds": 12, "max_output_tokens": 700, "timeout": 120, "config_sha256": checksum(config.model_dump(mode="json"))}
+    agent = NativeConversationAgent(store, registry, lambda: snapshot, attachments)
+    agent.provider.generation = config.resolve_preset().to_generation_settings()
+    loop = AgentLoop.from_config(config, session_manager=sessions, provider=agent.provider, tool_registry=registry,
+        hook_factories=[agent.recorder.hook_factory])
+    for name in list(registry.tool_names):
+        registry.unregister(name)
+    for tool in agent.tools():
+        registry.register(tool)
+    with store.connect() as db:
+        row = store.get(db, "ui-check", "configuration", "current")
+        row["tool_scope"] = sorted(READ_TOOLS)
+        store.put(db, "ui-check", "configuration", "current", row)
+    gateway = WebUIMediaGateway(workspace_path=tmp_path, logger=logger, media_dir=lambda _: media_root)
+    return store, agent, loop, config, gateway
+
+
+def read(native, kind):
+    with native[0].connect() as db:
+        return [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE kind=? ORDER BY rowid", (kind,))]
+
+
+def execute(native, questions, *, upload=None, before_context=None):
+    store, agent, loop, config, gateway = native
+    admitted = []
+    async def run():
+        async with Nanobot(loop, config=config) as bot:
+            async def transport(request):
+                request.metadata["webui_turn_id"] = request.turn_id
+                value = agent.admit("BOSS", CHAT, request.turn_id, request.original_user_text,
+                    media_sha256=checksum(upload[0] if upload else []), attached=lambda chat: chat == CHAT, active=lambda: True)
+                assert value["enqueue"]
+                admitted.append(value)
+                if upload:
+                    agent.record_media("BOSS", value["client_request_id"], upload[0], upload[1], active=lambda: True)
+                if before_context is not None:
+                    before_context(request)
+            remove = [bot.runtime.add_context_provider(provider) for provider in (transport, agent.native_context, agent.scope_context, agent.recorder.context)]
+            try:
+                return [await bot.run(question, channel="websocket", chat_id=CHAT, session_key="websocket:" + CHAT,
+                    sender_id="boss-1", media=upload[1] if upload else None) for question in questions]
+            finally:
+                for unsubscribe in reversed(remove):
+                    unsubscribe()
+    return asyncio.run(run()), admitted
+
+
+def test_native_current_input_plans_actual_parameters_and_follows_current_source(native):
+    results, admitted = execute(native, ["请读取来源 finance-note", "读取 meeting-minutes", "再次读取 finance-note", "继续核查这份资料的版本", "查看当前联系人与消息"])
+    values = [json.loads(result.content) for result in results]
+    assert values[0]["results"][0]["source_id"] == values[3]["results"][0]["source_id"] == "finance-note"
+    assert values[1]["results"][0]["source_id"] == "meeting-minutes"
+    assert values[4]["results"][0]["projection"] == "conversation-messages"
+    runs = ConversationAPI(native[0]).read("BOSS", {"session_id": "websocket:" + CHAT, "chat_id": CHAT})["runs"]
+    assert len(runs) == 5 and len({row["run_id"] for row in runs}) == 5
+    assert all(row["status"] == "SUCCEEDED" for row in runs)
+    row = read(native, "runtime_run")[0]
+    assert row["tool_results"][0]["parameters_sha256"] == checksum({"source": "finance-note"})
+    assert row["conversation_context"]["client_request_id"] == admitted[0]["client_request_id"]
+    assert not native[1].proofs
+    assert not read(native, "task") and not read(native, "authorization")
+
+
+def test_real_upload_is_metadata_and_does_not_become_business_source(native):
+    actual = (DOMAIN / "Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png").read_bytes()
+    selected = [{"name": "boss-logo-from-reference.png", "data_url": "data:image/png;base64," + base64.b64encode(actual).decode()}]
+    paths, failure = native[4].store_inbound_attachments(selected)
+    assert failure is None
+    results, _ = execute(native, ["查看附件并分析内容"], upload=(selected, paths))
+    value = json.loads(results[0].content)
+    assert value["outcome"] == "WAITING_INPUT"
+    item = value["results"][0]["attachments"][0]
+    assert item["original_name"] == selected[0]["name"] and item["size_bytes"] == len(actual)
+    assert item["processing_state"] == "STORED" and value["required_inputs"]
+    row = read(native, "runtime_run")[0]
+    assert row["status"] == "WAITING_INPUT" and row["stop_reason"] == "required_input"
+    assert row["conversation_context"]["attachment_refs"][0]["attachment_id"] == item["attachment_id"]
+    assert paths[0] not in json.dumps(row) and selected[0]["name"] not in json.dumps(row)
+
+
+def test_original_intent_duplicate_and_changed_media_are_not_replayed(native):
+    _, admitted = execute(native, ["查看当前任务"])
+    original = admitted[0]
+    again = native[1].admit("BOSS", CHAT, original["turn_id"], "查看当前任务", media_sha256=checksum([]), attached=lambda chat: True, active=lambda: True)
+    assert again["enqueue"] is False and again["run_id"] == read(native, "runtime_run")[0]["run_id"]
+    for text, media in (("不同文字", checksum([])), ("查看当前任务", "0" * 64)):
+        with pytest.raises(web.HTTPConflict):
+            native[1].admit("BOSS", CHAT, original["turn_id"], text, media_sha256=media, attached=lambda chat: True, active=lambda: True)
+    assert len(read(native, "runtime_run")) == len(read(native, "conversation_intent")) == 1
+
+
+def test_unknown_input_waits_and_new_input_can_continue(native):
+    results, _ = execute(native, ["处理一下这个事项", "查看当前任务"])
+    assert json.loads(results[0].content)["outcome"] == "WAITING_INPUT"
+    assert json.loads(results[1].content)["outcome"] == "READ_RESULT"
+    assert [row["status"] for row in read(native, "runtime_run")] == ["WAITING_INPUT", "SUCCEEDED"]
+
+
+def test_stop_has_no_new_intent_or_business_lookup(native):
+    assert native[1].admit(None, CHAT, None, "/STOP", media_sha256=None, attached=None, active=None) is None
+    assert not read(native, "conversation_intent") and not read(native, "runtime_run")
+
+
+def test_morning_binding_keeps_priority(native):
+    from product_morning import ProductMorning
+    morning = ProductMorning(native[0])
+    morning.native.bind("BOSS", "n02-morning-priority", {"chat_id": CHAT, "date": "2026-10-24", "timezone": "Asia/Shanghai"},
+        attached=lambda chat: True, active=lambda: True)
+    assert native[1].admit("BOSS", CHAT, str(uuid4()), "读取资料", media_sha256=checksum([]), attached=lambda chat: True, active=lambda: True) is None
+    assert not read(native, "conversation_intent")
+
+
+@pytest.mark.parametrize("role,attached,active", [("MAINTAINER", True, True), ("BOSS", False, True), ("BOSS", True, False)])
+def test_native_admission_needs_live_owner_connection(native, role, attached, active):
+    with pytest.raises(web.HTTPException):
+        native[1].admit(role, CHAT, str(uuid4()), "查看消息", media_sha256=checksum([]), attached=lambda chat: attached, active=lambda: active)
+    assert not read(native, "conversation_intent")
+
+
+def test_new_service_can_read_original_receipt_but_cannot_adopt_old_proof(native):
+    _, admitted = execute(native, ["读取 finance-note"])
+    store, old, loop, config, gateway = native
+    reopened = NativeConversationAgent(ControlStore(store.path), old.registry, old.recorder.runtime_snapshot, old.attachments)
+    receipt = reopened.receipt("BOSS", admitted[0]["client_request_id"], active=lambda: True)
+    assert receipt["request_state"] == "SUCCEEDED" and receipt["write_performed_by_lookup"] is False
+    unknown = reopened.receipt("BOSS", "unknown-original-request", active=lambda: True)
+    assert unknown["outcome"] == "NOT_FOUND_IN_CURRENT_STORE" and unknown["run_id"] is None
+    request = RequestContext(channel="websocket", chat_id=CHAT, session_key="websocket:" + CHAT, sender_id="boss-1",
+        original_user_text="读取 finance-note", metadata={"webui_turn_id": admitted[0]["turn_id"]})
+    with pytest.raises(web.HTTPForbidden):
+        asyncio.run(reopened.native_context(request))
+    assert len(read(native, "runtime_run")) == 1
+
+
+@pytest.mark.parametrize("failure,status", [("cancel", "CANCELED"), ("timeout", "TIMED_OUT")])
+def test_native_terminal_keeps_original_intent_and_clears_proof(native, failure, status):
+    original = native[1].provider.event_producer
+    async def events(messages, tools):
+        if not any(message["role"] == "tool" for message in messages):
+            return await original(messages, tools)
+        if failure == "cancel":
+            raise asyncio.CancelledError()
+        raise TimeoutError("明确模拟的原生会话超时")
+    native[1].provider.event_producer = events
+    with pytest.raises(asyncio.CancelledError if failure == "cancel" else TimeoutError):
+        execute(native, ["读取 finance-note"])
+    assert read(native, "runtime_run")[0]["status"] == status
+    assert read(native, "conversation_intent")[0]["status"] == status
+    assert not native[1].proofs
+
+
+def query_artifact(native, workspace):
+    from fc02_agent import Fc02Context, bind_query, register_fc02_tools
+    from fc02_agent.runtime import Fc02RuntimeRecorder, Fc02SimulatedProvider
+    store = native[0]
+    with store.connect() as db:
+        initial = store.get(db, "ui-check", "initial", "snapshot")
+        configuration = store.get(db, "ui-check", "configuration", "current")
+        configuration["tool_scope"] = sorted(set(configuration["tool_scope"]) | {"query_metrics", "read_evidence"})
+        store.put(db, "ui-check", "configuration", "current", configuration)
+    detail = initial["details"][0]
+    params = {"region_id": detail["region_id"], "product_ids": sorted({row["product_id"] for row in initial["details"]}),
+        "metric_ids": ["gross_margin"], "definition_version": "1", "period_start": initial["periods"]["CURRENT"][0],
+        "period_end": initial["periods"]["CURRENT"][1], "comparison_start": initial["periods"]["BASE"][0],
+        "comparison_end": initial["periods"]["BASE"][1], "question": "查询当前获准期间的毛利率及依据", "currency": "CNY",
+        "trade_scope": "EXTERNAL_SALES", "query_mode": "SCOPED", "legal_entity_id": detail["legal_entity_id"],
+        "quantity_unit": "tonne", "business_basis": "SELECTION_REPORTED", "settlement_state": "SETTLED"}
+    current = [Fc02Context("BOSS", "boss-1", "ui-check", "selection", "1", "n02-query-original", "websocket:" + CHAT,
+        True, (bind_query(params),), frozenset())]
+    registry = ToolRegistry()
+    async def events(messages, tools):
+        outputs = [json.loads(item["content"]) for item in messages if item["role"] == "tool"]
+        if not outputs:
+            return LLMResponse(content=None, tool_calls=[ToolCallRequest(id=str(uuid4()), name="query_metrics", arguments=params)])
+        return LLMResponse(content=json.dumps(outputs[-1], ensure_ascii=False))
+    provider = Fc02SimulatedProvider(events)
+    config = Config.model_validate({"agents": {"defaults": {"workspace": str(workspace), "provider": "deepseek",
+        "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 700, "dream": {"enabled": False}, "idleCompactAfterMinutes": 0}}})
+    snapshot = {**native[1].recorder.runtime_snapshot(), "config_sha256": checksum(config.model_dump(mode="json"))}
+    recorder = Fc02RuntimeRecorder(store, "ui-check", registry, lambda: snapshot, lambda: current[0])
+    provider.generation = config.resolve_preset().to_generation_settings()
+    sessions = SessionManager(workspace, sessions_root=workspace.parent / (workspace.name + "-sessions"))
+    loop = AgentLoop.from_config(config, session_manager=sessions, provider=provider, tool_registry=registry, hook_factories=[recorder.hook_factory])
+    for name in list(registry.tool_names):
+        registry.unregister(name)
+    register_fc02_tools(registry, store, lambda: current[0])
+    async def run():
+        async with Nanobot(loop, config=config) as bot:
+            bot.runtime.add_context_provider(recorder.context)
+            async def admitted(request):
+                binding = request.attributes["boss_runtime_binding"]
+                current[0] = replace(current[0], request_id=binding.request_id, session_id=binding.session_id)
+            bot.runtime.add_context_provider(admitted)
+            return await bot.run(params["question"], channel="websocket", chat_id=CHAT, session_key="websocket:" + CHAT, sender_id="boss-1")
+    result = asyncio.run(run())
+    assert not result.error
+    return json.loads(result.content)
+
+
+def test_actual_query_artifact_is_adopted_and_source_withdrawal_stops_current_read(native, tmp_path):
+    query = query_artifact(native, tmp_path / "query-runtime")
+    results, _ = execute(native, ["查看产物 " + query["query_id"]])
+    output = json.loads(results[0].content)["results"][0]
+    assert output["data"]["values"] == query["values"]
+    row = read(native, "runtime_run")[-1]
+    assert row["tool_results"][0]["query_id"] == query["query_id"]
+    assert len(read(native, "query")) == 1
+    native[0].control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    with pytest.raises(web.HTTPException):
+        execute(native, ["继续查看当前运行"])
+    assert len(read(native, "runtime_run")) == 2
+
+
+def test_actual_owner_message_and_draft_ids_use_correct_storage_kind(native):
+    commands = BossCommandAPI(native[0])
+    with native[0].connect() as db:
+        document = native[0].get(db, "ui-check", "document", "finance-note")
+    code, draft = commands.execute("BOSS", "boss.message.draft.save", {"client_request_id": "native-owner-draft",
+        "draft_id": None, "expected_version": "0", "recipient_id": "coordinator-1", "related_task_id": None,
+        "body": document["content"], "attachment_refs": [{"source_id": document["source_id"], "version": document["version"]}],
+        "visibility": "RECIPIENT_ONLY"})
+    assert code == 200
+    execute(native, ["查看草稿 " + draft["draft_id"]])
+    saved = read(native, "message_draft")[0]
+    code, sent = commands.execute("BOSS", "boss.message.send", {"client_request_id": "native-owner-send",
+        "draft_id": draft["draft_id"], "expected_version": draft["version"], "recipient_id": saved["recipient_id"],
+        "expected_content_sha256": saved["content_sha256"]})
+    assert code == 200
+    results, _ = execute(native, ["查看消息 " + sent["message_id"]])
+    assert json.loads(results[0].content)["results"][0]["data"]["send_state"] == "SENT_SIMULATED"
+    row = read(native, "runtime_run")[-1]
+    assert row["tool_results"][0]["message_id"] == sent["message_id"]
+    assert len(read(native, "message_outbox")) == len(read(native, "authorization")) == 1
+    assert not read(native, "outbox")
+
+
+def test_non_image_sdk_without_saved_media_reference_fails_without_claiming_processed_source(native):
+    actual = (DOMAIN / "specs/morning-coverage.json").read_bytes()
+    selected = [{"name": "morning-coverage.json", "data_url": "data:application/json;base64," + base64.b64encode(actual).decode()}]
+    paths, failure = native[4].store_inbound_attachments(selected)
+    assert failure is None
+    with pytest.raises(web.HTTPConflict):
+        execute(native, ["查看附件"], upload=(selected, paths))
+    assert read(native, "runtime_run")[0]["status"] == "FAILED"
+    assert not read(native, "runtime_run")[0]["tool_results"]
+
+
+def test_admission_can_be_explicitly_canceled_before_runtime(native):
+    receipt = native[1].admit("BOSS", CHAT, str(uuid4()), "查看任务", media_sha256=checksum([]),
+        attached=lambda chat: True, active=lambda: True)
+    native[1].finish(receipt["client_request_id"], status="CANCELED")
+    value = native[1].receipt("BOSS", receipt["client_request_id"], active=lambda: True)
+    assert value["request_state"] == "CANCELED" and value["run_id"] is None
+    assert not read(native, "runtime_run")

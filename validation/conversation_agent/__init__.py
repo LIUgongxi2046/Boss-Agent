@@ -13,9 +13,9 @@ from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_page_read_tools import _BossPageReadTool
 
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 CONVERSATION_REQUEST = "product_conversation_request"
-READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead"})
+READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead", "conversationRead"})
 
 
 @dataclass(frozen=True)
@@ -106,7 +106,7 @@ class ConversationReadTool(Tool):
                 "模型参数超出本次明确输入范围", web.HTTPForbidden)
         result = await self.delegate.execute(**params)
         output = json.loads(result)
-        require(output["source_type"] == "SIMULATED" and self.scope.current() == context,
+        require(output["source_type"] in {"SIMULATED", "RUNTIME_RECORD"} and self.scope.current() == context,
                 "会话读取期间当前范围已变化", web.HTTPConflict)
         return result
 

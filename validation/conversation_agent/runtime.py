@@ -23,9 +23,10 @@ class ConversationSimulatedProvider(Fc01SimulatedProvider):
 
 
 class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
-    def __init__(self, scope, registry, runtime_snapshot):
+    def __init__(self, scope, registry, runtime_snapshot, *, intent_adapter=None):
         super().__init__(scope.store, "ui-check", registry, runtime_snapshot)
         self.scope = scope
+        self.intent_adapter = intent_adapter
 
     async def context(self, request):
         context = self.scope.current(request, require_runtime=False)
@@ -37,6 +38,9 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
         reference = {"input_sha256": context.input_sha256,
             "allowed_call_refs": [{"tool_id": name, "parameters_sha256": digest} for name, digest in sorted(context.allowed_calls)],
             "references": [{"kind": kind, "id": identifier, "version": version} for kind, identifier, version in context.references]}
+        if self.intent_adapter is not None:
+            reference.update(self.intent_adapter.runtime_reference(request))
+            self.intent_adapter.bind_runtime(request, binding)
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self._read(db, binding.run_id)
@@ -70,9 +74,34 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
         output = json.loads(result)
         safe = {key: output[key] for key in ("source_type", "source_id", "version", "review_sha256") if key in output}
         safe.update(parameters_sha256=checksum(params), result_sha256=checksum(output))
+        if output.get("kind") in {"query", "task", "morning_list", "message", "message_draft"} and "data" in output:
+            kind, identifier, data = output["kind"], output["id"], output["data"]
+            storage = {"query": "query", "task": "task", "morning_list": "morning_list", "message_draft": "message_draft"}
+            with self.recorder.store.connect() as db:
+                if kind == "message":
+                    rows = db.execute("SELECT id FROM objects WHERE namespace='ui-check' AND id=? AND kind IN ('message_outbox','outbox')", (identifier,)).fetchall()
+                    require(len(rows) == 1, "消息产物缺少唯一正式存储记录")
+                else:
+                    self.recorder.store.get(db, "ui-check", storage[kind], identifier)
+            field = {"query": "query_id", "task": "task_id", "morning_list": "list_id", "message": "message_id", "message_draft": "draft_id"}[kind]
+            safe[field] = identifier
+            if kind in {"task", "message_draft"} and "version" in data:
+                safe["task_version" if kind == "task" else "version"] = data["version"]
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)
             reference = next(item for item in row["tool_results"] if item["tool_call_id"] == tool_call.id)
             reference.update(safe)
             self.recorder._save(db, row)
+
+    def _finish(self, context):
+        super()._finish(context)
+        if self.recorder.intent_adapter is not None:
+            with self.recorder.store.connect() as db:
+                db.execute("BEGIN IMMEDIATE")
+                row = self.recorder._read(db, self.run_id)
+                reference = row["conversation_context"]
+                if row["status"] == "SUCCEEDED" and reference["required_input_count"]:
+                    row.update(status="WAITING_INPUT", stop_reason="required_input")
+                    self.recorder._save(db, row)
+            self.recorder.intent_adapter.finish(reference["client_request_id"])
