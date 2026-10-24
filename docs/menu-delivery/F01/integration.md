@@ -1,6 +1,6 @@
 # MENU-F01 今日工作
 
-task_id=MENU-F01-N3；CURRENT；2026-10-24；DEVELOPED_PENDING_USER_ACCEPTANCE。唯一正式状态来源为原始目录 specs/feature-delivery.json。需求来源为 D-MENU-DELIVERY-20261024、docs/menu-delivery/F01.md；稳定检查点 MENU-F01.C01—C18，共18项，开发覆盖18项，用户验收分子null。业务、设计结构与样式、交互和可启动交付分别具有当前证据，视觉及用户验收保持待确认。
+task_id=MENU-F01-N3；CURRENT；2026-10-24；REQUIRES_DESIGN_REWORK。唯一正式状态来源为原始目录 specs/feature-delivery.json。需求来源为 D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及 docs/menu-delivery/F01.md；稳定检查点 MENU-F01.C01—C18，共18项，开发覆盖分子待设计返修核查，用户验收分子null。原候选业务证据按未变依赖保留，C01/C02/C18及受影响交互需要重新验证，视觉及用户验收保持待确认。
 
 ## 输入与检索
 
@@ -26,7 +26,7 @@ task_id=MENU-F01-N3；CURRENT；2026-10-24；DEVELOPED_PENDING_USER_ACCEPTANCE�
 
 ## 验证与18项依据
 
-当前源码实现为 2993eb00cc84b428b0724185db0298c47418f17f；完整18项开发覆盖18项。限定组合 combination.xml 的21项与 native-adapter.xml 的24项通过。behavior.json、native.json、launcher.json 均为当前准确制品 PASS；manifest 为 e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c，index 为 11a935970330ddfa87e50faeb5f266cd27163f11750945e01797be25d3396b1f。原设计实际加载 DOM 已提取，实际页面六种尺寸/缩放的列宽、区域间距、内距和 Token 具有对应记录。原始结果位于 evidence/menu-delivery/F01，candidate-inventory.json 核查源码、实际安装 Nanobot、13项业务依赖变化、147项保持及5项认证/宿主保持。
+已提供业务体验的源码实现为 2993eb00cc84b428b0724185db0298c47418f17f，候选为 d0e6326bcca49a2c8372c476c50808d454076127。限定组合 combination.xml 的21项与 native-adapter.xml 的24项通过。behavior.json、native.json、launcher.json 为该准确制品 PASS；manifest 为 e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c，index 为 11a935970330ddfa87e50faeb5f266cd27163f11750945e01797be25d3396b1f。原设计和该候选的六组 DOM/尺寸记录保留为差距核查依据，不能代表当前高保真还原通过。原始结果位于 evidence/menu-delivery/F01，candidate-inventory.json 对应该候选的源码、实际 Nanobot及制品。
 
 实际连续检查覆盖同一清单分类/详情/原文、关联会议关闭焦点、真实延迟响应不覆盖新选择、键盘和鼠标调整、排序响应交付中断后只读恢复、并发 CAS 保留编辑、非法 IANA 数量未知、D06 返回焦点和同库独立服务重开。准备没有自动业务写入，本人独立确认后交办保存为 OPEN，引用对应同一清单/事项/来源/会议，没有自动发送；业务变化后原清单显示历史需要重新查询。未知排序原编号只读且未重放。
 
@@ -36,7 +36,7 @@ task_id=MENU-F01-N3；CURRENT；2026-10-24；DEVELOPED_PENDING_USER_ACCEPTANCE�
 
 N4 接续 marker=MENU-F01-REVIEW-e9ee712-20261024，准确源码和制品已发送；发送前复查 idle，返回 threadId=01a16925-dec5-7202-8e3e-9605d9e073fe，turn=01a16ddb-5b51-7360-b675-d47b3dab2963。必要定向核查涵盖完整需求及 G01—G03，运行中不追加消息或调整。当前视觉和用户验收保持待确认。
 
-当前必要定向结论 PASS_DIRECTED_REVIEW，marker=MENU-F01-CANCEL-2993eb0-20261024，turn=01a16dea-6450-7e33-89c1-1eb9376a0e30。N4 独立核查当前源码、实际证据及各摘要，判定18项必要证据充分、未解决必要缺陷0项；没有重新运行生产者业务，也没有登记用户或视觉通过。准确记录为 N4 docs/menu-delivery/F01/qa.md，SHA256=9edc3ab4498bdef372b27ba7bd0755cbb6e8ff236e219db4b888f720bbf5f209。
+当前设计复核由 N4依据 D-UI-FIDELITY-20261024执行，只读核查准确候选、原设计及已有 DOM，输出带来源和数值的稳定差距清单。公共框架、正文起点/可用宽度、比例、区域层级、信息密度、尺寸间距及受影响交互均需处理；当前 Shell或开源默认布局不构成接受差距的批准依据。原业务检查按适用版本保留，不重复无变化全量。
 
 C01/C02/C18 依据原设计区域、层级、列结构、间距、文案、控件位置、窗口/缩放及键盘；C03—C10 依据正式日期、完整来源、分类、合并、排序、关联与当前版本；C11—C14 依据实际 Runtime、会话交接、独立交办和保存重读；C15—C17 依据适用状态及 E01—E06、权限、CAS、撤销和同编号恢复。领域40项仅作为其准确生产者的证据，公共组合与消费者另有当前结果。视觉和用户验收尚未执行。
 
@@ -44,4 +44,4 @@ C01/C02/C18 依据原设计区域、层级、列结构、间距、文案、控�
 
 当前用户 UI02 的 ui02-experience、desktop-ui02-experience 与 10411/10412/20411，以及原 MVP 资料与 9961/9962/19961 均保持原状态，不用于验证。新构建与数据采用独立目录和端口，全部外部 SIMULATED_FIRST，不新增真实外部请求；STT/F27/FC28 暂停，账号填充沿用原授权范围。
 
-当前独立启动入口为 scripts/run_menu_f01.command，使用 menu-f01-experience 及10611/10612/20611，准确制品与连续步骤见 delivery.json、experience.md。本人登录仍需手动提交；现有 UI02 和 MVP 用户体验保持。完整18项开发交付后，按批准菜单计划建立 N02 完整工单继续，用户验收独立等待。
+当前独立启动入口为 scripts/run_menu_f01.command，使用 menu-f01-experience/desktop-menu-f01-experience 及10611/10612/20611，准确制品与连续步骤见 delivery.json、experience.md。该窗口现为用户体验，不用于验证、退出、重启或热替换；本人登录仍需手动提交。当前唯一实施菜单为 N02，F01必要设计返修须在进入 N03前完成，保留原18项和全部 N02未完成工作，不并行实施两个菜单。修复采用新的独立候选、制品、端口和 SQLite。

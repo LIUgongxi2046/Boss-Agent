@@ -1,5 +1,7 @@
 # MENU-F01 连续操作
 
+当前状态 REQUIRES_DESIGN_REWORK，依据 D-UI-FIDELITY-20261024。此入口保留 d0e6326业务体验，原业务结果按适用版本有效；高保真设计和用户验收尚未通过。当前运行窗口和资料保持，修复使用新的独立候选和入口。
+
 源码目录为 /Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，启动入口为 scripts/run_menu_f01.command。当前源码实现 2993eb00cc84b428b0724185db0298c47418f17f，准确交付候选由原始 specs/feature-delivery.json 的当前或历史 MENU-F01 记录提供。制品和实际 Runtime 摘要见 evidence/menu-delivery/F01/candidate-inventory.json。
 
 该入口使用独立 validation/.work/menu-f01-experience、menu-f01-n3-dist 和10611/10612/20611。账号、SQLite、会话及 Electron 配置均在该独立目录，后续启动保留已有资料。现有 UI02 与 MVP 体验不受操作。首次准备通过既有正式初始化及维护入口采用获准模拟输入；全部外部响应为 SIMULATED_FIRST，没有新增真实外部请求。

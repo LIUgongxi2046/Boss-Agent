@@ -3,18 +3,21 @@
   "scope_id": "BOSS-PRIORITY-ITERATION",
   "decision_id": "D-MENU-DELIVERY-20261024",
   "baseline_id": "boss-menu-f01-coverage-20261024-v1",
-  "status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
+  "status": "REQUIRES_DESIGN_REWORK",
+  "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
+  "design_fidelity_requirements": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/menu-delivery/高保真还原执行要求.md",
+  "business_evidence_status": "RETAINED_FOR_UNCHANGED_DEPENDENCIES",
   "implementation_commit": "2993eb00cc84b428b0724185db0298c47418f17f",
   "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
   "ui02_base_candidate": "b7fdc76c81ef693da75511d736db60d92550784c",
   "domain_producer": "89d26855ba7d1fdb8bbe9ff0795a00562c9f53ab",
   "agent_producer": "961b8f68a037d819e4a705e6d6c7ba0d10c7d1da",
   "total_checkpoints": 18,
-  "development_covered_checkpoints": 18,
+  "development_covered_checkpoints": null,
   "user_verified_checkpoints": null,
   "user_acceptance": "PENDING_USER_ACCEPTANCE",
-  "independent_verdict": "PASS_DIRECTED_REVIEW",
-  "directed_review": {"type": "STATIC_AND_PRODUCER_EVIDENCE_AUDIT", "reviewed_implementation_commit": "2993eb00cc84b428b0724185db0298c47418f17f", "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md", "sha256": "9edc3ab4498bdef372b27ba7bd0755cbb6e8ff236e219db4b888f720bbf5f209", "remaining_necessary_defects": 0, "independent_business_rerun": false},
+  "independent_verdict": "DESIGN_REVIEW_IN_PROGRESS",
+  "directed_review": {"type": "DESIGN_FIDELITY_REVIEW", "reviewed_implementation_commit": "2993eb00cc84b428b0724185db0298c47418f17f", "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md", "sha256": null, "remaining_necessary_defects": null, "independent_business_rerun": false},
   "development_record": "docs/menu-delivery/F01/integration.md",
   "design_record": "docs/menu-delivery/F01/design.md",
   "experience_instructions": "docs/menu-delivery/F01/experience.md",
@@ -43,7 +46,7 @@
     "domain_producer": "docs/menu-delivery/F01/domain-check.xml",
     "independent_review": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md"
   },
-  "development_dimensions": {"BUSINESS": "CHECKS_PASSED", "DESIGN_STRUCTURE_AND_STYLE": "DOM_AND_SOURCE_CHECKS_PASSED", "INTERACTION_AND_STATES": "CHECKS_PASSED", "RUNNABLE_DELIVERY": "CHECKS_PASSED"},
+  "development_dimensions": {"BUSINESS": "CHECKS_PASSED_FOR_RECORDED_CANDIDATE", "DESIGN_STRUCTURE_AND_STYLE": "REQUIRES_DESIGN_REWORK", "INTERACTION_AND_STATES": "RECHECK_AFFECTED_DESIGN_PATHS", "RUNNABLE_DELIVERY": "RECORDED_CANDIDATE_REMAINS_AVAILABLE"},
   "checkpoint_development_evidence": [
     {"id": "MENU-F01.C01", "evidence": ["design_record#区域与数值", "behavior#formal_scope_categories_same_version_sources_meeting_sort_recovery", "launcher#actual_default_launcher_and_explicit_role_authentication"]},
     {"id": "MENU-F01.C02", "evidence": ["design_record#区域与数值", "reference_dom#layouts", "behavior#formal_scope_categories_same_version_sources_meeting_sort_recovery.layouts"], "visual": "NOT_RUN"},
@@ -72,5 +75,5 @@
     "E05": {"status": "CHECKS_PASSED", "scope": "缺少及未同步范围、非法时区、当前配置失败；交接取消保留未发送问题；原生停止当前轮次及实际 SDK 的 FAILED/CANCELED/TIMED_OUT 保留原清单", "evidence": ["behavior#actual_delayed_read_rejection_and_cas_edit_preservation", "native#native_context_failure_preserves_original_list_and_maintainer_denied", "native#actual_binding_handoff_cancellation_keeps_question_and_sends_no_message", "native#actual_native_stop_cancels_current_turn_without_new_query", "native_adapter#test_native_terminal_preserves_real_list_and_clears_proof"]},
     "E06": {"status": "CHECKS_PASSED", "scope": "SQLite 回执保存实际失败的事务保持；已保存排序交付中断后只读恢复；准备与创建、发送相互独立", "evidence": ["combination#test_actual_sqlite_save_failure_preserves_list_and_commits_no_order_or_authority", "behavior#current_scope_sources_meeting_and_actual_sort_recovery", "behavior#explicit_owner_confirmation_persists_current_morning_assignment"]}
   },
-  "limits": {"visual": "NOT_RUN", "user_acceptance": "PENDING_USER_ACCEPTANCE", "external_api_mode": "SIMULATED_FIRST", "new_real_external_requests": false, "external_model_quality": "NOT_RUN", "external_delivery": "NOT_RUN", "independent_installation": "NOT_RUN", "STT": "PAUSED_BY_USER", "next_action": "CREATE_FULL_N02_TICKET_AND_CONTINUE_AUTHORIZED_MENU_QUEUE"}
+  "limits": {"visual": "NOT_RUN", "user_acceptance": "PENDING_USER_ACCEPTANCE", "external_api_mode": "SIMULATED_FIRST", "new_real_external_requests": false, "external_model_quality": "NOT_RUN", "external_delivery": "NOT_RUN", "independent_installation": "NOT_RUN", "STT": "PAUSED_BY_USER", "next_action": "COMPLETE_F01_DESIGN_REWORK_BEFORE_N03_WITH_ONE_ACTIVE_MENU"}
 }
