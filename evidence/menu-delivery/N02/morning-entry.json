@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "scope": "N02_ACTUAL_F01_ITEM_ENTRY_AND_RUNTIME_SCOPE",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-morning-entry-b223fa0d-a638-4aeb-a26d-e79882ea92eb",
+  "ports": {
+    "business": 10841,
+    "webui": 10842,
+    "gateway": 20841
+  },
+  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_f01_morning_and_selected_item_enter_n02_keep_fixed_context_after_refresh_and_return",
+      "binding_id": "morning-bind-d1531ed0-aa6d-46d0-b09f-b412c1384e8d",
+      "selected_binding_id": "morning-bind-65cf9d64-685c-4759-81d9-9dd59e2429ac",
+      "list_id": "morning-6aa1342e-8725-44f9-be30-a9f1aca96cc2",
+      "item_id": "meeting:meeting-1",
+      "object_id": "meeting-1",
+      "object_version": "1",
+      "source_refs": [
+        {
+          "id": "meeting-1",
+          "kind": "meeting",
+          "version": "1"
+        },
+        {
+          "id": "event-1",
+          "kind": "event",
+          "version": "1"
+        },
+        {
+          "id": "finance-note",
+          "kind": "document",
+          "version": "1"
+        },
+        {
+          "id": "meeting-minutes",
+          "kind": "document",
+          "version": "1"
+        }
+      ],
+      "run_ids": [
+        "run-2742eab4-2ebc-44d8-ba0f-d0450050e435",
+        "run-0468a2c0-d014-4215-baa1-2ec4d5bb0db3",
+        "run-8ae81ebc-7af8-4120-b10a-3c17ec50d4a3"
+      ],
+      "f01_full_design_and_focus_acceptance": "NOT_RUN",
+      "morning_tool_count": 4
+    },
+    {
+      "check": "explicit_new_conversation_uses_general_seven_tool_scope_without_prior_morning_context",
+      "run_id": "run-b2533d49-fb26-4fc9-80ea-ae946f9981b3",
+      "session_id": "websocket:9748ea45-3ad3-4a3b-adf3-e89bcfe15731",
+      "morning_request_count": 3,
+      "additional_morning_requests": 0,
+      "ordinary_tool_count": 7,
+      "private_input_or_password_in_ordinary_storage": false
+    }
+  ]
+}

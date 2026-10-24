@@ -1,14 +1,14 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-2ea7b5ce-d9c5-4ed2-9bbb-29249a03b832",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-launcher-check-4751baf9-a160-4450-b7ad-cfa0d5fb8a64",
   "ports": {
     "business": 10791,
     "webui": 10792,
     "gateway": 20791
   },
   "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
-  "manifest_sha256": "eae01bafd2cb015f6000a7eb59cbc49932fb225fdaaa260689d04926119a4228",
+  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [

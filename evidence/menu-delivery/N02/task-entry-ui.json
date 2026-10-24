@@ -1,23 +1,23 @@
 {
   "status": "PASS",
   "scope": "N02_F06_ACTUAL_TASK_ENTRY",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-task-entry-c4a4130c-0643-433a-8a95-00f1af6ec117",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-task-entry-f1dd719d-693a-4922-9d53-2791e20a7ce0",
   "ports": {
     "business": 10811,
     "webui": 10812,
     "gateway": 20811
   },
   "proxy_port": 10813,
-  "manifest_sha256": "957cbd051c48adad90831a7753381f7db75beecdea54e1530c143045733fe823",
+  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
     {
       "check": "f06_actual_selection_d06_and_prepared_response_interruption",
-      "task_id": "21c3ec1e-1e50-49b4-873d-fb562bf40440",
+      "task_id": "1163e8a4-4a0f-40bf-95e7-1b309f0ba9dd",
       "task_version": "1",
-      "client_request_id": "d402f1d7-dbb9-42de-b04f-ac892ccfb441",
+      "client_request_id": "0482c2bd-742f-4d68-b161-f8145578ac2c",
       "preparation_submission_count": 1,
       "automatic_chat_count": 0,
       "draft_preserved_on_cancel": true,
@@ -25,9 +25,9 @@
     },
     {
       "check": "bound_response_interruption_reload_and_current_read_before_open",
-      "chat_id": "36aaebc4-c51f-40eb-ac46-6a7b030e9bea",
-      "preparation_id": "task-entry-86e9e41bf815c03b2d33525015424c4c4806b94a058efcf2d873e76189b85cac",
-      "preparation_sha256": "23bcdba46e8bcb7273b6378d854296d9703df0bf7f89f5a991d5442b5a1b4b45",
+      "chat_id": "036ae696-1936-4fea-b659-8888f90bf704",
+      "preparation_id": "task-entry-80a10fe32334a47cd55726ac03fa501175550c1a6a0727eb95f9c1537d45bdd8",
+      "preparation_sha256": "c7a39dd9d8089051d6bac83829b17e709d8826e8e376fc6601386a5a1e14b4c9",
       "binding_submission_count": 1,
       "automatic_message_count": 0,
       "automatic_runtime_count": 0,
@@ -35,9 +35,9 @@
     },
     {
       "check": "actual_ui_question_consumes_fixed_task_and_returns_to_formal_task_and_source",
-      "chat_id": "36aaebc4-c51f-40eb-ac46-6a7b030e9bea",
-      "run_id": "run-3dc593e7-1ea6-4561-af1a-1d198755d787",
-      "task_id": "21c3ec1e-1e50-49b4-873d-fb562bf40440",
+      "chat_id": "036ae696-1936-4fea-b659-8888f90bf704",
+      "run_id": "run-18ed4634-acb4-4cec-b4b4-dfcb0d582dc5",
+      "task_id": "1163e8a4-4a0f-40bf-95e7-1b309f0ba9dd",
       "task_version": "1",
       "current_source_reference_count": 1,
       "created_additional_task": false,
@@ -47,9 +47,9 @@
     },
     {
       "check": "actual_late_preparation_preserves_new_task_selection_and_late_binding_preserves_draft",
-      "original_task_id": "21c3ec1e-1e50-49b4-873d-fb562bf40440",
-      "selected_other_task_id": "4158dde8-8608-470d-8239-319bd0cb69ad",
-      "new_chat_id": "281a07ec-0f1d-4c9d-a7a5-da52c447f1f1",
+      "original_task_id": "1163e8a4-4a0f-40bf-95e7-1b309f0ba9dd",
+      "selected_other_task_id": "922cb2b5-2377-4eb1-bc7d-dbd3778ee8d8",
+      "new_chat_id": "8f4a5efb-3abd-4f15-9e43-8c1934abe326",
       "late_response_replaced_selection": false,
       "late_edit_preserved_on_cancel": true,
       "explicit_discard_opened_original_binding": true,
@@ -58,7 +58,7 @@
     },
     {
       "check": "new_chat_clears_context_and_changed_task_rejects_before_runtime",
-      "chat_id": "36aaebc4-c51f-40eb-ac46-6a7b030e9bea",
+      "chat_id": "036ae696-1936-4fea-b659-8888f90bf704",
       "original_task_version": "1",
       "original_receipt_retained": true,
       "independent_chat_inherited_task": false,
@@ -70,7 +70,31 @@
       "check": "actual_bound_task_runtime_current_strict_schema",
       "status": "PASS",
       "schema_id": "urn:boss-agent:runtime-records:1.13.0",
-      "runtime_count": 1
+      "runtime_count": 1,
+      "tool_scopes": [
+        [
+          "bossDashboardRead",
+          "bossEvidenceRead",
+          "bossMeetingsRead",
+          "bossTasksRead",
+          "bossWorkspaceRead",
+          "conversationRead",
+          "query_metrics"
+        ]
+      ],
+      "configuration_versions": [
+        "2"
+      ],
+      "active_tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "query_metrics"
+      ],
+      "active_configuration_version": "2"
     }
   ]
 }
