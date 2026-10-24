@@ -4,6 +4,7 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| MENU-F01-N3 | [今日工作完整菜单](../menu-delivery/F01/integration.md) | FR-01、原始 v6 F01、MENU-F01.C01—C18；区域结构、正式来源、排序、会话、共享交办与返回；正式状态引用原始 feature-delivery.json |
 | UI02-N3 | [开源界面统一体验](../feature-delivery/UI02/integration.md) | UI02.C01—C08；公共框架、原生会话、Settings、主题与连续操作；正式状态引用原始 feature-delivery.json |
 | UI01-N3 | [已完成功能菜单与登录页](../feature-delivery/UI01/integration.md) | 七项工单；已交付导航、受控账号填充和登录布局；后续界面整合见 UI02，用户验收独立登记 |
 | MVP01-N3 | [采购成本连续体验](../feature-delivery/MVP01/integration.md) | BOSS-MVP-1、MVP.C01—C12；同一采购报告、实际SDK/原文/本人确认/持久恢复和可启动体验；状态引用原始feature-delivery.json |
