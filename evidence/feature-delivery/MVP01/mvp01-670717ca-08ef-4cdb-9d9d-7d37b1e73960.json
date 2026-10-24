@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "scope": "MVP01_DEVELOPER_CHECKS_PENDING_USER_ACCEPTANCE",
+  "run_id": "mvp01-670717ca-08ef-4cdb-9d9d-7d37b1e73960",
+  "ports": {
+    "business": 10071,
+    "webui": 10072,
+    "gateway": 20071
+  },
+  "proxy_port": 10073,
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/mvp01-670717ca-08ef-4cdb-9d9d-7d37b1e73960",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/mvp01-n3-dist",
+  "manifest_sha256": "279dfb0372e8abd63ae079cadf66ec6137deb6aabbb10da87c211afce5aae8cd",
+  "index_sha256": "34a0b8f52ba9fe06d9a0479db6a6f59d5b3ff21163ae39bbd803a10612a4cbd0",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "matched_brand_resources",
+      "assets": [
+        {
+          "filename": "01-待机悬浮.webp",
+          "sha256": "15a632c68f8fa992553df4f42577214d0760d65280c8314124e84e78a5edf225",
+          "content_type": "image/webp"
+        },
+        {
+          "filename": "03-思考分析.webp",
+          "sha256": "c4ca31efd6ae3f4d0eb11d66e50f61220ebe9fe9a32d73d8f8ac138208f8b9ab",
+          "content_type": "image/webp"
+        }
+      ],
+      "decoded_within_brand_directory": true,
+      "missing_and_outside_rejected": true
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "mvp_dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "continuous_procurement_journey",
+      "query_key": "mvp-query-90ea1644-ae16-4d36-80bf-d36f01509c0b",
+      "coordinate_key": "mvp-coordinate-446d373e-be20-4e37-81a7-26449be3ee6c",
+      "task_id": "b3e6ef08-706a-42e3-8963-5b76039837c6",
+      "origin_record_id": "sim-cost-inbound_receipt-1",
+      "current_source_id": "sim-business:material_cost_report:sim-cost-inbound_receipt-1",
+      "current_source_version": "1",
+      "baseline_unit_cost": "2000",
+      "current_unit_cost": "2100",
+      "unit_cost_change": "100",
+      "currency": "CNY",
+      "quantity_unit": "tonne",
+      "source_matches": true,
+      "task_created_before_confirmation": false,
+      "body": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "transport": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "b25fcbd6-6082-4f41-9db3-1ce123e5c468",
+          "action": "boss.mvp.query",
+          "client_request_id": "mvp-query-90ea1644-ae16-4d36-80bf-d36f01509c0b"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "b25fcbd6-6082-4f41-9db3-1ce123e5c468",
+          "action": "boss.mvp.query",
+          "client_request_id": "mvp-query-90ea1644-ae16-4d36-80bf-d36f01509c0b",
+          "response_sha256": "8b67f6438fcde4c6fb7320829a591f931cfd24558ab0874b9a52805ac187fb0e"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "ea0b5157-8e2f-4af8-9296-e440102e763a",
+          "action": "boss.fc01.coordinate",
+          "client_request_id": "mvp-coordinate-446d373e-be20-4e37-81a7-26449be3ee6c"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "ea0b5157-8e2f-4af8-9296-e440102e763a",
+          "action": "boss.fc01.coordinate",
+          "client_request_id": "mvp-coordinate-446d373e-be20-4e37-81a7-26449be3ee6c",
+          "response_sha256": "48b39a96563494877e09867c193b96673325a61ff00624dddfe8b5375088cd8a"
+        }
+      ]
+    },
+    {
+      "check": "same_query_task_and_receipt_after_relogin_and_restart",
+      "query_key": "mvp-query-90ea1644-ae16-4d36-80bf-d36f01509c0b",
+      "task_id": "b3e6ef08-706a-42e3-8963-5b76039837c6",
+      "coordinate_key": "mvp-coordinate-446d373e-be20-4e37-81a7-26449be3ee6c",
+      "reopened_identical": true,
+      "source_restored": true,
+      "renderer_errors": []
+    }
+  ]
+}

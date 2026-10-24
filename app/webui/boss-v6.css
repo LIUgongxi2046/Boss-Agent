@@ -982,3 +982,10 @@
 .boss-morning-view blockquote { margin-inline: 0; padding: 16px; border-left: 3px solid var(--boss-accent, #14b8a6); white-space: pre-wrap; }
 @media (max-width: 1100px) { .boss-morning-view .boss-columns { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) { .boss-morning-fields { grid-template-columns: minmax(0, 1fr); } }
+.boss-mvp-view fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 16px; }
+.boss-mvp-view label { display: flex; flex-direction: column; gap: 8px; }
+.boss-v6 .boss-mvp-view .boss-mvp-confirm { min-height: 44px; flex-direction: row; align-items: center; gap: 8px; }
+.boss-v6 .boss-mvp-view input[type="checkbox"] { width: 20px; height: 20px; min-height: 20px; flex: 0 0 20px; }
+.boss-v6 .boss-mvp-view .boss-table { font-size: 16px; line-height: 24px; }
+.boss-mvp-view .boss-column ul { padding-left: 16px; }
+.boss-mvp-view .boss-column li { margin-block: 8px; }

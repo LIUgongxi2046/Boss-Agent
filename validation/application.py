@@ -41,6 +41,7 @@ from boss_page_api import BossPageAPI
 from product_read_tools import product_read_tools
 from product_skills import ProductSkills
 from product_fc01 import ProductFc01
+from product_mvp import ProductMVP
 from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
 from product_morning import ProductMorning
 from fc03_agent.formal import FormalMorningTool, FORMAL_TOOLS
@@ -109,6 +110,9 @@ async def serve():
     connection = settings()
     roles, config_path = prepare()
     product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
+    if os.environ.get("BOSS_EXECUTION_SCOPE") not in (None, "BOSS-MVP-1"):
+        raise ValueError("当前执行范围配置无效")
+    mvp_mode = product_mode and os.environ.get("BOSS_EXECUTION_SCOPE") == "BOSS-MVP-1"
     account_store = AccountStore(WORK / "accounts/accounts.sqlite") if product_mode else None
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
@@ -127,7 +131,7 @@ async def serve():
     output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
     if product_mode:
         output.chmod(0o700)
-    fc01 = ProductFc01(store) if product_mode else None
+    fc01 = (ProductMVP(store) if mvp_mode else ProductFc01(store)) if product_mode else None
     bi = ProductBI(store) if product_mode else None
     morning = ProductMorning(store) if product_mode else None
     provider = FeatureProvider(fc01, bi, morning) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
@@ -215,6 +219,7 @@ async def serve():
         channels.channels["websocket"].fc01 = fc01
         channels.channels["websocket"].bi = bi
         channels.channels["websocket"].morning = morning
+        channels.channels["websocket"].mvp = fc01 if mvp_mode else None
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()

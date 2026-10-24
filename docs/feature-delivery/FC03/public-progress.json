@@ -4,7 +4,7 @@
   "status": "IN_PROGRESS",
   "stage": "COMPLETE_CANDIDATE_READY_FOR_INDEPENDENT_ACCEPTANCE",
   "complete_feature_candidate": true,
-  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/candidate_commit",
+  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/historical_fc03_candidate/candidate_commit",
   "implementation_commit": "9bc99903988baafc1f61bedd1be88133fcde5cc6",
   "task_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/FC03晨间事项工单.md",
   "development_record": "docs/feature-delivery/FC03/integration.md",

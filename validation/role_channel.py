@@ -1,9 +1,10 @@
 import asyncio
 import hmac
 import json
+import os
 import time
 import uuid
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from nanobot.channels.websocket.runtime import WebSocketChannel
 from nanobot.webui.http_utils import bearer_token
@@ -29,6 +30,7 @@ class RoleChannel(WebSocketChannel):
         self.fc01 = None
         self.bi = None
         self.morning = None
+        self.mvp = None
         self.bi_responses = set()
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
@@ -40,6 +42,15 @@ class RoleChannel(WebSocketChannel):
 
     async def _dispatch_http(self, connection, request):
         address = urlsplit(request.path)
+        if address.path.startswith("/boss-brand/"):
+            asset_path = unquote(address.path, errors="strict")
+            frontend = self.gateway.http.static_dist_path
+            if frontend is None:
+                return connection.respond(503, "当前界面资源尚未就绪")
+            asset = (frontend / asset_path.lstrip("/")).resolve()
+            if not asset.is_relative_to(frontend / "boss-brand") or not asset.is_file():
+                return connection.respond(404, "界面资源不存在")
+            return self.gateway.http._serve_static(asset_path, accept_encoding=request.headers.get("Accept-Encoding", ""))
         if address.path == "/webui/bootstrap":
             supplied = bearer_token(request.headers) or request.headers.get("X-Nanobot-Auth", "")
             role = next((role for role, secret in self.secrets.items() if hmac.compare_digest(supplied, secret)), None)
@@ -82,8 +93,18 @@ class RoleChannel(WebSocketChannel):
                     self.record(role, address.path, 403)
                     return connection.respond(403, "身份权限不足")
                 self.record(role, address.path, 200)
-                return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None}))
+                return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE")}))
             if address.path.startswith("/api/boss/ui/"):
+                if address.path.startswith("/api/boss/ui/mvp/"):
+                    try:
+                        if self.mvp is None:
+                            raise web.HTTPServiceUnavailable(text="当前采购体验尚未启用")
+                        body = self.mvp.serve(role, address.path, address.query)
+                        status = 200
+                    except web.HTTPException as failure:
+                        status, body = failure.status, {"error": failure.text}
+                    self.record(role, address.path, status)
+                    return connection.respond(status, json.dumps(body, ensure_ascii=False))
                 if address.path in {"/api/boss/ui/morning/request", "/api/boss/ui/morning/history"}:
                     try:
                         if self.morning is None:
@@ -130,6 +151,11 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action in {"boss.mvp.query", "boss.mvp.cancel"}:
+            task = asyncio.create_task(self._mvp_response(connection, role, envelope))
+            self.bi_responses.add(task)
+            task.add_done_callback(self.bi_responses.discard)
+            return
         if kind == "webui_request" and action in {"boss.morning.query", "boss.morning.cancel"}:
             task = asyncio.create_task(self._morning_response(connection, role, envelope))
             self.bi_responses.add(task)
@@ -245,6 +271,31 @@ class RoleChannel(WebSocketChannel):
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
         await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
+
+    async def _mvp_response(self, connection, role, envelope):
+        request_id, action = envelope.get("request_id"), envelope["action"]
+        if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+            raise ValueError("采购请求缺少有效编号")
+        def active():
+            return self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+        try:
+            if self.mvp is None:
+                raise web.HTTPServiceUnavailable(text="当前采购体验尚未启用")
+            payload = envelope.get("payload")
+            if action == "boss.mvp.cancel":
+                if not isinstance(payload, dict) or set(payload) != {"client_request_id"}:
+                    raise web.HTTPBadRequest(text="取消请求字段无效")
+                result = self.mvp.cancel_query(role, payload["client_request_id"], active)
+            else:
+                result = await self.mvp.query(role, payload, active)
+            status, response = 200, {"result": result}
+        except asyncio.CancelledError:
+            status, response = 409, {"error": {"status": 409, "message": "当前查询已取消，请读取原编号确认结果"}}
+        except web.HTTPException as failure:
+            status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
+        self.record(role, action, status)
+        if connection.close_code is None:
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": status == 200, **response}, ensure_ascii=False))
 
     async def _morning_response(self, connection, role, envelope):
         request_id, action = envelope.get("request_id"), envelope["action"]
