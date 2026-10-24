@@ -8,7 +8,7 @@
     "gateway": 20831
   },
   "proxy_port": 10833,
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
@@ -34,7 +34,7 @@
       "check": "unknown_send_refresh_return_restores_original_message_run_scroll_and_focus",
       "chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
       "run_id": "run-e6dc3f09-9232-43cb-94b9-f62e4fc9cbbd",
-      "client_request_id": "boss-4b016460-a6ed-4525-95c8-5f713bc51710",
+      "client_request_id": "boss-704a0a01-6e8e-4ac7-986d-be0a678fafbb",
       "reading": {
         "conversationKey": "websocket:3962fd9f-4a9e-4a52-ae34-9876f937619e",
         "promptId": "u-8d12576b17c0ffcc",
@@ -57,7 +57,7 @@
     {
       "check": "actual_older_history_response_does_not_replace_explicit_new_conversation_or_input",
       "original_chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
-      "actual_response_bytes": 7279,
+      "actual_response_bytes": 7280,
       "request_terminals": [
         "requestfailed"
       ],

@@ -1,13 +1,13 @@
 {
   "status": "PASS",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-7d6851e3-ddab-4e53-81c5-f91bef2cff62",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-b9ac7143-60ec-41cb-acc2-c6374118ffec",
   "ports": {
     "business": 10731,
     "webui": 10732,
     "gateway": 20731
   },
   "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
@@ -15,13 +15,13 @@
   "records": [
     {
       "check": "actual_runtime_artifact_read_dialog_and_keyboard_return",
-      "chat_id": "d907c480-8180-4257-8d83-dca3c2ac74ab",
-      "list_id": "morning-5a1f24db-e566-4e1d-aad3-d0eb3493683d",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
+      "list_id": "morning-b9717a81-4bf0-40db-ab6d-8e643861643e",
       "focus_restored": true
     },
     {
       "check": "actual_arriving_native_response_preserves_history_reading_position",
-      "chat_id": "d907c480-8180-4257-8d83-dca3c2ac74ab",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
       "before": {
         "scroll_top": 0,
         "client_height": 181,
@@ -36,7 +36,7 @@
     },
     {
       "check": "actual_delayed_native_output_memory_only_queue_and_explicit_discard",
-      "chat_id": "d907c480-8180-4257-8d83-dca3c2ac74ab",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
       "queue_in_browser_storage": false,
       "queued_message_sent": false,
       "discarded_queue_restored": false

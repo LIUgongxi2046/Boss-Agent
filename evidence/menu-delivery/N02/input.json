@@ -1,13 +1,13 @@
 {
   "status": "PASS",
   "scope": "N02_ACTUAL_INPUT_AND_FILE_SELECTION",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-7ac94522-daf3-4fce-9230-847ebe7a2313",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-b03948fa-032f-4270-893b-3a29197e7fcf",
   "ports": {
     "business": 10781,
     "webui": 10782,
     "gateway": 20781
   },
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "external_api_mode": "SIMULATED_FIRST",
@@ -30,8 +30,8 @@
     {
       "check": "actual_source_export_exceeds_advertised_file_limit_without_padding",
       "source_file_count": 710,
-      "actual_bytes": 8557037,
-      "sha256": "4c8708b5b2ccbd853fe1e30b97fd4c1efac0678ba60e579699784df0f5961d6c",
+      "actual_bytes": 8558163,
+      "sha256": "607cefdc6b6b906892d022c4080e6f072898821f0cd049f32a606ad78db86364",
       "max_file_bytes": 6291456,
       "input_retained": true,
       "submission_count": 0
@@ -47,7 +47,7 @@
     {
       "check": "actual_source_export_excerpt_at_advertised_file_limit_is_read_and_submittable",
       "actual_bytes": 6291456,
-      "sha256": "909f7c142b12f3b239501e0d753cac4803a8d6a31187dc50b627d805862bc0c6",
+      "sha256": "9781c6add98f0ee02c1335419b78147e47a4cc6817fb3e5c76f0bc93f927b59c",
       "max_file_bytes": 6291456,
       "submission_count": 0,
       "uploaded_to_server": false

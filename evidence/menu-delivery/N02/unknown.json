@@ -1,32 +1,32 @@
 {
   "status": "PASS",
   "scope": "N02_SHARED_MESSAGE_SAVED_RESPONSE_INTERRUPTION",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-unknown-197f826a-8592-4995-ab3d-aab6a1542ab8",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-unknown-1af42abe-528a-42b0-8f48-c5f0203df5a5",
   "ports": {
     "business": 10771,
     "webui": 10772,
     "gateway": 20771
   },
   "proxy_port": 10773,
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
     {
       "check": "actual_saved_draft_response_interrupted_original_receipt_only",
-      "draft_id": "draft-b534d429-4a77-4486-b2a3-697367c79e94",
-      "client_request_id": "boss-c7b2f35e-5816-44e5-8781-9b18b1d387a3",
-      "transaction_response_sha256": "bec6dca3e2d20f003b50657d55d1bf147d0ca7e4ded754ec9191f009f3bd3817",
+      "draft_id": "draft-615cae80-ab12-48a6-b507-495ac373569d",
+      "client_request_id": "boss-016024a4-4a16-4500-aac6-745218e3a163",
+      "transaction_response_sha256": "95115eb55e3d4e78daaed3f2294f1a4419eb4bd974995274d84bc30dd5d3f5e9",
       "submission_count": 1,
       "lookup_replayed": false
     },
     {
       "check": "actual_sent_response_interrupted_reload_preserves_original_readonly_request",
-      "draft_id": "draft-b534d429-4a77-4486-b2a3-697367c79e94",
-      "message_id": "sim-msg-462e9311-85ca-4dcf-b311-bbd943364211",
-      "client_request_id": "boss-fc204886-a2f5-4469-8c11-30ebcd7017a3",
-      "transaction_response_sha256": "4144902de67882d3a40e8d1c052b84666d236c56b2754318e07a6cf9af16c895",
+      "draft_id": "draft-615cae80-ab12-48a6-b507-495ac373569d",
+      "message_id": "sim-msg-c2a80d94-90b3-46fe-a7ea-5d6e7d6ecb44",
+      "client_request_id": "boss-f7600415-e7ac-470d-98cb-bd5162c5a86b",
+      "transaction_response_sha256": "e0da3347eae122e37f7b4055a6967bc04b36e516992ea9f9aab20da8b0f90821",
       "submission_count": 1,
       "send_state": "SENT_SIMULATED",
       "delivery_state": "NOT_VERIFIED",

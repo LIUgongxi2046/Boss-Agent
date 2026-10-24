@@ -33,6 +33,21 @@ def main():
     if state["active_feature_id"] != "MENU-N02" or state["total_checkpoints"] != 26:
         raise ValueError("当前正式范围必须为MENU-N02完整26项")
     manifest = digest(DIST / "asset-manifest.json")
+    delivery_path = ROOT / "docs/menu-delivery/N02/delivery.json"
+    delivery = json.loads(delivery_path.read_text())
+    expected_ids = {f"MENU-N02.C{index:02}" for index in range(1, 27)}
+    checkpoints = delivery["checkpoint_development_evidence"]
+    if set(checkpoints) != expected_ids or any(row["status"] != "COVERED" for row in checkpoints.values()):
+        raise ValueError("完整26项开发证据没有逐项登记")
+    if delivery["status"] != "DEVELOPED_PENDING_USER_ACCEPTANCE" or delivery["development_covered_checkpoints"] != 26 or delivery["user_verified_checkpoints"] is not None:
+        raise ValueError("开发覆盖与用户验收状态不符")
+    if delivery["manifest_sha256"] != manifest or delivery["index_sha256"] != digest(DIST / "index.html"):
+        raise ValueError("完整交付记录没有绑定当前准确制品")
+    for row in checkpoints.values():
+        if not row["evidence"] or any(not (EVIDENCE / name).is_file() for name in row["evidence"]):
+            raise ValueError("必要开发证据缺少实际文件")
+    if {row["id"] for row in state["checkpoints"]} != expected_ids or any(row["development_status"] != "COVERED" or row["status"] != "PENDING_USER_ACCEPTANCE" for row in state["checkpoints"]):
+        raise ValueError("正式26项与交付记录的状态不一致")
     directory = args.configuration_directory.resolve()
     if not directory.is_relative_to(ROOT / "validation/.work") or not directory.name.startswith("menu-n02-"):
         raise ValueError("配置必须来自独立N02检查目录")
@@ -87,6 +102,7 @@ def main():
     public_configuration = {field: configuration[field] for field in ("config_id", "version", "provider", "model_id", "api_type", "max_tool_rounds", "max_output_tokens", "timeout", "tool_scope", "workspace_read_mode", "workspace_projections", "enabled")}
     result = {"scope": "MENU-N02_FULL_26_CANDIDATE", "implementation_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "formal_state": {"path": str(args.formal_state.resolve()), "sha256": digest(args.formal_state), "active_feature_id": "MENU-N02", "total_checkpoints": 26},
+        "delivery_record": {"path": str(delivery_path), "sha256": digest(delivery_path), "development_covered_checkpoints": 26, "user_verified_checkpoints": None},
         "sources": {str(path.relative_to(ROOT)): digest(path) for path in sorted(sources)},
         "installed_nanobot_directory": str(installed), "installed_nanobot_versions": {name: importlib.metadata.version(name) for name in distributions},
         "installed_nanobot_sources": {str(path.relative_to(installed)): digest(path) for path in sorted(installed.rglob("*.py"))},

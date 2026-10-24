@@ -1,20 +1,20 @@
 {
   "status": "PASS",
   "scope": "N02_BOUND_TASK_AND_SHARED_F08_D06_DOM",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-shared-layout-cbc6efb9-4691-4673-93ff-232e14b82e0c",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-shared-layout-29a044b4-79d4-4918-96f5-d66ee9219677",
   "ports": {
     "business": 10821,
     "webui": 10822,
     "gateway": 20821
   },
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
   "records": [
     {
       "check": "actual_bound_task_six_viewports",
-      "task_id": "d77db774-23e1-439d-8bd2-5d385699a1bb",
+      "task_id": "e89ed370-2f42-403e-ae81-bf58e09b15aa",
       "task_version": "1",
       "measurements": [
         {
@@ -648,7 +648,7 @@
               "outlineWidth": "3px",
               "outlineColor": "rgb(23, 91, 165)",
               "outlineOffset": "0px",
-              "boxShadow": "rgba(18, 107, 203, 0.06) 0px 1.61606px 5.38686px 0px",
+              "boxShadow": "rgba(18, 107, 203, 0.055) 0px 1.54363px 5.14545px 0px",
               "innerWidth": 1280,
               "innerHeight": 800
             }
@@ -1015,7 +1015,7 @@
               "lineHeight": "24px",
               "outlineStyle": "solid",
               "outlineWidth": "2px",
-              "outlineColor": "rgb(14, 97, 211)",
+              "outlineColor": "rgb(12, 98, 220)",
               "outlineOffset": "2px",
               "boxShadow": "none",
               "innerWidth": 1280,
@@ -1075,8 +1075,8 @@
               "lineHeight": "24px",
               "outlineStyle": "solid",
               "outlineWidth": "2px",
-              "outlineColor": "rgb(12, 98, 220)",
-              "outlineOffset": "2px",
+              "outlineColor": "rgb(10, 100, 232)",
+              "outlineOffset": "2.5px",
               "boxShadow": "none",
               "innerWidth": 640,
               "innerHeight": 400
@@ -1194,9 +1194,9 @@
               "fontSize": "16px",
               "lineHeight": "24px",
               "outlineStyle": "solid",
-              "outlineWidth": "2px",
-              "outlineColor": "rgb(16, 96, 200)",
-              "outlineOffset": "1.5px",
+              "outlineWidth": "2.5px",
+              "outlineColor": "rgb(19, 94, 186)",
+              "outlineOffset": "0.5px",
               "boxShadow": "none",
               "innerWidth": 512,
               "innerHeight": 384
@@ -1224,7 +1224,7 @@
             "label": "返回继续编辑",
             "outlineStyle": "solid",
             "outlineWidth": "2px",
-            "outlineColor": "rgb(11, 100, 229)",
+            "outlineColor": "rgb(11, 99, 225)",
             "outlineOffset": "2.5px",
             "boxShadow": "none"
           }

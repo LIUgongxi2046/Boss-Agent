@@ -1,12 +1,12 @@
 {
   "status": "PASS",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-078ad8ba-f8ea-48ab-90b9-4aa74ee75067",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-d4b10e8a-4dda-42ee-8039-6522ffdf3e47",
   "ports": {
     "business": 10761,
     "webui": 10762,
     "gateway": 20761
   },
-  "manifest_sha256": "bb4b5b4e0de0874d0e4552ca126702d27b8885b0be026c73a5c95ed4361aecd1",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
   "scope": "N02_PUBLIC_NATIVE_CONVERSATION",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
@@ -14,21 +14,21 @@
   "records": [
     {
       "check": "actual_public_native_three_turns_input_dependent_parameters_single_runtime",
-      "chat_id": "b1dfb746-d1b0-43b2-88f9-27a827c4fe81",
-      "session_id": "websocket:b1dfb746-d1b0-43b2-88f9-27a827c4fe81",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
+      "session_id": "websocket:7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
       "runs": [
         {
-          "run_id": "run-e7447c83-767a-4f82-93e8-ad92a0386959",
+          "run_id": "run-8a92e482-4d82-4b4e-b14d-ef595d24c8cc",
           "source_id": "finance-note",
           "version": "1"
         },
         {
-          "run_id": "run-7e3923e3-7331-49eb-b097-0879f7ffb142",
+          "run_id": "run-d0865dd9-3821-4141-ba16-e27619fb5119",
           "source_id": "meeting-minutes",
           "version": "1"
         },
         {
-          "run_id": "run-43d5dfcd-4566-44f1-9bde-5a1b30a11830",
+          "run_id": "run-b4895dda-e1e3-472e-8771-fdf4de9daaab",
           "source_id": "meeting-minutes",
           "version": "1"
         }
@@ -36,24 +36,24 @@
     },
     {
       "check": "public_original_turn_deduplication_unknown_lookup_and_actual_document_upload",
-      "original_request_id": "conversation-320ecc33462b64117187c3a57d4a949a95c1eb4dc3ca06581df8b4322b379f89",
+      "original_request_id": "conversation-bce183145bb08cd0a9d0d39daf86941dad01e88e453be96c23f203e526c3faed",
       "duplicate_replayed": false,
       "unknown_write": false,
-      "file_run_id": "run-e47c33bf-3d2c-456b-9b91-7350ff55fa4c",
-      "attachment_id": "attachment-b6530aac0934d863acaf7fc396388f3e1fa0b1aef55c89447e55eba296011bdc",
+      "file_run_id": "run-4ddf00bf-6eb4-4cdf-a84d-fdec25c01959",
+      "attachment_id": "attachment-c13a7e0b69c3d1a9157e042497ec04af2b9b863ec2ec6295c5346e02086d2b5b",
       "content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
-      "waiting_run_id": "run-2f5cea82-3b71-456f-adb1-c60c5e4a2f33",
-      "continued_run_id": "run-22a32a09-62a4-45f8-8185-aaec8ddc3ce9"
+      "waiting_run_id": "run-642ec698-d89e-4b89-ada0-bb09c27d5e94",
+      "continued_run_id": "run-b319973c-baa6-4e07-ab5e-68146d7b60a8"
     },
     {
       "check": "public_attachment_only_required_inputs_actual_query_scope_and_followup",
-      "attachment_only_run_id": "run-549c3670-9b78-4961-b8e4-3c999529890c",
-      "missing_conditions_run_id": "run-5984cd16-21be-4fe7-bf81-c5a171ac95cc",
-      "query_id": "de602814-bbe0-458d-a9bc-8611ede19613",
-      "followup_query_id": "7332b4af-cd85-45cf-96ce-c81cda318dab",
-      "parent_query_id": "de602814-bbe0-458d-a9bc-8611ede19613",
+      "attachment_only_run_id": "run-f9b19d63-49bc-405b-9d9c-1e8109a18d96",
+      "missing_conditions_run_id": "run-5f8e5341-9095-4bbb-afe3-27fcb72aec1c",
+      "query_id": "9d4d5069-5b57-430f-978f-31250d64c15d",
+      "followup_query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
+      "parent_query_id": "9d4d5069-5b57-430f-978f-31250d64c15d",
       "first_parameters_sha256": "4e36eeeddcdaa9b48641c1c73cec7bf93c37f12e8f433665a68c686dc55b024c",
-      "followup_parameters_sha256": "9e0051d4e5921229b79ea1e7521763e6a74a3e21ba517ddb252e9e040a74c76b",
+      "followup_parameters_sha256": "00f3074dfabeccb5af8d98193e46e74ef1ef9af441cdb168f05560063acaa730",
       "current_reference": {
         "id": "finance-note",
         "recorded_version": "1",
@@ -64,21 +64,21 @@
     },
     {
       "check": "current_reference_metadata_query_full_values_and_dialog_focus_return",
-      "query_id": "7332b4af-cd85-45cf-96ce-c81cda318dab",
+      "query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
       "value_count": 3,
       "focus_restored": true
     },
     {
       "check": "actual_native_history_selection_and_ordinary_storage_privacy",
-      "chat_id": "b1dfb746-d1b0-43b2-88f9-27a827c4fe81",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
       "history_question_preserved": true,
       "private_input_in_ordinary_storage": false
     },
     {
       "check": "shared_message_draft_current_owner_send_reply_and_original_conversation_return",
-      "draft_id": "draft-881c48d6-16db-4506-b400-f7103f2b743d",
-      "message_id": "sim-msg-e27adba5-65f2-499f-80b0-455a5ce81444",
-      "reply_to": "sim-msg-e27adba5-65f2-499f-80b0-455a5ce81444",
+      "draft_id": "draft-72e19abc-afa4-4790-be57-e807578fce88",
+      "message_id": "sim-msg-86dbb4cb-c66b-4e2a-a633-57326623a8dc",
+      "reply_to": "sim-msg-86dbb4cb-c66b-4e2a-a633-57326623a8dc",
       "delivery_state": "NOT_VERIFIED",
       "reply_state": "RECEIVED_SIMULATED",
       "send_count": 1,
@@ -86,11 +86,11 @@
       "return_focus_restored": true,
       "return_selection_restored": true,
       "return_scroll_restored": true,
-      "message_runtime_run_id": "run-cd1744c5-700a-48da-b84f-27103f55befd"
+      "message_runtime_run_id": "run-8f21dd32-a334-4ab3-a8c7-1f2d40aaf65d"
     },
     {
       "check": "actual_query_artifact_source_original_and_conversation_return",
-      "query_id": "7332b4af-cd85-45cf-96ce-c81cda318dab",
+      "query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
       "source_id": "finance-note",
       "return_focus_restored": true,
       "return_selection_restored": true,
@@ -98,10 +98,10 @@
     },
     {
       "check": "shared_assignment_missing_conditions_cancel_owner_create_and_native_binding",
-      "task_id": "b4a50d78-1c5d-4a6c-96da-880ae772c1a2",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
       "version": "1",
       "task_status": "OPEN",
-      "task_runtime_run_id": "run-e554daf4-8000-4695-8c05-aa1f357ab18c",
+      "task_runtime_run_id": "run-2f87ae97-5f1b-43ac-8cde-525134e380a0",
       "prepare_and_cancel_created_task": false,
       "creation_sent_message": false,
       "run_finished_task": false,
@@ -109,7 +109,7 @@
     },
     {
       "check": "actual_task_tool_reference_artifact_details_and_conversation_return",
-      "task_id": "b4a50d78-1c5d-4a6c-96da-880ae772c1a2",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
       "recorded_version": "1",
       "current_version": "1",
       "return_focus_restored": true,
@@ -118,14 +118,14 @@
     },
     {
       "check": "actual_public_task_preparation_saved_native_session_binding_and_readonly_receipt",
-      "client_request_id": "75ac1412-ccee-4996-a7fd-456ff7986183",
-      "preparation_id": "task-entry-c0531a5b787d904b9628d7e45c9a91c1edca976230e76a181f65e1ef7e25609c",
-      "chat_id": "33784af4-88fd-435f-b19a-4c3ebe923cb6",
-      "task_id": "b4a50d78-1c5d-4a6c-96da-880ae772c1a2",
+      "client_request_id": "59591059-50d8-474c-b783-cf6ced7fe5bb",
+      "preparation_id": "task-entry-6484e71fb8fe2f839c08612c48682284f4a247ff48cdb02323ca2cf0e74d8b06",
+      "chat_id": "d540384a-bf59-4da3-90d4-fef832a643cc",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
       "task_version": "1",
       "return_reference": {
         "page_id": "F06",
-        "task_id": "b4a50d78-1c5d-4a6c-96da-880ae772c1a2",
+        "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
         "task_version": "1"
       },
       "metadata_only": true,
@@ -137,7 +137,7 @@
     },
     {
       "check": "actual_configuration_preparation_failure_original_request_history_and_permission",
-      "failed_client_request_id": "conversation-d5df49dc2e4aaad2e0637cf0ee0cf03df3154254ec4c29d7d5675e497b09acba",
+      "failed_client_request_id": "conversation-dcba1dd3d8d9bb416cbed35cc10c9392af6b8e3376bafd6c0b9d6c4fffc90ca8",
       "failed_run_id": null,
       "request_count": 15,
       "lookup_replayed": false,
@@ -145,24 +145,24 @@
     },
     {
       "check": "same_database_service_restart_preserves_original_native_history_runtime_and_file",
-      "chat_id": "b1dfb746-d1b0-43b2-88f9-27a827c4fe81",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
       "run_ids": [
-        "run-e7447c83-767a-4f82-93e8-ad92a0386959",
-        "run-7e3923e3-7331-49eb-b097-0879f7ffb142",
-        "run-43d5dfcd-4566-44f1-9bde-5a1b30a11830",
-        "run-e47c33bf-3d2c-456b-9b91-7350ff55fa4c",
-        "run-2f5cea82-3b71-456f-adb1-c60c5e4a2f33",
-        "run-22a32a09-62a4-45f8-8185-aaec8ddc3ce9",
-        "run-549c3670-9b78-4961-b8e4-3c999529890c",
-        "run-1ed02fc6-6bd3-4a33-a7f6-5dc05cee74b4",
-        "run-5984cd16-21be-4fe7-bf81-c5a171ac95cc",
-        "run-842c96f9-c50c-41d2-87ab-101b52276eb4",
-        "run-c223c932-a2e8-44a4-a1d8-f1df4a88952d",
-        "run-cd1744c5-700a-48da-b84f-27103f55befd",
-        "run-e554daf4-8000-4695-8c05-aa1f357ab18c",
-        "run-0b68998a-0c3e-4cf8-bfbd-0209131a0b75"
+        "run-8a92e482-4d82-4b4e-b14d-ef595d24c8cc",
+        "run-d0865dd9-3821-4141-ba16-e27619fb5119",
+        "run-b4895dda-e1e3-472e-8771-fdf4de9daaab",
+        "run-4ddf00bf-6eb4-4cdf-a84d-fdec25c01959",
+        "run-642ec698-d89e-4b89-ada0-bb09c27d5e94",
+        "run-b319973c-baa6-4e07-ab5e-68146d7b60a8",
+        "run-f9b19d63-49bc-405b-9d9c-1e8109a18d96",
+        "run-692ebb0b-09e4-48fc-8e25-06f2f1b43177",
+        "run-5f8e5341-9095-4bbb-afe3-27fcb72aec1c",
+        "run-bff1978b-db50-404d-8651-a82f1c64fe76",
+        "run-44ba2c83-2120-4d56-bc45-a1fadc4fcdbd",
+        "run-8f21dd32-a334-4ab3-a8c7-1f2d40aaf65d",
+        "run-2f87ae97-5f1b-43ac-8cde-525134e380a0",
+        "run-3bf67fc6-e8ec-47fa-9a5e-c0db5c457bca"
       ],
-      "original_request_id": "conversation-320ecc33462b64117187c3a57d4a949a95c1eb4dc3ca06581df8b4322b379f89",
+      "original_request_id": "conversation-bce183145bb08cd0a9d0d39daf86941dad01e88e453be96c23f203e526c3faed",
       "original_request_count": 15,
       "lookup_replayed": false
     },

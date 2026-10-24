@@ -1,24 +1,26 @@
-# MENU-N02 设计差距
+# MENU-N02 设计核查
 
-CURRENT；decision_id=D-UI-FIDELITY-20261024；MENU-N02.C01/C02/C25/C26；责任N3。当前状态依据准确原稿和独立构建的DOM、计算样式、位置尺寸及行为；完整设计通过、视觉及用户验收尚未登记。
+CURRENT；2026-10-25；decision_id=D-UI-FIDELITY-20261024；MENU-N02.C01/C02/C25/C26；责任N3。当前必要结构、样式及交互采用DOM、计算样式、实际位置尺寸及业务操作核查；视觉及用户验收独立待确认。
 
-原设计记录evidence/menu-delivery/N02/reference-dom.json，当前产品记录framework-current.json，manifest=7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5。18组默认区域、18组历史展开、18组提交按钮五种状态：三种规定窗口100%/200%，以及1250、1050、700、690阈值及相邻宽度；记录实际视口、scroll位置、client/offset尺寸及内容状态。真实启用操作、禁用/悬停/键盘焦点/按压、字体、SVG节点/属性、图像、输入祖先及滚动祖先均记录。伪元素仅记录计算样式，不声称具有独立测量边界。历史来自本实例12个实际请求，记录原run_id和实际终态。原稿预览工具和预设状态说明不进入产品，不据不同内容下的正文纵向坐标差判错；screen的min-height:540px与200%动作可达分别核查。
+当前制品manifest=b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4。原设计为reference-dom.json；framework-current.json包含18组默认区域、18组真实历史展开和18组提交按钮五状态，header.json包含18组标题导航及36组导航状态。三种桌面窗口分别为1440×1024、1280×800、1024×768的100%/200%；另含1250、1050、700、690阈值及相邻宽度。共享页面另按1440×1000、1280×800、1024×768及200%检查，两个尺寸集合分别保留。
 
-| 编号 | 原稿依据及数值/结构 | 当前产品数值/结构 | 用户影响与责任文件 | 状态 |
-|---|---|---|---|---|
-| N02-D01 | screen padding clamp(8px,1.2vw,17px)，1440时17；shell x17/宽1406，1px边框、24px圆角及原阴影 | 18组同一视口；外框位置、内距及圆角采用原稿；1440为x17/宽1406 | 外框复核已记录；boss-n02.css；完整样式仍需独立核查 | FRAMEWORK_CHECKED |
-| N02-D02 | sidebar padding23px 13px 18px 14px；宽度>1250为204、≤1250为174、≤1050保持60图标导航 | 18组导航宽度相同，≤690仍保留60；采用原内距和阈值 | 响应框架复核已记录；boss-n02.css；图标与全部状态继续核查 | FRAMEWORK_CHECKED |
-| N02-D03 | 六项主导航及原稿选中标记 | 六项名称、顺序和对应图标已采用；当前N02选中；未交付菜单不可用，现有业务从目录可访问 | BossDesktop.tsx、delivered-navigation.ts、boss-n02.css；完整状态与键盘待复核 | REVIEW_PENDING |
-| N02-D04 | topbar高64、1440 gap18；今日/开始对话/语音/通知快捷操作；真实身份 | 采用64/gap18和原阈值，四项快捷操作已提供；语音暂停，身份来自当前认证 | BossDesktop.tsx、boss-n02.css；操作、窄窗口与密度待完整复核 | REVIEW_PENDING |
-| N02-D05 | hero高146/h1 29px；≤1250为124/25px，≤700标题21px，dapeng-side | 18组hero边界及标题字号与原稿相同；使用dapeng-side | BossDesktop.tsx、boss-n02.css；品牌图像边界及状态仍需测量 | FRAMEWORK_CHECKED |
-| N02-D06 | loaded chat主列+310px右列，≤1250右列260，≤1050单列；上下文、对话执行与进展 | 1440主列825/右列310，间距14；当前上下文、对话执行、右侧进展与可打开来源/附件已采用 | BossConversationWorkspace.tsx、App.tsx、boss-n02.css；全部区域/状态待独立复核 | REVIEW_PENDING |
-| N02-D07 | 关联事项、资料版本、任务对象及返回/新建 | 当前三项采用正式上下文、实际任务工具引用及来源元信息；原/当前版本和支持关系分别呈现 | BossConversationWorkspace.tsx、Conversation Schema1.2；实际task_id/version及TOOL_RESULT公开检查通过 | REVIEW_PENDING |
-| N02-D08 | HTML/source_summary的历史区域参考213；loaded chat的上下文和对话宽度 | 历史默认收起；18组实际展开记录12项真实会话，>1250宽度213px、≤1250单列；每组真实滚动成功；真实搜索、键盘选择及历史恢复通过 | BossConversationWorkspace.tsx、framework-current.json；完整状态继续复核 | TARGETED_CLOSED |
-| N02-D09 | 可观察步骤、实际产物、来源/交办/原执行结果入口和右侧进展 | 当前真实Runtime步骤/产物及重读采用；实际Dialog关闭及查询来源原文/交办详情返回后，同一会话、运行选择、滚动和触发按钮焦点保持 | BossConversationWorkspace.tsx、public_conversation.py、native.json；完整C07—C23待继续 | RETURN_CHECKED_REVIEW_PENDING |
-| N02-D10 | stage gap11、1440 padding4px 23px 22px 28px | 18组stage间距/内距匹配；正文起点1440为y243，不包含设计预览工具 | boss-n02.css、BossDesktop.tsx、App.tsx；正文内部完整密度待复核 | FRAMEWORK_CHECKED |
-| N02-D11 | Panel h2 17/26/760/#163052、正文16/24、辅助14/22、主操作84×44/14、背景#0969E8、焦点offset2；输入最小88/字重600 | 18组输入横向位置/宽度/88px高度与原稿相同；主操作五种状态84×44、字体14/690/24、键盘焦点offset2；真实label本次消息、主操作提交需求、附件入口添加附件；交办消息/步骤采用h2及完整Panel边框/圆角/内距/阴影 | boss-n02.css及原生Composer采用处；运行停止、长内容和全部状态仍需完整复核 | CONTROLS_CHECKED_REVIEW_PENDING |
-| N02-D12 | S00—S10、D06/D07/D08、选择/展开/滚动/历史返回及200% | 实际产物Dialog/Escape/焦点、草稿/附件/排队保护和后续输出保持历史位置通过；窗口关闭/app.quit的D06继续编辑及明确放弃、六组视口的44px目标和键盘焦点通过 | 当前N02组件、native-privacy.json、close.json；其他必要状态及完整26项继续核查 | INTERACTION_PENDING |
+| 编号 | 原稿依据及当前采用 | 实际证据及范围 | 状态 |
+|---|---|---|---|
+| N02-D01 | screen内距clamp(8px,1.2vw,17px)，1440时17；外框x17/宽1406、1px边框、24px圆角与原阴影 | framework-current的18组同一视口、框架边界及内距；没有像素结论 | RECORDED_SCOPE_CHECKED |
+| N02-D02 | 侧栏内距23/13/18/14px；>1250宽204，≤1250宽174，≤1050保留60px图标导航 | 18组宽度及阈值；200%仍保留导航，实际操作目标至少44px | RECORDED_SCOPE_CHECKED |
+| N02-D03 | 原六项主导航的名称、顺序、SVG节点/属性/线宽与当前选中标记；未交付菜单保持不可用 | framework-current记录六项真实导航；header逐项默认样式，并检查选中/未选中导航的悬停、按压和实际键盘焦点 | RECORDED_SCOPE_CHECKED |
+| N02-D04 | topbar高64px、宽屏间距18px及原阈值；四项快捷操作、搜索与真实身份 | 搜索左右内距14px，≤700快捷内距6px；身份文字11/15.4px，≤1250隐藏；header的18组属性比较及实际目标≥44×44 | RECORDED_SCOPE_CHECKED |
+| N02-D05 | hero高146/h1为29px，≤1250为124/25px，≤700标题21px；原品牌与dapeng-side素材 | framework-current保留原图像自然尺寸及实际矩形；品牌文字单独使用Range，17/26.35px、820字重及#172B4D，与原稿对应 | RECORDED_SCOPE_CHECKED |
+| N02-D06 | loaded chat主列加310px右列，≤1250右列260px，≤1050单列；间距14px，列内13px | 当前会话/关联事项→连续对话/可观察执行；右侧进展、来源、附件与异常。18组布局及真实任务/F08共享状态分别核查 | RECORDED_SCOPE_CHECKED |
+| N02-D07 | 关联事项、资料版本、任务对象及返回/新建入口 | Conversation Schema1.3.0、Runtime Schema1.13.0；正式任务prepare/bind/read/receipt、来源摘要和实际SDK消费；morning-entry及task-entry-ui | RECORDED_SCOPE_CHECKED |
+| N02-D08 | 原HTML/source_summary的克制历史区域参考213px，同时保持loaded chat的对话宽度 | 默认收起；18组展开12项本实例真实会话，>1250宽213px，其余单列；实际滚动、搜索、键盘选择及新空会话 | RECORDED_SCOPE_CHECKED |
+| N02-D09 | 可观察执行、当前产物、来源/交办/消息共享路径、原执行核查与最新进展 | native、task-entry-ui、return-position及native-privacy；同会话/原消息/运行、内外滚动和触发按钮焦点恢复，真实分页及迟到响应隔离 | RECORDED_SCOPE_CHECKED |
+| N02-D10 | stage间距11px，1440内距4/23/22/28px，正文起点y243 | framework-current的18组实际边界；设计预览工具、静态身份和预设答案不进入产品，动态正文按实际对象表达 | RECORDED_SCOPE_CHECKED |
+| N02-D11 | h2为17/26px、760、#163052；正文16/24px、辅助14/22px；输入88px/600；提交84×44px、14/690/24px及#0969E8 | 18组默认/启用/悬停/聚焦/按压、实际输入label与附件入口；主操作焦点2px/外距2px，导航采用原规则2px/外距3px | RECORDED_SCOPE_CHECKED |
+| N02-D12 | 适用S00—S10、D06/D07/D08、历史阅读、取消、未知结果及返回 | input、close、native、unknown、task-entry-ui、native-privacy及shared-layout；实际IME、准确边界、文件读取失败、重登、真实关闭、实际业务D06焦点及原编号恢复 | RECORDED_SCOPE_CHECKED |
 
-动态内容采用正式数据，比较继续记录数量、文字长度、选中与展开状态；自然高度变化单独说明。框架尺寸检查不代表正文和全部控件已完成设计复核。当前样式按N02作用范围采用，F01必要设计返修保持独立未完成。
+header比较字体、字号、字重、行高、颜色、背景、圆角、字距及显示规则；其他实际元素同时比较padding/gap，头像比较宽高。品牌文字与父容器分别处理，有限CSS过渡完成后采样。36组导航状态使用真实悬停、按压及Tab/Shift+Tab，没有修改被测样式。小窗口快捷操作最小宽度44px依据当前Token及工单目标要求，字体和内距继续采用原稿。
 
-N4对b3de8ea3788629f977f02f182e74a18ea430dc85和7fd1制品的指定SVG、子Panel、标签/输入/附件/提交操作、五状态、历史展开及详情返回增量已给出APPROVED/TARGETED_CLOSED；记录SHA256为30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca。该范围没有未处理必要缺陷。当前关闭增量构建manifest=0a1c260c9281c97b85a0a8b6e1e1a30cf9f5b1d69066a238be74ed05e3a66d6c，真实IME、输入与文件大小限制、文件读取失败、长文件名/D06、语音暂停/快捷键及真实关闭六组视口见input.json、close.json；搜索及历史阅读位置见各自准确版本framework-current.json、native-privacy.json。完整26项、迟到文件等其他必要路径、任务进入会话的版本绑定及用户验收继续保留。
+N4指定内距及导航状态审查APPROVED，准确实现3ebb31cdcac6f90e39b3b2c0808e5e9f21116c98，qa.md摘要404c7dadd9a778334933a211440c5cc43fafefe9879bbf33d8b8b4753c5ec2e5；G04/G05已关闭，该指定范围没有确定剩余必要缺陷。其他消费者报告与12份当前界面/启动记录由N3核对，没有独立完整26项PASS要求。
+
+framework报告的外框自动比较、原始测量与本记录的组合判断分别保留；MEASURED不转换为视觉评分。全部12份报告采用同一当前制品，完整26项开发证据见delivery.json。未测量的像素和视觉细节不作通过声明。F01必要设计返修保持独立，须在N03之前完成；F01/UI02/MVP原体验保持。

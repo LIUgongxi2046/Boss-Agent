@@ -2,7 +2,7 @@
 
 当前开发交付状态读取原始 specs/feature-delivery.json。视觉及用户验收独立登记。FR-27、F27及FC28保持暂停。
 
-启动入口为 scripts/run_menu_n02.command，源码与运行目录位于 /Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent。该入口使用 menu-n02-n3-dist、validation/.work/menu-n02-experience 及10711/10712/20711；账号、SQLite、原生会话及 Electron 配置保存在本实例目录。后续启动保留已有资料及维护配置。
+启动入口为 scripts/run_menu_n02.command，源码与运行目录位于 /Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent。该入口使用 menu-n02-n3-dist、validation/.work/menu-n02-release-experience 及10711/10712/20711；账号、SQLite、原生会话及 Electron 配置保存在本实例目录。后续启动保留已有资料及维护配置。
 
 全部业务资料及模型结果标记 SIMULATED_FIRST，没有新增真实外部请求。有效配置包含14项已有注册工具；普通会话实际采用七项会话工具，晨间绑定会话实际采用四项晨间工具，采购共享能力继续保留。每次运行固定当时配置版本，准备、绑定及原编号核查均没有业务批准权限。
 
