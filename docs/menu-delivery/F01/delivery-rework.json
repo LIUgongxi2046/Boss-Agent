@@ -4,16 +4,16 @@
   "decision_id": "D-MENU-DELIVERY-20261024",
   "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
   "baseline_id": "boss-menu-f01-coverage-20261024-v1",
-  "status": "CHECKED_PENDING_NECESSARY_DESIGN_REVIEW",
+  "status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
   "implementation_commit": "c72cb2e0d12662f25bdfbfdf0ff8885a9a6ebed4",
   "baseline_candidate": "8e135b8c8b09e0aa3b95ceddb9146868565fa8d7",
   "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/candidate_commit",
   "total_checkpoints": 18,
-  "development_covered_checkpoints": 15,
+  "development_covered_checkpoints": 18,
   "user_verified_checkpoints": null,
   "user_acceptance": "PENDING_USER_ACCEPTANCE",
   "visual": "NOT_RUN",
-  "directed_review": {"status": "PENDING_NECESSARY_CLOSURE", "scope": "F01-D12_DIALOG_LAYOUT", "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md", "independent_product_run": false, "full_menu_independent_pass_required": false},
+  "directed_review": {"status": "CLOSED_IN_SPECIFIED_SCOPE", "scope": "F01-D01_D12_NECESSARY_DESIGN_REVIEW", "final_closure_scope": "F01-D12_DIALOG_LAYOUT", "reviewed_commit": "9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf", "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md", "sha256": "3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9", "remaining_ids": [], "independent_product_run": false, "full_menu_independent_pass_required": false},
   "development_record": "docs/menu-delivery/F01/integration.md",
   "design_record": "docs/menu-delivery/F01/design-rework.md",
   "experience_instructions": "docs/menu-delivery/F01/experience-rework.md",
@@ -30,8 +30,8 @@
   "evidence": {"design": "rework-design.json", "header": "rework-header.json", "dialogs": "rework-dialogs.json", "behavior": "rework-behavior.json", "native": "rework-native.json", "launcher": "rework-launcher.json", "retained_domain": ["combination.xml", "native-adapter.xml"]},
   "business_evidence": "CURRENT_ACTUAL_UI_AND_RETAINED_UNCHANGED_DOMAIN_SDK_DEPENDENCIES",
   "checkpoint_development_evidence": {
-    "MENU-F01.C01": {"status": "CHECKED_PENDING_TARGETED_REVIEW", "evidence": ["rework-design.json", "rework-behavior.json", "rework-launcher.json"]},
-    "MENU-F01.C02": {"status": "CHECKED_PENDING_TARGETED_REVIEW", "evidence": ["rework-design.json", "rework-header.json", "rework-dialogs.json"], "visual": "NOT_RUN"},
+    "MENU-F01.C01": {"status": "COVERED", "evidence": ["rework-design.json", "rework-behavior.json", "rework-launcher.json"]},
+    "MENU-F01.C02": {"status": "COVERED", "evidence": ["rework-design.json", "rework-header.json", "rework-dialogs.json"], "visual": "NOT_RUN"},
     "MENU-F01.C03": {"status": "COVERED", "evidence": ["rework-behavior.json", "combination.xml"], "retained_scope": "strict_date_timezone_source_cutoff_and_DST"},
     "MENU-F01.C04": {"status": "COVERED", "evidence": ["rework-behavior.json", "combination.xml"], "retained_scope": "eight_inputs_scope_unknown_total_and_missing_sources"},
     "MENU-F01.C05": {"status": "COVERED", "evidence": ["rework-behavior.json"]},
@@ -47,8 +47,8 @@
     "MENU-F01.C15": {"status": "COVERED", "evidence": ["rework-behavior.json", "rework-native.json", "native-adapter.xml"], "retained_scope": "actual_runtime_failure_cancellation_timeout_and_source_revocation"},
     "MENU-F01.C16": {"status": "COVERED", "evidence": ["rework-behavior.json", "rework-native.json", "rework-launcher.json", "native-adapter.xml"]},
     "MENU-F01.C17": {"status": "COVERED", "evidence": ["rework-behavior.json", "combination.xml", "native-adapter.xml"], "retained_scope": "CAS_dedup_receipt_readonly_and_no_replay"},
-    "MENU-F01.C18": {"status": "CHECKED_PENDING_TARGETED_REVIEW", "evidence": ["rework-design.json", "rework-header.json", "rework-dialogs.json", "rework-behavior.json", "rework-launcher.json"], "visual": "NOT_RUN"}
+    "MENU-F01.C18": {"status": "COVERED", "evidence": ["rework-design.json", "rework-header.json", "rework-dialogs.json", "rework-behavior.json", "rework-launcher.json"], "visual": "NOT_RUN"}
   },
-  "development_dimensions": {"BUSINESS": "CURRENT_AFFECTED_UI_CHECKS_AND_RETAINED_DEPENDENCY_EVIDENCE", "DESIGN_STRUCTURE_AND_STYLE": "CURRENT_DOM_CHECKS_PASSED_PENDING_NECESSARY_REVIEW", "INTERACTION_AND_STATES": "CURRENT_AFFECTED_CHECKS_PASSED", "RUNNABLE_DELIVERY": "ISOLATED_LAUNCHER_CHECK_PASSED_FINAL_USER_DIRECTORY_PENDING"},
+  "development_dimensions": {"BUSINESS": "CURRENT_AFFECTED_UI_CHECKS_AND_RETAINED_DEPENDENCY_EVIDENCE", "DESIGN_STRUCTURE_AND_STYLE": "APPLICABLE_DOM_CHECKS_PASSED_NECESSARY_REVIEW_CLOSED", "INTERACTION_AND_STATES": "CURRENT_AFFECTED_CHECKS_PASSED", "RUNNABLE_DELIVERY": "ISOLATED_LAUNCHER_CHECK_PASSED_FINAL_USER_DIRECTORY_READY"},
   "limits": {"external_api_mode": "SIMULATED_FIRST", "STT": "PAUSED_BY_USER", "visual": "NOT_RUN", "user_acceptance": "PENDING_USER_ACCEPTANCE", "protected_experiences": ["MENU-F01-original", "MENU-N02", "UI02", "MVP01"]}
 }

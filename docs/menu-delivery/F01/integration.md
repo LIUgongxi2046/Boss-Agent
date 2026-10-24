@@ -1,59 +1,47 @@
 # MENU-F01 今日工作
 
-task_id=MENU-F01-N3；CURRENT；2026-10-25；IN_PROGRESS_DESIGN_REWORK。唯一正式状态来源为原始目录specs/feature-delivery.json。需求来源为D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及docs/menu-delivery/F01.md；稳定检查点MENU-F01.C01—C18，共18项，当前返修开发覆盖分子待核查，用户验收分子null。原候选业务证据按未变依赖保留，C01/C02/C18及受影响交互重新验证，视觉及用户验收保持待确认。
+task_id=MENU-F01-N3；CURRENT；2026-10-25；DEVELOPED_PENDING_USER_ACCEPTANCE。唯一正式状态来源为原始目录specs/feature-delivery.json。完整范围为MENU-F01.C01—C18，开发覆盖18/18；用户验收分子null，视觉NOT_RUN。必要设计事项F01-D01—D12均已在指定范围关闭。
 
-## 输入与检索
+## 需求与设计依据
 
-基准为 UI02 候选 b7fdc76c81ef693da75511d736db60d92550784c。已读取原始菜单计划、当前 PRD 决定、完整 FR-01/BR-01/WF-FR-01/AC-01-S/E、BR-C01—C07 和 E01—E06；采用原始 F01 HTML、页面配置和 v6 Token。检索当前前端规范、UI02/FC03/MVP/FC07/FC04 记录、BossDesktop、BossMorningView、BossToday 与 MorningAPI/公开读取入口。已读取 S008 记录与实施规则，以及适用 S003-2/S005-4、页面状态、Token、设计责任、身份与异步结果规范。
+需求采用D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024、docs/menu-delivery/F01.md、完整FR-01/BR-01/WF-FR-01/AC-01-S/E、BR-C01—C07及E01—E06。设计采用原始v6 F01 HTML、design-v6-panels.js实际加载的home、公共CSS、页面配置及Token。S008实施记录、S003-2设计规范和S005-4状态规则适用于当前实现。
 
-采用混合模式：批准需求和原始 v6 定义目标，当前源码说明实现现状。当前只实施 F01 及其必要共享流程。使用已有 Logo/大鹏与成熟图标，不增加图像资源；原设计结构采用 HTML、DOM、计算样式和位置尺寸核查，禁止主动视觉工具。
+主列采用日期范围、三类Tabs与紧凑事项、自然语言输入；右列采用选中对象、保存与返回。完整来源、会议、冲突、风险、目标及查询记录均有明确展开入口。公共框架保留原六类导航、侧栏尺寸、留白、问候、顶部控件和响应阈值；未交付菜单保持禁用，其他已交付页面由目录访问。原设计预览身份与示例业务值不进入产品。
 
-## 当前设计与依赖
+BossToday的compact呈现保留完整事项集合、统一上移/下移/保存/继续讨论，以及Alt+方向键。分类数量、选择、排序理由、负责人、期限、状态和风险均来自同一正式View。本人确认保存采用既有完整集合CAS接口。来源和会议通过同版本引用读取，Dialog关闭恢复触发焦点。
 
-| 区域与接口 | 当前采用依据及责任 |
+自然语言采用可见“本次需求”标签；没有问题文字时继续讨论聚焦输入。实际问题由本人明确提交，引用由正式服务绑定。D06支持保留编辑和明确放弃；放弃后清除未提交问题并建立独立会话。晨间返回保存安全技术坐标、分类和控件标识；刷新后重新核查当前事项版本，并恢复分类、滚动和继续讨论焦点，不持久保存问题正文。
+
+## 当前候选与适用证据
+
+基准为N02候选8e135b8c8b09e0aa3b95ceddb9146868565fa8d7。当前实施为c72cb2e0d12662f25bdfbfdf0ff8885a9a6ebed4，必要Dialog检查候选为9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf。独立制品menu-f01-rework-n3-dist的manifest为ee1b543a5258a12ad01676eed39e2923e6c55ed6aba4f857d78890016e32296a，index为fe9842f392bf853f217294d83dcad3918d2046afb62dfdbdac33ccee21ccff22。严格TypeScript和Vite构建通过。最终候选指针和完整文件摘要以正式状态及rework-candidate-inventory.json为准。
+
+| 记录 | 适用来源与结果 |
 |---|---|
-| 公共 Shell、会话、身份和菜单 | 继续采用 UI02 的 ClientProvider、原生传输、身份和焦点规则；当前菜单为今日工作，采购协调保留独立关联入口 |
-| 日期、IANA 时区、资料截至及读取时间 | /api/boss/ui/today 与 morning/preview/list 的正式字段；源资料截至与本机读取时间分别呈现 |
-| 自然语言、三类事项与当前列表 | 采用同一 Morning View，显示实际分类、参与原因、负责人、期限、状态及排序理由；不预填经营数值 |
-| 选中详情、会议/承诺、冲突及来源覆盖 | 采用同版本 detail/source 和 View 的关联；选择、筛选、返回、来源变化与异步结果绑定当前对象 |
-| 本人排序 | 采用现有 boss.today.reorder、CAS 与同编号只读回执，鼠标和键盘提供相同操作 |
-| 交办与会议共享路径 | 采用 MorningReference 和既有 F06 独立确认；关联会议限定读取当前正式对象，不提前开放完整后续菜单 |
-| N1 领域/Schema | 已接收生产者 89d26855ba7d1fdb8bbe9ff0795a00562c9f53ab，集成为 24f5c64；八类输入、分类计数、来源截至、有效风险、会议与当前排序状态使用正式 1.1.0 字段 |
-| N2 Agent/Runtime | 已接收选中事项 Runtime 7c4a9e8、原生设计 ec9b77f 与适配器 961b8f68a037d819e4a705e6d6c7ba0d10c7d1da；集成至 c2812c0，公开原生连接、Provider 与生命周期使用当前绑定 |
-| N4 差距矩阵 | 按原设计和完整18项建立独立依据，准确集成后处理必要问题 |
+| rework-dialogs.json | 当前ee1制品PASS；六种窗口/缩放、来源和会议共12组；x、width、实际定位容器、字体、边界、焦点与三种关闭均有实际记录 |
+| rework-launcher.json | 当前ee1制品PASS；两个角色受控填充与手动登录、14工具配置、实际普通会话、D06保留/放弃和独立新会话；既有业务与凭据保持 |
+| rework-design.json | 沿用准确8cab候选原字节；18组默认布局、字段样式、同分类状态、位置尺寸与焦点记录PASS |
+| rework-header.json | 沿用准确8cab候选原字节；18组环境、15组顶部角色及36项导航状态记录PASS |
+| rework-behavior.json | 沿用准确8cab候选原字节；当前正式资料、来源/会议、实际延迟响应、排序、CAS、原编号恢复、独立重开和本人确认交办PASS |
+| rework-native.json | 沿用准确8cab候选原字节；实际连续会话、固定事项引用、刷新返回分类/滚动/讨论焦点及独立会话范围PASS |
+| combination.xml、native-adapter.xml | 保留准确原F01领域与适配器记录，分别21项和24项通过；仅用于当前未变依赖对应的日期、来源、事务、权限、Runtime生命周期等行为 |
 
-布局采用原始F01脚本实际加载的home：日期、三类Tabs与紧凑事项列表、自然语言输入；右侧采用选中对象与保存返回两个区域。完整来源、会议、冲突、风险、目标与查询记录通过明确展开入口读取。正式类型、组件属性和异步状态继续采用既有业务接口，区域与样式测量见design-rework.md。
+四份沿用报告来自8cabf2ca2a7d3ae99500b1a137bc1dc14ea55827，保持原manifest6094fd56d16e1d50a10094a9d7c8c477972b8cf0c772ae5de4989bea2860ebfe及原摘要。Git核查确认app/webui除boss-morning.css外源码未变；该CSS差异仅包含F01遮罩、实际Radix定位容器与Dialog内容三条布局规则。沿用报告不登记为当前制品重新运行。
 
-## 验证与18项依据
+当前Dialog采用原Modal的min(580px,94vw)、24px内距、16px圆角及原字体/阴影；实际定位层采用grid、place-items、20px内距，无背景模糊。1024×768／200%下两种Dialog的x均为20px，与参考相同。全部12组验证Escape、关闭按钮、外部点击及返回焦点。有限动画和焦点过渡按实际状态完成后测量，不修改页面样式。其他逐项依据及测量见design-rework.md。
 
-已提供业务体验的源码实现为 2993eb00cc84b428b0724185db0298c47418f17f，候选为 d0e6326bcca49a2c8372c476c50808d454076127。限定组合 combination.xml 的21项与 native-adapter.xml 的24项通过。behavior.json、native.json、launcher.json 为该准确制品 PASS；manifest 为 e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c，index 为 11a935970330ddfa87e50faeb5f266cd27163f11750945e01797be25d3396b1f。原设计和该候选的六组 DOM/尺寸记录保留为差距核查依据，不能代表当前高保真还原通过。原始结果位于 evidence/menu-delivery/F01，candidate-inventory.json 对应该候选的源码、实际 Nanobot及制品。
+## 领域、Agent与检查点
 
-实际连续检查覆盖同一清单分类/详情/原文、关联会议关闭焦点、真实延迟响应不覆盖新选择、键盘和鼠标调整、排序响应交付中断后只读恢复、并发 CAS 保留编辑、非法 IANA 数量未知、D06 返回焦点和同库独立服务重开。准备没有自动业务写入，本人独立确认后交办保存为 OPEN，引用对应同一清单/事项/来源/会议，没有自动发送；业务变化后原清单显示历史需要重新查询。未知排序原编号只读且未重放。
+N1领域依赖采用已接收的89d26855ba7d1fdb8bbe9ff0795a00562c9f53ab及其集成24f5c64，八类输入、分类、来源截至、风险、会议和排序采用正式字段；N02后续领域依赖按其准确接收版本继续保留。N2当前Runtime1.3.0与Schema1.13及已接收原生连接、会话、工具范围、来源和生命周期继续采用。完整业务与实际安装SDK摘要由候选清单核查；没有新增领域或Agent替代实现。
 
-原生检查包含两轮同会话输入、当前事项工具采用、实际 Runtime 与历史返回、绑定响应交付中断后恢复、输入保留及明确提交。当前配置失败保留原清单，维护不能读取私人绑定。技术日志、URL、普通持久缓存及静态制品没有当前敏感输入或密码。独立启动检查验证 BOSS/MAINTAINER 受控填充与手动认证、单一窗口及既有业务/账号保持。
+C01/C02/C18采用原设计区域、层级、列结构、间距、文案、窗口/缩放和键盘证据；C03—C10采用正式日期、完整来源、分类、合并、排序、关联和当前版本；C11—C14采用实际Runtime、会话交接、独立交办及保存重读；C15—C17采用适用异常状态、权限、CAS、撤销与同编号恢复。具体18项映射保存在delivery-rework.json。N4对准确候选9fd9c6e完成D12限定关闭，D01—D11既有关闭结论保留；qa.md摘要为3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9。N4没有独立运行产品；必要审查不增加独立全菜单PASS门槛。
 
-会话交接使用独立 AbortSignal；实际绑定响应被持有期间点击取消，再释放实际响应后，问题仍保留、没有自动发送、last_request_id 为 null，没有晨间取消请求指向原查询。原生停止响应交给既有 /stop 命令，实际当前轮次为 CANCELED，run_id 可查，没有额外停止查询，原清单保持。分类随挂载组件跨页保持，刷新采用默认全部事项；LLD、体验步骤与当前行为一致。
-
-N4 接续 marker=MENU-F01-REVIEW-e9ee712-20261024，准确源码和制品已发送；发送前复查 idle，返回 threadId=01a16925-dec5-7202-8e3e-9605d9e073fe，turn=01a16ddb-5b51-7360-b675-d47b3dab2963。必要定向核查涵盖完整需求及 G01—G03，运行中不追加消息或调整。当前视觉和用户验收保持待确认。
-
-当前设计复核由 N4依据 D-UI-FIDELITY-20261024执行，只读核查准确候选、原设计及已有 DOM，输出带来源和数值的稳定差距清单。公共框架、正文起点/可用宽度、比例、区域层级、信息密度、尺寸间距及受影响交互均需处理；当前 Shell或开源默认布局不构成接受差距的批准依据。原业务检查按适用版本保留，不重复无变化全量。
-
-已接收 N4当前只读设计审查，结论 REVISE / DESIGN_REWORK_REQUIRED；稳定编号 F01-D01—D12，涵盖已有证据的差距及需要补充测量的事项，不将12项全部当作已测量缺陷。记录位于 N4 docs/menu-delivery/F01/qa.md，SHA256=476f296084c0659e86da1ff724c8256e19cc195e6d81e00611de0dbdea71849f。修复须记录同视口/缩放、scrollTop、实际数据条数/展开状态、client/offset宽度和最终计算样式；原型预览状态、动态资料高度及横向几何分别核查。当前没有设计通过声明。
-
-C01/C02/C18 依据原设计区域、层级、列结构、间距、文案、控件位置、窗口/缩放及键盘；C03—C10 依据正式日期、完整来源、分类、合并、排序、关联与当前版本；C11—C14 依据实际 Runtime、会话交接、独立交办和保存重读；C15—C17 依据适用状态及 E01—E06、权限、CAS、撤销和同编号恢复。领域40项仅作为其准确生产者的证据，公共组合与消费者另有当前结果。视觉和用户验收尚未执行。
+当前UI检查覆盖实际响应交付中断后的原编号只读恢复、并发CAS保留编辑、较早详情/来源响应不覆盖新选择、维护角色不能读取本人绑定、实际取消/超时与来源撤销。独立交办保存为OPEN，发送需要本人操作；未知写入只读查询，没有重放。来源缺少和没有记录分别呈现。
 
 ## 运行与保护
 
-当前用户 UI02 的 ui02-experience、desktop-ui02-experience 与 10411/10412/20411，以及原 MVP 资料与 9961/9962/19961 均保持原状态，不用于验证。新构建与数据采用独立目录和端口，全部外部 SIMULATED_FIRST，不新增真实外部请求；STT/F27/FC28 暂停，账号填充沿用原授权范围。
+入口scripts/run_menu_f01_rework.command采用10621/10622/20621与validation/.work/menu-f01-rework-release-experience。正式用户目录已经初始化READY，配置version2、14项工具及WORKSPACE_PROJECTIONS与当前制品一致；该目录没有用于业务测试。体验步骤见experience-rework.md。
 
-原用户启动入口scripts/run_menu_f01.command、menu-f01-experience/desktop-menu-f01-experience及10611/10612/20611保持保护，准确原制品与步骤见delivery.json、experience.md；该体验不用于验证、退出、重启或热替换。N02候选8e135b8c8b09e0aa3b95ceddb9146868565fa8d7已登记26/26开发覆盖，用户验收待确认；其menu-n02-n3-dist、menu-n02-release-experience及10711/10712/20711同样保护。
+账号填充仅沿用用户明确授权：受控Electron主窗口读取当前应用accounts/credentials.json对应角色的既有账号密码并填入表单；登录由本人操作。凭据不进入日志、URL、静态制品或浏览器持久存储。
 
-当前唯一活动菜单为F01必要设计返修，marker=MENU-F01-DESIGN-REWORK-20261025；基准为集成候选8e135b8。已实施公共框架、原六类导航、合法快捷动作、问候标题、紧凑事项、统一排序操作及右侧分组。晨间返回保存安全的技术坐标、分类和控件标识；刷新后重新读取当前事项版本，恢复继续讨论焦点，不持久保存问题正文。继续讨论在尚未输入问题时聚焦自然语言输入，由本人明确提交。
-
-独立制品为menu-f01-rework-n3-dist；新入口scripts/run_menu_f01_rework.command采用10621/10622/20621和menu-f01-rework-release-experience。实施提交c72cb2e0d12662f25bdfbfdf0ff8885a9a6ebed4；当前严格TypeScript及Vite构建通过。manifest=ee1b543a5258a12ad01676eed39e2923e6c55ed6aba4f857d78890016e32296a，index=fe9842f392bf853f217294d83dcad3918d2046afb62dfdbdac33ccee21ccff22。
-
-当前rework-dialogs.json与rework-launcher.json为准确制品PASS。12组真实来源/会议Dialog与参考Modal逐项比较水平起点、宽度、定位层20px内距、样式及焦点，并验证Escape、关闭按钮、外部点击三种关闭和返回焦点。复用Radix定位容器，采用原Modal的grid、place-items及内距规则。有限动画与焦点过渡按实际状态完成后测量，不修改页面样式。
-
-主列、顶部与Agent相关组件沿用准确候选8cabf2ca2a7d3ae99500b1a137bc1dc14ea55827、manifest6094fd56d16e1d50a10094a9d7c8c477972b8cf0c772ae5de4989bea2860ebfe的rework-design/header/behavior/native四份报告，原始文件和摘要保持。该证据覆盖18组默认布局、字段与相同分类状态、18组顶部逐个控件，以及已记录的实际业务和会话返回。Git核查确认app/webui除boss-morning.css外源码未变；该CSS仅更新F01 Dialog的遮罩、定位容器与内容布局规则。沿用报告保持原manifest，不登记为新制品重新运行。
-
-适用业务证据覆盖完整来源、真实延迟响应、CAS、排序原编号恢复、独立重开和本人交办确认；实际连续会话、固定事项引用、刷新返回原分类/滚动/讨论焦点、新建会话独立范围。当前启动检查覆盖两个角色受控填充与手动登录、14工具配置、快捷动作D06保留与明确放弃、业务和凭据文件保持。全部采用各自专用资料，正式用户目录不用于业务检查。当前必要样式采用88px输入、可见本次需求标签、24px按钮与事项标题行高、5px分类间隔、2px焦点及原Modal尺寸与字体。当前D01—D11已有关闭结论，D12仅待准确位置记录的限定关闭核查；没有独立全菜单产品检查门槛。N1/N2保留正确依赖；N03尚未启动。
+原F01入口及10611/10612/20611、N02及10711/10712/20711、UI02及10411/10412/20411、MVP及9961/9962/19961均受保护。相关前端、用户资料及桌面不用于测试、退出、重启或热替换。全部外部SIMULATED_FIRST；STT/F27/FC28保持暂停。DOM、计算样式和位置尺寸使用隐藏Electron核查，没有使用截图或图像工具。视觉和用户验收继续待确认。
