@@ -211,7 +211,7 @@ MorningConversationRequest 将 question、date/timezone、可选成对 list_id/i
 
 F01在跨页时保持挂载，date/timezone、选择、来源、分类及返回坐标使用安全URL参数morningDate/morningTimezone/morningItem/morningSource/morningCategory/morningScroll/morningFocus；问题正文仅保存在当前进程。返回重新读取当前正式对象，再恢复分类、滚动和可用触发焦点；D06关闭焦点与异步详情完成共同触发恢复。刷新恢复当前对象和已保存分类，没有分类参数时显示全部事项。继续讨论没有文字时聚焦输入，明确提交时才交接会话。F01顶部开始对话使用业务D06，明确放弃后通过morningDiscardVersion重新挂载以清除未提交编辑，并读取原编号与当前正式资料；未知回执仍保持只读核查。排序采用实际CAS，失败保留编辑；已保存历史结果不作为当前完整资料使用。
 
-自然语言字段使用可见本次需求标签作为可访问名称，输入为88px高度、10px 12px内距、16px/24px及字重600；按钮、Tabs与事项标题采用各自原字号和24px行高，说明保持14px/22px。F01顶部采用原布局分布、SVG和逐个控件间距。来源与会议沿用Radix Dialog，按原公共Modal采用min(580px,94vw)、16px圆角、24px内距及viewport减40px高度限制；44px关闭目标、2px蓝色焦点与Escape返回由当前真实Dialog检查核查。
+自然语言字段使用可见本次需求标签作为可访问名称，输入为88px高度、10px 12px内距、16px/24px及字重600；按钮、Tabs与事项标题采用各自原字号和24px行高，说明保持14px/22px。F01顶部采用原布局分布、SVG和逐个控件间距。来源与会议沿用Radix Dialog，按原公共Modal采用min(580px,94vw)、16px圆角、24px内距及viewport减40px高度限制；实际定位容器采用grid、place-items:center和20px内距，遮罩没有背景模糊。44px关闭目标、2px蓝色焦点，以及Escape、关闭按钮、外部点击和返回焦点由当前真实Dialog检查核查。
 
 源码增量保存在 app/webui/nanobot-menu-f01.patch；准备目录的 BossDesktop 与正式源码必须相同。独立制品 menu-f01-n3-dist、启动入口 scripts/run_menu_f01.command、数据目录 validation/.work/menu-f01-experience 使用10611/10612/20611，不操作现有 UI02 或 MVP 体验。初次准备采用获准 SIMULATED 输入及既有业务初始化，后续启动使用同一 SQLite 和 credentials，不重新配置或清空。显式本机模式的受控账号填充仅填写表单，手动登录仍使用正常服务认证。准确来源、实际安装 Nanobot、制品及证据摘要由当前 inventory 登记。
 
