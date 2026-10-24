@@ -9,16 +9,20 @@
 .boss-v6[data-page="N02"] .boss-sidebar-nav{gap:4px}
 .boss-v6[data-page="N02"] .boss-nav-item{position:relative;height:46px;min-height:46px;padding:0 13px;border:0;border-radius:12px;color:#52698b;font-size:14px;font-weight:550}
 .boss-v6[data-page="N02"] .boss-nav-item.active{background:#e5f1ff;color:#0866ea;font-weight:720;box-shadow:none}
+.boss-v6[data-page="N02"] .boss-nav-item:hover:not(:disabled){background:#edf6ff;color:#52698b}
+.boss-v6[data-page="N02"] .boss-nav-item.active:hover:not(:disabled){color:#0866ea}
+.boss-v6[data-page="N02"] .boss-nav-item:focus-visible{outline-offset:3px!important}
 .boss-v6[data-page="N02"] .boss-nav-item.active::before{content:"";position:absolute;left:-14px;width:3px;height:24px;background:#0c6bfa;border-radius:9px}
 .boss-v6[data-page="N02"] .boss-nav-item svg{stroke-width:1.75;color:#6b80a1}
 .boss-v6[data-page="N02"] .boss-nav-item.active svg{color:#0866ea}
 .boss-v6[data-page="N02"] .boss-main,.boss-v6[data-page="N02"] .boss-stage{background:transparent}
 .boss-v6[data-page="N02"] .boss-topbar{height:64px;min-height:64px;gap:18px;padding:8px 22px 8px 28px;background:transparent;border-bottom:0}
-.boss-v6[data-page="N02"] .boss-search{min-height:44px;max-width:450px;width:46%;min-width:300px;background:linear-gradient(100deg,#f3f7fd,#eef6fc);border:0;font-size:11px;color:#95a6bd}
+.boss-v6[data-page="N02"] .boss-search{min-height:44px;max-width:450px;width:46%;min-width:300px;background:linear-gradient(100deg,#f3f7fd,#eef6fc);border:0;padding:0 14px;font-size:11px;color:#95a6bd}
 .boss-v6[data-page="N02"] .boss-user{min-height:44px;padding:0 0 0 14px;border-left:1px solid #e7eef6;border-radius:0;color:#172B4D;font-weight:400;line-height:1.55}
 .boss-v6[data-page="N02"] .boss-user-avatar{width:33px;height:33px;background:linear-gradient(145deg,#d5e9ff,#89baff);color:#075fd5;font-size:14px;font-weight:760;line-height:1.55}
 .boss-v6[data-page="N02"] .boss-user>span:last-child{font-size:11px;font-weight:400;line-height:1.4;color:#172B4D}
 .boss-v6[data-page="N02"] .boss-user small{font-size:10px;font-weight:400;line-height:1.4;color:#8498b1}
+.boss-v6[data-page="N02"] .boss-user:hover{background:transparent}
 .boss-n02-quicknav{display:flex;align-items:center;gap:7px;padding-left:4px;white-space:nowrap}
 .boss-n02-quicknav button{min-width:44px;min-height:44px;border-radius:9px;border:1px solid transparent;background:transparent;color:#365d88;padding:7px 10px;font-size:13px;font-weight:650;display:inline-flex;align-items:center;gap:5px}
 .boss-n02-quicknav button:hover:not(:disabled){background:#ebf4ff}
@@ -132,6 +136,7 @@
  .boss-v6[data-page="N02"] .boss-sidebar{display:flex}
  .boss-v6[data-page="N02"] .boss-topbar{height:64px;min-height:64px;padding:4px 12px;gap:9px}
  .boss-n02-quicknav{padding:0}
+ .boss-n02-quicknav button{padding:6px}
  .boss-n02-quicknav button:nth-child(n+2){display:none}
  .boss-v6[data-page="N02"] .boss-hero h1{font-size:21px}
  .boss-v6[data-page="N02"] .boss-hero-copy p{font-size:12px}
