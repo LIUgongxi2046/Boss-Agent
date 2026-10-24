@@ -17,7 +17,7 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 | 需求/设计 | SATISFIED；当前完整26项工单、原 N02 区域与通用状态，不按原生组件当前功能缩减 |
 | 身份/原生框架 | SATISFIED 输入基础；UI02 当前 ClientProvider、历史、新建/选择/搜索、原生输入/上传/流式/停止及 D06；当前完整采用仍需逐项核查 |
 | 领域/消息/来源/版本 | 已接收5f21382至e5724eb、附件修复6164aac401712f397072fdfac788d04ffd91488a至eb9a4fe及记录4fcf950；ConversationAPI/附件Schema1.1.0和实际上传元信息采用。一般会话来源/对象投影与完整业务共享路径待继续 |
-| Agent/Runtime | 已接收 N2生产者86579a85c278e349d615aa39b57ba26b63729ad5，当前集成77f7647；一般会话可信读取和Runtime模块1.0.0，公开接收/完整规划及业务产物采用 PENDING |
+| Agent/Runtime | 已接收N2生产者b1eb8ed5c4bdf8458591bf541173572298343483至2260000，原生模块1.1.0；当前六项正式读取、原生接收与原编号读取具有公开消费者证据，完整条件规划及共享业务继续核查 |
 | 公开接收/前端 | N3唯一维护实际注册、RoleChannel、App、Shell、组件/样式、独立制品与连续验证；采用准确已有接口，不编造新业务值 |
 | 独立核查 | N4按原 PRD/设计建立26项独立矩阵；准确候选后只核查必要差距和受影响消费者 |
 | 新框架/真实外部/新视觉 | NOT_APPLICABLE；沿用当前技术及设计；SIMULATED_FIRST，FR-27保持暂停 |
@@ -34,9 +34,13 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 
 BossConversationWorkspace采用真实topicSessions、原生新建/选择/搜索、同一ThreadShell和D06；主列保留当前关联事项、资料版本、任务对象及对话/可观察执行，右列呈现实际进展、异常、来源与可展开附件。实际Runtime产物通过当前会话及原运行引用重读，关闭后返回原按钮；请求/身份/会话变化使迟到结果失效。N02为当前实际入口，原NATIVE本人地址保持兼容，维护Settings保持既有入口。F08仅开放本菜单所需的既有共享消息路径，完整消息授权/回复和一般会话采用继续核查。
 
-N2模块提供 ConversationContext/ConversationScope、五项正式只读适配、ConversationSimulatedProvider/ConversationRuntimeRecorder，记录输入/参数摘要与正式引用，不提供模型本人确认。接收后在当前 PRODUCT 运行 `CONVERSATION_DOMAIN_ROOT=当前PRODUCT validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_runtime.py`，12 passed，9.19秒，证据 evidence/menu-delivery/N02/read-runtime.xml。仅证明模块及实际 SDK的当前读取/终态/隐私；通用自然输入规划、原生接收去重、附件/消息/任务/产物关联和完整公开采用仍待准确接口和实际消费者，不登记完整N02通过。
+N2模块提供ConversationContext/ConversationScope、六项正式读取适配、ConversationSimulatedProvider/ConversationRuntimeRecorder及NativeConversationAgent，记录输入/参数摘要与正式引用，不提供模型本人确认。原模块实际SDK读取/终态/隐私证据read-runtime.xml为12 passed、9.19秒。当前公共ProductConversation采用同一AgentLoop、SessionManager、Registry及Runtime；同名读取按当前可信范围适配，非N02请求保留原正式工具。FeatureRecorder在准备阶段使用当前RequestContext，配置必须实际启用六项工具及正式工作投影模式。
 
-公共runtime-records.schema.json已接收准确N02字段至1.10.0：feature_id=N02、conversation_context中输入摘要/允许调用摘要/正式引用、工具结果parameters_sha256；不接收正文或原始参数。当前真实SDK两次来源读取记录通过严格CurrentRuntimeRun验证，12 passed、9.21秒，证据read-runtime-schema.xml。一般原生接收与完整任务路径仍待N2准确模块。
+公共runtime-records.schema.json为1.11.0：接收feature_id=N02、conversation_context中输入摘要/允许调用摘要/正式引用、原请求及媒体摘要、附件编号/摘要/状态和待补充数量；工具结果允许正式draft_id及parameters_sha256。不接收正文或原始参数。原两次实际SDK来源读取严格CurrentRuntimeRun验证为12 passed、9.21秒，read-runtime-schema.xml；扩展字段采用仍按准确公共消费者核查。
+
+RoleChannel在原生router之前核查当前本人、attach、token及期限，优先采用晨间绑定，一般会话通过NativeConversationAgent.admit接收。实际上传成功后内部record_media采用gateway返回路径；同一chat/turn内容重复只返回原回执，同键内容变化拒绝。boss.conversation.request按当前连接的chat_id/turn_id读取，HTTP原编号入口仅按client_request_id读取；均不产生业务变更或自动重放。SDK非Agent命令保留原路径。准备失败仅记录provider名称、时间及错误类别，不记录输入或原异常正文。
+
+check-menu-n02-native.cjs已通过，准确制品manifest=292c5d1ad9217adb3caa18fb7ea49161ac66049aca9054cc01a65b1b336f43d8，证据native.json。独立10761/10762/20761、生成的测试账号和SQLite通过实际WebSocket连续读取finance-note、meeting-minutes及同来源追问，工具参数摘要随实际选择变化，每轮只有一个N02 Runtime；原轮次重复没有额外执行，同键异内容拒绝，未知编号读取没有写入。批准JSON附件实际保存并重读摘要，条件不足产生WAITING_INPUT，后续任务读取正常；实际页面选回同一历史且问题不进入URL或普通存储。关闭本检查自己的服务并用同一资料重新启动后，六个run_id、附件编号和原回执保持，无额外执行。该证据覆盖一般读取与恢复增量，完整经营条件、仅附件执行、消息授权及完整26项仍需相应证据。
 
 N1领域与既有消息消费者在当前PRODUCT共19 passed、10.81秒，原始证据evidence/menu-delivery/N02/received-domain.xml。PublicConversation已接入RoleChannel的四项只读webui_request：boss.conversation.read/artifact/messages/attachments。身份和会话归属由当前认证连接及已订阅chat核查，session_id从原生映射产生，客户端不能提供owner/namespace/session_id。消息历史明确为OWNER_MESSAGE_HISTORY。`check-menu-n02-conversation-read.cjs`通过，结果public-read.json；采用独立10741/10742/20741及实际SDK晨间运行依赖，证明准确运行/产物读取、重复读取不变及维护/未订阅/注入字段/无关产物拒绝。该检查不证明一般会话规划、完整附件处理或完整N02菜单。
 

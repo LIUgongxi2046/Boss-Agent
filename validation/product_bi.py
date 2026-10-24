@@ -35,6 +35,10 @@ def validate_public(kind, payload):
 
 
 class FeatureToolRegistry(ToolRegistry):
+    def __init__(self):
+        super().__init__()
+        self.conversation = None
+
     def _request_scope(self):
         request = current_request_context() or PREPARING_REQUEST.get()
         if request is None or FEATURE_SCOPE not in request.attributes:
@@ -55,10 +59,19 @@ class FeatureToolRegistry(ToolRegistry):
 
     def get(self, name):
         scope = self._request_scope()
-        return None if scope is not None and name not in scope else super().get(name)
+        if scope is not None and name not in scope:
+            return None
+        ordinary = super().get(name)
+        request = current_request_context() or PREPARING_REQUEST.get()
+        if scope is not None and self.conversation is not None and self.conversation.handles(request):
+            return self.conversation.registry_tool(name, ordinary)
+        return ordinary
 
     def get_definitions(self):
         scope = self._request_scope()
+        request = current_request_context() or PREPARING_REQUEST.get()
+        if scope is not None and self.conversation is not None and self.conversation.handles(request):
+            return [self.get(name).to_schema() for name in sorted(self.tool_names)]
         definitions = super().get_definitions()
         return definitions if scope is None else [item for item in definitions if item["function"]["name"] in scope]
 
@@ -292,6 +305,7 @@ class FeatureProvider(LLMProvider):
         self.morning = morning
         self.assignment = assignment
         self.reminders = reminders
+        self.conversation = None
 
     def get_default_model(self):
         return "deepseek-flash"
@@ -302,6 +316,8 @@ class FeatureProvider(LLMProvider):
             return await self.reminders.provider.chat(messages, tools, model, **kwargs)
         if self.assignment is not None and self.assignment.handles(request):
             return await self.assignment.provider.chat(messages, tools, model, **kwargs)
+        if self.conversation is not None and self.conversation.handles(request):
+            return await self.conversation.provider.chat(messages, tools, model, **kwargs)
         provider = self.morning.provider if self.morning is not None and self.morning.handles(request) else self.bi.provider if request is not None and BI_REQUEST in request.attributes else self.fc01.provider
         return await provider.chat(messages, tools, model, **kwargs)
 
@@ -325,12 +341,19 @@ class FeatureRecorder:
         self.assignment = assignment.recorder(registry,snapshot) if assignment is not None else None
         self.reminder_service = reminders
         self.reminders = reminders.recorder(registry,snapshot) if reminders is not None else None
+        self.conversation = None
 
     async def context(self, request):
         if self.reminder_service is not None and self.reminder_service.handles(request):
             return await self.reminders.context(request)
         if self.assignment_service is not None and self.assignment_service.handles(request):
             return await self.assignment.context(request)
+        if self.conversation is not None and self.conversation.handles(request):
+            token = PREPARING_REQUEST.set(request)
+            try:
+                return await self.conversation.recorder.context(request)
+            finally:
+                PREPARING_REQUEST.reset(token)
         recorder = self.morning if self.morning_service is not None and self.morning_service.handles(request) else self.bi if BI_REQUEST in request.attributes else self.fc01
         token = PREPARING_REQUEST.set(request)
         try:

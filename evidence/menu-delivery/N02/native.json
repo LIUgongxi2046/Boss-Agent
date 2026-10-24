@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-74e22fd3-4e2d-4da8-9759-c74c08230f9a",
+  "ports": {
+    "business": 10761,
+    "webui": 10762,
+    "gateway": 20761
+  },
+  "manifest_sha256": "292c5d1ad9217adb3caa18fb7ea49161ac66049aca9054cc01a65b1b336f43d8",
+  "scope": "N02_PUBLIC_NATIVE_CONVERSATION",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_public_native_three_turns_input_dependent_parameters_single_runtime",
+      "chat_id": "3021dd30-c790-4734-8258-ce3cd0626282",
+      "session_id": "websocket:3021dd30-c790-4734-8258-ce3cd0626282",
+      "runs": [
+        {
+          "run_id": "run-03ec1284-9745-44b7-8b35-5e948c3a74fa",
+          "source_id": "finance-note",
+          "version": "1"
+        },
+        {
+          "run_id": "run-adc2c983-ecca-453a-bc72-f24098d3c7ce",
+          "source_id": "meeting-minutes",
+          "version": "1"
+        },
+        {
+          "run_id": "run-94907b76-04d9-4960-a7b2-41084fc997a8",
+          "source_id": "meeting-minutes",
+          "version": "1"
+        }
+      ]
+    },
+    {
+      "check": "public_original_turn_deduplication_unknown_lookup_and_actual_document_upload",
+      "original_request_id": "conversation-98cee9cb74e3c63d4c2ceecb687058c7f46ceecd530f66379e1c6458a14e2ddb",
+      "duplicate_replayed": false,
+      "unknown_write": false,
+      "file_run_id": "run-509c7877-2c21-42ea-aed3-08865c9e28e0",
+      "attachment_id": "attachment-cdb1a7c84080946e64c76894df42adb92d3a3f2a00c459eece324627e0bf29df",
+      "content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+      "waiting_run_id": "run-851f5550-c1bf-4cc3-ad86-f07c043b917f",
+      "continued_run_id": "run-fda07b1f-4e73-49d7-81c3-e8cd6215afe6"
+    },
+    {
+      "check": "actual_native_history_selection_and_ordinary_storage_privacy",
+      "chat_id": "3021dd30-c790-4734-8258-ce3cd0626282",
+      "history_question_preserved": true,
+      "private_input_in_ordinary_storage": false
+    },
+    {
+      "check": "same_database_service_restart_preserves_original_native_history_runtime_and_file",
+      "chat_id": "3021dd30-c790-4734-8258-ce3cd0626282",
+      "run_ids": [
+        "run-03ec1284-9745-44b7-8b35-5e948c3a74fa",
+        "run-adc2c983-ecca-453a-bc72-f24098d3c7ce",
+        "run-94907b76-04d9-4960-a7b2-41084fc997a8",
+        "run-509c7877-2c21-42ea-aed3-08865c9e28e0",
+        "run-851f5550-c1bf-4cc3-ad86-f07c043b917f",
+        "run-fda07b1f-4e73-49d7-81c3-e8cd6215afe6"
+      ],
+      "original_request_id": "conversation-98cee9cb74e3c63d4c2ceecb687058c7f46ceecd530f66379e1c6458a14e2ddb",
+      "lookup_replayed": false
+    }
+  ]
+}

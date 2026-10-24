@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import inspect
 import json
 import os
 import secrets
@@ -47,6 +48,9 @@ from product_reminders import ProductReminders
 from fc07_agent import TOOLS as ASSIGNMENT_TOOLS
 from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
 from product_morning import ProductMorning
+from product_conversation import ProductConversation
+from boss_conversation_attachments import ConversationAttachments
+from nanobot.config.paths import get_media_dir
 from fc03_agent.formal import FormalMorningTool, FORMAL_TOOLS
 from sop_write_tools.fc01 import Fc01Tool, TOOLS as FC01_TOOLS
 from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder
@@ -151,6 +155,12 @@ async def serve():
     audit.registry = registry
     bus = MessageBus()
     sessions = SessionManager(config.workspace_path)
+    conversation = ProductConversation(store, registry, lambda: runtime_control.snapshot(), ConversationAttachments(sessions, get_media_dir("websocket"))) if product_mode else None
+    if conversation is not None:
+        registry.conversation = conversation
+        provider.conversation = conversation
+        conversation.provider.generation = provider.generation
+        runtime_recorder.conversation = conversation
     recovery = RecoveryCoordinator(sessions=sessions, bus=bus, unified_session=False)
     delivery = TurnDeliveryFactory(bus, route_policy=WebuiTurnRoutePolicy(sessions))
     loop = AgentLoop.from_config(config, bus, provider=provider, tool_registry=registry, hooks=[audit],
@@ -185,6 +195,7 @@ async def serve():
             ordinary = registry.get(name)
             registry.unregister(name)
             registry.register(AssignmentReadTool(ordinary, assignment))
+        registry.register(next(tool for tool in conversation.delegates if tool.name == "conversationRead"))
     else:
         registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None
@@ -235,6 +246,7 @@ async def serve():
         channels.channels["websocket"].mvp = fc01 if mvp_mode else None
         channels.channels["websocket"].assignment = assignment
         channels.channels["websocket"].reminders = reminders
+        channels.channels["websocket"].native_conversation = conversation
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -270,18 +282,34 @@ async def serve():
                     "confirmed_owner_goals": record_runtime_goal_context_load(store, "ui-check"),
                     "guidance_authority_boundary": "Technical prompts do not grant BOSS rights or authorize business writes.",
                 }))
+            def guarded(provider):
+                guarded_provider = morning.guard_context(conversation.guard_context(provider))
+                name = provider.__qualname__ if inspect.isfunction(provider) or inspect.ismethod(provider) else type(provider).__qualname__
+                async def prepare(request):
+                    ready = False
+                    try:
+                        result = await guarded_provider(request)
+                        ready = True
+                        return result
+                    finally:
+                        if not ready:
+                            records.append({"type": "context_preparation_error", "name": name, "at": now()})
+                            audit.output.write_text(encode(records))
+                return prepare
             bot.runtime.add_context_provider(morning.native.native_context)
-            bot.runtime.add_context_provider(morning.guard_context(runtime_control.context))
-            bot.runtime.add_context_provider(morning.guard_context(skills.context))
-            bot.runtime.add_context_provider(morning.guard_context(OwnerMemoryContext(store)))
-            bot.runtime.add_context_provider(morning.guard_context(owner_goals_context))
+            bot.runtime.add_context_provider(guarded(conversation.native_context))
+            bot.runtime.add_context_provider(guarded(runtime_control.context))
+            bot.runtime.add_context_provider(guarded(skills.context))
+            bot.runtime.add_context_provider(guarded(OwnerMemoryContext(store)))
+            bot.runtime.add_context_provider(guarded(owner_goals_context))
             if mvp_mode:
-                bot.runtime.add_context_provider(morning.guard_context(fc01.scope_context))
-            bot.runtime.add_context_provider(morning.guard_context(bi.scope_context))
-            bot.runtime.add_context_provider(morning.guard_context(morning.scope_context))
-            bot.runtime.add_context_provider(morning.guard_context(assignment.scope_context))
-            bot.runtime.add_context_provider(morning.guard_context(reminders.scope_context))
-            bot.runtime.add_context_provider(morning.guard_context(runtime_recorder.context))
+                bot.runtime.add_context_provider(guarded(fc01.scope_context))
+            bot.runtime.add_context_provider(guarded(bi.scope_context))
+            bot.runtime.add_context_provider(guarded(morning.scope_context))
+            bot.runtime.add_context_provider(guarded(assignment.scope_context))
+            bot.runtime.add_context_provider(guarded(reminders.scope_context))
+            bot.runtime.add_context_provider(guarded(conversation.scope_context))
+            bot.runtime.add_context_provider(guarded(runtime_recorder.context))
         else:
             bot.runtime.add_context_provider(context)
         await cron.start()

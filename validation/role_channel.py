@@ -9,11 +9,12 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 from nanobot.channels.websocket.runtime import WebSocketChannel
 from nanobot.webui.http_utils import bearer_token
+from nanobot.command.builtin import builtin_command_starts_agent_turn
 from websockets.datastructures import Headers
 from websockets.http11 import Request
 from aiohttp import web
 
-from business import now
+from business import checksum, now
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
 from public_conversation import CONVERSATION_READ_ACTIONS, PublicConversation
@@ -35,7 +36,9 @@ class RoleChannel(WebSocketChannel):
         self.mvp = None
         self.assignment = None
         self.reminders = None
+        self.native_conversation = None
         self.morning_admission = ContextVar("morning_native_admission", default=None)
+        self.conversation_admission = ContextVar("conversation_native_admission", default=None)
         self.conversation_upload = ContextVar("conversation_native_upload", default=None)
         self.bi_responses = set()
         self.skills = skills
@@ -102,6 +105,19 @@ class RoleChannel(WebSocketChannel):
                 self.record(role, address.path, 200)
                 return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE")}))
             if address.path.startswith("/api/boss/ui/"):
+                if address.path == "/api/boss/ui/conversation/request":
+                    try:
+                        if self.native_conversation is None:
+                            raise web.HTTPServiceUnavailable(text="当前会话接收服务尚未就绪")
+                        values = parse_qs(address.query, keep_blank_values=True)
+                        if set(values) != {"client_request_id"} or len(values["client_request_id"]) != 1 or not values["client_request_id"][0] or len(values["client_request_id"][0]) > 128:
+                            raise web.HTTPBadRequest(text="原会话请求编号无效")
+                        body = self.native_conversation.receipt(role, values["client_request_id"][0], active=lambda: self.token_roles.get(token) == "BOSS" and self.gateway.tokens.check_api_token(request))
+                        status = 200
+                    except web.HTTPException as failure:
+                        status, body = failure.status, {"error": failure.text}
+                    self.record(role, address.path, status)
+                    return connection.respond(status, json.dumps(body, ensure_ascii=False))
                 if address.path == "/api/boss/ui/reminder-preparation":
                     try:
                         if self.reminders is None:
@@ -190,6 +206,9 @@ class RoleChannel(WebSocketChannel):
         action = envelope.get("action", "")
         if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS:
             await self._conversation_response(connection, role, envelope)
+            return
+        if kind == "webui_request" and action == "boss.conversation.request":
+            await self._conversation_receipt_response(connection, role, envelope)
             return
         if kind == "webui_request" and action == "boss.reminder.prepare":
             task = asyncio.create_task(self._reminder_response(connection, role, envelope))
@@ -321,8 +340,8 @@ class RoleChannel(WebSocketChannel):
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
         admitted = None
-        native_stop = kind == "message" and isinstance(envelope.get("content"), str) and envelope["content"].strip() == "/stop"
-        if kind == "message" and self.morning is not None and not native_stop:
+        control_message = kind == "message" and isinstance(envelope.get("content"), str) and not builtin_command_starts_agent_turn(envelope["content"])
+        if kind == "message" and self.morning is not None and not control_message:
             try:
                 admitted = self.morning.native.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
                     attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
@@ -334,34 +353,86 @@ class RoleChannel(WebSocketChannel):
                 self.record(role, "boss.morning.native.message", failure.status)
                 await connection.send(json.dumps({"event":"error","detail":"morning_scope_rejected","reason":failure.text,"chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}, ensure_ascii=False))
                 return
+        general_admitted = None
+        if kind == "message" and admitted is None and self.native_conversation is not None and not control_message:
+            try:
+                general_admitted = self.native_conversation.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
+                    media_sha256=checksum(envelope.get("media") or []),
+                    attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
+                    active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
+                if general_admitted is not None and not general_admitted["enqueue"]:
+                    await connection.send(json.dumps({"event": "error", "detail": "conversation_turn_already_recorded", "reason": "本轮已经接收，请读取原编号记录。", "chat_id": envelope.get("chat_id"), "turn_id": envelope.get("turn_id"), "receipt": general_admitted}, ensure_ascii=False))
+                    return
+            except web.HTTPException as failure:
+                self.record(role, "boss.conversation.native.message", failure.status)
+                await connection.send(json.dumps({"event": "error", "detail": "conversation_scope_rejected", "reason": failure.text, "chat_id": envelope.get("chat_id"), "turn_id": envelope.get("turn_id")}, ensure_ascii=False))
+                return
         admission = {"request": admitted, "enqueued": False} if admitted is not None else None
+        general_admission = {"request": general_admitted, "enqueued": False} if general_admitted is not None else None
         admission_token = self.morning_admission.set(admission)
+        general_token = self.conversation_admission.set(general_admission)
         upload_token = self.conversation_upload.set({"role": role, "connection": connection, "chat_id": envelope.get("chat_id"), "media": envelope.get("media")} if kind == "message" and envelope.get("media") else None)
         try:
             await super()._dispatch_active_envelope(connection, "boss-1" if role == "BOSS" else "maintainer-1", envelope)
         finally:
             self.morning_admission.reset(admission_token)
+            self.conversation_admission.reset(general_token)
             self.conversation_upload.reset(upload_token)
             if admission is not None and not admission["enqueued"]:
                 self.morning.native.finish(admitted["client_request_id"])
+            if general_admission is not None and not general_admission["enqueued"]:
+                self.native_conversation.finish(general_admitted["client_request_id"])
 
     async def webui_dispatch_message(self, *, sender_id, chat_id, content, media, metadata, is_dm, session_key, require_existing_session):
         upload = self.conversation_upload.get()
+        general_admission = self.conversation_admission.get()
+        if general_admission is not None:
+            accepted = general_admission["request"]
+            if accepted["chat_id"] != chat_id or accepted["turn_id"] != metadata.get("webui_turn_id"):
+                raise web.HTTPForbidden(text="原生入队对象与一般会话证明不符")
         if media and upload is not None and session_key in (None, "websocket:" + chat_id):
             connection = upload["connection"]
             if self.conversation is None or sender_id != "boss-1" or upload["chat_id"] != chat_id:
                 raise web.HTTPForbidden(text="原生附件与当前本人会话不符")
-            self.conversation.record_upload(upload["role"], chat_id, upload["media"], media,
-                attached=lambda selected: selected in self.webui_connection_chats(connection),
-                active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
+            active = lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+            if general_admission is not None:
+                self.native_conversation.record_media(upload["role"], general_admission["request"]["client_request_id"], upload["media"], media, active=active)
+            else:
+                self.conversation.record_upload(upload["role"], chat_id, upload["media"], media,
+                    attached=lambda selected: selected in self.webui_connection_chats(connection), active=active)
         await super().webui_dispatch_message(sender_id=sender_id, chat_id=chat_id, content=content, media=media,
             metadata=metadata, is_dm=is_dm, session_key=session_key, require_existing_session=require_existing_session)
+        if general_admission is not None:
+            general_admission["enqueued"] = True
         admission = self.morning_admission.get()
         if admission is not None:
             accepted = admission["request"]
             if accepted["chat_id"] != chat_id or accepted["turn_id"] != metadata.get("webui_turn_id"):
                 raise web.HTTPForbidden(text="原生入队对象与晨间证明不符")
             admission["enqueued"] = True
+
+    async def _conversation_receipt_response(self, connection, role, envelope):
+        request_id = envelope.get("request_id")
+        if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+            raise ValueError("原会话读取缺少有效请求编号")
+        def active():
+            return self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+        try:
+            if self.native_conversation is None:
+                raise web.HTTPServiceUnavailable(text="当前会话接收服务尚未就绪")
+            payload = envelope.get("payload")
+            if not isinstance(payload, dict) or set(payload) != {"chat_id", "turn_id"}:
+                raise web.HTTPBadRequest(text="原会话读取字段无效")
+            if payload["chat_id"] not in self.webui_connection_chats(connection):
+                raise web.HTTPForbidden(text="当前连接尚未订阅所选会话")
+            key = self.native_conversation.turn_key(payload["chat_id"], payload["turn_id"])
+            result = self.native_conversation.receipt(role, key, active=active)
+            status, response = 200, {"result": result}
+        except web.HTTPException as failure:
+            status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
+        self.record(role, envelope["action"], status)
+        if connection.close_code is None:
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": status == 200, **response}, ensure_ascii=False))
 
     async def _conversation_response(self, connection, role, envelope):
         request_id = envelope.get("request_id")
