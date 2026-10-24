@@ -11,7 +11,7 @@ from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
 from nanobot.agent.tools.context import current_request_context
 from runtime_page_read_tools import _BossPageReadTool
-from conversation_agent.queries import ConversationQueries
+from conversation_agent.queries import ConversationQueries, mentioned
 
 
 def branch(projection, properties=None):
@@ -93,11 +93,20 @@ class ConversationPlanner:
 
     def plan(self, text, query, previous_references, previous_artifacts=(), last_source_id=None, *, has_media=False, pending_query_scope=None):
         lowered = text.casefold()
-        calls, references, required, checks = [], list(previous_references), [], list(previous_artifacts)
+        calls, references, required, checks = [], [], [], []
         def add(name, params):
             call = (name, encode(params))
             if call not in calls:
                 calls.append(call)
+        def adopt_artifact(actual, parameters):
+            digest = artifact_digest(actual)
+            for encoded, previous_digest in previous_artifacts:
+                previous = json.loads(encoded)
+                if all(previous[field] == parameters[field] for field in ("kind", "id")):
+                    require(previous_digest == digest, "当前选中产物与已记录版本或摘要不符", web.HTTPConflict)
+            check = (encode(parameters), digest)
+            if check not in checks:
+                checks.append(check)
         if any(word in lowered for word in ("不要", "不用", "不需要", "别执行")):
             return ConversationPlan((), tuple(references), ("请明确当前需要执行的读取动作",), tuple(checks))
         query_plan = ConversationQueries(self.store, self.api).plan(text, query, pending_query_scope)
@@ -106,9 +115,7 @@ class ConversationPlanner:
             references.extend(ref for ref in query_plan.references if ref not in references)
             if query_plan.parent is not None:
                 parent = query_plan.parent
-                check = (encode({key: parent[key] for key in ("run_id", "kind", "id")}), artifact_digest(parent))
-                if check not in checks:
-                    checks.append(check)
+                adopt_artifact(parent, {key: parent[key] for key in ("run_id", "kind", "id")})
         required.extend(query_plan.required_inputs)
         if any(word in lowered for word in ("发送", "发信", "保存草稿", "拟消息", "写消息")):
             add("conversationRead", {"projection": "messages"})
@@ -116,17 +123,23 @@ class ConversationPlanner:
         with self.store.connect() as db:
             initial = self.store.get(db, "ui-check", "initial", "snapshot")
             documents = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='document' AND json_extract(body,'$.access_scope')=? AND json_extract(body,'$.source_type')='SIMULATED'", (initial["owner_id"],))]
-        selected = [document for document in documents if document["source_id"].casefold() in lowered
+        selected = [document for document in documents if mentioned(text, document["source_id"])
                     or document.get("title") and document["title"].casefold() in lowered]
+        selected_source_ids = []
         if not selected and any(word in lowered for word in ("继续", "这份", "该资料", "它的来源")):
             if last_source_id and any(word in lowered for word in ("资料", "原文", "来源", "版本")):
-                selected = [document for document in documents if document["source_id"] == last_source_id]
+                remembered = [ref for ref in previous_references if ref[0] == "document" and ref[1] == last_source_id]
+                require(bool(remembered), "此前选择的资料缺少已记录版本，请明确来源编号", web.HTTPConflict)
+                references.append(remembered[-1])
+                selected_source_ids.append(last_source_id)
+                add("bossEvidenceRead", {"source": last_source_id})
         for document in selected:
             add("bossEvidenceRead", {"source": document["source_id"]})
+            selected_source_ids.append(document["source_id"])
             reference = ("document", document["source_id"], document["version"])
             if reference not in references:
                 references.append(reference)
-        if any(word in lowered for word in ("资料", "原文", "来源")) and not selected and not any(word in lowered for word in ("附件", "文件")):
+        if any(word in lowered for word in ("资料", "原文", "来源")) and not selected_source_ids and not any(word in lowered for word in ("附件", "文件")):
             required.append("请明确当前来源ID或已有正式来源名称")
         if any(word in lowered for word in ("任务", "交办", "承诺")):
             status, tasks = self.pages.serve("BOSS", "/api/boss/ui/tasks")
@@ -142,19 +155,23 @@ class ConversationPlanner:
             add("bossMeetingsRead", {})
         if any(word in lowered for word in ("消息", "草稿", "联系人", "收件人", "待回复", "发件箱", "回复")):
             history = self.api.messages("BOSS")
-            for item in history["drafts"] + history["sent_messages"]:
-                for source in item["attachment_refs"]:
-                    reference = ("document", source["source_id"], source["version"])
-                    if source["status"] == "VALID" and reference not in references:
-                        references.append(reference)
             matches = [(kind, item[field]) for kind, items, field in (("message_draft", history["drafts"], "draft_id"),
                        ("message", history["sent_messages"], "message_id")) for item in items
                        if item.get(field) and item[field].casefold() in lowered]
             if len(matches) == 1:
                 kind, identifier = matches[0]
                 add("conversationRead", {"projection": "record", "kind": kind, "id": identifier})
+                field = "draft_id" if kind == "message_draft" else "message_id"
+                items = [item for item in history["drafts"] if item.get(field) == identifier] if kind == "message_draft" else [
+                    item for item in history["sent_messages"] if item.get(field) == identifier]
             else:
                 add("conversationRead", {"projection": "messages"})
+                items = history["drafts"] + history["sent_messages"]
+            for item in items:
+                for source in item["attachment_refs"]:
+                    reference = ("document", source["source_id"], source["version"])
+                    if source["status"] == "VALID" and reference not in references:
+                        references.append(reference)
         if any(word in lowered for word in ("运行", "执行过程", "进度")):
             add("conversationRead", {"projection": "runs"})
         if has_media or any(word in lowered for word in ("附件", "文件", "上传")):
@@ -170,7 +187,8 @@ class ConversationPlanner:
                 add("bossWorkspaceRead", {"projection": projection})
         if any(word in lowered for word in ("产物", "结果详情")):
             view = self.api.read("BOSS", query)
-            artifacts = [(run["run_id"], ref) for run in view["runs"] for ref in run["artifacts"]]
+            artifacts = list({(ref["kind"], ref["id"]): (run["run_id"], ref)
+                for run in view["runs"] for ref in run["artifacts"]}.values())
             matches = [(run_id, ref) for run_id, ref in artifacts if ref["id"].casefold() in lowered]
             if not matches and len(artifacts) == 1:
                 matches = artifacts
@@ -178,9 +196,7 @@ class ConversationPlanner:
                 run_id, reference = matches[0]
                 parameters = {"run_id": run_id, "kind": reference["kind"], "id": reference["id"]}
                 actual = self.api.artifact("BOSS", {**query, **parameters})
-                check = (encode(parameters), artifact_digest(actual))
-                if check not in checks:
-                    checks.append(check)
+                adopt_artifact(actual, parameters)
                 add("conversationRead", {"projection": "artifact", **parameters})
             else:
                 required.append("请明确当前会话中已经生成的产物编号；没有正式产物时不创建引用")

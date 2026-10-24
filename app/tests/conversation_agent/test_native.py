@@ -259,7 +259,7 @@ def test_actual_query_artifact_is_adopted_and_source_withdrawal_stops_current_re
     assert len(read(native, "query")) == 1
     native[0].control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
     with pytest.raises(web.HTTPException):
-        execute(native, ["继续查看当前运行"])
+        execute(native, ["继续查看产物 " + query["query_id"]])
     assert len(read(native, "runtime_run")) == 2
 
 

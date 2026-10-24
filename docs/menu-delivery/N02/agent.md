@@ -1,10 +1,10 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-REQUEST-HISTORY-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表扩展。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-CURRENT-REFERENCES-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表及本轮必要引用的采用。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
 
 ## 当前依据与准确依赖
 
-本次原请求扩展的PRODUCT准确候选为1b7a7fa0c72e176df746ca3d3e0e90993604e6e0，包含N2消费模块cd1a5b0的公共接收、N1上下文引用66fc44d/c9dada0及附件Schema1.1读取。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
+本次必要引用核查的PRODUCT准确候选为9c3caf80651fc74e1c0286fa5f946b96fc6d360e，包含N2原请求接口a74e97a的公共接收、N1上下文引用及实际Fc02接口。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
 已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、backend.md、boss_conversation.py、boss_conversation_attachments.py和conversation.schema.json 1.1.0，核查实际SDK命令生命周期、Session保存、Fc02Tool、bind_query、bind_scoped_followup、BIQueryAPI和范围Schema。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
@@ -40,7 +40,15 @@ allowed_tools为frozenset工具名，allowed_calls为frozenset((tool_id,paramete
 
 ## 当前输入、正式条件与连续追问
 
-ConversationPlanner根据当次输入和实际目录选择来源、概览、任务、会议、消息、运行、附件、已有产物或经营查询。来源ID/名称及任务/消息/产物编号均从正式资料采用。连续来源讨论保留最后实际选择，后续步骤核查当前版本。来源、对象不明确时返回具体required_inputs；消息写入和任务变更使用现有合法共享入口。附件元信息不授予业务来源资格。
+ConversationPlanner根据当次输入和实际目录选择来源、概览、任务、会议、消息、运行、附件、已有产物或经营查询。来源ID/名称及任务/消息/产物编号均从正式资料采用。本轮references只包含实际工具需要的来源，独立任务或明确新资料不要求无关历史资料继续有效。来源、对象不明确时返回具体required_inputs；消息写入和任务变更使用现有合法共享入口。附件元信息不授予业务来源资格。
+
+### C07/C20本轮必要依据与明确沿用
+
+native_context读取历史意图的技术引用供选择，旧意图及原运行保持原值；当前规划从空references和artifact_checks建立本轮范围。明确读取来源按完整编号或实际名称选择当前正式版本；“继续核查这份资料”等指向此前资料的输入采用最后明确选择的来源及其固定版本，失效时停止。独立输入不会更改该明确来源选择；本人明确读取新资料后，后续指向该资料的输入采用新选择。
+
+conversation_intent内部last_source_ref仅保存kind/id/version，用于保持明确选择的版本，公开回执字段保持。旧格式没有该字段时，从真实runtime_run中bossEvidenceRead的已保存source_id/version核查此前选择，不采用消息或其他无关对象的来源版本替换该选择；不补写旧记录。当前引用仍通过正式来源政策及固定版本核查，没有新增权限或来源恢复。
+
+产物按本轮实际选择的kind/id保留原摘要检查，再由正式API核查当前资格；同一产物在多个运行中的引用按kind/id归为同一对象，采用其实际运行引用。独立输入不采用无关旧产物，明确继续原产物仍要求已记录摘要一致。经营追问的正式父查询、参数继承及当前产物摘要核查继续适用。单对象消息只采用该正式草稿或发送消息的有效来源；完整消息历史投影采用实际返回内容需要的有效来源。附件当前采用、身份和配置核查保持。
 
 queries.py通过BIQueryAPI.dimensions和dimension_options取得获准维度、已保存期间、指标定义和来源。支持六项现有指标的中文名称及英文identifier、实际维度编号、明确日期范围、全部当前产品/全部区域、币种、单位、交易范围、结算状态及明确的正式口径字段。只有本人明确选择“使用当前获准口径”时，才采用相应单一正式维度值；区域、产品、指标和两组期间仍需要明确输入。相对期间要求实际起止日期。
 
@@ -109,6 +117,12 @@ Given真实SDK已运行、实际admit后准备失败、明确运行前取消及�
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-requests-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-requests-delivery --tb=short --junitxml=docs/menu-delivery/N02/request-history.xml
+```
+
+本次current-references.xml为59 passed、22.29秒，记录准确9c3caf80651fc74e1c0286fa5f946b96fc6d360e依赖下的当前引用组合，包含5项必要引用用例及受影响的54项。boss_conversation.py blob=334de8f8f188dc342188447606380283e6fbe34d，Fc02Tool blob=4b3ce9f0ab422bbca5e3c2e28b5eb8de932b62fa，附件模块blob=045e78b53a1c1eb8dce78edcec07c26ff37692ea。实际SDK、SQLite及正式control撤销证明finance-note撤销后独立任务与meeting-minutes读取成功，明确沿用finance-note停止；已有查询产物的独立输入成功，原产物及父查询追问停止；本人正式更新草稿后，独立任务成功，原产物摘要变化停止。原运行、原意图及历史引用逐项保持相同，旧格式来源版本由实际已保存运行取得。现有附件、身份、配置、取消、原编号和经营连续条件用例包含在同一受影响检查中。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-references-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-references-final --tb=short --junitxml=docs/menu-delivery/N02/current-references.xml
 ```
 
 所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。

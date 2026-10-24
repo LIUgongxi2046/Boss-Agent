@@ -199,17 +199,25 @@ class NativeConversationAgent:
                 require(row["status"] == "ADMITTED" and row["text_sha256"] == checksum(request.original_user_text)
                         and row["input_sha256"] == proof[1], "会话输入或原编号已变化", web.HTTPConflict)
                 previous = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND id<>? ORDER BY json_extract(body,'$.created_at')", (request.session_key, key))]
-            refs, artifacts, last_source_id, pending_query_scope = [], [], None, None
+            artifacts, last_source_id, last_source_ref, pending_query_scope = [], None, None, None
             for old in previous:
                 self._owner(old, identity)
-                for ref in old.get("references", []):
-                    if tuple(ref) not in refs:
-                        refs.append(tuple(ref))
+                if "last_source_ref" in old:
+                    last_source_ref = tuple(old["last_source_ref"]) if old["last_source_ref"] is not None else None
+                elif old["run_id"] is not None:
+                    with self.store.connect() as db:
+                        recorded = self.store.get(db, "ui-check", "runtime_run", old["run_id"])
+                    selected = [step for step in recorded["tool_results"] if step["tool_id"] == "bossEvidenceRead"
+                        and step.get("source_id") == old.get("last_source_id")]
+                    if selected:
+                        last_source_ref = ("document", selected[-1]["source_id"], selected[-1]["version"])
                 for check in old.get("artifact_checks", []):
                     if tuple(check) not in artifacts:
                         artifacts.append(tuple(check))
                 if old.get("last_source_id"):
                     last_source_id = old["last_source_id"]
+                    if last_source_ref is not None and last_source_ref[1] != last_source_id:
+                        last_source_ref = None
                 pending_query_scope = old.get("pending_query_scope")
             query = {"session_id": request.session_key, "chat_id": request.chat_id}
             media = self._media_refs(self.attachments.read("BOSS", query))
@@ -217,7 +225,7 @@ class NativeConversationAgent:
             require(row["media_sha256"] == checksum([]) or key in self.pending_media,
                     "本轮媒体尚无原生成功上传的正式元信息", web.HTTPConflict)
             media = tuple(sorted(set(media) | set(self.pending_media.get(key, ()))))
-            plan = self.planner.plan(request.original_user_text, query, tuple(refs), tuple(artifacts), last_source_id,
+            plan = self.planner.plan(request.original_user_text, query, (last_source_ref,) if last_source_ref else (), tuple(artifacts), last_source_id,
                 has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope)
             self.validate_artifacts(plan, query)
             grant = ConversationGrant(key, request.chat_id, row["turn_id"], row["text_sha256"], proof[0], plan, media,
@@ -229,9 +237,12 @@ class NativeConversationAgent:
                 db.execute("BEGIN IMMEDIATE")
                 row = self.store.get(db, "ui-check", "conversation_intent", key)
                 current_sources = [json.loads(parameters)["source"] for name, parameters in plan.calls if name == "bossEvidenceRead"]
+                if current_sources:
+                    last_source_ref = next(ref for ref in reversed(plan.references) if ref[0] == "document" and ref[1] == current_sources[-1])
                 row.update(references=plan.references, attachment_refs=media, artifact_checks=plan.artifact_checks,
                            pending_query_scope=plan.pending_query_scope,
                            last_source_id=current_sources[-1] if current_sources else last_source_id,
+                           last_source_ref=last_source_ref,
                            plan_sha256=checksum({"calls": plan.calls, "required_inputs": plan.required_inputs}))
                 self.store.put(db, "ui-check", "conversation_intent", key, row)
             ready = True
