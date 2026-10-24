@@ -50,7 +50,7 @@ const eventNotifications = new Map();
 const origin = 'http://127.0.0.1:' + ports.webui;
 const serviceStartupTimeoutMs = 90000;
 const initialPage = process.env.BOSS_INITIAL_PAGE;
-if (initialPage !== undefined && !['F01', 'F02'].includes(initialPage)) throw new Error('初始页面配置无效');
+if (initialPage !== undefined && !['F01', 'F02', 'N02'].includes(initialPage)) throw new Error('初始页面配置无效');
 if (!app.requestSingleInstanceLock()) {
   record('duplicate_instance_rejected');
   app.quit();

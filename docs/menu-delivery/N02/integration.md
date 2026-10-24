@@ -28,6 +28,8 @@ task_id=MENU-N02-N3；CURRENT；2026-10-25；IN_PROGRESS。唯一正式状态为
 
 当前没有完整 N02产品或业务通过声明。26项必要断言引用完整工单；N1/N2已有正确接口直接接收，存在差距才增量实施。公共层需要核查自然输入、附件、当前事项、同一 Runtime、任务/来源/产物、消息授权、原编号恢复及独立共享路径，不能仅将旧原生会话改名后登记完成。
 
+当前任务进入会话的版本绑定仍在实施：F06当前任务需要专门的正式上下文准备与绑定，固定本人选定任务、展示版本及来源引用；仅有工具读取产物与详情返回不构成该项完成。N1已续接marker=MENU-N02-N1-TASK-ENTRY-CONTEXT-20261025；准确领域交付后再接收N2 Native消费者和N3公开/UI入口。关闭应用时的未发送输入决定、迟到文件编码及文件大小/读取失败等必要路径仍需完整核查。
+
 已实施当前草稿及普通缓存保护增量：ThreadComposer暴露仅在进程内的 ComposerDraftController，涵盖文字、实际附件、引用和排队输入；ThreadShell透传，App以当前会话注册，用于切换、浏览历史地址及离开业务路径。本人明确放弃时清除对应未发送内容，返回继续编辑保留内容；beforeunload覆盖仅附件/排队状态。本人会话明确设置 persistQueuedPrompts=false，继续使用原生内存队列，不读取或写入普通 localStorage队列正文。源码增量保存在 app/webui/nanobot-menu-n02.patch。
 
 独立menu-n02-n3-dist完成TypeScript及Vite构建，当前manifest=7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5，日志.work/menu-n02-build.log。`check-menu-n02-native-privacy.cjs`的当前证据为native-privacy.json，采用同一manifest、独立10731/10732/20731及代理10733。实际产物Dialog/Escape/焦点、批准YAML仅附件离开保护、真实输出延迟下内存队列未发送/不缓存/明确放弃后不恢复均通过；不据该限定结果登记26项通过。
@@ -59,6 +61,16 @@ N2原请求只读历史a74e97abb4d8a93a027cc6287e6e941a5d0917cb已接收至9c3ca
 新应用实例通过官方set_config_path及runtime-scope.json绑定自身配置目录；新实例初始历史为空，随后仅使用自身生成的会话。原有无实例声明的用户体验保持其既有运行目录，不自动迁移或重启。当前native及unknown均验证新实例范围，native同库重开仍读取原14条运行与15条请求。
 
 check-menu-n02-unknown.cjs及unknown.json采用当前同一manifest、独立10771/10772/20771及10773代理。代理仅在实际保存或发送成功后中断真实连接；客户端刷新和重连没有重新提交，普通地址仅保留原操作编号/类型及返回标识，不包含正文、附件或凭据。按原编号只读核查后分别得到既有草稿及唯一SIMULATED发件，delivery_state仍为NOT_VERIFIED；可继续返回原N02共享入口。消息未知状态阻止新的保存/发送，确定未保存的输入仍由D06保护。
+
+check-menu-n02-input.cjs及input.json采用当前同一manifest、独立10781/10782/20781。实际Chromium IME候选期间Enter零提交，提交候选文字后值正确；Shift+Enter保留换行，空白不可提交。实际BossDesktop.tsx正文73531 bytes超过bootstrap发布的65536 bytes限制时就地提示、保留输入且零提交。实际四份Schema文件选择、取消、数量拒绝、不支持的真实脚本文件均保留原文字与附件；真实Schema内容以192 bytes长文件名选择成功。文字与四附件的D06继续编辑/明确放弃通过。语音入口禁用且显示暂停，原生Control+Shift+D零转写请求；本项不代表FR-27完成。
+
+当前native-privacy.json包含实际后续输出期间的历史阅读：本人点击并使用滚轮阅读历史后，真实响应由代理继续传递，内容高度789→1312px、clientHeight181px，scrollTop保持0，没有强制到底部。framework-current.json同时包含实际搜索12项会话、键盘选择与对应历史恢复，再进入新空会话测量18组状态。
+
+N2可观察事件与失败结果d6196221f92d5e9b325a6e3011b217d782a1225b接收至ba1fbde；生产签名及字段未变。observable-failure-receiver.xml为4 passed、3.88秒：真实关闭输出管道后失败、正式查询拒绝均保留已保存结果，终态FAILED/error；当前Provider、SDK事件、原生进度及历史未发现内部推理载荷。轮次不足为准备阶段拒绝、run_id=null；不声明已经进入SDK max_iterations耗尽路径。
+
+N4对b3de8ea3788629f977f02f182e74a18ea430dc85及7fd1制品的指定增量结论为APPROVED/TARGETED_CLOSED，记录位于其N02/qa.md，SHA256=30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca。范围为SVG、子Panel、标签/输入/附件及提交操作、五种按钮状态、历史展开和两条产物详情返回；该范围未发现未处理必要缺陷。完整26项及其他未验证状态继续保留。
+
+scripts/run_menu_n02.command与prepare_menu_n02.py已在独立menu-n02-launcher-check-20261025资料目录、10791/10792/20791实际通过，见launcher.json。默认新入口为10711/10712/20711及menu-n02-experience，尚未作为完整菜单交付；初始化只读取本次新生成的测试账号，已有目录启动不读取账号内容或重写资料。启用七项会话工具及既有晨间/采购工具、WORKSPACE_PROJECTIONS模式。受控主窗口分别填入BOSS/MAINTAINER既有账号，填充后零自动登录，明确提交登录后角色正确、单窗口；密码不在普通地址或存储中，账号文件元数据及业务资料保持。F01冻结制品摘要已再次核对一致。
 
 已发送当前四窗口的角色续接，marker=MENU-N02-START-20261024；每次发送前复查 idle。N1 turn=01a16df8-d1c1-79f3-87d2-3b362d5c889e，N2 turn=01a16df8-e6aa-7ac3-8a7b-a0abfc791fc0，N4 turn=01a16df8-f3bc-7ad1-8f73-d95ab5c77283；工具分别返回对应既有 threadId。运行中仅只读，角色准确自然交付后接收必要增量，禁止重复接续。
 

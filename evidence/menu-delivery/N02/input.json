@@ -1,0 +1,81 @@
+{
+  "status": "PASS",
+  "scope": "N02_ACTUAL_INPUT_AND_FILE_SELECTION",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-input-8b3c4bea-af64-45c0-b663-809bc08a0c9e",
+  "ports": {
+    "business": 10781,
+    "webui": 10782,
+    "gateway": 20781
+  },
+  "manifest_sha256": "7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "external_api_mode": "SIMULATED_FIRST",
+  "records": [
+    {
+      "check": "actual_chromium_ime_enter_empty_input_and_shift_enter",
+      "submission_count": 0,
+      "composition_committed": true,
+      "newline_preserved": true
+    },
+    {
+      "check": "actual_source_text_exceeds_current_advertised_limit",
+      "source": "app/webui/BossDesktop.tsx",
+      "source_sha256": "354570e91cb12a5646d2a9782237c44c3c2ed5346abc6b8209fd9430d3c2df27",
+      "actual_bytes": 73531,
+      "max_text_bytes": 65536,
+      "submission_count": 0,
+      "input_retained": true
+    },
+    {
+      "check": "actual_file_selection_cancel_and_advertised_attachment_count",
+      "source_files": [
+        {
+          "path": "specs/conversation.schema.json",
+          "sha256": "d4660f762a70ece6d58837fdfb96b8298d714688aa91fe34e8f4682fcca89ac5"
+        },
+        {
+          "path": "specs/conversation-requests.schema.json",
+          "sha256": "9badf4b946c0210a60dc5ac55c63c17e253601411bb448288850f88ba78e3785"
+        },
+        {
+          "path": "specs/morning-coverage.json",
+          "sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f"
+        },
+        {
+          "path": "specs/runtime-records.schema.json",
+          "sha256": "db84a1a5baa6a6471a7127d488eadff952bc5f5552c4f215d724ccbd0db6999c"
+        }
+      ],
+      "advertised_limits": {
+        "max_count": 4,
+        "max_file_bytes": 6291456,
+        "max_total_bytes": 25165824
+      },
+      "selection_retained_on_cancel": true,
+      "selection_retained_on_rejection": true,
+      "submission_count": 0
+    },
+    {
+      "check": "unsupported_real_file_preserves_selection_and_real_schema_long_filename_readable",
+      "unsupported_file": "validation/desktop/check-menu-n02-input.cjs",
+      "selected_file_sha256": "d4660f762a70ece6d58837fdfb96b8298d714688aa91fe34e8f4682fcca89ac5",
+      "long_filename_characters": 88,
+      "long_filename_utf8_bytes": 192,
+      "submission_count": 0
+    },
+    {
+      "check": "actual_text_and_four_files_d06_keep_or_discard",
+      "kept_selection_count": 4,
+      "discarded_selection_count": 0,
+      "submission_count": 0
+    },
+    {
+      "check": "paused_voice_control_and_native_shortcut_keep_text_available",
+      "voice_control_disabled": true,
+      "pause_notice": true,
+      "transcription_request_count": 0,
+      "submission_count": 0
+    }
+  ]
+}
