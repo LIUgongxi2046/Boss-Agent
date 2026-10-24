@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-8aaa4ae3-9fb4-40e6-a710-daf16cbcc58d",
+  "ports": {
+    "business": 10731,
+    "webui": 10732,
+    "gateway": 20731
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
+  "manifest_sha256": "46d2ce9cc438a05525463c44053ac86afa6c3bd75d3903f193e838b547887331",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "scope": "N02_NATIVE_DRAFT_AND_QUEUE_PRIVACY",
+  "records": [
+    {
+      "check": "actual_delayed_native_output_memory_only_queue_and_explicit_discard",
+      "chat_id": "241997e5-3a49-4183-a908-6252ae86449e",
+      "queue_in_browser_storage": false,
+      "queued_message_sent": false,
+      "discarded_queue_restored": false
+    },
+    {
+      "check": "actual_selected_file_attachment_only_navigation_guard_and_discard",
+      "source_file": "data/simulation/supply-quality-v1.yaml",
+      "source_sha256": "3cc09ad2a038b2217a01c986e36c7f70474261d162003298d8b6285cc9f8f3d0",
+      "attachment_sent": false,
+      "discarded_attachment_restored": false
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+*** Begin Patch
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+-interface ThreadComposerProps {
++export type ComposerDraftController={hasDraft:boolean;discard:()=>void};
++
++interface ThreadComposerProps {
+@@
+   pendingQueueKey?: string | null;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
+@@
+   pendingQueueKey = null,
++  persistQueuedPrompts = true,
++  onDraftController,
+@@
+-  useEffect(() => {
+-    if (!value.trim()) return;
+-    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
+-    window.addEventListener("beforeunload",protect);
+-    return () => window.removeEventListener("beforeunload",protect);
+-  }, [value]);
+@@
+-    () => queuedPromptsStorageKey(pendingQueueKey),
+-    [pendingQueueKey],
++    () => persistQueuedPrompts ? queuedPromptsStorageKey(pendingQueueKey) : null,
++    [pendingQueueKey,persistQueuedPrompts],
+@@
+   }, [resizeTextarea]);
++
++  const hasDraft=Boolean(value.trim()||images.length||queuedPrompts.length||normalizedQuotedContext);
++  useEffect(()=>{
++    onDraftController?.({hasDraft,discard:()=>{clear();clearComposerText(false);setQueuedPrompts([]);onQuotedContextChange?.(null);}});
++    return()=>onDraftController?.(null);
++  },[hasDraft,onDraftController,clear,clearComposerText,onQuotedContextChange]);
++  useEffect(()=>{
++    if(!hasDraft)return;
++    const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return()=>window.removeEventListener("beforeunload",protect);
++  },[hasDraft]);
+ 
+   const queueGuidancePrompt = useCallback(() => {
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+-import { ThreadComposer } from "@/components/thread/ThreadComposer";
++import { ThreadComposer,type ComposerDraftController } from "@/components/thread/ThreadComposer";
+@@
+   transcriptionEnabled?: boolean;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
+@@
+   transcriptionEnabled = true,
++  persistQueuedPrompts = true,
++  onDraftController,
+@@
+         <ThreadComposer
+           onSend={handleThreadSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+@@
+         <ThreadComposer
+           onSend={handleWelcomeSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+*** Update File: webui/src/App.tsx
+@@
+ import type { SettingsExitGuard } from "@/components/settings/contracts";
++import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
+@@
+   const [pendingNativeNavigation, setPendingNativeNavigation] = useState<(() => void) | null>(null);
++  const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const registerNativeDraft=useCallback((key:string,controller:ComposerDraftController|null)=>{
++    if(controller)nativeDrafts.current.set(key,controller);else nativeDrafts.current.delete(key);
++  },[]);
+@@
+-      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
+       if (!options?.sending && currentShellRouteRef.current.view === "chat" &&
+-          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
+-        setPendingNativeNavigation(() => leave);
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        setPendingNativeNavigation(() => ()=>{draft.discard();leave();});
+@@
+-      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
+       if (currentShellRouteRef.current.view === "chat" &&
+-          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
+@@
+         setPendingNativeNavigation(() => () => {
++          draft.discard();
+@@
+         onBeforeLeaveNative={leave => {
+-          if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++          const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++          if(view==="chat"&&draft?.hasDraft)setPendingNativeNavigation(()=>()=>{draft.discard();leave();});
++          else if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
+@@
+                             transcriptionEnabled={false}
++                            persistQueuedPrompts={false}
++                            onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
+@@
+                           transcriptionEnabled={false}
++                          persistQueuedPrompts={false}
++                          onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
+*** End Patch
