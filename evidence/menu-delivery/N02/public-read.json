@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-read-17a7c24b-9afc-4b14-a1e0-47c9e5c80dcf",
+  "ports": {
+    "business": 10741,
+    "webui": 10742,
+    "gateway": 20741
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "scope": "N02_AUTHENTICATED_CONVERSATION_READ",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_authenticated_attached_chat_runtime_and_artifact_read",
+      "chat_id": "effbfd6f-f20f-4382-ae9d-59ea48c4d5e6",
+      "session_id": "websocket:effbfd6f-f20f-4382-ae9d-59ea48c4d5e6",
+      "run_id": "run-9e788349-338f-4569-9fa5-ccd4e837e547",
+      "artifact": {
+        "kind": "morning_list",
+        "id": "morning-9448c287-fbcc-455a-b390-163f09fdd5b9"
+      },
+      "read_only_repeat_unchanged": true
+    },
+    {
+      "check": "unattached_connection_maintainer_injected_identity_and_unrelated_artifact_rejected",
+      "unattached_status": 403,
+      "maintainer_status": 403,
+      "injected_fields_status": 400,
+      "unrelated_artifact_status": 403
+    }
+  ]
+}

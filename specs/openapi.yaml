@@ -26,7 +26,9 @@ x-menu-n02-conversation:
   attachment_scope: native saved user media inside approved media root; real size/hash; no client filesystem path input; STORED is not business source authorization
   original_filename: actual accepted original name/MIME/file hash stored in native session metadata; absent historical metadata remains null; file change rejects current read
   mutation_policy: only accepted upload metadata stored in native session; no business writes or owner authorization; original message commands and original operation-status lookup reused
-  public_integration: PENDING_N2_N3
+  authenticated_read_transport: webui_request boss.conversation.read/artifact/messages/attachments; current BOSS connection and attached chat checked by RoleChannel; session_id derived by SDK mapping
+  public_read_payload: read/attachments use chat_id only; artifact adds run_id/kind/id; messages accepts empty object and retains OWNER_MESSAGE_HISTORY
+  public_integration: READ_ADAPTER_CHECKED_GENERAL_NATIVE_ADOPTION_AND_COMPLETE_MENU_PENDING
 x-fc04-business-alerts:
   schema_version: 1.0.0
   schema_extension: business-alert.schema.json

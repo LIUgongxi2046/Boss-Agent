@@ -16,6 +16,7 @@ from aiohttp import web
 from business import now
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
+from public_conversation import CONVERSATION_READ_ACTIONS, PublicConversation
 
 
 class RoleChannel(WebSocketChannel):
@@ -39,6 +40,7 @@ class RoleChannel(WebSocketChannel):
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
         self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
+        self.conversation = PublicConversation(business_store, self.gateway.session_manager, self.gateway.media._media_dir("websocket")) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
@@ -185,6 +187,9 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
+        if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS:
+            await self._conversation_response(connection, role, envelope)
+            return
         if kind == "webui_request" and action == "boss.reminder.prepare":
             task = asyncio.create_task(self._reminder_response(connection, role, envelope))
             self.bi_responses.add(task)
@@ -346,6 +351,24 @@ class RoleChannel(WebSocketChannel):
             if accepted["chat_id"] != chat_id or accepted["turn_id"] != metadata.get("webui_turn_id"):
                 raise web.HTTPForbidden(text="原生入队对象与晨间证明不符")
             admission["enqueued"] = True
+
+    async def _conversation_response(self, connection, role, envelope):
+        request_id = envelope.get("request_id")
+        if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
+            raise ValueError("会话读取缺少有效请求编号")
+        def active():
+            return self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0)
+        try:
+            if self.conversation is None:
+                raise web.HTTPServiceUnavailable(text="当前会话读取服务尚未就绪")
+            result = self.conversation.read(role, envelope["action"], envelope.get("payload"),
+                attached=lambda chat_id: chat_id in self.webui_connection_chats(connection), active=active)
+            status, response = 200, {"result": result}
+        except web.HTTPException as failure:
+            status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
+        self.record(role, envelope["action"], status)
+        if connection.close_code is None:
+            await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": status == 200, **response}, ensure_ascii=False))
 
     async def _reminder_response(self, connection, role, envelope):
         request_id = envelope.get("request_id")

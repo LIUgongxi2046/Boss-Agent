@@ -16,7 +16,7 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 |---|---|
 | 需求/设计 | SATISFIED；当前完整26项工单、原 N02 区域与通用状态，不按原生组件当前功能缩减 |
 | 身份/原生框架 | SATISFIED 输入基础；UI02 当前 ClientProvider、历史、新建/选择/搜索、原生输入/上传/流式/停止及 D06；当前完整采用仍需逐项核查 |
-| 领域/消息/来源/版本 | 现有 boss_message_calendar、消息命令、任务和来源为可复用输入；完整 N02 的会话/任务/产物关联及必要增量 PENDING，由 N1准确交接 |
+| 领域/消息/来源/版本 | 已接收N1生产者5f2138234353c5c224b3d0034d4c1565e6e8939b至e5724eb；ConversationAPI与实际原生附件元信息、消息/回复/来源采用；公开上传元信息和完整业务共享路径待继续 |
 | Agent/Runtime | 已接收 N2生产者86579a85c278e349d615aa39b57ba26b63729ad5，当前集成77f7647；一般会话可信读取和Runtime模块1.0.0，公开接收/完整规划及业务产物采用 PENDING |
 | 公开接收/前端 | N3唯一维护实际注册、RoleChannel、App、Shell、组件/样式、独立制品与连续验证；采用准确已有接口，不编造新业务值 |
 | 独立核查 | N4按原 PRD/设计建立26项独立矩阵；准确候选后只核查必要差距和受影响消费者 |
@@ -32,9 +32,13 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 
 独立 menu-n02-n3-dist 构建通过，Vite计时30.53秒，日志 .work/menu-n02-build.log。`node validation/desktop/check-menu-n02-native-privacy.cjs` 通过，原始结果 evidence/menu-delivery/N02/native-privacy.json；使用新10731/10732/20731及代理10733、独立SQLite/账号。实际批准 YAML文件的附件单独存在时触发离开保护，继续编辑保留、明确放弃清除；代理仅延迟真实当前会话输出，排队输入没有进入URL/普通浏览器缓存、没有发送，明确放弃后不恢复。该证据仅覆盖相应 C04/C06/C21的当前增量，不登记完整26项或一般会话业务通过。F01制品未更改。
 
-N2模块提供 ConversationContext/ConversationScope、五项正式只读适配、ConversationSimulatedProvider/ConversationRuntimeRecorder，记录输入/参数摘要与正式引用，不提供模型本人确认。接收后在当前 PRODUCT 运行 `CONVERSATION_DOMAIN_ROOT=当前PRODUCT validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_runtime.py`，12 passed，9.19秒，证据 evidence/menu-delivery/N02/read-runtime.xml。仅证明模块及实际 SDK的当前读取/终态/隐私；通用自然输入规划、原生接收去重、附件/消息/任务/产物关联、公开注册与Schema仍待准确接口和实际消费者，不登记完整N02通过。N1当前正在完成准确领域交付，运行中仅只读，不采用未完成文件作为正式接口。
+N2模块提供 ConversationContext/ConversationScope、五项正式只读适配、ConversationSimulatedProvider/ConversationRuntimeRecorder，记录输入/参数摘要与正式引用，不提供模型本人确认。接收后在当前 PRODUCT 运行 `CONVERSATION_DOMAIN_ROOT=当前PRODUCT validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_runtime.py`，12 passed，9.19秒，证据 evidence/menu-delivery/N02/read-runtime.xml。仅证明模块及实际 SDK的当前读取/终态/隐私；通用自然输入规划、原生接收去重、附件/消息/任务/产物关联、公开注册与Schema仍待准确接口和实际消费者，不登记完整N02通过。
 
-原设计实际加载检查已运行：`env TMPDIR=validation/.work/tmp node validation/desktop/check-menu-n02-design.cjs`，结果 PASS，六组 DOM/位置尺寸保存在 evidence/menu-delivery/N02/reference-dom.json。采用独立 menu-n02-reference-profile，未启动产品或读取现有用户资料。该结果仅证明设计来源及六组布局读取，不登记 N02 产品检查点通过。区域/Token/真实原生组件与正式接口依赖记录于 design.md。
+N1领域与既有消息消费者在当前PRODUCT共19 passed、10.81秒，原始证据evidence/menu-delivery/N02/received-domain.xml。PublicConversation已接入RoleChannel的四项只读webui_request：boss.conversation.read/artifact/messages/attachments。身份和会话归属由当前认证连接及已订阅chat核查，session_id从原生映射产生，客户端不能提供owner/namespace/session_id。消息历史明确为OWNER_MESSAGE_HISTORY。`check-menu-n02-conversation-read.cjs`通过，结果public-read.json；采用独立10741/10742/20741及实际SDK晨间运行依赖，证明准确运行/产物读取、重复读取不变及维护/未订阅/注入字段/无关产物拒绝。该检查不证明一般会话规划、完整附件处理或完整N02菜单。
+
+N2已接收准确N1接口并继续当前必要原生规划与admit/恢复适配，marker=MENU-N02-N2-NATIVE-20261024，turn=01a16e24-0c1d-72a3-ad17-86f62235402f；发送前复查idle，运行中保持只读。公开注册仍由N3负责，同一请求不得重复生成Runtime。
+
+原设计实际加载检查已运行：`env TMPDIR=validation/.work/tmp node validation/desktop/check-menu-n02-design.cjs`，结果 PASS，18组DOM/计算样式/尺寸保存在evidence/menu-delivery/N02/reference-dom.json，含三种窗口100%/200%及阈值相邻样本。当前产品另以独立10751/10752/20751及真实新建空会话测得18组framework-before.json。N02-D01—D12差距见design-gaps.md；区域/Token/真实原生组件与正式接口依赖见design.md。仅登记实际测量，设计完成与用户验收均未通过。
 
 已发送当前四窗口的角色续接，marker=MENU-N02-START-20261024；每次发送前复查 idle。N1 turn=01a16df8-d1c1-79f3-87d2-3b362d5c889e，N2 turn=01a16df8-e6aa-7ac3-8a7b-a0abfc791fc0，N4 turn=01a16df8-f3bc-7ad1-8f73-d95ab5c77283；工具分别返回对应既有 threadId。运行中仅只读，角色准确自然交付后接收必要增量，禁止重复接续。
 
