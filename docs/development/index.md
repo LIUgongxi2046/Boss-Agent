@@ -4,6 +4,7 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| MENU-N02-N3 | [聊天交办完整菜单](../menu-delivery/N02/integration.md) | FR-08/24/29、原始 v6 N02、MENU-N02.C01—C26；连续会话/附件、任务与来源、实际运行、消息授权及异常；FR-27暂停，正式状态引用原始 feature-delivery.json |
 | MENU-F01-N3 | [今日工作完整菜单](../menu-delivery/F01/integration.md) | FR-01、原始 v6 F01、MENU-F01.C01—C18；区域结构、正式来源、排序、会话、共享交办与返回；正式状态引用原始 feature-delivery.json |
 | UI02-N3 | [开源界面统一体验](../feature-delivery/UI02/integration.md) | UI02.C01—C08；公共框架、原生会话、Settings、主题与连续操作；正式状态引用原始 feature-delivery.json |
 | UI01-N3 | [已完成功能菜单与登录页](../feature-delivery/UI01/integration.md) | 七项工单；已交付导航、受控账号填充和登录布局；后续界面整合见 UI02，用户验收独立登记 |

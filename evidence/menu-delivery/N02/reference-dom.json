@@ -1,0 +1,205 @@
+{
+  "title": "N02 · 聊天交办 | Boss Agent",
+  "page_id": "N02",
+  "has_builder": true,
+  "headings": [
+    "当前会话与关联事项",
+    "对话与任务运行",
+    "交办消息",
+    "可观察执行步骤",
+    "持续进展与异常"
+  ],
+  "fields": [
+    {
+      "name": "本次消息",
+      "tag": "TEXTAREA"
+    }
+  ],
+  "actions": [
+    {
+      "title": "返回当前事项 ↗",
+      "action": null,
+      "page": "F01"
+    },
+    {
+      "title": "开始新会话",
+      "action": "new-session",
+      "page": null
+    },
+    {
+      "title": "添加附件",
+      "action": "choose-file",
+      "page": null
+    },
+    {
+      "title": "语音输入 ↗",
+      "action": null,
+      "page": "F27"
+    },
+    {
+      "title": "提交需求",
+      "action": "submit-chat",
+      "page": null
+    },
+    {
+      "title": "核查来源 ↗",
+      "action": null,
+      "page": "D01"
+    },
+    {
+      "title": "查看交办 ↗",
+      "action": null,
+      "page": "F06"
+    },
+    {
+      "title": "查询原执行结果 ↗",
+      "action": null,
+      "page": "D03"
+    },
+    {
+      "title": "查看最新进展",
+      "action": "latest-progress",
+      "page": null
+    },
+    {
+      "title": "必要决定 ↗",
+      "action": null,
+      "page": "D02"
+    }
+  ],
+  "source_sha256": "691b9a8c7e3698826cf14afb6b32343a497ed3bd52fbd37889eaec7be890141f",
+  "layouts": [
+    {
+      "width": 1440,
+      "height": 1024,
+      "zoom": 1,
+      "columns": "825px 310px",
+      "gap": "14px",
+      "main": {
+        "x": 250,
+        "y": 364.390625,
+        "width": 825,
+        "height": 915
+      },
+      "aside": {
+        "x": 1089,
+        "y": 364.390625,
+        "width": 310,
+        "height": 323
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1440,
+      "height": 1024,
+      "zoom": 2,
+      "columns": "612.734px",
+      "gap": "14px",
+      "main": {
+        "x": 83.6328125,
+        "y": 334.03125,
+        "width": 612.734375,
+        "height": 914
+      },
+      "aside": {
+        "x": 83.6328125,
+        "y": 1262.03125,
+        "width": 612.734375,
+        "height": 301
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "zoom": 1,
+      "columns": "668.281px 310px",
+      "gap": "14px",
+      "main": {
+        "x": 248.359375,
+        "y": 362.75,
+        "width": 668.28125,
+        "height": 915
+      },
+      "aside": {
+        "x": 930.640625,
+        "y": 362.75,
+        "width": 310,
+        "height": 323
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "zoom": 2,
+      "columns": "534px",
+      "gap": "14px",
+      "main": {
+        "x": 83,
+        "y": 373.3984375,
+        "width": 534,
+        "height": 912
+      },
+      "aside": {
+        "x": 83,
+        "y": 1299.3984375,
+        "width": 534,
+        "height": 295
+      },
+      "main_gap": "13px",
+      "panel_padding": "15px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "zoom": 1,
+      "columns": "909.438px",
+      "gap": "14px",
+      "main": {
+        "x": 87.28125,
+        "y": 337.671875,
+        "width": 909.4375,
+        "height": 915
+      },
+      "aside": {
+        "x": 87.28125,
+        "y": 1266.671875,
+        "width": 909.4375,
+        "height": 301
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "zoom": 2,
+      "columns": "406px",
+      "gap": "14px",
+      "main": {
+        "x": 83,
+        "y": 388.59375,
+        "width": 406,
+        "height": 987
+      },
+      "aside": {
+        "x": 83,
+        "y": 1389.59375,
+        "width": 406,
+        "height": 317
+      },
+      "main_gap": "13px",
+      "panel_padding": "15px",
+      "panel_radius": "15px"
+    }
+  ]
+}
