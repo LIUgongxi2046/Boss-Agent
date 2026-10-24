@@ -55,6 +55,36 @@
 .boss-f01-dialog blockquote{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;line-height:24px;margin:16px 0 0;padding:14px;border-left:3px solid #0968ea;background:#f5f8fc}
 .boss-f01-close{position:absolute;right:12px;top:12px}
 .boss-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.boss-v6 .boss-f01.boss-morning-view .boss-panel{border:1px solid #e0ebf7;border-radius:15px;box-shadow:0 10px 28px rgba(36,86,153,.06),0 1px 3px rgba(24,79,133,.03)}
+.boss-v6 .boss-f01 .boss-panel-head h2{font-size:17px;line-height:26px;font-weight:760;color:#163052}
+.boss-v6 .boss-f01 .boss-panel p{font-size:14px;line-height:22px;color:#52647A}
+.boss-v6 .boss-f01 .boss-btn{gap:6px;border:1px solid #cfe0f2;border-radius:10px;min-height:44px;padding:8px 13px;color:#1658a5;background:#fff;font-size:14px;line-height:22px;font-weight:690}
+.boss-v6 .boss-f01 .boss-btn-primary{background:#0969E8;border-color:#0969E8;color:#fff}
+.boss-v6 .boss-f01 .boss-btn:hover:not(:disabled){box-shadow:0 3px 11px rgba(12,96,200,.11);border-color:#6fa9e3}
+.boss-v6 .boss-f01 .boss-btn-primary:hover:not(:disabled){filter:none}
+.boss-v6 .boss-f01 .boss-actions{justify-content:flex-end;gap:9px;margin:2px 0}
+.boss-f01.boss-morning-view .boss-panel-head{align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.boss-f01-scope{margin-bottom:2px}
+.boss-f01-scope-actions{gap:9px}
+.boss-f01-categories{display:flex;gap:5px;padding:5px;background:#f4f8fc;border-radius:10px;margin-bottom:13px;flex-wrap:wrap}
+.boss-v6 .boss-f01 button.boss-f01-category{flex:1;min-width:80px;min-height:44px;padding:7px 10px;border:0;border-radius:8px;background:transparent;color:#627a94;font-size:14px;font-weight:650;line-height:22px;display:flex;justify-content:center;align-items:center;gap:6px}
+.boss-v6 .boss-f01 .boss-f01-category.selected{background:#fff;box-shadow:0 1px 5px #dae8f4;color:#0563c9}
+.boss-f01-category span{font-size:12px;white-space:nowrap}
+.boss-f01-items{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
+.boss-v6 .boss-f01 button.boss-f01-item{display:flex;align-items:center;gap:12px;width:100%;padding:12px 13px;border:1px solid #e1eaf5;border-radius:11px;background:#fcfeff;text-align:left;font-size:14px;line-height:22px;min-height:64px;color:#52647A}
+.boss-v6 .boss-f01 .boss-f01-item:hover,.boss-v6 .boss-f01 .boss-f01-item[aria-pressed=true]{border-color:#80b8f2;background:#f0f8ff}
+.boss-f01-item-icon{width:32px;height:32px;border-radius:10px;flex:0 0 32px;display:grid;place-items:center;background:#eaf3ff;color:#1467d6;font-size:15px;font-weight:800}
+.boss-f01-item-copy{flex:1;min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+.boss-f01-item-copy strong{font-size:15px;font-weight:700;color:#193c60}
+.boss-f01-item-copy>span{font-size:14px;line-height:22px}
+.boss-f01-item-category{font-size:12px;font-weight:650;border-radius:100px;padding:4px 9px;background:#ecf3fc;color:#37658f}
+.boss-f01 .boss-f01-table-foot{border:0;padding:10px 0;font-size:14px;line-height:22px}
+.boss-f01 .boss-f01-detail-fields{display:block;margin:0}
+.boss-f01-detail-fields>div{display:grid;grid-template-columns:125px minmax(0,1fr);gap:11px;padding:10px 0;border-bottom:1px solid #eaf0f7;font-size:14px;line-height:22px}
+.boss-f01-detail-fields>div:last-child{border:0}
+.boss-f01-detail-fields dt{color:#607d99}.boss-f01-detail-fields dd{margin:0;font-size:14px;font-weight:600;color:#244768}
+.boss-f01 details>summary{color:#1658a5;font-size:14px;line-height:22px}
+.boss-f01-entry-actions{justify-content:flex-end;gap:9px;margin:2px 0}
 @media(max-width:1250px){.boss-f01-grid{grid-template-columns:minmax(0,1fr) 260px}}
 @media(max-width:1050px){.boss-f01-grid{grid-template-columns:1fr}.boss-f01-aside{display:flex}.boss-f01-scope{grid-template-columns:repeat(2,minmax(0,1fr))}.boss-f01-categories{gap:10px}.boss-f01-category{flex-direction:column}}
-@media(max-width:700px){.boss-f01-categories,.boss-f01-aside,.boss-f01-detail-fields,.boss-f01-scope{grid-template-columns:1fr}.boss-f01-category{flex-direction:row}.boss-f01-scope label,.boss-f01-scope input{width:100%}.boss-f01.boss-morning-view .boss-panel{padding:15px}.boss-f01 .boss-panel-head{flex-wrap:wrap}.boss-f01-dialog.boss-v6{padding:18px}}
+@media(max-width:700px){.boss-f01-categories,.boss-f01-aside,.boss-f01-detail-fields,.boss-f01-scope{grid-template-columns:1fr}.boss-f01-category{flex-direction:row}.boss-f01-scope label,.boss-f01-scope input{width:100%}.boss-f01.boss-morning-view .boss-panel{padding:15px}.boss-f01 .boss-panel-head{flex-wrap:wrap}.boss-f01-dialog.boss-v6{padding:18px}.boss-f01-detail-fields>div{grid-template-columns:90px minmax(0,1fr)}.boss-f01-item{flex-wrap:wrap}.boss-f01-item-category{margin-left:44px}}

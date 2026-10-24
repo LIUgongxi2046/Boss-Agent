@@ -6,19 +6,20 @@ const {execFileSync}=require('node:child_process');
 const {_electron:electron}=require('playwright');
 const {expect:baseExpect}=require('@playwright/test');
 const expect=baseExpect.configure({timeout:15000});
-const root=path.resolve(__dirname,'../..'),validation=path.join(root,'validation'),directory=path.join(validation,'.work','menu-n02-launcher-check-'+randomUUID());
+const rework=process.env.MENU_F01_REWORK==='1';
+const root=path.resolve(__dirname,'../..'),validation=path.join(root,'validation'),directory=path.join(validation,'.work',(rework?'menu-f01-rework-launcher-check-':'menu-n02-launcher-check-')+randomUUID());
 const space=fs.statfsSync(root);assert(space.bavail*space.bsize>=200*1024*1024,'检查需要至少200MiB可用空间');
-const frontend=path.join(root,'menu-n02-n3-dist'),ports={business:10791,webui:10792,gateway:20791},origin='http://127.0.0.1:'+ports.webui;
-const output=path.join(root,'evidence/menu-delivery/N02/launcher.json'),records=[];
+const frontend=path.join(root,rework?'menu-f01-rework-n3-dist':'menu-n02-n3-dist'),ports={business:10791,webui:10792,gateway:20791},origin='http://127.0.0.1:'+ports.webui;
+const output=path.join(root,rework?'evidence/menu-delivery/F01/rework-launcher.json':'evidence/menu-delivery/N02/launcher.json'),records=[];
 let stage='INITIALIZE';
 function save(status){fs.writeFileSync(output,JSON.stringify({status,scope:'N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL',application_directory:directory,ports,frontend_directory:frontend,manifest_sha256:createHash('sha256').update(fs.readFileSync(path.join(frontend,'asset-manifest.json'))).digest('hex'),visual:'NOT_RUN',user_acceptance:'NOT_RUN',records},null,2)+'\n');}
 async function main(){let desktop;
   try{
-    const initialization=JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(root,'scripts/prepare_menu_n02.py'),'--directory',directory,'--frontend',frontend,'--ports',JSON.stringify(ports)],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(validation,'.work/tmp')},encoding:'utf8'}));assert.equal(initialization.existing_data_reused,false);
-    const setup=JSON.parse(fs.readFileSync(path.join(directory,'setup.json')));assert.equal(setup.feature_id,'MENU-N02');assert.equal(setup.status,'READY');assert.deepEqual(setup.ports,ports);records.push({check:'fresh_isolated_initializer_uses_actual_registered_tools',configuration_version:setup.configuration_version,tool_scope:setup.runtime_configuration_values.tool_scope});save('IN_PROGRESS');
+    const initialization=JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(root,rework?'scripts/prepare_menu_f01_rework.py':'scripts/prepare_menu_n02.py'),'--directory',directory,'--frontend',frontend,'--ports',JSON.stringify(ports)],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(validation,'.work/tmp')},encoding:'utf8'}));assert.equal(initialization.existing_data_reused,false);
+    const setup=JSON.parse(fs.readFileSync(path.join(directory,'setup.json')));assert.equal(setup.feature_id,rework?'MENU-F01':'MENU-N02');assert.equal(setup.status,'READY');assert.deepEqual(setup.ports,ports);records.push({check:'fresh_isolated_initializer_uses_actual_registered_tools',configuration_version:setup.configuration_version,tool_scope:setup.runtime_configuration_values.tool_scope});save('IN_PROGRESS');
     const credentialFile=path.join(directory,'accounts/credentials.json'),beforeCredential=fs.statSync(credentialFile),digest=()=>JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(validation,'fc04_state_digest.py'),directory],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(directory,'tmp')},encoding:'utf8'}));const before=digest();
-    desktop=await electron.launch({executablePath:path.join(root,'scripts/run_menu_n02.command'),args:[],cwd:root,timeout:120000,env:{...process.env,BOSS_DESKTOP_TEST_WINDOW_HIDDEN:'1',BOSS_MENU_N02_WORK_DIRECTORY:directory,BOSS_MENU_N02_PORTS:JSON.stringify(ports),PYTHONDONTWRITEBYTECODE:'1'}});
-    const page=await desktop.firstWindow({timeout:120000});await page.waitForURL(origin+'/?bossPage=N02');
+    desktop=await electron.launch({executablePath:path.join(root,rework?'scripts/run_menu_f01_rework.command':'scripts/run_menu_n02.command'),args:[],cwd:root,timeout:120000,env:{...process.env,BOSS_DESKTOP_TEST_WINDOW_HIDDEN:'1',...(rework?{BOSS_MENU_F01_REWORK_WORK_DIRECTORY:directory,BOSS_MENU_F01_REWORK_PORTS:JSON.stringify(ports)}:{BOSS_MENU_N02_WORK_DIRECTORY:directory,BOSS_MENU_N02_PORTS:JSON.stringify(ports)}),PYTHONDONTWRITEBYTECODE:'1'}});
+    const page=await desktop.firstWindow({timeout:120000});page.setDefaultTimeout(15000);await page.waitForURL(origin+'/?bossPage='+(rework?'F01':'N02'));
     for(const role of ['BOSS','MAINTAINER']){
       stage='FILL_'+role;
       if(role==='MAINTAINER')await page.getByRole('button',{name:'技术维护',exact:true}).click();
@@ -27,10 +28,12 @@ async function main(){let desktop;
       await page.getByRole('button',{name:/^(登录|重新认证)$/}).click();await expect(page.locator('.boss-v6[data-role="'+role+'"]')).toBeVisible();assert.equal(desktop.windows().length,1);
       if(role==='BOSS'){
         stage='RUN_WITH_FOURTEEN_TOOLS';
+        if(rework){await expect(page.locator('.boss-hero h1')).toHaveText('早上好 · 今天想推进什么？');await expect(page.getByRole('heading',{name:'交给 Boss Agent',exact:true})).toBeVisible();const question=page.getByLabel('晨间问题',{exact:true}),start=page.getByRole('navigation',{name:'老板快捷导航',exact:true}).getByRole('button',{name:'开始对话',exact:true});await question.fill('请帮助核查当前可读取资料');await start.click();await page.getByRole('dialog').getByRole('button',{name:'返回继续编辑',exact:true}).click();await expect(question).toHaveValue('请帮助核查当前可读取资料');await start.click();await page.getByRole('dialog').getByRole('button',{name:'放弃草稿并离开',exact:true}).click();}
         await expect(page.locator('.boss-hero h1')).toHaveText('聊天交办');const region=page.getByRole('region',{name:'聊天交办内容',exact:true});await expect(region).toBeVisible();await expect(page.getByRole('button',{name:'提交需求',exact:true})).toBeDisabled();
         await region.locator('textarea').fill('读取 finance-note');await region.getByRole('button',{name:'提交需求',exact:true}).click();await expect(region.locator('.boss-n02-progress')).toContainText('运行完成',{timeout:60000});
         const runtime=JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(validation,'check_menu_n02_runtime.py'),directory],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(directory,'tmp')},encoding:'utf8'}));
         assert.equal(runtime.runtime_count,1);assert.deepEqual(runtime.active_tool_scope,setup.runtime_configuration_values.tool_scope);assert.deepEqual(runtime.tool_scopes,[['bossDashboardRead','bossEvidenceRead','bossMeetingsRead','bossTasksRead','bossWorkspaceRead','conversationRead','query_metrics']]);assert.deepEqual(runtime.configuration_versions,[setup.configuration_version]);assert.equal(runtime.active_configuration_version,setup.configuration_version);records.push({check:'actual_launcher_active_fourteen_tools_and_native_scope_seven',...runtime});
+        if(rework){await region.getByRole('button',{name:'返回业务页面',exact:true}).click();await expect(page.getByLabel('晨间问题',{exact:true})).toHaveValue('');records.push({check:'f01_quick_start_respects_d06_keep_and_explicit_discard',question_submitted_by_shortcut:false,discarded_question_restored:false});}
       }
       records.push({check:'controlled_main_window_role_account_fill_requires_explicit_login',role,account_filled_without_login:true,ordinary_storage_contains_password:false,same_window:true});await page.getByTitle('退出当前身份',{exact:true}).click();await expect(page.getByLabel('账号',{exact:true})).toBeEnabled();
     }

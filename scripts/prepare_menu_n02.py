@@ -25,12 +25,12 @@ VALUES = {"max_tool_rounds": 12, "max_output_tokens": 700, "tool_scope": TOOLS,
 PROTECTED_PORTS = {9961, 9962, 19961, 10411, 10412, 20411, 10611, 10612, 20611}
 
 
-async def prepare(directory, frontend, ports):
+async def prepare(directory, frontend, ports, *, feature_id="MENU-N02"):
     manifest = hashlib.sha256((frontend / "asset-manifest.json").read_bytes()).hexdigest()
     marker = directory / "setup.json"
     if directory.exists():
         saved = json.loads(marker.read_text())
-        if any(saved.get(key) != value for key, value in {"feature_id": "MENU-N02", "status": "READY",
+        if any(saved.get(key) != value for key, value in {"feature_id": feature_id, "status": "READY",
                 "ports": ports, "manifest_sha256": manifest, "runtime_configuration_values": VALUES}.items()):
             raise ValueError("已有聊天交办资料与当前制品或配置声明不符，请保留资料并核查")
         for name in ("business.sqlite", "runtime-scope.json", "accounts/accounts.sqlite", "accounts/credentials.json"):
@@ -92,7 +92,7 @@ async def prepare(directory, frontend, ports):
                     active = await command("boss.runtime.activate", {"client_request_id": str(uuid4()),
                         "expected_version": checked["version"], "expected_content_sha256": checked["content_sha256"],
                         "expected_active_version": current["current"]["version"]})
-            result = {"feature_id": "MENU-N02", "status": "READY", "scope_id": "BOSS-PRIORITY-ITERATION",
+            result = {"feature_id": feature_id, "status": "READY", "scope_id": "BOSS-PRIORITY-ITERATION",
                 "ports": ports, "frontend_directory": str(frontend), "manifest_sha256": manifest,
                 "runtime_configuration_values": VALUES, "configuration_version": active["version"],
                 "external_api_mode": "SIMULATED_FIRST", "automatic_form_login": False}

@@ -269,6 +269,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [assignmentDirty, setAssignmentDirty] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
+  const [morningDiscardVersion,setMorningDiscardVersion]=useState(0);
   const [morningOrigin,setMorningOrigin]=useState<MorningReference|null>(null);
   const [morningReady,setMorningReady]=useState(false);
   const [morningContext,setMorningContext]=useState<MorningPreparationContext|null>(null);
@@ -527,7 +528,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     return () => abort.abort();
   }, [getToken, page, role, selectedTaskId, requestVersion]);
 
-  const userNav = page==="N02"&&role==="BOSS"?BOSS_MENU_NAV:(role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>role!==null&&allowed(id,role,mvpScope,priorityScope));
+  const referenceMenu = ["F01","N02"].includes(page)&&role==="BOSS"&&!mvpScope;
+  const userNav = referenceMenu?BOSS_MENU_NAV:(role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>role!==null&&allowed(id,role,mvpScope,priorityScope));
   const metadata = page === "NATIVE" ? {
     ...pages.N01,
     title: role === "BOSS" ? "大鹏会话" : "应用设置",
@@ -585,9 +587,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <nav className="boss-sidebar-nav">
             {userNav.map(([id, label, Icon]) =>
               <button type="button" key={id} className={"boss-nav-item " + (page === id ? "active" : "")}
-                onClick={() => navigate(id)} disabled={page==="N02"&&!deliveredPage(id,role,mvpScope)?.directory} title={page==="N02"?label:deliveredPage(id,role,mvpScope)?.title??label} aria-current={page === id ? "page" : undefined}>
-                {page==="N02"?<ReferenceNavigationIcon id={id}/>:<Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
-                {sidebarOpen && <span>{page==="N02"?label:deliveredPage(id,role,mvpScope)?.title??label}</span>}
+                onClick={() => navigate(id)} disabled={referenceMenu&&!deliveredPage(id,role,mvpScope)?.directory} title={referenceMenu?label:deliveredPage(id,role,mvpScope)?.title??label} aria-current={page === id ? "page" : undefined}>
+                {referenceMenu?<ReferenceNavigationIcon id={id}/>:<Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
+                {sidebarOpen && <span>{referenceMenu?label:deliveredPage(id,role,mvpScope)?.title??label}</span>}
               </button>
             )}
           </nav>
@@ -607,9 +609,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             <button className="boss-search" type="button" onClick={openDirectory}>
               <Search size={17}/><span>{(mvpScope||priorityScope)?"查找当前可用入口":"搜索页面、经营专题、任务入口…"}</span><kbd>⌘ K</kbd>
             </button>
-            {page==="N02"&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={onNewConversation}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
+            {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(page==="F01")guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
-              {page!=="N02"&&<Tag tone="blue">本地桌面开发版</Tag>}
+              {!referenceMenu&&<Tag tone="blue">本地桌面开发版</Tag>}
               <Tag tone="amber">模拟业务资料</Tag>
               {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}><Bell size={18}/></button>
@@ -624,7 +626,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             <div className={"boss-hero " + (["F01","N02"].includes(page) ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
                 <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
-                <h1>{page === "F01" ? mvpScope?"今日采购成本事项":"今日工作" : metadata?.title || "工作页面"}</h1>
+                <h1>{page === "F01" ? mvpScope?"今日采购成本事项":"早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{mvpScope&&page==="F01"?"核查同一采购报告的成本变化、原文与本人协调记录。":metadata?.summary || "按照 PRD 查看当前执行过程和资料来源。"}</p>
               </div>
               <img src={page==="N02"?"/boss-brand/dapeng-side.png":["F05","F13","F24","F29"].includes(page) ? "/boss-brand/dapeng-think.png" : ["F06","F07","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"].includes(page) ? "/boss-brand/dapeng-execute.png" : "/boss-brand/dapeng-front.png"} className="boss-hero-mascot" alt="大鹏吉祥物" />
@@ -634,7 +636,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
               {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenSource:id=>{conversationReturn.current=true;goSource(id);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onReturn:()=>navigate(businessPage.current??(previousPage!=="NATIVE"&&previousPage!=="N02"&&allowed(previousPage,role,mvpScope,priorityScope)?previousPage:role==="BOSS"?"F01":"A08"))})}
             </section>
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-morning-content" hidden={page!=="F01"}>
-              <BossMorningView refreshVersion={requestVersion} visible={page==="F01"} onDirtyChange={setWorkDirty}
+              <BossMorningView key={morningDiscardVersion} refreshVersion={requestVersion} visible={page==="F01"} onDirtyChange={setWorkDirty}
                 onStartConversation={async(value,signal)=>{const result=await onStartMorning(value,signal);if(!signal.aborted)navigate("NATIVE","",true);return result;}}
                 onOpenConversation={chatId=>{onOpenMorning(chatId);navigate("NATIVE","",true);}}
                 onNavigate={(target,objectId)=>target==="F06"?selectTask(objectId):navigate(target,objectId)}
@@ -1056,6 +1058,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             setSourceReviewDirty(false);
             setSettingsDirty(false);
             setWorkDirty(false);
+            if(page==="F01")setMorningDiscardVersion(value=>value+1);
             if(["F14","F21"].includes(page)&&!supplyEditor.pending&&!supplyEditor.pendingPreparation)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
             if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);

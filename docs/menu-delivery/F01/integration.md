@@ -1,6 +1,6 @@
 # MENU-F01 今日工作
 
-task_id=MENU-F01-N3；CURRENT；2026-10-24；REQUIRES_DESIGN_REWORK。唯一正式状态来源为原始目录 specs/feature-delivery.json。需求来源为 D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及 docs/menu-delivery/F01.md；稳定检查点 MENU-F01.C01—C18，共18项，开发覆盖分子待设计返修核查，用户验收分子null。原候选业务证据按未变依赖保留，C01/C02/C18及受影响交互需要重新验证，视觉及用户验收保持待确认。
+task_id=MENU-F01-N3；CURRENT；2026-10-25；IN_PROGRESS_DESIGN_REWORK。唯一正式状态来源为原始目录specs/feature-delivery.json。需求来源为D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及docs/menu-delivery/F01.md；稳定检查点MENU-F01.C01—C18，共18项，当前返修开发覆盖分子待核查，用户验收分子null。原候选业务证据按未变依赖保留，C01/C02/C18及受影响交互重新验证，视觉及用户验收保持待确认。
 
 ## 输入与检索
 
@@ -22,7 +22,7 @@ task_id=MENU-F01-N3；CURRENT；2026-10-24；REQUIRES_DESIGN_REWORK。唯一正�
 | N2 Agent/Runtime | 已接收选中事项 Runtime 7c4a9e8、原生设计 ec9b77f 与适配器 961b8f68a037d819e4a705e6d6c7ba0d10c7d1da；集成至 c2812c0，公开原生连接、Provider 与生命周期使用当前绑定 |
 | N4 差距矩阵 | 按原设计和完整18项建立独立依据，准确集成后处理必要问题 |
 
-布局保持原始 F01 的自然语言主操作、三类卡片、事项表格与当前详情、右侧关注和来源区域，页面配置补足日期与选中对象字段。正式类型、组件属性和异步状态在现有 docs/LLD-frontend.md 维护，区域/状态映射和设计核查证据在本任务目录维护。
+布局采用原始F01脚本实际加载的home：日期、三类Tabs与紧凑事项列表、自然语言输入；右侧采用选中对象与保存返回两个区域。完整来源、会议、冲突、风险、目标与查询记录通过明确展开入口读取。正式类型、组件属性和异步状态继续采用既有业务接口，区域与样式测量见design-rework.md。
 
 ## 验证与18项依据
 
@@ -46,4 +46,8 @@ C01/C02/C18 依据原设计区域、层级、列结构、间距、文案、控�
 
 当前用户 UI02 的 ui02-experience、desktop-ui02-experience 与 10411/10412/20411，以及原 MVP 资料与 9961/9962/19961 均保持原状态，不用于验证。新构建与数据采用独立目录和端口，全部外部 SIMULATED_FIRST，不新增真实外部请求；STT/F27/FC28 暂停，账号填充沿用原授权范围。
 
-当前独立启动入口为 scripts/run_menu_f01.command，使用 menu-f01-experience/desktop-menu-f01-experience 及10611/10612/20611，准确制品与连续步骤见 delivery.json、experience.md。该窗口现为用户体验，不用于验证、退出、重启或热替换；本人登录仍需手动提交。当前唯一实施菜单为 N02，F01必要设计返修须在进入 N03前完成，保留原18项和全部 N02未完成工作，不并行实施两个菜单。修复采用新的独立候选、制品、端口和 SQLite。
+原用户启动入口scripts/run_menu_f01.command、menu-f01-experience/desktop-menu-f01-experience及10611/10612/20611保持保护，准确原制品与步骤见delivery.json、experience.md；该体验不用于验证、退出、重启或热替换。N02候选8e135b8c8b09e0aa3b95ceddb9146868565fa8d7已登记26/26开发覆盖，用户验收待确认；其menu-n02-n3-dist、menu-n02-release-experience及10711/10712/20711同样保护。
+
+当前唯一活动菜单为F01必要设计返修，marker=MENU-F01-DESIGN-REWORK-20261025；基准为集成候选8e135b8。已实施公共框架、原六类导航、合法快捷动作、问候标题、紧凑事项、统一排序操作及右侧分组。晨间返回保存安全的技术坐标、分类和控件标识；刷新后重新读取当前事项版本，恢复继续讨论焦点，不持久保存问题正文。继续讨论在尚未输入问题时聚焦自然语言输入，由本人明确提交。
+
+独立制品为menu-f01-rework-n3-dist；新入口scripts/run_menu_f01_rework.command采用10621/10622/20621和menu-f01-rework-experience。当前严格TypeScript及Vite构建通过；当前同环境18组DOM/样式与主要按钮状态检查通过，业务来源、真实延迟响应、CAS、排序原编号恢复、独立重开及交办确认检查通过。真实连续会话和独立启动使用各自专用资料执行，正式覆盖计数待全部必要结果与准确候选记录完成后登记。原领域/Agent没有新增确证缺陷，N1/N2继续保留正确依赖；N4仅对准确候选执行必要设计复核。N03尚未启动。

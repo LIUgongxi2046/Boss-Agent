@@ -4,6 +4,7 @@ import {BossToday,morningReason,morningState,type TodayItem,type TodayOrderRecei
 import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogClose} from "@/components/ui/dialog";
 import {CheckCircle2,ClipboardList,Info,Send,X} from "lucide-react";
 import "./boss-morning.css";
+import "./boss-f01-shell.css";
 
 type Day={date:string;timezone:string};
 export type MorningConversationRequest=Day&{client_request_id:string;question:string;list_id?:string;item_id?:string;binding_id?:string};
@@ -88,6 +89,10 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   useEffect(()=>{
     const current=++epoch.current,abort=new AbortController();generation.current++;deniedRef.current=false;setDenied(false);clear();setDay(null);setDayDraft(null);setQuestion("");setQuestionDirty(false);setCategory("ALL");setMeetingOpen(false);returnPoint.current=null;setBusy(false);setOrderDirty(false);setLoading(true);setError("");setUncertain(false);
     const parameters=new URLSearchParams(window.location.search),key=parameters.get("morningRequest")??"",binding=parameters.get("morningBinding")??"";
+    const savedCategory=parameters.get("morningCategory");
+    if(savedCategory==="DECIDE"||savedCategory==="COORDINATE"||savedCategory==="INFORM")setCategory(savedCategory);
+    const savedScroll=Number(parameters.get("morningScroll")),savedFocus=parameters.get("morningFocus");
+    if(savedFocus&&/^morning-[A-Za-z0-9_-]+$/.test(savedFocus)&&Number.isFinite(savedScroll)&&savedScroll>=0){returnPoint.current={scroll:savedScroll,focus:savedFocus};returnPending.current=true;}
     setBindingId(binding);setNativeBinding(null);
     setRequestId(key);setSelected(parameters.get("morningItem")??"");setSourceId(parameters.get("morningSource")??"");
     const active=()=>current===epoch.current&&!abort.signal.aborted&&!deniedRef.current;
@@ -147,7 +152,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   },[sourceId,list,view?.list_id,read]);
   function changeDay(next:Day){
     generation.current++;receiptSequence.current++;setView(null);setList(null);bound.current=null;setReceipt(null);setRequestId("");setSelected("");setSourceId("");setDetail(null);setDocument(null);setUncertain(false);setDay(next);setDayDraft(next);setCategory("ALL");
-    setBindingId("");setNativeBinding(null);remember({morningDate:next.date,morningTimezone:next.timezone,morningRequest:null,morningItem:null,morningSource:null,morningBinding:null,morningChat:null,todayOrderRequest:null});
+    returnPoint.current=null;returnPending.current=false;
+    setBindingId("");setNativeBinding(null);remember({morningDate:next.date,morningTimezone:next.timezone,morningRequest:null,morningItem:null,morningSource:null,morningBinding:null,morningChat:null,todayOrderRequest:null,morningCategory:null,morningScroll:null,morningFocus:null});
   }
   async function submit(discuss=false){
     if(!day||busy||orderDirty||uncertain||!view||deniedRef.current||!question.trim())return;
@@ -176,16 +182,16 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   function cancelHandoff(){handoff.current?.abort();setHandoffCanceled(true);setError("会话交接取消已请求；等待原绑定结果，当前问题不会自动发送。");}
   const current=list?.adoption_state==="CURRENT",order=list?.current_order;
   useEffect(()=>{
-    if(!visible||!returnPending.current||!detail&&current)return;
+    if(!visible||!returnPending.current||loading||Boolean(selected)&&!detail)return;
     const point=returnPoint.current;if(!point)return;
-    const frame=requestAnimationFrame(()=>{surface.current?.closest(".boss-content")?.scrollTo({top:point.scroll});(window.document.getElementById(point.focus)??window.document.getElementById("morning-question"))?.focus({preventScroll:true});returnPending.current=false;});
+    const frame=requestAnimationFrame(()=>{const target=window.document.getElementById(point.focus);if(!target||target.matches(":disabled"))return;surface.current?.closest(".boss-content")?.scrollTo({top:point.scroll});target.focus({preventScroll:true});returnPending.current=false;});
     return()=>cancelAnimationFrame(frame);
-  },[visible,detail,current]);
+  },[visible,detail,current,loading,selected]);
   useEffect(()=>{
     let frame=0;
     const restoreFocus=()=>{if(!visibility.current||!returnPoint.current)return;frame=requestAnimationFrame(()=>{
       const point=returnPoint.current;if(!point)return;
-      const target=window.document.getElementById(point.focus);if(!target)return;
+      const target=window.document.getElementById(point.focus);if(!target||target.matches(":disabled"))return;
       surface.current?.closest(".boss-content")?.scrollTo({top:point.scroll});target.focus({preventScroll:true});returnPending.current=false;
     });};
     window.addEventListener("boss-navigation-focus-ready",restoreFocus);
@@ -200,7 +206,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const readOrder=useCallback((key:string,signal?:AbortSignal)=>read<TodayOrderReceipt>("/api/boss/ui/morning/receipt?"+new URLSearchParams({action:"boss.today.reorder",client_request_id:key}),signal),[read]);
   const categories=[{id:"DECIDE" as const,title:"待决定",Icon:ClipboardList},{id:"COORDINATE" as const,title:"待协调",Icon:CheckCircle2},{id:"INFORM" as const,title:"需要知晓",Icon:Info}];
   const meetings=detail?.objects.filter(object=>object.reference.kind==="meeting"&&detail.item.related_meetings?.some(ref=>ref.id===object.reference.id&&ref.version===object.reference.version))??[];
-  const captureReturn=()=>{returnPoint.current={scroll:surface.current?.closest(".boss-content")?.scrollTop??0,focus:window.document.activeElement?.id??"morning-question"};};
+  const captureReturn=()=>{const focus=window.document.activeElement?.id||"morning-question";returnPoint.current={scroll:surface.current?.closest(".boss-content")?.scrollTop??0,focus};remember({morningScroll:String(returnPoint.current.scroll),morningFocus:focus,morningCategory:category});};
+  const discuss=()=>{if(question.trim())void submit(true);else{const input=window.document.getElementById("morning-question");input?.focus();input?.scrollIntoView({block:"center"});}};
   const openRelated=(item:TodayItem)=>{captureReturn();onNavigate(item.page_id,item.object_id);};
   return <div ref={surface} className="boss-morning-view boss-f01" aria-busy={loading||busy}>
     {error&&<p role="alert" className="boss-status boss-status-error">{error}</p>}{loading&&<p role="status">正在读取当前日期资料</p>}
@@ -212,21 +219,41 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
       <label className="boss-f01-cutoff">资料截至时间<output>{view?.data_as_of??"来源截至时间不完整"}</output><small>清单读取时间 {view?.read_at??"等待读取"}</small></label>
       <div className="boss-f01-scope-actions"><span className="boss-tag boss-tag-amber">SIMULATED</span><button type="submit" className="boss-btn boss-btn-primary" disabled={disabled||loading||!dayDraft}>更新当前事项</button></div>
     </form><p>当前范围 {day?.date??"等待读取"} · {day?.timezone??"等待读取"}；业务时钟 {view?.business_clock??"等待读取"}</p></Panel>
-      <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title,Icon})=><button className={"boss-panel boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>setCategory(category===id?"ALL":id)}>
-        <span className={"boss-f01-category-icon "+id.toLowerCase()}><Icon size={22}/></span><span><strong>{title}</strong><span>{view?counts[id]+" 项":"数量待读取"}</span><small>{id==="DECIDE"?"需要本人核查并作出决定":id==="COORDINATE"?"需要本人协调人员和进展":"需要本人了解的当前事项"}</small></span>
-      </button>)}</div>
       <BossToday key={view?.list_id??day?.date??""} data={ordered} loading={loading} error="" onReload={()=>setRevision(value=>value+1)} onNavigate={onNavigate}
-        presentation="table" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={chooseItem}
-        orderScope={current&&view?.list_id?{list_id:view.list_id,date:view.date,timezone:view.timezone}:undefined} onReadOrder={readOrder} onReorder={payload=>client.requestMutation("boss.today.reorder",payload).then(()=>undefined)}/>
-      <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>现在就交给大鹏</h2><p>用自然语言提问、分析问题、准备会议或交办任务。</p></div></header>
+        presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={chooseItem} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
+        orderScope={current&&view?.list_id?{list_id:view.list_id,date:view.date,timezone:view.timezone}:undefined} onReadOrder={readOrder} onReorder={payload=>client.requestMutation("boss.today.reorder",payload).then(()=>undefined)}>
+        <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
+      </BossToday>
+      <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>交给 Boss Agent</h2></div></header>
         <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-sr-only" htmlFor="morning-question">晨间问题</label>
           <textarea id="morning-question" aria-label="晨间问题" placeholder="今天有哪些事项需要本人决定、协调或知晓？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
-          <div className="boss-f01-entry-actions"><span>{day?.date??"业务日期待读取"} · {day?.timezone??"时区待读取"}</span><button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
+          <div className="boss-f01-entry-actions"><button className="boss-btn" type="button" disabled title="语音输入暂停">语音输入</button><button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
           <p className="boss-helper">当前入口整理晨间事项。交办创建、发送与确认分别由本人决定。</p>
           {busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消会话交接</button>}
         </form>
       </section>
-      <Panel title="当前进展与查询记录"><p>{list?label(list.adoption_state):"当前日期预览"} · 清单版本 {view?.list_version??"尚未生成"}</p><p>业务日 {view?.day_start??"等待读取"} 至 {view?.day_end??"等待读取"}</p>
+    </main><aside className="boss-f01-aside" aria-label="今日工作相关信息">
+      <Panel title="选中事项与关联对象">{detail&&current?<>
+        <dl className="boss-f01-detail-fields"><div><dt>对象与当前版本</dt><dd>{detail.item.title} · {detail.item.object_id} · v{detail.item.version??"未知"}</dd></div><div><dt>关联来源</dt><dd>{detail.documents.length} 项</dd></div><div><dt>关联会议</dt><dd>{meetings.length?meetings.map(value=>value.reference.id+" · v"+value.reference.version).join("、"):"没有关联会议"}</dd></div><div><dt>交办记录</dt><dd>{detail.item.existing_measures.filter(value=>value.kind==="task").map(value=>value.id+" · v"+value.version).join("、")||"没有关联交办记录"}</dd></div></dl>
+        <div className="boss-actions"><button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>准备交办</button>
+          {meetings.length>0&&<button id="morning-meeting" className="boss-btn" disabled={disabled} onClick={()=>{overlayFocus.current=window.document.activeElement as HTMLElement;setMeetingOpen(true);}}>打开关联会议</button>}
+          {["F06","N05","F02"].includes(detail.item.page_id)&&<button id="morning-related" className="boss-btn" disabled={disabled} onClick={()=>openRelated(detail.item)}>打开关联事项</button>}</div>
+        <div className="boss-actions">{detail.documents.map(value=><button id={"morning-source-"+value.source_id} className="boss-btn" key={value.source_id} disabled={busy||uncertain} onClick={()=>chooseSource(value.source_id)}>查看依据：{value.source_id} · v{value.version}</button>)}</div>
+        <details><summary>查看事项完整资料与排序理由</summary>
+        <h3>{detail.item.title}</h3><p>{detail.item.reason}</p><p>处理人 {detail.item.coordinator_id??"尚未提供"} · 有效期限 {detail.item.due_at??"尚未提供"} · 当前状态 {morningState(detail.item.state??"尚未提供")}</p>
+        <p>时间 {detail.item.starts_at??"尚未提供"} 至 {detail.item.ends_at??"尚未提供"} · 对象时区 {detail.item.timezone??"尚未提供"}</p><p>地点 {detail.item.location??"尚未提供"}</p>
+        {detail.item.sorting_reasons?.map(reason=><p key={reason}>{morningReason(reason)}</p>)}{detail.item.goal_matches.map(goal=><p key={goal}>关联本人目标：{goal}</p>)}
+        {detail.item.risk_evaluations?.map(risk=><p key={risk.event_id}>风险 {risk.event_id} · 事件v{risk.event_version} · 规则v{risk.rule_version} · {risk.rule_state} / {risk.phase} · {risk.reason} · 持续时间 {risk.duration_seconds??"未知"} 秒</p>)}
+        {detail.item.existing_measures.map(measure=><p key={measure.kind+measure.id}>已有措施 {measure.id} · v{measure.version} · {measure.state}</p>)}
+        <p>清单 {detail.list_id} · 版本 {detail.list_version}</p>
+        {detail.documents.length===0&&<p>当前事项尚未提供原文材料。</p>}
+        {view?.preparation_materials.filter(value=>value.item_id===selected).map(value=><div key={value.item_id}><p>准备期限 {value.preparation_due_at??"尚未提供"}</p>{value.requirements.map(text=><p key={text}>{text}</p>)}</div>)}
+        </details>
+      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?"正在核查":"尚未选择事项"}</dd></div>)}</dl><p>{current?selected?"正在核查当前事项与来源版本。":"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p></>}</Panel>
+      <Panel title="保存与返回"><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
+      <div className="boss-actions"><button id="morning-tasks" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N05","");}}>任务与承诺</button><button id="morning-notifications" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N06","");}}>通知中心</button></div>
+      <details><summary>查看资料与业务记录</summary>
+      <details><summary>当前进展与查询记录</summary><p>{list?label(list.adoption_state):"当前日期预览"} · 清单版本 {view?.list_version??"尚未生成"}</p><p>业务日 {view?.day_start??"等待读取"} 至 {view?.day_end??"等待读取"}</p>
         <p>当前本人次序设置：{label(order?.state??view?.order_state??"NOT_SET")} · 当前次序版本 {order?.version??view?.order_version??"等待读取"}。事项排序理由保留清单查询时的依据。</p>
         {bindingId&&<><p>原生会话绑定 {bindingId}</p><button className="boss-btn" disabled={busy||orderDirty||denied} onClick={()=>void restoreBinding(bindingId).catch(failure=>setError(failure.message))}>读取原会话绑定与结果</button></>}
         {nativeBinding&&<button className="boss-btn" disabled={busy||orderDirty||denied} onClick={()=>{captureReturn();onOpenConversation(nativeBinding.chat_id);}}>打开当前晨间会话</button>}
@@ -234,39 +261,22 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         <p>原晨间请求 {requestId||"尚未提交"}</p><p>晨间运行状态 {receipt?.request_state??(busy?"运行中":uncertain?"结果尚未确认":"尚未提交")} · 回执 {receipt?.receipt.outcome??"未知"}</p>{receipt?.run_id&&<p>运行 {receipt.run_id}</p>}
         {uncertain&&<p role="status">结果尚未确认，请查询同一原请求。</p>}<button className="boss-btn" disabled={!requestId||orderDirty||denied} onClick={()=>void recover()}>读取原晨间请求结果</button>
         <details><summary>查看历史查询</summary><ul className="boss-morning-history">{history.requests.map(value=><li key={value.request_id}><button className="boss-btn" disabled={busy||orderDirty||uncertain||denied||questionDirty||dateDirty} onClick={()=>void recover(value.request_id,true)}>{value.date} · {value.timezone} · {value.created_at}</button></li>)}</ul></details>
-      </Panel>
-    </main><aside className="boss-f01-aside" aria-label="今日工作相关信息">
-      <Panel title="当前事项详情">{detail&&current?<><h3>{detail.item.title}</h3><p>{detail.item.reason}</p>
-        <dl className="boss-f01-detail-fields"><div><dt>处理人</dt><dd>{detail.item.coordinator_id??"尚未提供"}</dd></div><div><dt>有效期限</dt><dd>{detail.item.due_at??"尚未提供"}</dd></div><div><dt>当前状态</dt><dd>{morningState(detail.item.state??"尚未提供")}</dd></div><div><dt>事项版本</dt><dd>{detail.item.object_id} · v{detail.item.version??"未知"}</dd></div></dl>
-        <p>时间 {detail.item.starts_at??"尚未提供"} 至 {detail.item.ends_at??"尚未提供"} · 对象时区 {detail.item.timezone??"尚未提供"}</p><p>地点 {detail.item.location??"尚未提供"}</p>
-        {detail.item.sorting_reasons?.map(reason=><p key={reason}>{morningReason(reason)}</p>)}{detail.item.goal_matches.map(goal=><p key={goal}>关联本人目标：{goal}</p>)}
-        {detail.item.risk_evaluations?.map(risk=><p key={risk.event_id}>风险 {risk.event_id} · 事件v{risk.event_version} · 规则v{risk.rule_version} · {risk.rule_state} / {risk.phase} · {risk.reason} · 持续时间 {risk.duration_seconds??"未知"} 秒</p>)}
-        {detail.item.existing_measures.map(measure=><p key={measure.kind+measure.id}>已有措施 {measure.id} · v{measure.version} · {measure.state}</p>)}
-        <div className="boss-actions"><button id="morning-discuss" className="boss-btn boss-btn-primary" disabled={disabled||!question.trim()} onClick={()=>void submit(true)}>继续讨论</button>
-          <button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>准备交办</button>
-          {meetings.length>0&&<button id="morning-meeting" className="boss-btn" disabled={disabled} onClick={()=>{overlayFocus.current=window.document.activeElement as HTMLElement;setMeetingOpen(true);}}>打开关联会议</button>}
-          {["F06","N05","F02"].includes(detail.item.page_id)&&<button id="morning-related" className="boss-btn" disabled={disabled} onClick={()=>openRelated(detail.item)}>打开关联事项</button>}</div>
-        {meetings.length===0&&<p>当前事项没有可读取的关联会议。</p>}
-        <p>清单 {detail.list_id} · 版本 {detail.list_version}</p>
-        {detail.documents.length===0&&<p>当前事项尚未提供原文材料。</p>}
-        <div className="boss-actions">{detail.documents.map(value=><button className="boss-btn" key={value.source_id} disabled={busy||uncertain} onClick={()=>chooseSource(value.source_id)}>查看依据：{value.source_id} · v{value.version}</button>)}</div>
-        {view?.preparation_materials.filter(value=>value.item_id===selected).map(value=><div key={value.item_id}><p>准备期限 {value.preparation_due_at??"尚未提供"}</p>{value.requirements.map(text=><p key={text}>{text}</p>)}</div>)}
-      </>:<p>{current?selected?"正在核查当前事项与来源版本。":"选择表格中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>}</Panel>
-      <Panel title="当前需我关注"><div className="boss-f01-attention"><div><ClipboardList size={20}/><span>需要本人决定<strong>{view?counts.DECIDE+" 项":"等待读取"}</strong></span></div>
+      </details>
+      <details><summary>当前需我关注</summary><div className="boss-f01-attention"><div><ClipboardList size={20}/><span>需要本人决定<strong>{view?counts.DECIDE+" 项":"等待读取"}</strong></span></div>
         <div><CheckCircle2 size={20}/><span>会议与承诺<strong>{view?view.items.filter(item=>["meeting","self_commitment","historical_task"].includes(item.kind)).length+" 项":"等待读取"}</strong></span></div>
-        <div><Info size={20}/><span>可能的时间冲突<strong>{view?label(view.conflict_state):"等待读取"}</strong></span></div></div></Panel>
-      <Panel title="会议与承诺">{view?.items.filter(item=>["meeting","self_commitment","historical_task","private_calendar","travel_plan"].includes(item.kind)).map(item=><article className="boss-f01-related" key={item.item_id}>
+        <div><Info size={20}/><span>可能的时间冲突<strong>{view?label(view.conflict_state):"等待读取"}</strong></span></div></div></details>
+      <details><summary>会议与承诺</summary>{view?.items.filter(item=>["meeting","self_commitment","historical_task","private_calendar","travel_plan"].includes(item.kind)).map(item=><article className="boss-f01-related" key={item.item_id}>
         <button type="button" className="boss-f01-item-link" disabled={!current||busy||uncertain} onClick={()=>chooseItem(item)}>{item.title}</button><p>{item.starts_at??item.due_at??"时间尚未提供"} 至 {item.ends_at??"结束时间尚未提供"}</p><p>{inputLabels[item.kind]??item.kind} · {item.timezone??"对象时区尚未提供"}</p></article>)}
         {view&&!view.items.some(item=>["meeting","self_commitment","historical_task","private_calendar","travel_plan"].includes(item.kind))&&<p>当前所提供资料没有适用的会议或承诺；覆盖范围见来源区域。</p>}
-        {!view&&<p>资料尚待读取。</p>}</Panel>
-      <Panel title="时间冲突"><p>{view?label(view.conflict_state):"资料尚待读取"}</p>{view?.conflicts.map((conflict,index)=><article className="boss-f01-related" key={index}><p>{conflict.starts_at} 至 {conflict.ends_at}</p>{conflict.item_ids.map(id=><p key={id}>{view.items.find(item=>item.item_id===id)?.title??id}</p>)}<p>检查范围：当前所提供时段</p></article>)}<p>完整外部日历覆盖尚未验证。</p></Panel>
-      <Panel title="来源与依据"><p>资料覆盖范围 · {view?label(view.coverage_state):"数据尚待读取"}</p><p>资料截至 {view?.data_as_of??"来源更新时间不完整"}</p>
+        {!view&&<p>资料尚待读取。</p>}</details>
+      <details><summary>时间冲突</summary><p>{view?label(view.conflict_state):"资料尚待读取"}</p>{view?.conflicts.map((conflict,index)=><article className="boss-f01-related" key={index}><p>{conflict.starts_at} 至 {conflict.ends_at}</p>{conflict.item_ids.map(id=><p key={id}>{view.items.find(item=>item.item_id===id)?.title??id}</p>)}<p>检查范围：当前所提供时段</p></article>)}<p>完整外部日历覆盖尚未验证。</p></details>
+      <details><summary>来源与依据</summary><p>资料覆盖范围 · {view?label(view.coverage_state):"数据尚待读取"}</p><p>资料截至 {view?.data_as_of??"来源更新时间不完整"}</p>
         {view?.source_coverage.map(region=><p key={region.region_id}>{region.region_id} · {label(region.state)} · 截至 {region.as_of??"未知"}</p>)}
         {view?.input_coverage?.map(input=><p className="boss-f01-input-coverage" key={input.kind}>{inputLabels[input.kind]??input.kind} · {coverageLabels[input.state]??input.state} · 已提供 {input.provided_count} / 纳入 {input.included_count} / 未纳入 {input.excluded_count} · 完整范围数量 {input.reported_total??"未知"}</p>)}
         {view?.missing_sources.map(value=><p className="boss-helper" key={value}>{morningReason(value)}</p>)}
         {view?.source_statuses.map(source=><article className="boss-f01-related" key={source.source_id}><p>{source.source_id} · v{source.version??"未知"} · {label(source.status)}</p><p>资料截至 {source.data_as_of??"未知"} · 作者 {source.author_contact_id??"未知"} · 更新 {source.observed_at??"未知"}</p><button className="boss-btn" disabled={!current||source.status!=="VALID"||busy||uncertain} onClick={()=>chooseSource(source.source_id)}>查看来源原文</button></article>)}
-        <details><summary>查看未纳入的对象与原因</summary>{view?.excluded_items.map(value=><p key={value.kind+value.id}>{value.kind} / {value.id} / v{value.version} · {morningReason(value.reason)}</p>)}</details></Panel>
-      <Panel title="本人目标与阅读要求"><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></Panel>
+        <details><summary>查看未纳入的对象与原因</summary>{view?.excluded_items.map(value=><p key={value.kind+value.id}>{value.kind} / {value.id} / v{value.version} · {morningReason(value.reason)}</p>)}</details></details>
+      <details><summary>本人目标与阅读要求</summary><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></details></details></Panel>
     </aside></div>
     <Dialog open={Boolean(sourceId)&&visible} onOpenChange={open=>{if(!open){setSourceId("");setDocument(null);remember({morningSource:null});}}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-source-description"><DialogTitle>当前来源原文</DialogTitle><DialogDescription id="morning-source-description">当前清单与来源版本经服务端重新核查。关闭后返回当前事项。</DialogDescription>
       <DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>

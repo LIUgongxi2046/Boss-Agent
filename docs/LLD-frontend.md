@@ -197,9 +197,9 @@ UI02 的上游增量保存在 app/webui/nanobot-ui02-shell.patch，适用于 UI0
 
 ## MENU-F01 今日工作
 
-CURRENT，2026-10-24，需求为 D-MENU-DELIVERY-20261024 及完整 MENU-F01.C01—C18。F01 使用 BossMorningView；采购成本协调继续使用独立 MVP01 入口。Shell、可信 identity、认证、原生 ClientProvider 和 Electron 宿主权限沿用 UI02。同一 authenticated client 的 token 续期保留当前输入及编辑；退出与新身份清除私人状态。
+CURRENT，2026-10-25，需求为D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及完整MENU-F01.C01—C18。F01使用BossMorningView；采购成本协调继续使用独立MVP01入口。可信identity、认证、原生ClientProvider和Electron宿主权限沿用已接收依赖。同一authenticated client的token续期保留当前输入及编辑；退出与新身份清除私人状态。
 
-布局采用原 v6 实际加载 home：主列日期范围、三类事项及本人表格、自然语言；右列选中详情、会议与承诺、冲突、来源及覆盖。三类计数与筛选使用同一 View，表格每页10项，保存始终提交完整事项集合。宽屏右列310px，≤1250px为260px，≤1050px单列；区域间距14px、列内13px，Panel 内距18px/20px，≤700px为15px。卡片采用 Token 14px。设计区域映射、原脚本与 Token 数值依据见 docs/menu-delivery/F01/design.md；视觉验收独立。
+布局采用原v6实际加载home：主列日期范围、三类Tabs与紧凑事项、自然语言；右列选中关联对象、保存与返回。完整详情、会议承诺、冲突、来源覆盖、目标和查询记录提供展开入口。三类计数与筛选使用同一View，每页10项，保存始终提交完整事项集合。BossToday采用compact呈现，children提供分类控件；onDiscuss/discussEnabled绑定当前事项和明确输入，统一鼠标排序与Alt+方向键继续调用既有CAS接口。宽屏右列310px，≤1250px为260px，≤1050px单列；区域间距14px、列内13px，Panel内距18px/20px，≤700px为15px。Panel采用原加载CSS15px圆角及双层阴影。具体依据及测量见docs/menu-delivery/F01/design-rework.md；视觉验收独立。
 
 Morning View 1.1.0 的 input_coverage、category_counts、source_statuses[].data_as_of、risk_evaluations、related_meetings、timezone/location 及 current_order.state 贯穿公开读取和组件类型。provided_count 仅表示已提供范围，reported_total 未知保留 null。业务日期、对象时区、资料截至和读取时间分别呈现；非法日期或 IANA 时区显示当前输入错误，数量保持待读取。原保存清单保留查询版本，当前本人排序使用 current_order 的独立版本与撤销状态。
 
@@ -209,13 +209,13 @@ MorningConversationRequest 将 question、date/timezone、可选成对 list_id/i
 
 详情和来源读取以 generation、AbortController、当前 list/item/source/版本共同判定。较早响应不能覆盖新选择。关联会议只读取当前详情明确提供的同版本 meeting 引用，通过现有 Radix Dialog 提供当前必要共享入口，关闭恢复触发焦点。prepare 传递 MorningReference 与实际 source_ids/meeting_id/event_ids；F06 重新核查当前正式详情，只有现有受支持业务输入才能采用。缺少必要输入明确阻止创建。本人核对具体内容、勾选确认并提交后才正常保存交办，发送仍是独立操作。
 
-F01 在跨页时保持挂载，date/timezone、选择及来源安全标识写入 URL；分类和正文保存在当前进程。返回重新读取当前正式对象，恢复分类、滚动和可用触发焦点；D06 的关闭焦点与异步详情完成共同触发恢复。刷新按安全标识恢复当前对象，分类采用默认全部事项。排序使用实际 CAS，失败保留编辑；未知回执只读当前原编号。已保存历史结果不会作为当前完整资料使用。适用失败、取消、超时、来源撤销与保存事务结果分别在当前 Runtime、领域和公开消费者核查。
+F01在跨页时保持挂载，date/timezone、选择、来源、分类及返回坐标使用安全URL参数morningDate/morningTimezone/morningItem/morningSource/morningCategory/morningScroll/morningFocus；问题正文仅保存在当前进程。返回重新读取当前正式对象，再恢复分类、滚动和可用触发焦点；D06关闭焦点与异步详情完成共同触发恢复。刷新恢复当前对象和已保存分类，没有分类参数时显示全部事项。继续讨论没有文字时聚焦输入，明确提交时才交接会话。F01顶部开始对话使用业务D06，明确放弃后通过morningDiscardVersion重新挂载以清除未提交编辑，并读取原编号与当前正式资料；未知回执仍保持只读核查。排序采用实际CAS，失败保留编辑；已保存历史结果不作为当前完整资料使用。
 
 源码增量保存在 app/webui/nanobot-menu-f01.patch；准备目录的 BossDesktop 与正式源码必须相同。独立制品 menu-f01-n3-dist、启动入口 scripts/run_menu_f01.command、数据目录 validation/.work/menu-f01-experience 使用10611/10612/20611，不操作现有 UI02 或 MVP 体验。初次准备采用获准 SIMULATED 输入及既有业务初始化，后续启动使用同一 SQLite 和 credentials，不重新配置或清空。显式本机模式的受控账号填充仅填写表单，手动登录仍使用正常服务认证。准确来源、实际安装 Nanobot、制品及证据摘要由当前 inventory 登记。
 
 ## MENU-N02 聊天交办
 
-CURRENT；2026-10-24；D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及完整26项工单。当前N02实施中，F01设计部分仍需必要返修，已有业务证据按未变依赖保留。当前Shell或原生默认样式不作为设计差距的批准依据；视觉与用户验收独立。
+CURRENT；2026-10-25；D-MENU-DELIVERY-20261024、D-UI-FIDELITY-20261024及完整26项工单。N02候选8e135b8已登记26/26开发覆盖，视觉与用户验收独立。当前唯一活动菜单为F01必要设计修订，其新制品与N02已冻结体验独立。
 
 BossDesktop的children(role,visible,ConversationActions)提供当前本人/维护身份、可见性及原有共享导航。ConversationActions包含onOpenTask/onOpenSource/onOpenMessages/onReturn，调用仍经过既有未保存输入保护。N02为本人会话入口，原NATIVE地址兼容；维护NATIVE继续为Settings。BossConversationWorkspace使用真实topicSessions及原生新建/选择/搜索，连续消息和输入由同一ThreadShell处理；业务切换保持原生组件挂载，ThreadVisibilityContext跟随实际可见性。
 
