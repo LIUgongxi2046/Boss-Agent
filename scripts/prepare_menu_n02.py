@@ -108,7 +108,7 @@ async def prepare(directory, frontend, ports):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--directory", type=Path, default=ROOT / "validation/.work/menu-n02-experience")
+    parser.add_argument("--directory", type=Path, default=ROOT / "validation/.work/menu-n02-release-experience")
     parser.add_argument("--frontend", type=Path, default=ROOT / "menu-n02-n3-dist")
     parser.add_argument("--ports", default='{"business":10711,"webui":10712,"gateway":20711}')
     args = parser.parse_args()

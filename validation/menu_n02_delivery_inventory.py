@@ -48,7 +48,7 @@ def main():
     if configuration["version"] != setup["configuration_version"] or any(configuration[field] != value for field, value in expected_values.items()):
         raise ValueError("实际启用配置与当前启动声明不一致")
     reports = {}
-    for name in ("native.json", "task-entry-ui.json", "morning-entry.json", "return-position.json", "unknown.json", "input.json", "close.json", "native-privacy.json", "shared-layout.json", "launcher.json", "framework-current.json"):
+    for name in ("native.json", "task-entry-ui.json", "morning-entry.json", "return-position.json", "unknown.json", "input.json", "close.json", "native-privacy.json", "shared-layout.json", "launcher.json", "framework-current.json", "header.json"):
         report = json.loads((EVIDENCE / name).read_text())
         expected_status = "MEASURED" if name == "framework-current.json" else "PASS"
         if report["status"] != expected_status or report["manifest_sha256"] != manifest:
