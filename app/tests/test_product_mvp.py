@@ -4,7 +4,11 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 from aiohttp import web
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
 from nanobot.config.loader import save_config
@@ -24,6 +28,19 @@ from sop_write_tools.fc01 import Fc01Tool, TOOLS
 from test_boss_supply_quality import definition
 from test_boss_material_cost_reports import reports_input
 from test_product_read_scope import activate
+
+
+def validate_output(kind, value):
+    directory = Path(__file__).resolve().parents[2] / "specs"
+    path = directory / "product-mvp.openapi.yaml"
+    schema = yaml.safe_load(path.read_text())
+    resources = []
+    for name in ("product-mvp.openapi.yaml", "product-fc01.openapi.yaml", "supply-quality-results.schema.json", "simulated-supply-quality.schema.json"):
+        resource_path = directory / name
+        body = yaml.safe_load(resource_path.read_text())
+        resources.append((resource_path.as_uri(), Resource.from_contents(body, default_specification=DRAFT202012)))
+    registry = Registry().with_resources(resources)
+    Draft202012Validator({**schema, "$id": path.as_uri(), "$ref": "#/components/schemas/" + kind}, registry=registry, format_checker=FormatChecker()).validate(value)
 
 
 @pytest.fixture
@@ -72,6 +89,8 @@ def run_query(mvp):
 def test_mvp_actual_query_source_confirmation_and_saved_record(mvp):
     store, service, _, _, _, payload = mvp
     result = run_query(mvp)
+    validate_output("Receipt", result)
+    validate_output("History", service.serve("BOSS", "/api/boss/ui/mvp/history", ""))
     assert result["request_state"] == "SUCCEEDED" and result["adoption_state"] == "CURRENT"
     report = result["query"]["cost_report"]
     assert report["current"]["unit_cost"] == "2150" and report["baseline"]["unit_cost"] == "2000"
@@ -104,6 +123,7 @@ def test_mvp_source_scope_and_invalidated_query_never_authorize(mvp):
     source = result["query"]["cost_report"]["current"]["source_id"]
     store.control("ui-check", "withdraw", {"source_id": source, "version": result["query"]["cost_report"]["current"]["source_version"]})
     invalid = service.receipt("BOSS", payload["client_request_id"], lambda: True)
+    validate_output("Receipt", invalid)
     assert invalid["adoption_state"] == "HISTORICAL_REQUIRES_REQUERY" and invalid["query"] is None and invalid["preparation"] is None
     with pytest.raises(web.HTTPException):
         service.coordinate("BOSS", {"client_request_id": "mvp-invalid-coordinate", "preparation_request_id": payload["client_request_id"], "coordinate_input": payload["coordinate_input"]}, lambda: True)

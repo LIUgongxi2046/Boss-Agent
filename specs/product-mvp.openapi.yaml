@@ -1,0 +1,112 @@
+openapi: 3.1.0
+info:
+  title: MVP采购成本查询公共入口
+  version: 1.0.0
+  description: 采用现有SI09报告、FC01准备和本人协调动作；读取原编号不执行写入。
+security: [{BearerAuth: []}]
+paths:
+  /api/boss/ui/mvp/query:
+    get:
+      operationId: mvpQueryReceipt
+      x-role: BOSS
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 当前原请求与来源采用状态, content: {application/json: {schema: {$ref: '#/components/schemas/Receipt'}}}}
+        '400': {description: 缺少字段、额外字段或重复字段}
+        '401': {description: 未认证}
+        '403': {description: 当前本人或资料范围不符}
+        '404': {description: 原请求不存在}
+        '409': {description: 原来源或版本需要重新核查}
+        '410': {description: 原来源已经失效}
+  /api/boss/ui/mvp/history:
+    get:
+      operationId: mvpQueryHistory
+      x-role: BOSS
+      responses:
+        '200': {description: 当前本人和dataset/version的已观察查询元信息, content: {application/json: {schema: {$ref: '#/components/schemas/History'}}}}
+        '401': {description: 未认证}
+        '403': {description: 本人身份无效}
+  /api/boss/ui/mvp/source:
+    get:
+      operationId: mvpMatchedSource
+      x-role: BOSS
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+        - {name: source_id, in: query, required: true, schema: {type: string, minLength: 1}}
+      responses:
+        '200': {description: BossPageAPI当前原文投影；source_id/version必须属于原查询的source_refs}
+        '400': {description: 缺少字段、额外字段或重复字段}
+        '401': {description: 未认证}
+        '403': {description: 本人或来源范围不符}
+        '404': {description: 原请求不存在}
+        '409': {description: 当前报告或原文版本无法采用}
+        '410': {description: 当前来源失效}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
+  schemas:
+    SourceReference:
+      type: object
+      additionalProperties: false
+      required: [source_id, version, source_sha256]
+      properties:
+        source_id: {type: string, minLength: 1}
+        version: {type: string, minLength: 1}
+        source_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    Query:
+      type: object
+      additionalProperties: false
+      required: [query_id, source_type, interface_id, read_at, business_at, review_sha256, cost_report, source_refs, coordinate_input]
+      properties:
+        query_id: {type: string, minLength: 1, maxLength: 128}
+        source_type: {const: SIMULATED}
+        interface_id: {const: SI09}
+        read_at: {type: string, format: date-time}
+        business_at: {type: string, format: date-time}
+        review_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        cost_report: {$ref: './supply-quality-results.schema.json#/$defs/CostReportComparison'}
+        source_refs: {type: array, minItems: 1, items: {$ref: '#/components/schemas/SourceReference'}}
+        coordinate_input: {$ref: './product-fc01.openapi.yaml#/components/schemas/CoordinateContent'}
+    Receipt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, request_state, run_id, adoption_state, origin_reference, query, preparation, write_performed_by_lookup]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 128}
+        request_state: {type: string, description: 复用当前FC01准备与Runtime状态}
+        run_id: {type: [string, 'null']}
+        adoption_state: {enum: [CURRENT, HISTORICAL_REQUIRES_REQUERY, NOT_OBSERVED]}
+        origin_reference:
+          oneOf:
+            - type: 'null'
+            - type: object
+              additionalProperties: false
+              required: [origin_record_id, review_sha256]
+              properties:
+                origin_record_id: {type: string, minLength: 1}
+                review_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        query: {oneOf: [{type: 'null'}, {$ref: '#/components/schemas/Query'}]}
+        preparation:
+          type: [object, 'null']
+          description: 当前FC01 interface_contract.preparation_output及client_request_id/run_id；原有执行器校验全部字段。
+        write_performed_by_lookup: {const: false}
+    History:
+      type: object
+      additionalProperties: false
+      required: [requests]
+      properties:
+        requests:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [client_request_id, read_at, cost_type]
+            properties:
+              client_request_id: {type: string, minLength: 1, maxLength: 128}
+              read_at: {type: string, format: date-time}
+              cost_type: {$ref: './supply-quality-results.schema.json#/$defs/CostReportComparison/properties/cost_type'}
+x-websocket-operations:
+  - {operationId: mvpQuery, action: boss.mvp.query, role: BOSS, input: './product-fc01.openapi.yaml#/components/schemas/Prepare', output: '#/components/schemas/Receipt', replay_after_reconnect: false}
+  - {operationId: mvpCancel, action: boss.mvp.cancel, role: BOSS, input: './product-fc01.openapi.yaml#/components/schemas/Status', output: 'client_request_id/cancel_requested'}
+  - {operationId: mvpOwnerCoordinate, action: boss.fc01.coordinate, role: BOSS, input: './product-fc01.openapi.yaml#/components/schemas/Adopt', output: './supply-quality-results.schema.json#/$defs/CoordinateResult', replay_after_reconnect: false}

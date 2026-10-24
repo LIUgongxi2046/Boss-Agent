@@ -27,6 +27,7 @@ RoleChannel在当前MVP范围注册公共读取、查询与取消入口。品牌
 | app/webui/BossMVPView.tsx、BossDesktop.tsx、boss-v6.css | MVP连续页面、必要导航、原编号恢复与既有v6样式 |
 | app/webui/nanobot-mvp-request.patch | 在既有原生Client补丁之后禁止当前查询和本人协调重发 |
 | scripts/prepare_mvp01.py、run_mvp01.command | 独立体验资料、正式配置和实际桌面启动 |
+| specs/product-mvp.openapi.yaml | 查询/原文/历史及原编号回执字段，引用现有成本报告与FC01输入Schema |
 | app/tests/test_product_mvp.py、validation/desktop/check-mvp01.cjs | 当前连接的实际SDK、权限/来源、桌面连续流程及真实响应中断 |
 
 ## 验证与交付状态
@@ -35,7 +36,7 @@ RoleChannel在当前MVP范围注册公共读取、查询与取消入口。品牌
 
 | 实际检查 | 命令与证据 | 结果 |
 |---|---|---|
-| 采购公共连接 | validation/.venv/bin/python -m pytest -q app/tests/test_product_mvp.py --basetemp=.work/pytest-mvp01-public-final -p no:cacheprovider --junitxml=evidence/feature-delivery/MVP01/public-query.xml --tb=short | 2 passed，10.81秒；实际SDK与四项工具、幂等、来源匹配、确认前无任务/授权、确认后单项任务、重读一致、无关来源与维护越权拒绝、来源撤回后禁止采用 |
+| 采购公共连接 | validation/.venv/bin/python -m pytest -q app/tests/test_product_mvp.py --basetemp=.work/pytest-mvp01-schema-final -p no:cacheprovider --junitxml=evidence/feature-delivery/MVP01/public-query.xml --tb=short | 2 passed，5.42秒；实际SDK与四项工具、幂等、来源匹配、确认前无任务/授权、确认后单项任务、重读一致、无关来源与维护越权拒绝、来源撤回后禁止采用；当前/历史回执与查询历史通过公共Schema核查 |
 | 当前桌面连续流程 | BOSS_PRODUCT_FRONTEND_DIR=当前工程/mvp01-n3-dist node validation/desktop/check-mvp01.cjs；mvp01-670717ca-08ef-4cdb-9d9d-7d37b1e73960.json | PASS；真实BOSS/MAINTAINER、必填条件、入库基期2000/本期2100 CNY/tonne、原文、明确确认、单项任务、刷新/重登/同库重启；查询与协调真实成功交付中断后各一次转发；维护403/匿名401；正文16/24、三尺寸及200%无整页溢出、renderer错误零；两份动画HTTP内容/摘要匹配、目录范围与404拒绝 |
 | 实际体验入口 | node validation/desktop/check-mvp01-launcher.cjs；launcher.json | PASS；直接运行run_mvp01.command，默认9961/9962/19961与独立资料，隐藏Electron中真实本人登录及采购页面 |
 | 工程 | .work/product/nanobot/webui中npm run build -- --outDir ../../../../mvp01-n3-dist；bash -n scripts/run_mvp01.command；git diff --check；cmp核对准备目录 | PASS；严格TypeScript、Vite 16.80秒；启动语法及BossDesktop/CSS输入逐字一致，MVP模块由显式export采用当前源码 |
