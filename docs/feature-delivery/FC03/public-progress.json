@@ -2,53 +2,55 @@
   "feature_id": "FC03",
   "role": "N3",
   "status": "IN_PROGRESS",
-  "complete_feature_candidate": false,
-  "implementation_commit": "8769fbe0b9e62dd131f6aef4c6ede390af5d2fbe",
+  "stage": "COMPLETE_CANDIDATE_READY_FOR_INDEPENDENT_ACCEPTANCE",
+  "complete_feature_candidate": true,
+  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/candidate_commit",
+  "implementation_commit": "9bc99903988baafc1f61bedd1be88133fcde5cc6",
   "task_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/FC03晨间事项工单.md",
   "development_record": "docs/feature-delivery/FC03/integration.md",
-  "local_scope": "本人排序原请求只读恢复、刷新保留编号、身份/异步保护及原生Client连接恢复不重发排序；不包含完整日期/晨间Runtime/清单版本/冲突/来源详情",
+  "scope": "完整FR-01晨间事项、日期/IANA时区、三分类/参与原因/有效风险/排序理由、冲突与准备材料、同版本详情与来源、本人明确保存与原回执、受限实际SDK、F01与维护覆盖入口及同库恢复",
   "verified_feature_checkpoints": null,
   "total_feature_checkpoints": 22,
-  "candidate_commit": null,
-  "frontend_directory": "fc03-n3-order-dist",
-  "manifest_sha256": "e60089dfdb81777241d7615a92ab3a12e1580271513a4819cbd8828345098fcd",
-  "index_sha256": "8f2054bf88be7a6e1434836065f0007cf1bd164077fe030716ddbb1e95d58ede",
-  "source_sha256": {
-    "app/webui/BossToday.tsx": "f02f96a68320b57c899bf405f86c3d442a997aff1af1024e422d84da70ea1f15",
-    "app/webui/BossDesktop.tsx": "7cd4411843f5b45892f7a2b0c674abfbc76e9ce38fe9113fbf46e22e2b0d9cce",
-    "app/webui/nanobot-today-order.patch": "1c4c6dfe94250ebcc35335e7f3b3f272e37dc71a3bed99e432725eb92406a9ce"
+  "independent_verdict": "NOT_RUN",
+  "producer_commits": {
+    "N1_domain": "e3faa5dcd90831d5e84e42c6ca66b418f85b767c",
+    "N2_foundation": "5aca0f3dee6202943c57d5c3b287e2640d4333fb",
+    "N2_formal": "42f949eda36b7bee4e5c5ece8da44e586fbd2b43",
+    "N3_order_recovery": "8769fbe0b9e62dd131f6aef4c6ede390af5d2fbe"
   },
-  "native_client_sha256": "dd5a98697609ac316d41889387a71d3f4898a51e1a409cc25bb1ef30a259f3f0",
-  "native_patch_order": [
-    "app/webui/nanobot-one-shot.patch",
-    "app/webui/nanobot-today-order.patch"
-  ],
+  "producer_input_files_verified": 9,
+  "frontend_directory": "fc03-n3-morning-dist",
+  "manifest_sha256": "42c2e226574ea2e13dbb432586cbd893d86a37db37c391184e5d0de53d881208",
+  "index_sha256": "9c5c5e2cd05358cc9d8284794a40fb47c5237dd650f7f0ee9e6d0fb43e84f134",
+  "native_client_sha256": "8e6161bdd219f72723f3db8993db4005db3a28ca0efb7a9436a9b3e3de379155",
+  "source_sha256": {
+    "app/webui/BossAssignmentFlow.tsx": "2e2a156fbd970a2afc582c1e22b083d56f4068385ef93b4faf053c7abaee9720",
+    "app/webui/BossDesktop.tsx": "71abbffd122bd02b640dec447d9ae1a2065b00b7fd32ebf44d8b57d87f1d6941",
+    "app/webui/BossMorningPreparation.tsx": "9cc3f755bbcd25423062e170d4eda1e07423b8032676fb247622af082dc60a68",
+    "app/webui/BossMorningView.tsx": "dc3d00a75c12671e2b3378d3a1ae895c120f8bbd3fa0c52a302f20016abfc71b",
+    "app/webui/BossToday.tsx": "e13b671e48bd3416c4436b9ee3fa5dfe901a55b4e89c48083d5eb76634e05e70",
+    "app/webui/MaintainerMorningCoverage.tsx": "4ace758765d5c1bcba831349facff86e82345f63400e3dd1176d5d9cb72207b0",
+    "app/webui/boss-v6.css": "9c920d151922bf9f734a9728952f7647f797d3921c15184c0b2e923ee9b9897c",
+    "app/webui/nanobot-today-order.patch": "b93bdc2fc0ffcd44c4a17ebd6468388626811494255961213cd757f99b53a3de"
+  },
+  "inventory": "evidence/feature-delivery/FC03/candidate-inventory.json",
+  "build_input_files": 254,
+  "artifact_files": 451,
+  "native_patch_order": ["app/webui/nanobot-one-shot.patch", "app/webui/nanobot-today-order.patch"],
   "build": {
     "result": "PASS",
-    "seconds": 15.01,
-    "command": "npm run build -- --outDir ../../../../fc03-n3-order-dist"
+    "strict_typescript": "PASS",
+    "vite_seconds": 14.80,
+    "command": "npm run build -- --outDir ../../../../fc03-n3-morning-dist"
   },
   "checks": [
-    {
-      "result": "PASS",
-      "scope": "真实排序成功响应中断后仅一次转发、原编号只读恢复及刷新；未知回执保持未知；维护403和匿名401",
-      "evidence": "evidence/feature-delivery/FC03/fc03-order-e9244282-e72d-4a7e-9d59-1fdbe2fbb55b.json"
-    },
-    {
-      "result": "PASS",
-      "cases": 3,
-      "scope": "当前排序CAS/幂等/同库读取、身份及关联事件合并",
-      "evidence": "evidence/feature-delivery/FC03/today-existing.xml"
-    },
-    {
-      "result": "PASS",
-      "scope": "严格TypeScript/Vite构建及git diff --check"
-    }
+    {"result": "PASS", "cases": 9, "scope": "公共晨间/覆盖、实际SDK与受影响创建消费者", "evidence": "evidence/feature-delivery/FC03/morning-public-combination-green.xml"},
+    {"result": "PASS", "cases": 5, "scope": "公共Schema、实际取消、工具未启用、同键异内容、清单讨论和共享经营执行器", "evidence": "evidence/feature-delivery/FC03/morning-sdk-schema-and-shared.xml"},
+    {"result": "PASS", "cases": 4, "scope": "最终公开读取/覆盖/排序/来源与晨间交办引用Schema及拒绝路径", "evidence": "evidence/feature-delivery/FC03/morning-public-final.xml"},
+    {"result": "PASS", "cases": 1, "scope": "同时注册晨间服务后仍正确执行实际FC01准备流程", "evidence": "evidence/feature-delivery/FC03/morning-fc01-shared.xml"},
+    {"result": "PASS", "scope": "真实身份、日期范围、SDK清单/详情/原文、三项成功响应中断后各一次转发、未知排序只读恢复、刷新与同库重启、原清单讨论/交办准备、稳定后三尺寸/200%、Token和键盘", "evidence": "evidence/feature-delivery/FC03/fc03-morning-64c57e60-ba28-4dac-8899-95f8d6f510f2.json"}
   ],
-  "required_inputs": [
-    "N1当前正式日期/时区、完整事项/来源/冲突/版本详情及排序兼容Schema",
-    "N2使用该正式版本的晨间可信请求、受限工具、实际SIMULATED事件和持久运行/结果/原回执"
-  ],
+  "independent_acceptance_required": "N4对唯一状态来源中的准确完整候选独立核查全部22项；N3确认代码/输入/制品一致后才启用FC04",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "real_model_quality": "NOT_RUN",
