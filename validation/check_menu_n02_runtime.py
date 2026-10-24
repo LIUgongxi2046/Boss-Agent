@@ -10,8 +10,8 @@ from controls import ControlStore
 
 root=Path(__file__).resolve().parents[1]
 directory=Path(sys.argv[1]).resolve()
-if not directory.is_relative_to(root/"validation/.work") or not directory.name.startswith("menu-n02-") or not (directory/"business.sqlite").is_file():
-    raise ValueError("仅允许核查当前N02独立检查资料")
+if not directory.is_relative_to(root/"validation/.work") or not directory.name.startswith(("menu-n02-", "menu-f01-rework-")) or not (directory/"business.sqlite").is_file():
+    raise ValueError("仅允许核查已授权菜单的独立检查资料")
 schema=json.loads((root/"specs/runtime-records.schema.json").read_text())
 validator=Draft202012Validator({**schema,"$ref":"#/$defs/CurrentRuntimeRun"})
 store=ControlStore(directory/"business.sqlite")

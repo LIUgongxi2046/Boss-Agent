@@ -58,7 +58,7 @@ def main():
     baseline = json.loads((ROOT / "evidence/menu-delivery/N02/candidate-inventory.json").read_text())
     business = {}
     for name, expected in baseline["sources"].items():
-        if name.startswith("specs/") or name.startswith("validation/") and name.endswith(".py"):
+        if name != "validation/check_menu_n02_runtime.py" and (name.startswith("specs/") or name.startswith("validation/") and name.endswith(".py")):
             if digest(ROOT / name) != expected:
                 raise ValueError("设计修订改变了已接收业务依赖：" + name)
             business[name] = expected

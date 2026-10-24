@@ -397,6 +397,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       return;
     }
     if (id !== page) setPreviousPage(page);
+    if(id==="F01"&&!mvpScope)setSidebarOpen(true);
     if (["NATIVE","N02"].includes(id) && !["NATIVE","N02"].includes(page)) {
       businessPage.current = page;
       onOpenNative(role);
@@ -595,11 +596,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           </nav>
           <div className="boss-sidebar-bottom">
             <button type="button" onClick={openDirectory} title="已交付功能目录">
-              <FolderOpen size={17} aria-hidden="true" />{sidebarOpen && ((mvpScope||priorityScope)?"当前可用入口":"全部页面")}
+              {page==="F01"&&!mvpScope?<Settings size={17} aria-hidden="true"/>:<FolderOpen size={17} aria-hidden="true" />}{sidebarOpen && ((mvpScope||priorityScope)?"当前可用入口":"全部页面")}
             </button>
-            <button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
+            {(page!=="F01"||mvpScope)&&<button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
               <Menu size={17} aria-hidden="true" />{sidebarOpen && "收起导航"}
-            </button>
+            </button>}
           </div>
         </aside>
         <main className="boss-main" id="boss-main">
