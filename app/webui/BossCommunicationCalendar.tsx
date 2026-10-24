@@ -4,6 +4,7 @@ import {
   FolderOpen, Loader2, MessageSquareText, RefreshCw, Send, ShieldCheck, X,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import {BossOriginalReceipt} from "./BossOriginalReceipt";
 import "./boss-v6.css";
 
 type Contact = {
@@ -90,11 +91,17 @@ function validate(text:string,label:string,max=2400) {
   return text.trim();
 }
 
+const MESSAGE_ACTIONS=["boss.message.draft.save","boss.message.send"] as const;
+function messageRequest(){const values=new URLSearchParams(window.location.search),action=values.get("messageOperationAction"),id=values.get("messageOperationRequest");return action&&id&&MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number])?{action,id}:null;}
+function retainMessageRequest(action:string,id:string){if(!MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number]))return;const current=messageRequest();if(current&&(current.action!==action||current.id!==id))throw new Error("当前消息存在待核查原请求");const url=new URL(window.location.href);url.searchParams.set("messageOperationAction",action);url.searchParams.set("messageOperationRequest",id);window.history.replaceState(null,"",url);}
+function clearMessageRequest(action:string,id:string){const current=messageRequest();if(current?.action===action&&current.id===id){const url=new URL(window.location.href);url.searchParams.delete("messageOperationAction");url.searchParams.delete("messageOperationRequest");window.history.replaceState(null,"",url);}}
+
 function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
   const {client,getToken}=useClient();
   const [lookupBusy,setLookupBusy]=useState(false);
   const [pending,setPending]=useState<Pending|null>(null);
   const [checked,setChecked]=useState(false);
+  const [uncertain,setUncertain]=useState(false);
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState("");
   const [status,setStatus]=useState("");
@@ -120,23 +127,29 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
   },[pending?.key]);
   const propose=useCallback((action:string,payload:Record<string,unknown>,
                             title:string,lines:string[])=>{
+    if(MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number])&&messageRequest()){setError("当前消息存在待核查原请求，请先读取原编号。");return;}
     setPending({action,payload,key:"boss-"+crypto.randomUUID(),title,lines});
-    setChecked(false);setStatus("");setError("");
+    setChecked(false);setUncertain(false);setStatus("");setError("");
   },[]);
   const submit=async()=>{
-    if(!pending||!checked||busy)return;
+    if(!pending||!checked||busy||uncertain)return;
+    retainMessageRequest(pending.action,pending.key);
     setBusy(true);setError("");
     try{
       const result=await client.requestMutation<MutationResult>(pending.action,{
         ...pending.payload,client_request_id:pending.key,
       });
+      clearMessageRequest(pending.action,pending.key);
       setStatus("模拟业务事务已保存："+(result.status||result.send_state||result.share_status||"已记录")+
                 "。请以重新读取的状态为准。");
       success?.(result);
       setPending(null);setChecked(false);refresh();
     }catch(e){
-      setError((e instanceof Error?e.message:String(e))+
-        "。请求结果可能尚未同步；请先重新核查，重试会复用原请求编号。");
+      const message=MESSAGE_ACTIONS.includes(pending.action as typeof MESSAGE_ACTIONS[number]);
+      const rejected=e instanceof Error&&"status" in e&&typeof e.status==="number"&&[400,401,403,404,409,410,413,422].includes(e.status);
+      setUncertain(message&&!rejected);
+      if(message){setChecked(false);if(rejected)clearMessageRequest(pending.action,pending.key);}
+      setError((e instanceof Error?e.message:String(e))+(message&&!rejected?"。结果需要核查，请读取原编号；当前不会重新提交。":""));
     }finally{setBusy(false);}
   };
   const reconcile=async()=>{
@@ -153,17 +166,18 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
       });
       if(!response.ok)throw new Error("原请求回执读取失败（HTTP "+response.status+"）");
       const data=await response.json() as {
-        action:string;client_request_id:string;outcome:string;
+        action:string;client_request_id:string;outcome:string;write_performed_by_lookup:boolean;
         result?:MutationResult;
       };
-      if(data.action!==pending.action||data.client_request_id!==pending.key)
+      if(data.action!==pending.action||data.client_request_id!==pending.key||data.write_performed_by_lookup!==false)
         throw new Error("回执请求标识或动作不一致");
       if(data.outcome==="RECORDED"&&data.result){
+        clearMessageRequest(pending.action,pending.key);setUncertain(false);
         success?.(data.result);
         setStatus("已从服务端 SQLite 幂等回执证实本次动作已保存，已重新读取正式状态。");
         setPending(null);setChecked(false);refresh();
       }else if(data.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
-        setError("当前数据库没有找到本次幂等回执，但这不能证明原请求未执行。请先核对正式业务对象，必要时保持本请求编号重试。");
+        setUncertain(MESSAGE_ACTIONS.includes(pending.action as typeof MESSAGE_ACTIONS[number]));setError("当前数据库没有找到原回执，结果仍待核查。请继续读取原编号和正式业务对象。");
         refresh();
       }else throw new Error("未识别的回执状态，不进行再次提交");
     }catch(e){
@@ -189,13 +203,14 @@ function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
           {lookupBusy&&<Loader2 size={16} className="boss-spin"/>} 查询本次回执
         </button>
         <button className="boss-btn boss-btn-primary" type="button"
-          disabled={!checked||busy||lookupBusy} onClick={()=>void submit()}>
+          disabled={!checked||busy||lookupBusy||uncertain} onClick={()=>void submit()}>
           {busy&&<Loader2 size={16} className="boss-spin"/>} 确认并提交
         </button>
       </footer>
     </section>
   </div>:null;
-  return {propose,dialog,status,error,busy};
+  const finishRecovery=()=>{setError("");setUncertain(false);setPending(null);setChecked(false);};
+  return {propose,dialog,status,error,busy,finishRecovery};
 }
 
 export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusDraftId,onFocusDraftConsumed,onDirtyChange}:Props) {
@@ -230,7 +245,7 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusD
   const [sharePurpose,setSharePurpose]=useState("");
   const [shareExpires,setShareExpires]=useState("");
   const reload=()=>setRevision(x=>x+1);
-  const {propose,dialog,status,busy}=useMutation(reload,result=>{
+  const {propose,dialog,status,busy,error:mutationError,finishRecovery}=useMutation(reload,result=>{
     if(result.draft_id){setSelectedDraft(result.draft_id);setDirty(false);}
     if(result.version&&!isMessage)setDirty(false);
   });
@@ -459,7 +474,8 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusD
       </button>
     </div>
     {loading&&<div className="boss-status"><Loader2 size={16} className="boss-spin"/>正在读取有权版本…</div>}
-    {error&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error}</div>}
+    {(error||(isMessage&&mutationError))&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error||mutationError}</div>}
+    {isMessage&&<BossOriginalReceipt scope="messageOperation" actions={MESSAGE_ACTIONS} onRecorded={()=>{finishRecovery();setDirty(false);reload();}}/>}
     {status&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={16}/>{status}</div>}
     <div className="boss-columns">
       <div className="boss-column">
@@ -495,10 +511,10 @@ export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusD
                 setSelectedDraft("");setSelectedRecipient("");setRelatedTask("");setMessageBody("");
                 setAttachmentId("");setDirty(false);
               }}>新建草稿</button>
-              <button type="button" className="boss-btn" onClick={saveDraft} disabled={busy}>
+              <button type="button" className="boss-btn" onClick={saveDraft} disabled={busy||Boolean(messageRequest())}>
                 <ShieldCheck size={15}/> 保存当前草稿</button>
               <button type="button" className="boss-btn boss-btn-primary"
-                disabled={!draft||dirty||busy||draft.status!=="DRAFT"} onClick={sendDraft}>
+                disabled={!draft||dirty||busy||Boolean(messageRequest())||draft.status!=="DRAFT"} onClick={sendDraft}>
                 <Send size={15}/> 审核并模拟发送</button>
             </div>
             <div className="boss-status boss-status-warn"><AlertCircle size={16}/>

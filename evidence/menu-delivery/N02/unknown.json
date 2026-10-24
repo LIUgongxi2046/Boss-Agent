@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "scope": "N02_SHARED_MESSAGE_SAVED_RESPONSE_INTERRUPTION",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-unknown-2e719457-d557-478c-856f-fcb58020eb0d",
+  "ports": {
+    "business": 10771,
+    "webui": 10772,
+    "gateway": 20771
+  },
+  "proxy_port": 10773,
+  "manifest_sha256": "7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_saved_draft_response_interrupted_original_receipt_only",
+      "draft_id": "draft-822229fd-6497-4fda-8d4f-61006d3c50fc",
+      "client_request_id": "boss-7ed2fc61-be0e-4625-9a0d-ae1bbd76e52a",
+      "transaction_response_sha256": "59cd398fa0b94f47d13b4fe625532a1311d0fcb802383844d8b1c68bc1b7ab82",
+      "submission_count": 1,
+      "lookup_replayed": false
+    },
+    {
+      "check": "actual_sent_response_interrupted_reload_preserves_original_readonly_request",
+      "draft_id": "draft-822229fd-6497-4fda-8d4f-61006d3c50fc",
+      "message_id": "sim-msg-0a0eef90-399c-4155-9695-02f4e776ec25",
+      "client_request_id": "boss-d31e3927-72e2-4e18-810a-230e2b1b9b44",
+      "transaction_response_sha256": "dbc33801eca93fb99bb32ab00af04eb5ab0f3df78c0be96a3a340411896cba91",
+      "submission_count": 1,
+      "send_state": "SENT_SIMULATED",
+      "delivery_state": "NOT_VERIFIED",
+      "lookup_replayed": false,
+      "refresh_preserved_original_id": true,
+      "private_body_in_ordinary_storage": false,
+      "refresh_preserved_conversation_return": true
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "status": "PASS",
-  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-7655db93-d33a-4612-b1dd-4d604f10bd4f",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-7c0e86db-7cff-4511-bdec-04330aca7f64",
   "ports": {
     "business": 10731,
     "webui": 10732,
     "gateway": 20731
   },
   "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
-  "manifest_sha256": "04982d32e86a0183e68bba1cbcfa5747a5cd0ed97c669d4ab75b02d3582c5c3e",
+  "manifest_sha256": "7fd1a426910b2f4efed10143e91f3fc76d9afe1502ce2234ef91107a31c016c5",
   "external_api_mode": "SIMULATED_FIRST",
   "visual": "NOT_RUN",
   "user_acceptance": "NOT_RUN",
@@ -15,13 +15,13 @@
   "records": [
     {
       "check": "actual_runtime_artifact_read_dialog_and_keyboard_return",
-      "chat_id": "77f3e0c4-0721-4f5a-b928-c1a736cfe24e",
-      "list_id": "morning-1d618bc5-3748-40d9-b84d-649b61ef8633",
+      "chat_id": "76db46ba-6636-4edd-ad45-ce8230e6f62b",
+      "list_id": "morning-38e1e944-eedb-42f3-b280-de6bdc57f318",
       "focus_restored": true
     },
     {
       "check": "actual_delayed_native_output_memory_only_queue_and_explicit_discard",
-      "chat_id": "77f3e0c4-0721-4f5a-b928-c1a736cfe24e",
+      "chat_id": "76db46ba-6636-4edd-ad45-ce8230e6f62b",
       "queue_in_browser_storage": false,
       "queued_message_sent": false,
       "discarded_queue_restored": false

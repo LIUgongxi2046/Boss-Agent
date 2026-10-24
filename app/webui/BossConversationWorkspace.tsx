@@ -58,7 +58,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
     const saved=businessReturn.current;
     if(visible&&saved?.chatId===chatId){if(workspace.current)workspace.current.scrollTop=saved.scrollTop;saved.focus?.focus({preventScroll:true});businessReturn.current=null;}
   },[visible,chatId]);
-  const openBusiness=(action:()=>void)=>{businessReturn.current={chatId,focus:document.activeElement instanceof HTMLElement?document.activeElement:null,scrollTop:workspace.current?.scrollTop??0};action();};
+  const openBusiness=(action:()=>void,focus:HTMLElement|null=document.activeElement instanceof HTMLElement?document.activeElement:null)=>{businessReturn.current={chatId,focus,scrollTop:workspace.current?.scrollTop??0};action();};
   const openArtifact=async(run:Run,reference:Reference)=>{
     if(!chatId)throw new Error("当前产物缺少会话编号");
     const current=++artifactGeneration.current,readGeneration=generation.current;
@@ -115,7 +115,14 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
       </section>
     </aside>
     <Dialog.Root open={artifactOpen&&visible} onOpenChange={open=>{setArtifactOpen(open);if(!open)++artifactGeneration.current;}}><Dialog.Portal><Dialog.Overlay className="boss-n02-dialog-overlay"/><Dialog.Content className="boss-n02-dialog" onCloseAutoFocus={event=>{event.preventDefault();if(visible&&artifactFocus.current?.isConnected)artifactFocus.current.focus({preventScroll:true});}}><Dialog.Title>当前产物与依据</Dialog.Title><Dialog.Description>根据当前会话的原运行引用，重新核查实际对象与来源。</Dialog.Description><Dialog.Close className="boss-icon-button" aria-label="关闭产物详情"><X size={18}/></Dialog.Close>
-      {artifactLoading&&<p role="status">正在核查当前产物</p>}{artifactError&&<p role="alert" className="boss-n02-note error">{artifactError}</p>}{artifact&&<><Row name="产物类型" value={kindLabel[artifact.kind]}/><Row name="对象编号" value={artifact.id}/>{["status","version","purpose","body","send_state","delivery_state","reply_state"].filter(key=>artifact.data[key]!==undefined).map(key=><Row key={key} name={{status:"当前状态",version:"当前版本",purpose:"交办目的",body:"消息正文",send_state:"发送状态",delivery_state:"送达状态",reply_state:"回复状态"}[key]??key} value={artifact.data[key]===null?"当前不能采用":String(artifact.data[key])}/>)}{artifact.kind==="task"&&<button className="boss-btn" onClick={()=>{setArtifactOpen(false);actions.onOpenTask(artifact.id);}}>查看交办详情</button>}{artifact.evidence?.sources.map(source=><div className="boss-n02-source" key={source.source_id}><strong>{source.source_id}</strong><span>版本 {source.version} · {source.published_at??"发布时间未知"} · {source.author_contact_id??"作者待核查"}</span><button className="boss-btn" onClick={()=>{setArtifactOpen(false);actions.onOpenSource(source.source_id);}}>查看来源原文</button></div>)}</>}
+      {artifactLoading&&<p role="status">正在核查当前产物</p>}
+      {artifactError&&<p role="alert" className="boss-n02-note error">{artifactError}</p>}
+      {artifact&&<>
+        <Row name="产物类型" value={kindLabel[artifact.kind]}/><Row name="对象编号" value={artifact.id}/>
+        {["status","version","purpose","body","send_state","delivery_state","reply_state"].filter(key=>artifact.data[key]!==undefined).map(key=><Row key={key} name={{status:"当前状态",version:"当前版本",purpose:"交办目的",body:"消息正文",send_state:"发送状态",delivery_state:"送达状态",reply_state:"回复状态"}[key]??key} value={artifact.data[key]===null?"当前不能采用":String(artifact.data[key])}/>)}
+        {artifact.kind==="task"&&<button className="boss-btn" onClick={()=>{setArtifactOpen(false);openBusiness(()=>actions.onOpenTask(artifact.id),artifactFocus.current);}}>查看交办详情</button>}
+        {artifact.evidence?.sources.map(source=><div className="boss-n02-source" key={source.source_id}><strong>{source.source_id}</strong><span>版本 {source.version} · {source.published_at??"发布时间未知"} · {source.author_contact_id??"作者待核查"}</span><button className="boss-btn" onClick={()=>{setArtifactOpen(false);openBusiness(()=>actions.onOpenSource(source.source_id),artifactFocus.current);}}>查看来源原文</button></div>)}
+      </>}
       {artifact?.kind==="query"&&<QueryDetails data={artifact.data}/>}
     </Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
@@ -123,7 +130,17 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
 
 function ContextReferenceDetails({reference:ref,onOpenSource,onOpenTask}:{reference:ContextReference;onOpenSource:(id:string)=>void;onOpenTask:(id:string)=>void}){
   const names:Record<string,string>={source_type:"资料类型",author_contact_id:"作者编号",author_kind:"作者类型",author_display_name:"作者名称",generator_version:"生成器版本",published_at:"发布时间",observed_at:"观察时间",business_as_of:"业务时间",valid_from:"有效开始",valid_until:"有效结束",coverage:"资料范围",business_basis:"业务口径",business_basis_description:"口径说明",allowed_use:"允许用途"};
-  return <div className="boss-n02-source" data-reference-id={ref.id}><strong>{ref.id}</strong><span>原版本 {ref.recorded_version??"未知"} · 当前版本 {ref.current_version??"无法读取"}</span><span>{label(ref.reference_state)} · {label(ref.adoption_state)}{ref.current_validity?" · "+ref.current_validity:""}{ref.current_object_state?" · "+ref.current_object_state:""}</span><span>{ref.support.some(item=>item.origin==="TOOL_RESULT")?"包含实际工具读取关系":"可信上下文选定关系"}</span><details><summary>查看引用元信息</summary>{ref.source_metadata?Object.entries(names).map(([field,name])=><Row key={field} name={name} value={ref.source_metadata?.[field]??"未知"}/>):<p>当前元信息不可采用，原引用记录保留。</p>}{ref.source_refs.map(source=><p key={source.source_id}>{source.source_id} · 原版本 {source.version??"未知"} / 当前 {source.current_version??"未知"} · {source.status}</p>)}</details>{ref.kind==="document"&&<button className="boss-btn" disabled={ref.current_version===null} onClick={()=>onOpenSource(ref.id)}>核查来源原文</button>}{ref.kind==="task"&&<button className="boss-btn" disabled={ref.adoption_state!=="CURRENT"} onClick={()=>onOpenTask(ref.id)}>查看交办详情</button>}</div>;
+  return <div className="boss-n02-source" data-reference-id={ref.id}>
+    <strong>{ref.id}</strong><span>原版本 {ref.recorded_version??"未知"} · 当前版本 {ref.current_version??"无法读取"}</span>
+    <span>{label(ref.reference_state)} · {label(ref.adoption_state)}{ref.current_validity?" · "+ref.current_validity:""}{ref.current_object_state?" · "+ref.current_object_state:""}</span>
+    <span>{ref.support.some(item=>item.origin==="TOOL_RESULT")?"包含实际工具读取关系":"可信上下文选定关系"}</span>
+    <details><summary>查看引用元信息</summary>
+      {ref.source_metadata?Object.entries(names).map(([field,name])=><Row key={field} name={name} value={ref.source_metadata?.[field]??"未知"}/>):ref.kind==="document"&&<p>当前元信息不可采用，原引用记录保留。</p>}
+      {ref.source_refs.map(source=><div key={source.source_id}><p>{source.source_id} · 原版本 {source.version??"未知"} / 当前 {source.current_version??"未知"} · {source.status}</p><button className="boss-btn" disabled={source.current_version===null} onClick={()=>onOpenSource(source.source_id)}>核查关联来源 {source.source_id}</button></div>)}
+    </details>
+    {ref.kind==="document"&&<button className="boss-btn" disabled={ref.current_version===null} onClick={()=>onOpenSource(ref.id)}>核查来源原文</button>}
+    {ref.kind==="task"&&<button className="boss-btn" disabled={ref.adoption_state!=="CURRENT"} onClick={()=>onOpenTask(ref.id)}>查看交办详情</button>}
+  </div>;
 }
 
 function QueryDetails({data}:{data:Record<string,unknown>}){

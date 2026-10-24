@@ -17,7 +17,7 @@ from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.agent.turn_delivery import TurnDeliveryFactory
 from nanobot.bus.queue import MessageBus
 from nanobot.channels.manager import ChannelManager
-from nanobot.config.loader import load_config, resolve_config_env_vars
+from nanobot.config.loader import load_config, resolve_config_env_vars, set_config_path
 from nanobot.cron.service import CronService
 from nanobot.cron.types import CronSchedule
 from nanobot.cron.bound_runner import run_bound_cron_job
@@ -89,7 +89,14 @@ def prepare():
     os.environ["BOSS_PROBE_TOKEN"] = roles["BOSS"]
     os.environ["MAINTAINER_PROBE_TOKEN"] = roles["MAINTAINER"]
     config = WORK / "config.json"
+    runtime_scope = WORK / "runtime-scope.json"
+    if config.is_symlink() or runtime_scope.is_symlink():
+        raise ValueError("应用配置与实例目录声明不能使用符号链接")
     if not config.exists():
+        if runtime_scope.exists():
+            raise ValueError("当前实例声明已经存在，应用配置缺少，需要明确恢复配置")
+        runtime_scope.write_text(encode({"schema_version": 1, "configuration_path": str(config)}))
+        runtime_scope.chmod(0o600)
         config.write_text(encode({
             "agents": {"defaults": {"workspace": str(WORK / "workspace"), "provider": "deepseek",
                 "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096,
@@ -103,6 +110,10 @@ def prepare():
                 "showReasoning": False, "tokenTtlS": 3600}},
             "tools": {"restrictToWorkspace": True}, "transcription": {"enabled": False},
         }))
+    if runtime_scope.exists():
+        if json.loads(runtime_scope.read_text()) != {"schema_version": 1, "configuration_path": str(config)}:
+            raise ValueError("实例目录声明与当前应用配置不符")
+        set_config_path(config)
     return roles, config
 
 

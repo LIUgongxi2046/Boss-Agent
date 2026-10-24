@@ -55,6 +55,15 @@ import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
 
 type Role = "BOSS" | "MAINTAINER";
+const navigationGraphics:Record<string,ReactNode>={
+  F01:<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>,
+  N02:<path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.8L3 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/>,
+  N03:<path d="M4 20V10m5 10V4m6 16v-7m5 7V7"/>,
+  N04:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></>,
+  N05:<><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6m-6 7 2 2 4-4m-6 8h6"/></>,
+  N06:<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/>,
+};
+function ReferenceNavigationIcon({id}:{id:string}){const graphic=navigationGraphics[id];if(!graphic)throw new Error("当前聊天导航缺少原稿图形");return <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{graphic}</svg>;}
 type DesignPage = {
   title: string; summary: string; technical: boolean; module: string;
   filters: string[]; fields: string[]; sections: string[];
@@ -247,8 +256,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [page, setPage] = useState("F01");
   const [previousPage, setPreviousPage] = useState(()=>new URLSearchParams(window.location.search).get("bossReturn")??"F01");
   const businessPage = useRef<string | null>(null);
-  const conversationReturn=useRef(false);
-  useEffect(()=>{conversationReturn.current=false;},[client]);
+  const conversationReturn=useRef(new URLSearchParams(window.location.search).get("bossConversationReturn")==="N02");
+  useEffect(()=>{conversationReturn.current=new URLSearchParams(window.location.search).get("bossConversationReturn")==="N02";},[client]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [pageFilter, setPageFilter] = useState("");
@@ -391,6 +400,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     if (focus) setOriginFocus(focus);
     const url = new URL(window.location.href);
     url.searchParams.set("bossPage", id);
+    if(conversationReturn.current)url.searchParams.set("bossConversationReturn","N02");
     if (["NATIVE","N02"].includes(id)) url.searchParams.set("bossReturn", page);
     if (taskId ?? selectedTaskId) url.searchParams.set("bossTask", taskId ?? selectedTaskId);
     if(id==="D01")url.searchParams.set("bossReturn",page);
@@ -558,7 +568,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             {userNav.map(([id, label, Icon]) =>
               <button type="button" key={id} className={"boss-nav-item " + (page === id ? "active" : "")}
                 onClick={() => navigate(id)} disabled={page==="N02"&&!deliveredPage(id,role,mvpScope)?.directory} title={page==="N02"?label:deliveredPage(id,role,mvpScope)?.title??label} aria-current={page === id ? "page" : undefined}>
-                <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                {page==="N02"?<ReferenceNavigationIcon id={id}/>:<Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
                 {sidebarOpen && <span>{page==="N02"?label:deliveredPage(id,role,mvpScope)?.title??label}</span>}
               </button>
             )}

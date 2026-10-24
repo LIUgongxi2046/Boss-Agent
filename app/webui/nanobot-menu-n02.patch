@@ -141,4 +141,113 @@
 @@
 -                "thread-composer-action thread-composer-round-action touch-target rounded-full transition-transform",
 +                "thread-composer-action thread-composer-submit-action thread-composer-round-action touch-target rounded-full transition-transform",
+*** Update File: webui/src/lib/nanobot-client.ts
+@@
+-      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
++      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback", "boss.simulation.message.reply"].includes(pending.action) || pending.action.startsWith("boss.message.") || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+   useEffect,
++  useId,
+@@
+   inputAriaLabel?: string;
++  inputLabel?: string;
++  submitLabel?: string;
+@@
+   inputAriaLabel,
++  inputLabel,
++  submitLabel,
+@@
+ }: ThreadComposerProps) {
+   const { t } = useTranslation();
++  const inputId=useId();
+@@
+         <GoalStateStrip goalState={goalState} />
++        {inputLabel&&<label className="boss-n02-composer-label" htmlFor={inputId}>{inputLabel}</label>}
+@@
+           <textarea
++            id={inputId}
+@@
+-            aria-label={inputAriaLabel ?? t("thread.composer.inputAria")}
++            aria-label={inputLabel?(inputAriaLabel?inputLabel+" · "+inputAriaLabel:inputLabel):inputAriaLabel??t("thread.composer.inputAria")}
+@@
+-                    : t("thread.composer.send")
++                    : submitLabel??t("thread.composer.send")
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   composerInputAriaLabel?: string;
++  composerInputLabel?: string;
++  composerSubmitLabel?: string;
+@@
+   composerInputAriaLabel,
++  composerInputLabel,
++  composerSubmitLabel,
+@@
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
+@@
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
+*** Update File: webui/src/App.tsx
+@@
+                             persistQueuedPrompts={false}
++                            composerInputLabel={role==="BOSS"?"本次消息":undefined}
++                            composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
+                             onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
+@@
+                           persistQueuedPrompts={false}
++                          composerInputLabel={role==="BOSS"?"本次消息":undefined}
++                          composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
+                           onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+   submitLabel?: string;
++  attachmentLabel?: string;
+@@
+   submitLabel,
++  attachmentLabel,
+@@
+-            aria-label={t("thread.composer.attachImage")}
++            aria-label={attachmentLabel??t("thread.composer.attachImage")}
+@@
+-              aria-label={t("thread.composer.attachImage")}
++              aria-label={attachmentLabel??t("thread.composer.attachImage")}
+@@
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
++                "thread-composer-action thread-composer-attachment-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   composerSubmitLabel?: string;
++  composerAttachmentLabel?: string;
++  composerPlaceholder?: string;
+@@
+   composerSubmitLabel,
++  composerAttachmentLabel,
++  composerPlaceholder,
+@@
+           submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+@@
+-            composerVariant === "hero"
++            composerPlaceholder??(composerVariant === "hero"
+               ? t("thread.composer.placeholderHero")
+-              : t("thread.composer.placeholderThread")
++              : t("thread.composer.placeholderThread"))
+@@
+           submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+@@
+-              : t("thread.composer.placeholderHero")
++              : composerPlaceholder??t("thread.composer.placeholderHero")
+*** Update File: webui/src/App.tsx
+@@
+                             composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
++                            composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}
++                            composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}
+@@
+                           composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
++                          composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}
++                          composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}
 *** End Patch

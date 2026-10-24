@@ -10,7 +10,8 @@
 .boss-v6[data-page="N02"] .boss-nav-item{position:relative;height:46px;min-height:46px;padding:0 13px;border:0;border-radius:12px;color:#52698b;font-size:14px;font-weight:550}
 .boss-v6[data-page="N02"] .boss-nav-item.active{background:#e5f1ff;color:#0866ea;font-weight:720;box-shadow:none}
 .boss-v6[data-page="N02"] .boss-nav-item.active::before{content:"";position:absolute;left:-14px;width:3px;height:24px;background:#0c6bfa;border-radius:9px}
-.boss-v6[data-page="N02"] .boss-nav-item svg{stroke-width:1.75}
+.boss-v6[data-page="N02"] .boss-nav-item svg{stroke-width:1.75;color:#6b80a1}
+.boss-v6[data-page="N02"] .boss-nav-item.active svg{color:#0866ea}
 .boss-v6[data-page="N02"] .boss-main,.boss-v6[data-page="N02"] .boss-stage{background:transparent}
 .boss-v6[data-page="N02"] .boss-topbar{height:64px;min-height:64px;gap:18px;padding:8px 22px 8px 28px;background:transparent;border-bottom:0}
 .boss-v6[data-page="N02"] .boss-search{min-height:44px;max-width:450px;width:46%;min-width:300px;background:linear-gradient(100deg,#f3f7fd,#eef6fc);border:0;font-size:11px}
@@ -51,22 +52,29 @@
 .boss-n02-history small{display:block;font-size:12px;color:#627b96;line-height:20px}
 .boss-n02-session-select{display:grid;gap:5px;font-size:14px;color:#2d4a67}
 .boss-n02-session-select select{min-height:44px;min-width:0;width:100%;padding:8px;border:1px solid #d8e4f1;border-radius:9px;background:#fbfdff}
-.boss-n02-message-column{min-width:0}
+.boss-n02-message-column{min-width:0;border:1px solid #e0ebf7;border-radius:15px;padding:18px 20px;background:#fff;box-shadow:0 10px 28px rgba(36,86,153,.06),0 1px 3px rgba(24,79,133,.03)}
+.boss-n02-thread [data-testid="thread-welcome-layout"],.boss-n02-thread [data-testid="thread-composer-dock"]>div,.boss-n02-thread form{padding-inline:0}
+.boss-n02-composer-label{display:block;margin:0 0 5px;color:#2d4a67;font-size:14px;font-weight:600;line-height:22px}
 .boss-n02-thread{height:clamp(380px,48vh,560px);min-width:0;position:relative;overflow:hidden}
 .boss-n02-thread>.relative{height:100%}
 .boss-n02-thread .thread-composer-surface{background:transparent;border-radius:0;max-width:none}
 .boss-n02-thread textarea{min-height:88px;padding:10px 12px;border:1px solid #d8e4f1;border-radius:9px;background:#fbfdff;color:#1d3a5a;font-size:16px;line-height:24px;font-weight:600}
 .boss-n02-thread .thread-composer-footer{padding-top:10px}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-action{height:44px;min-width:44px;min-height:44px;margin:0}
-.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action{width:auto;min-width:84px;padding:8px 13px;border:1px solid #0969E8;border-radius:10px;background:#0969E8;color:#fff;box-shadow:none;gap:6px;font-size:14px;font-weight:690;line-height:22px}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action{width:auto;min-width:84px;padding:8px 13px;border:1px solid #0969E8;border-radius:10px;background:#0969E8;color:#fff;box-shadow:none;gap:6px;font-size:14px;font-weight:690;line-height:24px}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action::before{content:none}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action{transform:none;scale:1}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action::after{content:attr(aria-label);font:inherit;white-space:nowrap}
-.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action[type="submit"]::after{content:"发送"}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action[type="submit"] .lucide-arrow-up{display:none}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action[type="button"]{background:#fff6f6;color:#ad3737;border-color:#f2d4d4}
-.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action:hover:not(:disabled){background:#085dce}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action:hover:not(:disabled){border-color:#6fa9e3;box-shadow:0 3px 11px rgba(12,96,200,.11)}
 .boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-submit-action:disabled{opacity:.5}
-.boss-n02-progress{margin-top:13px;padding:18px 20px;border:1px solid #e0ebf7;border-radius:15px;background:#fff}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-attachment-action{width:auto;min-width:84px;padding:8px 13px;border:1px solid #cfe0f2;border-radius:10px;background:#fff;color:#1658a5;box-shadow:none;gap:6px;font-size:14px;font-weight:690;line-height:24px}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-attachment-action::before{content:none}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-attachment-action::after{content:attr(aria-label);font:inherit;white-space:nowrap}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-attachment-action>.lucide-plus{display:none}
+.boss-v6[data-page="N02"] .boss-n02-thread .thread-composer-attachment-action:hover:not(:disabled){border-color:#6fa9e3;box-shadow:0 3px 11px rgba(12,96,200,.11)}
+.boss-n02-progress{margin-top:13px;padding:18px 20px;border:1px solid #e0ebf7;border-radius:15px;background:#fff;box-shadow:0 10px 28px rgba(36,86,153,.06),0 1px 3px rgba(24,79,133,.03)}
 .boss-n02-note{background:#f0f7ff;border:1px solid #dcebf9;border-radius:10px;padding:12px 14px;color:#496986;font-size:14px;line-height:22px;margin:10px 0}
 .boss-n02-note.warn{background:#fff9ee;border-color:#f0dfbb;color:#88601c}
 .boss-n02-note.error{background:#fff4f4;border-color:#f3d7d7;color:#a43939}
@@ -123,6 +131,6 @@
  .boss-v6[data-page="N02"] .boss-hero h1{font-size:21px}
  .boss-v6[data-page="N02"] .boss-hero-copy p{font-size:12px}
  .boss-v6[data-page="N02"] .boss-stage .boss-hero-mascot{opacity:.25}
- .boss-n02-panel{padding:15px}.boss-n02-kv{grid-template-columns:90px minmax(0,1fr)}
+ .boss-n02-panel,.boss-n02-message-column,.boss-n02-progress{padding:15px}.boss-n02-kv{grid-template-columns:90px minmax(0,1fr)}
  .boss-n02-heading{flex-wrap:wrap}
 }
