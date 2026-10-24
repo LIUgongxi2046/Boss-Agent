@@ -142,6 +142,16 @@ A02通过`GET /api/boss/ui/simulation-inspect`人工检查SI01—SI14的当前�
 
 ## 7. 验收与接收条件
 
+### FC07 当前交办与承诺
+
+优先迭代入口保留F01采购记录，通过同一task_id进入F06或N05。BossTaskCenter分别管理他人交办和本人承诺；本人承诺采用当前来源、原定期限、独立完成证据、版本及提醒历史。目的、唯一负责人、期限/时区、产物、当前版本、署名反馈、证据版本及模拟消息正文均来自正式页面投影。
+
+BossAssignmentPreparation通过boss.assignment.prepare读取当前任务及来源；assignmentPreparation和assignmentPreparationTask绑定原查询与对象，其他任务不采用该编号。准备不签发本人授权。延期申请读取assignment-extensions；APPROVE/REJECT分别展示申请、旧/新期限、理由和当前版本，经独立确认提交boss.assignment.extension.decide。结果提交保持RESULT_SUBMITTED，完成确认依赖当前充分证据；取消后的反馈显示为历史。
+
+useTransaction按assignment、commitment、feedback保存原动作、对象和client_request_id，URL不保存私人正文。未知结果禁止新提交和Escape关闭，刷新后仅查询原operation-status。来源确认采用sourceReviewRequest/sourceReviewTask恢复原编号。身份和对象变化使旧读取失效；未保存编辑使用现有D06，原文读取保持bossSource/bossReturn与bossTask。原生Client对boss.assignment.*、boss.commitment.*及boss.simulation.feedback禁止连接恢复重发。
+
+当前构建采用canonical组件、同一ClientProvider和原生Client，独立fc07-n3-dist保留MVP冻结制品。公开字段见specs/product-assignment.openapi.yaml；实际结果见docs/feature-delivery/FC07。DOM检查覆盖F06/N05三种窗口和100%/200%缩放，正文16/24；视觉及用户验收未执行。
+
 T08正式接收必须包含：72页面各自组件、真实读写与事件、角色、对象/版本、全部状态、返回上下文、焦点恢复及源码位置；完整561状态与公共状态责任保留。T03提供视觉和素材结果，T05/T06提供字段及operationId，T07提供工具/事件和上下文采用；完整设计验收仍未完成。
 
 已接收的局部接口与字段如下；正式设计验收继续独立执行。

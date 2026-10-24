@@ -42,6 +42,8 @@ from product_read_tools import product_read_tools
 from product_skills import ProductSkills
 from product_fc01 import ProductFc01
 from product_mvp import ProductMVP
+from product_assignment import ProductAssignment, AssignmentReadTool
+from fc07_agent import TOOLS as ASSIGNMENT_TOOLS
 from product_bi import ProductBI, FeatureProvider, FeatureRecorder, FeatureToolRegistry, FeatureBusinessTool, BI_TOOLS
 from product_morning import ProductMorning
 from fc03_agent.formal import FormalMorningTool, FORMAL_TOOLS
@@ -110,9 +112,9 @@ async def serve():
     connection = settings()
     roles, config_path = prepare()
     product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
-    if os.environ.get("BOSS_EXECUTION_SCOPE") not in (None, "BOSS-MVP-1"):
+    if os.environ.get("BOSS_EXECUTION_SCOPE") not in (None, "BOSS-MVP-1", "BOSS-PRIORITY-ITERATION"):
         raise ValueError("当前执行范围配置无效")
-    mvp_mode = product_mode and os.environ.get("BOSS_EXECUTION_SCOPE") == "BOSS-MVP-1"
+    mvp_mode = product_mode and os.environ.get("BOSS_EXECUTION_SCOPE") in {"BOSS-MVP-1", "BOSS-PRIORITY-ITERATION"}
     account_store = AccountStore(WORK / "accounts/accounts.sqlite") if product_mode else None
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
@@ -134,10 +136,11 @@ async def serve():
     fc01 = (ProductMVP(store) if mvp_mode else ProductFc01(store)) if product_mode else None
     bi = ProductBI(store) if product_mode else None
     morning = ProductMorning(store) if product_mode else None
-    provider = FeatureProvider(fc01, bi, morning) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
+    assignment = ProductAssignment(store) if product_mode else None
+    provider = FeatureProvider(fc01, bi, morning, assignment) if product_mode else RecordedProvider(connection, output / "http-requests.json", redact_payload=False)
     provider.generation = config.resolve_preset().to_generation_settings()
     registry = FeatureToolRegistry() if product_mode else ToolRegistry()
-    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi, morning) if product_mode else None
+    runtime_recorder = FeatureRecorder(store, registry, lambda: runtime_control.snapshot(), bi, morning, assignment) if product_mode else None
     events_path = output / "events.json"
     records, bindings = json.loads(events_path.read_text()) if events_path.exists() else [], {}
     if product_mode:
@@ -174,6 +177,12 @@ async def serve():
             if name in registry.tool_names:
                 registry.unregister(name)
             registry.register(FormalMorningTool(store, morning.context_provider, name))
+        for name in sorted(ASSIGNMENT_TOOLS):
+            if name not in registry.tool_names:
+                raise ValueError("当前应用缺少正式交办读取工具：" + name)
+            ordinary = registry.get(name)
+            registry.unregister(name)
+            registry.register(AssignmentReadTool(ordinary, assignment))
     else:
         registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None
@@ -184,6 +193,7 @@ async def serve():
         fc01.runtime = runtime_control
         bi.runtime = runtime_control
         morning.runtime = runtime_control
+        assignment.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
     cron = CronService(WORK / "cron/jobs.json")
@@ -220,6 +230,7 @@ async def serve():
         channels.channels["websocket"].bi = bi
         channels.channels["websocket"].morning = morning
         channels.channels["websocket"].mvp = fc01 if mvp_mode else None
+        channels.channels["websocket"].assignment = assignment
     server = web.AppRunner(business_application(WORK / "business.sqlite"))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
@@ -231,6 +242,7 @@ async def serve():
             fc01.bot = bot
             bi.bot = bot
             morning.bot = bot
+            assignment.bot = bot
         async def context(request):
             current = store.context("ui-check")
             selected_prompts = load_runtime_prompts(store, "ui-check")
@@ -257,8 +269,11 @@ async def serve():
             bot.runtime.add_context_provider(skills.context)
             bot.runtime.add_context_provider(OwnerMemoryContext(store))
             bot.runtime.add_context_provider(owner_goals_context)
+            if mvp_mode:
+                bot.runtime.add_context_provider(fc01.scope_context)
             bot.runtime.add_context_provider(bi.scope_context)
             bot.runtime.add_context_provider(morning.scope_context)
+            bot.runtime.add_context_provider(assignment.scope_context)
             bot.runtime.add_context_provider(runtime_recorder.context)
         else:
             bot.runtime.add_context_provider(context)

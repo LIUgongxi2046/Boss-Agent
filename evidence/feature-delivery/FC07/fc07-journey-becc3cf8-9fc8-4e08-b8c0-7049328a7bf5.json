@@ -1,0 +1,182 @@
+{
+  "status": "PASS",
+  "scope": "FC07_DEVELOPER_CHECKS_PENDING_USER_ACCEPTANCE",
+  "run_id": "fc07-journey-becc3cf8-9fc8-4e08-b8c0-7049328a7bf5",
+  "ports": {
+    "business": 10091,
+    "webui": 10092,
+    "gateway": 20091
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc07-journey-becc3cf8-9fc8-4e08-b8c0-7049328a7bf5",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc07-n3-dist",
+  "manifest_sha256": "b67076ef5343ab3f824e4afbc9635c0621422325adc4c6c4538fbe0e8b7b6c6f",
+  "index_sha256": "55cde8ee46f466ec5299ae6da3310282b2b20fbd382d3b6376c4d3dee5ccd0b7",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "procurement_task_complete_journey",
+      "query_key": "mvp-query-ec02cf3c-0b99-4f56-acc7-d7d9c6a836d2",
+      "task_id": "e7cd682b-28ec-4b68-aa83-2b49c3970c59",
+      "run_id": "run-9f971b48-7291-4235-926a-a5b7c4d6956e",
+      "same_task_from_procurement": true,
+      "progress": "IN_PROGRESS",
+      "result_before_owner": "RESULT_SUBMITTED",
+      "final": "COMPLETED_CONFIRMED",
+      "extension_decisions": [
+        {
+          "decision": "APPROVE",
+          "old_due_at": "2026-10-25T17:00:00+08:00",
+          "new_due_at": "2026-10-26T17:00:00+08:00"
+        },
+        {
+          "decision": "REJECT",
+          "old_due_at": "2026-10-26T17:00:00+08:00",
+          "new_due_at": "2026-10-26T17:00:00+08:00"
+        }
+      ],
+      "simulated_messages": 2
+    },
+    {
+      "check": "canceled_task_late_feedback",
+      "task_id": "dab28325-81b0-4a5a-926e-459c6a53f814",
+      "status": "CANCELED",
+      "historical_only": true,
+      "retained_message_count": 1,
+      "reminder_state": "CANCELED"
+    },
+    {
+      "check": "owner_commitment_current_source_and_completion",
+      "commitment_id": "owner-task-d926dd5d-6e86-4885-8283-27db905d1e5f",
+      "source_id": "finance-note",
+      "source_version": "1",
+      "status": "COMPLETED_CONFIRMED",
+      "version": "3",
+      "reminder_state": "CANCELED",
+      "external_message_sent": false
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "N05",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "current_dom_bounds",
+      "page": "F06",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "current_body_typography",
+      "values": []
+    },
+    {
+      "check": "same_database_relogin_and_restart",
+      "task_ids": [
+        "e7cd682b-28ec-4b68-aa83-2b49c3970c59",
+        "dab28325-81b0-4a5a-926e-459c6a53f814"
+      ],
+      "commitment_id": "owner-task-d926dd5d-6e86-4885-8283-27db905d1e5f",
+      "simulated_messages": 3,
+      "renderer_errors": []
+    }
+  ]
+}

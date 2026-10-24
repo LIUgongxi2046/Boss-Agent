@@ -27,7 +27,7 @@ SAFE_RECEIPT_FIELDS = {
     "share_id", "share_status", "fields", "active_shares_invalidated",
     "external_delivery_created", "external_recall_verified",
     "future_visibility_stopped", "task_id", "task_status_after_reply",
-    "task_feedback_id", "task_completion_confirmed", "confirmation_state",
+    "task_feedback_id", "feedback_id", "task_completion_confirmed", "confirmation_state",
     "minute_id", "minute_version", "entry_id", "meeting_id",
     "independent_send_required", "message_sent",
     "application_id", "decision_id",
@@ -109,6 +109,11 @@ class BossRecoveryAPI:
             if required != role:
                 return 403, {"error": "FORBIDDEN"}
             key = _client_key(params["client_request_id"])
+            if action == "boss.assignment.extension.decide":
+                if self.namespace != NS:
+                    return 409, {"error": "EXECUTION_SCOPE_UNAVAILABLE"}
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                return 200, {**AssignmentExtensionAPI(self.store).receipt(role, key), "write_performed_by_lookup": False}
             with self.store.connect() as db:
                 self.store.active(db, self.namespace)
                 found = db.execute(

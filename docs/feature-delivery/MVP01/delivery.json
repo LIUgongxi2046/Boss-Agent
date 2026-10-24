@@ -9,7 +9,7 @@
   "total_checkpoints": 12,
   "routine_independent_full_acceptance_gate": false,
   "implementation_commit": "adee5342f5356d53af048b842baaa665411b5385",
-  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/candidate_commit",
+  "candidate_commit_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json#/historical_mvp01/candidate_commit",
   "task_source": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/docs/MVP01采购成本体验交付工单.md",
   "development_record": "docs/feature-delivery/MVP01/integration.md",
   "experience_instructions": "docs/feature-delivery/MVP01/experience.md",

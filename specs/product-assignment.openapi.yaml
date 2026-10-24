@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: FC07 交办读取准备与延期决定公共入口
+  version: 1.0.0
+  description: 采用现有任务、来源核查及延期领域结果，准备仅调用两项读取工具。
+security: [{BearerAuth: []}]
+paths:
+  /api/boss/ui/assignment-preparation:
+    get:
+      operationId: assignmentPreparationReceipt
+      x-role: BOSS
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {$ref: './product-fc01.openapi.yaml#/components/schemas/Status/properties/client_request_id'}}
+      responses:
+        '200': {description: 原请求状态及当前可采用材料, content: {application/json: {schema: {$ref: '#/components/schemas/PreparationReceipt'}}}}
+        '400': {description: 缺少字段、额外字段或重复字段}
+        '401': {description: 未认证或认证已经失效}
+        '403': {description: 本人或资料范围不符}
+        '404': {description: 原请求不存在}
+        '409': {description: 当前来源不能读取}
+        '410': {description: 来源已经失效}
+  /api/boss/ui/assignment-extensions:
+    get:
+      operationId: assignmentExtensionHistory
+      x-role: BOSS
+      parameters:
+        - {name: task_id, in: query, required: true, schema: {$ref: './assignment-extension.schema.json#/$defs/Id'}}
+      responses:
+        '200': {description: 当前任务期限与本人决定历史, content: {application/json: {schema: {$ref: '#/components/schemas/ExtensionHistory'}}}}
+        '400': {description: 缺少字段、额外字段或重复字段}
+        '401': {description: 未认证}
+        '403': {description: 当前身份没有读取权限}
+        '404': {description: 当前任务不存在}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
+  schemas:
+    Prepare:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, task_id, task_version]
+      properties:
+        client_request_id: {$ref: './product-fc01.openapi.yaml#/components/schemas/Status/properties/client_request_id'}
+        task_id: {type: string, minLength: 1, maxLength: 200}
+        task_version: {type: string, minLength: 1, maxLength: 200}
+    Preparation:
+      type: object
+      additionalProperties: false
+      required: [source_type, task, source_review, owner_decision_required, business_authority_granted]
+      properties:
+        source_type: {const: SIMULATED}
+        task: {$ref: './business-tools.schema.json#/$defs/read_output'}
+        source_review: {$ref: './assignment-source-review.schema.json#/$defs/Projection'}
+        owner_decision_required: {const: true}
+        business_authority_granted: {const: false}
+    PreparationReceipt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, task_id, task_version, run_id, request_state, adoption_state, preparation, write_performed_by_lookup]
+      properties:
+        client_request_id: {$ref: './product-fc01.openapi.yaml#/components/schemas/Status/properties/client_request_id'}
+        task_id: {type: string, minLength: 1}
+        task_version: {type: string, minLength: 1}
+        run_id: {type: [string, 'null']}
+        request_state: {type: string, description: 复用实际 Runtime 状态；尚未开始运行时为 PREPARED}
+        adoption_state: {enum: [CURRENT, HISTORICAL_REQUIRES_REQUERY]}
+        preparation: {oneOf: [{type: 'null'}, {$ref: '#/components/schemas/Preparation'}]}
+        write_performed_by_lookup: {const: false}
+    ExtensionDecision:
+      type: object
+      additionalProperties: false
+      required: [decision_id, task_id, feedback_id, owner_id, source_type, decision, old_due_at, new_due_at, proposed_due_at, request_reason, reason, authorization_id, previous_task_version, task_version, decided_at]
+      properties:
+        decision_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        task_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        feedback_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        owner_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        source_type: {const: SIMULATED}
+        decision: {enum: [APPROVE, REJECT]}
+        old_due_at: {type: string, format: date-time}
+        new_due_at: {type: string, format: date-time}
+        proposed_due_at: {type: string, format: date-time}
+        request_reason: {type: string}
+        reason: {type: string, minLength: 1, maxLength: 500}
+        authorization_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        previous_task_version: {$ref: './assignment-extension.schema.json#/$defs/Version'}
+        task_version: {$ref: './assignment-extension.schema.json#/$defs/Version'}
+        decided_at: {type: string, format: date-time}
+    ExtensionHistory:
+      type: object
+      additionalProperties: false
+      required: [source_type, task_id, task_version, due_at, decisions]
+      properties:
+        source_type: {const: SIMULATED}
+        task_id: {$ref: './assignment-extension.schema.json#/$defs/Id'}
+        task_version: {$ref: './assignment-extension.schema.json#/$defs/Version'}
+        due_at: {type: string, format: date-time}
+        decisions: {type: array, items: {$ref: '#/components/schemas/ExtensionDecision'}}
+x-websocket-operations:
+  - {operationId: assignmentPrepare, action: boss.assignment.prepare, role: BOSS, input: '#/components/schemas/Prepare', output: '#/components/schemas/PreparationReceipt', replay_after_reconnect: false}
+  - {operationId: assignmentExtensionDecide, action: boss.assignment.extension.decide, role: BOSS, input: './assignment-extension.schema.json#/$defs/DecisionInput', output: './assignment-extension.schema.json#/$defs/Result', replay_after_reconnect: false}
+x-runtime-policy:
+  provider: SIMULATED
+  tools: [read_assignment, assignmentSourcesRead]
+  request_binding: authenticated owner, dataset/version, task/version and current source review digest
+  owner_authorization: each business action uses its existing independent owner decision
+  unknown_write_recovery: original action and client_request_id only; lookup performs no write
+  external_model_invoked: false
+  unknown_usage: null
+  unknown_cost: null
+x-task-projection:
+  authority: BossPageAPI /api/boss/ui/tasks
+  task_fields: [source_versions, result_evidence_requires_resubmission]
+  feedback_fields: [evidence_versions, evidence_states, historical_only, task_version]
+  linked_message_fields: [body, authorization_id]
+  commitment_fields: [source_state, source_versions]
+  related_collections: [self_due_events, self_commitment_revisions]

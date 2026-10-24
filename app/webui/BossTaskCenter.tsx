@@ -12,6 +12,8 @@ type Response = TaskListResponse & {
   business_clock?:string;
   read_at?:string;
   source_type?:string;
+  self_due_events?:{commitment_id:string;event_id:string;event_state:string;due_at:string}[];
+  self_commitment_revisions?:SelfCommitment[];
 };
 type Tab = "本人承诺"|"他人交办"|"等待反馈"|"待核查结果";
 type Props = {
@@ -21,6 +23,7 @@ type Props = {
   onOpenTask:(id:string)=>void;
   onNavigate:(page:string)=>void;
   onReload:()=>void;
+  onDirtyChange:(value:boolean)=>void;
 };
 const TABS:Tab[]=["本人承诺","他人交办","等待反馈","待核查结果"];
 function labelTime(value?:string){return value?value.replace("T"," "):"未提供";}
@@ -38,8 +41,8 @@ function dueStatus(task:AssignmentTask,clock?:string){
   if(!Number.isFinite(due)||!Number.isFinite(at))return "期限不可解析";
   return due<at?"已超模拟业务时钟":"当前期限未超过模拟业务时钟";
 }
-export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNavigate,onReload}:Props){
-  const [tab,setTab]=useState<Tab>("他人交办");
+export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNavigate,onReload,onDirtyChange}:Props){
+  const [tab,setTab]=useState<Tab>(()=>{const value=new URLSearchParams(window.location.search).get("taskTab");return TABS.includes(value as Tab)?value as Tab:"他人交办";});
   const [coordinator,setCoordinator]=useState("");
   const [before,setBefore]=useState("");
   const [status,setStatus]=useState("");
@@ -79,8 +82,8 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
   const submitted=[...chosenFeedback].reverse().find(f=>f.kind==="RESULT_SUBMITTED");
 
   function apply(){setApplied({coordinator,before,status,meeting});setPage(0);}
-  function changeTab(value:Tab){setTab(value);setPage(0);}
-  return <>
+  function changeTab(value:Tab){setTab(value);setPage(0);const url=new URL(window.location.href);url.searchParams.set("taskTab",value);window.history.replaceState(null,"",url);}
+  return <div className="boss-task-center-view">
     <section className="boss-panel boss-task-center">
       <div className="boss-minutes-tabs" role="tablist" aria-label="任务与承诺分类">
         {TABS.map(key=><button type="button" role="tab" key={key}
@@ -93,7 +96,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
             tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}</span>
         </button>)}
       </div>
-      <div className="boss-task-filter-grid">
+      <div className="boss-task-filter-grid" style={tab==="本人承诺"?{display:"none"}:undefined}>
         <label>负责人
           <select value={coordinator} onChange={e=>setCoordinator(e.target.value)}>
             <option value="">全部已知负责人</option>
@@ -121,14 +124,13 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
         </button>
       </div>
     </section>
-    <div className="boss-columns">
+    <div hidden={tab!=="本人承诺"}><BossPersonalCommitments items={data?.self_commitments||[]} businessClock={data?.business_clock} onReload={onReload} onDirtyChange={onDirtyChange} dueEvents={data?.self_due_events} revisions={data?.self_commitment_revisions}/></div>
+    <div className="boss-columns" style={tab==="本人承诺"?{gridTemplateColumns:"minmax(0,1fr)"}:undefined}>
       <div className="boss-column">
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>对象与正式业务记录</h2>
             <small>原版 v6 五列信息 · 数据来自当前有权 SQLite 对象</small></div>
           {tab==="本人承诺" ? <>
-            <BossPersonalCommitments items={data?.self_commitments||[]}
-              businessClock={data?.business_clock} onReload={onReload}/>
             {data?.historical_commitment?<div className="boss-workspace-item">
               <strong>{data.historical_commitment.task_id}</strong>
               <Display name="历史状态" value={data.historical_commitment.status}/>
@@ -177,7 +179,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
           </div>
         </section>
       </div>
-      <div className="boss-column">
+      <div className="boss-column" style={tab==="本人承诺"?{display:"none"}:undefined}>
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>选中任务</h2>
             <small>只读预览 · 重大动作进入 F06 本人确认</small></div>
@@ -226,5 +228,5 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
         </section>
       </div>
     </div>
-  </>;
+  </div>;
 }

@@ -111,6 +111,7 @@ class BossCommandAPI:
         "boss.assignment.nudge": "BOSS",
         "boss.assignment.complete": "BOSS",
         "boss.assignment.extend": "BOSS",
+        "boss.assignment.extension.decide": "BOSS",
         "boss.assignment.cancel": "BOSS",
         "boss.assignment.sources.confirm": "BOSS",
         "boss.commitment.create": "BOSS",
@@ -208,6 +209,9 @@ class BossCommandAPI:
             elif action == "boss.assignment.sources.confirm":
                 from boss_assignment_sources import AssignmentSourcesAPI
                 result = AssignmentSourcesAPI(self.store).execute(role, payload)
+            elif action == "boss.assignment.extension.decide":
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                result = AssignmentExtensionAPI(self.store).execute(role, payload)
             elif action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
                 require(self.runtime_control is not None, "当前Runtime尚未准备", web.HTTPServiceUnavailable)
                 result = self.runtime_control.execute(self, action, payload)

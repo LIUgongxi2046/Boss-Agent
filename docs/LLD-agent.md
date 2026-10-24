@@ -4,6 +4,8 @@
 
 ## 主体与治理
 
+FC07当前公共适配使用validation/product_assignment.py与正式fc07_agent模块。可信ProductAssignment在实际BOSS请求内绑定task_id/task_version、dataset/version及AssignmentSourcesAPI当前review_sha256；同一Nanobot/AgentLoop执行read_assignment和assignmentSourcesRead。FeatureProvider/FeatureRecorder按该请求选择两项工具和实际记录器，已有MVP成本查询仍采用原四项工具。运行记录采用specs/runtime-records.schema.json的FC07与assignment_context字段；不得保存目的、原文或私人正文。模型事件明确SIMULATED，usage/cost为null；发送、催办、延期决定、取消、完成及来源确认均保持独立本人页面动作。
+
 唯一业务主体 `boss-1`；唯一 Agent 由 nanobot0.3.5的 AgentLoop 承载。MAINTAINER 维护技术配置；联系人只作为来源作者、收件人及负责人。模型为 DeepSeek `deepseek-flash`，协议 Chat Completions，thinking disabled。当前凭据已通过真实服务连通性与五工具任务检查，范围见 T16。
 
 | 层级 | 载体与加载 | 强制控制和验证 |

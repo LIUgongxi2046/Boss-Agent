@@ -117,7 +117,7 @@
         "detail_refs":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},
         "review_sha256":{"$ref":"#/$defs/Sha256"}, "preparation_sha256":{"$ref":"#/$defs/Sha256"},
         "result_sha256":{"$ref":"#/$defs/Sha256"}, "owner_decision_required":{"const":true},
-        "source_refs":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["source_id","version"],"properties":{"source_id":{"type":"string"},"version":{"type":"string"},"source_sha256":{"$ref":"#/$defs/Sha256"}}}},
+        "source_refs":{"type":"array","items":{"oneOf":[{"type":"object","additionalProperties":false,"required":["source_id","version"],"properties":{"source_id":{"type":"string"},"version":{"type":"string"},"source_sha256":{"$ref":"#/$defs/Sha256"}}},{"type":"object","additionalProperties":false,"required":["source_id","pinned_version","current_version","source_status"],"properties":{"source_id":{"type":"string"},"pinned_version":{"type":["string","null"]},"current_version":{"type":["string","null"]},"source_status":{"type":"string"}}}]}},
         "origin":{"type":"object","additionalProperties":false,"required":["interface_id","origin_entity_type","origin_record_id","origin_version","review_sha256"],"properties":{"interface_id":{"enum":["SI09","SI10"]},"origin_entity_type":{"type":"string"},"origin_record_id":{"type":"string"},"origin_version":{"type":"string"},"review_sha256":{"$ref":"#/$defs/Sha256"}}}
       }
     },
@@ -143,7 +143,8 @@
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
         "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
-        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03"]},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03","FC07"]},
+        "assignment_context":{"type":"object","additionalProperties":false,"required":["task_id","task_version","review_sha256"],"properties":{"task_id":{"$ref":"#/$defs/Identifier"},"task_version":{"$ref":"#/$defs/Version"},"review_sha256":{"$ref":"#/$defs/Sha256"}}},
         "morning_context": {"$ref": "#/$defs/MorningContext"},
         "bi_query_context":{"type":"array","items":{"$ref":"#/$defs/BIQueryContext"}},
         "bi_readable_query_ids":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/Identifier"}},

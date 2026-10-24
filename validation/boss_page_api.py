@@ -30,7 +30,7 @@ from boss_simulation_api import SimulationAPI
 from boss_bi_scenarios import BIScenarioAPI
 from public_bi_scenarios import maintainer_catalog
 from public_morning import morning_read, morning_coverage_read
-from boss_supply_quality import SupplyQualityAPI
+from boss_supply_quality import SupplyQualityAPI, external_adoption
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -117,7 +117,7 @@ class BossPageAPI:
             "task_id", "status", "version", "purpose", "coordinator_id",
             "due_at", "timezone", "evidence_requirements", "related_meeting_id",
             "related_event_ids", "source_refs", "feedback_ids", "message_ids",
-            "execution_namespace", "origin_minute_id", "origin_minute_version",
+            "execution_namespace", "source_versions", "origin_minute_id", "origin_minute_version",
             "origin_entry_id", "origin_source_id", "origin_source_version",
         )
         return {key: item[key] for key in keys if key in item}
@@ -133,6 +133,8 @@ class BossPageAPI:
                 "task_id": row["task_id"],
                 "type": "ASSIGNMENT_SEND",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "send_state": "SENT_SIMULATED",
                 "delivery_state": "NOT_VERIFIED",
@@ -146,6 +148,8 @@ class BossPageAPI:
                 "task_id": row["related_task_id"],
                 "type": "FOLLOWUP_MESSAGE",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "send_state": row["send_state"],
                 "delivery_state": row["delivery_state"],
@@ -159,6 +163,8 @@ class BossPageAPI:
                 "task_id": row["task_id"],
                 "type": "ASSIGNMENT_NUDGE",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "business_at": row["business_at"],
                 "send_state": row["message_status"],
@@ -232,7 +238,7 @@ class BossPageAPI:
                     {key: item[key] for key in (
                         "feedback_id", "task_id", "kind", "content",
                         "evidence_refs", "author_contact_id", "submitted_at",
-                        "source_type", "proposed_due_at",
+                        "source_type", "proposed_due_at", "evidence_versions", "evidence_states", "historical_only", "task_version",
                     ) if key in item}
                     for item in self._items(db, self.namespace, "feedback")
                 ],
@@ -245,16 +251,20 @@ class BossPageAPI:
                         "source_type",
                     ) if k in item},
                     "source_reference_state": (
-                        "CURRENT" if all(
+                        "CURRENT" if item.get("source_refs") and all(
                             ref["source_id"] in available
                             and available[ref["source_id"]].get("version") == ref["version"]
                             and not available[ref["source_id"]].get("withdrawn")
                             and available[ref["source_id"]].get("access_scope") == data["owner_id"]
                             and available[ref["source_id"]].get("source_type") == "SIMULATED"
+                            and source_validity(available[ref["source_id"]], business_at) == "VALID"
+                            and external_adoption(db, self.namespace, data, business_at, available[ref["source_id"]])["state"] != "NEEDS_REIMPORT"
                             for ref in (item.get("source_refs", []) + item.get("completion_evidence", []))
                         ) else "NEEDS_REVIEW"
                     ),
                 } for item in self._items(db, self.namespace, "self_commitment")],
+                "self_commitment_revisions": [{key: item[key] for key in ("commitment_id", "purpose", "version", "status", "due_at", "timezone", "importance", "evidence_requirements", "source_refs", "completion_evidence") if key in item}
+                    for item in self._items(db, self.namespace, "self_commitment_revision")],
                 "self_due_events": [{
                     "event_id": row["event_id"],
                     "commitment_id": row["commitment_id"],
@@ -585,6 +595,13 @@ class BossPageAPI:
                 return 200, OwnerPlansAPI(self.store).read(role)
             if path == "/api/boss/ui/dashboard":
                 return 200, self._dashboard()
+            if path == "/api/boss/ui/assignment-extensions":
+                require(role == "BOSS", "延期决定仅限本人读取", web.HTTPForbidden)
+                query = parse_qs(query_string, keep_blank_values=True)
+                require(set(query) == {"task_id"} and len(query["task_id"]) == 1 and bool(query["task_id"][0]), "延期读取字段无效", web.HTTPBadRequest)
+                require(self.namespace == DEMO_NAMESPACE, "当前执行范围不可用", web.HTTPConflict)
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                return 200, AssignmentExtensionAPI(self.store).read(role, query["task_id"][0])
             if path == "/api/boss/ui/model-health":
                 return 200, self._model_runtime(role)
             if path == "/api/boss/ui/tasks":

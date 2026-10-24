@@ -1,4 +1,5 @@
-import {useId, useState} from "react";
+import {useEffect,useId,useRef,useState} from "react";
+import {useClient} from "@/providers/ClientProvider";
 
 type SourceStatus="VALID"|"RECEIVED"|"INCOMPLETE"|"CONFLICTED"|"SUPERSEDED"|"WITHDRAWN"|"EXPIRED"|"MISSING"|"FORBIDDEN";
 type Source={source_id:string;pinned_version:string|null;current_version:string|null;source_status:SourceStatus;excerpt:string|null;
@@ -9,11 +10,13 @@ export type AssignmentSourceReviewProjection={source_type:"SIMULATED";task:{task
   result_evidence_current:boolean|null;result_evidence_requires_resubmission:boolean;confirmed_reason:string|null;read_at:string;
   history:{before_task_version:string;source_versions:Record<string,string>;archived_at:string;origin_source:{source_id:string;version:string}|null;review_reason:string|null}[]};
 type Payload={client_request_id:string;task_id:string;task_version:string;review_sha256:string;reason:string};
-type Receipt={action:string;client_request_id:string;outcome:string};
+type Receipt={action:string;client_request_id:string;outcome:string;result?:{task_id:string}};
 type Props={data:AssignmentSourceReviewProjection|null;loading:boolean;error:string;onReload:()=>void;
   onCommand:(action:string,payload:Record<string,unknown>)=>Promise<void>;
   onReceipt:(action:string,clientRequestId:string)=>Promise<Receipt>;onOpenSource:(sourceId:string)=>void;onDirtyChange:(dirty:boolean)=>void};
 const ACTION="boss.assignment.sources.confirm";
+function original():Payload|null{const values=new URLSearchParams(window.location.search),key=values.get("sourceReviewRequest"),task=values.get("sourceReviewTask");return key&&task?{client_request_id:key,task_id:task,task_version:"",review_sha256:"",reason:""}:null;}
+function remember(value:Payload|null){const url=new URL(window.location.href);if(value){url.searchParams.set("sourceReviewRequest",value.client_request_id);url.searchParams.set("sourceReviewTask",value.task_id);}else{url.searchParams.delete("sourceReviewRequest");url.searchParams.delete("sourceReviewTask");}window.history.replaceState(null,"",url);}
 const SOURCE_LABELS:Record<SourceStatus,string>={VALID:"当前可用",RECEIVED:"尚未生效",INCOMPLETE:"资料不完整",CONFLICTED:"存在冲突",
   SUPERSEDED:"已经换版",WITHDRAWN:"已经撤销",EXPIRED:"已经到期",MISSING:"没有找到资料",FORBIDDEN:"当前没有权限"};
 
@@ -23,40 +26,46 @@ function definiteRejection(error:unknown){
 }
 
 export function BossAssignmentSourceReview({data,loading,error,onReload,onCommand,onReceipt,onOpenSource,onDirtyChange}:Props){
+  const {token}=useClient();
+  const epoch=useRef(0),identity=useRef(token);
   const heading=useId();
   const [reason,setReason]=useState("");
   const [approvedFor,setApprovedFor]=useState<string|null>(null);
   const [busy,setBusy]=useState(false);
   const [failure,setFailure]=useState("");
-  const [pending,setPending]=useState<Payload|null>(null);
+  const [pending,setPending]=useState<Payload|null>(original);
+  useEffect(()=>{epoch.current++;if(identity.current!==token){identity.current=token;setReason("");setApprovedFor(null);setPending(original());setFailure("");setBusy(false);}return()=>{epoch.current++;};},[token]);
+  useEffect(()=>{onDirtyChange(Boolean(pending||reason||approvedFor));},[pending,reason,approvedFor,onDirtyChange]);
   const approved=data!==null&&approvedFor===data.review_sha256;
   const targetChanged=Boolean(pending&&data&&pending.task_id!==data.task.task_id);
-  function saved(){setPending(null);setReason("");setApprovedFor(null);setBusy(false);setFailure("");onDirtyChange(false);onReload();}
+  function saved(){remember(null);setPending(null);setReason("");setApprovedFor(null);setBusy(false);setFailure("");onDirtyChange(false);onReload();}
   async function submit(){
-    if(busy||loading||!data||targetChanged||(!pending&&(!data.can_confirm||!approved||!reason.trim())))return;
-    const payload=pending||{client_request_id:"source-review-"+crypto.randomUUID(),task_id:data.task.task_id,
+    if(busy||loading||pending||!data||targetChanged||!data.can_confirm||!approved||!reason.trim())return;
+    const current=epoch.current,payload={client_request_id:"source-review-"+crypto.randomUUID(),task_id:data.task.task_id,
       task_version:data.task.version,review_sha256:data.review_sha256,reason:reason.trim()};
-    setPending(payload);setBusy(true);setFailure("");onDirtyChange(true);
-    await onCommand(ACTION,payload).then(saved,(error:unknown)=>{
+    remember(payload);setPending(payload);setBusy(true);setFailure("");onDirtyChange(true);
+    await onCommand(ACTION,payload).then(()=>{if(current===epoch.current)saved();},(error:unknown)=>{
+      if(current!==epoch.current)return;
       setBusy(false);setFailure(error instanceof Error?error.message:String(error));
-      if(definiteRejection(error)){setPending(null);setApprovedFor(null);onReload();}
+      if(definiteRejection(error)){remember(null);setPending(null);setApprovedFor(null);onReload();}
     });
   }
   async function reconcile(){
     if(!pending||busy)return;
-    setBusy(true);setFailure("");
+    const current=epoch.current;setBusy(true);setFailure("");
     await onReceipt(ACTION,pending.client_request_id).then(receipt=>{
+      if(current!==epoch.current)return;
       setBusy(false);
       if(receipt.action!==ACTION||receipt.client_request_id!==pending.client_request_id){
         setFailure("原请求回执与当前请求标识不符，需要继续核查。");return;
       }
-      if(receipt.outcome==="RECORDED"){saved();return;}
+      if(receipt.outcome==="RECORDED"){if(receipt.result?.task_id!==pending.task_id){setFailure("原来源回执不属于当前请求对象。");return;}saved();return;}
       setFailure(receipt.outcome==="NOT_FOUND_IN_CURRENT_STORE"?
         "当前没有查到回执，执行结果仍未确定。请重新读取交办，并使用原请求编号继续核查。":"原请求结果没有得到确认。");
       onReload();
-    },(error:unknown)=>{setBusy(false);setFailure(error instanceof Error?error.message:String(error));});
+    },(error:unknown)=>{if(current===epoch.current){setBusy(false);setFailure(error instanceof Error?error.message:String(error));}});
   }
-  return <section className="boss-panel" aria-labelledby={heading}>
+  return <section className="boss-panel boss-assignment-scope" aria-labelledby={heading}>
     <div className="boss-panel-head"><h2 id={heading}>核查交办来源</h2><button className="boss-btn" type="button" disabled={busy||loading} onClick={onReload}>重新读取当前资料</button></div>
     {loading&&<p role="status">正在读取交办与来源版本</p>}
     {(error||failure)&&<p className="boss-status boss-status-error" role="alert">{error||failure}</p>}
@@ -82,14 +91,13 @@ export function BossAssignmentSourceReview({data,loading,error,onReload,onComman
           setApprovedFor(event.target.checked?data.review_sha256:null);onDirtyChange(Boolean(reason)||event.target.checked);}}/>本人已经核查当前资料，确认用于此项交办</label>
       </fieldset>
       <p className="boss-helper">来源确认保存当前采用范围。发送、完成及其他业务决定各自保留独立确认。</p>
-      <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button" disabled={busy||loading||targetChanged||(!pending&&(!data.can_confirm||!approved||!reason.trim()))}
-        onClick={()=>void submit()}>{busy?"正在核查":pending?"使用原请求编号继续确认":"本人确认当前来源"}</button>
-        {pending&&<button className="boss-btn" type="button" disabled={busy} onClick={()=>void reconcile()}>查询原请求回执</button>}</div>
-      {pending&&<p className="boss-helper" role="status">待核查交办：{pending.task_id}；请求编号：{pending.client_request_id}</p>}
+      <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button" disabled={busy||loading||Boolean(pending)||targetChanged||!data.can_confirm||!approved||!reason.trim()}
+        onClick={()=>void submit()}>{busy?"正在核查":"本人确认当前来源"}</button></div>
       {data.confirmed_reason&&<p>已保存核查依据：{data.confirmed_reason}</p>}
       {data.history.length>0&&<details><summary>已知来源历史（{data.history.length}）</summary>{data.history.map(item=><p key={item.before_task_version}>
         交办版本 {item.before_task_version} 之前保存的来源：{Object.entries(item.source_versions).map(([identifier,version])=>identifier+" v"+version).join("、")}
         {item.origin_source&&"；原始纪要 "+item.origin_source.source_id+" v"+item.origin_source.version} · {item.archived_at}{item.review_reason&&"；核查依据："+item.review_reason}</p>)}</details>}
     </>}
+    {pending&&<><button className="boss-btn" type="button" disabled={busy} onClick={()=>void reconcile()}>查询原请求回执</button><p className="boss-helper" role="status">待核查交办：{pending.task_id}；请求编号：{pending.client_request_id}。结果尚未确定时仅查询原编号。</p></>}
   </section>;
 }

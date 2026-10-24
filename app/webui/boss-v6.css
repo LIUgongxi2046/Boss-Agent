@@ -989,3 +989,36 @@
 .boss-v6 .boss-mvp-view .boss-table { font-size: 16px; line-height: 24px; }
 .boss-mvp-view .boss-column ul { padding-left: 16px; }
 .boss-mvp-view .boss-column li { margin-block: 8px; }
+.boss-assignment-scope { min-width: 0; font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-assignment-scope .boss-label,
+.boss-v6 .boss-assignment-scope label,
+.boss-v6 .boss-assignment-scope input,
+.boss-v6 .boss-assignment-scope select,
+.boss-v6 .boss-assignment-scope textarea { font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-assignment-scope small,
+.boss-v6 .boss-assignment-scope .boss-helper,
+.boss-v6 .boss-task-table-row small,
+.boss-v6 .boss-task-table-heading { font-size: 14px; line-height: 22px; }
+.boss-v6 .boss-assignment-scope .boss-task-row strong,
+.boss-v6 .boss-task-table-row,
+.boss-v6 .boss-task-table-row strong,
+.boss-v6 .boss-commitments { font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-commitments fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.boss-v6 .boss-commitments input,
+.boss-v6 .boss-commitments select { font-size: 16px; line-height: 24px; min-height: 44px; }
+.boss-v6 .boss-commitments small { font-size: 14px; line-height: 22px; }
+.boss-v6 .boss-assignment-scope .boss-btn,
+.boss-v6 .boss-commitments .boss-btn,
+.boss-v6 .boss-task-table-footer .boss-btn { min-height: 44px; }
+.boss-v6 .boss-commitments blockquote { margin-inline: 0; padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.boss-v6 .boss-fc07-confirm,
+.boss-v6 .boss-fc07-confirm dd { font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+.boss-v6 .boss-task-center-view { min-width: 0; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+.boss-v6 .boss-task-center-view .boss-kv,
+.boss-v6 .boss-assignment-scope .boss-kv { font-size: 14px; line-height: 22px; }
+.boss-v6 .boss-task-center-view .boss-kv strong,
+.boss-v6 .boss-assignment-scope .boss-kv strong,
+.boss-v6 .boss-commitments .boss-task-row strong { font-size: 16px; line-height: 24px; }
+.boss-v6 .boss-task-filter-grid input,
+.boss-v6 .boss-task-filter-grid select { font-size: 16px; line-height: 24px; min-height: 44px; }
+.boss-v6 .boss-task-table-footer { font-size: 14px; line-height: 22px; }

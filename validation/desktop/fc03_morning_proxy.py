@@ -8,7 +8,7 @@ from aiohttp import ClientSession, WSMsgType, web
 UPSTREAM = "http://127.0.0.1:" + sys.argv[1]
 PORT = int(sys.argv[2])
 HOP = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailer", "transfer-encoding", "upgrade", "content-length"}
-ACTIONS = {"boss.morning.query", "boss.today.reorder", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate"}
+ACTIONS = {"boss.morning.query", "boss.today.reorder", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.assignment.send", "boss.assignment.sources.confirm", "boss.commitment.create"}
 STATE = {"events": [], "connections": 0, "armed": None, "dropped_actions": []}
 
 

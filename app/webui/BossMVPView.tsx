@@ -14,7 +14,7 @@ const titles:Record<string,string>={INBOUND_RECEIPT:"入库报告成本",ACTUAL_
 const shown=(value:string|null)=>value??"未知";
 function remember(values:Record<string,string|null>){const url=new URL(window.location.href);for(const [key,value] of Object.entries(values)){if(value===null)url.searchParams.delete(key);else url.searchParams.set(key,value);}window.history.replaceState(null,"",url);}
 
-export function BossMVPView({contacts,onDirtyChange,refreshVersion}:{contacts:{contact_id:string;name:string}[];onDirtyChange:(value:boolean)=>void;refreshVersion:number}){
+export function BossMVPView({contacts,onDirtyChange,refreshVersion,onOpenTask}:{contacts:{contact_id:string;name:string}[];onDirtyChange:(value:boolean)=>void;refreshVersion:number;onOpenTask?:(id:string)=>void}){
   const {client,getToken,token}=useClient();
   const [data,setData]=useState<Projection|null>(null),[day,setDay]=useState<{date:string;timezone:string}|null>(null),[selected,setSelected]=useState("");
   const [purpose,setPurpose]=useState(""),[due,setDue]=useState(""),[evidence,setEvidence]=useState("");
@@ -127,6 +127,7 @@ export function BossMVPView({contacts,onDirtyChange,refreshVersion}:{contacts:{c
       <p>创建仅保存协调交办，后续发送与完成分别处理。</p>{coordinateKey&&<><p>原协调请求 {coordinateKey} · 回执 {saved?.outcome??"结果尚未确认"}</p><button className="boss-btn" disabled={busy||denied} onClick={()=>void readSaved(coordinateKey).catch(failure=>setError(failure.message))}>读取原协调请求回执</button></>}
     </section><section className="boss-panel"><header className="boss-panel-head"><h2>已保存的协调记录</h2></header>{currentTask?<><p>交办 {currentTask.task_id} · 版本 {currentTask.version} · 状态 {currentTask.status}</p><p>{currentTask.purpose}</p><p>负责人 {currentTask.coordinator_id} · 期限 {currentTask.due_at}</p><p>来源 {currentTask.source_refs.join("；")}</p></>:<p>选择已保存交办后读取实际记录。</p>}
       {data?.coordination_links.filter(link=>link.origin_record_id===selected).map(link=><button className="boss-btn" key={link.task_id} disabled={busy||denied} onClick={()=>{setTaskId(link.task_id);remember({mvpTask:link.task_id});void reload().catch(failure=>setError(failure.message));}}>重新打开交办 {link.task_id}</button>)}</section>
+    {currentTask&&onOpenTask&&<button className="boss-btn boss-btn-primary" type="button" disabled={blocked||dirty} onClick={()=>onOpenTask(currentTask.task_id)}>进入此项交办详情</button>}
     <section className="boss-panel"><header className="boss-panel-head"><h2>查询记录与原编号恢复</h2></header><p>原采购查询 {queryKey||"尚未提交"}</p><p>查询状态 {receipt?.request_state??(busy?"执行中":uncertain?"结果尚未确认":"尚未提交")} · 来源采用 {receipt?.adoption_state??"尚未读取"}</p>
       {uncertain&&<p role="status">执行结果尚未确定，仅查询同一原编号。</p>}<button className="boss-btn" disabled={!queryKey||dirty||denied} onClick={()=>void recover()}>读取原采购查询结果</button>
       <ul>{history.map(value=><li key={value.client_request_id}><button className="boss-btn" disabled={blocked||dirty} onClick={()=>{setCoordinateKey("");setSaved(null);setTaskId("");remember({mvpCoordinate:null,mvpTask:null});void recover(value.client_request_id);}}>{titles[value.cost_type]} · {value.read_at}</button></li>)}</ul></section>

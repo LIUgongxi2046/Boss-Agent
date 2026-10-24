@@ -4,6 +4,10 @@
 
 ## 服务、身份与事务
 
+FC07公共扩展采用specs/product-assignment.openapi.yaml。BossCommandAPI对boss.assignment.extension.decide完成角色检查后延迟导入AssignmentExtensionAPI，在同一正式领域事务完成独立本人授权、CAS、决定和原回执。BossPageAPI严格读取assignment-extensions，operation-status委派原动作和编号，读取不执行决定。任务投影增加source_versions、结果证据重新提交标记、反馈证据版本/状态与historical_only、本人承诺的当前来源及期限/修订历史；模拟消息正文和授权编号仅提供给BOSS。
+
+RoleChannel在当前认证和有效连接内执行boss.assignment.prepare；HTTP assignment-preparation仅读取原请求。ProductAssignment从实际会话、当前task/version及来源摘要建立可信读取范围，assignment_public_request仅记录查询准备及运行关联；正式任务状态继续由ControlStore维护。来源或任务变化返回HISTORICAL_REQUIRES_REQUERY并隐藏旧准备内容。所有公开参数拒绝额外字段，客户端不能传入owner、namespace或授权。
+
 RoleChannel 从服务端认证确定 BOSS/MAINTAINER；HTTP 查询和 WebSocket 写入复用同一身份。联系人、正文、模型、payload.role/owner_id 不提供身份。前端只能提交动作参数；owner、namespace、数据集和有效资料版本由服务端验证。MAINTAINER 可以配置技术参数和提供获准模拟反馈，不能完成、批准、发送或读取私人正文。
 
 `BossCommandAPI.execute` 是已有写入入口；`BossPageAPI.serve` 是已有读取入口。所有动作按当前 `ACTION_ROLES` 验证角色。当前业务空间 `ui-check` 的来源为获准 selection 数据集；不能冒充生产企业资料。SQLite 保存正式状态，聊天和工具文本只引用对象 ID。

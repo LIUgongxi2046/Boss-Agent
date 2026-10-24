@@ -10,7 +10,8 @@ from boss_page_api import BossPageAPI
 from boss_simulation_api import _context
 from boss_supply_quality import SupplyQualityAPI, bound_source_references
 from boss_source_access import require_current_business_source
-from product_fc01 import ProductFc01, GRANT, validate_request
+from product_fc01 import ProductFc01, GRANT, REQUIRED, validate_request
+from product_bi import FEATURE_SCOPE
 
 
 class ProductMVP(ProductFc01):
@@ -18,6 +19,11 @@ class ProductMVP(ProductFc01):
         super().__init__(store)
         self.query_requests = set()
         self.active_queries = {}
+
+    async def scope_context(self, request):
+        if GRANT in request.attributes:
+            require(REQUIRED <= set(self.runtime.registry.tool_names), "当前配置未启用采购准备工具", web.HTTPConflict)
+            request.attributes[FEATURE_SCOPE] = REQUIRED
 
     async def events(self, messages, tools):
         response = await super().events(messages, tools)
