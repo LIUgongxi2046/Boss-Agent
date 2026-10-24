@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "scope": "F01_ACTUAL_NATIVE_ITEM_ENTRY_AND_RETURN",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-f01-rework-morning-entry-8d7b5d39-1b61-4816-a02c-b9dfee1fb911",
+  "ports": {
+    "business": 10841,
+    "webui": 10842,
+    "gateway": 20841
+  },
+  "manifest_sha256": "66fbe8920baf62749e338106b2c1a499b7ae7c13a4101bbeffd9c9ae448244b4",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "f01_refresh_return_keeps_original_selected_item_and_discuss_focus",
+      "item_id": "meeting:meeting-1",
+      "focus_id": "morning-discuss",
+      "private_question_persisted": false
+    },
+    {
+      "check": "actual_f01_morning_and_selected_item_enter_n02_keep_fixed_context_after_refresh_and_return",
+      "binding_id": "morning-bind-d6f0aa8b-1497-4196-814d-6580ee8344e5",
+      "selected_binding_id": "morning-bind-f1cdc5ed-bf51-4b14-9ad7-0ca1794237e7",
+      "list_id": "morning-611aa475-e9e0-498f-8d35-bbb422200555",
+      "item_id": "meeting:meeting-1",
+      "object_id": "meeting-1",
+      "object_version": "1",
+      "source_refs": [
+        {
+          "id": "meeting-1",
+          "kind": "meeting",
+          "version": "1"
+        },
+        {
+          "id": "event-1",
+          "kind": "event",
+          "version": "1"
+        },
+        {
+          "id": "finance-note",
+          "kind": "document",
+          "version": "1"
+        },
+        {
+          "id": "meeting-minutes",
+          "kind": "document",
+          "version": "1"
+        }
+      ],
+      "run_ids": [
+        "run-f37dd5f1-e57c-4c07-8bf3-e102dd0cd42c",
+        "run-e4b585a9-63c9-4e2c-b84b-d1638127467d",
+        "run-94678233-e9f4-49f5-8d5f-3965622f5afe"
+      ],
+      "f01_full_design_and_focus_acceptance": "NOT_RUN",
+      "morning_tool_count": 4
+    },
+    {
+      "check": "explicit_new_conversation_uses_general_seven_tool_scope_without_prior_morning_context",
+      "run_id": "run-88491f6b-497a-4c67-bcca-7c24c2a52280",
+      "session_id": "websocket:f655b554-313a-40be-b45c-7292adcd8bbe",
+      "morning_request_count": 3,
+      "additional_morning_requests": 0,
+      "ordinary_tool_count": 7,
+      "private_input_or_password_in_ordinary_storage": false
+    }
+  ]
+}
