@@ -1,6 +1,9 @@
+import asyncio
 import json
+import math
 
 from nanobot import RuntimeContextBlock
+from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, encode, require
 from boss_runtime_records import ATTRIBUTE, RuntimeRecordHook
@@ -17,8 +20,14 @@ class ConversationSimulatedProvider(Fc01SimulatedProvider):
         context = self.scope.current()
         require({item["function"]["name"] for item in tools or []} == context.allowed_tools,
                 "会话模型工具与当前可信范围不符")
-        response = await super().chat(messages, tools, model, **kwargs)
-        require(self.scope.current() == context, "模型步骤期间会话资料或认证已变化")
+        binding = current_request_context().attributes[ATTRIBUTE]
+        require(isinstance(binding.recorder, ConversationRuntimeRecorder) and binding.run_id in binding.recorder.deadlines,
+                "当前模型步骤缺少实际运行截止时间")
+        async with asyncio.timeout_at(binding.recorder.deadlines[binding.run_id]):
+            await asyncio.sleep(0)
+            response = await super().chat(messages, tools, model, **kwargs)
+            await asyncio.sleep(0)
+            require(self.scope.current() == context, "模型步骤期间会话资料或认证已变化")
         return response
 
 
@@ -27,6 +36,7 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
         super().__init__(scope.store, "ui-check", registry, runtime_snapshot)
         self.scope = scope
         self.intent_adapter = intent_adapter
+        self.deadlines = {}
 
     async def context(self, request):
         context = self.scope.current(request, require_runtime=False)
@@ -57,6 +67,15 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
 
 
 class ConversationRuntimeHook(Fc01RuntimeHook):
+    async def before_run(self, context):
+        await super().before_run(context)
+        with self.recorder.store.connect() as db:
+            timeout = self.recorder._read(db, self.run_id)["runtime"]["timeout"]
+        require(type(timeout) in (int, float) and math.isfinite(timeout) and timeout > 0,
+                "实际启用的运行超时配置无效")
+        # 每轮从实际RUNNING开始固定截止，后续模型步骤共用该计时。
+        self.recorder.deadlines[self.run_id] = asyncio.get_running_loop().time() + timeout
+
     async def on_execute_tool_error(self, context, tool_call, tool, params, error):
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -101,13 +120,16 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
             self.recorder._save(db, row)
 
     def _finish(self, context):
-        super()._finish(context)
-        if self.recorder.intent_adapter is not None:
-            with self.recorder.store.connect() as db:
-                db.execute("BEGIN IMMEDIATE")
-                row = self.recorder._read(db, self.run_id)
-                reference = row["conversation_context"]
-                if row["status"] == "SUCCEEDED" and reference["required_input_count"]:
-                    row.update(status="WAITING_INPUT", stop_reason="required_input")
-                    self.recorder._save(db, row)
-            self.recorder.intent_adapter.finish(reference["client_request_id"])
+        try:
+            super()._finish(context)
+            if self.recorder.intent_adapter is not None:
+                with self.recorder.store.connect() as db:
+                    db.execute("BEGIN IMMEDIATE")
+                    row = self.recorder._read(db, self.run_id)
+                    reference = row["conversation_context"]
+                    if row["status"] == "SUCCEEDED" and reference["required_input_count"]:
+                        row.update(status="WAITING_INPUT", stop_reason="required_input")
+                        self.recorder._save(db, row)
+                self.recorder.intent_adapter.finish(reference["client_request_id"])
+        finally:
+            self.recorder.deadlines.pop(self.run_id, None)

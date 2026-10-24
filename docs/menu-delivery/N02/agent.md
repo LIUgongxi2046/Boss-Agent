@@ -1,10 +1,10 @@
 # MENU-N02-N2 聊天交办Agent开发记录
 
-task_id=MENU-N02-N2；marker=MENU-N02-N2-CURRENT-REFERENCES-20261024；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表及本轮必要引用的采用。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-24。主记录路径及既有索引引用保持。
+task_id=MENU-N02-N2；marker=MENU-N02-N2-CANCEL-DEADLINE-20261025；decision_id=D-MENU-DELIVERY-20261024。当前模块版本1.2.0，包含原请求只读列表、本轮必要引用及实际配置截止。N02完整26项及正式状态由N3维护specs/feature-delivery.json，本记录只登记Agent模块及准确消费证据，不登记完整菜单或用户验收通过。文档有效性CURRENT，核查日期2026-10-25。主记录路径及既有索引引用保持。
 
 ## 当前依据与准确依赖
 
-本次必要引用核查的PRODUCT准确候选为9c3caf80651fc74e1c0286fa5f946b96fc6d360e，包含N2原请求接口a74e97a的公共接收、N1上下文引用及实际Fc02接口。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
+本次SDK取消及截止的PRODUCT准确候选为490ba0b041d91229bdf37a8e3c285d94c05b2069，包含N2当前必要引用3259f2a的公共接收、实际N1与Fc02接口及当前Runtime配置。公共ProductMorning/FeatureProvider/FeatureRecorder、RoleChannel、application、Schema和App由N3唯一维护；本目录没有修改这些文件，也没有启动产品或预览。D-UI-FIDELITY-20261024及F01设计返修继续由N3处理，进入N03前的必要条件保持。
 
 已完整读取适用AGENTS、原始N02完整26项、PRD当前决定、FR-08/24/29及BR/AC、共同BR-C01—C07/E01—E06、原N02 HTML、原始提示词及实际chat区域。当前续接读取N02主记录、backend.md、boss_conversation.py、boss_conversation_attachments.py和conversation.schema.json 1.1.0，核查实际SDK命令生命周期、Session保存、Fc02Tool、bind_query、bind_scoped_followup、BIQueryAPI和范围Schema。S008任务记录、执行规则及连续验证要求继续采用；记忆索引没有相关命中。
 
@@ -84,6 +84,14 @@ requests在同一SQLite BEGIN快照中按ui-check和实际chat_id选择conversat
 
 Hook在实际工具错误时保存工具/调用编号和异常类型并终止。失败、取消、超时保留原运行与已保存对象，未知usage/cost_total/price_version保持null。存在required_inputs时，成功结束的运行记为WAITING_INPUT、stop_reason=required_input并保留finished_at，允许下一条本人输入。模型不能签发本人授权；本人写入/发送的匹配资格由正式共享领域判断。
 
+### C17/C19正式SDK取消与实际配置截止
+
+当前ProductRuntime._apply和公开配置将timeout固定为120秒，RuntimeRecorder在采用时核查启用配置与snapshot一致，并将timeout保存在本轮runtime记录。ConversationRuntimeHook.before_run在实际状态进入RUNNING后，从该记录取得有限正数timeout，以事件循环单调时钟固定本轮截止点。ConversationSimulatedProvider使用asyncio.timeout_at约束真实事件等待，各模型步骤共用该截止点；后续步骤不重新获得120秒。截止只保存在Recorder内部按run_id区分，终态后清理对应记录，不增加公开参数、模型工具或Schema字段。
+
+到达截止时，由asyncio实际定时触发TimeoutError，SDK Runner沿正式异常路径记录TIMED_OUT、stop_reason=error并执行原意图清理。没有在事件生产者手工抛出TimeoutError或写入预设终态。本模块的截止检查发生在模型阶段；已经完成的同步工具及其正式结果保留，后续SDK保存和传输采用原路径。当前事件生产者、模型、工具与业务数据保持实际来源。
+
+SDK控制采用Nanobot.run_streamed返回的正式RunStream.cancel()。外部取消保持实际CancelledError，Runner记录CANCELED、stop_reason=cancelled；只清理目标run_id的截止及原意图proof。两个会话共用同一Nanobot/AgentLoop时，另一会话可以继续完成。原生/stop继续使用已有公共路径，本次实际控制证据明确限定为SDK取消入口。
+
 ## N3公共接收要求
 
 1. RoleChannel/application保持当前本人连接、attach、token与过期检查。原生/stop及SDK非Agent命令保留原路径；NativeMorningAdapter优先。一般message在router之前调用admit，摘要取自实际envelope.media。enqueue=false时只读取原编号及实际历史，禁止重复入队。
@@ -94,6 +102,7 @@ Hook在实际工具错误时保存工具/调用编号和异常类型并终止。
 6. 配置实际启用全部七项，max_tool_rounds至少为本次plan.calls数量加一。Recorder核查Registry实际集合与当前allowed_tools完全一致，模型只能看到该集合。query_metrics已存在于公共配置名称集合；本模块没有新增本人写入工具。
 7. 公共runtime-records.schema.json接收feature_id=N02、conversation_context以及实际tool_results的parameters_sha256和已有Fc02的bi_query_context/source_refs/definition_versions/detail_refs。附件投影采用Schema1.1.0的四状态、nullable字段与recorded_*字段。公共Schema、配置、注册及实际候选检查由N3完成。
 8. 当前会话原请求读取调用agent.requests(role, chat_id, attached=当前连接采用核查, active=当前本人有效认证核查)。返回数组逐项保持上述receipt字段；公共Schema、路由和前端读取由N3接收。本接口不注册为模型工具，不恢复或执行列表中的原请求。
+9. 当前实际配置截止由同一ConversationRuntimeRecorder/Hook/Provider执行，N3现有注册接口继续接收本模块；每个实际运行采用其已保存timeout。截止内部状态没有公开字段，也不恢复为可执行原请求。公开停止入口与完整菜单证据由N3维护。
 
 公开原编号端点、实际WebSocket接收/重连/停止、阅读位置与焦点、UI完整设计及全部26项由N3对准确候选验证。本人草稿/发送/回复及任务共享流程需要完整产品消费证据，本模块检查不代替这些验收。复杂或不明确自然条件明确保持待补充；未支持的其他业务动作仍需相应正式输入及领域能力。F01设计返修、STT暂停及用户验收状态继续保持独立。
 
@@ -105,7 +114,7 @@ conftest.py使用标准importlib加载当前N2被测package，其余领域、工
 
 BDD：Given当前本人、正式来源与明确范围；When连续输入不同来源、补充缺失条件或改变查询期间/产品/指标；Then实际工具参数、正式快照、父查询与结果随输入变化，实际query_id可从当前会话产物重读。Given仅附件输入及实际成功上传；When SDK保存普通文档且user.media为空；Then正式元信息保持可读，等待用途，后续输入继续；文件变化或缺失停止采用。Given SDK非Agent命令、晨间绑定、参数越界、失效连接或来源撤销；When进入相应路径；Then无额外一般意图、无越权查询或结果释放，原编号与真实终态可读。
 
-当前consumer-runtime.xml为41 passed、15.28秒，模块状态MODULE_CHECKS_PASSED；覆盖上述行为及受影响的可信读取、Runtime、原意图幂等、同键异内容、维护拒绝、重建服务回执、取消/超时、本人实际草稿和明确模拟发送后的正确消息编号。既有read-runtime.xml及native-runtime.xml分别保留原限定范围，不将数量相加登记菜单完成。
+consumer-runtime.xml记录41 passed、15.28秒的限定范围，模块状态MODULE_CHECKS_PASSED；覆盖可信读取、Runtime、原意图幂等、同键异内容、维护拒绝、重建服务回执、取消/超时终态映射、本人实际草稿和明确模拟发送后的正确消息编号。既有read-runtime.xml及native-runtime.xml分别保留原限定范围，不将数量相加登记菜单完成。
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-consumer-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-consumer-receive --tb=short --junitxml=docs/menu-delivery/N02/consumer-runtime.xml
@@ -123,6 +132,16 @@ env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/
 
 ```bash
 env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-references-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider --basetemp=validation/.work/n02-references-final --tb=short --junitxml=docs/menu-delivery/N02/current-references.xml
+```
+
+本次sdk-cancel-deadline.xml为61 passed、143.86秒，包含2项实际SDK控制/计时及受影响的59项。准确依赖为validation/.work/n02-cancel-public的490ba0b041d91229bdf37a8e3c285d94c05b2069；product_runtime.py blob=de258204d4334c1b641de37dfdc7fc957d7a0eec，boss_runtime_records.py blob=302bfed77595c4fa00764641c305823f073216f3，runtime-records.schema.json blob=1f26bfc860afcd596895944d47354738a0b48ba4。实际已安装SDK的sdk/streaming.py SHA256=264004c9381e90ec2b79040b37cec3ac90366c8266a610329a180e39f953799a，agent/runner.py SHA256=72ecdd211827762f098da376b85f79f5722d6b506bf7935ce6b418c814864662。
+
+Given同一实际Nanobot/AgentLoop中两个当前ConversationGrant和已完成的正式工具；When调用目标RunStream.cancel；Then目标为CANCELED，另一会话仍为RUNNING且能够完成，目标已保存tool_results保持，只有该轮原意图proof及截止被清理。当前实测cancel调用耗时0.008秒。Given本轮实际配置timeout=120且query_metrics已产生正式查询；When仅延迟后续真实事件释放；Then实际计时在120秒触发，SDK请求前至异常返回测得120.239秒，包含准备及收尾，运行终态TIMED_OUT。计时没有调整配置、替换LLMResponse、工具结果或业务数据。
+
+两个场景中已执行步骤均为query_metrics，计划中的后续bossEvidenceRead(meeting-minutes)未执行；目标tool_results仅保留原一步，query只有实际一项，没有新增授权或任务。相同Store重建服务后，原client_request_id、run_id、query_id及真实终态可以重读，正式产物仍可由ConversationAPI.artifact读取，没有恢复proof或重新执行。另一会话的实际来源读取独立完成。轮次规划、轮次配置检查及SDK后续保存/表达路径没有本次行为修改，受影响的原59项随同验证。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/validation/.work/n02-cancel-public validation/.venv/bin/python -m pytest app/tests/conversation_agent -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n02-cancel-delivery --tb=short --junitxml=docs/menu-delivery/N02/sdk-cancel-deadline.xml
 ```
 
 所有检查socket.connect由审计拒绝，没有外部请求、凭据读取或产品服务启动。MVP的9961/9962/19961、UI02的10411/10412/20411、F01的10611/10612/20611及其源码、资料、制品和进程保持。FR-27/STT/F27/FC28暂停，没有视觉或用户验收。当前提交范围仅包含本模块、用例、主记录及其限定证据。
