@@ -43,13 +43,14 @@ def test_message_contact_expiry_uses_owner_iana_date_at_utc_midnight(store):
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='message_draft'").fetchone()[0] == 0
 
 
-def actual_query_run(store, workspace, session="websocket:n02-current"):
+def actual_query_run(store, workspace, session="websocket:n02-current", *, media=None, sessions=None):
     from dataclasses import replace
     from nanobot import Nanobot
     from nanobot.agent.loop import AgentLoop
     from nanobot.agent.tools.registry import ToolRegistry
     from nanobot.config.schema import Config
     from nanobot.providers.base import LLMResponse, ToolCallRequest
+    from nanobot.session.manager import SessionManager
     from fc02_agent import Fc02Context, bind_query, register_fc02_tools
     from fc02_agent.runtime import Fc02RuntimeRecorder, Fc02SimulatedProvider
     config = Config.model_validate({"agents": {"defaults": {"provider": "deepseek", "model": "deepseek-flash",
@@ -70,7 +71,9 @@ def actual_query_run(store, workspace, session="websocket:n02-current"):
         return LLMResponse(content=encode(outputs[-1]))
     provider = Fc02SimulatedProvider(produce)
     provider.generation = config.resolve_preset().to_generation_settings()
-    loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider, hook_factories=[recorder.hook_factory])
+    if sessions is None:
+        sessions = SessionManager(workspace, sessions_root=workspace.parent / (workspace.name + "-sessions"))
+    loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider, hook_factories=[recorder.hook_factory], session_manager=sessions)
     for name in list(registry.tool_names):
         registry.unregister(name)
     register_fc02_tools(registry, store, lambda: current[0])
@@ -81,7 +84,7 @@ def actual_query_run(store, workspace, session="websocket:n02-current"):
                 binding = request.attributes["boss_runtime_binding"]
                 current[0] = replace(current[0], request_id=binding.request_id, session_id=binding.session_id)
             bot.runtime.add_context_provider(admitted_request)
-            return await bot.run("查询当前获准期间的毛利率及依据", session_key=session, sender_id="boss-1")
+            return await bot.run("查询当前获准期间的毛利率及依据", session_key=session, sender_id="boss-1", media=media)
     result = asyncio.run(execute())
     assert not result.error
     with store.connect() as db:
@@ -172,7 +175,7 @@ def test_native_attachment_metadata_uses_saved_session_and_actual_file(store, tm
     from nanobot.session.manager import SessionManager
     from nanobot.webui.media_gateway import WebUIMediaGateway
     from loguru import logger
-    sessions = SessionManager(tmp_path / "sessions")
+    sessions = SessionManager(tmp_path / "sessions", sessions_root=tmp_path / "native-sessions")
     media = tmp_path / "media"
     media.mkdir()
     gateway = WebUIMediaGateway(workspace_path=tmp_path, logger=logger, media_dir=lambda _: media)
@@ -194,6 +197,7 @@ def test_native_attachment_metadata_uses_saved_session_and_actual_file(store, tm
     assert view["attachments"][0]["size_bytes"] == len(actual)
     assert view["attachments"][0]["content_sha256"] == checksum_bytes(actual)
     assert view["attachments"][0]["processing_state"] == "STORED"
+    assert view["attachments"][0]["user_message_index"] == 0
     assert str(tmp_path) not in json.dumps(view)
     with pytest.raises(web.HTTPForbidden):
         api.read("MAINTAINER", scope)
@@ -202,7 +206,7 @@ def test_native_attachment_metadata_uses_saved_session_and_actual_file(store, tm
     with pytest.raises(web.HTTPBadRequest):
         api.read("BOSS", {**scope, "path": paths[0]})
     assert api.read("BOSS", {"session_id": "websocket:n02-empty", "chat_id": "n02-empty"})["attachments"] == []
-    reopened = ConversationAttachments(SessionManager(tmp_path / "sessions"), media)
+    reopened = ConversationAttachments(SessionManager(tmp_path / "sessions", sessions_root=tmp_path / "native-sessions"), media)
     assert reopened.read("BOSS", scope) == view
     Path(paths[0]).unlink()
     missing = reopened.read("BOSS", scope)["attachments"][0]
@@ -218,7 +222,7 @@ def test_native_attachment_symlink_cannot_read_outside_approved_media(tmp_path):
     media.mkdir()
     link = media / "outside.json"
     link.symlink_to(ROOT / "specs/morning-coverage.json")
-    sessions = SessionManager(tmp_path / "sessions")
+    sessions = SessionManager(tmp_path / "sessions", sessions_root=tmp_path / "native-sessions")
     session = sessions.get_or_create("websocket:n02-restricted")
     session.add_message("user", "核查附件范围限制", media=[str(link)])
     sessions.save(session)

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:conversation:1.0.0",
+  "$id": "urn:boss-agent:conversation:1.1.0",
   "$defs": {
     "Id": {"type": "string", "minLength": 1, "maxLength": 200},
     "Context": {"type": "object", "additionalProperties": false, "required": ["session_id", "chat_id"], "properties": {
@@ -28,9 +28,15 @@
       "attachments": {"type": "array", "items": {"$ref": "#/$defs/Attachment"}}, "business_authorization_granted": {"const": false}}},
     "UploadMetadataResult": {"type": "object", "additionalProperties": false, "required": ["session_id", "attachment_ids", "metadata_saved", "business_authorization_granted"], "properties": {
       "session_id": {"$ref": "#/$defs/Id"}, "attachment_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}}, "metadata_saved": {"const": true}, "business_authorization_granted": {"const": false}}},
-    "Attachment": {"type": "object", "additionalProperties": false, "required": ["attachment_id", "stored_name", "original_name", "mime_type", "size_bytes", "content_sha256", "processing_state", "user_message_index"], "properties": {
-      "attachment_id": {"$ref": "#/$defs/Id"}, "stored_name": {"type": "string"}, "original_name": {"type": ["string", "null"]}, "mime_type": {"type": ["string", "null"]},
-      "size_bytes": {"type": ["integer", "null"], "minimum": 0}, "content_sha256": {"type": ["string", "null"]}, "processing_state": {"enum": ["STORED", "MISSING"]},
-      "user_message_index": {"type": "integer", "minimum": 0}}}
+    "StoredAttachment": {"type": "object", "additionalProperties": false, "required": ["original_name", "mime_type", "size_bytes", "content_sha256"], "properties": {
+      "original_name": {"type": ["string", "null"]}, "mime_type": {"type": "string", "minLength": 1},
+      "size_bytes": {"type": "integer", "minimum": 0}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "relative_path": {"type": "string", "minLength": 1, "description": "仅可信上传入口保存的获准媒体目录内部相对引用，禁止公开输出或客户端输入。"}}},
+    "Attachment": {"type": "object", "additionalProperties": false, "required": ["attachment_id", "stored_name", "original_name", "mime_type", "size_bytes", "content_sha256", "recorded_size_bytes", "recorded_content_sha256", "processing_state", "user_message_index"], "properties": {
+      "attachment_id": {"$ref": "#/$defs/Id"}, "stored_name": {"type": ["string", "null"]}, "original_name": {"type": ["string", "null"]}, "mime_type": {"type": ["string", "null"]},
+      "size_bytes": {"type": ["integer", "null"], "minimum": 0}, "content_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+      "recorded_size_bytes": {"type": ["integer", "null"], "minimum": 0}, "recorded_content_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+      "processing_state": {"enum": ["STORED", "MISSING", "CHANGED", "REFERENCE_UNAVAILABLE"]},
+      "user_message_index": {"type": ["integer", "null"], "minimum": 0, "description": "仅唯一已保存原生 user.media 引用能够确认时返回位置；其他情况为 null，不代表消息编号。"}}}
   }
 }
