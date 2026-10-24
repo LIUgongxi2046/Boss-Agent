@@ -159,7 +159,7 @@ def test_memory_confirm_delete_and_owner_commitments_match_declared_input(servic
     confirmed = checked(api, "boss.memory.confirm", {"client_request_id": "schema-memory-confirm", "expected_version": "1", "text": data["memory"]["text"]})
     checked(api, "boss.memory.delete", {"client_request_id": "schema-memory-delete", "expected_version": confirmed["version"]})
     fields = {"purpose": create_input()["purpose"], "due_at": data["historical_task"]["due_at"], "timezone": data["private_calendar"]["timezone"],
-        "importance": "NORMAL", "evidence_requirements": data["historical_task"]["evidence_requirements"], "source_refs": []}
+        "importance": "NORMAL", "evidence_requirements": data["historical_task"]["evidence_requirements"], "source_refs": [{"source_id": "finance-note", "version": "1"}]}
     commitment = checked(api, "boss.commitment.create", {"client_request_id": "schema-commitment-create", **fields})
     extended = checked(api, "boss.commitment.extend", {"client_request_id": "schema-commitment-extend", "commitment_id": commitment["commitment_id"],
         "expected_version": commitment["version"], "due_at": data["private_calendar"]["ends_at"], "reason": data["memory"]["text"]})

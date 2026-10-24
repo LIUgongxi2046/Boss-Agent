@@ -46,6 +46,7 @@ owner_id 固定绑定当前空间的 initial/snapshot，不能信任浏览器输
 | 本人设置 | owner_goals_*、owner_notice_* | 草稿、确认、替代、到期；撤销确认授权后停止当前采用 |
 | 授权 | authorization | action、target_id、content_version、scope、payload、valid_from/until、revoked；保存决定与将来持续采用分别校验 |
 | 交办 | task、feedback、outbox | OPEN→WAITING_FEEDBACK→IN_PROGRESS/RESULT_SUBMITTED；本人完成或取消终止催办；延期申请独立 |
+| 延期决定 | assignment_extension_decision、task_revision | 同一申请只决定一次；保存申请原文、本人理由、旧/新期限和前后任务版本，拒绝不改变期限与提醒 |
 | 本人承诺 | self_commitment、self_commitment_revision | ACTIVE→COMPLETED_CONFIRMED/CANCELED；独立于对他人交办 |
 | 会议 | initial/snapshot.meeting、meeting、meeting_draft、meeting_brief、minutes | 初始来源、当前安排与待确认草稿分别保存；会前材料、纪要和逐项交办引用当前会议版本 |
 | 审批 | application、application_revision、application_decision | 材料缺少、待决定、本人决定分别维护；不执行资金或专业放行 |
@@ -188,6 +189,14 @@ flowchart LR
 业务使用责任：BOSS命令产生任务/授权/本人设置，后续页面、工具及Cron按当前版本读取；MAINTAINER只产生获准模拟资料、反馈与技术配置；资料换版或撤销使会前材料、纪要引用、研究、人员会面和计划需要复核；通知知晓、关闭与暂缓不改变任务期限及完成状态。具体接收动作与acceptance_id分别见T06、T12—T18及T21—T24。
 
 ## 事务、重置与恢复
+
+### FC07 交办、延期决定与本人承诺
+
+AssignmentExtensionAPI只供已认证本人的明确决定入口，正式Schema为assignment-extension.schema.json。输入client_request_id、task_id、task_version、feedback_id、decision、due_at、reason；APPROVE提供当前IANA时区下更晚且晚于业务时钟的期限，REJECT的due_at为null。BEGIN IMMEDIATE内复用当前ControlStore、本人授权、CAS、来源绑定与原回执，保存单次assignment_extension_decision及实际task_revision。拒绝保持原任务阶段、期限和提醒；批准保持任务阶段并更新期限及任务提醒。新入口和旧boss.assignment.extend共享决定记录，不能对同一申请再次决定。旧入口只有申请理由时保存原申请理由，本人理由保持null。
+
+ControlStore的正式反馈核查已发送前提、作者、当前任务版本、附件与合法申请期限；进展、延期申请和结果提交分别处理。当前结果重新提交后，完成只能采用最新结果及其提交时的来源版本/完整摘要。完成或取消保持经营事件独立，只终止对应任务提醒。来源失效后允许本人取消或拒绝继续延期，这些动作不采用失效资料作为完成或发送依据。
+
+新本人承诺必须提供至少一份当前有效且版本明确的来源，延期和完成重新验证已有来源，当前业务来源与SI09/SI10依赖采用既有统一政策。已有承诺保持原状态和历史，缺少旧来源时不补造；取消继续可用。新增kind无DDL迁移，既有task/feedback/outbox/authorization不批量改写。变更前的数据保护采用SQLite原生backup建立独立副本并核查integrity_check；代码恢复仅使用文件编辑工具。当前公开入口、维护界面、任务详情和本人决定由N3接收，模型不得注册本人决定能力。
 
 ### FC03 晨间清单与逐日次序
 

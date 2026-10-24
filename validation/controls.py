@@ -15,7 +15,7 @@ TEXT = {"type": "string", "minLength": 1}
 TIME = {"type": "string", "format": "date-time"}
 FIELDS = {
     "feedback": ({"task_id": TEXT, "task_version": TEXT, "author_contact_id": TEXT, "kind": {"enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": TEXT, "proposed_due_at": TIME, "evidence_refs": {"type": "array", "minItems": 0, "maxItems": 16, "items": TEXT}}, ["task_id", "task_version", "author_contact_id", "kind", "content"]),
-    "decide": ({"authorization_id": TEXT, "task_id": TEXT, "task_version": TEXT, "feedback_id": TEXT, "due_at": TIME}, ["authorization_id", "task_id", "task_version", "feedback_id"]),
+    "decide": ({"authorization_id": TEXT, "task_id": TEXT, "task_version": TEXT, "feedback_id": TEXT, "due_at": TIME, "reason": TEXT}, ["authorization_id", "task_id", "task_version", "feedback_id"]),
     "revoke": ({"authorization_id": TEXT}, ["authorization_id"]),
     "withdraw": ({"source_id": TEXT, "version": TEXT}, ["source_id", "version"]),
     "search": ({"query": TEXT}, ["query"]),
@@ -49,6 +49,7 @@ class ControlStore(Store):
                 audit_result = {"source_ids": [row["source_id"] for row in result["results"]],
                                 "result_count": len(result["results"])}
             elif action == "decide":
+                audit_input = {key: p[key] for key in ("authorization_id", "task_id", "task_version", "feedback_id", "due_at") if key in p}
                 audit_result = {key: result[key] for key in ("task_id", "version", "status", "due_at")}
             db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
             return result
@@ -60,12 +61,22 @@ class ControlStore(Store):
         require(p["kind"] in {"PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"}, "反馈类型无效", web.HTTPBadRequest)
         require(task["status"] != "COMPLETED_CONFIRMED", "已确认完成的任务不接受进度变更")
         historical_only = task["status"] == "CANCELED"
+        require(task["status"] in {"WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED"}
+                and bool(task["message_ids"]), "交办必须已经发送才能接收反馈")
+        require(task["status"] != "RESULT_SUBMITTED" or p["kind"] == "RESULT_SUBMITTED", "已提交结果的交办仅接受重新提交结果")
         if p["kind"] == "RESULT_SUBMITTED":
             require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
         refs = p.get("evidence_refs", [])
         require(len(set(refs)) == len(refs), "反馈证据引用重复", web.HTTPBadRequest)
         data = self.get(db, ns, "initial", "snapshot")
         clock = self.get(db, ns, "clock", "current")["at"]
+        if p["kind"] == "EXTENSION_REQUEST":
+            require(isinstance(p.get("proposed_due_at"), str), "延期申请需要明确新期限", web.HTTPBadRequest)
+            from boss_command_api import _aware_due
+            proposed = _aware_due(p["proposed_due_at"], task["timezone"])
+            require(proposed > datetime.fromisoformat(task["due_at"]), "申请期限必须晚于当前期限", web.HTTPBadRequest)
+            if not historical_only:
+                require(proposed > datetime.fromisoformat(clock), "申请期限必须晚于当前业务时钟", web.HTTPBadRequest)
         documents = {}
         for source_id in refs:
             document = self.get(db, ns, "document", source_id)
@@ -96,21 +107,41 @@ class ControlStore(Store):
     def control_decide(self, db, ns, p):
         auth = self.get(db, ns, "authorization", p["authorization_id"])
         content = {key: value for key, value in p.items() if key != "authorization_id"}
-        require(auth["authorization_id"] == p["authorization_id"] and auth["action"] in {"extend_assignment", "complete_assignment"},
+        require(auth["authorization_id"] == p["authorization_id"] and auth["action"] in {"extend_assignment", "reject_assignment_extension", "complete_assignment"},
                 "决定授权标识或动作不符", web.HTTPForbidden)
         data = self.get(db, ns, "initial", "snapshot")
         self.require_current_authorization(auth, ns, data, auth["action"], content)
         require(auth["payload"] == content, "决定参数与本人授权不符", web.HTTPForbidden)
         task = self.get(db, ns, "task", p["task_id"])
         require(task["version"] == p["task_version"], "任务版本冲突")
-        if auth["action"] == "extend_assignment":
+        previous_task = dict(task)
+        extension_decision = None
+        if auth["action"] in {"extend_assignment", "reject_assignment_extension"}:
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
-            require(feedback["kind"] == "EXTENSION_REQUEST" and feedback["task_id"] == p["task_id"], "延期依据不符")
-            require(datetime.fromisoformat(p["due_at"]).tzinfo is not None, "期限必须包含时区", web.HTTPBadRequest)
-            task["due_at"] = p["due_at"]
+            require(feedback["kind"] == "EXTENSION_REQUEST" and feedback["task_id"] == p["task_id"]
+                    and feedback["author_contact_id"] == task["coordinator_id"] and not feedback.get("historical_only")
+                    and task["status"] in {"WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED"}, "延期依据或任务状态不符")
+            decision_id = task["task_id"] + ":" + p["feedback_id"]
+            require(db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='assignment_extension_decision' AND id=?", (ns, decision_id)).fetchone() is None
+                    and p["feedback_id"] not in task.get("accepted_extension_feedback_ids", []), "延期申请已经有本人决定")
+            if auth["action"] == "extend_assignment":
+                self.require_current_assignment_sources(db, ns, data, task)
+                from boss_command_api import _aware_due
+                requested = _aware_due(p["due_at"], task["timezone"])
+                require(requested > datetime.fromisoformat(task["due_at"])
+                        and requested > datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]), "批准期限必须晚于当前期限及业务时钟", web.HTTPBadRequest)
+                task["due_at"] = p["due_at"]
+            extension_decision = {"decision_id": decision_id, "task_id": task["task_id"], "feedback_id": p["feedback_id"],
+                "owner_id": data["owner_id"], "source_type": "SIMULATED", "decision": "APPROVE" if auth["action"] == "extend_assignment" else "REJECT",
+                "old_due_at": previous_task["due_at"], "new_due_at": task["due_at"], "proposed_due_at": feedback["proposed_due_at"],
+                "request_reason": feedback["content"], "reason": p.get("reason"), "authorization_id": p["authorization_id"],
+                "previous_task_version": previous_task["version"], "decided_at": now()}
         elif auth["action"] == "complete_assignment":
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
             require(task["status"] == "RESULT_SUBMITTED" and feedback["task_id"] == p["task_id"] and feedback["kind"] == "RESULT_SUBMITTED" and feedback["evidence_refs"], "当前结果证据不完整")
+            current_results = [identifier for identifier in task["feedback_ids"]
+                               if self.get(db, ns, "feedback", identifier)["kind"] == "RESULT_SUBMITTED"]
+            require(current_results and current_results[-1] == p["feedback_id"], "当前结果已经重新提交，需要核查最新结果")
             self.require_current_assignment_sources(db, ns, data, task)
             versions = feedback.get("evidence_versions")
             fingerprints = feedback.get("evidence_fingerprints")
@@ -130,6 +161,10 @@ class ControlStore(Store):
         else:
             raise web.HTTPForbidden(text="当前授权不支持此决定")
         task["version"] = str(int(task["version"]) + 1)
+        self.put(db, ns, "task_revision", task["task_id"] + ":v" + previous_task["version"], previous_task)
+        if extension_decision is not None:
+            extension_decision["task_version"] = task["version"]
+            self.put(db, ns, "assignment_extension_decision", extension_decision["decision_id"], extension_decision)
         self.put(db, ns, "task", p["task_id"], task)
         return task
 

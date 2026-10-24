@@ -133,13 +133,26 @@
       "fields": {"task_id": {"type_ref": "identifier"}, "before_task_version": {"type_ref": "version"}, "binding": {"type": "object", "inherits": "assignment_source_binding"}, "archived_at": {"type_ref": "instant", "clock": "WALL"}},
       "policy": "仅归档确认前实际存在的绑定；没有旧绑定时不生成历史版本。before_task_version表示归档时读取的任务版本，不推测原始创建时间。"
     },
+    "assignment_extension_decision": {
+      "storage": "objects/assignment_extension_decision; id=task_id:feedback_id", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"decision_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "feedback_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"},
+        "decision": {"type": "string", "enum": ["APPROVE", "REJECT"]}, "old_due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "new_due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS"},
+        "request_reason": {"type_ref": "private_text"}, "reason": {"type": ["string", "null"]}, "previous_task_version": {"type_ref": "version"}, "task_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "decided_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}},
+      "policy": "同一申请只能产生一次本人决定；拒绝保持期限和提醒，批准才更新。旧批准入口缺少本人理由时保留null，申请原文独立保存；不为既有决定补造历史。"
+    },
+    "task_revision": {
+      "storage": "objects/task_revision; id=task_id:v<before_version>", "access": "BOSS_ONLY", "version": "1", "inherits": "task",
+      "fields": {},
+      "policy": "body直接保存本人延期决定或完成之前实际读取的任务对象；只有真实状态变更才保存，不补造旧版本。"
+    },
     "self_commitment": {
       "storage": "objects/self_commitment", "access": "BOSS_ONLY", "version": "1",
       "fields": {
         "commitment_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
         "status": {"type": "string", "enum": ["ACTIVE", "COMPLETED_CONFIRMED", "CANCELED"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"},
         "importance": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "evidence_requirements": {"type": "array", "items": "string"},
-        "source_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "completion_evidence": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
+        "source_refs": {"type": "array", "minItems": 1, "items": {"source_id": "identifier", "version": "version"}, "meaning": "新建必须具有当前有效来源；已有无来源对象保持历史，不补造来源"}, "completion_evidence": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
         "authorization_id": {"type_ref": "identifier"}, "completion_authorization_id": {"type": ["string", "null"]},
         "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "external_message_sent": {"type": "boolean", "const": false},
         "last_extension_authorization_id": {"type_ref": "identifier", "optional": true}, "completed_at": {"type_ref": "instant", "optional": true}, "canceled_at": {"type_ref": "instant", "optional": true},

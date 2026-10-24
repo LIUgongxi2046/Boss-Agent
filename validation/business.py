@@ -293,7 +293,8 @@ class Store:
         for identifier in p["related_event_ids"]:
             row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event' AND id=?", (ns, identifier)).fetchone()
             event = json.loads(row[0]) if row else data["event"]
-            require(event["event_id"] == identifier and event["owner_id"] == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
+            # 正式维护事件从当前namespace继承本人；显式归属仍必须一致。
+            require(event["event_id"] == identifier and event.get("owner_id", data["owner_id"]) == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
         documents = self.assignment_sources(db, ns, data, p["source_refs"])
         require(all(identifier == "finance-note" or document.get("simulation_definition") == DEFINITION for identifier, document in documents.items()),
                 "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)

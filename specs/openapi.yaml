@@ -8,6 +8,20 @@ security:
 x-acceptance: NOT_RUN
 x-integration: W3_PRIOR_DOMAINS_INTEGRATED_CURRENT_SCHEMA_RECHECK_PENDING
 x-command-transport: authenticated nanobot WebSocket webui_request
+x-fc07-assignment-extension:
+  schema_extension: assignment-extension.schema.json
+  input_schema: assignment-extension.schema.json#/$defs/DecisionInput
+  result_schema: assignment-extension.schema.json#/$defs/Result
+  action: boss.assignment.extension.decide
+  role: BOSS
+  execute: AssignmentExtensionAPI.execute(role, payload)
+  history: AssignmentExtensionAPI.read(role, task_id)
+  receipt: AssignmentExtensionAPI.receipt(role, client_request_id)
+  transport: PENDING_N3; lazy import before public transaction; no model decision tool
+  decision: APPROVE requires later aware due_at; REJECT requires null due_at and preserves deadline/reminder
+  persistence: assignment_extension_decision plus task_revision in same transaction as task/authorization/receipt
+  legacy: boss.assignment.extend remains; records actual request reason and null owner reason when absent; cannot reverse decided feedback
+  source: new commitments require at least one current versioned source; expiry/withdrawal return 410; cancellation remains available
 x-fc03-morning:
   schema_version: 1.0.0
   schema_extension: morning.schema.json
@@ -800,7 +814,7 @@ components:
         - {$ref: '#/components/schemas/CommandFields'}
         - required: [client_request_id, due_at, evidence_requirements, importance, purpose, source_refs, timezone]
           propertyNames: {enum: [client_request_id, due_at, evidence_requirements, importance, purpose, source_refs, timezone]}
-          properties: {source_refs: {type: array, maxItems: 8, items: {$ref: '#/components/schemas/SourceReference'}}}
+          properties: {source_refs: {type: array, minItems: 1, maxItems: 8, items: {$ref: '#/components/schemas/SourceReference'}}}
     CommitmentExtend:
       allOf:
         - {$ref: '#/components/schemas/CommandFields'}

@@ -129,7 +129,7 @@ def test_real_commitment_event_dedup_and_current_rule_priority(store):
     view = query(MorningAPI(store), date="2026-10-23")
     commitment = next(item for item in view["items"] if item["object_id"] == created["commitment_id"])
     assert commitment["important"] is True
-    assert {ref["kind"] for ref in commitment["source_refs"]} == {"self_commitment", "event"}
+    assert {ref["kind"] for ref in commitment["source_refs"]} == {"self_commitment", "event", "document"}
     assert not any(item["kind"] == "event" and item["object_id"] == created["due_event"]["event_id"] for item in view["items"])
     store.control("ui-check", "rules", {"version": "2", "cooldown_seconds": 0, "quiet_start": 22, "quiet_end": 7, "timezone": "Asia/Shanghai", "important_escalation": False})
     assert not any(item["important"] for item in MorningAPI(store).read("BOSS", {"date": "2026-10-23", "timezone": "Asia/Shanghai"})["items"])

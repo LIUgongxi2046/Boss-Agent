@@ -31,7 +31,7 @@ def create(cmd,key="owner-commitment-create-001",**override):
         "timezone":"Asia/Shanghai",
         "importance":"NORMAL",
         "evidence_requirements":["带版本的原始财务凭证"],
-        "source_refs":[],
+        "source_refs":[{"source_id":"finance-note","version":"1"}],
         **override,
     }
     return action(cmd,"BOSS","boss.commitment.create",key,**fields)
