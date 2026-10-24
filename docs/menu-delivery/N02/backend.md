@@ -2,6 +2,8 @@
 
 task_id=MENU-N02-N1，marker=MENU-N02-START-20261024；来源为原始docs/menu-delivery/N02.md完整26项工单及D-MENU-DELIVERY-20261024。正式状态由N3维护specs/feature-delivery.json，本记录只登记领域阶段。当前N1基点87cac76259a8c48b6a755180d4046249f06b89d2；当前PRODUCT候选d0e6326bcca49a2c8372c476c50808d454076127供只读核查，未把本分支旧HEAD视为完整PRODUCT。
 
+领域实施提交5f2138234353c5c224b3d0034d4c1565e6e8939b，分支codex/business，包含12份领域、规范、检查和记录文件。N2/N3按该准确增量接收，本记录的模块证据不代表公开注册、完整26项或用户验收通过。
+
 ## 当前依据与检索
 
 已完整读取适用AGENTS、N02工单、PRD当前决定、完整产品FR-08/24/29及BR/AC、原N02页面与原始提示词、实际chat面板。共同BR-C01—C07/E01—E06及交互规范沿用本轮当前读取内容。S008任务记录、执行规则及接口改动检查继续采用。检索现有消息/联系人/草稿/发送/回复、任务/来源/授权、runtime_run与原生会话/附件代码，读取T18-message-calendar及相关字段规范。记忆索引没有相关命中。
