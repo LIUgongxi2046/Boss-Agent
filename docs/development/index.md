@@ -4,6 +4,7 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| UI01-N3 | [已完成功能菜单与登录页](../feature-delivery/UI01/integration.md) | 当前唯一实施项；七项完整工单，已交付导航、受控账号填充和登录布局；业务队列暂停，完成后等待用户 |
 | MVP01-N3 | [采购成本连续体验](../feature-delivery/MVP01/integration.md) | BOSS-MVP-1、MVP.C01—C12；同一采购报告、实际SDK/原文/本人确认/持久恢复和可启动体验；状态引用原始feature-delivery.json |
 | FC07-N3 | [交办与承诺公共集成](../feature-delivery/FC07/integration.md) | FR-06、FC07.C01—C12；F06/N05、发送/催办/反馈/延期/证据/本人结束、SDK、保存恢复；状态引用原始feature-delivery.json |
 | FC04-N3 | [经营提醒公共集成](../feature-delivery/FC04/integration.md) | FR-02、FC04.C01—C20；提醒规则、唯一Cron、本人处理与后续调度、桌面通知、原编号恢复；状态引用原始feature-delivery.json |
