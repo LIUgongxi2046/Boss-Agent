@@ -144,7 +144,7 @@
 *** Update File: webui/src/lib/nanobot-client.ts
 @@
 -      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
-+      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback", "boss.simulation.message.reply"].includes(pending.action) || pending.action.startsWith("boss.message.") || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
++      if (["boss.conversation.task.prepare", "boss.conversation.task.bind", "boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback", "boss.simulation.message.reply"].includes(pending.action) || pending.action.startsWith("boss.message.") || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
 *** Update File: webui/src/components/thread/ThreadComposer.tsx
 @@
    useEffect,
@@ -268,4 +268,9 @@
 @@
        <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
 +        onRegisterCloseGuard={registerWindowCloseGuard}
+*** Update File: webui/src/App.tsx
+@@
+         onNewConversation={onNewChat}
++        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
++        onOpenTaskConversation={chatId=>onSelectChat("websocket:"+chatId)}
 *** End Patch

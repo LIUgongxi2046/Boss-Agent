@@ -45,6 +45,7 @@ import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
 import { MaintainerScheduler } from "./MaintainerScheduler";
 import { BossMorningView, type MorningReference,type MorningConversationRequest,type MorningBindingReceipt } from "./BossMorningView";
 import type {ConversationActions} from "./BossConversationWorkspace";
+import {BossTaskConversationEntry} from "./BossTaskConversationEntry";
 import { BossMorningPreparation,type MorningPreparationContext } from "./BossMorningPreparation";
 import { BossMVPView } from "./BossMVPView";
 import { BossBIView } from "./BossBIView";
@@ -137,6 +138,8 @@ type Props = {
   onStartMorning:(value:MorningConversationRequest,signal:AbortSignal)=>Promise<MorningBindingReceipt>;
   onOpenMorning:(chatId:string)=>void;
   onNewConversation:()=>void;
+  onCreateTaskConversation:()=>Promise<string>;
+  onOpenTaskConversation:(chatId:string)=>void;
   children: (role: Role, visible: boolean, actions:ConversationActions) => ReactNode;
   onOpenNative: (role: Role) => void;
   onBeforeLeaveNative: (leave: () => void) => void;
@@ -247,7 +250,7 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
   </div>;
 }
 
-export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onNewConversation, children, onOpenNative, onBeforeLeaveNative,onRegisterCloseGuard }: Props) {
+export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onNewConversation,onCreateTaskConversation,onOpenTaskConversation, children, onOpenNative, onBeforeLeaveNative,onRegisterCloseGuard }: Props) {
   const { client, token } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [mvpScope,setMvpScope]=useState(false);
@@ -287,7 +290,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
   const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
-  const [pendingWindowClose,setPendingWindowClose]=useState<(()=>void)|null>(null);
+  const [pendingLeaveAction,setPendingLeaveAction]=useState<(()=>void)|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -423,7 +426,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       if(["NATIVE","N02"].includes(page)){onBeforeLeaveNative(close);return;}
       if(assignmentDirty||sourceReviewDirty||settingsDirty||workDirty||supplyDirty||importDirty){
         navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
-        setPendingWindowClose(()=>close);
+        setPendingLeaveAction(()=>close);
       }else close();
     });
     return()=>onRegisterCloseGuard(null);
@@ -674,6 +677,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onViewMessages={()=>navigate("F08")}
                   onMessageDraftCreated={setDraftToReview}
                 />
+                <BossTaskConversationEntry task={tasks?.tasks.find(task=>task.task_id===selectedTaskId)??null} getToken={getToken}
+                  onBeforeStart={start=>{
+                    if(assignmentDirty||sourceReviewDirty){navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setPendingLeaveAction(()=>start);}
+                    else start();
+                  }} onCreateChat={onCreateTaskConversation}
+                  onOpenChat={chatId=>{onOpenTaskConversation(chatId);navigate("N02","F06",true);}}
+                  onReturnTask={id=>selectTask(id)}/>
                 {selectedTaskId && <BossAssignmentSourceReview key={selectedTaskId} data={sourceReview}
                   loading={sourceReviewLoading} error={sourceReviewError} onReload={refresh} onCommand={scopedCommand}
                   onReceipt={(action, clientRequestId) => jsonRequest("/api/boss/ui/operation-status?action=" +
@@ -1017,7 +1027,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
         </main>
       </div>
     </div>
-    <DialogPrimitive.Root open={pendingNavigation !== null||pendingWindowClose!==null} onOpenChange={(open) => {if (!open){setPendingNavigation(null);setPendingWindowClose(null);}}}>
+    <DialogPrimitive.Root open={pendingNavigation !== null||pendingLeaveAction!==null} onOpenChange={(open) => {if (!open){setPendingNavigation(null);setPendingLeaveAction(null);}}}>
       <DialogPrimitive.Portal container={shellRef.current}>
         <DialogPrimitive.Overlay className="boss-confirm-backdrop"/>
         <DialogPrimitive.Content className="boss-confirm boss-navigation-confirm" onCloseAutoFocus={(event) => {
@@ -1037,8 +1047,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <DialogPrimitive.Close asChild><button type="button" className="boss-btn">返回继续编辑</button></DialogPrimitive.Close>
           <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
             const destination=pendingNavigation;
-            const close=pendingWindowClose;
-            if (!destination&&!close) throw new Error("离开页面缺少目标");
+            const action=pendingLeaveAction;
+            if (!destination&&!action) throw new Error("离开页面缺少目标");
             setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});
             setAssignmentDirty(false);
             setSourceReviewDirty(false);
@@ -1047,8 +1057,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             if(["F14","F21"].includes(page)&&!supplyEditor.pending&&!supplyEditor.pendingPreparation)updateSupplyEditor(supplyInterface,{...EMPTY_SUPPLY_EDITOR});
             if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);
-            setPendingWindowClose(null);
-            if(close)close();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
+            setPendingLeaveAction(null);
+            if(action)action();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
           }}>放弃草稿并离开</button>
         </div>
         </DialogPrimitive.Content>

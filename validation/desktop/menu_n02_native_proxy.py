@@ -12,6 +12,7 @@ GATE = {"chat_id": None, "release": None, "held": None}
 MESSAGES = []
 REQUESTS = []
 DROP = {"action": None, "request_id": None, "client_request_id": None, "dropped": None}
+ACTION_GATE = {"action": None, "request_id": None, "release": None, "held": None}
 
 
 async def start(app):
@@ -23,12 +24,27 @@ async def close(app):
 
 
 async def state(request):
-    return web.json_response({"held": GATE["held"], "messages": MESSAGES, "requests": REQUESTS, "dropped": DROP["dropped"]})
+    return web.json_response({"held": GATE["held"], "action_held": ACTION_GATE["held"], "messages": MESSAGES, "requests": REQUESTS, "dropped": DROP["dropped"]})
+
+
+async def hold_action(request):
+    body = await request.json()
+    assert set(body) == {"action"} and body["action"] in {"boss.conversation.task.prepare", "boss.conversation.task.bind"}
+    assert ACTION_GATE["release"] is None
+    ACTION_GATE.update(action=body["action"], request_id=None, release=asyncio.Event(), held=None)
+    return web.json_response({"armed": True})
+
+
+async def release_action(request):
+    assert ACTION_GATE["release"] is not None and ACTION_GATE["held"] is not None
+    ACTION_GATE["release"].set()
+    return web.json_response({"released": True})
 
 
 async def drop_response(request):
     body = await request.json()
-    assert set(body) == {"action"} and body["action"] in {"boss.message.draft.save", "boss.message.send"}
+    assert set(body) == {"action"} and body["action"] in {
+        "boss.message.draft.save", "boss.message.send", "boss.conversation.task.prepare", "boss.conversation.task.bind"}
     assert DROP["action"] is None and DROP["request_id"] is None
     DROP.update(action=body["action"], client_request_id=None, dropped=None)
     return web.json_response({"armed": True})
@@ -64,6 +80,9 @@ async def proxy(request):
                     if body.get("type") == "webui_request":
                         action, identifier = body["action"], body["request_id"]
                         REQUESTS.append({"action": action, "request_id": identifier})
+                        if action == ACTION_GATE["action"]:
+                            assert ACTION_GATE["request_id"] is None
+                            ACTION_GATE["request_id"] = identifier
                         if action == DROP["action"]:
                             assert DROP["request_id"] is None
                             DROP.update(request_id=identifier, client_request_id=body["payload"]["client_request_id"])
@@ -73,6 +92,12 @@ async def proxy(request):
                 async for frame in upstream:
                     assert frame.type == WSMsgType.TEXT
                     body = json.loads(frame.data)
+                    if ACTION_GATE["request_id"] is not None and body.get("event") == "webui_response" and body.get("request_id") == ACTION_GATE["request_id"]:
+                        assert body["ok"] is True
+                        ACTION_GATE["held"] = {"action": ACTION_GATE["action"], "request_id": body["request_id"],
+                            "response_sha256": hashlib.sha256(frame.data.encode()).hexdigest()}
+                        await ACTION_GATE["release"].wait()
+                        ACTION_GATE.update(action=None, request_id=None, release=None, held=None)
                     if DROP["request_id"] is not None and body.get("event") == "webui_response" and body.get("request_id") == DROP["request_id"]:
                         assert body["ok"] is True
                         DROP["dropped"] = {"action": DROP["action"], "request_id": DROP["request_id"], "client_request_id": DROP["client_request_id"],
@@ -100,5 +125,7 @@ app.router.add_get("/_n02/state", state)
 app.router.add_post("/_n02/hold", hold)
 app.router.add_post("/_n02/release", release)
 app.router.add_post("/_n02/drop-response", drop_response)
+app.router.add_post("/_n02/hold-action", hold_action)
+app.router.add_post("/_n02/release-action", release_action)
 app.router.add_route("*", "/{path:.*}", proxy)
 web.run_app(app, host="127.0.0.1", port=PORT, access_log=None)

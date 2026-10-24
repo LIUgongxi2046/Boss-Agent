@@ -78,6 +78,18 @@ scripts/run_menu_n02.command与prepare_menu_n02.py已在独立menu-n02-launcher-
 
 主记录随准确接口、设计选择、实际修改和原始结果更新；保持全体未完成项、当前范围与必要阻塞。正常完成当前26项后登记开发交付待用户验收，并处理进入 N03前必要的 F01设计返修，始终只实施一个菜单。暂停语音独立保留，不计完成。现有四窗口仅在 idle 复查后一次具体续接，marker=MENU-N02-START-20261024，运行中只读。
 
+## 固定任务入口与当前消费
+
+N1任务入口5fb1def3cfd17e895691ccd8c52d1effed441886及记录分别接收至5919fd3/4d7038dc7e5accb2e0123a3f3a28392e2a8c2385。task-entry-receiver.xml为14 passed、3.96秒；既有消费者接收4 passed、3.86秒。N2消费者e2d76dceb354d50781fd13f0100d2979a74f3c7a接收至6d620bb，task-bound-consumer-receiver.xml为16 passed、10.68秒。Runtime Schema 1.13.0生产者b5e2fbe6a6571d90f5f3c2d5c0ae407e3817980c接收至b131d96；task-bound-schema-receiver.xml为4 passed、4.32秒，包含58项受限输入拒绝。Schema基线采用固定def38c666c6b653aa939062540e692ba2dbd0e5a的1.12.0原文，当前运行字段完整参与验证。生产者完整85项SDK回归为160.79秒，包含实际120秒deadline。
+
+PublicConversation公开注册prepare/bind/read/receipt四项任务入口动作；服务端确定会话标识及本人范围。客户端使用实际useSessions.createChat与原生new_chat，绑定前由官方gateway.workspaces.persist_scope保存真实空会话及已有工作空间范围。固定任务与来源在保存空会话之前重新核查，绑定不提交问题、不创建业务任务、不模拟发送。重连不会重放prepare或bind；按原client_request_id只读查询，不将历史回执视作当前有效性证明。
+
+F06选择已经保存的实际任务后，可建立固定版本的任务会话。准备、绑定和最终打开分别检查当前身份与选择；离开前新增编辑仍由D06处理。N02直接读取当前绑定，显示原任务与来源版本及返回入口；当前连接建立并订阅原会话后才读取，换会话清除原关联，业务详情返回保留原按钮与焦点。
+
+check-menu-n02-task-entry.cjs及task-entry-ui.json在独立10811/10812/20811和10813真实代理通过，manifest=957cbd051c48adad90831a7753381f7db75beecdea54e1530c143045733fe823。实际准备与绑定成功响应分别中断，每项仅提交一次，刷新按原记录恢复；打开期间零问题、零Runtime。本人提交“查看当前任务”后，实际conversationRead仅采用选定task_id/version，Runtime完整task_entry通过1.13.0。来源和任务详情返回、同会话刷新保持；真实延迟准备响应不改变新选择，绑定期间新增编辑保留并再次经过D06。新会话不继承任务；本人正式取消任务后，后续输入在Runtime建立前FAILED、run_id=null，原运行和历史准备记录保留。本项不代表完整26项、视觉或用户验收完成。
+
+N4对def38c666c6b653aa939062540e692ba2dbd0e5a的关闭和文件指定增量结论为APPROVED/TARGETED_CLOSED，qa.md摘要79adf404cef54765f43ac94aa4ca9501dadf54f709d4d7ec1504aef45b3dfd07；完整菜单证据继续保持未完成。
+
 ## 资料与运行
 
 保护原 UI02/MVP 及当前已交付 F01 的制品、账号、SQLite、会话、端口与用户窗口。新候选使用独立目录、制品和端口，不自动退出、重启、覆盖或热替换已有体验。受控账号注入仅填写当前角色表单，手动登录仍经正常认证。全部外部 SIMULATED_FIRST，无新增真实外部请求；STT/F27/FC28暂停。禁止主动视觉、截图、图像、/tmp、Git恢复和程序化修改源码。

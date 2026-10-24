@@ -17,7 +17,7 @@ from aiohttp import web
 from business import checksum, now
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
-from public_conversation import CONVERSATION_READ_ACTIONS, PublicConversation, validate_request_result
+from public_conversation import CONVERSATION_READ_ACTIONS, CONVERSATION_TASK_ACTIONS, PublicConversation, validate_request_result
 
 
 class RoleChannel(WebSocketChannel):
@@ -44,7 +44,7 @@ class RoleChannel(WebSocketChannel):
         self.skills = skills
         self.boss_pages = BossPageAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
         self.boss_commands = BossCommandAPI(business_store, runtime_control=runtime_control, skills=skills) if business_store is not None else None
-        self.conversation = PublicConversation(business_store, self.gateway.session_manager, self.gateway.media._media_dir("websocket")) if business_store is not None else None
+        self.conversation = PublicConversation(business_store, self.gateway.session_manager, self.gateway.media._media_dir("websocket"), workspaces=self.gateway.workspaces) if business_store is not None else None
 
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
@@ -105,6 +105,20 @@ class RoleChannel(WebSocketChannel):
                 self.record(role, address.path, 200)
                 return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE")}))
             if address.path.startswith("/api/boss/ui/"):
+                if address.path == "/api/boss/ui/conversation/task-entry":
+                    try:
+                        if self.conversation is None:
+                            raise web.HTTPServiceUnavailable(text="任务会话接收服务尚未就绪")
+                        values = parse_qs(address.query, keep_blank_values=True)
+                        if set(values) != {"client_request_id"} or len(values["client_request_id"]) != 1:
+                            raise web.HTTPBadRequest(text="原任务会话请求字段无效")
+                        body = self.conversation.task(role, "boss.conversation.task.receipt", {"client_request_id": values["client_request_id"][0]},
+                            attached=lambda chat_id: False, active=lambda: self.token_roles.get(token) == "BOSS" and self.gateway.tokens.check_api_token(request))
+                        status = 200
+                    except web.HTTPException as failure:
+                        status, body = failure.status, {"error": failure.text}
+                    self.record(role, address.path, status)
+                    return connection.respond(status, json.dumps(body, ensure_ascii=False))
                 if address.path == "/api/boss/ui/conversation/request":
                     try:
                         if self.native_conversation is None:
@@ -204,7 +218,7 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
-        if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS:
+        if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS | CONVERSATION_TASK_ACTIONS:
             await self._conversation_response(connection, role, envelope)
             return
         if kind == "webui_request" and action in {"boss.conversation.request", "boss.conversation.requests"}:
@@ -450,7 +464,8 @@ class RoleChannel(WebSocketChannel):
         try:
             if self.conversation is None:
                 raise web.HTTPServiceUnavailable(text="当前会话读取服务尚未就绪")
-            result = self.conversation.read(role, envelope["action"], envelope.get("payload"),
+            operation = self.conversation.task if envelope["action"] in CONVERSATION_TASK_ACTIONS else self.conversation.read
+            result = operation(role, envelope["action"], envelope.get("payload"),
                 attached=lambda chat_id: chat_id in self.webui_connection_chats(connection), active=active)
             status, response = 200, {"result": result}
         except web.HTTPException as failure:

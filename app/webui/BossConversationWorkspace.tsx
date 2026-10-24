@@ -2,6 +2,7 @@ import {useEffect,useRef,useState,type ReactNode} from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {ArrowLeft,FileText,History,MessageCircle,Plus,RefreshCw,Search,X} from "lucide-react";
 import {useClient} from "@/providers/ClientProvider";
+import {verifyTaskContext,type TaskConversationContext} from "./BossTaskConversationEntry";
 import "./boss-n02.css";
 
 export type ConversationActions={onOpenTask:(id:string)=>void;onOpenSource:(id:string)=>void;onOpenMessages:()=>void;onReturn:()=>void};
@@ -21,20 +22,25 @@ const fileState={STORED:"已经保存",MISSING:"文件缺少",CHANGED:"内容已
 function Row({name,value}:{name:string;value:ReactNode}){return <div className="boss-n02-kv"><span>{name}</span><strong>{value}</strong></div>;}
 export function BossConversationWorkspace({role,visible,activeKey,sessions,onNewChat,onSelectChat,onSearch,actions,children}:Props){
   const {client,token}=useClient();
+  const [connectionStatus,setConnectionStatus]=useState(client.status);
   const session=sessions.find(value=>value.key===activeKey),chatId=session?.chatId??(activeKey?.startsWith("websocket:")?activeKey.slice(10):null);
   const [view,setView]=useState<View|null>(null),[attachments,setAttachments]=useState<Attachment[]>([]),[error,setError]=useState(""),[revision,setRevision]=useState(0);
   const [receipts,setReceipts]=useState<RequestReceipt[]>([]);
+  const [taskContext,setTaskContext]=useState<TaskConversationContext|null>(null),[taskContextError,setTaskContextError]=useState(""),[taskContextChecking,setTaskContextChecking]=useState(false);
   const [artifact,setArtifact]=useState<Artifact|null>(null),[artifactOpen,setArtifactOpen]=useState(false),[artifactError,setArtifactError]=useState(""),[artifactLoading,setArtifactLoading]=useState(false);
   const [historyOpen,setHistoryOpen]=useState(false),[selectedRunId,setSelectedRunId]=useState("");
   const scope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
+  const taskScope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
   const workspace=useRef<HTMLDivElement|null>(null),businessReturn=useRef<{chatId:string|null;focus:HTMLElement|null;scrollTop:number}|null>(null);
   const generation=useRef(0),artifactGeneration=useRef(0),progress=useRef<HTMLDivElement|null>(null),artifactFocus=useRef<HTMLElement|null>(null);
+  useEffect(()=>client.onStatus(setConnectionStatus),[client]);
+  useEffect(()=>{if(role==="BOSS"&&visible&&chatId&&connectionStatus==="open")client.attach(chatId);},[client,role,visible,chatId,connectionStatus]);
   useEffect(()=>{
     const current=++generation.current;++artifactGeneration.current;setArtifact(null);setArtifactOpen(false);setArtifactError("");
     if(scope.current?.client!==client||scope.current?.token!==token||scope.current?.chatId!==chatId||scope.current?.role!==role){
       scope.current={client,token,chatId,role};setView(null);setAttachments([]);setReceipts([]);setError("");setSelectedRunId("");businessReturn.current=null;
     }
-    if(role!=="BOSS"||!visible||!chatId)return;
+    if(role!=="BOSS"||!visible||!chatId||connectionStatus!=="open")return;
     let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,attachmentRevision:string|null=null;
     const read=async()=>{
       try{
@@ -52,8 +58,24 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
       }catch(failure){if(!disposed&&generation.current===current){setView(null);setAttachments([]);setReceipts([]);setError(failure instanceof Error?failure.message:String(failure));}}
     };
     void read();return()=>{disposed=true;if(timer)clearTimeout(timer);};
-  },[role,visible,chatId,client,token,revision]);
+  },[role,visible,chatId,client,token,revision,connectionStatus]);
   useEffect(()=>()=>{++artifactGeneration.current;},[]);
+  useEffect(()=>{
+    let disposed=false,timer:ReturnType<typeof setTimeout>|undefined;
+    if(taskScope.current?.client!==client||taskScope.current?.token!==token||taskScope.current?.chatId!==chatId||taskScope.current?.role!==role){
+      taskScope.current={client,token,chatId,role};setTaskContext(null);setTaskContextError("");
+    }
+    setTaskContextChecking(true);
+    if(role!=="BOSS"||!visible||!chatId||connectionStatus!=="open")return;
+    const read=async()=>{
+      try{
+        const result=await client.requestMutation<TaskConversationContext>("boss.conversation.task.read",{chat_id:chatId});
+        if(disposed)return;
+        verifyTaskContext(result,chatId);setTaskContext(result);setTaskContextError("");setTaskContextChecking(false);timer=setTimeout(()=>void read(),2000);
+      }catch(failure){if(!disposed){setTaskContextError(failure instanceof Error?failure.message:String(failure));setTaskContextChecking(false);}}
+    };
+    void read();return()=>{disposed=true;if(timer)clearTimeout(timer);};
+  },[client,token,chatId,role,visible,revision,connectionStatus]);
   useEffect(()=>{
     const saved=businessReturn.current;
     if(visible&&saved?.chatId===chatId){if(workspace.current)workspace.current.scrollTop=saved.scrollTop;saved.focus?.focus({preventScroll:true});businessReturn.current=null;}
@@ -75,11 +97,16 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   if(role!=="BOSS")return <>{children}</>;
   const latest=view?.runs.find(run=>run.run_id===selectedRunId)??view?.runs.at(-1),origin=latest?.origin_references.morning_context,selected=origin?.selected_item_ref as {object_id?:string;version?:string;source_refs?:{kind:string;id:string;version:string|null}[]}|undefined;
   const contextRefs=latest?.context_references??[],taskRefs=contextRefs.filter(ref=>ref.kind==="task"),documentRefs=contextRefs.filter(ref=>ref.kind==="document");
+  const taskEntry=taskContext?.entry;
   return <div className="boss-n02" aria-label="聊天交办工作区" ref={workspace}>
     <div className="boss-n02-main">
       <section className="boss-n02-panel boss-n02-context" aria-labelledby="boss-n02-context-title">
         <header className="boss-n02-heading"><h2 id="boss-n02-context-title">当前会话与关联事项</h2></header>
-        <Row name="关联事项" value={selected?.object_id??(contextRefs.length?contextRefs.map(ref=>ref.id).join("、"):origin?.date?"晨间事项 · "+String(origin.date):"尚未关联")}/><Row name="资料版本" value={selected?.version??(documentRefs.length?documentRefs.map(ref=>ref.id+" · 原版本 "+(ref.recorded_version??"未知")+" / 当前 "+(ref.current_version??"未知")).join("；"):origin?.snapshot_sha256?"已保存当前清单快照":"待读取")}/><Row name="任务对象" value={[...new Set([...taskRefs.map(ref=>ref.id),...latest?.artifacts.filter(value=>value.kind==="task").map(value=>value.id)??[]])].join("、")||"尚未关联交办"}/>
+        {taskEntry&&<div className="boss-n02-source" aria-label="固定任务上下文"><strong>{taskEntry.task_reference.id} · 原任务版本 {taskEntry.task_reference.version}</strong><span>{taskContextError?"当前有效性核查失败，原选择仅供核查":taskContextChecking?"正在核查原任务与来源的当前有效性":"当前任务与来源版本已经核查"}</span><button className="boss-btn" onClick={()=>openBusiness(()=>actions.onOpenTask(taskEntry.return_reference.task_id))}>返回关联任务</button></div>}
+        {taskContextError&&<div className="boss-n02-note error" role="alert">{taskContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查任务上下文</button></div>}
+        <Row name="关联事项" value={taskEntry?.task_reference.id??selected?.object_id??(contextRefs.length?contextRefs.map(ref=>ref.id).join("、"):origin?.date?"晨间事项 · "+String(origin.date):"尚未关联")}/>
+        <Row name="资料版本" value={taskEntry?taskEntry.source_references.map(ref=>ref.id+" · 原版本 "+ref.version).join("；"):selected?.version??(documentRefs.length?documentRefs.map(ref=>ref.id+" · 原版本 "+(ref.recorded_version??"未知")+" / 当前 "+(ref.current_version??"未知")).join("；"):origin?.snapshot_sha256?"已保存当前清单快照":"待读取")}/>
+        <Row name="任务对象" value={[...new Set([...(taskEntry?[taskEntry.task_reference.id]:[]),...taskRefs.map(ref=>ref.id),...latest?.artifacts.filter(value=>value.kind==="task").map(value=>value.id)??[]])].join("、")||"尚未关联交办"}/>
         <div className="boss-n02-actions"><button className="boss-btn" onClick={actions.onReturn}><ArrowLeft size={16}/>返回业务页面</button><button className="boss-btn" onClick={onNewChat}><Plus size={16}/>新建会话</button><button className="boss-btn" type="button" aria-expanded={historyOpen} onClick={()=>setHistoryOpen(value=>!value)}><History size={16}/>历史会话</button></div>
       </section>
       <section className="boss-n02-panel boss-n02-conversation" aria-labelledby="boss-n02-conversation-title">
@@ -110,7 +137,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
         <details aria-label="原请求记录"><summary>原请求记录（{receipts.length}）</summary>{receipts.length?receipts.map(receipt=><div className="boss-n02-source" key={receipt.client_request_id}><strong>{receipt.client_request_id}</strong><span>{receipt.request_state==="ADMITTED"?"已经接收":label(receipt.request_state)}</span><span>原轮次 {receipt.turn_id}</span>{receipt.run_id?<button className="boss-btn" onClick={()=>{setSelectedRunId(receipt.run_id!);progress.current?.scrollIntoView({block:"nearest"});progress.current?.focus();}}>读取关联运行</button>:<p>当前没有已建立的运行记录。读取原请求不会重新执行。</p>}</div>):<p>当前会话没有一般请求记录。晨间绑定按原业务记录核查。</p>}</details>
         <div className="boss-n02-actions"><button className="boss-btn" onClick={()=>openBusiness(actions.onOpenMessages)}>查看消息草稿与回复</button><button className="boss-btn" onClick={()=>openBusiness(()=>actions.onOpenTask(""))}>准备交办</button></div>
       </section>
-      <section className="boss-n02-panel" aria-label="来源与依据"><h2>来源与依据</h2>{contextRefs.length?contextRefs.map(reference=><ContextReferenceDetails key={reference.kind+reference.id+reference.recorded_version} reference={reference} onOpenSource={id=>openBusiness(()=>actions.onOpenSource(id))} onOpenTask={id=>openBusiness(()=>actions.onOpenTask(id))}/>):selected?.source_refs?.length?selected.source_refs.map(source=><div className="boss-n02-source" key={source.kind+source.id}><strong>{source.id}</strong><span>版本 {source.version??"未知"}</span>{source.kind==="document"&&<button className="boss-btn" onClick={()=>openBusiness(()=>actions.onOpenSource(source.id))}>核查来源</button>}</div>):<p>当前运行没有已记录的来源或对象引用。</p>}<p className="boss-n02-note">上下文关联及工具读取分别记录，附件保存状态和业务来源采用分别核查。</p>
+      <section className="boss-n02-panel" aria-label="来源与依据"><h2>来源与依据</h2>{taskEntry?.source_references.map(source=><div className="boss-n02-source" key={"task-entry-"+source.id} data-task-entry-source={source.id}><strong>{source.id}</strong><span>任务入口原来源版本 {source.version} · {taskContextError?"当前有效性待核查":"当前固定来源已经核查"}</span><button className="boss-btn" onClick={()=>openBusiness(()=>actions.onOpenSource(source.id))}>核查任务来源原文</button></div>)}{contextRefs.length?contextRefs.map(reference=><ContextReferenceDetails key={reference.kind+reference.id+reference.recorded_version} reference={reference} onOpenSource={id=>openBusiness(()=>actions.onOpenSource(id))} onOpenTask={id=>openBusiness(()=>actions.onOpenTask(id))}/>):selected?.source_refs?.length?selected.source_refs.map(source=><div className="boss-n02-source" key={source.kind+source.id}><strong>{source.id}</strong><span>版本 {source.version??"未知"}</span>{source.kind==="document"&&<button className="boss-btn" onClick={()=>openBusiness(()=>actions.onOpenSource(source.id))}>核查来源</button>}</div>):<p>当前运行没有已记录的来源或对象引用。</p>}<p className="boss-n02-note">上下文关联及工具读取分别记录，附件保存状态和业务来源采用分别核查。</p>
         <details aria-label="当前已保存附件"><summary>当前已保存附件（{attachments.length}）</summary>{attachments.length?attachments.map(file=><div className="boss-n02-source" key={file.attachment_id}><strong>{file.original_name??file.stored_name??"附件名称未知"}</strong><span>{file.mime_type??"类型未知"} · {file.size_bytes===null?"当前大小未知":file.size_bytes+" bytes"} · {fileState[file.processing_state]}</span>{file.processing_state!=="STORED"&&<p className="boss-n02-note warn">上传记录大小：{file.recorded_size_bytes===null?"未知":file.recorded_size_bytes+" bytes"}。当前附件不能作为已核查的业务依据。</p>}</div>):<p>尚无已保存附件。当前选择及未发送附件保留在输入区域。</p>}</details>
       </section>
     </aside>

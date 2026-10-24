@@ -1,11 +1,12 @@
 import asyncio
 from copy import deepcopy
 import json
+import subprocess
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 
-from conftest import DOMAIN, ROOT
+from conftest import ROOT
 from controls import ControlStore
 from test_cancel_deadline import arguments, run_for
 from test_native import native
@@ -108,7 +109,8 @@ def test_actual_unbound_runtime_keeps_optional_task_entry_absent(native):
 
 
 def test_runtime_schema_preserves_exact_product_112_baseline():
-    base = json.loads((DOMAIN / "specs/runtime-records.schema.json").read_text())
+    base = json.loads(subprocess.run(["git", "show", "def38c666c6b653aa939062540e692ba2dbd0e5a:specs/runtime-records.schema.json"],
+        cwd=ROOT, check=True, capture_output=True, text=True).stdout)
     assert base["$id"] == "urn:boss-agent:runtime-records:1.12.0"
     schema = json.loads(SCHEMA_PATH.read_text())
     assert schema["$id"] == "urn:boss-agent:runtime-records:1.13.0"
