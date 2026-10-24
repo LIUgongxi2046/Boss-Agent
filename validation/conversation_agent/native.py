@@ -36,6 +36,7 @@ class ConversationGrant:
     owner_id: str
     dataset_id: str
     dataset_version: str
+    task_entry_json: str | None = None
 
 
 class NativeConversationAgent:
@@ -44,6 +45,7 @@ class NativeConversationAgent:
         self.proofs = {}
         self.pending_media = {}
         self.planner = ConversationPlanner(store)
+        self.task_entry = self.planner.api.task_entry(attachments.sessions)
         self.scope = ConversationScope(store, self.context_provider, self.validate_context)
         api = BossPageAPI(store)
         self.delegates = [BossDashboardReadTool(api, "BOSS"), BossTasksReadTool(api, "BOSS"),
@@ -165,6 +167,20 @@ class NativeConversationAgent:
         return tuple(sorted({(item["attachment_id"], item["content_sha256"], item["processing_state"])
                              for item in view["attachments"]}))
 
+    def task_entry_pin(self, query):
+        current = self.task_entry.read("BOSS", query)
+        if current["binding_state"] == "UNBOUND":
+            require(current["current_use_verified"] is False and current["entry"] is None,
+                    "未绑定会话的任务入口状态无效", web.HTTPConflict)
+            return None
+        entry = current["entry"]
+        require(current["binding_state"] == "BOUND" and current["current_use_verified"] is True
+                and entry["binding_state"] == "BOUND" and entry["current_use_verified"] is True,
+                "任务入口缺少当前有效绑定", web.HTTPConflict)
+        # 使用不可变字符串保存原始选择，后续读取持续核查相同摘要。
+        return encode({field: entry[field] for field in ("preparation_id", "client_request_id", "preparation_sha256",
+            "task_reference", "source_references", "return_reference")})
+
     def record_media(self, role, key, accepted_media, accepted_paths, *, active):
         self._authorize(role, active)
         require(key in self.proofs, "实际上传缺少当前会话接收证明", web.HTTPForbidden)
@@ -220,16 +236,22 @@ class NativeConversationAgent:
                         last_source_ref = None
                 pending_query_scope = old.get("pending_query_scope")
             query = {"session_id": request.session_key, "chat_id": request.chat_id}
+            task_entry_json = self.task_entry_pin(query)
+            for old in previous:
+                if "task_entry" in old:
+                    require((encode(old["task_entry"]) if old["task_entry"] is not None else None) == task_entry_json,
+                            "本会话任务入口与原固定选择不符", web.HTTPConflict)
+            task_entry = json.loads(task_entry_json) if task_entry_json is not None else None
             media = self._media_refs(self.attachments.read("BOSS", query))
             require(all(state == "STORED" for _, _, state in media), "当前附件已变化或无法读取，请核查原附件", web.HTTPConflict)
             require(row["media_sha256"] == checksum([]) or key in self.pending_media,
                     "本轮媒体尚无原生成功上传的正式元信息", web.HTTPConflict)
             media = tuple(sorted(set(media) | set(self.pending_media.get(key, ()))))
             plan = self.planner.plan(request.original_user_text, query, (last_source_ref,) if last_source_ref else (), tuple(artifacts), last_source_id,
-                has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope)
+                has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope, task_entry=task_entry)
             self.validate_artifacts(plan, query)
             grant = ConversationGrant(key, request.chat_id, row["turn_id"], row["text_sha256"], proof[0], plan, media,
-                row["owner_id"], row["dataset_id"], row["dataset_version"])
+                row["owner_id"], row["dataset_id"], row["dataset_version"], task_entry_json)
             require(CONVERSATION_REQUEST not in request.attributes, "请求已经包含会话采用上下文", web.HTTPForbidden)
             request.attributes[CONVERSATION_REQUEST] = grant
             self.scope.current(request, require_runtime=False)
@@ -240,7 +262,7 @@ class NativeConversationAgent:
                 if current_sources:
                     last_source_ref = next(ref for ref in reversed(plan.references) if ref[0] == "document" and ref[1] == current_sources[-1])
                 row.update(references=plan.references, attachment_refs=media, artifact_checks=plan.artifact_checks,
-                           pending_query_scope=plan.pending_query_scope,
+                           pending_query_scope=plan.pending_query_scope, task_entry=task_entry,
                            last_source_id=current_sources[-1] if current_sources else last_source_id,
                            last_source_ref=last_source_ref,
                            plan_sha256=checksum({"calls": plan.calls, "required_inputs": plan.required_inputs}))
@@ -256,6 +278,8 @@ class NativeConversationAgent:
         require(isinstance(grant, ConversationGrant), "一般会话缺少可信本次输入", web.HTTPForbidden)
         require(grant.chat_id == request.chat_id and grant.turn_id == request.metadata.get("webui_turn_id")
                 and grant.key == self.turn_key(request.chat_id, grant.turn_id), "会话采用上下文不属于本轮输入", web.HTTPForbidden)
+        require(self.task_entry_pin({"session_id": request.session_key, "chat_id": request.chat_id}) == grant.task_entry_json,
+                "任务入口与本轮固定准备摘要不符", web.HTTPConflict)
         binding = request.attributes.get(ATTRIBUTE)
         return ConversationContext("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else request.message_id or request.turn_id, request.session_key,
@@ -265,9 +289,12 @@ class NativeConversationAgent:
     def validate_context(self, context):
         with self.store.connect() as db:
             for kind, identifier, version in context.references:
-                require(kind == "document", "会话历史包含未验证来源种类", web.HTTPForbidden)
-                document = require_current_business_source(self.store, db, "ui-check", context.owner_id, identifier)
-                require(document["version"] == version, "会话历史来源版本已经变化", web.HTTPConflict)
+                if kind == "task":
+                    self.planner.api.task_in_transaction(db, _context(db), identifier, version)
+                else:
+                    require(kind == "document", "会话历史包含未验证来源种类", web.HTTPForbidden)
+                    document = require_current_business_source(self.store, db, "ui-check", context.owner_id, identifier)
+                    require(document["version"] == version, "会话历史来源版本已经变化", web.HTTPConflict)
         request = current_request_context()
         if request is not None and self.handles(request) and ATTRIBUTE in request.attributes:
             grant = request.attributes[CONVERSATION_REQUEST]
@@ -321,10 +348,13 @@ class NativeConversationAgent:
         grant = request.attributes[CONVERSATION_REQUEST]
         with self.store.connect() as db:
             row = self.store.get(db, "ui-check", "conversation_intent", grant.key)
-        return {"client_request_id": grant.key, "media_sha256": row["media_sha256"],
+        result = {"client_request_id": grant.key, "media_sha256": row["media_sha256"],
                 "attachment_refs": [{"attachment_id": key, "content_sha256": digest, "processing_state": state}
                                     for key, digest, state in grant.attachment_refs],
                 "required_input_count": len(grant.plan.required_inputs)}
+        if grant.task_entry_json is not None:
+            result["task_entry"] = json.loads(grant.task_entry_json)
+        return result
 
     def bind_runtime(self, request, binding):
         grant = request.attributes[CONVERSATION_REQUEST]

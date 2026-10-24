@@ -13,7 +13,7 @@ from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_page_read_tools import _BossPageReadTool
 
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 CONVERSATION_REQUEST = "product_conversation_request"
 READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead", "conversationRead"})
 CONVERSATION_TOOLS = READ_TOOLS | {"query_metrics"}

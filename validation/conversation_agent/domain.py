@@ -9,6 +9,7 @@ from business import checksum, encode, require
 from boss_conversation import ConversationAPI, SCHEMA, validate
 from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
+from boss_simulation_api import _context
 from nanobot.agent.tools.context import current_request_context
 from runtime_page_read_tools import _BossPageReadTool
 from conversation_agent.queries import ConversationQueries, mentioned
@@ -54,12 +55,10 @@ class ConversationDomainReadTool(_BossPageReadTool):
         elif kind == "record":
             identifier, record_kind = params["id"], params["kind"]
             if record_kind == "task":
-                tasks = self._read("/api/boss/ui/tasks")["tasks"]
-                require(any(item["task_id"] == identifier for item in tasks), "任务不属于当前本人可读范围", web.HTTPForbidden)
+                versions = [version for kind, key, version in context.references if kind == "task" and key == identifier]
                 with self._api.store.connect() as db:
-                    initial = self._api.store.get(db, "ui-check", "initial", "snapshot")
-                    data = self._api.store.get(db, "ui-check", "task", identifier)
-                    self._api.store.require_current_assignment_sources(db, "ui-check", initial, data)
+                    db.execute("BEGIN")
+                    data = self.conversation.task_in_transaction(db, _context(db), identifier, versions[0] if versions else None)
             else:
                 history = self.conversation.messages("BOSS")
                 items = history["drafts"] if record_kind == "message_draft" else history["sent_messages"]
@@ -91,9 +90,12 @@ class ConversationPlanner:
         self.store, self.api = store, ConversationAPI(store)
         self.pages = BossPageAPI(store)
 
-    def plan(self, text, query, previous_references, previous_artifacts=(), last_source_id=None, *, has_media=False, pending_query_scope=None):
+    def plan(self, text, query, previous_references, previous_artifacts=(), last_source_id=None, *, has_media=False, pending_query_scope=None, task_entry=None):
         lowered = text.casefold()
         calls, references, required, checks = [], [], [], []
+        if task_entry is not None:
+            references.extend((ref["kind"], ref["id"], ref["version"]) for ref in
+                [task_entry["task_reference"], *task_entry["source_references"]])
         def add(name, params):
             call = (name, encode(params))
             if call not in calls:
@@ -130,7 +132,8 @@ class ConversationPlanner:
             if last_source_id and any(word in lowered for word in ("资料", "原文", "来源", "版本")):
                 remembered = [ref for ref in previous_references if ref[0] == "document" and ref[1] == last_source_id]
                 require(bool(remembered), "此前选择的资料缺少已记录版本，请明确来源编号", web.HTTPConflict)
-                references.append(remembered[-1])
+                if remembered[-1] not in references:
+                    references.append(remembered[-1])
                 selected_source_ids.append(last_source_id)
                 add("bossEvidenceRead", {"source": last_source_id})
         for document in selected:
@@ -141,14 +144,24 @@ class ConversationPlanner:
                 references.append(reference)
         if any(word in lowered for word in ("资料", "原文", "来源")) and not selected_source_ids and not any(word in lowered for word in ("附件", "文件")):
             required.append("请明确当前来源ID或已有正式来源名称")
-        if any(word in lowered for word in ("任务", "交办", "承诺")):
-            status, tasks = self.pages.serve("BOSS", "/api/boss/ui/tasks")
-            require(status == 200, "当前任务范围读取失败", web.HTTPConflict)
-            matches = [item for item in tasks["tasks"] if item["task_id"].casefold() in lowered]
-            if len(matches) == 1:
-                add("conversationRead", {"projection": "record", "kind": "task", "id": matches[0]["task_id"]})
+        if any(word in lowered for word in ("任务", "交办", "承诺")) or task_entry is not None and any(
+                word in lowered for word in ("当前事项", "这个事项", "该事项", "本次事项", "当前对象", "这个对象")):
+            if task_entry is not None:
+                selected = task_entry["task_reference"]
+                with self.store.connect() as db:
+                    context = _context(db)
+                    identifiers = [row[0] for row in db.execute("SELECT id FROM objects WHERE namespace=? AND kind='task'", (context["namespace"],))]
+                require(all(identifier == selected["id"] for identifier in identifiers if mentioned(text, identifier)),
+                        "当前任务输入与本会话固定选择不符", web.HTTPConflict)
+                add("conversationRead", {"projection": "record", "kind": "task", "id": selected["id"]})
             else:
-                add("bossTasksRead", {})
+                status, tasks = self.pages.serve("BOSS", "/api/boss/ui/tasks")
+                require(status == 200, "当前任务范围读取失败", web.HTTPConflict)
+                matches = [item for item in tasks["tasks"] if item["task_id"].casefold() in lowered]
+                if len(matches) == 1:
+                    add("conversationRead", {"projection": "record", "kind": "task", "id": matches[0]["task_id"]})
+                else:
+                    add("bossTasksRead", {})
             if any(word in lowered for word in ("取消任务", "确认完成", "延期", "交办给", "批准")):
                 required.append("任务变更请采用当前正式任务共享入口及匹配对象版本的本人有效决定")
         if any(word in lowered for word in ("会议", "会面")):
