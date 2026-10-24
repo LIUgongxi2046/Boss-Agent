@@ -12,7 +12,7 @@ const space=fs.statfsSync(root);assert(space.bavail*space.bsize>=200*1024*1024,'
 const frontend=path.join(root,rework?'menu-f01-rework-n3-dist':'menu-n02-n3-dist'),ports={business:10791,webui:10792,gateway:20791},origin='http://127.0.0.1:'+ports.webui;
 const output=path.join(root,rework?'evidence/menu-delivery/F01/rework-launcher.json':'evidence/menu-delivery/N02/launcher.json'),records=[];
 let stage='INITIALIZE';
-function save(status){fs.writeFileSync(output,JSON.stringify({status,scope:'N02_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL',application_directory:directory,ports,frontend_directory:frontend,manifest_sha256:createHash('sha256').update(fs.readFileSync(path.join(frontend,'asset-manifest.json'))).digest('hex'),visual:'NOT_RUN',user_acceptance:'NOT_RUN',records},null,2)+'\n');}
+function save(status){fs.writeFileSync(output,JSON.stringify({status,scope:(rework?'F01':'N02')+'_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL',application_directory:directory,ports,frontend_directory:frontend,manifest_sha256:createHash('sha256').update(fs.readFileSync(path.join(frontend,'asset-manifest.json'))).digest('hex'),visual:'NOT_RUN',user_acceptance:'NOT_RUN',records},null,2)+'\n');}
 async function main(){let desktop;
   try{
     const initialization=JSON.parse(execFileSync(path.join(validation,'.venv/bin/python'),[path.join(root,rework?'scripts/prepare_menu_f01_rework.py':'scripts/prepare_menu_n02.py'),'--directory',directory,'--frontend',frontend,'--ports',JSON.stringify(ports)],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',TMPDIR:path.join(validation,'.work/tmp')},encoding:'utf8'}));assert.equal(initialization.existing_data_reused,false);

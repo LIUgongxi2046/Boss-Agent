@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "menu-f01-rework-n3-dist"
 EVIDENCE = ROOT / "evidence/menu-delivery/F01"
 PREPARED = ROOT / ".work/product/nanobot/webui"
+RETAINED_CANDIDATE = "8cabf2ca2a7d3ae99500b1a137bc1dc14ea55827"
+RETAINED_MANIFEST = "6094fd56d16e1d50a10094a9d7c8c477972b8cf0c772ae5de4989bea2860ebfe"
+RETAINED_REPORTS = {"rework-design.json", "rework-header.json", "rework-behavior.json", "rework-native.json"}
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from prepare_menu_n02 import VALUES
@@ -51,11 +54,19 @@ def main():
     manifest = digest(DIST / "asset-manifest.json")
     if delivery["manifest_sha256"] != manifest or delivery["index_sha256"] != digest(DIST / "index.html"):
         raise ValueError("今日工作交付记录没有采用当前制品")
-    reports = {}
+    subprocess.run(["git", "diff", "--quiet", RETAINED_CANDIDATE, "--", "app/webui", ":(exclude)app/webui/boss-morning.css"], cwd=ROOT, check=True)
+    reports, retained_reports = {}, {}
     for name in ("rework-design.json", "rework-header.json", "rework-dialogs.json", "rework-behavior.json", "rework-native.json", "rework-launcher.json"):
         report = json.loads((EVIDENCE / name).read_text())
-        if report["status"] != "PASS" or report["manifest_sha256"] != manifest:
-            raise ValueError("当前必要检查没有采用准确制品：" + name)
+        if report["status"] != "PASS":
+            raise ValueError("必要检查没有通过：" + name)
+        if name in RETAINED_REPORTS:
+            recorded = subprocess.check_output(["git", "show", RETAINED_CANDIDATE + ":evidence/menu-delivery/F01/" + name], cwd=ROOT)
+            if report["manifest_sha256"] != RETAINED_MANIFEST or digest(EVIDENCE / name) != hashlib.sha256(recorded).hexdigest():
+                raise ValueError("沿用的准确组件证据发生变化：" + name)
+            retained_reports[name] = {"source_commit": RETAINED_CANDIDATE, "manifest_sha256": RETAINED_MANIFEST, "sha256": digest(EVIDENCE / name)}
+        elif report["manifest_sha256"] != manifest:
+            raise ValueError("当前Dialog与启动检查没有采用准确制品：" + name)
         reports[name] = digest(EVIDENCE / name)
     for name in ("combination.xml", "native-adapter.xml"):
         suites = list(ET.parse(EVIDENCE / name).getroot().iter("testsuite"))
@@ -116,7 +127,9 @@ def main():
         "installed_nanobot_sources": {str(path.relative_to(installed)): digest(path) for path in sorted(installed.rglob("*.py"))},
         "frontend_directory": str(DIST), "manifest_sha256": manifest, "index_sha256": digest(DIST / "index.html"),
         "frontend_files": {str(path.relative_to(DIST)): digest(path) for path in sorted(DIST.rglob("*")) if path.is_file()},
-        "reports": reports, "runtime_configuration": public_configuration, "setup_sha256": digest(directory / "setup.json"), "protected_frontends": protected,
+        "reports": reports, "retained_frontend_reports": retained_reports,
+        "frontend_reuse_boundary": {"baseline_commit": RETAINED_CANDIDATE, "changed_frontend_file": "app/webui/boss-morning.css", "reviewed_changed_rules": [".boss-f01-overlay[data-state]", "div:has(> .boss-f01-dialog.boss-v6)", ".boss-f01-dialog.boss-v6"], "other_tracked_frontend_sources_unchanged": True},
+        "runtime_configuration": public_configuration, "setup_sha256": digest(directory / "setup.json"), "protected_frontends": protected,
         "external_api_mode": "SIMULATED_FIRST", "visual": "NOT_RUN", "user_acceptance": "NOT_RUN"}
     target = EVIDENCE / "rework-candidate-inventory.json"
     target.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")

@@ -9,7 +9,7 @@ from application_paths import application_work_directory, application_ports
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--directory", type=Path, default=ROOT / "validation/.work/menu-f01-rework-experience")
+    parser.add_argument("--directory", type=Path, default=ROOT / "validation/.work/menu-f01-rework-release-experience")
     parser.add_argument("--frontend", type=Path, default=ROOT / "menu-f01-rework-n3-dist")
     parser.add_argument("--ports", default='{"business":10621,"webui":10622,"gateway":20621}')
     args = parser.parse_args()

@@ -49,8 +49,9 @@
 .boss-f01-detail-fields dd{margin:4px 0 0;overflow-wrap:anywhere}
 .boss-f01-related{padding:11px 0;border-bottom:1px solid #e6edf5;overflow-wrap:anywhere}
 .boss-f01-related:last-child{border-bottom:0}.boss-f01-related p{font-size:14px;line-height:22px}
-.boss-f01-overlay[data-state]{z-index:101;background:rgba(20,42,69,.28)}
-.boss-f01-dialog.boss-v6{position:fixed;z-index:102;width:min(580px,94vw);max-width:580px;height:auto;max-height:calc(100vh - 40px);overflow:auto;padding:24px;border:0;border-radius:16px;background:#fff;box-shadow:0 20px 70px rgba(0,35,80,.25);display:block;font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.55}
+.boss-f01-overlay[data-state]{z-index:101;background:rgba(20,42,69,.28);display:grid;place-items:center;padding:20px;-webkit-backdrop-filter:none;backdrop-filter:none}
+div:has(> .boss-f01-dialog.boss-v6){display:grid;place-items:center;align-content:normal;justify-content:normal;padding:20px;z-index:102}
+.boss-f01-dialog.boss-v6{position:relative;z-index:102;width:min(580px,94vw);max-width:none;height:auto;max-height:calc(100vh - 40px);overflow:auto;padding:24px;border:0;border-radius:16px;background:#fff;box-shadow:0 20px 70px rgba(0,35,80,.25);display:block;font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.55}
 .boss-f01-dialog.boss-v6 :focus-visible{outline:2px solid #0A64E8!important;outline-offset:2px!important}
 .boss-f01-dialog h2{font-size:20px;line-height:31px;font-weight:700;margin:0 42px 11px 0;color:#172B4D}
 .boss-f01-dialog h3{font-size:17px;line-height:26px}.boss-f01-dialog p{margin:10px 0;font-size:14px;line-height:1.6;color:#172B4D;overflow-wrap:anywhere}

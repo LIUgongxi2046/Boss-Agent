@@ -1,6 +1,6 @@
 # 今日工作独立体验
 
-使用scripts/run_menu_f01_rework.command。独立前端为menu-f01-rework-n3-dist，资料为validation/.work/menu-f01-rework-experience，端口10621/10622/20621；运行状态采用当前本机应用记录。原F01、N02、UI02和MVP体验保持独立。
+使用scripts/run_menu_f01_rework.command。独立前端为menu-f01-rework-n3-dist，资料为validation/.work/menu-f01-rework-release-experience，端口10621/10622/20621；运行状态采用当前本机应用记录。原F01、N02、UI02和MVP体验保持独立。
 
 登录页面选择本人或技术维护，点击“测试账号注入”。受控Electron主窗口仅读取当前应用accounts/credentials.json对应角色的既有账号密码并填入表单；随后由使用者点击登录。密码不进入URL、日志、静态制品或浏览器持久存储。
 

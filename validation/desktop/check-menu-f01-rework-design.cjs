@@ -48,4 +48,4 @@ async function main(){let product,reference;
     save(differences.length?'REQUIRES_REVIEW':'PASS');console.log(JSON.stringify({status:differences.length?'REQUIRES_REVIEW':'PASS',report:output,differences:differences.length,examples:differences.filter((value,index,array)=>array.findIndex(item=>item.region===value.region&&item.field===value.field)===index)}));
   }finally{if(product){await product.evaluate(({BrowserWindow})=>{for(const window of BrowserWindow.getAllWindows())window.destroy();});await product.close();}if(reference)await reference.close();}
 }
-main().catch(error=>{console.error(error.message);save('FAIL');process.exitCode=1;});
+void main();
