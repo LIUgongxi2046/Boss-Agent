@@ -28,13 +28,23 @@ class Fc03Context:
     timezone: str
     snapshot_sha256: str
     order_version: str
+    client_request_id: str | None = None
+    allowed_list_ids: frozenset[str] = frozenset()
 
 
-def register_fc03_tools(registry, store, context_provider):
+def register_fc03_tools(registry, store, context_provider, *, formal=False):
     require(callable(context_provider), "缺少本人认证请求生产者", web.HTTPBadRequest)
-    require(not any(registry.has(name) for name in TOOLS), "晨间工具名称已经注册", web.HTTPConflict)
-    registry.register(Fc03TodayTool(store, context_provider))
-    return sorted(TOOLS)
+    if formal:
+        from fc03_agent.formal import FORMAL_TOOLS, FormalMorningTool
+        names = FORMAL_TOOLS
+        require(not any(registry.has(name) for name in names), "晨间工具名称已经注册", web.HTTPConflict)
+        for name in sorted(names):
+            registry.register(FormalMorningTool(store, context_provider, name))
+    else:
+        names = TOOLS
+        require(not any(registry.has(name) for name in names), "晨间工具名称已经注册", web.HTTPConflict)
+        registry.register(Fc03TodayTool(store, context_provider))
+    return sorted(names)
 
 
 class Fc03TodayTool(Tool):

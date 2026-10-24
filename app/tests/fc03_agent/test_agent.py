@@ -96,7 +96,7 @@ def test_model_runtime_requires_matching_server_request(scope):
         asyncio.run(registry(scope).get("todayRead").execute())
 
 
-def run(scope, tmp_path, producer):
+def run(scope, tmp_path, producer, *, formal=False):
     store, current, _ = scope
     logger.remove()
     logger.add(sys.stderr, level="WARNING", diagnose=False, backtrace=False)
@@ -107,15 +107,21 @@ def run(scope, tmp_path, producer):
     snapshot = {"provider": "deepseek", "model_id": "deepseek-flash", "api_type": "chat_completions",
         "max_tool_rounds": 12, "max_output_tokens": 700, "timeout": 120, "config_sha256": checksum(config.model_dump(mode="json"))}
     recorder = Fc03RuntimeRecorder(store, "ui-check", tools, lambda: snapshot, lambda: current[0])
-    provider = Fc03SimulatedProvider(producer)
+    from fc03_agent import TOOLS
+    if formal:
+        from fc03_agent.formal import FORMAL_TOOLS
+        approved = FORMAL_TOOLS
+    else:
+        approved = TOOLS
+    provider = Fc03SimulatedProvider(producer, allowed_tools=approved)
     provider.generation = config.resolve_preset().to_generation_settings()
     loop = AgentLoop.from_config(config, tool_registry=tools, provider=provider, hook_factories=[recorder.hook_factory])
     for name in list(tools.tool_names):
         tools.unregister(name)
-    register_fc03_tools(tools, store, lambda: current[0])
+    register_fc03_tools(tools, store, lambda: current[0], formal=formal)
     with store.connect() as db:
         configuration = store.get(db, "ui-check", "configuration", "current")
-        configuration["tool_scope"] = ["todayRead"]
+        configuration["tool_scope"] = sorted(approved)
         store.put(db, "ui-check", "configuration", "current", configuration)
     async def execute():
         async with Nanobot(loop, config=config) as bot:

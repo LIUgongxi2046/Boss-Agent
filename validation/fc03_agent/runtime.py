@@ -9,8 +9,12 @@ from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder, Fc01RuntimeHook, F
 
 
 class Fc03SimulatedProvider(Fc01SimulatedProvider):
+    def __init__(self, event_producer, *, allowed_tools=TOOLS):
+        super().__init__(event_producer)
+        self.allowed_tools = frozenset(allowed_tools)
+
     async def chat(self, messages, tools=None, model=None, **kwargs):
-        require({item["function"]["name"] for item in tools or []} == TOOLS,
+        require({item["function"]["name"] for item in tools or []} == self.allowed_tools,
                 "晨间模型工具超出批准读取范围")
         return await super().chat(messages, tools, model, **kwargs)
 
@@ -21,7 +25,8 @@ class Fc03RuntimeRecorder(Fc01RuntimeRecorder):
         self.context_provider = context_provider
 
     async def context(self, request):
-        tool = Fc03TodayTool(self.store, self.context_provider)
+        tool = self.registry.get("todayRead")
+        require(isinstance(tool, Fc03TodayTool), "晨间实际读取工具尚未注册")
         context = tool.context(require_runtime=False)
         require(context.owner_id == request.sender_id and context.namespace == self.namespace,
                 "晨间运行与可信本人范围不符")
@@ -30,6 +35,7 @@ class Fc03RuntimeRecorder(Fc01RuntimeRecorder):
         binding = request.attributes[ATTRIBUTE]
         reference = {key: getattr(context, key) for key in ("date", "timezone", "snapshot_sha256", "order_version")}
         reference["parameters_sha256"] = checksum(json.loads(context.read_parameters_json))
+        reference["client_request_id"] = context.client_request_id
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self._read(db, binding.run_id)
@@ -59,8 +65,12 @@ class Fc03RuntimeHook(Fc01RuntimeHook):
     async def after_execute_tool(self, context, tool_call, tool, params, result):
         await super().after_execute_tool(context, tool_call, tool, params, result)
         output = json.loads(result)
-        safe = {key: output[key] for key in ("date", "timezone", "snapshot_sha256", "order_version", "business_clock")}
-        safe["item_refs"] = [{key: item[key] for key in ("item_id", "object_id", "version", "source_refs")} for item in output["items"]]
+        view = output.get("result", output)
+        safe = {key: view[key] for key in ("date", "timezone", "snapshot_sha256", "order_version", "business_clock", "list_id", "list_version") if key in view}
+        items = view.get("items", [view["item"]] if "item" in view else [])
+        safe["item_refs"] = [{key: item[key] for key in ("item_id", "object_id", "version", "source_refs")} for item in items]
+        if "document" in output:
+            safe["document_ref"] = {key: output["document"][key] for key in ("source_id", "version")}
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)
