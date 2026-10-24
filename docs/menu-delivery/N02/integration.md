@@ -17,7 +17,7 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 | 需求/设计 | SATISFIED；当前完整26项工单、原 N02 区域与通用状态，不按原生组件当前功能缩减 |
 | 身份/原生框架 | SATISFIED 输入基础；UI02 当前 ClientProvider、历史、新建/选择/搜索、原生输入/上传/流式/停止及 D06；当前完整采用仍需逐项核查 |
 | 领域/消息/来源/版本 | 现有 boss_message_calendar、消息命令、任务和来源为可复用输入；完整 N02 的会话/任务/产物关联及必要增量 PENDING，由 N1准确交接 |
-| Agent/Runtime | 同一实际 SDK、Registry、F01可信绑定及原生停止为输入；一般连续会话当前意图/正式工具/上下文/结果的完整采用 PENDING，由 N2核查并交付准确接口 |
+| Agent/Runtime | 已接收 N2生产者86579a85c278e349d615aa39b57ba26b63729ad5，当前集成77f7647；一般会话可信读取和Runtime模块1.0.0，公开接收/完整规划及业务产物采用 PENDING |
 | 公开接收/前端 | N3唯一维护实际注册、RoleChannel、App、Shell、组件/样式、独立制品与连续验证；采用准确已有接口，不编造新业务值 |
 | 独立核查 | N4按原 PRD/设计建立26项独立矩阵；准确候选后只核查必要差距和受影响消费者 |
 | 新框架/真实外部/新视觉 | NOT_APPLICABLE；沿用当前技术及设计；SIMULATED_FIRST，FR-27保持暂停 |
@@ -31,6 +31,8 @@ task_id=MENU-N02-N3；CURRENT；2026-10-24；IN_PROGRESS。唯一正式状态为
 已实施当前草稿及普通缓存保护增量：ThreadComposer暴露仅在进程内的 ComposerDraftController，涵盖文字、实际附件、引用和排队输入；ThreadShell透传，App以当前会话注册，用于切换、浏览历史地址及离开业务路径。本人明确放弃时清除对应未发送内容，返回继续编辑保留内容；beforeunload覆盖仅附件/排队状态。本人会话明确设置 persistQueuedPrompts=false，继续使用原生内存队列，不读取或写入普通 localStorage队列正文。源码增量保存在 app/webui/nanobot-menu-n02.patch。
 
 独立 menu-n02-n3-dist 构建通过，Vite计时30.53秒，日志 .work/menu-n02-build.log。`node validation/desktop/check-menu-n02-native-privacy.cjs` 通过，原始结果 evidence/menu-delivery/N02/native-privacy.json；使用新10731/10732/20731及代理10733、独立SQLite/账号。实际批准 YAML文件的附件单独存在时触发离开保护，继续编辑保留、明确放弃清除；代理仅延迟真实当前会话输出，排队输入没有进入URL/普通浏览器缓存、没有发送，明确放弃后不恢复。该证据仅覆盖相应 C04/C06/C21的当前增量，不登记完整26项或一般会话业务通过。F01制品未更改。
+
+N2模块提供 ConversationContext/ConversationScope、五项正式只读适配、ConversationSimulatedProvider/ConversationRuntimeRecorder，记录输入/参数摘要与正式引用，不提供模型本人确认。接收后在当前 PRODUCT 运行 `CONVERSATION_DOMAIN_ROOT=当前PRODUCT validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_runtime.py`，12 passed，9.19秒，证据 evidence/menu-delivery/N02/read-runtime.xml。仅证明模块及实际 SDK的当前读取/终态/隐私；通用自然输入规划、原生接收去重、附件/消息/任务/产物关联、公开注册与Schema仍待准确接口和实际消费者，不登记完整N02通过。N1当前正在完成准确领域交付，运行中仅只读，不采用未完成文件作为正式接口。
 
 原设计实际加载检查已运行：`env TMPDIR=validation/.work/tmp node validation/desktop/check-menu-n02-design.cjs`，结果 PASS，六组 DOM/位置尺寸保存在 evidence/menu-delivery/N02/reference-dom.json。采用独立 menu-n02-reference-profile，未启动产品或读取现有用户资料。该结果仅证明设计来源及六组布局读取，不登记 N02 产品检查点通过。区域/Token/真实原生组件与正式接口依赖记录于 design.md。
 
