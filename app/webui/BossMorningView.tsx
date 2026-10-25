@@ -3,6 +3,7 @@ import {useClient} from "@/providers/ClientProvider";
 import {BossToday,morningReason,morningState,type TodayItem,type TodayOrderReceipt,type TodayProjection} from "./BossToday";
 import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogClose} from "@/components/ui/dialog";
 import {CheckCircle2,ClipboardList,Info,Send,X} from "lucide-react";
+import {isSafeMorningFocusId,readMorningReturnPoint} from "./morning-return";
 import "./boss-morning.css";
 import "./boss-f01-shell.css";
 
@@ -43,16 +44,17 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const [bindingId,setBindingId]=useState(""),[nativeBinding,setNativeBinding]=useState<MorningBinding|null>(null);
   const handoff=useRef<AbortController|null>(null),[handoffCanceled,setHandoffCanceled]=useState(false);
   const [detail,setDetail]=useState<Detail|null>(null),[document,setDocument]=useState<Document|null>(null);
+  const [detailLoading,setDetailLoading]=useState(false),[detailError,setDetailError]=useState(""),[detailRevision,setDetailRevision]=useState(0);
   const [error,setError]=useState(""),[loading,setLoading]=useState(false),[busy,setBusy]=useState(false),[uncertain,setUncertain]=useState(false),[orderDirty,setOrderDirty]=useState(false),[denied,setDenied]=useState(false),[revision,setRevision]=useState(0);
   const epoch=useRef(0),generation=useRef(0),receiptSequence=useRef(0),deniedRef=useRef(false),bound=useRef<Read|null>(null);
   const surface=useRef<HTMLDivElement>(null),returnPoint=useRef<{scroll:number;focus:string}|null>(null),returnPending=useRef(false),overlayFocus=useRef<HTMLElement|null>(null),visibility=useRef(visible);
   visibility.current=visible;
   const clearDetailForRead=useCallback(()=>{
     if(visibility.current&&returnPoint.current?.focus===window.document.activeElement?.id)returnPending.current=true;
-    setDetail(null);
+    setDetail(null);setDetailLoading(false);setDetailError("");
   },[]);
   bound.current=list;
-  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");},[]);
+  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");setDetailLoading(false);setDetailError("");},[]);
   const read=useCallback(async<T,>(path:string,signal?:AbortSignal):Promise<T>=>{
     const response=await fetch(path,{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal});
     if(response.status===401||response.status===403){deniedRef.current=true;setDenied(true);generation.current++;clear();if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));throw new Error("当前身份无法读取晨间资料");}
@@ -91,8 +93,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     const parameters=new URLSearchParams(window.location.search),key=parameters.get("morningRequest")??"",binding=parameters.get("morningBinding")??"";
     const savedCategory=parameters.get("morningCategory");
     if(savedCategory==="DECIDE"||savedCategory==="COORDINATE"||savedCategory==="INFORM")setCategory(savedCategory);
-    const savedScroll=Number(parameters.get("morningScroll")),savedFocus=parameters.get("morningFocus");
-    if(savedFocus&&/^morning-[A-Za-z0-9_-]+$/.test(savedFocus)&&Number.isFinite(savedScroll)&&savedScroll>=0){returnPoint.current={scroll:savedScroll,focus:savedFocus};returnPending.current=true;}
+    const restored=readMorningReturnPoint(parameters.get("morningFocus"),parameters.get("morningScroll"));
+    if(restored){returnPoint.current=restored;returnPending.current=true;}
     setBindingId(binding);setNativeBinding(null);
     setRequestId(key);setSelected(parameters.get("morningItem")??"");setSourceId(parameters.get("morningSource")??"");
     const active=()=>current===epoch.current&&!abort.signal.aborted&&!deniedRef.current;
@@ -129,15 +131,17 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   useEffect(()=>{
     if(!selected||!list||list.adoption_state!=="CURRENT"||!view?.list_id)return;
     const abort=new AbortController(),current=epoch.current,version=generation.current,listId=view.list_id;
-    clearDetailForRead();setDocument(null);
+    const active=()=>current===epoch.current&&version===generation.current&&!abort.signal.aborted;
+    clearDetailForRead();setDocument(null);setDetailLoading(true);
     void read<Detail>("/api/boss/ui/morning/detail?"+new URLSearchParams({list_id:listId,item_id:selected}),abort.signal).then(value=>{
-      if(current===epoch.current&&version===generation.current&&!abort.signal.aborted&&bound.current?.result.list_id===listId){
-        if(value.list_id!==listId||value.item.item_id!==selected||value.list_version!==bound.current.result.list_version||value.snapshot_sha256!==bound.current.result.snapshot_sha256)throw new Error("当前事项与清单版本不符，请重新查询");
-        setDetail(value);
-      }
-    }).catch(failure=>{if(current===epoch.current&&!abort.signal.aborted)setError(failure.message);});
+      if(!active())return;
+      if(bound.current?.result.list_id!==listId||value.list_id!==listId||value.item.item_id!==selected||
+        value.list_version!==bound.current.result.list_version||value.snapshot_sha256!==bound.current.result.snapshot_sha256)
+        throw new Error("当前事项与清单版本不符，请重新查询");
+      setDetail(value);setDetailError("");setDetailLoading(false);
+    }).catch(failure=>{if(active()){setDetailLoading(false);setDetailError(failure instanceof Error?failure.message:String(failure));}});
     return()=>abort.abort();
-  },[selected,list,view?.list_id,read,clearDetailForRead]);
+  },[selected,list,view?.list_id,read,clearDetailForRead,detailRevision]);
   useEffect(()=>{
     if(!sourceId||!list||list.adoption_state!=="CURRENT"||!view?.list_id)return;
     const abort=new AbortController(),current=epoch.current,version=generation.current;
@@ -201,12 +205,12 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const disabled=busy||uncertain||orderDirty||denied;
   const actualCounts={DECIDE:0,COORDINATE:0,INFORM:0};for(const item of view?.items??[])actualCounts[item.category]++;
   const counts=view?.category_counts??actualCounts;
-  const chooseItem=(item:TodayItem)=>{setSelected(item.item_id);setDetail(null);setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
-  const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setSourceId(id);setDocument(null);remember({morningSource:id});};
+  const chooseItem=(item:TodayItem)=>{if(selected===item.item_id&&!detail)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(true);setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
+  const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setError("");setSourceId(id);setDocument(null);remember({morningSource:id});};
   const readOrder=useCallback((key:string,signal?:AbortSignal)=>read<TodayOrderReceipt>("/api/boss/ui/morning/receipt?"+new URLSearchParams({action:"boss.today.reorder",client_request_id:key}),signal),[read]);
   const categories=[{id:"DECIDE" as const,title:"待决定",Icon:ClipboardList},{id:"COORDINATE" as const,title:"待协调",Icon:CheckCircle2},{id:"INFORM" as const,title:"需要知晓",Icon:Info}];
   const meetings=detail?.objects.filter(object=>object.reference.kind==="meeting"&&detail.item.related_meetings?.some(ref=>ref.id===object.reference.id&&ref.version===object.reference.version))??[];
-  const captureReturn=()=>{const focus=window.document.activeElement?.id||"morning-question";returnPoint.current={scroll:surface.current?.closest(".boss-content")?.scrollTop??0,focus};remember({morningScroll:String(returnPoint.current.scroll),morningFocus:focus,morningCategory:category});};
+  const captureReturn=()=>{const active=window.document.activeElement,focus=active instanceof HTMLElement&&surface.current?.contains(active)&&isSafeMorningFocusId(active.id)?active.id:"morning-question";returnPoint.current={scroll:surface.current?.closest(".boss-content")?.scrollTop??0,focus};remember({morningScroll:String(returnPoint.current.scroll),morningFocus:focus,morningCategory:category});};
   const discuss=()=>{if(question.trim())void submit(true);else{const input=window.document.getElementById("morning-question");input?.focus();input?.scrollIntoView({block:"center"});}};
   const openRelated=(item:TodayItem)=>{captureReturn();onNavigate(item.page_id,item.object_id);};
   return <div ref={surface} className="boss-morning-view boss-f01" aria-busy={loading||busy}>
@@ -249,7 +253,9 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         {detail.documents.length===0&&<p>当前事项尚未提供原文材料。</p>}
         {view?.preparation_materials.filter(value=>value.item_id===selected).map(value=><div key={value.item_id}><p>准备期限 {value.preparation_due_at??"尚未提供"}</p>{value.requirements.map(text=><p key={text}>{text}</p>)}</div>)}
         </details>
-      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?"正在核查":"尚未选择事项"}</dd></div>)}</dl><p>{current?selected?"正在核查当前事项与来源版本。":"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p></>}</Panel>
+      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在核查":detailError?"当前读取失败":current?"尚未取得详情":"需重新查询清单":"尚未选择事项"}</dd></div>)}</dl>
+        <p>{selected?detailLoading?"正在核查当前事项与来源版本。":detailError?"详情读取失败，原有清单仍在；请重新核查该事项。":current?"当前事项尚未取得可采用详情，请核查来源。":"当前清单需要重新查询，历史内容不可直接操作。":current?"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>
+        {detailError&&current&&selected&&<div className="boss-status boss-status-error" role="alert"><span>{detailError}</span><button id="morning-detail-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setDetailRevision(value=>value+1)}>重新核查当前事项</button></div>}</>}</Panel>
       <Panel title="保存与返回"><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
       <div className="boss-actions"><button id="morning-tasks" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N05","");}}>任务与承诺</button><button id="morning-notifications" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N06","");}}>通知中心</button></div>
       <details><summary>查看资料与业务记录</summary>
