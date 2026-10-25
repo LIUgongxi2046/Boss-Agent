@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:business-overview-preparation:1.0.0",
+  "$defs": {
+    "Id": {"type":"string","minLength":1,"maxLength":200},
+    "Sha256": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "Reference": {"type":"object","additionalProperties":false,"required":["kind","id","version"],"properties":{
+      "kind":{"$ref":"#/$defs/Id"},"id":{"$ref":"#/$defs/Id"},"version":{"$ref":"#/$defs/Id"}}},
+    "Input": {"type":"object","additionalProperties":false,"required":["applied_scope","topic_reference","snapshot_sha256","object_reference","action"],"properties":{
+      "applied_scope":{"$ref":"business-overview.schema.json#/$defs/Scope"},
+      "topic_reference":{"$ref":"business-overview.schema.json#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "object_reference":{"anyOf":[{"$ref":"#/$defs/Reference"},{"type":"null"}]},"action":{"enum":["ASSIGNMENT_REVIEW","MEETING_PREPARATION"]}}},
+    "AssignmentContext": {"type":["object","null"],"additionalProperties":false,"required":["task_reference","review_sha256","binding_state","task_state","result_evidence_current","result_evidence_requires_resubmission"],"properties":{
+      "task_reference":{"$ref":"#/$defs/Reference"},"review_sha256":{"$ref":"#/$defs/Sha256"},"binding_state":{"enum":["CURRENT","NEEDS_REVIEW","MISSING"]},
+      "task_state":{"$ref":"#/$defs/Id"},"result_evidence_current":{"type":["boolean","null"]},"result_evidence_requires_resubmission":{"type":"boolean"}}},
+    "MeetingContext": {"type":["object","null"],"additionalProperties":false,"required":["meeting_reference","relation","state","source_scope_current"],"properties":{
+      "meeting_reference":{"$ref":"#/$defs/Reference"},"relation":{"const":"EXPLICIT_TASK_MEETING_REFERENCE"},"state":{"$ref":"#/$defs/Id"},"source_scope_current":{"type":"boolean"}}},
+    "Handoff": {"type":["object","null"],"additionalProperties":false,"required":["page_id","operation","parameters","required_inputs"],"properties":{
+      "page_id":{"const":"F06"},"operation":{"const":"boss.assignment.prepare"},
+      "parameters":{"type":"object","additionalProperties":false,"required":["task_id","task_version"],"properties":{"task_id":{"$ref":"#/$defs/Id"},"task_version":{"$ref":"#/$defs/Id"}}},
+      "required_inputs":{"const":["client_request_id"]}}},
+    "View": {"type":"object","additionalProperties":false,"required":["source_type","applied_scope","topic_reference","snapshot_sha256","object_reference","action","state","candidates","task_candidates","source_references","assignment_context","meeting_context","handoff","missing_conditions","required_inputs","business_at","read_at","current_use_verified","owner_decision_required","business_authorization_granted","business_mutation_performed","message_sent","task_completed","context_sha256"],"properties":{
+      "source_type":{"const":"SIMULATED"},"applied_scope":{"$ref":"business-overview.schema.json#/$defs/Scope"},
+      "topic_reference":{"$ref":"business-overview.schema.json#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "object_reference":{"anyOf":[{"$ref":"#/$defs/Reference"},{"type":"null"}]},"action":{"enum":["ASSIGNMENT_REVIEW","MEETING_PREPARATION"]},
+      "state":{"enum":["READY_FOR_REVIEW","WAITING_INPUT"]},"candidates":{"type":"array","items":{"$ref":"#/$defs/Reference"}},
+      "task_candidates":{"type":"array","items":{"$ref":"#/$defs/Reference"}},
+      "source_references":{"type":"array","items":{"$ref":"business-overview.schema.json#/$defs/EntrySource"}},
+      "assignment_context":{"$ref":"#/$defs/AssignmentContext"},"meeting_context":{"$ref":"#/$defs/MeetingContext"},"handoff":{"$ref":"#/$defs/Handoff"},
+      "missing_conditions":{"type":"array","items":{"$ref":"#/$defs/Id"},"uniqueItems":true},"required_inputs":{"type":"array","items":{"$ref":"#/$defs/Id"},"uniqueItems":true},
+      "business_at":{"type":"string"},"read_at":{"type":"string","format":"date-time"},"current_use_verified":{"type":"boolean"},
+      "owner_decision_required":{"const":true},"business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false},
+      "message_sent":{"const":false},"task_completed":{"const":false},"context_sha256":{"$ref":"#/$defs/Sha256"}}}
+  }
+}

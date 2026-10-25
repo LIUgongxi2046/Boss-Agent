@@ -8,6 +8,8 @@ task_id=MENU-N03-N1；marker=MENU-N03-START-20261025；依据原始docs/menu-del
 
 原生入口实施提交d57de121854c656ba2a068392298c121ab05af29，准确八份文件；本记录提供该提交的接口与证据。原五项未提交内容没有进入提交。
 
+C17准备接口补充marker=MENU-N03-N1-PREPARATION-BRIDGE-20261025，PRODUCT准确输入72f0a7f5af190eadded4f93e385abfa4d067be2a；只读核查ProductAssignment、AssignmentSourcesAPI、MeetingAPI、会议材料与正式协调关系。范围限于已应用Scope/专题/快照的准备上下文，领域检查MODULE_CHECKS_PASSED，公共适配、界面及role_channel保持N3负责。
+
 ## 当前依据与边界
 
 完整读取当前工单和适用AGENTS，沿用S008任务记录、实施与接口检查规范。核查准确PRODUCT基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57的BossSectorAPI、正式BI计算、SimulationAPI、供应品质、经营提醒、任务和来源规则；验证时PRODUCT HEAD为ba59c33bc3cc6b914bdd0b0792aeedc49b3f2220，相关领域文件与基准相同。PRODUCT目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，仅作只读依赖。记忆索引没有本任务相关证据。
@@ -118,3 +120,52 @@ env PYTHONDONTWRITEBYTECODE=1 MENU_N02_PRODUCT_ROOT=/Users/liuhaoxian/.codex/wor
 ```
 
 本次接收范围包含新领域文件、ConversationAPI最少getter、task_entry互斥类型、business-overview Schema、限定测试与同一主记录/索引/证据。N3接收实际公共prepare/bind/read/receipt路由及原生Session前置，N2接收每轮当前核查、受限工具与结构化Fc02采用；晨间共享检查接入由N3/N2完成。完整C01—C26及用户/视觉状态继续由N3唯一正式记录管理，领域通过不增加完整验收数量。
+
+## C17正式准备接口
+
+marker=MENU-N03-N1-PREPARATION-BRIDGE-20261025。检索并完整核查现有ProductAssignment.prepare、AssignmentSourcesAPI.project_in_transaction、ConversationAPI.task_in_transaction、SupplyQualityAPI正式协调关系，以及MeetingAPI和会议材料编制方式。PRODUCT输入72f0a7f5af190eadded4f93e385abfa4d067be2a；结束复核a7a3992c5b59e1ca21db29c4a6d34bc03f3f44fa时，上述相关领域及ProductAssignment没有变化。公共native binding及前端在途改动保持原角色维护，本次没有修改这些文件。
+
+新增validation/boss_business_overview_preparation.py及specs/business-overview-preparation.schema.json 1.0.0；BusinessOverviewAPI仅增加preparation() getter，返回BusinessOverviewPreparation(overview)。规范通过referencing.Registry读取本地business-overview.schema.json的Scope、EntryTopic、EntrySource定义，不使用外部网络解析Schema。
+
+| 精确签名 | 当前行为 |
+|---|---|
+| BusinessOverviewAPI(store).preparation() | 构造同库正式准备读取服务 |
+| read(BOSS,payload) | 独立BEGIN只读事务，返回严格View |
+| project_in_transaction(BOSS,db,payload) | 采用调用方现有事务，范围、专题、对象、来源与交办源审查保持同一快照；零写入 |
+| verify(BOSS,payload,context_sha256) | 重新执行read，要求当前READY_FOR_REVIEW且完整上下文摘要相同；变化或等待409 |
+
+Input严格五字段，全部必需：applied_scope为原六字段Scope；topic_reference为null或{page_id,use}，用途规则沿用原生入口；snapshot_sha256来自相同已应用范围的View；object_reference为null或{kind,id,version}；action仅ASSIGNMENT_REVIEW或MEETING_PREPARATION。零客户端owner/namespace/dataset/来源清单/会议ID/负责人/本人确认标记。匿名401、维护403、非法或额外字段400、旧快照与旧对象版本409、不属于当前范围或专题的对象403。调用方role继续来自当前可信认证。
+
+View准确字段：source_type=SIMULATED、applied_scope、topic_reference、snapshot_sha256、object_reference、action、state、candidates、task_candidates、source_references、assignment_context、meeting_context、handoff、missing_conditions、required_inputs、business_at、read_at、current_use_verified、owner_decision_required=true、business_authorization_granted=false、business_mutation_performed=false、message_sent=false、task_completed=false、context_sha256。state仅READY_FOR_REVIEW或WAITING_INPUT。对象和源版本从当前正式服务读取，缺少条件不返回成功handoff。
+
+选择专题时candidates来自该专题正式records，以及与专题明确source_refs/related_sales_source_refs有关的当前总览associations；未选专题时只提供当前范围关联任务。没有按专题名称、对象名称或默认任务匹配。每项候选严格kind/id/version，不选择首个对象。object_reference=null时等待EXPLICIT_OBJECT_SELECTION_REQUIRED，required_inputs=[object_reference]；没有专题当前来源同时说明CURRENT_TOPIC_SOURCE_REQUIRED。F19用途仅保留当前明确选择，不借用财务资料替代专业来源。
+
+source_references严格kind=document、id、version、content_sha256、status，来自选中对象当前正式source_refs与同事务View.sources。缺少、变化或失效的来源返回MISSING_OR_CHANGED或当前真实状态，缺少摘要保持null；当前采用要求全部VALID。专题对象采用正式CURRENT状态；任务采用SI06的STORED_RECORD状态，并继续核查正式来源绑定。原文、私人问题、任务目的、负责人、凭据或文件路径不进入该技术上下文。
+
+选中现有任务时，使用AssignmentSourcesAPI.project_in_transaction取得准确review_sha256、binding_state和结果证据状态，并用ConversationAPI.task_in_transaction复核来源绑定、归属和版本。所有审查来源都必须属于当前选中专题的明确来源集合，或未选专题时的当前范围来源集合；存在范围外来源时等待ASSIGNMENT_SOURCES_OUTSIDE_SELECTED_SCOPE。assignment_context严格保存task_reference、review_sha256、binding_state、task_state、result_evidence_current、result_evidence_requires_resubmission，不复制审查原文、目的或负责人。当前来源绑定不足时等待ASSIGNMENT_SOURCE_REVIEW_REQUIRED，结果证据需要重交的语义保持，读取不完成任务。
+
+ASSIGNMENT_REVIEW满足上述条件时READY_FOR_REVIEW/current_use_verified=true，handoff严格为{page_id:F06,operation:boss.assignment.prepare,parameters:{task_id,task_version},required_inputs:[client_request_id]}。参数可交给现有ProductAssignment.prepare，client_request_id由正式共享准备流程生成；本接口没有创建该请求，也不自动运行SDK。N3/N2应在调用前后verify原payload/context_sha256，并核对实际准备结果的task/version与source_review.review_sha256。现有准备接口继续采用实际SDK和原编号回执；结果未知时仅读取既有assignment-preparation原编号，不因重新读取桥接而重放运行。
+
+选中专题记录时，只通过同库正式supply_quality_coordination记录的origin_entity_type/origin_record_id/origin_version精确关系提供task_candidates，候选任务须仍属于当前范围/专题并为STORED_RECORD。即使唯一候选也等待EXPLICIT_RELATED_TASK_SELECTION_REQUIRED，由本人明确选择任务后重新read。没有关系时等待EXISTING_RELATED_TASK_REQUIRED；object_reference所需值来自正式候选。对象换版后旧协调关系不匹配新版本，不自动迁移或创建任务。
+
+本接口的可采用动作限定既有任务来源审查。新增交办需要本人明确目的、负责人、期限、IANA时区、证据要求以及当前范围绑定的正式来源；当前桥接不接收、生成或默认填充这些值，也不提供创建/保存/发送/完成权限。没有既有任务时保留当前对象来源及具体等待原因，不能转入带有无关默认关系的普通创建请求。既有晨间preparation和未过滤SupplyQualityView均不作为N03准备上下文。
+
+MEETING_PREPARATION仅检查任务明确related_meeting_id及同库实际当前会议。没有关系时meeting_context=null，等待RELATED_MEETING_REFERENCE_REQUIRED；不会选用默认会议。能够证明关系时，meeting_context严格包含meeting_reference{kind:meeting,id,version}、relation=EXPLICIT_TASK_MEETING_REFERENCE、state、source_scope_current。材料来源必须属于当前范围及选中任务来源版本，额外材料等待MEETING_MATERIALS_OUTSIDE_SELECTED_SCOPE，失效引用等待CURRENT_MEETING_SOURCES_REQUIRED，结束或取消会议等待CURRENT_MEETING_STATE_REQUIRED。
+
+当前现有会议编制会读取整场会议及固定指标，没有接收N03 Scope的正式准备消费者，因此MEETING_PREPARATION仍明确等待SCOPED_MEETING_PREPARATION_REQUIRED，handoff=null/current_use_verified=false。该能力缺口属于当前C17范围说明，不能通过传递旧会议准备字段宣称范围已采用。会议引用可供当前合法详情阅读；没有会议保存、邀请、编制材料或业务授权。required_inputs只列本接口能够接收的object_reference，正式能力或关系缺口使用missing_conditions表达。
+
+context_sha256覆盖服务端当前身份/资料/时钟，以及完整输出中的原Scope、专题/用途、对象、来源、审查摘要、会议当前引用及等待条件，排除read_at。同库重新构造服务后相同当前上下文摘要一致。关联会议变化即使未改变总览snapshot_sha256，也会改变该上下文摘要。摘要仅用于当前完整引用比较，不构成本人授权或原生执行证明；verify不会恢复历史执行。桥接没有持久记录、receipt或自动业务操作，重复读取零写入。
+
+## C17限定验证与接收
+
+2026-10-25，24项通过，用时5.47秒；13项准备接口检查与11项受影响总览回归，原始证据preparation-check.xml。N1独立.work/pytest-menu-n03-preparation-delivery保存实际SQLite、配置及SDK工作目录，输入来自正式初始化、本人Command、获准供应品质导入/协调与正式会议决定。测试明确加载本次N1 BusinessOverviewAPI文件，并断言准备服务源码路径；依赖领域保持上述准确PRODUCT版本语义。没有mock、伪造来源正文、预设经营答案或外部请求。
+
+Given当前获准范围及正式任务，When明确选择F14或当前关联任务并读取来源准备，Then原Scope/专题/快照、任务版本及实际AssignmentSourcesAPI审查摘要一致，handoff参数可以被现有ProductAssignment采用，同库重开与verify保持相同摘要。真实SDK用正式配置保存/校验/启用后的两项读取工具read_assignment、assignmentSourcesRead执行成功，准备结果的任务和审查摘要与桥接一致，调用前后verify通过。SDK仅保存实际runtime_run/assignment_public_request及一项read_assignment审计，其他业务对象和idempotency不变；桥接本身objects/audit/idempotency完全不变。
+
+Given缺少当前专题来源、未明确选择、没有协调任务、没有明确会议关系或材料超出范围，When请求准备，Then具体missing_conditions、WAITING_INPUT和null handoff准确，没有默认会议/负责人或业务授权。正式原始对象重新导入换版后，旧快照409，新版本不能继承原协调关系。来源撤销后新读取等待、旧摘要采用拒绝；任务版本、Scope、专题变更均停止旧采用。实际关联会议取消后，会议版本及上下文摘要变化，来源范围不被扩大。拒绝匿名、维护、额外身份/来源/负责人/确认字段、非法用途、不相关对象、自算快照及旧对象版本，全部拒绝路径零写入。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 MENU_N02_PRODUCT_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent PYTHONPATH=/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation validation/.venv/bin/python -m pytest -q app/tests/test_menu_n03_preparation.py app/tests/test_menu_n03_overview.py --basetemp=.work/pytest-menu-n03-preparation-delivery -p no:cacheprovider --junitxml=docs/menu-delivery/N03/preparation-check.xml --tb=short
+```
+
+N3负责将严格payload接入正式公共读取、对象选择与等待展示，以及进入实际交办准备前后的verify；本次没有修改公共适配、UI、role_channel或认证。完整C17的公共交互与会议准备能力继续由N3按实际条件登记，完整26项状态不由本记录增加。没有GUI、登录、视觉、产品启动或未来专题菜单交付，既有五套体验保持保护。

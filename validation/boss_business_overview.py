@@ -48,6 +48,10 @@ class BusinessOverviewAPI:
     def __init__(self, store):
         self.store, self.simulation = store, SimulationAPI(store)
 
+    def preparation(self):
+        from boss_business_overview_preparation import BusinessOverviewPreparation
+        return BusinessOverviewPreparation(self)
+
     def dimensions(self, role):
         owner(role)
         with self.store.connect() as db:
