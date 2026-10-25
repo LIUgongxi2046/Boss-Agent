@@ -5,7 +5,7 @@
 ## 准确候选与作用范围
 
 - 源码：`d1436abc614dbfeb842421b5b1bdefe53d9d5df9`，内含 N02 当前上下文/中断清理/返回重试修复；此前旧 N02 v6 `docs/menu-delivery/N02/delivery.json` 的26/26为历史候选，**不是当前新版**。
-- 产品前端构建：GitHub Actions `40202750383` 中 `react-webui-build` 为 PASS，构建制品 `boss-agent-frontend-d1436abc614dbfeb842421b5b1bdefe53d9d5df9`，artifact ID `12603035088`。GitHub ZIP SHA256 `d436ac9bc8684d0a26a2c1b4f0e03a5b622a3d90d86b330e0cf782f37a019f3a`；仅静态前端和来源 manifest，无私密数据库、密码或 Mac 安装程序。2026-11-08 到期；此后仍可从锁定提交重新构建。
+- 产品前端构建：GitHub Actions `40203082570` 中 `react-webui-build` 为 PASS，**包含同版本N02人工启动器及当前前端的准确完整工作树**为提交 `b5b05d2da40299045cae36842006edf87c211ef9`，构建制品 `boss-agent-frontend-b5b05d2da40299045cae36842006edf87c211ef9`，artifact ID `12603230096`。GitHub ZIP SHA256 `f71ef50d4a2af43c76047bd7f4beb8b086e5ebc84142c8377bfa5ba31915afd4`；仅静态前端和来源 manifest，无私密数据库、密码或 Mac 安装程序。2026-11-08 到期；此后仍可从锁定提交重新构建。上述打包源码基于 `d1436abc...` 的产品代码，二者之间只有CI/收口文档/状态以及新增N02人工启动器变化，没有再改前端或领域源码；用户的**源码工作树必须使用制品记录的 b5b05d2...，而不是单独 checkout d1436...**。
 - 域/SDK定向检查：N02 `40202750401` 中 Node **4/4**、实际领域/附件/任务入口 **37/37**、原生 nanobot AgentLoop/SessionManager **59/59**，与上述源码是同一代码提交。综合桌面 workflow 的另一个历史 N03 Python job 仍失败，不能把整条运行标 PASS。
 - 桌面版要求：用户实际 Intel Mac 上的**独立资料、合法人工登录和完整页面操作**；当前没有在用户 Mac 上执行，不能标定验收。
 
@@ -16,7 +16,7 @@
 仅在账号及数据环境**已经由用户明确授权并手动初始化**之后，使用 `scripts/run_n02_manual_review.command`；此入口是复用 `scripts/verify_f01_candidate.py` 实施通用编译制品只读校验，尽管脚本历史命名为 F01，所校验的是当前归档实际 commit/资源/锁定上游和第一方源码。它不会自动认证、自动初始化、读取凭据正文、访问个人旧资料、生成新业务模拟记录或退出运行中的用户程序。
 
 ```bash
-# 在准确 d1436abc... 的隔离工作树根目录执行；文件和资料目录都位于该工作树内
+# 在准确 b5b05d2... 的隔离工作树根目录执行；文件和资料目录都位于该工作树内
 export BOSS_N02_REVIEW_BUNDLE="$PWD/.work/<N02-artifact-dir>"
 export BOSS_N02_REVIEW_WORK_DIR="$PWD/validation/.work/menu-n02-v7-review-<new-unique-name>"
 bash scripts/run_n02_manual_review.command
