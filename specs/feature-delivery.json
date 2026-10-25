@@ -10,7 +10,7 @@
     "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
     "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
     "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip",
-    "source_access": "DESIGN_ARCHIVE_NOT_IN_GITHUB_SOURCE_TREE",
+    "source_access": "V7_LIBRARY_ARCHIVE_FOUND_BUT_RAW_BYTES_NOT_MATERIALIZABLE__GITHUB_SOURCE_UNAVAILABLE",
     "current_completed_checkpoints": 0,
     "total_checkpoints": 18,
     "previous_development": {
@@ -29,8 +29,8 @@
     },
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
-    "independent_current_main_build": "FAILED_SOURCE_INTEGRATION",
-    "latest_clean_build_run_id": 40161702949,
+    "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_UNRELATED_FAILURES",
+    "latest_clean_build_run_id": 40164765972,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -39,10 +39,10 @@
         "0d320b5c92d6749f5dab1e6a4567f32f47542547"
       ],
       "desktop_build": {
-        "result": "PASS",
-        "job_id": 121079563848,
-        "run_id": 40163435064,
-        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX"
+        "result": "PASS_REACT_JOB_ONLY",
+        "job_id": 121083458430,
+        "run_id": 40164765972,
+        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX_AND_REPEAT"
       },
       "repeat_preparation": {
         "result": "PASS",
@@ -52,13 +52,36 @@
       },
       "f01_business": {
         "result": "41_PASSED_0_FAILED",
-        "run_id": 40163532726,
+        "run_id": 40164777236,
         "scope": "CURRENT_CODE_TESTS_SIMULATED_DOMAIN_PUBLIC_API"
       },
       "current_full_f01_e2e": "NOT_RUN",
       "design_v7_dom_and_visual": "NOT_RUN",
       "user_acceptance": "PENDING_USER_ACCEPTANCE",
-      "main_legacy_comprehensive_suite": "FAILS_OUTSIDE_CURRENT_F01_SCOPE"
+      "main_legacy_comprehensive_suite": "FAILS_OUTSIDE_CURRENT_F01_SCOPE",
+      "f01_frontend_fixes": {
+        "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
+        "commit_sha": [
+          "ab24197c5e195a2b9ae47a3a0ddc4eed4381e62e",
+          "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212"
+        ],
+        "changes": [
+          "filtered_category_reorder",
+          "original_request_validation_and_error_recovery",
+          "technical_colon_id_return_focus",
+          "retryable_selected_detail_errors"
+        ]
+      },
+      "f01_order_and_return": {
+        "result": "8_PASSED_0_FAILED",
+        "run_id": 40164777236,
+        "scope": "NODE_CLIENTSIDE_ORDER_AND_RETURN_POSITION"
+      },
+      "f01_native_agent": {
+        "result": "39_PASSED_0_FAILED",
+        "run_id": 40164777236,
+        "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
+      }
     }
   },
   "suspended_current_menu": {
@@ -323,56 +346,252 @@
   "index_sha256": null,
   "inventory": null,
   "inventory_sha256": null,
-  "directed_review": {"status":"PENDING_CURRENT_V7_REFERENCE_AND_BUILD","feature_id":"MENU-F01","record":"docs/menu-delivery/F01/integration.md","independent_product_run":false,"visual":"NOT_RUN"},
+  "directed_review": {
+    "status": "PENDING_CURRENT_V7_REFERENCE_AND_BUILD",
+    "feature_id": "MENU-F01",
+    "record": "docs/menu-delivery/F01/integration.md",
+    "independent_product_run": false,
+    "visual": "NOT_RUN"
+  },
   "candidate_scope": "F01原18项按最新v7源重新核验：真实今日事项/三类分类/日期/来源/排序/会话/会议与交办；复用v6能力，验证干净构建与独立运行，保护旧体验",
-  "menu_completed_development_ids": ["MENU-F01", "MENU-N02"],
+  "menu_completed_development_ids": [
+    "MENU-F01",
+    "MENU-N02"
+  ],
   "menu_completed_development_evidence_basis": "DESKTOP_V6_HISTORICAL_ONLY_REVALIDATION_REQUIRED",
-  "menu_revalidation_required_ids": ["MENU-F01", "MENU-N02"],
+  "menu_revalidation_required_ids": [
+    "MENU-F01",
+    "MENU-N02"
+  ],
   "menu_user_accepted_ids": [],
-  "required_menu_rework": {"feature_id":"MENU-F01","ticket":"docs/menu-delivery/F01.md","decision_id":"D-UI-FIDELITY-20261024","status":"COMPLETE","before_feature_id":"MENU-N03","checkpoint_ids":["MENU-F01.C01","MENU-F01.C02","MENU-F01.C18"],"business_evidence":"RETAINED_FOR_UNCHANGED_DEPENDENCIES","parallel_menu_implementation":false,"latest_v7_revalidation":"PENDING","historical_v6_rework_complete":true},
+  "required_menu_rework": {
+    "feature_id": "MENU-F01",
+    "ticket": "docs/menu-delivery/F01.md",
+    "decision_id": "D-UI-FIDELITY-20261024",
+    "status": "COMPLETE",
+    "before_feature_id": "MENU-N03",
+    "checkpoint_ids": [
+      "MENU-F01.C01",
+      "MENU-F01.C02",
+      "MENU-F01.C18"
+    ],
+    "business_evidence": "RETAINED_FOR_UNCHANGED_DEPENDENCIES",
+    "parallel_menu_implementation": false,
+    "latest_v7_revalidation": "PENDING",
+    "historical_v6_rework_complete": true
+  },
   "historical_menu_n02_handoff": {
     "marker": "MENU-N02-START-20261024",
     "initiator": "N3",
     "ticket": "docs/menu-delivery/N02.md",
     "N1": {
-      "status": "TASK_ENTRY_CONTEXT_RECEIVED", "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c", "initial_turn_id": "01a16df8-d1c1-79f3-87d2-3b362d5c889e", "turn_id": "01a16ef9-91a9-73e1-9c54-96aa230abc61", "marker": "MENU-N02-N1-TASK-ENTRY-CONTEXT-20261025",
-      "producer_commit": "5f2138234353c5c224b3d0034d4c1565e6e8939b", "integration_commit": "e5724eb", "attachment_producer_commit": "6164aac401712f397072fdfac788d04ffd91488a", "attachment_integration_commit": "eb9a4fe", "context_producer_commit": "9c47e229e3ee6e67d853076b6b98089e7067e966", "context_integration_commit": "66fc44d", "task_reference_producer_commit": "8f2fa156e739b1d0a16640988bb5e75da31e2eb7", "task_reference_integration_commit": "d5c9316",
-      "task_entry_producer_commit": "5fb1def3cfd17e895691ccd8c52d1effed441886", "task_entry_integration_commit": "5919fd3", "task_entry_record_integration_commit": "4d7038dc7e5accb2e0123a3f3a28392e2a8c2385",
+      "status": "TASK_ENTRY_CONTEXT_RECEIVED",
+      "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c",
+      "initial_turn_id": "01a16df8-d1c1-79f3-87d2-3b362d5c889e",
+      "turn_id": "01a16ef9-91a9-73e1-9c54-96aa230abc61",
+      "marker": "MENU-N02-N1-TASK-ENTRY-CONTEXT-20261025",
+      "producer_commit": "5f2138234353c5c224b3d0034d4c1565e6e8939b",
+      "integration_commit": "e5724eb",
+      "attachment_producer_commit": "6164aac401712f397072fdfac788d04ffd91488a",
+      "attachment_integration_commit": "eb9a4fe",
+      "context_producer_commit": "9c47e229e3ee6e67d853076b6b98089e7067e966",
+      "context_integration_commit": "66fc44d",
+      "task_reference_producer_commit": "8f2fa156e739b1d0a16640988bb5e75da31e2eb7",
+      "task_reference_integration_commit": "d5c9316",
+      "task_entry_producer_commit": "5fb1def3cfd17e895691ccd8c52d1effed441886",
+      "task_entry_integration_commit": "5919fd3",
+      "task_entry_record_integration_commit": "4d7038dc7e5accb2e0123a3f3a28392e2a8c2385",
       "receiver_checks": "task-entry-receiver.xml: 14 passed in 3.96 seconds; task-entry-consumer-receiver.xml: 4 passed in 3.86 seconds; public actual SDK preparation, persistence, binding and original receipt PASS"
     },
     "N2": {
-      "status": "TASK_ENTRY_RUNTIME_SCHEMA_RECEIVED", "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a", "turn_id": "01a16f32-290c-75e0-adb3-415330089b4b", "marker": "MENU-N02-N2-TASK-ENTRY-RUNTIME-SCHEMA-20261025",
-      "read_runtime_producer_commit": "86579a85c278e349d615aa39b57ba26b63729ad5", "native_producer_commit": "b1eb8ed5c4bdf8458591bf541173572298343483", "native_integration_commit": "2260000", "consumer_producer_commit": "cd1a5b0f75b68da909fc423bc8125580f9cbcc19", "consumer_integration_commit": "1b7a7fa", "request_history_producer_commit": "a74e97abb4d8a93a027cc6287e6e941a5d0917cb", "request_history_integration_commit": "9c3caf8", "current_references_producer_commit": "3259f2a4ff74420b8b8b6b941bef37e96ff35472", "current_references_integration_commit": "490ba0b", "cancel_deadline_producer_commit": "4836527f3de19383d5eed8bb608c4fc891215104", "cancel_deadline_integration_commit": "e31370e", "observable_failure_producer_commit": "d6196221f92d5e9b325a6e3011b217d782a1225b", "observable_failure_integration_commit": "ba1fbde",
-      "task_entry_consumer_producer_commit": "e2d76dceb354d50781fd13f0100d2979a74f3c7a", "task_entry_consumer_integration_commit": "6d620bb",
-      "task_entry_schema_producer_commit": "b5e2fbe6a6571d90f5f3c2d5c0ae407e3817980c", "task_entry_schema_integration_commit": "b131d96",
+      "status": "TASK_ENTRY_RUNTIME_SCHEMA_RECEIVED",
+      "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a",
+      "turn_id": "01a16f32-290c-75e0-adb3-415330089b4b",
+      "marker": "MENU-N02-N2-TASK-ENTRY-RUNTIME-SCHEMA-20261025",
+      "read_runtime_producer_commit": "86579a85c278e349d615aa39b57ba26b63729ad5",
+      "native_producer_commit": "b1eb8ed5c4bdf8458591bf541173572298343483",
+      "native_integration_commit": "2260000",
+      "consumer_producer_commit": "cd1a5b0f75b68da909fc423bc8125580f9cbcc19",
+      "consumer_integration_commit": "1b7a7fa",
+      "request_history_producer_commit": "a74e97abb4d8a93a027cc6287e6e941a5d0917cb",
+      "request_history_integration_commit": "9c3caf8",
+      "current_references_producer_commit": "3259f2a4ff74420b8b8b6b941bef37e96ff35472",
+      "current_references_integration_commit": "490ba0b",
+      "cancel_deadline_producer_commit": "4836527f3de19383d5eed8bb608c4fc891215104",
+      "cancel_deadline_integration_commit": "e31370e",
+      "observable_failure_producer_commit": "d6196221f92d5e9b325a6e3011b217d782a1225b",
+      "observable_failure_integration_commit": "ba1fbde",
+      "task_entry_consumer_producer_commit": "e2d76dceb354d50781fd13f0100d2979a74f3c7a",
+      "task_entry_consumer_integration_commit": "6d620bb",
+      "task_entry_schema_producer_commit": "b5e2fbe6a6571d90f5f3c2d5c0ae407e3817980c",
+      "task_entry_schema_integration_commit": "b131d96",
       "receiver_checks": "task-bound-consumer-receiver.xml: 16 passed in 10.68 seconds; task-bound-schema-receiver.xml: 4 passed in 4.32 seconds; producer complete SDK regression: 85 passed in 160.79 seconds with actual 120-second deadline"
     },
     "N4": {
-      "status": "SPACING_CLOSURE_APPROVED", "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe", "turn_id": "01a16fcb-6291-74f1-a240-46592bac5728", "marker": "MENU-N02-N4-SPACING-CLOSURE-20261025", "reviewed_commit": "3ebb31cdcac6f90e39b3b2c0808e5e9f21116c98", "record_sha256": "404c7dadd9a778334933a211440c5cc43fafefe9879bbf33d8b8b4753c5ec2e5", "targeted_verdict": "APPROVED_TARGETED_CLOSED", "full_menu_verdict": "NOT_A_FULL_MENU_VERDICT",
-      "header_reviewed_commit": "b96b298437ca0521e1f8a78f30c8afae0b450cd3", "header_record_sha256": "b70e2144c8840728a5e17c4e85802bf8ddb96e8ec9852eef54ae471c7fb977c8",
-      "release_evidence_reviewed_commit": "a1f8a2a55e1aec9825bb1aae89fd5cfedede581e", "release_evidence_record_sha256": "1465a5493915d5a8bdf7441225c70ca103d339143c01e59357d4426690d8045b",
-      "explicit_navigation_reviewed_commit": "22180cb5ad9bf855d2241590e4815853aaab7d44", "explicit_navigation_record_sha256": "7181a23668806ccb2d82ce635ba388fd1e50d863eaf677ad053d95f5468739f0",
-      "reviewed_manifest": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4", "task_entry_reviewed_commit": "73d40071b2cd0a88b6b7fa9f4fdd2d543daf3125", "task_entry_record_sha256": "32e92be87bdfc0a9472e4e4107b7c0120ac165194d1bddc2124903447f93797a",
-      "reading_position_reviewed_commit": "c9b5a64368a92da997ce161ce719a3e2b96fc75c", "reading_position_record_sha256": "f5d969c555044a44b0df9ca8356c79c85624448638a0f070e3e523fc7a82db4c",
-      "close_file_reviewed_commit": "def38c666c6b653aa939062540e692ba2dbd0e5a", "close_file_record_sha256": "79adf404cef54765f43ac94aa4ca9501dadf54f709d4d7ec1504aef45b3dfd07",
-      "return_history_reviewed_commit": "b3de8ea3788629f977f02f182e74a18ea430dc85", "return_history_record_sha256": "30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca"
+      "status": "SPACING_CLOSURE_APPROVED",
+      "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe",
+      "turn_id": "01a16fcb-6291-74f1-a240-46592bac5728",
+      "marker": "MENU-N02-N4-SPACING-CLOSURE-20261025",
+      "reviewed_commit": "3ebb31cdcac6f90e39b3b2c0808e5e9f21116c98",
+      "record_sha256": "404c7dadd9a778334933a211440c5cc43fafefe9879bbf33d8b8b4753c5ec2e5",
+      "targeted_verdict": "APPROVED_TARGETED_CLOSED",
+      "full_menu_verdict": "NOT_A_FULL_MENU_VERDICT",
+      "header_reviewed_commit": "b96b298437ca0521e1f8a78f30c8afae0b450cd3",
+      "header_record_sha256": "b70e2144c8840728a5e17c4e85802bf8ddb96e8ec9852eef54ae471c7fb977c8",
+      "release_evidence_reviewed_commit": "a1f8a2a55e1aec9825bb1aae89fd5cfedede581e",
+      "release_evidence_record_sha256": "1465a5493915d5a8bdf7441225c70ca103d339143c01e59357d4426690d8045b",
+      "explicit_navigation_reviewed_commit": "22180cb5ad9bf855d2241590e4815853aaab7d44",
+      "explicit_navigation_record_sha256": "7181a23668806ccb2d82ce635ba388fd1e50d863eaf677ad053d95f5468739f0",
+      "reviewed_manifest": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
+      "task_entry_reviewed_commit": "73d40071b2cd0a88b6b7fa9f4fdd2d543daf3125",
+      "task_entry_record_sha256": "32e92be87bdfc0a9472e4e4107b7c0120ac165194d1bddc2124903447f93797a",
+      "reading_position_reviewed_commit": "c9b5a64368a92da997ce161ce719a3e2b96fc75c",
+      "reading_position_record_sha256": "f5d969c555044a44b0df9ca8356c79c85624448638a0f070e3e523fc7a82db4c",
+      "close_file_reviewed_commit": "def38c666c6b653aa939062540e692ba2dbd0e5a",
+      "close_file_record_sha256": "79adf404cef54765f43ac94aa4ca9501dadf54f709d4d7ec1504aef45b3dfd07",
+      "return_history_reviewed_commit": "b3de8ea3788629f977f02f182e74a18ea430dc85",
+      "return_history_record_sha256": "30db6b3981e5df7bdf84046b391da4f1b09636d4f2e9594f482ebe6f83babeca"
     }
   },
   "menu_handoff": {
-    "marker":"MENU-N03-START-20261025","initiator":"N3","ticket":"docs/menu-delivery/N03.md",
-    "N1":{"status":"DOMAIN_AND_SCOPED_PREPARATION_RECEIVED","thread_id":"01a16925-a11e-70e3-9b45-6f27d4753d9c","completed_turn_id":"01a1709e-f757-7ff1-a66f-e6e09eef8192","overview_producer_commit":"a38bf9b41f5b1f88d08ebbac10b62a2610962515","native_entry_producer_commit":"d57de121854c656ba2a068392298c121ab05af29","native_entry_record_commit":"97e3b3cf86ec3c8ff0ac8d67f393411ef4daa510","preparation_producer_commit":"463704e2f758acde393af56d8f1a3df4ba87a44f","preparation_record_commit":"d95532b1c1bcf8fdc4538b94a6bca3abb561210a","meeting_preparation_producer_commit":"504d0b0e8ddd6cfa8dbd091a12f4fe81102d96c2","meeting_preparation_record_commit":"4056c8230889ce1f8cfd816f3028268bbf29923e","integrated_head":"38ae898","native_entry_receiver_checks":36,"scoped_meeting_receiver_checks":32,"marker":"MENU-N03-N1-SCOPED-MEETING-PREPARATION-20261025","pre_send_status":"IDLE","new_message_sent":false},
-    "N2":{"status":"BOUND_CONSUMER_AND_SHARED_ENTRY_RECEIVED","thread_id":"01a16925-c11b-7593-aaea-4704cac0d78a","turn_id":"01a17092-68a2-75e0-9eab-75f1c03a9a67","producer_design_commit":"6d9eacf2725f82a103daabc778453ee5aea07b52","producer_commit":"68d9b269e74f046b2c66be624a3d227ee2e21e43","shared_entry_commit":"e3c28e01168099ebf56c15b9bd96c1999b43095f","integration_commits":["a7a3992","5b334fd"],"development_record":"/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/docs/menu-delivery/N03/agent.md","marker":"MENU-N03-N2-MORNING-MUTUAL-EXCLUSION-20261025","pre_send_status":"IDLE","new_message_sent":false,"implementation":"RECEIVER_CHECKS_PASSED_PUBLIC_UI_PENDING"},
-    "N3":{"status":"PUBLIC_ROUTE_AND_SCOPED_PREPARATION_BUILT_UI_PENDING","thread_id":"01a16926-a48c-7b83-9811-f1905cf0f1ab","baseline_commit":"3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57","preparation_commit":"3fc7446801a15b91b2c56e6a3066bc06c823c9fa","preparation_manifest_sha256":"fd3f4fb3deedf50f217cfac00129f4c54fc6da0cdeba6ecaa2db503378c525ed","preparation_index_sha256":"57ae52b55fe52819462b4a5775b9f48dae20c198f13c9f89f1ed7f94cfb96811","product_check_status":"NOT_RUN_AUTHENTICATION_REVIEW_REJECTED","initialization_status":"SCRIPT_CREATION_REJECTED_PENDING_USER_AUTHORIZATION"},
-    "N4":{"status":"REQUESTED_SOURCE_SCOPE_REVIEW_COMPLETE_UI_MEASUREMENT_PENDING","thread_id":"01a16925-dec5-7202-8e3e-9605d9e073fe","marker":"MENU-N03-N4-SCOPED-MEETING-REVIEW-20261025","previous_turn_id":"01a170a9-3545-7761-90f3-16850f520aef","reviewed_commit":"3fc7446801a15b91b2c56e6a3066bc06c823c9fa","record":"/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N03/qa.md","expectation_record_sha256":"60b6bc4f263529489125338693ed6a8de73f03adf23c0702fea91f14e3f75a01","record_sha256":"22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da","source_review_ids":["MENU-N03.C17","N03-G05"],"source_verdict":"SOURCE_REVIEW_COMPLETE_NO_NEW_CONFIRMED_DEFECTS","evidence_status":"SOURCE_AND_RECEIVER_EVIDENCE_PRESENT_NEEDS_AUTHENTICATED_UI","checkpoint_closed":false,"retained_reviewed_commit":"7db7dbacdaa02445e4ff0fcc1c677835b150426f","retained_source_review_ids":["N03-G01","N03-G03","N03-G04","N03-G05"],"design_item_ids":["N03-D01","N03-D02","N03-D03","N03-D04","N03-D05","N03-D06","N03-D07","N03-D08","N03-D09","N03-D10","N03-D11","N03-D12"],"design_status":"SOURCE_PRESENT_NEEDS_MEASUREMENT","pre_send_status":"IDLE","new_message_sent":false,"independent_product_run":false}
+    "marker": "MENU-N03-START-20261025",
+    "initiator": "N3",
+    "ticket": "docs/menu-delivery/N03.md",
+    "N1": {
+      "status": "DOMAIN_AND_SCOPED_PREPARATION_RECEIVED",
+      "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c",
+      "completed_turn_id": "01a1709e-f757-7ff1-a66f-e6e09eef8192",
+      "overview_producer_commit": "a38bf9b41f5b1f88d08ebbac10b62a2610962515",
+      "native_entry_producer_commit": "d57de121854c656ba2a068392298c121ab05af29",
+      "native_entry_record_commit": "97e3b3cf86ec3c8ff0ac8d67f393411ef4daa510",
+      "preparation_producer_commit": "463704e2f758acde393af56d8f1a3df4ba87a44f",
+      "preparation_record_commit": "d95532b1c1bcf8fdc4538b94a6bca3abb561210a",
+      "meeting_preparation_producer_commit": "504d0b0e8ddd6cfa8dbd091a12f4fe81102d96c2",
+      "meeting_preparation_record_commit": "4056c8230889ce1f8cfd816f3028268bbf29923e",
+      "integrated_head": "38ae898",
+      "native_entry_receiver_checks": 36,
+      "scoped_meeting_receiver_checks": 32,
+      "marker": "MENU-N03-N1-SCOPED-MEETING-PREPARATION-20261025",
+      "pre_send_status": "IDLE",
+      "new_message_sent": false
+    },
+    "N2": {
+      "status": "BOUND_CONSUMER_AND_SHARED_ENTRY_RECEIVED",
+      "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a",
+      "turn_id": "01a17092-68a2-75e0-9eab-75f1c03a9a67",
+      "producer_design_commit": "6d9eacf2725f82a103daabc778453ee5aea07b52",
+      "producer_commit": "68d9b269e74f046b2c66be624a3d227ee2e21e43",
+      "shared_entry_commit": "e3c28e01168099ebf56c15b9bd96c1999b43095f",
+      "integration_commits": [
+        "a7a3992",
+        "5b334fd"
+      ],
+      "development_record": "/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent/docs/menu-delivery/N03/agent.md",
+      "marker": "MENU-N03-N2-MORNING-MUTUAL-EXCLUSION-20261025",
+      "pre_send_status": "IDLE",
+      "new_message_sent": false,
+      "implementation": "RECEIVER_CHECKS_PASSED_PUBLIC_UI_PENDING"
+    },
+    "N3": {
+      "status": "PUBLIC_ROUTE_AND_SCOPED_PREPARATION_BUILT_UI_PENDING",
+      "thread_id": "01a16926-a48c-7b83-9811-f1905cf0f1ab",
+      "baseline_commit": "3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57",
+      "preparation_commit": "3fc7446801a15b91b2c56e6a3066bc06c823c9fa",
+      "preparation_manifest_sha256": "fd3f4fb3deedf50f217cfac00129f4c54fc6da0cdeba6ecaa2db503378c525ed",
+      "preparation_index_sha256": "57ae52b55fe52819462b4a5775b9f48dae20c198f13c9f89f1ed7f94cfb96811",
+      "product_check_status": "NOT_RUN_AUTHENTICATION_REVIEW_REJECTED",
+      "initialization_status": "SCRIPT_CREATION_REJECTED_PENDING_USER_AUTHORIZATION"
+    },
+    "N4": {
+      "status": "REQUESTED_SOURCE_SCOPE_REVIEW_COMPLETE_UI_MEASUREMENT_PENDING",
+      "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe",
+      "marker": "MENU-N03-N4-SCOPED-MEETING-REVIEW-20261025",
+      "previous_turn_id": "01a170a9-3545-7761-90f3-16850f520aef",
+      "reviewed_commit": "3fc7446801a15b91b2c56e6a3066bc06c823c9fa",
+      "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N03/qa.md",
+      "expectation_record_sha256": "60b6bc4f263529489125338693ed6a8de73f03adf23c0702fea91f14e3f75a01",
+      "record_sha256": "22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da",
+      "source_review_ids": [
+        "MENU-N03.C17",
+        "N03-G05"
+      ],
+      "source_verdict": "SOURCE_REVIEW_COMPLETE_NO_NEW_CONFIRMED_DEFECTS",
+      "evidence_status": "SOURCE_AND_RECEIVER_EVIDENCE_PRESENT_NEEDS_AUTHENTICATED_UI",
+      "checkpoint_closed": false,
+      "retained_reviewed_commit": "7db7dbacdaa02445e4ff0fcc1c677835b150426f",
+      "retained_source_review_ids": [
+        "N03-G01",
+        "N03-G03",
+        "N03-G04",
+        "N03-G05"
+      ],
+      "design_item_ids": [
+        "N03-D01",
+        "N03-D02",
+        "N03-D03",
+        "N03-D04",
+        "N03-D05",
+        "N03-D06",
+        "N03-D07",
+        "N03-D08",
+        "N03-D09",
+        "N03-D10",
+        "N03-D11",
+        "N03-D12"
+      ],
+      "design_status": "SOURCE_PRESENT_NEEDS_MEASUREMENT",
+      "pre_send_status": "IDLE",
+      "new_message_sent": false,
+      "independent_product_run": false
+    }
   },
   "historical_menu_f01_rework_handoff": {
-    "marker":"MENU-F01-DESIGN-REWORK-20261025",
-    "initiator":"N3",
-    "ticket":"docs/menu-delivery/F01.md",
-    "N1":{"status":"RETAIN_EXISTING_DOMAIN_DEPENDENCIES","thread_id":"01a16925-a11e-70e3-9b45-6f27d4753d9c","new_message_sent":false},
-    "N2":{"status":"RETAIN_EXISTING_AGENT_DEPENDENCIES","thread_id":"01a16925-c11b-7593-aaea-4704cac0d78a","new_message_sent":false},
-    "N3":{"status":"DEVELOPED_PENDING_USER_ACCEPTANCE","thread_id":"01a16926-a48c-7b83-9811-f1905cf0f1ab","baseline_commit":"8e135b8c8b09e0aa3b95ceddb9146868565fa8d7","candidate_commit":"3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57","implementation_commit":"c72cb2e0d12662f25bdfbfdf0ff8885a9a6ebed4"},
-    "N4":{"status":"NECESSARY_DESIGN_ITEMS_CLOSED","thread_id":"01a16925-dec5-7202-8e3e-9605d9e073fe","turn_id":"01a17052-c3a7-7322-991a-d4d3a44c0c65","marker":"MENU-F01-N4-D12-CLOSURE-20261025","new_message_sent":true,"review_candidate":"9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf","record":"docs/menu-delivery/F01/qa.md","record_sha256":"3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9","remaining_ids":[],"closed_ids":["F01-D01","F01-D02","F01-D03","F01-D04","F01-D05","F01-D06","F01-D07","F01-D08","F01-D09","F01-D10","F01-D11","F01-D12"],"full_menu_independent_pass_required":false}
+    "marker": "MENU-F01-DESIGN-REWORK-20261025",
+    "initiator": "N3",
+    "ticket": "docs/menu-delivery/F01.md",
+    "N1": {
+      "status": "RETAIN_EXISTING_DOMAIN_DEPENDENCIES",
+      "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c",
+      "new_message_sent": false
+    },
+    "N2": {
+      "status": "RETAIN_EXISTING_AGENT_DEPENDENCIES",
+      "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a",
+      "new_message_sent": false
+    },
+    "N3": {
+      "status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
+      "thread_id": "01a16926-a48c-7b83-9811-f1905cf0f1ab",
+      "baseline_commit": "8e135b8c8b09e0aa3b95ceddb9146868565fa8d7",
+      "candidate_commit": "3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57",
+      "implementation_commit": "c72cb2e0d12662f25bdfbfdf0ff8885a9a6ebed4"
+    },
+    "N4": {
+      "status": "NECESSARY_DESIGN_ITEMS_CLOSED",
+      "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe",
+      "turn_id": "01a17052-c3a7-7322-991a-d4d3a44c0c65",
+      "marker": "MENU-F01-N4-D12-CLOSURE-20261025",
+      "new_message_sent": true,
+      "review_candidate": "9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf",
+      "record": "docs/menu-delivery/F01/qa.md",
+      "record_sha256": "3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9",
+      "remaining_ids": [],
+      "closed_ids": [
+        "F01-D01",
+        "F01-D02",
+        "F01-D03",
+        "F01-D04",
+        "F01-D05",
+        "F01-D06",
+        "F01-D07",
+        "F01-D08",
+        "F01-D09",
+        "F01-D10",
+        "F01-D11",
+        "F01-D12"
+      ],
+      "full_menu_independent_pass_required": false
+    }
   },
   "historical_menu_f01_rework": {
     "feature_status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
@@ -397,8 +616,21 @@
     "index_sha256": "fe9842f392bf853f217294d83dcad3918d2046afb62dfdbdac33ccee21ccff22",
     "inventory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/menu-delivery/F01/rework-candidate-inventory.json",
     "inventory_sha256": "e07a542b95895c5b05f097680402fa80477acd3277e3c4617fb05851a7624cd7",
-    "directed_review": {"status":"CLOSED_IN_SPECIFIED_SCOPE","reviewed_commit":"9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf","record":"/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md","sha256":"3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9","remaining_ids":[],"independent_product_run":false,"full_menu_independent_pass_required":false},
-    "limits": {"visual":"NOT_RUN","user_acceptance":"PENDING_USER_ACCEPTANCE","external_api_mode":"SIMULATED_FIRST","STT":"PAUSED_BY_USER"}
+    "directed_review": {
+      "status": "CLOSED_IN_SPECIFIED_SCOPE",
+      "reviewed_commit": "9fd9c6e2128a313e1820a4e7bedd16b4a10da7bf",
+      "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md",
+      "sha256": "3bae06f42605a57c2662db56df0150a6fe7a6b237eb1db3c9ac0b0c4cb29c3e9",
+      "remaining_ids": [],
+      "independent_product_run": false,
+      "full_menu_independent_pass_required": false
+    },
+    "limits": {
+      "visual": "NOT_RUN",
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "external_api_mode": "SIMULATED_FIRST",
+      "STT": "PAUSED_BY_USER"
+    }
   },
   "historical_menu_n02": {
     "feature_status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
@@ -421,8 +653,20 @@
     "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
     "index_sha256": "d48741e7cb653318a8cf275a93b1ae2680e2a280de7079d7c6d0f2d34b447139",
     "inventory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/menu-delivery/N02/candidate-inventory.json",
-    "directed_review": {"reviewed_commit":"3ebb31cdcac6f90e39b3b2c0808e5e9f21116c98","record":"/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N02/qa.md","sha256":"404c7dadd9a778334933a211440c5cc43fafefe9879bbf33d8b8b4753c5ec2e5","verdict":"APPROVED_IN_SPECIFIED_SCOPE","independent_product_run":false,"full_menu_independent_pass_required":false},
-    "limits": {"visual":"NOT_RUN","user_acceptance":"PENDING_USER_ACCEPTANCE","external_api_mode":"SIMULATED_FIRST","STT":"PAUSED_BY_USER"}
+    "directed_review": {
+      "reviewed_commit": "3ebb31cdcac6f90e39b3b2c0808e5e9f21116c98",
+      "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N02/qa.md",
+      "sha256": "404c7dadd9a778334933a211440c5cc43fafefe9879bbf33d8b8b4753c5ec2e5",
+      "verdict": "APPROVED_IN_SPECIFIED_SCOPE",
+      "independent_product_run": false,
+      "full_menu_independent_pass_required": false
+    },
+    "limits": {
+      "visual": "NOT_RUN",
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "external_api_mode": "SIMULATED_FIRST",
+      "STT": "PAUSED_BY_USER"
+    }
   },
   "historical_menu_f01": {
     "feature_status": "REQUIRES_DESIGN_REWORK",
@@ -440,7 +684,27 @@
     "acceptance_status": "PENDING_USER_ACCEPTANCE",
     "independent_verdict": "DESIGN_REWORK_REQUIRED",
     "checkpoint_source": "#/historical_menu_f01_checkpoints",
-    "directed_review": {"reviewed_implementation_commit": "2993eb00cc84b428b0724185db0298c47418f17f", "type": "DESIGN_FIDELITY_REVIEW", "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md", "sha256": "476f296084c0659e86da1ff724c8256e19cc195e6d81e00611de0dbdea71849f", "remaining_necessary_defects": null, "design_item_ids": ["F01-D01", "F01-D02", "F01-D03", "F01-D04", "F01-D05", "F01-D06", "F01-D07", "F01-D08", "F01-D09", "F01-D10", "F01-D11", "F01-D12"]},
+    "directed_review": {
+      "reviewed_implementation_commit": "2993eb00cc84b428b0724185db0298c47418f17f",
+      "type": "DESIGN_FIDELITY_REVIEW",
+      "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/F01/qa.md",
+      "sha256": "476f296084c0659e86da1ff724c8256e19cc195e6d81e00611de0dbdea71849f",
+      "remaining_necessary_defects": null,
+      "design_item_ids": [
+        "F01-D01",
+        "F01-D02",
+        "F01-D03",
+        "F01-D04",
+        "F01-D05",
+        "F01-D06",
+        "F01-D07",
+        "F01-D08",
+        "F01-D09",
+        "F01-D10",
+        "F01-D11",
+        "F01-D12"
+      ]
+    },
     "development_record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/menu-delivery/F01/integration.md",
     "delivery_record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/menu-delivery/F01/delivery.json",
     "experience_instructions": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/menu-delivery/F01/experience.md",
@@ -592,8 +856,26 @@
     "record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/feature-delivery/FC02/acceptance.json"
   },
   "required_input_checkpoints": [],
-  "authenticated_automation_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_TEST_DIRECTORIES_AND_PORTS_ONLY","product_account_fill_auto_login":false,"review_reason":"自动审批审查拒绝入口测试中的自动认证，需要明确专用测试认证授权；产品账号填充继续手动登录","affected_work":"AUTHENTICATED_UI_CHECKS_ONLY","unaffected_work":"DOMAIN_AND_FRONTEND_IMPLEMENTATION_REFERENCE_DOM","applicability":"SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"},
-  "initialization_authentication_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_INITIALIZATION_DIRECTORY_GENERATED_MAINTAINER_ACCOUNT_ONLY","rejected_action":"CREATE_N03_INITIALIZATION_AND_LAUNCHER_SCRIPTS_WITH_HTTP_WEBSOCKET_MAINTAINER_AUTHENTICATION","review_reason":"自动审批审查认为读取新目录credentials.json并自动维护认证及配置超出仅受控Electron填表授权","scripts_created":false,"scripts_executed":false,"product_account_fill_auto_login":false,"affected_work":"INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY","applicability":"SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"},
+  "authenticated_automation_approval": {
+    "status": "PENDING_USER_REPLY",
+    "scope": "N03_NEW_PRIVATE_TEST_DIRECTORIES_AND_PORTS_ONLY",
+    "product_account_fill_auto_login": false,
+    "review_reason": "自动审批审查拒绝入口测试中的自动认证，需要明确专用测试认证授权；产品账号填充继续手动登录",
+    "affected_work": "AUTHENTICATED_UI_CHECKS_ONLY",
+    "unaffected_work": "DOMAIN_AND_FRONTEND_IMPLEMENTATION_REFERENCE_DOM",
+    "applicability": "SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"
+  },
+  "initialization_authentication_approval": {
+    "status": "PENDING_USER_REPLY",
+    "scope": "N03_NEW_PRIVATE_INITIALIZATION_DIRECTORY_GENERATED_MAINTAINER_ACCOUNT_ONLY",
+    "rejected_action": "CREATE_N03_INITIALIZATION_AND_LAUNCHER_SCRIPTS_WITH_HTTP_WEBSOCKET_MAINTAINER_AUTHENTICATION",
+    "review_reason": "自动审批审查认为读取新目录credentials.json并自动维护认证及配置超出仅受控Electron填表授权",
+    "scripts_created": false,
+    "scripts_executed": false,
+    "product_account_fill_auto_login": false,
+    "affected_work": "INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY",
+    "applicability": "SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"
+  },
   "checkpoint_evidence_policy": "本轮F01稳定18项检查点，当前v7逐项重核0/18；历史v6 F01 18/18和N02 26/26完整保留不转为当前已验收；业务、视觉、交互、可重建版本和用户验收分开登记",
   "completed_features": [
     {
@@ -638,9 +920,40 @@
   "post_current_work_item": "MENU-N02",
   "post_current_ticket": "docs/menu-delivery/N02.md",
   "post_ui_action": "CONTINUE_F01_THEN_N02_THEN_RESUME_N03",
-  "paused_feature_ids": ["FC28"],
+  "paused_feature_ids": [
+    "FC28"
+  ],
   "historical_mvp_deferred_status": "DEFERRED",
-  "historical_mvp_deferred_feature_ids": ["FC04", "FC05", "FC06", "FC07", "FC08", "FC09", "FC10", "FC11", "FC12", "FC13", "FC14", "FC15", "FC16", "FC17", "FC18", "FC19", "FC20", "FC21", "FC22", "FC23", "FC24", "FC25", "FC26", "FC27", "FC28", "FC29", "FC30", "FC31"],
+  "historical_mvp_deferred_feature_ids": [
+    "FC04",
+    "FC05",
+    "FC06",
+    "FC07",
+    "FC08",
+    "FC09",
+    "FC10",
+    "FC11",
+    "FC12",
+    "FC13",
+    "FC14",
+    "FC15",
+    "FC16",
+    "FC17",
+    "FC18",
+    "FC19",
+    "FC20",
+    "FC21",
+    "FC22",
+    "FC23",
+    "FC24",
+    "FC25",
+    "FC26",
+    "FC27",
+    "FC28",
+    "FC29",
+    "FC30",
+    "FC31"
+  ],
   "historical_queue": [
     "FC01",
     "FC02",
@@ -830,93 +1143,419 @@
     }
   ],
   "historical_menu_f01_checkpoints": [
-    {"id": "MENU-F01.C01", "status": "PENDING_USER_ACCEPTANCE", "development_status": "REQUIRES_DESIGN_REWORK", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C01"},
-    {"id": "MENU-F01.C02", "status": "PENDING_USER_ACCEPTANCE", "development_status": "REQUIRES_DESIGN_REWORK", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C02"},
-    {"id": "MENU-F01.C03", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C03"},
-    {"id": "MENU-F01.C04", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C04"},
-    {"id": "MENU-F01.C05", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C05"},
-    {"id": "MENU-F01.C06", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C06"},
-    {"id": "MENU-F01.C07", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C07"},
-    {"id": "MENU-F01.C08", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C08"},
-    {"id": "MENU-F01.C09", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C09"},
-    {"id": "MENU-F01.C10", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C10"},
-    {"id": "MENU-F01.C11", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C11"},
-    {"id": "MENU-F01.C12", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C12"},
-    {"id": "MENU-F01.C13", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C13"},
-    {"id": "MENU-F01.C14", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C14"},
-    {"id": "MENU-F01.C15", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C15"},
-    {"id": "MENU-F01.C16", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C16"},
-    {"id": "MENU-F01.C17", "status": "PENDING_USER_ACCEPTANCE", "development_status": "COVERED", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C17"},
-    {"id": "MENU-F01.C18", "status": "PENDING_USER_ACCEPTANCE", "development_status": "REQUIRES_DESIGN_REWORK", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C18"}
+    {
+      "id": "MENU-F01.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "REQUIRES_DESIGN_REWORK",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C01"
+    },
+    {
+      "id": "MENU-F01.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "REQUIRES_DESIGN_REWORK",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C02"
+    },
+    {
+      "id": "MENU-F01.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C03"
+    },
+    {
+      "id": "MENU-F01.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C04"
+    },
+    {
+      "id": "MENU-F01.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C05"
+    },
+    {
+      "id": "MENU-F01.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C06"
+    },
+    {
+      "id": "MENU-F01.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C07"
+    },
+    {
+      "id": "MENU-F01.C08",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C08"
+    },
+    {
+      "id": "MENU-F01.C09",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C09"
+    },
+    {
+      "id": "MENU-F01.C10",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C10"
+    },
+    {
+      "id": "MENU-F01.C11",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C11"
+    },
+    {
+      "id": "MENU-F01.C12",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C12"
+    },
+    {
+      "id": "MENU-F01.C13",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C13"
+    },
+    {
+      "id": "MENU-F01.C14",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C14"
+    },
+    {
+      "id": "MENU-F01.C15",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C15"
+    },
+    {
+      "id": "MENU-F01.C16",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C16"
+    },
+    {
+      "id": "MENU-F01.C17",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "COVERED",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C17"
+    },
+    {
+      "id": "MENU-F01.C18",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_status": "REQUIRES_DESIGN_REWORK",
+      "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C18"
+    }
   ],
   "historical_ui02_checkpoints": [
-    {"id": "UI02.C01", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/0"},
-    {"id": "UI02.C02", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/1"},
-    {"id": "UI02.C03", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/2"},
-    {"id": "UI02.C04", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/3"},
-    {"id": "UI02.C05", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/4"},
-    {"id": "UI02.C06", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/5"},
-    {"id": "UI02.C07", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/6"},
-    {"id": "UI02.C08", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/7"}
+    {
+      "id": "UI02.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/0"
+    },
+    {
+      "id": "UI02.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/1"
+    },
+    {
+      "id": "UI02.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/2"
+    },
+    {
+      "id": "UI02.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/3"
+    },
+    {
+      "id": "UI02.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/4"
+    },
+    {
+      "id": "UI02.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/5"
+    },
+    {
+      "id": "UI02.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/6"
+    },
+    {
+      "id": "UI02.C08",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui02.delivery_record#/checkpoint_development_evidence/7"
+    }
   ],
   "historical_ui01_checkpoints": [
-    {"id": "UI01.C01", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/0"},
-    {"id": "UI01.C02", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/1"},
-    {"id": "UI01.C03", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/2"},
-    {"id": "UI01.C04", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/3"},
-    {"id": "UI01.C05", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/4"},
-    {"id": "UI01.C06", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/5"},
-    {"id": "UI01.C07", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/6"}
+    {
+      "id": "UI01.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/0"
+    },
+    {
+      "id": "UI01.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/1"
+    },
+    {
+      "id": "UI01.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/2"
+    },
+    {
+      "id": "UI01.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/3"
+    },
+    {
+      "id": "UI01.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/4"
+    },
+    {
+      "id": "UI01.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/5"
+    },
+    {
+      "id": "UI01.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_ui01.delivery_record#/checkpoint_development_evidence/6"
+    }
   ],
   "historical_fc04_checkpoints": [
-    {"id": "FC04.C01", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/0"},
-    {"id": "FC04.C02", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/1"},
-    {"id": "FC04.C03", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/2"},
-    {"id": "FC04.C04", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/3"},
-    {"id": "FC04.C05", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/4"},
-    {"id": "FC04.C06", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/5"},
-    {"id": "FC04.C07", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/6"},
-    {"id": "FC04.C08", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/7"},
-    {"id": "FC04.C09", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/8"},
-    {"id": "FC04.C10", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/9"},
-    {"id": "FC04.C11", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/10"},
-    {"id": "FC04.C12", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/11"},
-    {"id": "FC04.C13", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/12"},
-    {"id": "FC04.C14", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/13"},
-    {"id": "FC04.C15", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/14"},
-    {"id": "FC04.C16", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/15"},
-    {"id": "FC04.C17", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/16"},
-    {"id": "FC04.C18", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/17"},
-    {"id": "FC04.C19", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/18"},
-    {"id": "FC04.C20", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/19"}
+    {
+      "id": "FC04.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/0"
+    },
+    {
+      "id": "FC04.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/1"
+    },
+    {
+      "id": "FC04.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/2"
+    },
+    {
+      "id": "FC04.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/3"
+    },
+    {
+      "id": "FC04.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/4"
+    },
+    {
+      "id": "FC04.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/5"
+    },
+    {
+      "id": "FC04.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/6"
+    },
+    {
+      "id": "FC04.C08",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/7"
+    },
+    {
+      "id": "FC04.C09",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/8"
+    },
+    {
+      "id": "FC04.C10",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/9"
+    },
+    {
+      "id": "FC04.C11",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/10"
+    },
+    {
+      "id": "FC04.C12",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/11"
+    },
+    {
+      "id": "FC04.C13",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/12"
+    },
+    {
+      "id": "FC04.C14",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/13"
+    },
+    {
+      "id": "FC04.C15",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/14"
+    },
+    {
+      "id": "FC04.C16",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/15"
+    },
+    {
+      "id": "FC04.C17",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/16"
+    },
+    {
+      "id": "FC04.C18",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/17"
+    },
+    {
+      "id": "FC04.C19",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/18"
+    },
+    {
+      "id": "FC04.C20",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc04.delivery_record#/checkpoint_development_evidence/19"
+    }
   ],
   "historical_fc07_checkpoints": [
-    {"id": "FC07.C01", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/0"},
-    {"id": "FC07.C02", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/1"},
-    {"id": "FC07.C03", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/2"},
-    {"id": "FC07.C04", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/3"},
-    {"id": "FC07.C05", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/4"},
-    {"id": "FC07.C06", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/5"},
-    {"id": "FC07.C07", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/6"},
-    {"id": "FC07.C08", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/7"},
-    {"id": "FC07.C09", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/8"},
-    {"id": "FC07.C10", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/9"},
-    {"id": "FC07.C11", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/10"},
-    {"id": "FC07.C12", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/11"}
+    {
+      "id": "FC07.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/0"
+    },
+    {
+      "id": "FC07.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/1"
+    },
+    {
+      "id": "FC07.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/2"
+    },
+    {
+      "id": "FC07.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/3"
+    },
+    {
+      "id": "FC07.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/4"
+    },
+    {
+      "id": "FC07.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/5"
+    },
+    {
+      "id": "FC07.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/6"
+    },
+    {
+      "id": "FC07.C08",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/7"
+    },
+    {
+      "id": "FC07.C09",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/8"
+    },
+    {
+      "id": "FC07.C10",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/9"
+    },
+    {
+      "id": "FC07.C11",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/10"
+    },
+    {
+      "id": "FC07.C12",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "historical_fc07.delivery_record#/checkpoint_development_evidence/11"
+    }
   ],
   "historical_mvp_checkpoints": [
-    {"id": "MVP.C01", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/0"},
-    {"id": "MVP.C02", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/1"},
-    {"id": "MVP.C03", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/2"},
-    {"id": "MVP.C04", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/3"},
-    {"id": "MVP.C05", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/4"},
-    {"id": "MVP.C06", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/5"},
-    {"id": "MVP.C07", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/6"},
-    {"id": "MVP.C08", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/7"},
-    {"id": "MVP.C09", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/8"},
-    {"id": "MVP.C10", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/9"},
-    {"id": "MVP.C11", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/10"},
-    {"id": "MVP.C12", "status": "PENDING_USER_ACCEPTANCE", "development_evidence": "delivery_record#/checkpoint_development_evidence/11"}
+    {
+      "id": "MVP.C01",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/0"
+    },
+    {
+      "id": "MVP.C02",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/1"
+    },
+    {
+      "id": "MVP.C03",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/2"
+    },
+    {
+      "id": "MVP.C04",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/3"
+    },
+    {
+      "id": "MVP.C05",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/4"
+    },
+    {
+      "id": "MVP.C06",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/5"
+    },
+    {
+      "id": "MVP.C07",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/6"
+    },
+    {
+      "id": "MVP.C08",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/7"
+    },
+    {
+      "id": "MVP.C09",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/8"
+    },
+    {
+      "id": "MVP.C10",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/9"
+    },
+    {
+      "id": "MVP.C11",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/10"
+    },
+    {
+      "id": "MVP.C12",
+      "status": "PENDING_USER_ACCEPTANCE",
+      "development_evidence": "delivery_record#/checkpoint_development_evidence/11"
+    }
   ],
   "historical_fc03_checkpoints": [
     {
