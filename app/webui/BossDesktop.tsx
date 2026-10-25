@@ -1,17 +1,18 @@
 import {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useRef, useState,
   type ReactNode,
 } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
-  Activity, AlertCircle, ArrowLeft, ArrowRight, Bell,
-  ChartNoAxesCombined, CheckCircle2, ChevronRight, ClipboardCheck,
-  Clock3, Database, FileSearch, FolderOpen, LayoutDashboard, Loader2, House, CalendarDays,
+  AlertCircle, ArrowLeft, ArrowRight, Bell,
+  CheckCircle2, ChevronRight,
+  Clock3, FileSearch, FolderOpen, Loader2,
   Menu, MessageCircle, RefreshCw, Search, Settings,
-  ShieldCheck, X,
+  X,
 } from "lucide-react";
 import pageMeta from "./page-meta.json";
 import {deliveredPage} from "./delivered-navigation";
+import {BossPrimaryNavigation,BossMenuDirectory} from "./BossMenuNavigation";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import {BossNotificationReturn} from "./BossDesktopNotifications";
@@ -20,7 +21,6 @@ import { BossSupplyQualityView } from "./BossSupplyQualityView";
 import { EMPTY_SUPPLY_EDITOR, type SupplyQualityEditor } from "./BossSupplyQualityPanel";
 import { MaintainerSupplyQuality, EMPTY_IMPORT_EDITOR, type SupplyImportEditor } from "./MaintainerSupplyQuality";
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
-import { BossVoiceAssignment } from "./BossVoiceAssignment";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
 import { BossMeetingArrangement, type MeetingArrangementProjection } from "./BossMeetingArrangement";
@@ -154,45 +154,6 @@ type Props = {
 };
 
 const pages = pageMeta as Record<string, DesignPage>;
-const BOSS_NAV = [
-  ["F01", "今日工作", LayoutDashboard],
-  ["N02", "聊天交办", MessageCircle],
-  ["N03", "经营关注", ChartNoAxesCombined],
-  ["MVP01", "采购成本协调", ClipboardCheck],
-  ["F03", "经营查询与追问", ChartNoAxesCombined],
-  ["F14", "原料与饲料报告", FolderOpen],
-  ["F21", "食品与品质报告", FileSearch],
-  ["F02", "经营提醒", Bell],
-  ["F06", "交办管理", ClipboardCheck],
-  ["N05", "任务与承诺", ClipboardCheck],
-  ["N06", "通知中心", Bell],
-  ["N08", "本人通知设置", Settings],
-  ["N09", "本人计划", Clock3],
-] as const;
-const BOSS_MENU_NAV=[
-  ["F01","今日工作",House],["N02","聊天交办",MessageCircle],
-  ["N03","经营关注",ChartNoAxesCombined],["N04","会议与资料",CalendarDays],
-  ["N05","任务与承诺",ClipboardCheck],["N06","通知与设置",Bell],
-] as const;
-const MAINT_NAV = [
-  ["A01", "档案与访问", ShieldCheck],
-  ["A02", "接口目录", Database],
-  ["A03", "数据集", FolderOpen],
-  ["A04", "场景与事件", Activity],
-  ["A05", "Prompt 版本", FileSearch],
-  ["A06", "SOP 与 Skills", ClipboardCheck],
-  ["A07", "Knowledge Base", FolderOpen],
-  ["A08", "模型连接", Settings],
-  ["A09", "Tools 与连接", Settings],
-  ["A10", "指标与规则", ChartNoAxesCombined],
-  ["A11", "关联对象", ClipboardCheck],
-  ["A12", "记忆技术维护", Database],
-  ["A13", "调度计划", Clock3],
-  ["A14", "动作授权记录", ShieldCheck],
-  ["A15", "运行记录", Activity],
-  ["A16", "评测管理", ClipboardCheck],
-  ["NATIVE", "应用设置", Settings],
-] as const;
 function allowed(page: string, role: Role, mvp=false, _priority=false) {
   return deliveredPage(page,role,mvp)!==undefined;
 }
@@ -545,8 +506,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
 
   const referenceMenu = ["F01","N02","N03"].includes(page)&&role==="BOSS"&&!mvpScope;
   const fromOverview=new URLSearchParams(window.location.search).get("overviewReturn")==="N03";
-  const userNav = referenceMenu?BOSS_MENU_NAV:(role === "MAINTAINER" ? MAINT_NAV : BOSS_NAV).filter(([id])=>role!==null&&allowed(id,role,mvpScope,priorityScope));
-  const metadata = page === "NATIVE" ? {
+  const currentEntry=role?deliveredPage(page,role,mvpScope):undefined;
+  const metadata = currentEntry?.state==="AUTHENTICATION"?{...pages[page],title:"当前登录状态",summary:"查看当前身份，需要切换账号时可以退出并返回登录表单。"}:page === "NATIVE" ? {
     ...pages.N01,
     title: role === "BOSS" ? "大鹏会话" : "应用设置",
     module: role === "BOSS" ? "会话" : "应用设置",
@@ -554,11 +515,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     initial_state: "当前身份与原生连接保持",
   } : page==="MVP01"?{...pages.F01,title:"采购成本协调",module:"采购成本协调",summary:"核查当前采购报告的成本变化、原文与本人协调记录。"}:pages[page];
   const isNative = ["NATIVE","N02"].includes(page);
-  const searchablePages = useMemo(() => {
-    return Object.entries({...pages,MVP01:{...pages.F01,title:"采购成本协调",module:"采购成本协调"},NATIVE:{...pages.N01,module:"会话与应用设置"}}).filter(([id, p]) => role && deliveredPage(id,role,mvpScope)?.directory &&
-      (id.toLowerCase().includes(pageFilter.toLowerCase()) ||
-       deliveredPage(id,role,mvpScope)?.title.includes(pageFilter) || p.module.includes(pageFilter)));
-  }, [pageFilter, role,mvpScope,priorityScope]);
   const refresh = () => setRequestVersion((v) => v + 1);
   const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
     if (typeof payload.client_request_id !== "string") throw new Error("业务请求缺少原请求编号");
@@ -590,7 +546,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     </div> : <Loader2 size={22} className="boss-spin" aria-hidden="true" />}
   </div>;
 
-  if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前入口尚未交付</h1><p>当前版本没有开放此功能。请返回已经交付的功能入口。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回可用入口</button><button className="boss-btn" onClick={requestLogout}>退出当前身份</button></div></section></div>;
+  if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前身份无法打开此页面</h1><p>页面编号未知或不属于当前身份的菜单范围。请返回相应工作区。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回工作区</button><button className="boss-btn" onClick={requestLogout}>退出当前身份</button></div></section></div>;
   return <div className="boss-v6" data-role={role} data-page={page} ref={shellRef}>
     <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);window.history.replaceState(null,"",url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
@@ -602,18 +558,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           </div>
           {sidebarOpen && <p className="boss-brand-caption">让重要的事，推进得更确定</p>}
           <div className="boss-sidebar-label">{sidebarOpen ? (role === "BOSS" ? "老板工作区" : "技术维护工作区") : "◈"}</div>
-          <nav className="boss-sidebar-nav">
-            {userNav.map(([id, label, Icon]) =>
-              <button type="button" key={id} className={"boss-nav-item " + (page === id ? "active" : "")}
-                onClick={() => navigate(id)} disabled={referenceMenu&&!deliveredPage(id,role,mvpScope)?.directory} title={referenceMenu?label:deliveredPage(id,role,mvpScope)?.title??label} aria-current={page === id ? "page" : undefined}>
-                {referenceMenu?<ReferenceNavigationIcon id={id}/>:<Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
-                {sidebarOpen && <span>{referenceMenu?label:deliveredPage(id,role,mvpScope)?.title??label}</span>}
-              </button>
-            )}
-          </nav>
+          <BossPrimaryNavigation role={role} page={page} expanded={sidebarOpen} onNavigate={id=>navigate(id)} referenceIcon={referenceMenu?id=><ReferenceNavigationIcon id={id}/>:undefined}/>
           <div className="boss-sidebar-bottom">
-            <button type="button" onClick={openDirectory} title="已交付功能目录">
-              {page==="F01"&&!mvpScope?<Settings size={17} aria-hidden="true"/>:<FolderOpen size={17} aria-hidden="true" />}{sidebarOpen && ((mvpScope||priorityScope)?"当前可用入口":"全部页面")}
+            <button type="button" onClick={openDirectory} title="全部菜单目录">
+              {page==="F01"&&!mvpScope?<Settings size={17} aria-hidden="true"/>:<FolderOpen size={17} aria-hidden="true" />}{sidebarOpen && "全部菜单"}
             </button>
             {(page!=="F01"||mvpScope)&&<button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
               <Menu size={17} aria-hidden="true" />{sidebarOpen && "收起导航"}
@@ -625,7 +573,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             <button className="boss-mobile-menu" type="button" onClick={openDirectory}
               aria-label="打开页面目录"><Menu size={19}/></button>
             <button className="boss-search" type="button" onClick={openDirectory}>
-              {["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="search"/>:<Search size={17}/>}<span>{(mvpScope||priorityScope)?"查找当前可用入口":"搜索页面、经营专题、任务入口…"}</span><kbd>⌘ K</kbd>
+              {["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="search"/>:<Search size={17}/>}<span>搜索全部菜单、页面与专题…</span><kbd>⌘ K</kbd>
             </button>
             {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(["F01","N03"].includes(page))guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
@@ -643,7 +591,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <section className="boss-stage">
             <div className={"boss-hero " + (["F01","N02","N03"].includes(page) ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
-                <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page}</div>
+                <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page} · {currentEntry?.stateLabel}</div>
                 <h1>{page === "F01" ? mvpScope?"今日采购成本事项":"早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{mvpScope&&page==="F01"?"核查同一采购报告的成本变化、原文与本人协调记录。":metadata?.summary || "按照 PRD 查看当前执行过程和资料来源。"}</p>
               </div>
@@ -670,10 +618,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             {!isNative && !(role==="BOSS"&&!mvpScope&&["F01","N03"].includes(page)) && <div className="boss-content" key={page}>
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
-                  <Tag tone="green">
-                    {role==="BOSS"&&conversationReturn.current?"当前会话共享操作":"已交付 · 可使用"}
+                  <Tag tone={currentEntry?.state==="DEVELOPED"?"green":"amber"}>
+                    {currentEntry?.stateLabel}
                   </Tag>
-                  <span>{metadata?.initial_state || "业务状态待读取"}</span>
+                  <span>{currentEntry?.state==="AUTHENTICATION"?"当前身份已经认证":metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
                 <div className="boss-meta-actions">
                   {role==="BOSS"&&conversationReturn.current&&<button className="boss-btn" type="button" onClick={()=>navigate("N02")}><ArrowLeft size={15}/>返回原会话</button>}
@@ -686,14 +634,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
               </div>
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
               {loading && <StatusLine text="正在从本机业务服务读取有权数据和当前状态…" />}
-              {role === "BOSS" ? (
+              {currentEntry?.state==="AUTHENTICATION"?<div className="boss-columns"><div className="boss-column"><Panel title="当前认证状态"><Value label="当前身份" value={role==="BOSS"?"本人":"技术维护"}/><p>当前账号已经登录。切换身份需要退出当前账号，然后使用登录表单。</p><GlassButton onClick={requestLogout}>退出当前身份并返回登录</GlassButton></Panel></div></div>:
+                currentEntry?.state==="PAUSED"?<div className="boss-columns"><div className="boss-column"><Panel title="语音交办暂停"><p>语音交办当前暂停，可以使用文字交办。</p><GlassButton onClick={()=>navigate("N02")}>使用文字交办</GlassButton></Panel></div></div>:
+                page==="D06"&&role==="MAINTAINER"?<Panel title="未保存修改保护"><p>切换页面、退出或关闭时，未保存编辑继续由现有D06确认流程处理。打开此说明页面不会提交或放弃任何业务记录。</p><GlassButton onClick={()=>navigate("A08")}>返回维护工作区</GlassButton></Panel>:
+                role === "BOSS" ? (
                 (page === "MVP01"||page==="F01"&&mvpScope) ? <BossMVPView contacts={dashboard?.contacts??[]} refreshVersion={requestVersion} onDirtyChange={setWorkDirty} onOpenTask={priorityScope?selectTask:undefined}/> :
                 page==="F03" ? fromOverview?<BusinessOverviewQuery getToken={getToken} onSource={goSource} onReturn={returnOverview} onDirtyChange={setQueryDirty}/>:<BossBIView getToken={getToken} onSource={goSource} onDirtyChange={setQueryDirty}/> :
-                page === "F27" ? <BossVoiceAssignment
-                  getToken={getToken}
-                  onSubmit={onStartChat}
-                  onOpenConversation={() => navigate("NATIVE")}
-                /> :
                 page === "F06" ? <>{morningOrigin&&<BossMorningPreparation reference={morningOrigin} onReady={setMorningReady} onContext={setMorningContext} onReturn={()=>navigate("F01")} refreshVersion={requestVersion}/>}<BossAssignmentFlow
                   morningReference={morningOrigin??undefined} morningReady={morningReady} morningContext={morningContext}
                   messagesEnabled={!priorityScope}
@@ -1106,15 +1052,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <button type="button" onClick={() => setDirectoryOpen(false)} aria-label="关闭目录"><X size={19}/></button></header>
         <label className="boss-directory-search"><Search size={17}/><input autoFocus value={pageFilter}
           onChange={(e) => setPageFilter(e.target.value)} placeholder="搜索页面编号或名称"/></label>
-        <p>当前身份可使用的已交付功能。</p>
-        <div className="boss-directory-list">
-          {searchablePages.map(([id,p])=>
-            <button type="button" key={id} onClick={() => navigate(id)} className={page===id?"selected":""}>
-              <span>{id} · {deliveredPage(id,role,mvpScope)?.title??p.title}</span>
-              <Tag tone="green">可使用</Tag>
-            </button>)}
-          {searchablePages.length === 0 && <Quiet message="当前身份下无匹配页面。"/>}
-        </div>
+        <BossMenuDirectory role={role} page={page} search={pageFilter} onNavigate={id=>navigate(id)}/>
         {allowed("NATIVE",role,mvpScope,priorityScope)&&<footer><button type="button" onClick={() => navigate("NATIVE")}>
           <MessageCircle size={16}/>{role === "BOSS" ? "大鹏会话" : "应用设置"}
         </button></footer>}

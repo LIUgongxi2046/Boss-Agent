@@ -36,7 +36,7 @@ BusinessOverviewPreparation已经提供并接收范围限定会议准备：正�
 | N2经营消费者 | 6d9eacf、68d9b269 → a71c8dd/a7a3992；businessOverviewRead、结构化指标、Runtime Schema 1.14.0 |
 | N2共享晨间 | e3c28e01 → 5b334fd；bind_sessions与原子互斥 |
 | N1准备接口 | 463704e2/d95532b1及504d0b0e/4056c823 → 03af5a8/5a899ef、c7054eb/38ae898；BusinessOverviewPreparation与preparation Schema 1.1.0 |
-| N4期望 | qa.md，摘要60b6bc4f263529489125338693ed6a8de73f03adf23c0702fea91f14e3f75a01；完整26项、D01—D12、G01—G07 |
+| N4期望与审查 | qa.md，当前摘要22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da；完整26项、D01—D12、G01—G07；本次3fc7446限定审查C17/G05及受影响消费者 |
 
 公共总览读取使用当前已认证WebUI结构化动作与GET范围选项；没有第二套认证或新增HTTP POST服务。公共准备提供严格read/verify及实际交办prepare与原编号读取。RoleChannel仅记录动作和状态。nanobot-menu-n03.patch记录当前SDK客户端对经营准备/绑定/选择接收的中断处理，连接重建不自动重发这些动作。
 
@@ -58,7 +58,7 @@ BusinessOverviewPreparation已经提供并接收范围限定会议准备：正�
 
 以上组合存在范围交集，数量不相加。各领域/SDK结果不能替代认证UI、当前产品的成对DOM、连续业务行为、启动器、制品清单及完整26项映射。N2自有25项当前定向和77项受影响组合、N1自有24项准备组合分别见各自准确主记录，不登记为N3完整菜单通过。
 
-N4已完成7db7dbacdaa02445e4ff0fcc1c677835b150426f的G01/G03/G04/G05必要限定只读源码审查，没有发现新增确定源码缺陷；qa.md摘要b8176c5966386924da3cf7637c411e774c9b2cd6332fec3d0c4e5906ee7da003。D01—D12保持SOURCE_PRESENT/NEEDS_MEASUREMENT；后续会议和固定事项接收、认证UI、焦点/滚动及当前制品成对测量仍需验证，没有完整菜单或独立产品通过结论。
+N4已完成3fc7446801a15b91b2c56e6a3066bc06c823c9fa的C17/G05新增范围限定会议准备、受影响公共DTO/Dialog及准确提醒版本消费者源码审查，限定结论为SOURCE_REVIEW_COMPLETE_NO_NEW_CONFIRMED_DEFECTS；qa.md摘要22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da。G01/G03/G04及既有交办准备继续按7db7dbacdaa02445e4ff0fcc1c677835b150426f的原有限定范围采用；32项meeting-receiver.xml保持原次接收证据及覆盖范围，N4没有重新执行。C17保持SOURCE_AND_RECEIVER_EVIDENCE_PRESENT/NEEDS_AUTHENTICATED_UI，完整检查点未关闭。D01—D12保持SOURCE_PRESENT/NEEDS_MEASUREMENT；认证UI、连续返回、焦点/滚动及当前制品成对测量仍需验证，没有完整菜单或独立产品通过结论。
 
 会议准备Dialog通过boss.business.meeting.prepare读取同一正式领域结果，展示真实材料、参会职责、范围指标和各自版本；不注册新的模型权限。N1独立businessMeetingPreparationRead的实际SDK检查表示该受控工具的能力，当前N03原生讨论继续采用三项既有经营工具。刷新只保存严格范围、对象和选择引用，不保存会议材料正文。
 

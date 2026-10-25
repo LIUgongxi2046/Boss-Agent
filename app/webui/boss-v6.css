@@ -318,6 +318,10 @@
   text-align:left;background:#fff;border:1px solid #e5eef6;border-radius:10px;padding:7px 11px;color:#345777;font-size:12.5px
 }
 .boss-directory-list>button.selected,.boss-directory-list>button:hover{background:#edf6ff;border-color:#8fbce8}
+.boss-directory-group{flex-shrink:0}
+.boss-directory-group>h3{margin:12px 2px 7px;font-size:13px;color:#345777}
+.boss-directory-group>.boss-directory-list{overflow:visible;flex:none;padding-right:0}
+.boss-directory-list>button>span{min-width:0;overflow-wrap:anywhere}
 .boss-directory>footer{padding-top:13px;border-top:1px solid #e4ecf5}
 .boss-directory>footer button{
   display:flex;align-items:center;gap:8px;border:0;background:#eaf4ff;
