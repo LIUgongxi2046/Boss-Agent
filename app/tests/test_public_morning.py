@@ -90,6 +90,37 @@ def test_valid_unrelated_source_cannot_be_pinned_to_selected_morning_item(store)
         ).fetchone()[0] == 0
 
 
+def test_missing_original_order_receipt_is_readonly_and_cannot_claim_saved_order(store):
+    """F01 may unlock a missing request only after a definitive owner read."""
+    pages = BossPageAPI(store)
+    query_string = urlencode({"action": "boss.today.reorder", "client_request_id": "f01-not-in-current-store"})
+    before = {}
+    with store.connect() as db:
+        for kind in ("today_order", "authorization", "task"):
+            before[kind] = db.execute(
+                "SELECT COUNT(*) FROM objects WHERE kind=?", (kind,)
+            ).fetchone()[0]
+        before["idempotency"] = db.execute("SELECT COUNT(*) FROM idempotency").fetchone()[0]
+        before["audit"] = db.execute("SELECT COUNT(*) FROM audit").fetchone()[0]
+
+    status, receipt = pages.serve("BOSS", "/api/boss/ui/morning/receipt", query_string)
+    assert status == 200
+    assert receipt == {
+        "action": "boss.today.reorder",
+        "client_request_id": "f01-not-in-current-store",
+        "outcome": "NOT_FOUND_IN_CURRENT_STORE",
+        "result": None,
+        "write_performed_by_lookup": False,
+    }
+    assert pages.serve("MAINTAINER", "/api/boss/ui/morning/receipt", query_string)[0] == 403
+    assert pages.serve(None, "/api/boss/ui/morning/receipt", query_string)[0] == 401
+    with store.connect() as db:
+        for kind in ("today_order", "authorization", "task"):
+            assert db.execute("SELECT COUNT(*) FROM objects WHERE kind=?", (kind,)).fetchone()[0] == before[kind]
+        assert db.execute("SELECT COUNT(*) FROM idempotency").fetchone()[0] == before["idempotency"]
+        assert db.execute("SELECT COUNT(*) FROM audit").fetchone()[0] == before["audit"]
+
+
 def test_public_morning_day_preview_is_actual_and_strict(store):
     pages = BossPageAPI(store)
     days = [{"date": "2026-10-23", "timezone": "Asia/Shanghai"}, DAY]
