@@ -4,7 +4,7 @@
 
 ## 1. 上游与实际使用方
 
-PRD FR-02/03/14—23、BR-C01—C07、E01—E06限定范围、专业职责、来源和后续授权。原N03 HTML与加载topics定义主列范围/十专题、右列提醒/来源。现有HLD、ClientProvider、RoleChannel和SQLite领域继续使用；公共组件由N3维护，领域N1与实际Agent N2提供准确接口。当前新总览API/Schema及可信会话范围绑定待生产者交付，不从原稿推断权限或正式字段。
+PRD FR-02/03/14—23、BR-C01—C07、E01—E06限定范围、专业职责、来源和后续授权。原N03 HTML与加载topics定义主列范围/十专题、右列提醒/来源。现有HLD、ClientProvider、RoleChannel和SQLite领域继续使用；公共组件由N3维护。领域N1的a38bf9b已接收为67be86d，记录4b48ccb已接收为a8cc244；BusinessOverviewAPI与Schema1.0.0已提供准确只读范围。原生经营入口持久绑定仍由N1补充，N2实际采用等待该准确接口。
 
 | 使用方 | 当前接入或责任 |
 |---|---|
@@ -40,7 +40,7 @@ evidence/menu-delivery/N03/reference-dom.json包含18组原稿记录：三种桌
 
 ## 4. 类型与状态
 
-UI状态分别采用NOT_LOADED、LOADING、READY、EMPTY、PARTIAL、ERROR、FORBIDDEN、HISTORICAL与RECONCILING语义，最终映射到正式API返回状态，不为未知字段填造值。正式范围、专题、来源及关联对象TypeScript类型在N1准确Schema接收后建立；当前不猜测后端字段。
+UI状态分别采用NOT_LOADED、LOADING、READY、EMPTY、PARTIAL、ERROR、FORBIDDEN、HISTORICAL与RECONCILING语义，映射到正式API返回状态，不为未知字段填造值。business-overview-types.ts采用已接收Schema与实际服务字段。OverviewScope严格包含legal_entity_id、region_id、period_start、period_end、timezone、attention；attention仅允许ALL/OWNER_INVOLVEMENT/SOURCE_REVIEW。Overview与OverviewDetail分别采用完整根字段、当前快照、十专题、指标、提醒、关联及来源类型；实际BusinessAlert与BI Scope复用现有定义。
 
 本地拥有draft、dirty、selectedTopic、expandedDetail、returnPoint；服务端拥有appliedScope、overview、source/object版本与业务状态；原生会话拥有chat/run/消息和流式终态。身份epoch、generation及AbortController属于读取生命周期。重新查询只有本人明确应用范围触发，较早读取不覆盖新输入或已应用范围。
 
@@ -63,7 +63,16 @@ flowchart TD
     NativeConversation --> TrustedContext
 ```
 
-FormalOverviewRead的实际模块/函数、HTTP路径、请求映射、严格字段和错误状态待N1准确交付；TrustedContext待N2基于该接口提供。N3接收后补充逐字段传播与消费者断言，公共Page/Command/RoleChannel及注册由N3唯一维护。当前F03、F02、D01、F06和原生会话的现有能力按各自准确范围复用，不由入口存在推断完整菜单通过。
+| 正式入口 | 请求与当前采用 |
+|---|---|
+| GET /api/boss/ui/business-overview/dimensions | 当前Bearer身份，无URL参数；返回正式法人/区域/期间/时区及attention选项 |
+| boss.business_overview.dimensions | 已认证WebUI请求，payload必须为空对象；调用BusinessOverviewAPI.dimensions |
+| boss.business_overview.read | 已认证WebUI结构化Scope，调用BusinessOverviewAPI.read；范围正文不进入URL |
+| boss.business_overview.detail | 已认证WebUI的scope/page_id/snapshot_sha256，调用BusinessOverviewAPI.detail；来源/范围变化返回409 |
+
+public_business_overview.py提供精确只读映射，BossCommandAPI限定BOSS并使用现有WebUI传输；BossPageAPI提供无参数范围选项读取。RoleChannel仅记录操作与状态，不记录payload。当前没有新增HTTP POST服务或第二套认证。程序错误继续抛出，正式HTTP业务拒绝由现有边界返回对应状态。
+
+TrustedContext等待N1持久入口及N2准确采用。当前F03、F02、D01、F06和原生会话的既有能力按各自准确范围复用，不由入口存在推断完整菜单通过。Scope→applied_scope→query_handoff/Topic/Source字段由当前容器及后续共享页面分别采用，公开接收14项消费者检查已有结果；实际页面与Agent传播仍待验证。
 
 ## 6. 异步、流式与恢复
 

@@ -317,10 +317,8 @@ class RoleChannel(WebSocketChannel):
             for peer in peers:
                 await peer.close(code=1000, reason="身份已退出")
             return
-        # Boss business commands reuse the authenticated WebUI mutation protocol.
-        # Scope is the WebSocket's server-authenticated role, not payload.role.
-        # Each domain command creates a transactional idempotency receipt and
-        # survives the upstream client's same-request reconnect/replay behavior.
+        # 共用当前WebSocket可信身份及请求编号，只读投影直接返回当前资料。
+        # 业务写入继续使用各自领域事务和原编号回执。
         if kind == "webui_request" and isinstance(action, str) and action.startswith("boss."):
             request_id = envelope.get("request_id")
             if not isinstance(request_id, str) or len(request_id) > 128:

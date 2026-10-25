@@ -32,6 +32,7 @@ from public_bi_scenarios import maintainer_catalog
 from public_morning import morning_read, morning_coverage_read
 from public_notification_target import notification_target
 from public_business_alerts import read_alerts, read_rules, input_catalog
+from boss_business_overview import BusinessOverviewAPI
 from boss_supply_quality import SupplyQualityAPI, external_adoption
 
 DEMO_NAMESPACE = "ui-check"
@@ -487,6 +488,9 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == '/api/boss/ui/business-overview/dimensions':
+                require(not query_string, '经营范围选项不接受URL参数', web.HTTPBadRequest)
+                return 200, BusinessOverviewAPI(self.store).dimensions(role)
             if path.startswith("/api/boss/ui/morning/"):
                 return 200, morning_read(self.store,role,path,query_string)
             if path in {"/api/boss/ui/admin/morning-coverage","/api/boss/ui/admin/morning-coverage-receipt"}:

@@ -45,6 +45,7 @@ from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQ
 from boss_bi_scenarios import BIScenarioAPI, LOAD_ACTION as BI_SCENARIO_LOAD
 from boss_morning_inputs import MorningInputAPI, LOAD_ACTION as MORNING_COVERAGE_LOAD
 from boss_morning import MorningAPI
+from public_business_overview import READ_ACTIONS as BUSINESS_OVERVIEW_READ_ACTIONS, read_business_overview
 from boss_simulation_api import _context
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
@@ -102,6 +103,7 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        **{action: 'BOSS' for action in BUSINESS_OVERVIEW_READ_ACTIONS},
         "boss.simulation.alert.load": "MAINTAINER",
         **{"boss.alert." + action: "BOSS" for action in ("ack", "snooze", "close", "meeting.link", "assignment.create")},
         **{prefix + action: role for prefix, role in (("boss.alert.rule.", "BOSS"), ("boss.simulation.alert.rule.", "MAINTAINER")) for action in ("save", "validate", "activate", "disable")},
@@ -200,7 +202,9 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action == "boss.simulation.alert.load":
+            if action in BUSINESS_OVERVIEW_READ_ACTIONS:
+                result = read_business_overview(self.store, role, action, payload)
+            elif action == "boss.simulation.alert.load":
                 from boss_alert_rules import BusinessAlertInputAPI
                 result = BusinessAlertInputAPI(self.store).load(role, payload)
             elif action.startswith(("boss.alert.rule.", "boss.simulation.alert.rule.")):
@@ -241,6 +245,8 @@ class BossCommandAPI:
         except web.HTTPException as exc:
             return exc.status, {"error": ERROR_CODE.get(exc.status, "BUSINESS_REJECTED"), "status": exc.status}
         except (TypeError, ValueError, KeyError):
+            if action in BUSINESS_OVERVIEW_READ_ACTIONS:
+                raise
             # Never leak a Python exception or private source data to renderer.
             return 400, {"error": "INVALID_INPUT"}
 
