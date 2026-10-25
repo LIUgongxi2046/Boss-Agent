@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   isActiveN02Scope, sameActiveN02Scope, mayDisplayCurrentTaskReference,
+  shouldCancelN02PositionOnInteraction,
 } from "../webui/n02-context-guard.ts";
 
 const client={id:"current-provider"};
@@ -38,4 +39,18 @@ test("late business-context replies cannot cross authentication, chat or lifecyc
     {role:"MAINTAINER"},{visible:false},{connectionStatus:"closed"},
   ])assert.equal(sameActiveN02Scope(active,{...active,...change}),false);
   assert.equal(sameActiveN02Scope({...active,visible:false},active),false);
+});
+
+test("N02 restore retry remains usable by mouse and keyboard",()=>{
+  assert.equal(shouldCancelN02PositionOnInteraction("click",null,true),false,
+    "click capture must not delete the original URL before retry");
+  assert.equal(shouldCancelN02PositionOnInteraction("keydown","Enter",true),false,
+    "keyboard Enter on retry must read the same saved original position");
+  assert.equal(shouldCancelN02PositionOnInteraction("keydown"," ",true),false);
+  assert.equal(shouldCancelN02PositionOnInteraction("keydown","Tab",false),false,
+    "Tab and Shift+Tab must be able to reach the retry control");
+  assert.equal(shouldCancelN02PositionOnInteraction("click",null,false),true,
+    "a new explicit click outside the retry control abandons recovery");
+  assert.equal(shouldCancelN02PositionOnInteraction("keydown","Escape",false),true);
+  assert.equal(shouldCancelN02PositionOnInteraction("keydown","A",false),true);
 });
