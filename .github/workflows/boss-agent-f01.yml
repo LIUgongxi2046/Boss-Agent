@@ -1,0 +1,43 @@
+name: Boss-Agent F01 focused validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "validation/**"
+      - "scripts/**"
+      - "specs/**"
+      - ".github/workflows/boss-agent-f01.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  morning-business:
+    name: F01 real domain and persistence contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked product and nanobot dependencies
+        run: uv sync --project validation --locked
+      - name: Create private project-local test directories
+        run: mkdir -p .work/ci-pytest .work/ci-tmp
+      - name: Exercise F01 classifications, source versions, CAS and public endpoints
+        env:
+          PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
+          TMPDIR: ${{ github.workspace }}/.work/ci-tmp
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --project validation --no-sync python -m pytest -q
+          --basetemp .work/ci-pytest/f01
+          app/tests/test_boss_today.py
+          app/tests/test_fc03_morning.py
+          app/tests/test_menu_f01_domain.py
+          app/tests/test_public_morning.py
