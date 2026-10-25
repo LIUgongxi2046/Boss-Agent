@@ -2,17 +2,17 @@
   "schema_version": 1,
   "execution_model": "ONE_ACTIVE_REQUIREMENT_CONTINUOUS_DELIVERY",
   "execution_scope": "BOSS-PRIORITY-ITERATION",
-  "decision_id": "D-MENU-DELIVERY-20261024",
+  "decision_id": "D-NEXT-MENU-N02-20261025",
   "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
   "design_fidelity_requirements": "docs/menu-delivery/高保真还原执行要求.md",
-  "source": "用户2026-10-25明确要求F01工程收口，固定源码、聚焦证据与人工验收入口；保留完整PRD及未完成的v7和Mac验收，不继续零散开发",
+  "source": "用户明确指令：F01工程冻结收口后继续推进下一个菜单N02，遵守开发接手与执行规范；F01 v7/目标Mac/用户验收后置、不减项不伪造通过；N03继续冻结",
   "revalidation": {
-    "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
-    "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
-    "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip",
-    "source_access": "V7_LIBRARY_ZIP_METADATA_AVAILABLE_181_MB_RAW_DESIGN_BYTES_NOT_AUTHORIZED_IN_THIS_SESSION",
+    "decision_id": "D-NEXT-MENU-N02-20261025",
+    "baseline_id": "boss-menu-n02-revalidation-v7-20261025-v1",
+    "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip / N02-聊天交办",
+    "source_access": "V7_LIBRARY_ARCHIVE_METADATA_ONLY_RAW_HTML_CSS_JS_UNAVAILABLE",
     "current_completed_checkpoints": 0,
-    "total_checkpoints": 18,
+    "total_checkpoints": 26,
     "previous_development": {
       "F01": {
         "count": 18,
@@ -29,214 +29,24 @@
     },
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
-    "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_N03_FAILURE",
+    "independent_current_main_build": "F01_SHARED_PINNED_REACT_BUILD_PASSED_N02_OPERATIONAL_E2E_NOT_RUN",
     "latest_clean_build_run_id": 40195931205,
     "paused_menu": "MENU-N03",
-    "scoped_engineering_evidence": {
-      "native_integration_commits": [
-        "855edf4af6ca681dc23dff04abed06445c90e213",
-        "df940f7db3df2c4b80712727ad8248396ea45f61",
-        "0d320b5c92d6749f5dab1e6a4567f32f47542547"
-      ],
-      "desktop_build": {
-        "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121176692836,
-        "run_id": 40195931205,
-        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_NATIVE_PATCHES_ASSET_SHA_ELECTRON_SYNTAX"
-      },
-      "repeat_preparation": {
-        "result": "PASS",
-        "job_id": 121080102274,
-        "run_id": 40163625105,
-        "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
-      },
-      "f01_business": {
-        "result": "53_PASSED_0_FAILED",
-        "run_id": 40195948810,
-        "scope": "SQLITE_DOMAIN_PUBLIC_API_AND_BUNDLE_INTEGRITY_INCLUDING_READONLY_MISSING_SORT_RECEIPT"
-      },
-      "current_full_f01_e2e": "NOT_RUN",
-      "design_v7_dom_and_visual": "NOT_RUN",
-      "user_acceptance": "PENDING_USER_ACCEPTANCE",
-      "main_legacy_comprehensive_suite": "FAILS_OUTSIDE_CURRENT_F01_SCOPE",
-      "f01_frontend_fixes": {
-        "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
-        "commit_sha": [
-          "ab24197c5e195a2b9ae47a3a0ddc4eed4381e62e",
-          "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212",
-          "e7f466dfc5d3dc0eb1a5ea3f1ab79c529b77f9d0",
-          "5092880d98c4c5d7015520c83e930d7c286767f5",
-          "1effb0f03f345c31fa878f711664a9bb3caebe41"
-        ],
-        "changes": [
-          "filtered_category_reorder",
-          "original_request_validation_and_error_recovery",
-          "technical_colon_id_return_focus",
-          "retryable_selected_detail_errors",
-          "failure_does_not_block_saved_task_focus_restore",
-          "reselect_existing_current_item_restarts_real_detail_read",
-          "filter_change_removes_offscreen_selected_item_and_source_context"
-        ]
-      },
-      "f01_order_and_return": {
-        "result": "27_PASSED_0_FAILED",
-        "run_id": 40195948810,
-        "scope": "NODE_CATEGORY_ORDER_RETURN_PREVIEW_CONTEXT_ASSIGNMENT_AND_NATIVE_BINDING_RECOVERY"
-      },
-      "f01_native_agent": {
-        "result": "39_PASSED_0_FAILED",
-        "run_id": 40195948810,
-        "scope": "SIMULATED_NATIVE_NANOBOT_SDK_TOOLS_SOURCE_AUTHORIZATION_AND_ORIGINAL_BINDING"
-      },
-      "f01_preview_and_source": {
-        "result": "SOURCE_FIXES_WITH_SCOPED_TEST_AND_BUILD_ONLY",
-        "commits": [
-          "56b7e57a5a651055ffbc1ac309d6ab11dfbdbf26",
-          "e2021d95f5d8cb5367c352e05106bff5486ae453",
-          "00431ece9f8f31d3b2032e5a174dde52ce411b4f",
-          "559ab1a6972823eb427ecf0ec6289f49839e36d9",
-          "2bb3e901789336006438115eba31f8d0053f0617"
-        ],
-        "changes": [
-          "date_preview_does_not_fake_current_detail_loading",
-          "invalidated_list_cannot_adopt_old_details_or_sources",
-          "current_source_read_error_has_explicit_retry",
-          "strict_current_list_id_type_guard"
-        ],
-        "validation_scope": "NO_AUTHENTICATED_UI_OR_V7_DOM_CHECK"
-      },
-      "f01_morning_to_assignment": {
-        "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
-        "commit_shas": [
-          "7e44072f2911513eceb7fe9c787dafdffe51e006",
-          "418a2551a4680d70f355f953f0e3698166b24adc",
-          "bd5d2e4d8b057aadc0824da64763cd2ebe95d98d",
-          "a7010f5e573d436eeb0abd84e3501c77e9ff57a4",
-          "0875b79dd0fbb1e36b8db8a76ae6e3fd15244a74"
-        ],
-        "verified_scope": [
-          "exact_current_list_item_source_and_version",
-          "allowed_non_finance_source_to_open_assignment",
-          "unbound_legacy_source_policy_unchanged",
-          "unrelated_current_source_denied_with_zero_business_write"
-        ],
-        "f01_ci_run_id": 40183732776,
-        "current_main_product_gui": "NOT_RUN",
-        "source_design_v7": "NOT_AVAILABLE_AS_VERIFIABLE_RAW_BYTES"
-      },
-      "f01_exact_version_artifact": {
-        "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
-        "workflow_run_id": 40195931205,
-        "artifact_id": 12599921374,
-        "artifact_name": "boss-f01-frontend-5ac660330fce99c925163f06a62951563a24d383",
-        "zip_sha256": "ca3860e98b0547c8bb9384e65bad5726a05b4719d2393dbf9a96700ea5f7eea3",
-        "artifact_limit": "FRONTEND_BUILD_ONLY_NOT_MAC_GUI_OR_V7_ACCEPTED",
-        "manual_launch": "scripts/run_f01_manual_review.command",
-        "preflight": "scripts/verify_f01_candidate.py",
-        "instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md"
-      },
-      "f01_original_request_recovery": {
-        "result": "SCOPED_TESTED_NOT_FULL_UI_E2E",
-        "relevant_checkpoints": [
-          "MENU-F01.C08",
-          "MENU-F01.C11",
-          "MENU-F01.C15",
-          "MENU-F01.C17"
-        ],
-        "source_commits": [
-          "309cd1981b1c2931df0f5f4cc9189a41a5950ba9",
-          "5e8f1860f7fa5c7f8d48a003a15836be7cade556",
-          "00fda92e4099c5f1f29d080bb795202ca92e46a0",
-          "dc3dc7cfbdab6165d424c9553ef42e3d8b0f93c0",
-          "ae72eff43c87d2886cceb15036f338d17e4801d1"
-        ],
-        "guarantees": [
-          "RECORD_WITH_REAL_AUTHORIZATION_BEFORE_SUCCESS",
-          "RECORDED_ORDER_URL_ID_CLEARED_ONLY_EXACT_MATCH",
-          "MISSING_RECEIPT_REQUIRES_EXPLICIT_OWNER_ACKNOWLEDGEMENT",
-          "NEVER_REPLAY_ON_NETWORK_ERROR",
-          "BINDING_MISSING_REQUIRES_STRICT_READONLY_RECEIPT",
-          "NO_AUTOMATIC_NATIVE_MESSAGE_SUBMISSION"
-        ],
-        "frontend_node": 27,
-        "agent_sdk": 39,
-        "domain_and_asset": 53,
-        "full_native_desktop_recovery": "NOT_RUN"
-      }
-    },
-    "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度",
-    "closeout": {
-      "decision_id": "D-MENU-F01-SCOPE-FREEZE-20261025",
-      "status": "ENGINEERING_SCOPE_FROZEN__REQUIRED_V7_AND_MAC_EVIDENCE_PENDING",
-      "active_menu": "MENU-F01",
+    "f01_deferral": {
+      "status": "ENGINEERING_FROZEN_AND_V7_GUI_ACCEPTANCE_DEFERRED_BY_EXPLICIT_NEXT_MENU_INSTRUCTION",
       "record": "docs/menu-delivery/F01/closeout.md",
-      "user_intent": "F01收口吧",
-      "freeze_source_commit": "5ac660330fce99c925163f06a62951563a24d383",
-      "code_compare": {
-        "base": "5ac660330fce99c925163f06a62951563a24d383",
-        "head": "fa2a4ac36989332e52168c2f5fff7830b63d519d",
-        "conclusion": "PRODUCT_SOURCE_UNCHANGED_AFTER_FROZEN_ARTIFACT",
-        "changed_files": [
-          ".github/workflows/boss-agent-f01.yml",
-          "docs/menu-delivery/F01/integration.md",
-          "specs/feature-delivery.json"
-        ]
-      },
-      "verified_scoped_tests": {
-        "node": 27,
-        "native_agent": 39,
-        "sqlite_api_and_artifact": 53,
-        "run_id": 40195948810
-      },
-      "build": {
-        "result": "REACT_WEBUI_BUILD_PASSED__COMPREHENSIVE_PYTHON_WORKFLOW_FAILED_OTHER_N03",
-        "run_id": 40195931205,
-        "artifact_id": 12599921374,
-        "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
-        "artifact_expires_at": "2026-11-08T13:05:21Z"
-      },
-      "not_yet_verified": {
-        "f01_v7_html_css_js_assets": "UNAVAILABLE_AS_AUTHORIZED_RAW_BYTES",
-        "v7_dom_style_responsive_comparison": "NOT_RUN",
-        "target_mac_isolated_manual_login_and_business_e2e": "NOT_RUN",
-        "visual_feedback": "NOT_RUN",
-        "user_acceptance": "PENDING_USER_ACCEPTANCE"
-      },
-      "unclosed_current_v7_checkpoints": [
-        "MENU-F01.C01",
-        "MENU-F01.C02",
-        "MENU-F01.C03",
-        "MENU-F01.C04",
-        "MENU-F01.C05",
-        "MENU-F01.C06",
-        "MENU-F01.C07",
-        "MENU-F01.C08",
-        "MENU-F01.C09",
-        "MENU-F01.C10",
-        "MENU-F01.C11",
-        "MENU-F01.C12",
-        "MENU-F01.C13",
-        "MENU-F01.C14",
-        "MENU-F01.C15",
-        "MENU-F01.C16",
-        "MENU-F01.C17",
-        "MENU-F01.C18"
-      ],
-      "historical_v6_covered_checkpoint_count": 18,
-      "exact_version_manual_instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md",
-      "permitted_reopen_causes": [
-        "V7_RAW_REFERENCE_AVAILABLE_FOR_SINGLE_SCOPED_COMPARISON",
-        "USER_AUTHORIZED_MAC_ISOLATED_MANUAL_REVIEW",
-        "CONFIRMED_BLOCKING_REGRESSION"
-      ],
-      "other_work": "DO_NOT_START_N02_OR_RESUME_N03_UNTIL_FORMAL_GATE_OR_NEW_EXPLICIT_USER_PRIORITY_DECISION",
-      "policies": [
-        "NO_AUTOMATIC_AUTHENTICATION",
-        "NO_VISUAL_SCREENSHOT",
-        "NO_UNAPPROVED_EXTERNAL_MODEL_API",
-        "NO_USER_PROCESS_OR_DATA_SWITCH",
-        "NO_AUTOMATION_RESTART"
-      ]
+      "frozen_source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+      "unchanged_v7_full_checkpoints": 0,
+      "total": 18,
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "f01_source_snapshot_field": "deferred_menu_f01",
+      "no_waiver_of_criteria": true
+    },
+    "scoped_engineering_evidence": {
+      "native_base": "F01_SHARED_NATIVE_BUILD_ONLY",
+      "n02_current_gui": "NOT_RUN",
+      "n02_current_v7_dom": "NOT_RUN",
+      "n02_current_all_26": "NOT_RUN"
     }
   },
   "suspended_current_menu": {
@@ -484,13 +294,13 @@
     "status": "PAUSED_WITH_SOURCE_AND_EVIDENCE_PRESERVED"
   },
   "plan": "docs/菜单开发总计划.md",
-  "active_feature_id": "MENU-F01",
-  "active_ticket": "docs/menu-delivery/F01.md",
-  "current_stage": "MENU_F01_ENGINEERING_FROZEN_AWAITING_V7_AND_MAC_EVIDENCE",
+  "active_feature_id": "MENU-N02",
+  "active_ticket": "docs/menu-delivery/N02.md",
+  "current_stage": "MENU_N02_V7_REVALIDATION_AND_IMPLEMENTATION",
   "candidate_commit": null,
   "implementation_commit": null,
   "baseline_commit": "7527537830f6c011c328dc3bb6b7567ff262c20b",
-  "development_record": "docs/menu-delivery/F01/integration.md",
+  "development_record": "docs/menu-delivery/N02/integration.md",
   "delivery_record": null,
   "experience_instructions": null,
   "experience_launcher": null,
@@ -502,13 +312,13 @@
   "inventory": null,
   "inventory_sha256": null,
   "directed_review": {
-    "status": "PENDING_RAW_V7_DESIGN_AND_AUTHORIZED_MAC_GUI",
-    "feature_id": "MENU-F01",
-    "record": "docs/menu-delivery/F01/integration.md",
+    "status": "PENDING_N02_V7_REFERENCE_AND_CURRENT_BUILD",
+    "feature_id": "MENU-N02",
+    "record": "docs/menu-delivery/N02/integration.md",
     "independent_product_run": false,
     "visual": "NOT_RUN"
   },
-  "candidate_scope": "F01工程冻结：保留已实现的日期/分类/来源/排序/原生晨间会话/交办与状态修复；新v7完整18项检查及Mac受控人工登录/交互仍须同版本证据，不降级设计和权限",
+  "candidate_scope": "N02全部26项按完整FR-08/24/29与最新Desktop v7长页重新核验，复用原v6 26/26领域/SDK/原生会话，补当前真实缺口与明确限制；F01工程冻结/验收后置，N03已有开发不推进",
   "menu_completed_development_ids": [
     "MENU-F01",
     "MENU-N02"
@@ -993,8 +803,8 @@
   "feature_status": "IN_PROGRESS",
   "development_covered_checkpoints": 0,
   "verified_checkpoints": null,
-  "total_checkpoints": 18,
-  "acceptance_baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
+  "total_checkpoints": 26,
+  "acceptance_baseline_id": "boss-menu-n02-revalidation-v7-20261025-v1",
   "development_status": "IN_PROGRESS",
   "acceptance_owner": "USER_AND_SUPERVISOR",
   "acceptance_status": "PENDING_USER_ACCEPTANCE",
@@ -1031,7 +841,7 @@
     "affected_work": "INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY",
     "applicability": "SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"
   },
-  "checkpoint_evidence_policy": "本轮F01稳定18项检查点，当前v7逐项重核0/18；历史v6 F01 18/18和N02 26/26完整保留不转为当前已验收；业务、视觉、交互、可重建版本和用户验收分开登记",
+  "checkpoint_evidence_policy": "本轮N02完整26项按准确版本逐点验收；原v6 N02 26/26仅历史开发证据；F01源码冻结后置v7验收不冒称通过；用户/视觉待确认独立记录",
   "completed_features": [
     {
       "feature_id": "FC01",
@@ -1072,8 +882,8 @@
   "queue": [],
   "planning_queue_source": "specs/menu-plan.json",
   "remaining_feature_status": "CONTINUE_MENU_QUEUE_AFTER_CURRENT_COMPLETE",
-  "post_current_work_item": "MENU-N02",
-  "post_current_ticket": "docs/menu-delivery/N02.md",
+  "post_current_work_item": "MENU-N03",
+  "post_current_ticket": "docs/menu-delivery/N03.md",
   "post_ui_action": "CONTINUE_F01_THEN_N02_THEN_RESUME_N03",
   "paused_feature_ids": [
     "FC28"
@@ -1154,147 +964,195 @@
       "responsibility": "业务数据与领域服务",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
       "thread_id": null,
-      "task_id": "MENU-F01-N1",
-      "development_record": "docs/menu-delivery/F01/backend.md",
-      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "task_id": "MENU-N02-N1",
+      "development_record": "docs/menu-delivery/N02/backend.md",
+      "activation_condition": "ONLY_IF_CURRENT_N02_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
       "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N2": {
       "responsibility": "Agent工具与运行采用",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent",
       "thread_id": null,
-      "task_id": "MENU-F01-N2",
-      "development_record": "docs/menu-delivery/F01/agent.md",
-      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "task_id": "MENU-N02-N2",
+      "development_record": "docs/menu-delivery/N02/agent.md",
+      "activation_condition": "ONLY_IF_CURRENT_N02_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
       "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N3": {
       "responsibility": "高保真界面、公共集成与功能推进",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
       "thread_id": null,
-      "task_id": "MENU-F01-N3",
-      "development_record": "docs/menu-delivery/F01/integration.md",
-      "activation_condition": "CURRENT_REVALIDATION_OWNER_NOT_DISPATCHED",
+      "task_id": "MENU-N02-N3",
+      "development_record": "docs/menu-delivery/N02/integration.md",
+      "activation_condition": "CURRENT_N02_IMPLEMENTATION_OWNER_NO_DEV_CHAT",
       "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N4": {
       "responsibility": "当前菜单PRD、原设计与实现差距矩阵及必要定向验证，用户验收单独登记",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent",
       "thread_id": null,
-      "task_id": "MENU-F01-N4",
-      "development_record": "docs/menu-delivery/F01/design-rework.md",
-      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "task_id": "MENU-N02-N4",
+      "development_record": "docs/menu-delivery/N02/qa.md",
+      "activation_condition": "ONLY_IF_CURRENT_N02_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
       "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     }
   },
   "checkpoints": [
     {
-      "id": "MENU-F01.C01",
+      "id": "MENU-N02.C01",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C01"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C01"
     },
     {
-      "id": "MENU-F01.C02",
+      "id": "MENU-N02.C02",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C02"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C02"
     },
     {
-      "id": "MENU-F01.C03",
+      "id": "MENU-N02.C03",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C03"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C03"
     },
     {
-      "id": "MENU-F01.C04",
+      "id": "MENU-N02.C04",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C04"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C04"
     },
     {
-      "id": "MENU-F01.C05",
+      "id": "MENU-N02.C05",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C05"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C05"
     },
     {
-      "id": "MENU-F01.C06",
+      "id": "MENU-N02.C06",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C06"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C06"
     },
     {
-      "id": "MENU-F01.C07",
+      "id": "MENU-N02.C07",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C07"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C07"
     },
     {
-      "id": "MENU-F01.C08",
+      "id": "MENU-N02.C08",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C08"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C08"
     },
     {
-      "id": "MENU-F01.C09",
+      "id": "MENU-N02.C09",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C09"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C09"
     },
     {
-      "id": "MENU-F01.C10",
+      "id": "MENU-N02.C10",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C10"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C10"
     },
     {
-      "id": "MENU-F01.C11",
+      "id": "MENU-N02.C11",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C11"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C11"
     },
     {
-      "id": "MENU-F01.C12",
+      "id": "MENU-N02.C12",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C12"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C12"
     },
     {
-      "id": "MENU-F01.C13",
+      "id": "MENU-N02.C13",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C13"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C13"
     },
     {
-      "id": "MENU-F01.C14",
+      "id": "MENU-N02.C14",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C14"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C14"
     },
     {
-      "id": "MENU-F01.C15",
+      "id": "MENU-N02.C15",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C15"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C15"
     },
     {
-      "id": "MENU-F01.C16",
+      "id": "MENU-N02.C16",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C16"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C16"
     },
     {
-      "id": "MENU-F01.C17",
+      "id": "MENU-N02.C17",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C17"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C17"
     },
     {
-      "id": "MENU-F01.C18",
+      "id": "MENU-N02.C18",
       "status": "NOT_RUN",
       "development_status": "NOT_RUN",
-      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C18"
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C18"
+    },
+    {
+      "id": "MENU-N02.C19",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C19"
+    },
+    {
+      "id": "MENU-N02.C20",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C20"
+    },
+    {
+      "id": "MENU-N02.C21",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C21"
+    },
+    {
+      "id": "MENU-N02.C22",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C22"
+    },
+    {
+      "id": "MENU-N02.C23",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C23"
+    },
+    {
+      "id": "MENU-N02.C24",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C24"
+    },
+    {
+      "id": "MENU-N02.C25",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C25"
+    },
+    {
+      "id": "MENU-N02.C26",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/N02/delivery.json#/checkpoint_development_evidence/MENU-N02.C26"
     }
   ],
   "historical_menu_f01_checkpoints": [
@@ -1801,5 +1659,399 @@
       "id": "FC03.C22",
       "status": "NOT_RUN"
     }
-  ]
+  ],
+  "deferred_menu_f01": {
+    "active_feature_id": "MENU-F01",
+    "active_ticket": "docs/menu-delivery/F01.md",
+    "current_stage": "MENU_F01_ENGINEERING_FROZEN_AWAITING_V7_AND_MAC_EVIDENCE",
+    "development_status": "IN_PROGRESS",
+    "acceptance_status": "PENDING_USER_ACCEPTANCE",
+    "development_covered_checkpoints": 0,
+    "total_checkpoints": 18,
+    "acceptance_baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
+    "checkpoints": [
+      {
+        "id": "MENU-F01.C01",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C01"
+      },
+      {
+        "id": "MENU-F01.C02",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C02"
+      },
+      {
+        "id": "MENU-F01.C03",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C03"
+      },
+      {
+        "id": "MENU-F01.C04",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C04"
+      },
+      {
+        "id": "MENU-F01.C05",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C05"
+      },
+      {
+        "id": "MENU-F01.C06",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C06"
+      },
+      {
+        "id": "MENU-F01.C07",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C07"
+      },
+      {
+        "id": "MENU-F01.C08",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C08"
+      },
+      {
+        "id": "MENU-F01.C09",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C09"
+      },
+      {
+        "id": "MENU-F01.C10",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C10"
+      },
+      {
+        "id": "MENU-F01.C11",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C11"
+      },
+      {
+        "id": "MENU-F01.C12",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C12"
+      },
+      {
+        "id": "MENU-F01.C13",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C13"
+      },
+      {
+        "id": "MENU-F01.C14",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C14"
+      },
+      {
+        "id": "MENU-F01.C15",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C15"
+      },
+      {
+        "id": "MENU-F01.C16",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C16"
+      },
+      {
+        "id": "MENU-F01.C17",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C17"
+      },
+      {
+        "id": "MENU-F01.C18",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN",
+        "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C18"
+      }
+    ],
+    "revalidation": {
+      "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
+      "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
+      "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip",
+      "source_access": "V7_LIBRARY_ZIP_METADATA_AVAILABLE_181_MB_RAW_DESIGN_BYTES_NOT_AUTHORIZED_IN_THIS_SESSION",
+      "current_completed_checkpoints": 0,
+      "total_checkpoints": 18,
+      "previous_development": {
+        "F01": {
+          "count": 18,
+          "total": 18,
+          "source": "docs/menu-delivery/F01/delivery-rework.json",
+          "design": "Desktop v6"
+        },
+        "N02": {
+          "count": 26,
+          "total": 26,
+          "source": "docs/menu-delivery/N02/delivery.json",
+          "design": "Desktop v6"
+        }
+      },
+      "visual": "NOT_RUN",
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_N03_FAILURE",
+      "latest_clean_build_run_id": 40195931205,
+      "paused_menu": "MENU-N03",
+      "scoped_engineering_evidence": {
+        "native_integration_commits": [
+          "855edf4af6ca681dc23dff04abed06445c90e213",
+          "df940f7db3df2c4b80712727ad8248396ea45f61",
+          "0d320b5c92d6749f5dab1e6a4567f32f47542547"
+        ],
+        "desktop_build": {
+          "result": "PASS_REACT_JOB_ONLY",
+          "job_id": 121176692836,
+          "run_id": 40195931205,
+          "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_NATIVE_PATCHES_ASSET_SHA_ELECTRON_SYNTAX"
+        },
+        "repeat_preparation": {
+          "result": "PASS",
+          "job_id": 121080102274,
+          "run_id": 40163625105,
+          "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
+        },
+        "f01_business": {
+          "result": "53_PASSED_0_FAILED",
+          "run_id": 40195948810,
+          "scope": "SQLITE_DOMAIN_PUBLIC_API_AND_BUNDLE_INTEGRITY_INCLUDING_READONLY_MISSING_SORT_RECEIPT"
+        },
+        "current_full_f01_e2e": "NOT_RUN",
+        "design_v7_dom_and_visual": "NOT_RUN",
+        "user_acceptance": "PENDING_USER_ACCEPTANCE",
+        "main_legacy_comprehensive_suite": "FAILS_OUTSIDE_CURRENT_F01_SCOPE",
+        "f01_frontend_fixes": {
+          "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
+          "commit_sha": [
+            "ab24197c5e195a2b9ae47a3a0ddc4eed4381e62e",
+            "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212",
+            "e7f466dfc5d3dc0eb1a5ea3f1ab79c529b77f9d0",
+            "5092880d98c4c5d7015520c83e930d7c286767f5",
+            "1effb0f03f345c31fa878f711664a9bb3caebe41"
+          ],
+          "changes": [
+            "filtered_category_reorder",
+            "original_request_validation_and_error_recovery",
+            "technical_colon_id_return_focus",
+            "retryable_selected_detail_errors",
+            "failure_does_not_block_saved_task_focus_restore",
+            "reselect_existing_current_item_restarts_real_detail_read",
+            "filter_change_removes_offscreen_selected_item_and_source_context"
+          ]
+        },
+        "f01_order_and_return": {
+          "result": "27_PASSED_0_FAILED",
+          "run_id": 40195948810,
+          "scope": "NODE_CATEGORY_ORDER_RETURN_PREVIEW_CONTEXT_ASSIGNMENT_AND_NATIVE_BINDING_RECOVERY"
+        },
+        "f01_native_agent": {
+          "result": "39_PASSED_0_FAILED",
+          "run_id": 40195948810,
+          "scope": "SIMULATED_NATIVE_NANOBOT_SDK_TOOLS_SOURCE_AUTHORIZATION_AND_ORIGINAL_BINDING"
+        },
+        "f01_preview_and_source": {
+          "result": "SOURCE_FIXES_WITH_SCOPED_TEST_AND_BUILD_ONLY",
+          "commits": [
+            "56b7e57a5a651055ffbc1ac309d6ab11dfbdbf26",
+            "e2021d95f5d8cb5367c352e05106bff5486ae453",
+            "00431ece9f8f31d3b2032e5a174dde52ce411b4f",
+            "559ab1a6972823eb427ecf0ec6289f49839e36d9",
+            "2bb3e901789336006438115eba31f8d0053f0617"
+          ],
+          "changes": [
+            "date_preview_does_not_fake_current_detail_loading",
+            "invalidated_list_cannot_adopt_old_details_or_sources",
+            "current_source_read_error_has_explicit_retry",
+            "strict_current_list_id_type_guard"
+          ],
+          "validation_scope": "NO_AUTHENTICATED_UI_OR_V7_DOM_CHECK"
+        },
+        "f01_morning_to_assignment": {
+          "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
+          "commit_shas": [
+            "7e44072f2911513eceb7fe9c787dafdffe51e006",
+            "418a2551a4680d70f355f953f0e3698166b24adc",
+            "bd5d2e4d8b057aadc0824da64763cd2ebe95d98d",
+            "a7010f5e573d436eeb0abd84e3501c77e9ff57a4",
+            "0875b79dd0fbb1e36b8db8a76ae6e3fd15244a74"
+          ],
+          "verified_scope": [
+            "exact_current_list_item_source_and_version",
+            "allowed_non_finance_source_to_open_assignment",
+            "unbound_legacy_source_policy_unchanged",
+            "unrelated_current_source_denied_with_zero_business_write"
+          ],
+          "f01_ci_run_id": 40183732776,
+          "current_main_product_gui": "NOT_RUN",
+          "source_design_v7": "NOT_AVAILABLE_AS_VERIFIABLE_RAW_BYTES"
+        },
+        "f01_exact_version_artifact": {
+          "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+          "workflow_run_id": 40195931205,
+          "artifact_id": 12599921374,
+          "artifact_name": "boss-f01-frontend-5ac660330fce99c925163f06a62951563a24d383",
+          "zip_sha256": "ca3860e98b0547c8bb9384e65bad5726a05b4719d2393dbf9a96700ea5f7eea3",
+          "artifact_limit": "FRONTEND_BUILD_ONLY_NOT_MAC_GUI_OR_V7_ACCEPTED",
+          "manual_launch": "scripts/run_f01_manual_review.command",
+          "preflight": "scripts/verify_f01_candidate.py",
+          "instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md"
+        },
+        "f01_original_request_recovery": {
+          "result": "SCOPED_TESTED_NOT_FULL_UI_E2E",
+          "relevant_checkpoints": [
+            "MENU-F01.C08",
+            "MENU-F01.C11",
+            "MENU-F01.C15",
+            "MENU-F01.C17"
+          ],
+          "source_commits": [
+            "309cd1981b1c2931df0f5f4cc9189a41a5950ba9",
+            "5e8f1860f7fa5c7f8d48a003a15836be7cade556",
+            "00fda92e4099c5f1f29d080bb795202ca92e46a0",
+            "dc3dc7cfbdab6165d424c9553ef42e3d8b0f93c0",
+            "ae72eff43c87d2886cceb15036f338d17e4801d1"
+          ],
+          "guarantees": [
+            "RECORD_WITH_REAL_AUTHORIZATION_BEFORE_SUCCESS",
+            "RECORDED_ORDER_URL_ID_CLEARED_ONLY_EXACT_MATCH",
+            "MISSING_RECEIPT_REQUIRES_EXPLICIT_OWNER_ACKNOWLEDGEMENT",
+            "NEVER_REPLAY_ON_NETWORK_ERROR",
+            "BINDING_MISSING_REQUIRES_STRICT_READONLY_RECEIPT",
+            "NO_AUTOMATIC_NATIVE_MESSAGE_SUBMISSION"
+          ],
+          "frontend_node": 27,
+          "agent_sdk": 39,
+          "domain_and_asset": 53,
+          "full_native_desktop_recovery": "NOT_RUN"
+        }
+      },
+      "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度",
+      "closeout": {
+        "decision_id": "D-MENU-F01-SCOPE-FREEZE-20261025",
+        "status": "ENGINEERING_SCOPE_FROZEN__REQUIRED_V7_AND_MAC_EVIDENCE_PENDING",
+        "active_menu": "MENU-F01",
+        "record": "docs/menu-delivery/F01/closeout.md",
+        "user_intent": "F01收口吧",
+        "freeze_source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+        "code_compare": {
+          "base": "5ac660330fce99c925163f06a62951563a24d383",
+          "head": "fa2a4ac36989332e52168c2f5fff7830b63d519d",
+          "conclusion": "PRODUCT_SOURCE_UNCHANGED_AFTER_FROZEN_ARTIFACT",
+          "changed_files": [
+            ".github/workflows/boss-agent-f01.yml",
+            "docs/menu-delivery/F01/integration.md",
+            "specs/feature-delivery.json"
+          ]
+        },
+        "verified_scoped_tests": {
+          "node": 27,
+          "native_agent": 39,
+          "sqlite_api_and_artifact": 53,
+          "run_id": 40195948810
+        },
+        "build": {
+          "result": "REACT_WEBUI_BUILD_PASSED__COMPREHENSIVE_PYTHON_WORKFLOW_FAILED_OTHER_N03",
+          "run_id": 40195931205,
+          "artifact_id": 12599921374,
+          "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+          "artifact_expires_at": "2026-11-08T13:05:21Z"
+        },
+        "not_yet_verified": {
+          "f01_v7_html_css_js_assets": "UNAVAILABLE_AS_AUTHORIZED_RAW_BYTES",
+          "v7_dom_style_responsive_comparison": "NOT_RUN",
+          "target_mac_isolated_manual_login_and_business_e2e": "NOT_RUN",
+          "visual_feedback": "NOT_RUN",
+          "user_acceptance": "PENDING_USER_ACCEPTANCE"
+        },
+        "unclosed_current_v7_checkpoints": [
+          "MENU-F01.C01",
+          "MENU-F01.C02",
+          "MENU-F01.C03",
+          "MENU-F01.C04",
+          "MENU-F01.C05",
+          "MENU-F01.C06",
+          "MENU-F01.C07",
+          "MENU-F01.C08",
+          "MENU-F01.C09",
+          "MENU-F01.C10",
+          "MENU-F01.C11",
+          "MENU-F01.C12",
+          "MENU-F01.C13",
+          "MENU-F01.C14",
+          "MENU-F01.C15",
+          "MENU-F01.C16",
+          "MENU-F01.C17",
+          "MENU-F01.C18"
+        ],
+        "historical_v6_covered_checkpoint_count": 18,
+        "exact_version_manual_instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md",
+        "permitted_reopen_causes": [
+          "V7_RAW_REFERENCE_AVAILABLE_FOR_SINGLE_SCOPED_COMPARISON",
+          "USER_AUTHORIZED_MAC_ISOLATED_MANUAL_REVIEW",
+          "CONFIRMED_BLOCKING_REGRESSION"
+        ],
+        "other_work": "DO_NOT_START_N02_OR_RESUME_N03_UNTIL_FORMAL_GATE_OR_NEW_EXPLICIT_USER_PRIORITY_DECISION",
+        "policies": [
+          "NO_AUTOMATIC_AUTHENTICATION",
+          "NO_VISUAL_SCREENSHOT",
+          "NO_UNAPPROVED_EXTERNAL_MODEL_API",
+          "NO_USER_PROCESS_OR_DATA_SWITCH",
+          "NO_AUTOMATION_RESTART"
+        ]
+      }
+    },
+    "source": "用户2026-10-25明确要求F01工程收口，固定源码、聚焦证据与人工验收入口；保留完整PRD及未完成的v7和Mac验收，不继续零散开发",
+    "delivery_record": null,
+    "experience_launcher": null,
+    "roles": {
+      "N1": {
+        "responsibility": "业务数据与领域服务",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+        "thread_id": null,
+        "task_id": "MENU-F01-N1",
+        "development_record": "docs/menu-delivery/F01/backend.md",
+        "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+        "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
+      },
+      "N2": {
+        "responsibility": "Agent工具与运行采用",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent",
+        "thread_id": null,
+        "task_id": "MENU-F01-N2",
+        "development_record": "docs/menu-delivery/F01/agent.md",
+        "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+        "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
+      },
+      "N3": {
+        "responsibility": "高保真界面、公共集成与功能推进",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+        "thread_id": null,
+        "task_id": "MENU-F01-N3",
+        "development_record": "docs/menu-delivery/F01/integration.md",
+        "activation_condition": "CURRENT_REVALIDATION_OWNER_NOT_DISPATCHED",
+        "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
+      },
+      "N4": {
+        "responsibility": "当前菜单PRD、原设计与实现差距矩阵及必要定向验证，用户验收单独登记",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent",
+        "thread_id": null,
+        "task_id": "MENU-F01-N4",
+        "development_record": "docs/menu-delivery/F01/design-rework.md",
+        "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+        "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
+      }
+    }
+  }
 }
