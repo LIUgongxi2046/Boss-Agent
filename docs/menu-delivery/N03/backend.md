@@ -6,6 +6,8 @@ task_id=MENU-N03-N1；marker=MENU-N03-START-20261025；依据原始docs/menu-del
 
 原生入口补充marker=MENU-N03-N1-NATIVE-ENTRY-20261025，范围为C16/C18/C20/C24必要领域绑定。依据N2准确设计6d9eacf2725f82a103daabc778453ee5aea07b52的docs/menu-delivery/N03/agent.md，读取PRODUCT a8cc2446be0f4a94022c15d841814514012492d8及N1基准4b48ccb2fa8e586de26aa5a16e7c0ea1c742e47e。入口领域状态MODULE_CHECKS_PASSED；采用独立经营准备与绑定，task_entry保持固定任务语义。真实Session、来源与范围变化、同库重开、原编号历史、互斥及零业务变更检查维护于app/tests/test_menu_n03_entry.py。公共Page/Command/RoleChannel/application/认证/Shell/Agent仍由原角色维护。
 
+原生入口实施提交d57de121854c656ba2a068392298c121ab05af29，准确八份文件；本记录提供该提交的接口与证据。原五项未提交内容没有进入提交。
+
 ## 当前依据与边界
 
 完整读取当前工单和适用AGENTS，沿用S008任务记录、实施与接口检查规范。核查准确PRODUCT基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57的BossSectorAPI、正式BI计算、SimulationAPI、供应品质、经营提醒、任务和来源规则；验证时PRODUCT HEAD为ba59c33bc3cc6b914bdd0b0792aeedc49b3f2220，相关领域文件与基准相同。PRODUCT目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，仅作只读依赖。记忆索引没有本任务相关证据。
