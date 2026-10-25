@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="11" time="5.211" timestamp="2026-10-23T21:19:29.138126+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_explicit_import_and_role_scoped_receipt[SI09]" time="0.014"><failure message="AssertionError: {'error': 'API_NOT_FOUND'}&#10;assert 404 == 200">app/tests/test_product_supply_quality.py:27: in test_public_supply_quality_explicit_import_and_role_scoped_receipt
+    assert code == 200, view
+E   AssertionError: {'error': 'API_NOT_FOUND'}
+E   assert 404 == 200</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_explicit_import_and_role_scoped_receipt[SI10]" time="0.009"><failure message="AssertionError: {'error': 'API_NOT_FOUND'}&#10;assert 404 == 200">app/tests/test_product_supply_quality.py:27: in test_public_supply_quality_explicit_import_and_role_scoped_receipt
+    assert code == 200, view
+E   AssertionError: {'error': 'API_NOT_FOUND'}
+E   assert 404 == 200</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_import_preserves_actual_outcome_and_receipt[empty_request-200-EMPTY]" time="0.047"><failure message="AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})&#10;assert 404 == 200">app/tests/test_product_supply_quality.py:47: in test_public_supply_quality_import_preserves_actual_outcome_and_receipt
+    assert response[0] == status, response
+E   AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})
+E   assert 404 == 200</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_import_preserves_actual_outcome_and_receipt[failed_request-502-FAILED]" time="0.044"><failure message="AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})&#10;assert 404 == 502">app/tests/test_product_supply_quality.py:47: in test_public_supply_quality_import_preserves_actual_outcome_and_receipt
+    assert response[0] == status, response
+E   AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})
+E   assert 404 == 502</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_import_preserves_actual_outcome_and_receipt[timeout_request-504-TIMED_OUT]" time="0.042"><failure message="AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})&#10;assert 404 == 504">app/tests/test_product_supply_quality.py:47: in test_public_supply_quality_import_preserves_actual_outcome_and_receipt
+    assert response[0] == status, response
+E   AssertionError: (404, {'error': 'UNKNOWN_COMMAND'})
+E   assert 404 == 504</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_rejects_invalid_scope[]" time="0.010"><failure message="assert 404 == 400">app/tests/test_product_supply_quality.py:57: in test_public_supply_quality_rejects_invalid_scope
+    assert BossPageAPI(store).serve("BOSS", "/api/boss/ui/supply-quality", query)[0] == 400
+E   assert 404 == 400</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_rejects_invalid_scope[interface_id=]" time="0.009"><failure message="assert 404 == 400">app/tests/test_product_supply_quality.py:57: in test_public_supply_quality_rejects_invalid_scope
+    assert BossPageAPI(store).serve("BOSS", "/api/boss/ui/supply-quality", query)[0] == 400
+E   assert 404 == 400</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_rejects_invalid_scope[interface_id=SI09&amp;interface_id=SI10]" time="0.010"><failure message="assert 404 == 400">app/tests/test_product_supply_quality.py:57: in test_public_supply_quality_rejects_invalid_scope
+    assert BossPageAPI(store).serve("BOSS", "/api/boss/ui/supply-quality", query)[0] == 400
+E   assert 404 == 400</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_rejects_invalid_scope[interface_id=SI09&amp;namespace=ui-check]" time="0.011"><failure message="assert 404 == 400">app/tests/test_product_supply_quality.py:57: in test_public_supply_quality_rejects_invalid_scope
+    assert BossPageAPI(store).serve("BOSS", "/api/boss/ui/supply-quality", query)[0] == 400
+E   assert 404 == 400</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_supply_quality_rejects_invalid_scope[interface_id=SI13]" time="0.009"><failure message="assert 404 == 400">app/tests/test_product_supply_quality.py:57: in test_public_supply_quality_rejects_invalid_scope
+    assert BossPageAPI(store).serve("BOSS", "/api/boss/ui/supply-quality", query)[0] == 400
+E   assert 404 == 400</failure></testcase><testcase classname="app.tests.test_product_supply_quality" name="test_public_source_consumers_require_current_external_dependencies" time="0.043"><failure message="assert 404 == 200">app/tests/test_product_supply_quality.py:64: in test_public_source_consumers_require_current_external_dependencies
+    assert BossCommandAPI(store).execute("MAINTAINER", IMPORT_ACTION, definition()["initial_request"])[0] == 200
+E   assert 404 == 200</failure></testcase></testsuite></testsuites>

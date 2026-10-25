@@ -1,0 +1,13 @@
+*** Begin Patch
+*** Update File: .work/product/nanobot/webui/src/lib/nanobot-client.ts
+@@
+-      this.rawSendSerialized(pending.serializedFrame);
++      // 晨间请求与本人排序在连接中断后只读取原请求结果。
++      if (["boss.today.reorder", "boss.morning.query", "boss.simulation.morning_coverage.load"].includes(pending.action)) {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "连接已经中断，请读取当前动作的原请求结果"));
++        continue;
++      }
++      this.rawSendSerialized(pending.serializedFrame);
+*** End Patch

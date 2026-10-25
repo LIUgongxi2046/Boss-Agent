@@ -16,6 +16,7 @@ from aiohttp import web
 
 from boss_command_api import BossCommandAPI, _client_key, _aware_due
 from boss_message_calendar import work_meeting_conflict
+from boss_meetings import meeting_materials
 from business import now
 
 NS = "ui-check"
@@ -26,12 +27,17 @@ SAFE_RECEIPT_FIELDS = {
     "share_id", "share_status", "fields", "active_shares_invalidated",
     "external_delivery_created", "external_recall_verified",
     "future_visibility_stopped", "task_id", "task_status_after_reply",
-    "task_feedback_id", "task_completion_confirmed", "confirmation_state",
+    "task_feedback_id", "feedback_id", "task_completion_confirmed", "confirmation_state",
     "minute_id", "minute_version", "entry_id", "meeting_id",
     "independent_send_required", "message_sent",
     "application_id", "decision_id",
-    "commitment_id", "external_message_sent", "due_at",
+    "commitment_id", "external_message_sent", "due_at", "event_id", "event_version", "until",
     "authorization_id",
+    "plan_id", "date", "item_ids",
+    "meeting_version", "review_sha256", "meeting_changed", "invitation_sent", "independent_tasks_unchanged",
+    "historical_only",
+    "task_status", "assignment_authorization_id", "meeting_arranged", "business_authorization_granted", "external_service_invoked", "definition_version", "source_id", "source_version",
+    "task_version", "sources_reconfirmed", "business_status_unchanged", "result_evidence_requires_resubmission",
 }
 
 
@@ -76,10 +82,12 @@ class BossRecoveryAPI:
                 return 400, {"error": "INVALID_TIME_WINDOW"}
             with self.store.connect() as db:
                 self.store.active(db, self.namespace)
-                data = self.store.get(db, self.namespace, "initial", "snapshot")
+                data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
                 meeting = data["meeting"]
                 observed = work_meeting_conflict(
                     start, end, datetime.fromisoformat(meeting["starts_at"]),
+                    datetime.fromisoformat(meeting["ends_at"]) if meeting.get("ends_at") else None,
+                    meeting.get("state", "DRAFT"),
                 )
                 return 200, {
                     "source_type": "SIMULATED",
@@ -102,6 +110,24 @@ class BossRecoveryAPI:
             if required != role:
                 return 403, {"error": "FORBIDDEN"}
             key = _client_key(params["client_request_id"])
+            if action == "boss.simulation.alert.load" or action.startswith(("boss.alert.", "boss.simulation.alert.rule.")):
+                if self.namespace != NS:
+                    return 409, {"error": "EXECUTION_SCOPE_UNAVAILABLE"}
+                if action == "boss.simulation.alert.load":
+                    from boss_alert_rules import BusinessAlertInputAPI
+                    receipt = BusinessAlertInputAPI(self.store).receipt(role, key)
+                elif action.startswith(("boss.alert.rule.", "boss.simulation.alert.rule.")):
+                    from boss_alert_rules import BusinessAlertRulesAPI
+                    receipt = BusinessAlertRulesAPI(self.store).receipt(role, action.rsplit(".", 1)[-1], key)
+                else:
+                    from boss_business_alerts import BusinessAlertsAPI
+                    receipt = BusinessAlertsAPI(self.store).receipt(role, action.removeprefix("boss.alert."), key)
+                return 200, {"source_type": "SIMULATED", **receipt, "write_performed_by_lookup": False}
+            if action == "boss.assignment.extension.decide":
+                if self.namespace != NS:
+                    return 409, {"error": "EXECUTION_SCOPE_UNAVAILABLE"}
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                return 200, {**AssignmentExtensionAPI(self.store).receipt(role, key), "write_performed_by_lookup": False}
             with self.store.connect() as db:
                 self.store.active(db, self.namespace)
                 found = db.execute(
@@ -125,6 +151,9 @@ class BossRecoveryAPI:
                     if field in SAFE_RECEIPT_FIELDS
                     and isinstance(val, (str, bool, int, float, type(None), list))
                 }
+                if action == "boss.simulation.feedback" and isinstance(result.get("task"), dict):
+                    task = result["task"]
+                    safe.update({field: task[source] for field, source in (("task_id", "task_id"), ("task_version", "version"), ("task_status_after_reply", "status")) if isinstance(task.get(source), str)})
                 return 200, {
                     "source_type": "SIMULATED", "action": action,
                     "client_request_id": key, "outcome": "RECORDED",
@@ -156,6 +185,9 @@ class BossRecoveryAPI:
                     **data["private_calendar"], "version": "1", "status": "ACTIVE",
                 }
                 clock = self.store.get(db, self.namespace, "clock", "current")
+                authorization = self.store.get(db, self.namespace, "authorization", share["authorization_id"])
+                if authorization["revoked"]:
+                    return 410, {"error": "SHARE_INACTIVE", "share_status": "AUTHORIZATION_REVOKED"}
                 status = calendar_share_state(share, calendar, clock)
                 if status != "ACTIVE_SIMULATED":
                     return 410, {"error": "SHARE_INACTIVE", "share_status": status}

@@ -31,7 +31,7 @@ def create(cmd,key="owner-commitment-create-001",**override):
         "timezone":"Asia/Shanghai",
         "importance":"NORMAL",
         "evidence_requirements":["带版本的原始财务凭证"],
-        "source_refs":[],
+        "source_refs":[{"source_id":"finance-note","version":"1"}],
         **override,
     }
     return action(cmd,"BOSS","boss.commitment.create",key,**fields)
@@ -98,7 +98,7 @@ def test_source_withdrawal_blocks_owner_completion_and_leaves_active(services):
                     "bad-withdrawn-proof",commitment_id=ident,
                     expected_version="1",
                     evidence_refs=[{"source_id":"finance-note","version":"1"}])
-    assert status==403
+    assert status==410
     assert read(pages)[1]["self_commitments"][0]["status"]=="ACTIVE"
     with cmd.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='authorization'").fetchone()[0]==1

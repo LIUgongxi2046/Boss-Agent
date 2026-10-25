@@ -1,0 +1,55 @@
+{
+  "work_item_id": "T13-MATERIAL-COST-REPORTS",
+  "application_base": "4e7c452",
+  "interface_version": "1.8.0",
+  "source_type": "SIMULATED",
+  "external_services_invoked": false,
+  "acceptance_state": "NOT_RUN",
+  "implemented": ["独立入库与实际领用成本报告", "报告范围、成本口径与归属分组", "成本归属与资产归属分别保存", "未知成本归属不进行跨期比较", "同单位币种与等时长期间比较", "原数量金额及来源版本", "空值与零数量保持未知", "修订、冲销与原回执", "合作资产查询与独立维护元信息", "真实React组件成本与协调交互"],
+  "domain_cases": 20,
+  "full_regression": {
+    "command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-material-cost-owned -p no:cacheprovider --junitxml=.work/w1-material-cost-owned.xml --tb=short",
+    "passed": 647,
+    "seconds": 46.65,
+    "report": ".work/w1-material-cost-owned.xml",
+    "report_sha256": "cbcf9560bd55b46578d248866c426652995af371f2b545fc9dad2bb6292f1094"
+  },
+  "receipt_validation": {
+    "command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-material-cost-owned",
+    "result": "PASS",
+    "actual_receipts": 921,
+    "declared_actions": 71,
+    "observed_actions": 71
+  },
+  "standards": {
+    "command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py",
+    "result": "PASS: OpenAPI3.1与YAML重复字段检查",
+    "typecheck_command": ".work/ui-typecheck/node_modules/.bin/tsc -p .work/ui-typecheck/tsconfig-integrated.json",
+    "typecheck_result": "PASS: strict/noEmit with actual nanobot dependencies"
+  },
+  "component": {
+    "command": "NODE_PATH=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/product/nanobot/webui/node_modules node evidence/T12/verify_supply_quality_ui.mjs /Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/product/nanobot/webui .work/material-cost-owned-ui",
+    "result": "PASS",
+    "environment": "actual React, happy-dom and actual local SupplyQualityAPI with SQLite",
+    "report": ".work/material-cost-owned-ui/result.json",
+    "report_sha256": "e1920d0be233af0977b14baf2dc72a909de6d1033fbe0d40d24810fedf1331bb",
+    "public_authenticated_channel": "NOT_RUN",
+    "visual": "NOT_RUN"
+  },
+  "source_sha256": {
+    "validation/boss_material_costs.py": "7dfc7ee2330bb28a1bf67830dfabf59f2d8fcf36461fdcc7aec50efb8366fc06",
+    "validation/boss_supply_quality.py": "a4d86a8b25edbea567038a7c838674cdd1bf905412409e21d51e0b6d2f63e588",
+    "validation/boss_supply_quality_views.py": "0c9069d6688d9b76129a82dfb61ee8eb2bc25e92c6e4285872bcef9797c8a826",
+    "specs/simulated-supply-quality.schema.json": "15ebf46c862765eb3786ef4421eb30a69f81e3cb34262de569e700f4218399e0",
+    "specs/supply-quality-results.schema.json": "cc05ef529d1159162c6bc54297e5b04f233501f102e98926acda89366c92ed89"
+  },
+  "handoff": {
+    "calculation": "boss_material_costs.calculate_cost_reports(records); input must come from the same transaction's current protected projection",
+    "reader": "SupplyQualityAPI.read(BOSS, SI09), existing read_http adapter",
+    "field": "SI09.supply.cost_reports",
+    "new_package_file": "validation/boss_material_costs.py",
+    "current_schemas": "1.8.0; current consumers receive the same version",
+    "record": "docs/development/T13.md",
+    "remaining": ["公共路由、专题挂载与完整应用验证", "真实模型采用与外部服务验证", "完整专业资料和其他专题指标", "独立语义与父任务正式验收"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": "ACTUAL_PUBLIC_GUI_NATIVE_SQLITE_BACKUP",
+  "source_type": "SIMULATED",
+  "producer_commit": "ccfca967de2a7025c7efe44da0cc1d970a29d546",
+  "source_report": "evidence/T11/w3-local-20261023/source-review-4084bdad-2dbd-4f4b-adb6-7554f131b1ed.json",
+  "source_report_sha256": "3f287f42869bacd92710250443d2b9cf72951273a432bb1b5ea82c8dc0250e4c",
+  "source_database_sha256": "47c9a4afc9d0c2251b0a38d02829484429a68c1894ff11f0b3befc5ad80a38ef",
+  "fixture_database_sha256": "66b21370704328887d92c06105edb7c95b2b546bb1d266fb2ab61727a06cfa0c",
+  "source_sha256": {
+    "validation/boss_today.py": "a6073095326b8be0ac16ea58bccd346bb095f8e89e50077250989286aeb15f18",
+    "validation/boss_owner_plans.py": "a29cfbcd8bc0ab32f8c0ecfd0a44333a09014df9658ad39c1a52c2bbba18f1b8",
+    "validation/boss_meetings.py": "1b0c43f0963373bf5484a1f4e39dc21db592c10b3c4aba8fc8d45cedb89a0e3c",
+    "validation/export_public_store_fixture.py": "6c757a5d52258735924a7abbb9fe4bb01ef3eb74fa6eba739e02c5423c3ee481"
+  },
+  "logical_copy_identical": true,
+  "integrity_check": "ok",
+  "source_modified": false,
+  "export_requested_model_calls": false
+}

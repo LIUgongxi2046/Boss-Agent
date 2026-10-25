@@ -1,0 +1,50 @@
+{
+  "status": "PASS_CURRENT_MEETING_AND_SOURCE_VERSION_BINDING",
+  "received_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
+  "backend_version": "1.5.0",
+  "input_sha256": {
+    "specs/openapi.yaml": "f8ad3608fc0d5fde292b5c6d51198a836f6e3ee682dc8fd4c772508b462ff6f0",
+    "specs/data-dictionary.json": "331dc3b0bd440b12e260daf5cbb3474243080aeb8be7b2955c81c44c57036c2f",
+    "specs/runtime-events.schema.json": "ab6f912b3ff72b9887bc9225b345774343f738b6f54b3e62246909e600585f93",
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/controls.py": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d",
+    "validation/boss_meetings.py": "1b0c43f0963373bf5484a1f4e39dc21db592c10b3c4aba8fc8d45cedb89a0e3c",
+    "validation/boss_command_api.py": "0f21113c8d28408a47552a64728dec3b42b0746721e7fc10f29cfd803440b36a",
+    "validation/boss_memory.py": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631",
+    "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
+    "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
+  },
+  "runtime_meeting_tool_sha256": "6b4f6ce2a034065e2951adcd3b3978b4eab07c3f4fdba62ae1f200934132ae04",
+  "meeting_read": {
+    "initial_version": "1",
+    "draft_does_not_replace_current": true,
+    "confirmed_version": "2",
+    "canceled_version": "3",
+    "terminal_state_reread": "CANCELED",
+    "initial_snapshot_unchanged": true,
+    "held_state_reread": "HELD",
+    "action_schema_checks": [
+      "meetingDraftSave",
+      "meetingConfirm",
+      "meetingCancel",
+      "meetingHeld"
+    ],
+    "actual_read_projections_validated": 5,
+    "authentication_rejection": true,
+    "maintainer_rejection": true,
+    "contact_rejection": true
+  },
+  "source_revision_check": {
+    "current_document_version": "2",
+    "reported_source_version": "2",
+    "source_version_matches": true,
+    "body_changed": false,
+    "earlier_query_status": 409,
+    "fresh_query_created": true
+  },
+  "source_validity_fields_declared": true,
+  "external_request_sent": false,
+  "public_runtime_registered": false,
+  "full_A07_accepted": false
+}

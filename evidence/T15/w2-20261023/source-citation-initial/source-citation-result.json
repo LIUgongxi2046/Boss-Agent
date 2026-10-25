@@ -1,0 +1,110 @@
+{
+  "status": "PASS",
+  "source_type": "SIMULATED",
+  "stages": [
+    {
+      "stage": "original",
+      "stop_reason": "completed",
+      "tool_observations": [
+        {
+          "current_reference_state": "CURRENT_SOURCE_EXCERPTS",
+          "current_references": [
+            {
+              "source_id": "finance-note",
+              "version": "1"
+            }
+          ],
+          "conflict_count": 0,
+          "source_issue_count": 0
+        }
+      ],
+      "usable_as_current_evidence": true,
+      "source_id": "finance-note",
+      "source_version": "1",
+      "answer_sha256": "23774e2df96c703ca30e651f1ffcedf9bfcd908525d4cae14c1e5eebb18bb43e",
+      "response_ids": [
+        "451c563c-1fbb-45cf-920c-a102b8ea6e03",
+        "cb9d3968-ef48-41bc-9a0e-c863fe393438"
+      ],
+      "private_body_recorded": false
+    },
+    {
+      "stage": "revised",
+      "stop_reason": "completed",
+      "tool_observations": [
+        {
+          "current_reference_state": "NEEDS_REVIEW",
+          "current_references": [
+            {
+              "source_id": "finance-note",
+              "version": "2"
+            }
+          ],
+          "conflict_count": 0,
+          "source_issue_count": 0
+        }
+      ],
+      "usable_as_current_evidence": true,
+      "source_id": "finance-note",
+      "source_version": "2",
+      "answer_sha256": "7da45c44ca63610748191d0207316b23f64514996499733108f48c41a2b921ab",
+      "response_ids": [
+        "1ccb24a0-6347-4080-b4eb-b9947783f13d",
+        "311b5878-3eed-4363-be26-c21816fd8c35"
+      ],
+      "private_body_recorded": false
+    },
+    {
+      "stage": "conflicted",
+      "stop_reason": "completed",
+      "tool_observations": [
+        {
+          "current_reference_state": "NEEDS_REVIEW",
+          "current_references": [],
+          "conflict_count": 1,
+          "source_issue_count": 1
+        }
+      ],
+      "usable_as_current_evidence": false,
+      "source_id": null,
+      "source_version": null,
+      "answer_sha256": "5d2afe9fc9ca9beea59869ef2a0f219258570098250c4aa2c434c81e3dad4c2a",
+      "response_ids": [
+        "1df6412f-9977-47b9-a47b-9c829e284439",
+        "9b4da376-c10e-4996-a763-58b157273fec"
+      ],
+      "private_body_recorded": false
+    },
+    {
+      "stage": "withdrawn",
+      "stop_reason": "completed",
+      "tool_observations": [
+        {
+          "current_reference_state": "NEEDS_REVIEW",
+          "current_references": [],
+          "conflict_count": 0,
+          "source_issue_count": 0
+        }
+      ],
+      "usable_as_current_evidence": false,
+      "source_id": null,
+      "source_version": null,
+      "answer_sha256": "5d2afe9fc9ca9beea59869ef2a0f219258570098250c4aa2c434c81e3dad4c2a",
+      "response_ids": [
+        "23713f6a-24ee-4735-8cbf-c3efc0576852",
+        "b500a4b0-38ba-42af-9187-686bf3af1040"
+      ],
+      "private_body_recorded": false
+    }
+  ],
+  "source_body_unchanged": true,
+  "new_runtime_and_session_per_stage": true,
+  "business_write_performed": false,
+  "full_A15_accepted": false,
+  "source_code_sha256": {
+    "validation/boss_research.py": "f6246b04d78541180b50b0d4f6dafb799dfb77c630d1aafd1fdcde307aaefd68",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896",
+    "validation/boss_agent_read_tools.py": "028566d858df6481bba992302f59048fcf3bba792129dcad309d21c7db7a877f",
+    "app/tests/test_boss_live_research.py": "5767154f38c1098a36853a3a9b63603dab1fd320d9a79220c75134c3df662b96"
+  }
+}

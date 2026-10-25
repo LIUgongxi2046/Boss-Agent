@@ -1,0 +1,170 @@
+{
+  "status": "PASS",
+  "run_id": "fc03-morning-64c57e60-ba28-4dac-8899-95f8d6f510f2",
+  "ports": {
+    "business": 9951,
+    "webui": 9952,
+    "gateway": 19951
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc03-morning-64c57e60-ba28-4dac-8899-95f8d6f510f2",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc03-n3-morning-dist",
+  "manifest_sha256": "42c2e226574ea2e13dbb432586cbd893d86a37db37c391184e5d0de53d881208",
+  "index_sha256": "9c5c5e2cd05358cc9d8284794a40fb47c5237dd650f7f0ee9e6d0fb43e84f134",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440,
+      "inner_width": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720,
+      "inner_width": 720
+    },
+    {
+      "check": "dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280,
+      "inner_width": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640,
+      "inner_width": 640
+    },
+    {
+      "check": "dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024,
+      "inner_width": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512,
+      "inner_width": 512
+    },
+    {
+      "check": "public_morning_sdk_detail_source_sort",
+      "date": "2026-10-23",
+      "other_date": "2026-10-24",
+      "request_id": "morning-824f75fd-d1f0-40c2-8778-22c2ce4bb0f5",
+      "run_id": "run-121bc3d8-7354-421c-a756-123443bfb43a",
+      "list_id": "morning-9466a07c-abce-4dd2-b53a-0a7a215bfa97",
+      "list_version": "1",
+      "item_id": "meeting:meeting-1",
+      "source_id": "finance-note",
+      "source_version": "1",
+      "order_request_id": "today-45f94d9b-d5e6-4488-9ff4-977c3b7c0ae2",
+      "order_version": "1",
+      "unknown_order_key": "today-unknown-6a298036-71f7-4a62-819b-2930fa6ebd13",
+      "unknown_order_replayed": false,
+      "coverage_request_id": "morning-coverage-a85aef95-09e7-40e6-996d-4f84972293ee",
+      "style": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "field": {
+        "font": "14px",
+        "line": "22px",
+        "input": "16px"
+      },
+      "source_style": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "renderer_errors": []
+    },
+    {
+      "check": "actual_interrupted_success_without_replay",
+      "actions": [
+        "boss.simulation.morning_coverage.load",
+        "boss.morning.query",
+        "boss.today.reorder"
+      ],
+      "events": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "a2882ad3-229f-4e4e-88d8-6f80995d5bff",
+          "action": "boss.simulation.morning_coverage.load",
+          "client_request_id": "morning-coverage-a85aef95-09e7-40e6-996d-4f84972293ee"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "a2882ad3-229f-4e4e-88d8-6f80995d5bff",
+          "action": "boss.simulation.morning_coverage.load",
+          "client_request_id": "morning-coverage-a85aef95-09e7-40e6-996d-4f84972293ee",
+          "response_sha256": "7e63605c1ffac9e8c87223cb5f3f260f2ce9338bdf5a85d87c4ef7d2920aee0c"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "1a8d281c-a3fc-4745-83f6-1850d7e5644a",
+          "action": "boss.morning.query",
+          "client_request_id": "morning-824f75fd-d1f0-40c2-8778-22c2ce4bb0f5"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "1a8d281c-a3fc-4745-83f6-1850d7e5644a",
+          "action": "boss.morning.query",
+          "client_request_id": "morning-824f75fd-d1f0-40c2-8778-22c2ce4bb0f5",
+          "response_sha256": "5eb84cdcfc5c83811cb59e4c6d5301c2c339703aa925245dab2bc3a4b28f36f3"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "f2f850dc-94f4-45ce-9e7c-37dc8c01a997",
+          "action": "boss.today.reorder",
+          "client_request_id": "today-45f94d9b-d5e6-4488-9ff4-977c3b7c0ae2"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "f2f850dc-94f4-45ce-9e7c-37dc8c01a997",
+          "action": "boss.today.reorder",
+          "client_request_id": "today-45f94d9b-d5e6-4488-9ff4-977c3b7c0ae2",
+          "response_sha256": "5bb849ceb3b6fed54291510255aaa07b4e5b92f6404954ba139676ea3806d81c"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "76cac48d-b1dc-4279-bd28-50dd180cf5b1",
+          "action": "boss.morning.query",
+          "client_request_id": "morning-c158e128-cfbe-44c8-8723-3bc69dd4c5c2"
+        }
+      ],
+      "preparation_list_id": "morning-9466a07c-abce-4dd2-b53a-0a7a215bfa97",
+      "preparation_item_id": "meeting:meeting-1",
+      "business_task_created_by_preparation": false
+    },
+    {
+      "check": "same_database_service_restart_and_discussion",
+      "request_id": "morning-824f75fd-d1f0-40c2-8778-22c2ce4bb0f5",
+      "reopened_identical": true,
+      "order_version": "1",
+      "source_id": "finance-note",
+      "discussion_request_id": "morning-c158e128-cfbe-44c8-8723-3bc69dd4c5c2",
+      "discussion_run_id": "run-4c941982-c3a2-43db-af1e-10afc77d2659",
+      "same_list_id": "morning-9466a07c-abce-4dd2-b53a-0a7a215bfa97"
+    }
+  ]
+}

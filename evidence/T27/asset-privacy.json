@@ -1,0 +1,48 @@
+{
+  "status": "PASS_ASSET_METADATA_AND_PASSWORD_EXCLUSION",
+  "icon_master_size": [
+    1332,
+    1181
+  ],
+  "animation": {
+    "format": "PNG_SPRITE",
+    "frames": 8,
+    "grid": [
+      4,
+      2
+    ],
+    "size": [
+      1774,
+      887
+    ],
+    "frame_sha256": [
+      "cd37e33bba74ad5d213ee38b029671b2c8ada1d22bf767f298e74162d56e2485",
+      "0612f625edf58ff8a9d1081831975fa69625918be1baa72378662b7e649eb499",
+      "760325698b6699992d5ccde0ae44b2d122613a0d107b59aa6f77804ca22ea737",
+      "30b084cda13affbecc2cc8bd8049b92e55f8b26b36bb13d0774db460e9ad6433",
+      "4b9b9d06b9510d08f7ba866ce176b9498c57f1a560ae352c186e3d5e6105decd",
+      "8b834151d5c0169ba8e3cdc7584841556a752d73c339c33d8d3924876cd74dfa",
+      "97e98b7e04577e00e04e48263edd41b37a354467f7efcfeca2d025a75b1c8f53",
+      "1862caef5d834a5c50675b7df36c885d5df1835f2bd04b240283162730523566"
+    ],
+    "sha256": "c78e73133875870b6e1af3e2214fd625c13acfc57aee00d8a8f06f27503e9782"
+  },
+  "repository_files_checked": 5056,
+  "audit_files_checked": 5,
+  "source_sha256": {
+    "app/webui/BossLogin.tsx": "7bd7ed92859ed291252f777b7a3a0d678072601c2012044af3659a9ea5e00b8e",
+    "app/webui/boss-login.css": "c2572f06a2d14dea2c6edf87a25ec3bb18171196fa827ab2c0a18549ccb1bbef",
+    "validation/boss_account_auth.py": "83d50c78fbc9a4c4f97823ca6fc9581e119cb94a5a95921e8e43631dba103f4f",
+    "validation/desktop/branding.cjs": "3292dce1a14e0788318295d6db8115875a2d1069b080bcd6b39688aef735d710",
+    "design/T27/harness/main.tsx": "2c4e33c03e29424c17004349b8a2936b9da91d3d861065047401a4906b638091",
+    "design/T27/harness/vite.config.ts": "5b4adbb85a885e93fb817380e8110de144853dbaba152563f6b08f4c5e8f1329",
+    "design/T27/server.py": "1ea9f8fec3ceb0012336eb5b6e6d887ceaa5057c85b8815c72c4c1c7331c9bb5",
+    "design/T27/check-native-zoom.cjs": "52790a96d9e05567a43be3001710f720b6e19a276567d9b3732d02441711d26d",
+    "design/T27/zoom-host.cjs": "36c5c35a857217b7070508073d5775b4761b7883455d12637c8af0dd391e24ae",
+    "design/T27/check-flight.cjs": "2402c6f2b8cbd3961e540f21d6a255baf7c2e870701ded2386ad3a35f3139a44",
+    "design/T27/open-review.cjs": "b58b3f7a069f2bef37c8da00d4f850407ccc442f747e24687b36d5284d4b132e",
+    "design/T27/review-host.cjs": "768a5ac1bd7890dc24a6b896c02211d20ecd5728d76aec7292da999d1a0d3cf8",
+    "validation/desktop/check-login-polish.cjs": "d2c6993a490470fd48ac17f83cf6198d36fc8cbd442f8158ef085ebe177c4a0b"
+  },
+  "visual": "NOT_RUN"
+}

@@ -1,0 +1,185 @@
+{
+  "status": "PASS",
+  "source_type": "SIMULATED",
+  "stages": [
+    {
+      "stage": "first",
+      "runtime_record": {
+        "chat_id": "direct",
+        "configuration_id": "runtime-1",
+        "configuration_version": "1",
+        "cost_total": null,
+        "finished_at": "2026-10-23T05:38:03.689236+00:00",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-cd1f0d7c-25b1-4bb5-a3ac-4e2c73c7e20a",
+            "request_sha256": "c0fb7238b7cc3699c59fd1d61dc842c9f944a9d341061cea17cfd2b166957855",
+            "response_ids": [
+              "bf17664d-e3f7-4063-9790-25c4654593e1"
+            ],
+            "tool_config_sha256": "0daca6881d6011aa05e0f28ba3e626c4fc49edd7e660bc5711c59ce9b7d62cf5",
+            "usage": {
+              "completion_tokens": 66,
+              "prompt_tokens": 2661,
+              "total_tokens": 2727
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [
+          {
+            "active_version": "1",
+            "content_sha256": "b0e64bfd21855a76a42aa09f5d24bf3440ef06e69760cc0da9c5112ad73b408f",
+            "kind": "TASK_HINTS",
+            "prompt_id": "prompt-e76b8f11-3179-4777-8d04-b5df5810560f",
+            "prompt_version": "2",
+            "source_refs": [
+              {
+                "source_id": "finance-note",
+                "version": "1"
+              }
+            ]
+          }
+        ],
+        "request_id": "first:1792733875866918000",
+        "request_id_source": "TURN",
+        "run_id": "run-6e41c397-1839-4c2b-a98d-b7a3a90b8258",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "d3e5961bd54f1efcbf8fa56eeca960270a48308540fa195fa384ee1b22211468",
+          "max_output_tokens": 700,
+          "max_tool_rounds": 12,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "first",
+        "started_at": "2026-10-23T05:37:55.875260+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "0daca6881d6011aa05e0f28ba3e626c4fc49edd7e660bc5711c59ce9b7d62cf5",
+        "tool_configuration": [
+          {
+            "implementation": "model_probe.BusinessTool",
+            "schema_sha256": "51d2479a6389bdda317d75ce6e660cf7a0af948df655e28e76e5b77fff3397a1",
+            "tool_id": "query_metrics"
+          }
+        ],
+        "tool_results": [],
+        "turn_id": "first:1792733875866918000",
+        "usage": {
+          "completion_tokens": 66,
+          "prompt_tokens": 2661,
+          "total_tokens": 2727
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "prompt_version_adoption_verified": true,
+      "tool_schema_transport_matches": true,
+      "answer_sha256": "ca8e9541478506b8b945096c54f1488d0d85b95963744bf857dc041f72ec5802"
+    },
+    {
+      "stage": "second",
+      "runtime_record": {
+        "chat_id": "direct",
+        "configuration_id": "runtime-1",
+        "configuration_version": "2",
+        "cost_total": null,
+        "finished_at": "2026-10-23T05:38:08.181244+00:00",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-d2a4e1da-ecec-46ff-ae4f-f4ad8d4151ed",
+            "request_sha256": "36ffe533ed4d7191307c3702b4b83e425d10426c215816202c441a0fdaf865af",
+            "response_ids": [
+              "fcba48d1-a73b-4705-af0c-fcdb8344b4c1"
+            ],
+            "tool_config_sha256": "9bc72480f74355aabeb043cd756f00e6b87d9d00f6e7fd4e5e152cea8ad58be7",
+            "usage": {
+              "completion_tokens": 66,
+              "prompt_tokens": 2467,
+              "total_tokens": 2533
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [
+          {
+            "active_version": "2",
+            "content_sha256": "b0e64bfd21855a76a42aa09f5d24bf3440ef06e69760cc0da9c5112ad73b408f",
+            "kind": "TASK_HINTS",
+            "prompt_id": "prompt-e76b8f11-3179-4777-8d04-b5df5810560f",
+            "prompt_version": "4",
+            "source_refs": [
+              {
+                "source_id": "finance-note",
+                "version": "1"
+              }
+            ]
+          }
+        ],
+        "request_id": "second:1792733884155456000",
+        "request_id_source": "TURN",
+        "run_id": "run-ff0a26be-2594-4603-9eb9-a3c85464e338",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "2e0f57cb0fb472912e4a6b6e78eb4f3cb3743c73be0aea1c9a4b8072491c48bd",
+          "max_output_tokens": 700,
+          "max_tool_rounds": 2,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "second",
+        "started_at": "2026-10-23T05:38:04.161707+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "9bc72480f74355aabeb043cd756f00e6b87d9d00f6e7fd4e5e152cea8ad58be7",
+        "tool_configuration": [
+          {
+            "implementation": "model_probe.BusinessTool",
+            "schema_sha256": "88b733828298d2099c669938c09f057e0599443c98481a49c46f9c2b3c2de596",
+            "tool_id": "read_evidence"
+          }
+        ],
+        "tool_results": [],
+        "turn_id": "second:1792733884155456000",
+        "usage": {
+          "completion_tokens": 66,
+          "prompt_tokens": 2467,
+          "total_tokens": 2533
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      },
+      "prompt_version_adoption_verified": true,
+      "tool_schema_transport_matches": true,
+      "answer_sha256": "4fbf9e06d71f7744bdba8e9e144a0d8ba9cbbb0b9ec6502e98783a90e8234f30"
+    }
+  ],
+  "new_runtime_and_session_per_stage": true,
+  "business_mutation_performed": false,
+  "full_A16_accepted": false,
+  "full_A19_accepted": false,
+  "source_code_sha256": {
+    "validation/boss_runtime_records.py": "7ac1e8140873d73b1e662a7293047a600064c652e5701dffb1d2d1d8181bb906",
+    "validation/connection.py": "860951977196826db8c4bc88654829d55423defc817fa4bc306ecb50b8dd6c68",
+    "validation/model_probe.py": "5ce1210c8bf6c72278530f8285b5ce1234d16911d00d167fc5ddec00cef29caa",
+    "validation/boss_prompt_config.py": "273ebaa346f217cb348682915c6c3fb3e0de8bc60d9d3bba5dc8e673b19f0b9a",
+    "app/tests/test_boss_live_runtime_records.py": "950ddb3af7b7b7869595f1b6806b671b4a31450539a3e89a146f49780b209963"
+  }
+}

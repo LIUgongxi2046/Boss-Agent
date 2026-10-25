@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.3.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "workspace": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+  "source_base": "d1abaaa16cab34757d4adbb37021314d86fa2c89",
+  "source_scope": "W1 commit containing this evidence",
+  "receivers": ["W3 public source guards, projections and integration", "W2 independent source-version checks and runtime adoption"],
+  "source_policy": {
+    "owner": "W2",
+    "origin_commit": "224fbe00b03df312791856f3e76850cd55baa848",
+    "path": "validation/boss_source_policy.py",
+    "sha256": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896",
+    "received_unchanged": true
+  },
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v13-verified -p no:cacheprovider --junitxml=.work/w1-v13-verified.xml", "status": "PASS", "tests": 427, "failures": 0, "errors": 0, "skipped": 0, "junit_seconds": 26.319, "raw_result": ".work/w1-v13-verified.xml"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v13-verified", "status": "PASS", "actual_sqlite_receipts": 629, "declared_actions_observed": 67, "baseline_role_mappings": 58},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v13", "status": "PASS", "result": "16 passed in 38.75s; each of 58 baseline public actions has at least one valid declared input and actual result"},
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation and duplicate YAML key validation"},
+    {"command": "node .work/ui-typecheck/node_modules/typescript/bin/tsc --project .work/ui-typecheck/tsconfig-integrated.json", "status": "PASS", "result": "strict/noEmit against actual nanobot ClientProvider, NanobotClient, events and installed dependencies", "components": ["BossToday", "BossOwnerPlans", "BossMeetingArrangement", "BossMeetingBrief"], "production_build": "PENDING_W3"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_tool_source_binding.py --run-dir .work/tool-source-binding-v13-verified --reference-policy /Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/boss_source_policy.py", "status": "PASS", "current_document_version": "2", "reported_source_version": "2", "earlier_query_requires_refresh": true, "original_body_unchanged": true, "external_request_sent": false}
+  ],
+  "verified": [
+    "query_metrics reports current document metadata and persists an immutable owner/dataset/source/detail binding",
+    "read_evidence rechecks current scope, validity, version and full fingerprints",
+    "an earlier query returns 409 after source metadata or version changes; a fresh query reads matching current versions",
+    "legacy queries without bindings require a fresh query without inventing historical bindings",
+    "six noncurrent source states stop new metrics, evidence and independent FTS adoption",
+    "business-clock expiry and access scope are checked before adoption",
+    "six dependent business draft operations reject expired sources without adding authorizations",
+    "completion rechecks current task and result evidence without changing status or authorization count on rejection",
+    "meeting material source changes and expiry remove old quotation and metric cache from current display",
+    "SQLite native backup preserves query bindings, withdrawn sources, deleted memory, FTS removal and object integrity",
+    "simulation application validity starts at the approved business clock while published_at retains generation time"
+  ],
+  "source_behavior_test_cases": 20,
+  "external_model_or_stt_calls": false,
+  "new_agricultural_facts": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": [
+    "W3 reception of 1.3.0 and public source read/write projections using the same policy",
+    "public historical feedback with source identity and owner checks, CAS and idempotency",
+    "W2 independent source-version verification using old-query conflict then fresh-query evidence",
+    "runtime current source/memory/meeting adoption and existing session/cache propagation",
+    "all parameter boundaries, business variants and independent semantic review",
+    "complete fourteen simulated interfaces and approved missing agricultural materials",
+    "complete older-version migration and runtime/voice record binding",
+    "morning model tasks, recurring plans, device notifications and sleep recovery",
+    "complete cross-page flows, E01-E06, all authorization consumers and full parent acceptance"
+  ]
+}

@@ -20,10 +20,10 @@ READING_FORMATS = ("ACTIONS_FIRST", "SUMMARY", "DETAIL")
 READING_LIMIT = 800
 
 
-def _get(db, kind, key="current"):
+def _get(db, kind, key="current", namespace=NS):
     row = db.execute(
         "SELECT body FROM objects WHERE namespace=? AND kind=? AND id=?",
-        (NS, kind, key),
+        (namespace, kind, key),
     ).fetchone()
     return json.loads(row[0]) if row else None
 
@@ -223,28 +223,49 @@ def notice_confirm(api, db, data, payload):
     return _confirm(api, db, data, payload, "owner_notice")
 
 
-def _effective(db, data, domain):
-    active = _get(db, domain + "_active")
+def _effective(db, data, domain, namespace=NS):
+    space = db.execute("SELECT active FROM spaces WHERE namespace=?", (namespace,)).fetchone()
+    require(space is not None and space[0] == 1, "执行空间已失效")
+    active = _get(db, domain + "_active", namespace=namespace)
     if active is None or active.get("state") != "CONFIRMED":
+        return None
+    authorization = _get(db, "authorization", active["authorization_id"], namespace=namespace)
+    require(authorization is not None, "本人设置缺少确认授权", web.HTTPConflict)
+    require(active["id"] == domain + ":current" and active["author_identity"] == "BOSS"
+            and active["source_type"] == "SIMULATED"
+            and authorization["authorization_id"] == active["authorization_id"]
+            and authorization["owner_id"] == data["owner_id"]
+            and authorization["scope"] == namespace
+            and authorization["issuer_identity"] == "BOSS"
+            and authorization["issuer"] == data["owner_id"]
+            and authorization["action"] == domain + ".confirm"
+            and authorization["target_id"] == active["id"]
+            and int(authorization["content_version"]) + 1 == int(active["version"])
+            and authorization["payload"]["active_version"] == authorization["content_version"]
+            and authorization["payload"]["draft_version"] == active["source_draft_version"]
+            and authorization["payload"]["content_sha256"] == active["content_sha256"] == checksum(active["content"]),
+            "本人设置与当前确认授权的身份、范围或内容绑定不符", web.HTTPForbidden)
+    if authorization["revoked"]:
         return None
     expiry = active["content"].get("valid_until")
     if expiry is not None:
-        clock = _get(db, "clock")
-        if not clock or datetime.fromisoformat(expiry) <= datetime.fromisoformat(clock["at"]):
+        clock = _get(db, "clock", namespace=namespace)
+        require(clock is not None, "当前执行空间缺少业务时钟")
+        if datetime.fromisoformat(expiry) <= datetime.fromisoformat(clock["at"]):
             return None
     return active
 
 
-def effective_owner_goals(db, data):
-    return _effective(db, data, "owner_goals")
+def effective_owner_goals(db, data, namespace=NS):
+    return _effective(db, data, "owner_goals", namespace)
 
 
-def effective_owner_notice(db, data):
-    return _effective(db, data, "owner_notice")
+def effective_owner_notice(db, data, namespace=NS):
+    return _effective(db, data, "owner_notice", namespace)
 
 
-def owner_goal_reference(db, data):
-    effective = effective_owner_goals(db, data)
+def owner_goal_reference(db, data, namespace=NS):
+    effective = effective_owner_goals(db, data, namespace)
     if not effective or effective["content"]["scope"] not in ("OWNER_WORKSPACE", "MEETING_PREP"):
         return {"status": "NO_APPLICABLE_CONFIRMED_MEETING_GOALS",
                 "active_version": None, "scope": None}
@@ -256,8 +277,8 @@ def owner_goal_reference(db, data):
     }
 
 
-def owner_profile(db, data):
-    active = effective_owner_goals(db, data)
+def owner_profile(db, data, namespace=NS):
+    active = effective_owner_goals(db, data, namespace)
     if active is None or active["content"]["scope"] not in (
         "OWNER_WORKSPACE", "DAILY_BRIEF",
     ):
@@ -282,13 +303,14 @@ def record_runtime_goal_context_load(store, namespace=NS):
     """A context-provider invocation is NOT proof the model followed a goal."""
     with store.connect() as db:
         db.execute("BEGIN IMMEDIATE")
+        store.active(db, namespace)
         data = store.get(db, namespace, "initial", "snapshot")
-        active = effective_owner_goals(db, data)
+        active = effective_owner_goals(db, data, namespace)
         if active is None or active["content"]["scope"] != "OWNER_WORKSPACE":
             # The generic chat context cannot prove a DAILY_BRIEF/MEETING_PREP
             # request. Do not leak scoped instructions into unrelated turns.
             return None
-        current = _get(db, "owner_goals_runtime_use", active["version"])
+        current = _get(db, "owner_goals_runtime_use", active["version"], namespace=namespace)
         count = int(current.get("context_load_count", 0)) if current else 0
         observation = {
             "active_version": active["version"],
@@ -360,13 +382,13 @@ def notice_projection(api, db, data):
     }
 
 
-def owner_notification_suppression(db, data, clock, event, technical_rules):
+def owner_notification_suppression(db, data, clock, event, technical_rules, namespace=NS):
     """Only add restrictions; never override technical suppressions.
 
     OWNER-important override applies to OWNER quiet hours only when the
     technical rule also allows escalation. No new event is created here.
     """
-    active = effective_owner_notice(db, data)
+    active = effective_owner_notice(db, data, namespace)
     if active is None:
         return None, None
     content = active["content"]

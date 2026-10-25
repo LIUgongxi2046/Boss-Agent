@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.2.1",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "workspace": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+  "source_base": "924f961",
+  "source_scope": "W1 commit containing this evidence",
+  "receivers": ["W3 continuing authorization and memory effective projections", "W2 memory eligibility and runtime adoption"],
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v121-verified -p no:cacheprovider --junitxml=.work/w1-v121-verified.xml", "status": "PASS", "result": "407 passed in 56.10s"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v121", "status": "PASS", "result": "16 passed in 9.44s; all 58 baseline public actions executed with at least one valid declared input and actual result"},
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation and duplicate YAML key validation"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v121-verified", "status": "PASS", "result": "624 actual SQLite receipts covering all 67 declared actions; component/event schemas; role and version mappings"}
+  ],
+  "verified": ["same-transaction memory context checks current confirmation by target, owner, scope, issuer and predecessor version", "revoked current confirmation not adopted after database reopen", "historical confirmed memory and original content preserved", "old revocation does not affect newer owner confirmation", "new explicit confirmation after revocation has a distinct version and authorization", "six continuing-use authorization actions remain revocable after their original confirmation window", "expired single-action authorization remains unavailable for new actions", "all 58 baseline public actions match declared input and output schemas", "complete current meeting interval and inactive state reach calendar save result"],
+  "compatibility": "same 1.2.0 command inputs and receipt fields; current initial memory and separate approved validation-service updates retain their declared source; explicit authorization_id must match when present",
+  "public_integration": "W3 adopts authorization_can_revoke and confirmed_memory in current projections; W2 adopts confirmed_memory for metadata eligibility and tests actual runtime",
+  "remaining": ["W2 independent source-version correction and source validity field handoff", "all boundary variants and independent semantic review", "public N10 eligibility and memory effective projection", "already loaded sessions and cache propagation", "four meeting actions and current-meeting public integration", "same integrated source and device verification", "full simulation data coverage and approved missing sector materials", "periodic morning plans and actual model execution"],
+  "acceptances_changed": false,
+  "A05": "NOT_RUN",
+  "A06": "NOT_RUN",
+  "A14": "NOT_RUN",
+  "A17": "NOT_RUN",
+  "A18": "NOT_RUN"
+}

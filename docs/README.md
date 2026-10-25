@@ -10,12 +10,16 @@
 | DOC-VALUE | G01—G04、H01—H37、M01—M17、协议、未知阈值与桌面资源条件 | [价值验证定义](../specs/value-validation.json) | S001；S009 采集结果 | CURRENT | 2026-10-22 |
 | DOC-PRD | 32 项 FR/BR/AC、48 个功能与管理线框、六类 Agent 组件、两端开源复用；第 10.5 节桌面窗口、权限与生命周期 | [PRD](PRD.md) | S002 | IN_REVIEW | 2026-10-22 |
 | DOC-PROBE | T02 的 15 步骤、37 断言；DeepSeek、记忆、调度、权限、两端复用及桌面安装恢复 | [共同验证定义](../specs/selection-probe.json) | S002；T02 执行 | DEFINITION_ONLY | 2026-10-22 |
-| DOC-MODEL-LOCAL | 用户本机 DeepSeek 文件配置、最小真实模型调用、私有脱敏日志、F24/A15 和未完成联调 | [T16开发记录](development/T16.md)、[本机配置脚本](../scripts/configure_local_deepseek.py) | T11/T16/T18/T19 | PARTIAL_CODE；MODEL_RUN_NOT_VERIFIED_ON_TARGET_MAC | 2026-10-22 |
+| DOC-MODEL-LOCAL | DeepSeek 配置引用、真实SDK与公共应用证据、运行元信息及当前验证范围 | [T16开发记录](development/T16.md)、[公共集成记录](development/T11.md)、[本机配置脚本](../scripts/configure_local_deepseek.py) | T11/T16/T18/T19 | PARTIAL_EVIDENCE；完整A16未验收 | 2026-10-23 |
 | DOC-DEV-FIRST | 固定开源 v0.3.5、Desktop v6 React 首批实现、可复现构建、权限测试、剩余阻塞 | [首批开发记录](development/T11.md)、[运行脚本](../scripts/run_boss_local.sh) | S008 / T11，后续 T18 接收 | IN_PROGRESS（不等于 T11/T18 验收通过） | 2026-10-22 |
 | DOC-PAGE-SVC | 72 页真实代码绑定/未实现区分、F06/A04事务动作、视觉像素检查入口 | [当前页面服务映射](../specs/page-service-map.json)、[T18开发记录](development/T18.md)、[T19开发记录](development/T19.md) | T08/T18/T19 | DRAFT_PARTIAL_CODE（非产品验收） | 2026-10-22 |
 | DOC-DEV-MINUTES-APPROVAL | FR05纪要分类/确认、FR07附件和金额版本审批、A03模拟申请与补件升版、v6原稿几何复核 | [开发与测试记录](development/T18-meeting-approval.md)、[72页实际实现映射](../specs/page-service-map.json) | T08/T18/T19 | PARTIAL_CODE；A18/A19 NOT_RUN | 2026-10-22 |
 | DOC-HLD | 固定 nanobot/Electron/DeepSeek 架构、身份与权限、唯一数据来源、生命周期、ADR、NFR 和任务交接 | [HLD](HLD.md) | S004 / T04 | A04 PASS（仅静态架构设计，非产品验收） | 2026-10-22 |
-| DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[机器可读契约](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
+| DOC-HLD-72 | 桌面 v6 72 页逐页实现责任、上游复用锚点、逻辑路由、语义读写、561 状态及验证任务 | [72页实现映射](HLD-72页面实现映射.md)、[结构化映射](../specs/hld-72-page-map.json) | S004 / T04；S005-4 / T08 接收 | A04 PASS（架构映射固定，待 T08 实际绑定） | 2026-10-22 |
+| DOC-INTEGRATION | 当前源码、来源规则、会议终态、身份、独立宿主与A15公共查询 | [T11公共集成](development/T11.md)、[运行环境](运行环境.md) | T11 | IN_PROGRESS；正式验收未通过 | 2026-10-23 |
+| DOC-ACCOUNT | T27账号密码、会话、身份范围、桌面品牌与公共重启 | [T27主记录](development/T27.md)、[公共接收](development/T11.md)、[本机初始化工具](../scripts/provision_boss_accounts.py) | T27/T11 | IN_PROGRESS；完整A27未验收 | 2026-10-23 |
+| DOC-LLD | 数据/API、Runtime记录、Agent与前端字段和责任 | [数据](LLD-data.md)、[后端](LLD-backend.md)、[Agent](LLD-agent.md)、[前端](LLD-frontend.md) | T05—T08 | IN_REVIEW；状态引用台账 | 2026-10-23 |
+| DOC-REVIEW | 全部FR/AC、异常、安全及实施接收条件 | [T09评审与验收](development/T09.md)、[T10执行接收](development/T10.md)、[设计评审](设计评审.md) | T09/T10 | IN_PROGRESS | 2026-10-23 |
 | DOC-SELECTION | nanobot 0.3.5、Electron 45.0.0、DeepSeek 实际任务、六类入口、AD01—AD16、两端 DOM；D18 选型可行性完成及后续检查责任 | [选型验证](选型验证.md) | S004 | ACCEPTED_FEASIBILITY | 2026-10-22 |
 | DOC-SELECTION-ENV | 本机依赖、独立验证程序、服务端配置及运行命令 | [选型环境](选型环境.md)、[验证工程](../validation/README.md) | S004 | CURRENT | 2026-10-22 |
 | DOC-UI | 桌面六类老板入口、16 类管理能力、48 个线框映射与系统权限；第 13 节规定最终高保真和素材，等待 T02 完成制作与绑定 | [交互与页面规范](交互与页面规范.md) | S003-1/S003-2；T08 接收 | PARTIAL_HANDOFF | 2026-10-22 |

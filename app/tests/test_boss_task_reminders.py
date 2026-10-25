@@ -18,6 +18,7 @@ from boss_command_api import BossCommandAPI
 from boss_page_api import BossPageAPI
 from boss_task_reminders import current
 from controls import ControlStore
+from legacy_assignment_fixture import create_legacy_assignment
 
 
 @pytest.fixture
@@ -353,7 +354,7 @@ def test_revoked_original_task_source_blocks_completion_without_fake_success(con
         task_version=submitted[1]["task"]["version"],
         feedback_id=submitted[1]["feedback_id"],
     )
-    assert refused[0] == 403
+    assert refused[0] == 410
     task_now = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
     assert task_now["status"] == "RESULT_SUBMITTED"
     assert due(api, task["task_id"])["state"] == "OPEN"
@@ -400,19 +401,22 @@ def test_task_source_version_is_pinned_and_changed_document_blocks_send(context)
     assert canceled[0] == 200
 
 
-def test_legacy_task_without_pinned_versions_is_not_sent_as_verified(context):
-    api, pages = context
-    created = create(api)[1]
-    with api.store.connect() as db:
-        original = api.store.get(db, "ui-check", "task", created["task_id"])
-        del original["source_versions"]
-        api.store.put(db, "ui-check", "task", created["task_id"], original)
+def test_legacy_task_without_pinned_versions_is_not_sent_as_verified(tmp_path):
+    from test_boss_command_api import create_input
+    content = {key: value for key, value in create_input().items() if key != "client_request_id"}
+    database = tmp_path / "legacy-task-due.sqlite"
+    created = create_legacy_assignment(database, content)["task"]
+    store = ControlStore(database)
+    api, pages = BossCommandAPI(store), BossPageAPI(store)
     task = pages.serve("BOSS", "/api/boss/ui/tasks")[1]["tasks"][0]
     assert task["source_reference_state"] == "NEEDS_REVIEW"
     assert "UNPINNED_SOURCE_VERSION" in task["source_reference_reasons"]
     assert send(
         api, created["task_id"], key="legacy-unpinned-cannot-send"
     )[0] == 409
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+        assert current(db, created["task_id"]) is None
 
 
 

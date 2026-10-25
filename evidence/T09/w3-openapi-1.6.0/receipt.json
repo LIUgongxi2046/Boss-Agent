@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-OPENAPI-160",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-api-160-aa946e1",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "evidence/T06/validate_openapi.py"
+  ],
+  "started_at": "2026-10-23T10:51:38.881399+00:00",
+  "ended_at": "2026-10-23T10:51:43.287380+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/openapi.yaml",
+      "sha256": "e32c60cad37374e75a8f800ca0e6e8eb77aa7d25e7036fcc9a73a2d383ad5493"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-events.schema.json",
+      "sha256": "922a9bd8e05d4aeb579c679257085b57a3e1e2ebdf3f8a34066588f351a11fa5"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/runtime-records.schema.json",
+      "sha256": "9566d6d5126d7e5d5f7d2d4659e56166333f7e3b13b6d0d451a425bcc24b77f2"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/assignment-source-review.schema.json",
+      "sha256": "d3b5020476b1ab292237923eafb40eea0aef138b7b7e15c09f21beb767b58f24"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/simulation-query.schema.json",
+      "sha256": "52307e247933fad63b50bd3e3e185d451957c7245000d6a6a46f49a0fbb9dd54"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T06/validate_openapi.py",
+      "sha256": "a3d46a414bfd954fdacd4fd282037d0c7b78312d5a0915571939dbede82dff06"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-openapi-1.6.0/output.log",
+      "sha256": "de916c7aa510bd59bc0e706c50517ee2e6f4a57c13bb04edbde7fe5345949089"
+    }
+  ]
+}

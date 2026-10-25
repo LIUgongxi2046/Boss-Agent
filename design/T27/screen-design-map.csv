@@ -1,0 +1,3 @@
+source_id,screen_id,name,source_type,status,artifact_path,requirement_refs,required_states
+N01,N01,身份登录,EXPLICIT,CREATED,../../app/webui/BossLogin.tsx,FR-26 FR-28 FR-32,初始 加载 错误 帮助 维护入口 减少动态效果
+D08,D08,重新认证,EXPLICIT,CREATED,../../app/webui/BossLogin.tsx,FR-26 FR-28,过期 重新认证 认证拒绝

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="9" failures="1" skipped="0" tests="17" time="10.239" timestamp="2026-10-23T16:51:41.063928+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_runtime_configuration" name="test_scope_is_explicit_and_current_configuration_is_not_expanded" time="1.252"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_scope_is_explicit_and_cur0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_version_conflict_and_repeated_activation_preserve_receipt" time="0.108"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_version_conflict_and_repe0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_saved_native_change_requires_explicit_revalidation" time="0.088"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: '尚未启用'&#10; Input: 'Conflict'">product = (&lt;product_runtime.ProductRuntime object at 0x10fa8d1f0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x11018f1d0&gt;, &lt;boss_page_api.BossPageAPI object at 0x10fa8d850&gt;)
+
+    def test_saved_native_change_requires_explicit_revalidation(product):
+        runtime, api, _ = product
+        checked = validated(product)
+        runtime.config.update(lambda config: setattr(config.agents.defaults, "max_tool_iterations", 8))
+        assert runtime.read()["admission_ready"] is False
+        with pytest.raises(Exception, match="尚未启用"):
+&gt;           runtime.snapshot()
+
+app/tests/test_product_runtime_configuration.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/product_runtime.py:98: in snapshot
+    require(self._native_sha() == self.effective["config_sha256"],
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = '已保存配置尚未启用到当前Runtime'
+error = &lt;class 'aiohttp.web_exceptions.HTTPConflict'&gt;
+
+    def require(condition, message, error=web.HTTPConflict):
+        if not condition:
+&gt;           raise error(text=message)
+E           aiohttp.web_exceptions.HTTPConflict: Conflict
+
+validation/business.py:31: HTTPConflict
+
+During handling of the above exception, another exception occurred:
+
+product = (&lt;product_runtime.ProductRuntime object at 0x10fa8d1f0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x11018f1d0&gt;, &lt;boss_page_api.BossPageAPI object at 0x10fa8d850&gt;)
+
+    def test_saved_native_change_requires_explicit_revalidation(product):
+        runtime, api, _ = product
+        checked = validated(product)
+        runtime.config.update(lambda config: setattr(config.agents.defaults, "max_tool_iterations", 8))
+        assert runtime.read()["admission_ready"] is False
+&gt;       with pytest.raises(Exception, match="尚未启用"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E        Regex: '尚未启用'
+E        Input: 'Conflict'
+
+app/tests/test_product_runtime_configuration.py:116: AssertionError</failure></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_saved_native_change_requires_explicit_revalidation" time="0.000"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_saved_native_change_requi0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_roles_cannot_change_runtime_or_read_configuration" time="0.062"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_roles_cannot_change_runti0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_unapproved_or_invalid_configuration_has_no_write[values0]" time="0.067"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_unapproved_or_invalid_con0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_unapproved_or_invalid_configuration_has_no_write[values1]" time="0.062"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_unapproved_or_invalid_con1')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_unapproved_or_invalid_configuration_has_no_write[values2]" time="0.068"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_unapproved_or_invalid_con2')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_unapproved_or_invalid_configuration_has_no_write[values3]" time="0.067"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_unapproved_or_invalid_con3')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase><testcase classname="app.tests.test_product_runtime_configuration" name="test_disable_keeps_business_and_tool_state_and_blocks_next_admission" time="0.067"><error message="failed on teardown with &quot;AttributeError: 'RecordedProvider' object has no attribute 'close'&quot;">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-runtime-config/test_disable_keeps_business_an0')
+
+    @pytest.fixture
+    def product(tmp_path):
+        connection = settings()
+        config = Config()
+        config.agents.defaults.workspace = str(tmp_path / "workspace")
+        config.agents.defaults.provider = "deepseek"
+        config.agents.defaults.model = "deepseek-flash"
+        config.agents.defaults.max_tool_iterations = 12
+        config.agents.defaults.max_tokens = 4096
+        config.agents.defaults.dream.enabled = False
+        config.providers.deepseek.api_key = "${DEEPSEEK_API_KEY}"
+        config.providers.deepseek.api_base = "https://api.deepseek.com"
+        filename = tmp_path / "config.json"
+        save_config(config, filename)
+        config = resolve_config_env_vars(load_config(filename), config_path=filename)
+        store = ControlStore(tmp_path / "business.sqlite")
+        store.initialize("ui-check")
+        registry = ToolRegistry()
+        envelope = {"request_id": "config-check", "owner_id": "boss-1", "execution_namespace": "ui-check",
+                    "dataset_id": "selection", "dataset_version": "1", "session_id": "config-check"}
+        tools = [BusinessTool(name, store, envelope, {}, []) for name in OPERATIONS]
+        tools.append(BossResearchSourcesTool(store, "BOSS"))
+        provider = RecordedProvider(connection, tmp_path / "transport.json", redact_payload=True)
+        loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry)
+        runtime = ProductRuntime(store, filename, loop, registry, tools, provider)
+        yield runtime, BossCommandAPI(store, runtime), BossPageAPI(store, runtime_control=runtime)
+&gt;       asyncio.run(provider.close())
+                    ^^^^^^^^^^^^^^
+E       AttributeError: 'RecordedProvider' object has no attribute 'close'
+
+app/tests/test_product_runtime_configuration.py:51: AttributeError</error></testcase></testsuite></testsuites>

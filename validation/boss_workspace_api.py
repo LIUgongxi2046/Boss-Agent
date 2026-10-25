@@ -9,7 +9,6 @@ Endpoints are deliberately under the authenticated RoleChannel gateway.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -23,6 +22,11 @@ from boss_travel import projection as travel_projection
 from boss_people import projection as people_projection
 from boss_owner_preferences import goals_projection, notice_projection, effective_owner_notice
 from boss_recovery_api import calendar_share_state
+from boss_meetings import meeting_materials
+from boss_memory import confirmed_memory
+from boss_owner_authorizations import authorization_can_revoke
+from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS = "ui-check"
 BOSS_PAGES = {
@@ -45,25 +49,20 @@ def _object_list(db, namespace, kind, limit=100):
     return [json.loads(row[0]) for row in require]
 
 
-def _future_authorization_expiry(raw):
-    try:
-        value = datetime.fromisoformat(raw)
-        return value.tzinfo is not None and value > datetime.now(timezone.utc)
-    except (TypeError, ValueError):
-        return False
-
-
 def _safe_date(raw):
     return raw if isinstance(raw, str) and len(raw) <= 64 else None
 
 
-def _safe_source(entry):
+def _safe_source(entry, business_at):
     return {
         "source_id": entry.get("source_id"),
         "source_type": entry.get("source_type"),
         "version": entry.get("version"),
         "author_contact_id": entry.get("author_contact_id"),
         "published_at": entry.get("published_at"),
+        "valid_from": entry.get("valid_from"),
+        "valid_until": entry.get("valid_until"),
+        "validity_state": source_validity(entry, business_at),
         "withdrawn": bool(entry.get("withdrawn")),
         "access_scope": "BOSS_ONLY" if entry.get("access_scope") == "boss-1" else "NOT_AUTHORIZED",
         "content_visible": False,
@@ -91,8 +90,9 @@ class BossWorkspaceAPI:
         if key not in allowed:
             return 403, {"error": "FORBIDDEN"}
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             output = self._read(db, data, key, role, query_string)
         output["read_at"] = now()
         output["source_type"] = "SIMULATED"
@@ -102,10 +102,11 @@ class BossWorkspaceAPI:
         return 200, output
 
     def _read(self, db, data, key, role, query_string):
+        business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
         if key == "voice":
             # Fixed local runtime configuration, never client-selected paths
             # or the raw Provider secret/transport state.
-            runtime_config = ROOT / ".work" / "application" / "config.json"
+            runtime_config = Path(self.store.path).parent / "config.json"
             enabled = False
             max_duration = 120
             provider = "NOT_CONFIGURED"
@@ -153,10 +154,11 @@ class BossWorkspaceAPI:
             if minute is not None:
                 source = current_sources.get(minute["source_id"])
                 current = bool(
-                    source and not source.get("withdrawn")
+                    source and source_validity(source, business_at) == "VALID"
                     and source.get("access_scope") == data["owner_id"]
                     and source.get("source_type") == "SIMULATED"
                     and source.get("version") == minute["source_version"]
+                    and external_adoption(db, self.namespace, data, business_at, source)["state"] != "NEEDS_REIMPORT"
                 )
                 minute = dict(minute)
                 minute["source_reference_state"] = "CURRENT" if current else "NEEDS_REVIEW"
@@ -171,7 +173,7 @@ class BossWorkspaceAPI:
                         "reference_state": "NEEDS_REVIEW",
                     } for entry in minute["entries"]]
             associated = [
-                _safe_source(current_sources[source_id])
+                _safe_source(current_sources[source_id], business_at)
                 for source_id in meeting["material_ids"]
                 if source_id in current_sources
             ]
@@ -283,8 +285,8 @@ class BossWorkspaceAPI:
                     "confirmation_state": current["confirmation_state"],
                     "text": current.get("text", "") if current["confirmation_state"] == "CONFIRMED" else "",
                 },
-                "effective": current["confirmation_state"] == "CONFIRMED",
-                "future_turn_policy": "CONFIRMED_ONLY",
+                "effective": confirmed_memory(db, self.namespace, current, data["owner_id"]) is not None,
+                "future_turn_policy": "CURRENT_NON_REVOKED_CONFIRMATION_ONLY",
                 "physical_secure_erasure_verified": False,
             }
         if key == "calendar":
@@ -316,7 +318,8 @@ class BossWorkspaceAPI:
                 "meeting": {
                     "meeting_id": data["meeting"]["meeting_id"],
                     "starts_at": data["meeting"]["starts_at"],
-                    "ends_at": None, "end_is_known": False,
+                    "ends_at": data["meeting"].get("ends_at"),
+                    "end_is_known": bool(data["meeting"].get("ends_at")),
                 },
                 "visibility": "BOSS_PRIVATE",
                 "external_share_created": False,
@@ -325,7 +328,7 @@ class BossWorkspaceAPI:
             }
         if key == "sources" or key == "source-index":
             docs = _object_list(db, self.namespace, "document")
-            records = [_safe_source(d) for d in docs]
+            records = [_safe_source(d, business_at) for d in docs]
             if role == "MAINTAINER":
                 records = [{k: v for k, v in d.items() if k not in
                             ("author_contact_id",)} for d in records]
@@ -344,9 +347,10 @@ class BossWorkspaceAPI:
             documents = _object_list(db, self.namespace, "document")
             matches = []
             for document in documents:
-                if (document.get("withdrawn")
+                if (source_validity(document, business_at) != "VALID"
                         or document.get("access_scope") != data["owner_id"]
-                        or document.get("source_type") != "SIMULATED"):
+                        or document.get("source_type") != "SIMULATED"
+                        or external_adoption(db, self.namespace, data, business_at, document)["state"] == "NEEDS_REIMPORT"):
                     continue
                 if phrase and phrase.casefold() not in document.get("content", "").casefold():
                     continue
@@ -379,14 +383,25 @@ class BossWorkspaceAPI:
                 "owner_plan_events": [],
                 "plan_event_tracking_implemented": False}
         if key == "notifications":
+            from boss_business_alerts import BusinessAlertsAPI
+
+            if self.namespace != "ui-check":
+                raise web.HTTPConflict(text="当前经营提醒执行空间不匹配")
             events = _object_list(db, self.namespace, "event")
+            operating_ids = {event["event_id"] for event in events if event.get("generated_by") == "BUSINESS_ALERT_INPUT"}
+            events = [event for event in events if event["event_id"] not in operating_ids]
             sent = _object_list(db, self.namespace, "notification")
             reminders = _object_list(db, self.namespace, "reminder")
             deliveries = _object_list(db, self.namespace, "delivery")
             rules = _object_list(db, self.namespace, "rules")
             active_notice = effective_owner_notice(db, data)
             dispatches = _object_list(db, self.namespace, "dispatch")
+            sent = [row for row in sent if row.get("event_id") not in operating_ids]
+            reminders = [row for row in reminders if row.get("event_id") not in operating_ids]
+            deliveries = [row for row in deliveries if row.get("event_id") not in operating_ids]
+            dispatches = [row for row in dispatches if row.get("event_id") not in operating_ids]
             return {
+                "business_alerts": BusinessAlertsAPI(self.store).project_in_transaction(role, db),
                 "events": [{k: row[k] for k in (
                     "event_id", "version", "state", "impact", "due_at", "task_id"
                 ) if k in row} for row in events],
@@ -430,14 +445,7 @@ class BossWorkspaceAPI:
                     "content_version", "version", "revoked", "revoked_at",
                     "valid_from", "valid_until", "scope",
                 ) if k in row},
-                "can_revoke": bool(
-                    row.get("issuer_identity") == "BOSS"
-                    and row.get("owner_id") == data["owner_id"]
-                    and row.get("scope") == self.namespace
-                    and row.get("action") != "authorization.revoke"
-                    and not row.get("revoked")
-                    and _future_authorization_expiry(row.get("valid_until"))
-                ),
+                "can_revoke": authorization_can_revoke(row, data["owner_id"], self.namespace),
             } for row in rows],
             "revocation_only_affects_future_use": True,
             "historical_actions_reversed": False,

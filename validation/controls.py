@@ -7,13 +7,15 @@ from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 
 from business import Store, checksum, encode, initial_materials, now, require
+from boss_source_access import require_current_simulated_source
+from boss_source_policy import source_validity
 
 
 TEXT = {"type": "string", "minLength": 1}
 TIME = {"type": "string", "format": "date-time"}
 FIELDS = {
     "feedback": ({"task_id": TEXT, "task_version": TEXT, "author_contact_id": TEXT, "kind": {"enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": TEXT, "proposed_due_at": TIME, "evidence_refs": {"type": "array", "minItems": 0, "maxItems": 16, "items": TEXT}}, ["task_id", "task_version", "author_contact_id", "kind", "content"]),
-    "decide": ({"authorization_id": TEXT, "task_id": TEXT, "task_version": TEXT, "feedback_id": TEXT, "due_at": TIME}, ["authorization_id", "task_id", "task_version", "feedback_id"]),
+    "decide": ({"authorization_id": TEXT, "task_id": TEXT, "task_version": TEXT, "feedback_id": TEXT, "due_at": TIME, "reason": TEXT}, ["authorization_id", "task_id", "task_version", "feedback_id"]),
     "revoke": ({"authorization_id": TEXT}, ["authorization_id"]),
     "withdraw": ({"source_id": TEXT, "version": TEXT}, ["source_id", "version"]),
     "search": ({"query": TEXT}, ["query"]),
@@ -37,7 +39,19 @@ class ControlStore(Store):
             self.active(db, ns)
             result = getattr(self, "control_" + action)(db, ns, p)
             audit_result = {"calendar_id": result["calendar_id"], "visibility": result["visibility"]} if action == "private_calendar" else result
-            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(p), encode(audit_result), now()))
+            audit_input = p
+            if action == "feedback":
+                audit_input = {k: p[k] for k in ("task_id", "task_version", "author_contact_id", "kind")}
+                audit_result = {"feedback_id": result["feedback"]["feedback_id"], "task_id": result["task"]["task_id"],
+                                "task_version": result["task"]["version"], "historical_only": result["feedback"].get("historical_only", False)}
+            elif action == "search":
+                audit_input = {"query_sha256": checksum(p["query"])}
+                audit_result = {"source_ids": [row["source_id"] for row in result["results"]],
+                                "result_count": len(result["results"])}
+            elif action == "decide":
+                audit_input = {key: p[key] for key in ("authorization_id", "task_id", "task_version", "feedback_id", "due_at") if key in p}
+                audit_result = {key: result[key] for key in ("task_id", "version", "status", "due_at")}
+            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
             return result
 
     def control_feedback(self, db, ns, p):
@@ -45,39 +59,112 @@ class ControlStore(Store):
         require(task["version"] == p["task_version"], "任务版本冲突")
         require(p["author_contact_id"] == task["coordinator_id"], "反馈作者不符", web.HTTPForbidden)
         require(p["kind"] in {"PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"}, "反馈类型无效", web.HTTPBadRequest)
-        require(task["status"] not in {"CANCELED", "COMPLETED_CONFIRMED"}, "当前任务已结束")
+        require(task["status"] != "COMPLETED_CONFIRMED", "已确认完成的任务不接受进度变更")
+        historical_only = task["status"] == "CANCELED"
+        require(task["status"] in {"WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED"}
+                and bool(task["message_ids"]), "交办必须已经发送才能接收反馈")
+        require(task["status"] != "RESULT_SUBMITTED" or p["kind"] == "RESULT_SUBMITTED", "已提交结果的交办仅接受重新提交结果")
+        if p["kind"] == "RESULT_SUBMITTED":
+            require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
+        refs = p.get("evidence_refs", [])
+        require(len(set(refs)) == len(refs), "反馈证据引用重复", web.HTTPBadRequest)
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
+        if p["kind"] == "EXTENSION_REQUEST":
+            require(isinstance(p.get("proposed_due_at"), str), "延期申请需要明确新期限", web.HTTPBadRequest)
+            from boss_command_api import _aware_due
+            proposed = _aware_due(p["proposed_due_at"], task["timezone"])
+            require(proposed > datetime.fromisoformat(task["due_at"]), "申请期限必须晚于当前期限", web.HTTPBadRequest)
+            if not historical_only:
+                require(proposed > datetime.fromisoformat(clock), "申请期限必须晚于当前业务时钟", web.HTTPBadRequest)
+        documents = {}
+        for source_id in refs:
+            document = self.get(db, ns, "document", source_id)
+            require(document.get("source_id") == source_id and document.get("source_type") == "SIMULATED"
+                    and document.get("access_scope") == data["owner_id"], "反馈证据不属于当前本人获准范围", web.HTTPForbidden)
+            if not historical_only:
+                require_current_simulated_source(document, data["owner_id"], clock)
+                from boss_supply_quality import DEFINITION, require_external_source_dependencies
+                if document.get("simulation_definition") == DEFINITION:
+                    require_external_source_dependencies(self, db, ns, data, document)
+            documents[source_id] = document
         feedback_id = str(uuid.uuid4())
-        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now()}
+        feedback = {**p, "feedback_id": feedback_id, "source_type": "SIMULATED", "submitted_at": now(), "historical_only": historical_only,
+                    "evidence_versions": {source_id: document["version"] for source_id, document in documents.items()},
+                    "evidence_fingerprints": {source_id: checksum(document) for source_id, document in documents.items()},
+                    "evidence_states": {source_id: source_validity(document, clock) for source_id, document in documents.items()}}
         self.put(db, ns, "feedback", feedback_id, feedback)
         task["feedback_ids"].append(feedback_id)
         task["version"] = str(int(task["version"]) + 1)
-        if p["kind"] == "PROGRESS":
+        if p["kind"] == "PROGRESS" and not historical_only:
             task["status"] = "IN_PROGRESS"
         if p["kind"] == "RESULT_SUBMITTED":
-            require(p.get("evidence_refs"), "结果必须包含证据", web.HTTPBadRequest)
-            task["status"] = "RESULT_SUBMITTED"
+            if not historical_only:
+                task["status"] = "RESULT_SUBMITTED"
         self.put(db, ns, "task", p["task_id"], task)
         return {"feedback": feedback, "task": task}
 
     def control_decide(self, db, ns, p):
         auth = self.get(db, ns, "authorization", p["authorization_id"])
         content = {key: value for key, value in p.items() if key != "authorization_id"}
-        require(not auth["revoked"] and auth["payload"] == content and datetime.fromisoformat(auth["valid_until"]) > datetime.fromisoformat(now()), "当前授权无效", web.HTTPForbidden)
+        require(auth["authorization_id"] == p["authorization_id"] and auth["action"] in {"extend_assignment", "reject_assignment_extension", "complete_assignment"},
+                "决定授权标识或动作不符", web.HTTPForbidden)
+        data = self.get(db, ns, "initial", "snapshot")
+        self.require_current_authorization(auth, ns, data, auth["action"], content)
+        require(auth["payload"] == content, "决定参数与本人授权不符", web.HTTPForbidden)
         task = self.get(db, ns, "task", p["task_id"])
         require(task["version"] == p["task_version"], "任务版本冲突")
-        if auth["action"] == "extend_assignment":
+        previous_task = dict(task)
+        extension_decision = None
+        if auth["action"] in {"extend_assignment", "reject_assignment_extension"}:
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
-            require(feedback["kind"] == "EXTENSION_REQUEST" and feedback["task_id"] == p["task_id"], "延期依据不符")
-            require(datetime.fromisoformat(p["due_at"]).tzinfo is not None, "期限必须包含时区", web.HTTPBadRequest)
-            task["due_at"] = p["due_at"]
+            require(feedback["kind"] == "EXTENSION_REQUEST" and feedback["task_id"] == p["task_id"]
+                    and feedback["author_contact_id"] == task["coordinator_id"] and not feedback.get("historical_only")
+                    and task["status"] in {"WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED"}, "延期依据或任务状态不符")
+            decision_id = task["task_id"] + ":" + p["feedback_id"]
+            require(db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='assignment_extension_decision' AND id=?", (ns, decision_id)).fetchone() is None
+                    and p["feedback_id"] not in task.get("accepted_extension_feedback_ids", []), "延期申请已经有本人决定")
+            if auth["action"] == "extend_assignment":
+                self.require_current_assignment_sources(db, ns, data, task)
+                from boss_command_api import _aware_due
+                requested = _aware_due(p["due_at"], task["timezone"])
+                require(requested > datetime.fromisoformat(task["due_at"])
+                        and requested > datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]), "批准期限必须晚于当前期限及业务时钟", web.HTTPBadRequest)
+                task["due_at"] = p["due_at"]
+            extension_decision = {"decision_id": decision_id, "task_id": task["task_id"], "feedback_id": p["feedback_id"],
+                "owner_id": data["owner_id"], "source_type": "SIMULATED", "decision": "APPROVE" if auth["action"] == "extend_assignment" else "REJECT",
+                "old_due_at": previous_task["due_at"], "new_due_at": task["due_at"], "proposed_due_at": feedback["proposed_due_at"],
+                "request_reason": feedback["content"], "reason": p.get("reason"), "authorization_id": p["authorization_id"],
+                "previous_task_version": previous_task["version"], "decided_at": now()}
         elif auth["action"] == "complete_assignment":
             feedback = self.get(db, ns, "feedback", p["feedback_id"])
             require(task["status"] == "RESULT_SUBMITTED" and feedback["task_id"] == p["task_id"] and feedback["kind"] == "RESULT_SUBMITTED" and feedback["evidence_refs"], "当前结果证据不完整")
+            current_results = [identifier for identifier in task["feedback_ids"]
+                               if self.get(db, ns, "feedback", identifier)["kind"] == "RESULT_SUBMITTED"]
+            require(current_results and current_results[-1] == p["feedback_id"], "当前结果已经重新提交，需要核查最新结果")
+            self.require_current_assignment_sources(db, ns, data, task)
+            versions = feedback.get("evidence_versions")
+            fingerprints = feedback.get("evidence_fingerprints")
+            require(isinstance(versions, dict) and isinstance(fingerprints, dict)
+                    and set(versions) == set(fingerprints) == set(feedback["evidence_refs"]),
+                    "结果缺少提交时证据绑定，需要重新提交当前证据")
+            clock = self.get(db, ns, "clock", "current")["at"]
+            for source_id in set(task["source_refs"]) | set(feedback["evidence_refs"]):
+                document = self.assignment_sources(db, ns, data, [source_id])[source_id]
+                if source_id in task.get("source_versions", {}):
+                    require(document["version"] == task["source_versions"][source_id], "完成依据的来源版本已经变化")
+                if source_id in versions:
+                    require(document["version"] == versions[source_id] and checksum(document) == fingerprints[source_id],
+                            "结果证据在提交后已经变化，需要重新提交当前证据")
             task["status"] = "COMPLETED_CONFIRMED"
             task["completion_authorization_id"] = p["authorization_id"]
         else:
             raise web.HTTPForbidden(text="当前授权不支持此决定")
         task["version"] = str(int(task["version"]) + 1)
+        self.put(db, ns, "task_revision", task["task_id"] + ":v" + previous_task["version"], previous_task)
+        if extension_decision is not None:
+            extension_decision["task_version"] = task["version"]
+            self.put(db, ns, "assignment_extension_decision", extension_decision["decision_id"], extension_decision)
         self.put(db, ns, "task", p["task_id"], task)
         return task
 
@@ -97,17 +184,43 @@ class ControlStore(Store):
 
     def control_search(self, db, ns, p):
         rows = db.execute("SELECT source_id,content FROM knowledge WHERE namespace=? AND knowledge MATCH ?", (ns, p["query"])).fetchall()
-        return {"results": [{"source_id": row[0], "content": row[1]} for row in rows]}
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
+        results = []
+        from boss_supply_quality import external_adoption
+        for source_id, indexed in rows:
+            document = self.get(db, ns, "document", source_id)
+            if (document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"]
+                    and source_validity(document, clock) == "VALID"
+                    and external_adoption(db, ns, data, clock, document)["state"] != "NEEDS_REIMPORT"):
+                require(indexed == document["content"], "资料索引与当前原文不一致，需要重新摄取")
+                results.append({"source_id": source_id, "content": document["content"]})
+        return {"results": results}
 
     def control_private_calendar(self, db, ns, p):
-        return self.get(db, ns, "initial", "snapshot")["private_calendar"]
+        data = self.get(db, ns, "initial", "snapshot")
+        calendar_id = data["private_calendar"]["calendar_id"]
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id=?", (ns, calendar_id)).fetchone()
+        if row is None:
+            current = data["private_calendar"]
+        else:
+            current = json.loads(row[0])
+        require(current["calendar_id"] == calendar_id and current["owner_id"] == data["owner_id"],
+                "私人安排不属于当前本人范围", web.HTTPForbidden)
+        if row is not None:
+            require(current["status"] == "ACTIVE", "私人安排当前已经删除", web.HTTPGone)
+        return current
 
     def control_reference_status(self, db, ns, p):
         task = self.get(db, ns, "task", p["task_id"])
+        data = self.get(db, ns, "initial", "snapshot")
+        clock = self.get(db, ns, "clock", "current")["at"]
         sources = []
         for source_id in task["source_refs"]:
             document = self.get(db, ns, "document", source_id)
-            sources.append({"source_id": source_id, "version": document["version"], "state": "WITHDRAWN" if document.get("withdrawn", False) else "ACTIVE"})
+            require(document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"], "资料不属于当前本人获准范围", web.HTTPForbidden)
+            state = source_validity(document, clock)
+            sources.append({"source_id": source_id, "version": document["version"], "state": "ACTIVE" if state == "VALID" else state})
         return {"task_id": task["task_id"], "sources": sources}
 
     def control_clock(self, db, ns, p):
@@ -127,11 +240,23 @@ class ControlStore(Store):
     def control_event(self, db, ns, p):
         require(p["state"] in {"OPEN", "RECOVERED", "CANCELED"}, "事件状态无效", web.HTTPBadRequest)
         require(p["impact"] in {"NORMAL", "IMPORTANT"}, "事件影响无效", web.HTTPBadRequest)
-        self.put(db, ns, "event", p["event_id"], p)
-        return p
+        require(p["version"].isdecimal() and 1 <= int(p["version"]) <= 99999999, "事件版本必须为有效十进制字符串", web.HTTPBadRequest)
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event' AND id=?", (ns, p["event_id"])).fetchone()
+        event = dict(p)
+        if row:
+            previous = json.loads(row[0])
+            if previous["version"] == p["version"]:
+                require(all(previous.get(key) == value for key, value in p.items()), "相同事件版本不能更改内容")
+                return previous
+            require(int(p["version"]) == int(previous["version"]) + 1, "事件版本必须基于当前版本递增")
+            if previous.get("owner_plan_id"):
+                event["owner_plan_id"] = previous["owner_plan_id"]
+        self.put(db, ns, "event", p["event_id"], event)
+        return event
 
     def control_reminder(self, db, ns, p):
         event = self.get(db, ns, "event", p["event_id"])
+        require(event.get("generated_by") != "BUSINESS_ALERT_INPUT", "经营提醒需要核查当前详情与确认摘要")
         require(p["state"] in {"SNOOZED", "CLOSED", "ACKNOWLEDGED"}, "提醒状态无效", web.HTTPBadRequest)
         current = {"state": p["state"], "until": p.get("until"), "event_id": event["event_id"]}
         if p["state"] == "SNOOZED":
@@ -159,18 +284,25 @@ class ControlStore(Store):
         Caller must own BEGIN IMMEDIATE; no external messaging occurs here.
         """
         self.active(db, ns)
+        from boss_alert_dispatch import dispatch
+        from boss_alert_policy import record_dispatch
+        from boss_owner_preferences import effective_owner_notice
+        alert_results = dispatch(self, db, ns, only_event_id)
         schedule = self.get(db, ns, "schedule", "current")
         rules_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'", (ns,)).fetchone()
         if rules_row is None:
-            return []
+            return alert_results
         rules = json.loads(rules_row[0])
         clock = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"])
         local = clock.astimezone(ZoneInfo(rules["timezone"]))
         from boss_owner_preferences import owner_notification_suppression
         data = self.get(db, ns, "initial", "snapshot")
+        owner_notice = effective_owner_notice(db, data, ns)
         results = []
         for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
             event = json.loads(row[0])
+            if event.get("generated_by") == "BUSINESS_ALERT_INPUT":
+                continue
             if only_event_id is not None and event["event_id"] != only_event_id:
                 continue
             if datetime.fromisoformat(event["due_at"]) > clock:
@@ -181,8 +313,12 @@ class ControlStore(Store):
             reminder = json.loads(reminder_row[0]) if reminder_row else None
             reason = None
             owner_notice_version = None
+            from boss_owner_plans import suppression
+            plan_reason = suppression(self, db, ns, event, clock)
             if not schedule["enabled"] or schedule["canceled"]:
                 reason = "PLAN_PAUSED_OR_CANCELED"
+            elif plan_reason:
+                reason = plan_reason
             elif event["state"] == "CANCELED":
                 reason = "SOURCE_CANCELED"
             elif reminder and reminder["state"] == "CLOSED":
@@ -195,7 +331,7 @@ class ControlStore(Store):
                 reason = "DUPLICATE_EVENT"
             else:
                 owner_reason, owner_notice_version = owner_notification_suppression(
-                    db, data, clock, event, rules,
+                    db, data, clock, event, rules, namespace=ns,
                 )
                 if owner_reason:
                     reason = owner_reason
@@ -203,17 +339,19 @@ class ControlStore(Store):
                     start, end = rules["quiet_start"], rules["quiet_end"]
                     quiet = (local.hour >= start or local.hour < end) if start > end else start <= local.hour < end
                     escalation = rules["important_escalation"] and event["impact"] == "IMPORTANT"
-                    if quiet and not escalation:
+                    if quiet and not (escalation and owner_notice is not None and owner_notice["content"]["important_during_quiet"]):
                         reason = "QUIET_HOURS"
                     elif previous and (clock - datetime.fromisoformat(previous["delivered_at"])).total_seconds() < rules["cooldown_seconds"] and event["state"] != "RECOVERED" and not escalation:
                         reason = "COOLDOWN"
             result = {"event_id": event["event_id"], "event_version": event["version"], "state": "SUPPRESSED" if reason else "DELIVERED", "reason": reason, "rule_version": rules["version"], "schedule_version": schedule["version"], "business_at": clock.isoformat()}
+            if event.get("owner_plan_id"):
+                result["owner_plan_id"] = event["owner_plan_id"]
             if owner_notice_version is not None:
                 result["owner_notice_version"] = owner_notice_version
-            self.put(db, ns, "dispatch", event["event_id"], result)
+            record_dispatch(self, db, ns, result)
             if reason is None:
                 delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
                 self.put(db, ns, "delivery", event["event_id"], delivery)
                 self.put(db, ns, "notification", event["event_id"] + ":" + event["version"], delivery)
             results.append(result)
-        return results
+        return alert_results + results

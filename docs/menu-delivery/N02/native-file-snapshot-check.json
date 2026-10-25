@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "scope": "N1_ACTUAL_SDK_SAVED_DOCUMENT_SNAPSHOT",
+  "metadata_count": 1,
+  "metadata_has_internal_reference": false,
+  "user_message_keys": [
+    [
+      "_runtime_context",
+      "content",
+      "role",
+      "timestamp"
+    ]
+  ],
+  "user_media_count": 0,
+  "snapshot_mutation_performed": false,
+  "view": {
+    "source_type": "RUNTIME_RECORD",
+    "session_id": "websocket:n02-real-file",
+    "chat_id": "n02-real-file",
+    "session_state": "SAVED",
+    "attachments": [
+      {
+        "attachment_id": "attachment-015e34bceed64d23b6bfff68e02b579c1b2c92a7b6f5d2f95f1c53ce3a85fdc9",
+        "stored_name": "0565a30a5967_morning-coverage.json",
+        "original_name": "morning-coverage.json",
+        "mime_type": "application/json",
+        "size_bytes": 548,
+        "content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+        "recorded_size_bytes": 548,
+        "recorded_content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+        "processing_state": "STORED",
+        "user_message_index": null
+      }
+    ],
+    "business_authorization_granted": false
+  },
+  "reference_unavailable_view": {
+    "source_type": "RUNTIME_RECORD",
+    "session_id": "websocket:n02-real-file",
+    "chat_id": "n02-real-file",
+    "session_state": "SAVED",
+    "attachments": [
+      {
+        "attachment_id": "attachment-015e34bceed64d23b6bfff68e02b579c1b2c92a7b6f5d2f95f1c53ce3a85fdc9",
+        "stored_name": null,
+        "original_name": "morning-coverage.json",
+        "mime_type": "application/json",
+        "size_bytes": null,
+        "content_sha256": null,
+        "recorded_size_bytes": 548,
+        "recorded_content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+        "processing_state": "REFERENCE_UNAVAILABLE",
+        "user_message_index": null
+      }
+    ],
+    "business_authorization_granted": false
+  }
+}

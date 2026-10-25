@@ -1,0 +1,27 @@
+{
+  "status": "SCHEMA_MISMATCH",
+  "event": "stream_end",
+  "schema_sha256": "d4aca773e13c6309d6522b030ab9ab7484c74551a5be950229f084a165700b55",
+  "frame_fields": [
+    "chat_id",
+    "event",
+    "resuming",
+    "stream_id",
+    "turn_id",
+    "turn_phase",
+    "turn_seq"
+  ],
+  "frame_field_types": {
+    "event": "str",
+    "chat_id": "str",
+    "stream_id": "str",
+    "resuming": "bool",
+    "turn_id": "str",
+    "turn_phase": "str",
+    "turn_seq": "int"
+  },
+  "frame_sha256": "afb0966482bea9ee04d2bd245cc8e821c3df45aaa91da456972947b553027b41",
+  "private_body_recorded": false,
+  "business_write_requested": false,
+  "at": "2026-10-23T04:55:07.576718+00:00"
+}

@@ -1,0 +1,1270 @@
+[
+  {
+    "check": "public_auth_controls",
+    "result": [
+      {
+        "id": "",
+        "type": "radio",
+        "disabled": false,
+        "labels": [
+          "老板本人本人决定与日常工作"
+        ],
+        "width": 16,
+        "height": 16,
+        "display": "block",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "type": "radio",
+        "disabled": false,
+        "labels": [
+          "技术维护配置、模拟与运行检查"
+        ],
+        "width": 16,
+        "height": 16,
+        "display": "block",
+        "visibility": "visible"
+      },
+      {
+        "id": "boss-login-secret",
+        "type": "password",
+        "disabled": false,
+        "labels": [
+          "本机访问凭据"
+        ],
+        "width": 414,
+        "height": 50,
+        "display": "inline-block",
+        "visibility": "visible"
+      }
+    ],
+    "at": "2026-10-23T04:22:58.597Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1024x768:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.653Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1280x800:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.677Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1440x1024:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.708Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1024x768:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.814Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1280x800:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.859Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "N01:1440x1024:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:58.914Z"
+  },
+  {
+    "check": "empty_credential_validation",
+    "result": {
+      "private_shell_present": false,
+      "focus_on_credential": true
+    },
+    "at": "2026-10-23T04:22:59.088Z"
+  },
+  {
+    "check": "contact_credential_rejected",
+    "result": {
+      "private_shell_present": false
+    },
+    "at": "2026-10-23T04:22:59.369Z"
+  },
+  {
+    "check": "entry_scope_mismatch_rejected",
+    "result": {
+      "private_shell_present": false
+    },
+    "at": "2026-10-23T04:22:59.481Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/webui/bootstrap"
+    },
+    "at": "2026-10-23T04:22:59.552Z"
+  },
+  {
+    "check": "actual_network_unavailable",
+    "result": {
+      "private_shell_present": false
+    },
+    "at": "2026-10-23T04:22:59.564Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/boss-brand/01-%E5%BE%85%E6%9C%BA%E6%82%AC%E6%B5%AE.webp"
+    },
+    "at": "2026-10-23T04:22:59.847Z"
+  },
+  {
+    "check": "authenticated_shell",
+    "result": {
+      "role": "BOSS"
+    },
+    "at": "2026-10-23T04:22:59.886Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1024x768:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:22:59.999Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1280x800:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:00.124Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1440x1024:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:00.273Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1024x768:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:00.356Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1280x800:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:00.404Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS:1440x1024:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:00.507Z"
+  },
+  {
+    "check": "host_isolation",
+    "result": {
+      "electron": "45.0.0",
+      "architecture": "x64",
+      "service_pid": 34259
+    },
+    "at": "2026-10-23T04:23:00.617Z"
+  },
+  {
+    "check": "navigation_dom",
+    "result": {
+      "width": 1024,
+      "height": 768
+    },
+    "at": "2026-10-23T04:23:00.684Z"
+  },
+  {
+    "check": "navigation_dom",
+    "result": {
+      "width": 1280,
+      "height": 800
+    },
+    "at": "2026-10-23T04:23:00.723Z"
+  },
+  {
+    "check": "navigation_dom",
+    "result": {
+      "width": 1440,
+      "height": 1024
+    },
+    "at": "2026-10-23T04:23:00.791Z"
+  },
+  {
+    "check": "zoom_dom",
+    "result": {
+      "factor": 2
+    },
+    "at": "2026-10-23T04:23:00.832Z"
+  },
+  {
+    "check": "page_reload_context",
+    "result": {
+      "page_id": "N03"
+    },
+    "at": "2026-10-23T04:23:01.533Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "BOSS_AFTER_RELOAD",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:01.628Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1024x768:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:01.925Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1280x800:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:01.950Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1440x1024:1",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "32px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:01.974Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1024x768:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:02.014Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1280x800:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:02.042Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "D08:1440x1024:2",
+      "nodes": [
+        {
+          "className": "boss-v6 boss-login",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-login-content",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "24px 16px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:02.075Z"
+  },
+  {
+    "check": "expired_identity_hides_private_shell",
+    "result": true,
+    "at": "2026-10-23T04:23:02.095Z"
+  },
+  {
+    "check": "authenticated_shell",
+    "result": {
+      "role": "BOSS"
+    },
+    "at": "2026-10-23T04:23:02.298Z"
+  },
+  {
+    "check": "reauthentication_does_not_replay_business",
+    "result": true,
+    "at": "2026-10-23T04:23:02.422Z"
+  },
+  {
+    "check": "authenticated_shell",
+    "result": {
+      "role": "MAINTAINER"
+    },
+    "at": "2026-10-23T04:23:02.779Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1024x768:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:02.850Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1280x800:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:02.894Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1440x1024:1",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:03.012Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1024x768:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:03.076Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1280x800:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:03.116Z"
+  },
+  {
+    "check": "content_bounds",
+    "result": {
+      "stage": "MAINTAINER:1440x1024:2",
+      "nodes": [
+        {
+          "className": "boss-v6",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-frame",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        },
+        {
+          "className": "boss-layout ",
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "padding": "0px",
+          "margin": "0px",
+          "border": "0px",
+          "radius": "0px",
+          "shadow": "none",
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "at": "2026-10-23T04:23:03.177Z"
+  },
+  {
+    "check": "role_switch_dom",
+    "result": {
+      "role": "MAINTAINER",
+      "boss_navigation_present": false
+    },
+    "at": "2026-10-23T04:23:03.201Z"
+  },
+  {
+    "check": "memory_technical_dom",
+    "result": {
+      "role": "MAINTAINER",
+      "read_only": true
+    },
+    "at": "2026-10-23T04:23:03.489Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/webui/bootstrap"
+    },
+    "at": "2026-10-23T04:23:04.164Z"
+  },
+  {
+    "check": "desktop_quit",
+    "result": {
+      "service_pid": 34259
+    },
+    "at": "2026-10-23T04:23:05.164Z"
+  },
+  {
+    "check": "restart_rejects_previous_token",
+    "result": {
+      "status": 401
+    },
+    "at": "2026-10-23T04:23:14.313Z"
+  },
+  {
+    "check": "desktop_restart",
+    "result": {
+      "service_pid": 34316,
+      "task_and_outbox_unchanged": true
+    },
+    "at": "2026-10-23T04:23:14.314Z"
+  },
+  {
+    "check": "request_failed",
+    "result": {
+      "path": "/webui/bootstrap"
+    },
+    "at": "2026-10-23T04:23:14.438Z"
+  },
+  {
+    "check": "scope",
+    "result": {
+      "visual_acceptance": "NOT_RUN",
+      "model_tools": "NOT_RUN",
+      "os_permissions": "NOT_RUN"
+    },
+    "at": "2026-10-23T04:23:15.084Z"
+  }
+]

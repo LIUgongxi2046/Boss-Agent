@@ -1,0 +1,21 @@
+{
+  "status": "PASS_ACTUAL_PUBLIC_RUNTIME_SCHEMA_AND_TRANSPORT",
+  "reference": "evidence/T11/w3-local-20261023/memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef.json",
+  "reference_sha256": "389ba6c7567687d93819d6dd854bf61eef3bdf44d6310fd04807250bf6aa290c",
+  "schema_sha256": "8a044505168c705c27c13648111a5350e932668fe770373e41e9972c2c257c3c",
+  "database_sha256": "da7154bd3b41b31d9966de9b54d8a55b0d1f199265fbfcb9b53365f99911bbe0",
+  "transport_sha256": "be706d2795195da4f502a35c51d1b390d733dc69cb5f33c17c406e75a2780162",
+  "runs": [
+    {
+      "run_id": "run-d03d3382-a763-465f-a32f-b57420e37515",
+      "configuration_version": "3",
+      "max_tool_rounds": 6,
+      "model_requests": 3,
+      "total_tokens": 14968
+    }
+  ],
+  "new_model_calls": false,
+  "private_body_recorded": false,
+  "cost_total": null,
+  "full_A11_A16_accepted": false
+}

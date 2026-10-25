@@ -1,0 +1,205 @@
+{
+  "status": "PASS",
+  "run_id": "fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5",
+  "ports": {
+    "business": 9681,
+    "webui": 9682,
+    "gateway": 19681
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-scoped-33ace095-ecd7-447f-aefa-5ce0c52e14b5",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-scoped-dist",
+  "manifest_sha256": "03ea8a455e7cdc5c49d6a30b57ca385bac575acc24fda23e64b2510a5c7413bc",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "public_scoped_query_followup_runtime",
+      "parent_query_id": "ba6a70dc-55e4-4d7b-bbf7-b845784ac19c",
+      "query_id": "499c0ba5-d681-47fb-8c31-13618c745cff",
+      "run_id": "run-b9e583e4-9057-4095-a229-fef7c2af61a3",
+      "detail_count": 4,
+      "usage": null,
+      "cost": null
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "persistence_comparison_roles_tokens_keyboard",
+      "reload": true,
+      "relogin": true,
+      "incomparable": true,
+      "anonymous": 401,
+      "maintainer": 403,
+      "style": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "field": {
+        "font": "14px",
+        "line": "22px",
+        "input": "16px"
+      },
+      "renderer_errors": 0
+    }
+  ]
+}

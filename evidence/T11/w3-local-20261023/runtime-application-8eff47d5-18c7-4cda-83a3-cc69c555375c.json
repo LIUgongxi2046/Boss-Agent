@@ -1,0 +1,412 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "runtime-application-8eff47d5-18c7-4cda-83a3-cc69c555375c",
+  "at": "2026-10-23T09:01:09.148Z",
+  "inputs": [
+    {
+      "path": "validation/application.py",
+      "sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "8e481bf1bb916c3894464a4838f56d7aa220e08b716d0b93ed5332889f3e5743"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "50654431359b01b4a0152655bf4b13cdd0fc45a67bde5b985a57910a9bb6f120"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "fb21a4353dd3ddedaf59d37c5520baa3b091bcefe75ccd23b156f1c2e568c12a"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "807251bcb5e0b6bb589fcf50d4f4d748364f3f7e38f88cfa8467ecf2996bfa8c"
+    },
+    {
+      "path": "validation/boss_runtime_records.py",
+      "sha256": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe"
+    },
+    {
+      "path": "validation/boss_memory_runtime.py",
+      "sha256": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64"
+    },
+    {
+      "path": "validation/connection.py",
+      "sha256": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89"
+    },
+    {
+      "path": "validation/controls.py",
+      "sha256": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d"
+    },
+    {
+      "path": "validation/business.py",
+      "sha256": "fa0ecb2923390afe56e45220077f67afb1ba0e2c6a31b00eda0458b8b8d9b738"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "ffc588ece6a12d90d90a65871664e960d6873d7ee0ea5352451946933df53ee6"
+    },
+    {
+      "path": "app/webui/ProductRuntimeConfiguration.tsx",
+      "sha256": "ac846eadb3e9f9e361a6d1d009c7716e5d62cea7212d2cac6043f87f2e247204"
+    },
+    {
+      "path": "app/webui/MaintainerRuntimeRecords.tsx",
+      "sha256": "230e82bdd683ef8f340d4e5a12cb1f36cc1687c0ef22838960ac7cfc8d27d2ee"
+    },
+    {
+      "path": "app/webui/RuntimeTaskTechnicalView.tsx",
+      "sha256": "2cf3245c7e008279f59afc3e27734ffb52863802af7a19db010299caa5bbf7b5"
+    },
+    {
+      "path": "validation/desktop/check-public-runtime.cjs",
+      "sha256": "2a408a13f4caf74a90da61eb7c99ed10bd92f6f2f523118f11cfea33ec7cc22c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d62f18f31a0d9f88f446ddcbc0620ad3b520fd9cdd40381de534c22255c230b9"
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "records": [
+    {
+      "check": "gui_configuration_save_validate_activate",
+      "version": "2",
+      "max_tool_rounds": 8,
+      "max_output_tokens": 2048,
+      "tool_scope": [
+        "bossWorkspaceRead",
+        "create_assignment",
+        "query_metrics",
+        "read_assignment",
+        "read_evidence",
+        "send_assignment"
+      ],
+      "actual_native_sha256": "86b7e14be2968e49b5224f29017e2a3790dbcc777c6b0019bdaa65641b2b3985"
+    },
+    {
+      "check": "activation_rejected_during_actual_model_run",
+      "http_status": 409
+    },
+    {
+      "check": "home_form_actual_model_and_persisted_runtime",
+      "record": {
+        "chat_id": "0be17605-821e-4890-b8ed-95cd505c8e62",
+        "configuration_id": "runtime-1",
+        "configuration_version": "2",
+        "cost_total": null,
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "finished_at": "2026-10-23T09:00:10.669388+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "CONFIRMED",
+          "eligible": true,
+          "memory_id": "memory-1",
+          "version": "1"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-510f1440-36a1-4bc3-ab69-344ce87e1cfc",
+            "request_sha256": "1df999a6be4aca2a46c3d2a3a9d8af708e139cfeb9b6f25b7f5d99a84cfea7c4",
+            "response_ids": [
+              "f94f721d-6e13-480c-afaa-f903bf9537a0"
+            ],
+            "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+            "usage": {
+              "completion_tokens": 308,
+              "prompt_cache_hit_tokens": 3072,
+              "prompt_cache_miss_tokens": 352,
+              "prompt_tokens": 3424,
+              "total_tokens": 3732
+            }
+          },
+          {
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-92553b77-500a-4ba4-bae7-be648b3175c2",
+            "request_sha256": "7439f0e9995f4f18ae9e2939799b31155141b4816461f72854d2331edd7d9a41",
+            "response_ids": [
+              "83c85d9b-b153-40ff-ad7b-6a9dbc27c743"
+            ],
+            "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+            "usage": {
+              "completion_tokens": 141,
+              "prompt_cache_hit_tokens": 3712,
+              "prompt_cache_miss_tokens": 753,
+              "prompt_tokens": 4465,
+              "total_tokens": 4606
+            }
+          },
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-23dce24a-5eb7-4b2a-b653-30105793972a",
+            "request_sha256": "acd00574db1a580baa69d696527c07d3355217d0fa877b311a66ba4dcbe27247",
+            "response_ids": [
+              "dc44c3b7-aea3-4845-808f-5d4f9455b741"
+            ],
+            "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+            "usage": {
+              "completion_tokens": 558,
+              "prompt_cache_hit_tokens": 4480,
+              "prompt_cache_miss_tokens": 1251,
+              "prompt_tokens": 5731,
+              "total_tokens": 6289
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "websocket:0be17605-821e-4890-b8ed-95cd505c8e62:1792745994845644000",
+        "request_id_source": "TURN",
+        "run_id": "run-5172c114-0d65-4240-bd9c-450269c07f90",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "86b7e14be2968e49b5224f29017e2a3790dbcc777c6b0019bdaa65641b2b3985",
+          "max_output_tokens": 2048,
+          "max_tool_rounds": 8,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "websocket:0be17605-821e-4890-b8ed-95cd505c8e62",
+        "started_at": "2026-10-23T08:59:54.852153+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+        "tool_configuration": [
+          {
+            "implementation": "boss_agent_read_tools.BossResearchSourcesTool",
+            "implementation_sha256": "3624e56c601a698798d2b2eaf2a0a4152d198967051ab3c82463142560ac1da4",
+            "schema_sha256": "9fd8e306e29a52418caa4bea5d34453aa4d84414cd344cb463b0357d5b5c8eaa",
+            "tool_id": "bossWorkspaceRead"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "c77cab6b9917b893ad4d5d84d95eee6c2fee08117ee8ce14c4b59d3dd1d48f9d",
+            "tool_id": "create_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "51d2479a6389bdda317d75ce6e660cf7a0af948df655e28e76e5b77fff3397a1",
+            "tool_id": "query_metrics"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "ad2ad30bb622de43fa9bd4f725f87b4134dbbf6bdcf9fdd65efef83dfbc15876",
+            "tool_id": "read_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "88b733828298d2099c669938c09f057e0599443c98481a49c46f9c2b3c2de596",
+            "tool_id": "read_evidence"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "b6ba085b5c6154aa64e73f13b795acb931d0dc9f6a7f6477024ce920a1bf42e1",
+            "tool_id": "send_assignment"
+          }
+        ],
+        "tool_results": [
+          {
+            "iteration": 0,
+            "query_id": "9bb2f249-bd10-4040-a124-a739f6b916c9",
+            "tool_call_id": "call_00_tF1u0CeopCoEwJdB39Y59596",
+            "tool_id": "query_metrics"
+          },
+          {
+            "iteration": 1,
+            "tool_call_id": "call_00_sWfZZ1X1Xc2ECQRNtqMb1033",
+            "tool_id": "read_evidence"
+          }
+        ],
+        "turn_id": "websocket:0be17605-821e-4890-b8ed-95cd505c8e62:1792745994845644000",
+        "usage": {
+          "completion_tokens": 1007,
+          "prompt_cache_hit_tokens": 11264,
+          "prompt_cache_miss_tokens": 2356,
+          "prompt_tokens": 13620,
+          "total_tokens": 14627
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      }
+    },
+    {
+      "check": "next_home_task_adopts_new_configuration_and_real_task_reference",
+      "task_id": "7ee8498c-9286-4d8b-a3ba-6d36c9855bb8",
+      "record": {
+        "chat_id": "bc8556c6-4c47-4b2b-934f-ab05deba4fdf",
+        "configuration_id": "runtime-1",
+        "configuration_version": "3",
+        "cost_total": null,
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "finished_at": "2026-10-23T09:00:17.777974+00:00",
+        "memory_reference": {
+          "confirmation_authority_checked": true,
+          "confirmation_state": "CONFIRMED",
+          "eligible": true,
+          "memory_id": "memory-1",
+          "version": "1"
+        },
+        "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
+        "model_behavior_evaluation_passed": false,
+        "model_completion_observed": true,
+        "model_requests": [
+          {
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-0524c86a-e224-4369-9d85-93f39b9f5fbf",
+            "request_sha256": "83b0a045120c32fca0604dd54a786fc647441c43696c3a3a95bd101a1c9c5245",
+            "response_ids": [
+              "d27a7bca-ae8b-481c-a8e5-b94f15f58812"
+            ],
+            "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+            "usage": {
+              "completion_tokens": 63,
+              "prompt_cache_hit_tokens": 3072,
+              "prompt_cache_miss_tokens": 318,
+              "prompt_tokens": 3390,
+              "total_tokens": 3453
+            }
+          },
+          {
+            "finish_reasons": [
+              "stop"
+            ],
+            "http_status": 200,
+            "model_request_id": "model-request-2742a732-0823-4c51-ad96-67f7bf4dd661",
+            "request_sha256": "9d17d3fdcc735cc4dda911e796740fb7ec435cdc385510dccdf3994b25568fda",
+            "response_ids": [
+              "af95ac71-788b-49b5-a6d4-647da02b3ba8"
+            ],
+            "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+            "usage": {
+              "completion_tokens": 246,
+              "prompt_cache_hit_tokens": 3328,
+              "prompt_cache_miss_tokens": 326,
+              "prompt_tokens": 3654,
+              "total_tokens": 3900
+            }
+          }
+        ],
+        "namespace": "ui-check",
+        "price_version": null,
+        "private_body_recorded": false,
+        "prompt_versions": [],
+        "request_id": "websocket:bc8556c6-4c47-4b2b-934f-ab05deba4fdf:1792746013538807000",
+        "request_id_source": "TURN",
+        "run_id": "run-6e15dfcb-82bc-4e14-adfb-990ece95c857",
+        "runtime": {
+          "api_type": "chat_completions",
+          "config_sha256": "b8f71df1302237d1f46902fa3cee59310005b4f6e2b89682a2d207b78d7e5117",
+          "max_output_tokens": 2048,
+          "max_tool_rounds": 6,
+          "model_id": "deepseek-flash",
+          "provider": "deepseek",
+          "timeout": 120
+        },
+        "session_id": "websocket:bc8556c6-4c47-4b2b-934f-ab05deba4fdf",
+        "started_at": "2026-10-23T09:00:13.548562+00:00",
+        "status": "SUCCEEDED",
+        "stop_reason": "completed",
+        "tool_config_sha256": "aad61ddd780ae6ea2238965939cb456693f0c29a9f6d1fed944d2bee77b92719",
+        "tool_configuration": [
+          {
+            "implementation": "boss_agent_read_tools.BossResearchSourcesTool",
+            "implementation_sha256": "3624e56c601a698798d2b2eaf2a0a4152d198967051ab3c82463142560ac1da4",
+            "schema_sha256": "9fd8e306e29a52418caa4bea5d34453aa4d84414cd344cb463b0357d5b5c8eaa",
+            "tool_id": "bossWorkspaceRead"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "c77cab6b9917b893ad4d5d84d95eee6c2fee08117ee8ce14c4b59d3dd1d48f9d",
+            "tool_id": "create_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "51d2479a6389bdda317d75ce6e660cf7a0af948df655e28e76e5b77fff3397a1",
+            "tool_id": "query_metrics"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "ad2ad30bb622de43fa9bd4f725f87b4134dbbf6bdcf9fdd65efef83dfbc15876",
+            "tool_id": "read_assignment"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "88b733828298d2099c669938c09f057e0599443c98481a49c46f9c2b3c2de596",
+            "tool_id": "read_evidence"
+          },
+          {
+            "implementation": "__main__.ApplicationTool",
+            "implementation_sha256": "9a9ed6fdf211751bb40450a1ba7b04407cc235e8f526a7e2ab64ec20f200aa11",
+            "schema_sha256": "b6ba085b5c6154aa64e73f13b795acb931d0dc9f6a7f6477024ce920a1bf42e1",
+            "tool_id": "send_assignment"
+          }
+        ],
+        "tool_results": [
+          {
+            "authorization_id": "05115de9-f905-49a1-81f4-addb6f5bac9b",
+            "iteration": 0,
+            "status": "OPEN",
+            "task_id": "7ee8498c-9286-4d8b-a3ba-6d36c9855bb8",
+            "tool_call_id": "call_00_FCjOQyk3BJnmuowvtZNp4340",
+            "tool_id": "read_assignment",
+            "version": "1"
+          }
+        ],
+        "turn_id": "websocket:bc8556c6-4c47-4b2b-934f-ab05deba4fdf:1792746013538807000",
+        "usage": {
+          "completion_tokens": 309,
+          "prompt_cache_hit_tokens": 6400,
+          "prompt_cache_miss_tokens": 644,
+          "prompt_tokens": 7044,
+          "total_tokens": 7353
+        },
+        "usage_coverage": "COMPLETE_OBSERVED_REQUESTS"
+      }
+    },
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "model_service": "api.deepseek.com",
+  "model_id": "deepseek-flash",
+  "source_type": "SIMULATED",
+  "cost_total": null,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A16_accepted": false
+}

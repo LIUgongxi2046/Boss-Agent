@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-privacy-b9ac7143-60ec-41cb-acc2-c6374118ffec",
+  "ports": {
+    "business": 10731,
+    "webui": 10732,
+    "gateway": 20731
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "scope": "N02_NATIVE_DRAFT_AND_QUEUE_PRIVACY",
+  "records": [
+    {
+      "check": "actual_runtime_artifact_read_dialog_and_keyboard_return",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
+      "list_id": "morning-b9717a81-4bf0-40db-ab6d-8e643861643e",
+      "focus_restored": true
+    },
+    {
+      "check": "actual_arriving_native_response_preserves_history_reading_position",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
+      "before": {
+        "scroll_top": 0,
+        "client_height": 181,
+        "scroll_height": 789
+      },
+      "after": {
+        "scroll_top": 0,
+        "client_height": 181,
+        "scroll_height": 1312
+      },
+      "forced_scroll_to_bottom": false
+    },
+    {
+      "check": "actual_delayed_native_output_memory_only_queue_and_explicit_discard",
+      "chat_id": "eafabca3-7e63-44d5-90fc-56f62d79ee43",
+      "queue_in_browser_storage": false,
+      "queued_message_sent": false,
+      "discarded_queue_restored": false
+    },
+    {
+      "check": "actual_selected_file_attachment_only_navigation_guard_and_discard",
+      "source_file": "data/simulation/supply-quality-v1.yaml",
+      "source_sha256": "3cc09ad2a038b2217a01c986e36c7f70474261d162003298d8b6285cc9f8f3d0",
+      "attachment_sent": false,
+      "discarded_attachment_restored": false
+    }
+  ]
+}

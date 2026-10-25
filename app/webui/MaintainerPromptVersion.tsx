@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertCircle, CheckCircle2, ClipboardCheck, Clock3, FileSearch,
   Loader2, RefreshCw, ShieldCheck, Square, WandSparkles,
@@ -41,7 +41,7 @@ function detailsLabel({label,value}:{label:string;value?:string|number|null}) {
 const Detail=detailsLabel;
 
 export function MaintainerPromptVersion({onNavigate}:Props) {
-  const {client,getToken}=useClient();
+  const {client,getToken,token}=useClient();
   const [data,setData]=useState<Data|null>(null);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
@@ -61,22 +61,47 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
   const [lookupBusy,setLookupBusy]=useState(false);
   const modalRef=useRef<HTMLElement|null>(null);
   const keyRef=useRef<string|null>(null);
+  const identityRef=useRef({client,token});
+  const mountedRef=useRef(true);
+  if(identityRef.current.client!==client||identityRef.current.token!==token)
+    identityRef.current={client,token};
   const reload=()=>setRevision(v=>v+1);
 
+  const clearConfiguration=useCallback(()=>{
+    identityRef.current={...identityRef.current};
+    setData(null);setChosen("");setTitle("");setBody("");setChangeNote("");setSources("");
+    setDirty(false);setPending(null);setDiscardIntent(null);setApproved(false);
+    setBusy(false);setLookupBusy(false);setLoading(false);setNotice("");keyRef.current=null;
+  },[]);
+
   useEffect(()=>{
-    const abort=new AbortController();const token=getToken();
-    if(!token){setError("技术维护身份已失效");return;}
+    mountedRef.current=true;
+    return ()=>{mountedRef.current=false;};
+  },[]);
+
+  useEffect(()=>{
+    clearConfiguration();
+  },[client,token,clearConfiguration]);
+
+  useEffect(()=>{
+    const abort=new AbortController();const currentToken=getToken();
+    const identity=identityRef.current;
+    if(!currentToken){setError("技术维护身份已失效");setLoading(false);return;}
     setLoading(true);setError("");setData(null);
     void fetch("/api/boss/ui/workspace/prompt-versions",{
-      headers:{Authorization:"Bearer "+token},cache:"no-store",signal:abort.signal,
+      headers:{Authorization:"Bearer "+currentToken},cache:"no-store",signal:abort.signal,
     }).then(async response=>{
+      if(abort.signal.aborted||identity!==identityRef.current)return null;
+      if(response.status===401||response.status===403){
+        clearConfiguration();setError("Prompt版本读取失败（HTTP "+response.status+"）");
+      }
       if(!response.ok)throw Error("Prompt版本读取失败（HTTP "+response.status+"）");
       const value=await response.json() as Data;
       if(value.projection!=="prompt-versions"||value.source_type!=="SIMULATED")
         throw Error("来源与身份不符，禁止把设计示例当真实状态");
       return value;
     }).then(value=>{
-      if(abort.signal.aborted)return;
+      if(abort.signal.aborted||identity!==identityRef.current||value===null)return;
       setData(value);setLoading(false);
       if(keyRef.current){
         const newlyCreated=value.drafts.find(item=>item.prompt_id===keyRef.current);
@@ -84,11 +109,11 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
         keyRef.current=null;
       }
     }).catch(e=>{
-      if(abort.signal.aborted)return;
+      if(abort.signal.aborted||identity!==identityRef.current)return;
       setError(e instanceof Error?e.message:String(e));setLoading(false);
     });
     return ()=>abort.abort();
-  },[revision,getToken]);
+  },[revision,getToken,client,token,clearConfiguration]);
 
   useEffect(()=>{
     if(!pending)return;
@@ -202,34 +227,43 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
   }
   async function commit(){
     if(!pending||!approved||busy||lookupBusy)return;
+    const identity=identityRef.current;
     setBusy(true);setError("");
     try{
       const value=await client.requestMutation<Record<string,unknown>>(pending.action,{
         ...pending.fields,client_request_id:pending.key,
       });
+      if(!mountedRef.current||identity!==identityRef.current)return;
       if(pending.action==="boss.prompt.save"&&typeof value.prompt_id==="string")
         keyRef.current=value.prompt_id;
       setNotice("已保存当前技术操作："+pending.action+"。重读已持久化配置与版本。");
       setPending(null);setApproved(false);setDirty(false);reload();
     }catch(e){
+      if(!mountedRef.current||identity!==identityRef.current)return;
       setError((e instanceof Error?e.message:String(e))+
         "。可能已写入，请优先查询本次幂等回执，不要生成新请求重试。");
-    }finally{setBusy(false);}
+    }finally{if(mountedRef.current&&identity===identityRef.current)setBusy(false);}
   }
   async function reconcile(){
     if(!pending||busy||lookupBusy)return;
-    const token=getToken();
-    if(!token){setError("身份过期，无法核查");return;}
+    const identity=identityRef.current;
+    const currentToken=getToken();
+    if(!currentToken){clearConfiguration();setError("身份过期，无法核查");return;}
     setLookupBusy(true);setError("");
     try{
       const qs=new URLSearchParams({
         action:pending.action,client_request_id:pending.key,
       });
       const response=await fetch("/api/boss/ui/operation-status?"+qs.toString(),{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
+        headers:{Authorization:"Bearer "+currentToken},cache:"no-store",
       });
+      if(!mountedRef.current||identity!==identityRef.current)return;
+      if(response.status===401||response.status===403){
+        clearConfiguration();setError("当前版本回执读取失败（HTTP "+response.status+"）");
+      }
       if(!response.ok)throw Error("当前版本回执读取失败（HTTP "+response.status+"）");
       const receipt=await response.json() as Receipt;
+      if(!mountedRef.current||identity!==identityRef.current)return;
       if(receipt.action!==pending.action||receipt.client_request_id!==pending.key)
         throw Error("当前回执与操作编号不匹配");
       if(receipt.outcome==="RECORDED"){
@@ -241,8 +275,8 @@ export function MaintainerPromptVersion({onNavigate}:Props) {
         setError("当前未发现回执，不代表绝对未执行。请重读技术配置并使用同编号重试。");
         reload();
       }else throw Error("无法确定原操作结果");
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setLookupBusy(false);}
+    }catch(e){if(mountedRef.current&&identity===identityRef.current)setError(e instanceof Error?e.message:String(e));}
+    finally{if(mountedRef.current&&identity===identityRef.current)setLookupBusy(false);}
   }
   return <>
     <div className="boss-workspace-toolbar">

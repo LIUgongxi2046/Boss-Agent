@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K10",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    "validation/.venv/bin/python",
+    "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py",
+    "delivery-ledger.json"
+  ],
+  "started_at": "2026-10-23T06:30:59.923077+00:00",
+  "ended_at": "2026-10-23T06:31:07.324918+00:00",
+  "exit_code": 1,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/delivery-ledger.json",
+      "sha256": "3147bbcbe980198d0ffca47777606e7f423fadb5c86b5ba4f81e21207e2b8ea4"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/implementation-map.json",
+      "sha256": "3db9f40b44383bd8ed8dc61beff37bc1b537d76485ce184b55bc187e3abaaad1"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T10/w3-ledger-20261023/output.log",
+      "sha256": "c42f44cf8bbfe8c0794485ad37db00ac697b4308c3d798991f36810d3c7da9d9"
+    }
+  ]
+}

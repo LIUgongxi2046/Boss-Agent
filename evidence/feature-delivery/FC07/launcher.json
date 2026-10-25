@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "launcher": "scripts/run_fc07.command",
+  "scope": "BOSS-PRIORITY-ITERATION",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc07-recovery-a002cae9-f1e9-4315-873f-84233f270cde",
+  "ports": {
+    "business": 10081,
+    "webui": 10082,
+    "gateway": 20081
+  },
+  "manifest_sha256": "b67076ef5343ab3f824e4afbc9635c0621422325adc4c6c4538fbe0e8b7b6c6f",
+  "actual_boss_login": true,
+  "configuration_version": "3",
+  "current_tool_scope": [
+    "assignmentSourcesRead",
+    "bossEvidenceRead",
+    "bossSupplyQualityPrepare",
+    "bossSupplyQualityQuery",
+    "bossSupplyQualityRead",
+    "read_assignment"
+  ],
+  "existing_business_rows_unchanged": 5,
+  "independent_validation_directory": true,
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN"
+}

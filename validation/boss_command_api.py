@@ -39,6 +39,14 @@ from boss_travel import review as travel_review, confirm as travel_confirm, canc
 from boss_people import prepare as people_prepare, attach as people_attach, detach as people_detach
 from boss_owner_preferences import (goals_save, goals_confirm, notice_save, notice_confirm)
 from boss_owner_authorizations import revoke as owner_authorization_revoke
+from boss_meetings import MeetingAPI, meeting_materials
+from boss_source_access import require_current_business_source
+from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQualityAPI
+from boss_bi_scenarios import BIScenarioAPI, LOAD_ACTION as BI_SCENARIO_LOAD
+from boss_morning_inputs import MorningInputAPI, LOAD_ACTION as MORNING_COVERAGE_LOAD
+from boss_morning import MorningAPI
+from public_business_overview import READ_ACTIONS as BUSINESS_OVERVIEW_READ_ACTIONS, read_business_overview
+from boss_simulation_api import _context
 from boss_task_reminders import synchronize_task_due, current as task_due_event
 from boss_self_commitments import (
     create as commitment_create, extend as commitment_extend,
@@ -95,12 +103,22 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        **{action: 'BOSS' for action in BUSINESS_OVERVIEW_READ_ACTIONS},
+        "boss.simulation.alert.load": "MAINTAINER",
+        **{"boss.alert." + action: "BOSS" for action in ("ack", "snooze", "close", "meeting.link", "assignment.create")},
+        **{prefix + action: role for prefix, role in (("boss.alert.rule.", "BOSS"), ("boss.simulation.alert.rule.", "MAINTAINER")) for action in ("save", "validate", "activate", "disable")},
+        MORNING_COVERAGE_LOAD: "MAINTAINER",
+        BI_SCENARIO_LOAD: "MAINTAINER",
+        **{action: definition[0] for action, definition in SUPPLY_QUALITY_ACTIONS.items()},
+        **{"boss.sop." + action: "MAINTAINER" for action in ("save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel")},
         "boss.assignment.create": "BOSS",
         "boss.assignment.send": "BOSS",
         "boss.assignment.nudge": "BOSS",
         "boss.assignment.complete": "BOSS",
         "boss.assignment.extend": "BOSS",
+        "boss.assignment.extension.decide": "BOSS",
         "boss.assignment.cancel": "BOSS",
+        "boss.assignment.sources.confirm": "BOSS",
         "boss.commitment.create": "BOSS",
         "boss.commitment.extend": "BOSS",
         "boss.commitment.complete": "BOSS",
@@ -121,6 +139,10 @@ class BossCommandAPI:
         "boss.reminder.snooze": "BOSS",
         "boss.reminder.close": "BOSS",
         "boss.meeting.brief.prepare": "BOSS",
+        "boss.meeting.draft.save": "BOSS",
+        "boss.meeting.confirm": "BOSS",
+        "boss.meeting.cancel": "BOSS",
+        "boss.meeting.held": "BOSS",
         "boss.research.prepare": "BOSS",
         "boss.minutes.save": "BOSS",
         "boss.minutes.confirm": "BOSS",
@@ -153,10 +175,21 @@ class BossCommandAPI:
         "boss.owner.notice.save": "BOSS",
         "boss.owner.notice.confirm": "BOSS",
         "boss.authorization.revoke": "BOSS",
+        "boss.owner.plan.save": "BOSS",
+        "boss.owner.plan.pause": "BOSS",
+        "boss.owner.plan.resume": "BOSS",
+        "boss.owner.plan.cancel": "BOSS",
+        "boss.today.reorder": "BOSS",
+        "boss.runtime.save": "MAINTAINER",
+        "boss.runtime.validate": "MAINTAINER",
+        "boss.runtime.activate": "MAINTAINER",
+        "boss.runtime.deactivate": "MAINTAINER",
     }
 
-    def __init__(self, store):
+    def __init__(self, store, runtime_control=None, skills=None):
         self.store = store
+        self.runtime_control = runtime_control
+        self.skills = skills
 
     def execute(self, role, action, payload):
         if role not in ("BOSS", "MAINTAINER"):
@@ -169,11 +202,51 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            result = self._transaction(action, payload)
+            if action in BUSINESS_OVERVIEW_READ_ACTIONS:
+                result = read_business_overview(self.store, role, action, payload)
+            elif action == "boss.simulation.alert.load":
+                from boss_alert_rules import BusinessAlertInputAPI
+                result = BusinessAlertInputAPI(self.store).load(role, payload)
+            elif action.startswith(("boss.alert.rule.", "boss.simulation.alert.rule.")):
+                from boss_alert_rules import BusinessAlertRulesAPI
+                result = BusinessAlertRulesAPI(self.store).execute(role, action.rsplit(".", 1)[-1], payload)
+            elif action.startswith("boss.alert."):
+                from boss_business_alerts import BusinessAlertsAPI
+                result = BusinessAlertsAPI(self.store).execute(role, action.removeprefix("boss.alert."), payload)
+            elif action == MORNING_COVERAGE_LOAD:
+                result = MorningInputAPI(self.store).load(role,payload)
+            elif action == BI_SCENARIO_LOAD:
+                result = BIScenarioAPI(self.store).execute(role,action,payload)
+            elif action in SUPPLY_QUALITY_ACTIONS:
+                result = SupplyQualityAPI(self.store).execute(role, action, payload)
+            elif action.startswith("boss.sop."):
+                require(self.skills is not None, "当前方法服务尚未准备", web.HTTPServiceUnavailable)
+                result = self.skills.execute(role, action.removeprefix("boss.sop."), payload)
+            elif action == "boss.assignment.sources.confirm":
+                from boss_assignment_sources import AssignmentSourcesAPI
+                result = AssignmentSourcesAPI(self.store).execute(role, payload)
+            elif action == "boss.assignment.extension.decide":
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                result = AssignmentExtensionAPI(self.store).execute(role, payload)
+            elif action in {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}:
+                require(self.runtime_control is not None, "当前Runtime尚未准备", web.HTTPServiceUnavailable)
+                result = self.runtime_control.execute(self, action, payload)
+            elif action in ("boss.meeting.draft.save", "boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held"):
+                result = MeetingAPI(self.store).execute(role, action.removeprefix("boss.meeting."), payload)
+            elif action.startswith("boss.owner.plan."):
+                from boss_owner_plans import OwnerPlansAPI
+                result = OwnerPlansAPI(self.store).execute(role, action.removeprefix("boss.owner.plan."), payload)
+            elif action == "boss.today.reorder":
+                from boss_today import TodayAPI
+                result = TodayAPI(self.store).reorder(role, payload)
+            else:
+                result = self._transaction(action, payload)
             return 200, result
         except web.HTTPException as exc:
             return exc.status, {"error": ERROR_CODE.get(exc.status, "BUSINESS_REJECTED"), "status": exc.status}
         except (TypeError, ValueError, KeyError):
+            if action in BUSINESS_OVERVIEW_READ_ACTIONS:
+                raise
             # Never leak a Python exception or private source data to renderer.
             return 400, {"error": "INVALID_INPUT"}
 
@@ -241,30 +314,10 @@ class BossCommandAPI:
 
     def _require_current_source(self, db, data, source_id):
         require(_is_text(source_id, 128), "来源标识无效", web.HTTPBadRequest)
-        doc = self.store.get(db, NAMESPACE, "document", source_id)
-        require(
-            not doc.get("withdrawn") and doc.get("access_scope") == data["owner_id"]
-            and doc.get("source_type") == "SIMULATED",
-            "来源已撤销或不可作为当前执行依据",
-            web.HTTPForbidden,
-        )
-        return doc
+        return require_current_business_source(self.store, db, NAMESPACE, data["owner_id"], source_id)
 
     def _require_current_task_sources(self, db, data, task):
-        """Task contents are not safe to send/close on unpinned provenance."""
-        sources = task.get("source_refs", [])
-        pinned = task.get("source_versions")
-        require(isinstance(pinned, dict) and set(pinned) == set(sources),
-                "当前任务没有完整的创建时来源版本；须重新核查后再执行")
-        for source_id in sources:
-            doc = self._require_current_source(db, data, source_id)
-            require(doc.get("version") == pinned[source_id],
-                    "任务原始来源已经换版，旧授权不能用于新的材料")
-        origin_source = task.get("origin_source_id")
-        if origin_source:
-            source = self._require_current_source(db, data, origin_source)
-            require(source.get("version") == task.get("origin_source_version"),
-                    "纪要创建任务所引用的原始资料版本已变化，必须重新核查")
+        self.store.require_current_assignment_sources(db, NAMESPACE, data, task)
 
     def _transaction(self, action, payload):
         with self.store.connect() as db:
@@ -273,7 +326,7 @@ class BossCommandAPI:
             key, digest, prev = self._check_existing(db, action, payload)
             if prev is not None:
                 return prev
-            data = self.store.get(db, NAMESPACE, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, NAMESPACE, "initial", "snapshot"))
             if action == "boss.assignment.create":
                 result = self._create(db, data, payload, key)
             elif action == "boss.assignment.send":
@@ -386,11 +439,28 @@ class BossCommandAPI:
             return result
 
     def _create(self, db, data, payload, key):
+        morning_reference = payload.get("morning_reference")
         self._exact(payload, {
             "client_request_id", "purpose", "coordinator_id", "due_at",
             "timezone", "evidence_requirements", "related_meeting_id",
             "related_event_ids", "source_refs", "content_version",
-        })
+        } | ({"morning_reference"} if "morning_reference" in payload else set()))
+        if "morning_reference" in payload:
+            require(isinstance(morning_reference, dict) and set(morning_reference) == {"list_id", "list_version", "item_id", "snapshot_sha256"},
+                    "晨间交办引用字段无效", web.HTTPBadRequest)
+            morning = MorningAPI(self.store)
+            stored, _, _ = morning._current(db, _context(db), morning_reference["list_id"])
+            view = stored["result"]
+            require(all(morning_reference[field] == view[field] for field in ("list_id", "list_version", "snapshot_sha256")), "晨间清单版本已变化")
+            item = next((item for item in view["items"] if item["item_id"] == morning_reference["item_id"]), None)
+            require(item is not None, "事项不属于当前晨间清单", web.HTTPForbidden)
+            require(isinstance(payload["source_refs"], list) and bool(payload["source_refs"])
+                    and set(payload["source_refs"]) <= {ref["id"] for ref in item["source_refs"] if ref["kind"] == "document"},
+                    "交办来源必须属于选中晨间事项", web.HTTPConflict)
+            require(payload["related_meeting_id"] is None or payload["related_meeting_id"] in {ref["id"] for ref in item.get("related_meetings", [])},
+                    "关联会议必须属于选中晨间事项", web.HTTPConflict)
+            require(isinstance(payload["related_event_ids"], list) and set(payload["related_event_ids"]) <= {ref["id"] for ref in item["source_refs"] if ref["kind"] == "event"},
+                    "关联事件必须属于选中晨间事项", web.HTTPConflict)
         require(_is_text(payload["purpose"]), "交办内容不能为空或过长", web.HTTPBadRequest)
         require(payload["content_version"] == "1", "当前只接受演示内容版本 1", web.HTTPBadRequest)
         require(payload["coordinator_id"] in {c["contact_id"] for c in data["contacts"]},
@@ -403,12 +473,13 @@ class BossCommandAPI:
                            if c["contact_id"] == payload["coordinator_id"])
         require(coordinator["valid_from"] <= today <= coordinator["valid_until"],
                 "负责人在当前模拟业务时钟下已失效", web.HTTPForbidden)
-        require(payload["related_meeting_id"] == data["meeting"]["meeting_id"],
-                "关联会议不符", web.HTTPBadRequest)
-        require(payload["related_event_ids"] == [data["event"]["event_id"]],
-                "关联事项不符", web.HTTPBadRequest)
+        if morning_reference is None:
+            require(payload["related_meeting_id"] == data["meeting"]["meeting_id"],
+                    "关联会议不符", web.HTTPBadRequest)
+            require(payload["related_event_ids"] == [data["event"]["event_id"]],
+                    "关联事项不符", web.HTTPBadRequest)
         refs = payload["source_refs"]
-        require(isinstance(refs, list) and refs == ["finance-note"],
+        require(isinstance(refs, list) and bool(refs) and len(refs) == len(set(refs)) and (morning_reference is not None or refs == ["finance-note"]),
                 "当前交办资料范围不符", web.HTTPBadRequest)
         for source_id in refs:
             self._require_current_source(db, data, source_id)
@@ -419,7 +490,7 @@ class BossCommandAPI:
         require(isinstance(evidence, list) and 1 <= len(evidence) <= 8 and
                 all(_is_text(t, 160) for t in evidence),
                 "证据要求缺少或无效", web.HTTPBadRequest)
-        bound = {k: v for k, v in payload.items() if k != "client_request_id"}
+        bound = {k: v for k, v in payload.items() if k not in {"client_request_id", "morning_reference"}}
         auth_id = self._authorize(db, "create_assignment", bound, "new-assignment", "1")
         tool_input = {
             **bound, "authorization_id": auth_id, "idempotency_key": key,
@@ -435,6 +506,10 @@ class BossCommandAPI:
         persisted = self.store.get(db, NAMESPACE, "task", result["task_id"])
         persisted["source_versions"] = pinned_versions
         self.store.put(db, NAMESPACE, "task", result["task_id"], persisted)
+        if morning_reference is not None:
+            self.store.put(db, NAMESPACE, "morning_assignment_reference", result["task_id"], {
+                "owner_id": data["owner_id"], "morning_reference": morning_reference,
+                "task_id": result["task_id"], "task_version": result["version"], "authorization_id": auth_id})
         return {**result, "source_type": "SIMULATED",
                 "authorization_scope": "BOSS_CONFIRMED"}
 
@@ -494,13 +569,20 @@ class BossCommandAPI:
         # Feedback is a response to a *sent* assignment, never a way for
         # the maintainer to forge a task state before the owner authorizes send.
         task = self.store.get(db, NAMESPACE, "task", body["task_id"])
-        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS"),
+        require(task["status"] in ("WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED"),
                 "当前交办不接受新的模拟反馈")
-        # Feedback may cite only currently available, scope-checked simulated
-        # sources. The maintainer has no capability to forge a source ID.
+        require(task["status"] != "RESULT_SUBMITTED" or body["kind"] == "RESULT_SUBMITTED",
+                "已提交结果的交办仅接受重新提交结果")
+        require(bool(task["message_ids"]), "交办必须已经发送才能接收模拟反馈")
+        # 历史反馈继续核查资料身份；当前采用另外核查有效状态。
         data = self.store.get(db, NAMESPACE, "initial", "snapshot")
         for source_id in body["evidence_refs"]:
-            self._require_current_source(db, data, source_id)
+            if task["status"] == "CANCELED":
+                source = self.store.get(db, NAMESPACE, "document", source_id)
+                require(source.get("source_type") == "SIMULATED" and source.get("access_scope") == data["owner_id"],
+                        "历史反馈资料不属于当前本人获准范围", web.HTTPForbidden)
+            else:
+                self._require_current_source(db, data, source_id)
         # No BOSS authorization is granted by simulated feedback; simulation
         # authors cannot approve a deadline or mark the task completed.
         result = self.store.control_feedback(db, NAMESPACE, body)
@@ -509,7 +591,8 @@ class BossCommandAPI:
             "version": result["task"]["version"],
             "status": result["task"]["status"],
         }, "feedback_id": result["feedback"]["feedback_id"],
-                "feedback_kind": result["feedback"]["kind"]}
+                "feedback_kind": result["feedback"]["kind"],
+                "historical_only": result["task"]["status"] == "CANCELED"}
 
     def _decide(self, db, payload, action):
         fields = {"client_request_id", "task_id", "task_version", "feedback_id"}
@@ -610,6 +693,7 @@ class BossCommandAPI:
             text=payload["text"].strip(),
             confirmation_state="CONFIRMED",
             version=str(int(current["version"]) + 1),
+            authorization_id=auth_id,
         )
         current["memory_version"] = current["version"]
         # No raw text in the authorization, idempotency receipt or audit log.
@@ -701,6 +785,7 @@ class BossCommandAPI:
             keys.add("until")
         self._exact(payload, keys)
         event = self.store.get(db, NAMESPACE, "event", payload["event_id"])
+        require(event.get("generated_by") != "BUSINESS_ALERT_INPUT", "经营提醒需要当前依据摘要与独立经营决定入口")
         require(event["version"] == payload["event_version"],
                 "事件版本变化，须重新核查")
         require(event["state"] != "CANCELED",

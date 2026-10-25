@@ -5,26 +5,26 @@
   "source_locked": "Boss-Agent Desktop v6.0",
   "original_hld_status": "ACCEPTED_STATIC_DESIGN_ONLY",
   "original_v6_status": "DESIGN_ONLY",
-  "implemented_page_count": 70,
-  "placeholder_page_count": 2,
+  "implemented_page_count": 72,
+  "placeholder_page_count": 0,
   "page_count": 72,
   "role_boundaries": {
     "BOSS": "WebUI RoleChannel + ControlStore server auth, owner scope fixed ui-check in demo",
     "MAINTAINER": "same gateway; maintenance metadata and one simulation feedback action only",
-    "ANONYMOUS": "nanobot original login, no business access"
+    "ANONYMOUS": "BossLogin account/password authentication through AccountRoleChannel; native nanobot token lifecycle and server role verification before protected Shell"
   },
   "notes": [
-    "72 pages are navigable by already-authenticated role; this does not mean 72 completed React business pages.",
+    "70 pages use authenticated role navigation; N01 and D08 use native authentication states. All 72 have code bindings; full functionality and acceptance remain separate.",
     "Back-end HTTP GET /api/boss/ui/* routes return actual persisted selection data through BossPageAPI. Mutation actions use authenticated nanobot requestMutation, not browser-side SQLite or direct unauthenticated HTTP POST.",
     "The role-scoped commands are boss.assignment.{create,send,complete,extend,cancel} and boss.simulation.feedback; each has its own server-side command whitelist, transaction, audit, version and idempotency receipt.",
     "Task completion requires result submitted with currently valid evidence and a separate authenticated BOSS decision. Simulated feedback never marks completed.",
     "Real Mac visual snapshots, actual DeepSeek+UI complete walkthrough and end-to-end E01-E06 remain not verified in this development slice.",
     "T08 must replace all remaining semantic placeholders with real components, service operation IDs and event contracts before acceptance.",
     "F24 and A15 use read-only, local metadata-only DeepSeek diagnostics; absence of response is explicit, no model success or cost is inferred from configuration.",
-    "2026-10-22 implementation slice: 36 modular workplace routes and 13 agriculture coverage routes added; existing A04 counts once. 61/72 pages have at least partial real code/role-scoped read data; none of these 61 is thereby accepted as functionally complete.",
+    "All page bindings remain partial until their independent requirement and business checks complete; source coverage and metadata do not imply agricultural KPI completeness.",
     "Agriculture pages only render verified source coverage and unknown KPIs: the selected water-feed sales note is not evidence for raw-material prices and does not support other sector metrics. All sector numeric KPIs are NULL and require new approved datasets.",
     "Remaining action gaps, 561 visual states, end-to-end Mac/DeepSeek/voice/installation, source/metric completeness and pixel-accurate visual comparison are not accepted. Metadata-only page content does not satisfy PRD write or approval actions.",
-    "D03 and F30 are read-only runtime diagnostic views; A06 delegates to upstream Skills catalog; F31 renders the real evaluation definition but no actual score. None is accepted as an end-to-end PRD feature.",
+    "D03 and F30 are read-only runtime diagnostic views; A06 manages native method drafts, validation, activation, history and recovery through authenticated WebSocket commands; F31 renders the real evaluation definition but no actual score. Full PRD acceptance remains separate.",
     "F27 records locally and requests the native authenticated transcribeAudio operation only after user action. Transcription remains disabled by default until a real STT provider is configured and tested; no success/e2e assertions are made.",
     "F05 meeting minutes are versioned and grouped OPINION/SUGGESTION/DECISION/ASSIGNMENT_DRAFT; owner confirmed only after original source check. No assignment is auto-created or sent.",
     "F07 application approvals must originate from explicit MAINTAINER simulated data in A03, with exact amount/currency and source version. REJECT/APPROVE/REQUEST_MORE are distinct. Revision after REQUEST_MORE invalidates old approvals; no financial transaction.",
@@ -75,18 +75,18 @@
       "logical_architecture_route": "/app/boss/F01",
       "actual_webui_navigation": "?bossPage=F01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_READ_UI",
+      "render_status": "PARTIAL_TODAY_CLASSIFICATION_AND_OWNER_ORDER",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/dashboard"
+        "GET /api/boss/ui/dashboard",
+        "GET /api/boss/ui/today"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.today.reorder"],
+      "other_integration_points": ["app/webui/BossToday.tsx"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "today.reorder",
         "conversation.start"
       ],
       "tests": [
@@ -202,14 +202,20 @@
       "logical_architecture_route": "/app/boss/F04",
       "actual_webui_navigation": "?bossPage=F04",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_VERSIONED_MEETING_BRIEF_AND_F08_DRAFT",
+      "render_status": "PARTIAL_OWNER_MEETING_LIFECYCLE_BRIEF_AND_F08_DRAFT",
       "component_file": "app/webui/BossMeetingBrief.tsx",
       "component_name": "BossMeetingBrief",
+      "additional_component_files": ["app/webui/BossMeetingArrangement.tsx"],
       "verified_http_read_routes": [
+        "GET /api/boss/ui/meeting-arrangement",
         "GET /api/boss/ui/workspace/briefing",
         "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
+        "boss.meeting.draft.save",
+        "boss.meeting.confirm",
+        "boss.meeting.cancel",
+        "boss.meeting.held",
         "boss.meeting.brief.prepare",
         "boss.message.draft.save"
       ],
@@ -220,7 +226,7 @@
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
         "meeting_brief.external_materials_ingest",
-        "meeting_calendar.schedule_change",
+        "meeting_calendar.external_schedule_update",
         "meeting_brief.generate_unstructured_llm_material",
         "meeting_brief.real_world_report_source"
       ],
@@ -321,9 +327,11 @@
       "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
       "component_file": "app/webui/BossAssignmentFlow.tsx",
       "component_name": "BossAssignmentFlow (nested in BossDesktop)",
+      "additional_component_files": ["app/webui/BossAssignmentSourceReview.tsx"],
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
         "GET /api/boss/ui/tasks",
+        "GET /api/boss/ui/assignment-source-review",
         "GET /api/boss/ui/operation-status"
       ],
       "code_wired_write_actions": [
@@ -332,10 +340,12 @@
         "boss.assignment.complete",
         "boss.assignment.extend",
         "boss.assignment.cancel",
-        "boss.assignment.nudge"
+        "boss.assignment.nudge",
+        "boss.assignment.sources.confirm"
       ],
       "other_integration_points": [
-        "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks"
+        "F05 confirmed minute entry origin fields are visible on current task via GET /api/boss/ui/tasks",
+        "bossTask preserves the selected task through source navigation and refresh; unsaved source review uses D06"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -352,7 +362,9 @@
         "app/tests/test_boss_recovery.py",
         "app/tests/test_boss_minutes_assignment_chain.py",
         "app/tests/test_v6_minutes_approval_ui.py",
-        "app/tests/test_boss_assignment_nudge.py"
+        "app/tests/test_boss_assignment_nudge.py",
+        "app/tests/test_product_assignment_sources.py",
+        "validation/desktop/check-source-review.cjs"
       ],
       "source_task_ids": [
         "T18",
@@ -506,7 +518,8 @@
         "Source citation opens D01 with exact character offset and live document version check",
         "F09 confirmed missing-source request saves owner-only F08 DRAFT; separate send approval",
         "Native nanobot chat continuation can ask about source IDs without claiming model research succeeded",
-        "Technically ingested, role-scoped SIMULATED sources are immediately available to BOSS-only current source search; withdrawn or replaced versions cannot be served as current"
+        "Technically ingested, role-scoped SIMULATED sources are immediately available to BOSS-only current source search; withdrawn or replaced versions cannot be served as current",
+        "validation/boss_agent_read_tools.py::BossResearchSourcesTool is registered in the public Runtime; only the prepared research projection is allowed"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -762,15 +775,16 @@
       "logical_architecture_route": "/app/boss/F14",
       "actual_webui_navigation": "?bossPage=F14",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
-      "component_file": "app/webui/BossSectorView.tsx",
-      "component_name": "BossSectorView",
+      "render_status": "PARTIAL_EXPLICIT_SIMULATED_SUPPLY_COORDINATION",
+      "component_file": "app/webui/BossSupplyQualityView.tsx",
+      "component_name": "BossSupplyQualityView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/sector?page=F14"
+        "GET /api/boss/ui/supply-quality?interface_id=SI09",
+        "GET /api/boss/ui/supply-quality-receipt"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.supply_quality.coordinate"],
       "other_integration_points": [
-        "authenticated native Agent conversation for identifying missing evidence"
+        "owner-confirmed coordination links to selected F06 task; source dependencies checked before current adoption"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1053,15 +1067,16 @@
       "logical_architecture_route": "/app/boss/F21",
       "actual_webui_navigation": "?bossPage=F21",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_AGRICULTURE_SOURCE_COVERAGE_NO_KPI_DATA",
-      "component_file": "app/webui/BossSectorView.tsx",
-      "component_name": "BossSectorView",
+      "render_status": "PARTIAL_EXPLICIT_SIMULATED_QUALITY_COORDINATION",
+      "component_file": "app/webui/BossSupplyQualityView.tsx",
+      "component_name": "BossSupplyQualityView",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/sector?page=F21"
+        "GET /api/boss/ui/supply-quality?interface_id=SI10",
+        "GET /api/boss/ui/supply-quality-receipt"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.supply_quality.coordinate"],
       "other_integration_points": [
-        "authenticated native Agent conversation for identifying missing evidence"
+        "batch processing quantities and professional records stay separate from owner-confirmed coordination task status"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
@@ -1561,25 +1576,25 @@
         "AC-28-E"
       ],
       "logical_architecture_route": "/app/auth/N01",
-      "actual_webui_navigation": "?bossPage=N01",
+      "actual_webui_navigation": "Native bootstrap AUTH_REQUIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_ACCOUNT_AUTHENTICATION_AND_NATIVE_BRANDING",
+      "component_file": "app/webui/BossLogin.tsx",
+      "component_name": "BossLogin",
+      "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["AccountStore bcrypt verification; AccountRoleChannel delegates native nanobot tokens and current RoleChannel business scope"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "auth.login"
+        "auth.full_viewport_accessibility_and_visual_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
-        "T18",
-        "T19",
+        "T11",
+        "T27",
         "T24"
       ]
     },
@@ -2001,20 +2016,19 @@
       "logical_architecture_route": "/app/boss/N09",
       "actual_webui_navigation": "?bossPage=N09",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_OWNER_PLAN_SAVE_PAUSE_RESUME_CANCEL",
+      "component_file": "app/webui/BossOwnerPlans.tsx",
+      "component_name": "BossOwnerPlans",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/plans"
+        "GET /api/boss/ui/workspace/plans",
+        "GET /api/boss/ui/owner-plans"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.owner.plan.save", "boss.owner.plan.pause", "boss.owner.plan.resume", "boss.owner.plan.cancel"],
+      "other_integration_points": ["app/webui/BossDesktop.tsx: scopedCommand"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "owner_plans.save",
-        "owner_plans.pause",
-        "owner_plans.cancel"
+        "owner_plans.repeated_model_task_and_complete_device_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
@@ -2424,18 +2438,18 @@
         "AC-28-E"
       ],
       "logical_architecture_route": "/app/auth/D08",
-      "actual_webui_navigation": "?bossPage=D08",
+      "actual_webui_navigation": "Native AUTH_EXPIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "DESIGN_PLACEHOLDER_ONLY",
-      "component_file": "app/webui/BossDesktop.tsx (metadata placeholder)",
-      "component_name": "BossDesktop placeholder metadata",
-      "verified_http_read_routes": [],
+      "render_status": "PARTIAL_BRANDED_REAUTHENTICATION_WITHOUT_BUSINESS_REPLAY",
+      "component_file": "app/webui/BossLogin.tsx",
+      "component_name": "BossLogin",
+      "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "auth.reauthenticate"
+        "auth.expired_session_complete_device_acceptance"
       ],
       "tests": [
         "app/tests/test_v6_contract.py"
@@ -2553,10 +2567,12 @@
       "logical_architecture_route": "/app/maintain/A02",
       "actual_webui_navigation": "?bossPage=A02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_ROLE_SCOPED_WORKSPACE_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_FOURTEEN_INTERFACE_TECHNICAL_INSPECTION",
+      "component_file": "app/webui/MaintainerSimulationInspect.tsx",
+      "component_name": "MaintainerSimulationInspect",
+      "additional_component_files": ["app/webui/BossWorkspaceView.tsx"],
       "verified_http_read_routes": [
+        "GET /api/boss/ui/simulation-inspect",
         "GET /api/boss/ui/workspace/tool-catalog"
       ],
       "code_wired_write_actions": [],
@@ -2564,13 +2580,14 @@
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "simulation.invoke",
-        "simulation.test"
+        "complete_simulated_write_interfaces_and_agent_adoption"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_product_simulation_access.py",
+        "app/tests/test_boss_simulation_api.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2595,16 +2612,18 @@
       "logical_architecture_route": "/app/maintain/A03",
       "actual_webui_navigation": "?bossPage=A03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_SIMULATED_DATASET_APPLICATION_CREATE_AND_REVISION",
+      "render_status": "PARTIAL_SIMULATED_DATASET_APPLICATION_AND_SUPPLY_QUALITY",
       "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView + MaintainerApplicationSeed",
+      "component_name": "BossWorkspaceView + MaintainerApplicationSeed + MaintainerSupplyQuality",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/dataset",
         "GET /api/boss/ui/workspace/approval-admin"
       ],
       "code_wired_write_actions": [
         "boss.simulation.application.seed",
-        "boss.simulation.application.revise"
+        "boss.simulation.application.revise",
+        "boss.simulation.supply_quality.import",
+        "boss.simulation.supply_quality.withdraw"
       ],
       "other_integration_points": [],
       "actual_e2e_verified": false,
@@ -2701,7 +2720,7 @@
       "logical_architecture_route": "/app/maintain/A05",
       "actual_webui_navigation": "?bossPage=A05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_REAL_PROMPT_DRAFT_VALIDATION_ACTIVATION_NEXT_CONTEXT_ADOPTION",
+      "render_status": "PARTIAL_REAL_PROMPT_LIFECYCLE_AND_SOURCE_ELIGIBILITY",
       "component_file": "app/webui/MaintainerPromptVersion.tsx",
       "component_name": "MaintainerPromptVersion",
       "verified_http_read_routes": [
@@ -2714,7 +2733,11 @@
         "boss.prompt.activate",
         "boss.prompt.deactivate"
       ],
-      "other_integration_points": [],
+      "other_integration_points": [
+        "app/webui/BossDesktop.tsx",
+        "validation/boss_admin_config.py::prompt_technical_status",
+        "runtime_eligibility reports current source versions and exclusion reasons without recording a context load or proving model adoption"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
@@ -2752,23 +2775,37 @@
       "logical_architecture_route": "/app/maintain/A06",
       "actual_webui_navigation": "?bossPage=A06",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_NATIVE_SKILLS_HANDOFF",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop + native nanobot Skills",
-      "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
+      "render_status": "PARTIAL_NATIVE_SOP_VERSIONS_HISTORY_AND_RECOVERY",
+      "component_file": "app/webui/MaintainerSkillVersions.tsx",
+      "component_name": "MaintainerSkillVersions",
+      "verified_http_read_routes": [
+        "GET /api/boss/ui/admin/sop-method",
+        "GET /api/boss/ui/admin/sop-history",
+        "GET /api/boss/ui/admin/sop-operation-status",
+        "GET /api/boss/ui/admin/skills"
+      ],
+      "code_wired_write_actions": [
+        "boss.sop.save", "boss.sop.validate", "boss.sop.activate", "boss.sop.enable",
+        "boss.sop.disable", "boss.sop.restore", "boss.sop.recover", "boss.sop.cancel", "skill.update"
+      ],
       "other_integration_points": [
-        "native nanobot Skills catalog (#/skills) inside the authenticated Shell"
+        "Same Runtime SkillsLoader, ToolRegistry and native disabled_skills configuration; method changes do not grant business permissions",
+        "MaintainerSkills provides the full technical catalog; all new contexts remain blocked while any activation is PREPARED",
+        "A15 receives the selected sop_id only as context; current formal RuntimeRun filtering and method association remain unverified"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "sop.save",
-        "sop.validate",
-        "sop.activate"
+        "complete business execution and model adoption for all thirteen methods",
+        "full operating-system and file-write interruption recovery coverage",
+        "formal RuntimeRun method-version association and T06 reception"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_product_skills.py",
+        "app/tests/test_product_skill_versions.py",
+        "app/tests/test_boss_native_skills.py",
+        "app/tests/test_boss_skill_drafts.py"
       ],
       "source_task_ids": [
         "T19",
@@ -2847,25 +2884,31 @@
       "logical_architecture_route": "/app/maintain/A08",
       "actual_webui_navigation": "?bossPage=A08",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_MAINTENANCE_READ",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop + native Settings",
+      "render_status": "PARTIAL_RUNTIME_CONFIGURATION",
+      "component_file": "app/webui/ProductRuntimeConfiguration.tsx",
+      "component_name": "ProductRuntimeConfiguration + native Settings",
       "verified_http_read_routes": [
-        "GET /api/boss/ui/maintenance"
+        "GET /api/boss/ui/maintenance",
+        "GET /api/boss/ui/admin/runtime-configuration"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"],
       "other_integration_points": [
-        "native settings mutation"
+        "native settings mutation",
+        "configuration/current and actual nanobot runtime",
+        "A15 actual run/version/tool references"
       ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "model_config.save",
-        "model_config.validate",
-        "model_config.activate"
+        "full_model_configuration_validation",
+        "credential_rotation_and_recovery",
+        "full_budget_and_failure_acceptance"
       ],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_product_runtime_configuration.py",
+        "validation/desktop/check-public-runtime.cjs",
+        "validation/desktop/check-public-runtime-recorded.cjs"
       ],
       "source_task_ids": [
         "T19",
@@ -3030,24 +3073,25 @@
       "logical_architecture_route": "/app/maintain/A12",
       "actual_webui_navigation": "?bossPage=A12",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_RELATED_READ_ONLY_PRD_ACTIONS_PENDING",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "PARTIAL_CURRENT_MEMORY_AND_ACTUAL_CONTEXT_SELECTION_STATUS",
+      "component_file": "app/webui/MaintainerMemoryStatus.tsx",
+      "component_name": "MaintainerMemoryStatus",
+      "additional_component_files": ["app/webui/BossWorkspaceView.tsx"],
       "verified_http_read_routes": [
-        "GET /api/boss/ui/workspace/source-index"
+        "GET /api/boss/ui/workspace/source-index",
+        "GET /api/boss/ui/admin/memory-status"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["app/webui/BossDesktop.tsx: A12 current confirmation, deletion scopes and A15 run_id navigation"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [
-        "memory_index.verify",
-        "memory_index.repair"
-      ],
+      "operations_not_yet_implemented": ["loaded_session_backup_and_physical_erasure_verification"],
       "tests": [
         "app/tests/test_v6_contract.py",
         "app/tests/test_boss_workspace_api.py",
-        "app/tests/test_boss_memory_notifications.py"
+        "app/tests/test_boss_memory_notifications.py",
+        "app/tests/test_boss_admin_config.py",
+        "validation/desktop/check-memory-public.cjs"
       ],
       "source_task_ids": [
         "T19",
@@ -3170,18 +3214,24 @@
       "logical_architecture_route": "/app/maintain/A15",
       "actual_webui_navigation": "?bossPage=A15",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_MAINTENANCE_USAGE",
+      "render_status": "PARTIAL_RUNTIME_QUERY_AND_TECHNICAL_TASK_REFERENCE",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop",
+      "additional_component_files": ["app/webui/MaintainerRuntimeRecords.tsx", "app/webui/RuntimeTaskTechnicalView.tsx"],
       "verified_http_read_routes": [
-        "GET /api/boss/ui/model-usage"
+        "GET /api/boss/ui/model-usage",
+        "GET /api/boss/ui/runtime-records",
+        "GET /api/boss/ui/runtime-records/task",
+        "GET /api/boss/ui/maintenance"
       ],
       "code_wired_write_actions": [],
       "other_integration_points": [],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [],
+      "operations_not_yet_implemented": ["complete_runtime_failure_and_recovery_acceptance"],
       "tests": [
+        "app/tests/test_product_runtime_access.py",
+        "app/tests/test_boss_runtime_query.py",
         "app/tests/test_v6_contract.py"
       ],
       "source_task_ids": [
@@ -3360,8 +3410,5 @@
   ],
   "business_mutation_end_to_end_accepted": false,
   "visual_all_pages_accepted": false,
-  "not_yet_built_page_ids": [
-    "N01",
-    "D08"
-  ]
+  "not_yet_built_page_ids": []
 }

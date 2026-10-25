@@ -1,0 +1,148 @@
+{
+  "status": "PASS_PUBLIC_F06_SOURCE_REVIEW_AND_LEGACY_UPGRADE",
+  "run_id": "source-review-4084bdad-2dbd-4f4b-adb6-7554f131b1ed",
+  "at": "2026-10-23T09:49:27.298Z",
+  "inputs": [
+    {
+      "path": "validation/legacy_assignment_fixture.py",
+      "sha256": "aa28fb89902f35274de7c7822770751749faf964864c69db3358dc944d55fbc7"
+    },
+    {
+      "path": "validation/boss_assignment_sources.py",
+      "sha256": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752"
+    },
+    {
+      "path": "validation/business.py",
+      "sha256": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3"
+    },
+    {
+      "path": "validation/boss_command_api.py",
+      "sha256": "2c2a1630c0d8db0c31782b726ce2f873435d8b800288670ea03b731493e3c1cc"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "c9ce5d7865afc353b1ead50692862d29ed4a4f4079b174341f8540ced8d41cf1"
+    },
+    {
+      "path": "validation/boss_recovery_api.py",
+      "sha256": "6ddfafff83154c6f2c91f4352a96518cf053e34fa9f5c2e451cc6598ad6d08ef"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "206a36ad69bf7c21e95fece577677e14f5e8f21bc383351d4cb92a2dff17cc95"
+    },
+    {
+      "path": "app/webui/BossAssignmentSourceReview.tsx",
+      "sha256": "7cfedb28d6416d72041e87141ecc1e7f75a1e8743a8cc09db2f3dabd6525aa19"
+    },
+    {
+      "path": "validation/desktop/check-source-review.cjs",
+      "sha256": "cd79763fd6c2436ef64bdabf15ea4a7b100a0e46a5a8b893fd7d1ae9d84cc298"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d8c9e9def8d13488ab0288948f7d9458da930461a93d09b25d0bcb60776d7eb9"
+    }
+  ],
+  "records": [
+    {
+      "check": "actual_legacy_store_produced_same_approved_selection",
+      "producer": {
+        "task": {
+          "task_id": "f306ef76-a663-46a4-9116-1ffabf6acded",
+          "status": "OPEN",
+          "version": "1",
+          "authorization_id": "729a1b32-f4ce-4bd6-9f36-3b13ba30133a",
+          "execution_namespace": "ui-check",
+          "persisted_at": "2026-10-23T09:49:03.664317+00:00"
+        },
+        "baseline": {
+          "namespace": "ui-check",
+          "snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345"
+        },
+        "producer_commit": "819e519842e41ee04e360c0ab99caf914c85baab",
+        "producer_sha256": "db19192ac98391e91783475a71c37c20620a49a885d1cef4677b85c1758aa1a8",
+        "model_requested": false
+      }
+    },
+    {
+      "check": "source_editing_protected_during_source_and_task_navigation",
+      "original_task_id": "f306ef76-a663-46a4-9116-1ffabf6acded",
+      "selected_task_id": "c2757ff2-6387-4c16-817c-a637cd5ce754"
+    },
+    {
+      "check": "gui_owner_confirm_persists_current_binding_and_original_business_state",
+      "task_id": "f306ef76-a663-46a4-9116-1ffabf6acded",
+      "version": "2",
+      "status": "OPEN",
+      "binding": "CURRENT",
+      "known_history_count": 0
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "f06_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "check": "refresh_source_return_logout_and_service_restart",
+      "task_id": "f306ef76-a663-46a4-9116-1ffabf6acded",
+      "version": "2",
+      "prior_token": 401,
+      "outbox_count": 0,
+      "renderer_errors": []
+    }
+  ],
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A14_accepted": false
+}

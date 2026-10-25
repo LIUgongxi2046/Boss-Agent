@@ -1,0 +1,139 @@
+{
+  "status": "PASS_ACTUAL_EXISTING_APPLICATION_ACCOUNT_UPGRADE_AND_RESTART",
+  "run_id": "account-upgrade-d35df187-5f2c-4b65-b603-0ceb871106b1",
+  "at": "2026-10-23T12:42:11.418Z",
+  "application_directory": "validation/.work/account-upgrade-d35df187-5f2c-4b65-b603-0ceb871106b1",
+  "inputs": [
+    {
+      "path": "validation/prepare_account_upgrade.py",
+      "sha256": "4ad546153f5345911c91810b0d61dc6a7f6c2b9f724fd20931d40a4239b709db"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "e33b76d8791810c0493607e6c79fe8ed28674de1c605b0df618d18cca0243e6c"
+    },
+    {
+      "path": "validation/product_runtime.py",
+      "sha256": "74f3574b78fb82ca4453e256e89bda80cc34ba259fe062a4cfb348b747f6f344"
+    },
+    {
+      "path": "validation/boss_account_auth.py",
+      "sha256": "a8e4f0851ecfa82bd99abdf7ba08694af231fd25a3e8868898bc77e994d84d6d"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "12abbbf8fd39b41ee4b0303003379dff96c1f1a754e14774f8d8a11e12a764f4"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "0284cd1c76fd5a88153990a9051b2764fa6c2794cc8766c67aa5b32b8c174ba9"
+    },
+    {
+      "path": "validation/desktop/check-account-upgrade.cjs",
+      "sha256": "84434bed45cdc22cc5aeb9d9e23215eb2708a48eb8c8fcecce6c058c693cbf6e"
+    },
+    {
+      "path": "validation/desktop/account-access.cjs",
+      "sha256": "4a51b580e52b3e0b4f8b324c72b636f3034d7dd7633e64ef42d57ccc4b63a604"
+    },
+    {
+      "path": "specs/runtime-records.schema.json",
+      "sha256": "9566d6d5126d7e5d5f7d2d4659e56166333f7e3b13b6d0d451a425bcc24b77f2"
+    },
+    {
+      "path": "evidence/T11/w3-local-20261023/memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef.json",
+      "sha256": "389ba6c7567687d93819d6dd854bf61eef3bdf44d6310fd04807250bf6aa290c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "199824707145d41aaba4d6e9226fcbffe9d41af5299f0027ce0c9bdc580416a3"
+    }
+  ],
+  "records": [
+    {
+      "check": "actual_existing_application_native_backup",
+      "prepared": {
+        "status": "ACTUAL_PREACCOUNT_APPLICATION_NATIVE_BACKUP",
+        "reference": "evidence/T11/w3-local-20261023/memory-public-5917d36b-ce8d-411a-af34-2e999e3feeef.json",
+        "reference_sha256": "389ba6c7567687d93819d6dd854bf61eef3bdf44d6310fd04807250bf6aa290c",
+        "source_directory": "validation/.work/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1",
+        "target_directory": "validation/.work/account-upgrade-d35df187-5f2c-4b65-b603-0ceb871106b1",
+        "source_database_sha256": "da7154bd3b41b31d9966de9b54d8a55b0d1f199265fbfcb9b53365f99911bbe0",
+        "copied_database_sha256": "a9eb3366aa54930d386f07169ba8289a8deccc35a8ed7e531f876f34b7a29e65",
+        "source_configuration_sha256": "89f08327eb57e7b750e036b409ebffe636f4355b2b78f52de6f280aba27e3b92",
+        "workspace_manifest_sha256": "0582661db54e79ce655d0dccaf7942cfb83979495b6f6a0a36a6cc4a67715a48",
+        "workspace_files": 1,
+        "historical_run_ids": [
+          "run-928f34d3-c296-4ac0-b14e-29b65f5282e4",
+          "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "run-d03d3382-a763-465f-a32f-b57420e37515"
+        ],
+        "configuration_version": "3",
+        "memory_version": "2",
+        "memory_confirmation_state": "DELETED",
+        "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+        "database_logical_copy_identical": true,
+        "workspace_copy_identical": true,
+        "source_database_configuration_and_workspace_unchanged": true,
+        "new_model_calls": false,
+        "private_body_recorded": false
+      }
+    },
+    {
+      "check": "account_login_preserves_existing_configuration_memory_runs_and_task_links",
+      "configuration_version": "3",
+      "max_tool_rounds": 6,
+      "memory_version": "2",
+      "confirmation_state": "DELETED",
+      "future_context_eligible": false,
+      "historical_run_ids": [
+        "run-928f34d3-c296-4ac0-b14e-29b65f5282e4",
+        "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+        "run-d03d3382-a763-465f-a32f-b57420e37515"
+      ],
+      "historical_run_records_sha256": "4f0bbbf026011d767e79990c4feb78ad48fdff94064f8b20dab16798e9933143",
+      "current_task_references": [
+        {
+          "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+          "task_id": "1d4ca9c1-67eb-4547-8b2b-c3e0d11b7107",
+          "task_version": "1",
+          "task_status": "OPEN"
+        }
+      ],
+      "current_task_ids": [
+        "1d4ca9c1-67eb-4547-8b2b-c3e0d11b7107"
+      ],
+      "maintenance_business": 403,
+      "owner_technical": 403
+    },
+    {
+      "check": "second_restart_preserves_actual_upgrade_and_source_application",
+      "previous_token": 401,
+      "source_database_and_configuration_unchanged": true,
+      "business_tables_sha256": {
+        "objects": "385970f1b48dbb3ec4419ca27e661c112ba41f3316819d216bcd0a06150b53d6",
+        "idempotency": "f6d5d109c5ce94497b589a176c6491f939a13a9eb3d310ab510bad2eee98f5bb",
+        "audit": "614217c0a75aa7cc3d4367ee111a9e8e7c53f9bb3920c96d67b18cc5077e5084",
+        "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+        "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+      },
+      "account_database_sha256": "facdadbc341b64268656b2797293dadde070e34dbcb9d4aa648ab592b7ada190",
+      "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+      "renderer_errors": [],
+      "historical_model_evidence_reused_only": true,
+      "fresh_runtime_model_adoption_verified": false
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "new_model_calls": false,
+  "new_business_actions": false,
+  "new_external_delivery": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A25_A27_accepted": false
+}

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext", "moduleResolution": "Bundler", "jsx": "react-jsx",
+    "strict": true, "skipLibCheck": true, "noEmit": true, "baseUrl": ".",
+    "paths": {
+      "react": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react"],
+      "react/*": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react/*"],
+      "react-dom/*": ["../../../.work/w2-checks/runtime-ui/node_modules/@types/react-dom/*"],
+      "lucide-react": ["../../../.work/w2-checks/runtime-ui/node_modules/lucide-react"]
+    }
+  },
+  "include": ["main.tsx", "../../../app/webui/MaintainerRuntimeRecords.tsx"]
+}

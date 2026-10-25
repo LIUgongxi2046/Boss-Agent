@@ -9,13 +9,14 @@ import sys
 from pathlib import Path
 
 import pytest
+from aiohttp import web
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "validation"))
 
 from boss_command_api import BossCommandAPI
 from boss_page_api import BossPageAPI
-from boss_owner_preferences import record_runtime_goal_context_load
+from boss_owner_preferences import effective_owner_goals, record_runtime_goal_context_load
 from controls import ControlStore
 
 SECRET = "仅老板设置的私密示例：请优先核查本人签发的工作事项"
@@ -79,6 +80,25 @@ def seed(api):
 def clock(api, at="2026-10-24T18:00:00+08:00"):
     return act(api, "boss.simulation.clock.advance", "owner-notice-clock-advance",
                role="MAINTAINER", at=at)
+
+
+@pytest.mark.parametrize("domain,fields", [("goals", goals()), ("notice", notice())])
+def test_revoked_confirmation_stops_future_setting_adoption(app, domain, fields):
+    api, pages = app
+    code, prepared = act(api, "boss.owner." + domain + ".save", "revocation-setting-save", **fields)
+    assert code == 200, prepared
+    code, confirmed = act(api, "boss.owner." + domain + ".confirm", "revocation-setting-confirm", **confirm_input(prepared))
+    assert code == 200, confirmed
+    route = "owner-goals" if domain == "goals" else "owner-notice"
+    assert view(pages, route)[1]["active_is_effective"]
+    code, result = act(api, "boss.authorization.revoke", "revoke-setting-confirmation",
+                       authorization_id=confirmed["authorization_id"], expected_version="1", reason="停止后续采用")
+    assert code == 200, result
+    observed = view(BossPageAPI(ControlStore(api.store.path)), route)[1]
+    assert observed["active"]["state"] == "CONFIRMED"
+    assert not observed["active_is_effective"]
+    if domain == "goals":
+        assert record_runtime_goal_context_load(api.store) is None
 
 
 def test_goal_draft_does_not_override_current_context_or_f01(app):
@@ -349,3 +369,76 @@ def test_notification_projection_discloses_applied_policy_version_not_owner_goal
     assert body["dispatches"][0]["reason"] == "OWNER_NOTIFICATIONS_PAUSED"
     assert body["dispatches"][0]["owner_notice_version"] == "1"
     assert SECRET not in json.dumps(body, ensure_ascii=False)
+
+
+def test_runtime_goals_do_not_follow_reset_into_a_new_execution_space(app):
+    api, _ = app
+    prepared = act(api, "boss.owner.goals.save", "reset-goals-save", **goals())[1]
+    assert act(api, "boss.owner.goals.confirm", "reset-goals-confirm", **confirm_input(prepared))[0] == 200
+    assert record_runtime_goal_context_load(api.store)["reading_requirement"] == SECRET
+    api.store.control("ui-check", "reset", {"namespace": "new-goal-execution"})
+    reopened = ControlStore(api.store.path)
+    assert record_runtime_goal_context_load(reopened, "new-goal-execution") is None
+    with reopened.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE namespace='new-goal-execution' AND kind='owner_goals_runtime_use'").fetchone()[0] == 0
+        assert reopened.get(db, "ui-check", "owner_goals_active", "current")["content"]["reading_requirement"] == SECRET
+
+
+def test_runtime_goals_reject_inactive_execution_space_without_new_observation(app):
+    api, _ = app
+    prepared = act(api, "boss.owner.goals.save", "inactive-goals-save", **goals())[1]
+    assert act(api, "boss.owner.goals.confirm", "inactive-goals-confirm", **confirm_input(prepared))[0] == 200
+    api.store.control("ui-check", "reset", {"namespace": "current-goal-execution"})
+    with pytest.raises(web.HTTPConflict):
+        record_runtime_goal_context_load(api.store, "ui-check")
+    with api.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='owner_goals_runtime_use'").fetchone()[0] == 0
+
+
+def test_new_space_dispatch_does_not_use_previous_space_notification_preferences(app):
+    api, _ = app
+    prepared = act(api, "boss.owner.notice.save", "reset-notice-save", **notice(notifications_enabled=False))[1]
+    assert act(api, "boss.owner.notice.confirm", "reset-notice-confirm", **confirm_input(prepared))[0] == 200
+    api.store.control("ui-check", "reset", {"namespace": "new-notice-execution"})
+    api.store.control("new-notice-execution", "rules", {"version": "1", "cooldown_seconds": 0,
+        "quiet_start": 0, "quiet_end": 0, "timezone": "Asia/Shanghai", "important_escalation": False})
+    with api.store.connect() as db:
+        initial = api.store.get(db, "new-notice-execution", "initial", "snapshot")["event"]
+    api.store.control("new-notice-execution", "event", {"event_id": initial["event_id"], "version": "1",
+        "state": "OPEN", "impact": "NORMAL", "due_at": initial["due_at"]})
+    api.store.control("new-notice-execution", "clock", {"at": "2026-10-25T09:00:00+08:00"})
+    result = api.store.dispatch_due("new-notice-execution")
+    assert result[0]["state"] == "DELIVERED" and result[0]["reason"] is None
+    assert "owner_notice_version" not in result[0]
+
+
+@pytest.mark.parametrize("field,value", [
+    ("owner_id", "different-owner"), ("scope", "different-execution"),
+    ("issuer_identity", "MAINTAINER"), ("issuer", "different-owner"),
+    ("action", "owner_notice.confirm"), ("target_id", "owner_notice:current"),
+    ("content_version", "4"),
+])
+def test_goal_adoption_requires_current_owner_authorization_binding(app, field, value):
+    api, _ = app
+    prepared = act(api, "boss.owner.goals.save", "binding-goals-save", **goals())[1]
+    confirmed = act(api, "boss.owner.goals.confirm", "binding-goals-confirm", **confirm_input(prepared))[1]
+    with api.store.connect() as db:
+        authorization = api.store.get(db, "ui-check", "authorization", confirmed["authorization_id"])
+        authorization[field] = value
+        api.store.put(db, "ui-check", "authorization", authorization["authorization_id"], authorization)
+    with pytest.raises(web.HTTPForbidden):
+        record_runtime_goal_context_load(api.store)
+    with api.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='owner_goals_runtime_use'").fetchone()[0] == 0
+
+
+def test_goal_adoption_rechecks_confirmed_content_digest(app):
+    api, _ = app
+    prepared = act(api, "boss.owner.goals.save", "digest-goals-save", **goals())[1]
+    assert act(api, "boss.owner.goals.confirm", "digest-goals-confirm", **confirm_input(prepared))[0] == 200
+    with api.store.connect() as db:
+        active = api.store.get(db, "ui-check", "owner_goals_active", "current")
+        active["content"]["scope"] = "DAILY_BRIEF"
+        api.store.put(db, "ui-check", "owner_goals_active", "current", active)
+    with api.store.connect() as db, pytest.raises(web.HTTPForbidden):
+        effective_owner_goals(db, api.store.get(db, "ui-check", "initial", "snapshot"))

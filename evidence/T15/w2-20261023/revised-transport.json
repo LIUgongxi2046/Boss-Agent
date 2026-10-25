@@ -1,0 +1,130 @@
+[
+  {
+    "at": "2026-10-23T06:04:53.595595+00:00",
+    "type": "request",
+    "method": "POST",
+    "url": "https://api.deepseek.com/chat/completions",
+    "model": "deepseek-flash",
+    "stream": true,
+    "max_tokens": 700,
+    "thinking": {
+      "type": "disabled"
+    },
+    "model_request_id": "model-request-8d2ba509-8754-4ef5-bc47-d54ea23ba6c6",
+    "request_sha256": "fb865baf49a9e515aad08cc7136bafc8edb3fcd727b2d22755bd0d7ae23955cb",
+    "tool_config_sha256": "98c21fe2b70faec717e319afcd490b832c52e8ba7c887f5186ca93f1fc3e5d41",
+    "request_bytes": 9486,
+    "message_count": 2,
+    "tool_count": 1,
+    "private_contents_recorded": false
+  },
+  {
+    "at": "2026-10-23T06:04:53.760609+00:00",
+    "type": "response",
+    "status": 200,
+    "url": "https://api.deepseek.com/chat/completions",
+    "request_id": null,
+    "content_type": "text/event-stream; charset=utf-8",
+    "model_request_id": "model-request-8d2ba509-8754-4ef5-bc47-d54ea23ba6c6"
+  },
+  {
+    "at": "2026-10-23T06:04:53.763074+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-8d2ba509-8754-4ef5-bc47-d54ea23ba6c6",
+    "response_id": "e0c39ca0-97e9-44dc-a8cf-14809d6212a6",
+    "model": "deepseek-flash",
+    "created": 1792735493,
+    "usage": null,
+    "finish_reasons": []
+  },
+  {
+    "at": "2026-10-23T06:04:54.574875+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-8d2ba509-8754-4ef5-bc47-d54ea23ba6c6",
+    "response_id": "e0c39ca0-97e9-44dc-a8cf-14809d6212a6",
+    "model": "deepseek-flash",
+    "created": 1792735493,
+    "usage": {
+      "completion_tokens": 40,
+      "prompt_tokens": 2255,
+      "total_tokens": 2295,
+      "completion_tokens_details": null,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cache_write_tokens": null,
+        "cached_tokens": 2048,
+        "image_tokens": null,
+        "text_tokens": null
+      },
+      "prompt_cache_hit_tokens": 2048,
+      "prompt_cache_miss_tokens": 207
+    },
+    "finish_reasons": [
+      "tool_calls"
+    ]
+  },
+  {
+    "at": "2026-10-23T06:04:54.606243+00:00",
+    "type": "request",
+    "method": "POST",
+    "url": "https://api.deepseek.com/chat/completions",
+    "model": "deepseek-flash",
+    "stream": true,
+    "max_tokens": 700,
+    "thinking": {
+      "type": "disabled"
+    },
+    "model_request_id": "model-request-8d662a62-41ec-42e5-81f3-b4c20c3a29de",
+    "request_sha256": "a34c72ea3a91ef73ea8086c2474078dd6f72b611170eaaa2f8c453de4115be00",
+    "tool_config_sha256": "98c21fe2b70faec717e319afcd490b832c52e8ba7c887f5186ca93f1fc3e5d41",
+    "request_bytes": 10752,
+    "message_count": 4,
+    "tool_count": 1,
+    "private_contents_recorded": false
+  },
+  {
+    "at": "2026-10-23T06:04:54.705567+00:00",
+    "type": "response",
+    "status": 200,
+    "url": "https://api.deepseek.com/chat/completions",
+    "request_id": null,
+    "content_type": "text/event-stream; charset=utf-8",
+    "model_request_id": "model-request-8d662a62-41ec-42e5-81f3-b4c20c3a29de"
+  },
+  {
+    "at": "2026-10-23T06:04:54.895034+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-8d662a62-41ec-42e5-81f3-b4c20c3a29de",
+    "response_id": "964da618-e1dc-44b8-b98c-5cde6d2895ed",
+    "model": "deepseek-flash",
+    "created": 1792735494,
+    "usage": null,
+    "finish_reasons": []
+  },
+  {
+    "at": "2026-10-23T06:04:55.678655+00:00",
+    "type": "stream_metadata",
+    "model_request_id": "model-request-8d662a62-41ec-42e5-81f3-b4c20c3a29de",
+    "response_id": "964da618-e1dc-44b8-b98c-5cde6d2895ed",
+    "model": "deepseek-flash",
+    "created": 1792735494,
+    "usage": {
+      "completion_tokens": 57,
+      "prompt_tokens": 2564,
+      "total_tokens": 2621,
+      "completion_tokens_details": null,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cache_write_tokens": null,
+        "cached_tokens": 2176,
+        "image_tokens": null,
+        "text_tokens": null
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 388
+    },
+    "finish_reasons": [
+      "stop"
+    ]
+  }
+]

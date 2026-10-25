@@ -5,14 +5,15 @@ import re
 import uuid
 from aiohttp import web
 from business import now, checksum, require
+from boss_source_policy import source_validity
 
 NS="ui-check"
 KINDS=("SECRETARY_ROLE","EXPRESSION","TASK_HINTS")
 SECRET=re.compile(r"\bsk-[A-Za-z0-9_-]{25,}\b")
 
 
-def obj(db,kind,key):
-    row=db.execute("SELECT body FROM objects WHERE namespace=? AND kind=? AND id=?",(NS,kind,key)).fetchone()
+def obj(db,kind,key,namespace=NS):
+    row=db.execute("SELECT body FROM objects WHERE namespace=? AND kind=? AND id=?",(namespace,kind,key)).fetchone()
     return json.loads(row[0]) if row else None
 
 
@@ -29,9 +30,17 @@ def refs(api,db,data,values):
             and len(set(values))==len(values),"Prompt资料引用不合法",web.HTTPBadRequest)
     items=[]
     for sid in values:
-        source=api._require_current_source(db,data,sid)
+        source=_require_adoptable_source(api,db,data,sid)
         items.append({"source_id":sid,"version":source["version"]})
     return items
+
+
+def _require_adoptable_source(api,db,data,source_id):
+    source=api._require_current_source(db,data,source_id)
+    clock=api.store.get(db,NS,"clock","current")["at"]
+    state=source_validity(source,clock)
+    require(state=="VALID","引用资料当前无法采用："+state)
+    return source
 
 
 def save(api,db,data,p):
@@ -75,7 +84,7 @@ def validate(api,db,data,p):
             doc["content_sha256"]==p["expected_content_sha256"],"版本或内容摘要冲突")
     require(doc["validation_status"]=="DRAFT_UNVALIDATED","当前版本已经校验")
     for ref in doc["source_refs"]:
-        d=api._require_current_source(db,data,ref["source_id"])
+        d=_require_adoptable_source(api,db,data,ref["source_id"])
         require(d["version"]==ref["version"],"引用资料版本变化")
     api.store.put(db,NS,"prompt_revision",doc["prompt_id"]+":v"+doc["version"],doc)
     doc["version"]=str(int(doc["version"])+1)
@@ -97,7 +106,7 @@ def activate(api,db,data,p):
     require(doc["validation_status"]=="VALIDATED_STATIC_ONLY" and
             doc["validated_content_sha256"]==doc["content_sha256"],"必须先校验当前内容")
     for ref in doc["source_refs"]:
-        d=api._require_current_source(db,data,ref["source_id"])
+        d=_require_adoptable_source(api,db,data,ref["source_id"])
         require(d["version"]==ref["version"],"知识来源已经失效")
     old=obj(db,"prompt_active",doc["kind"])
     ver=old["active_version"] if old else "0"
@@ -132,34 +141,67 @@ def deactivate(api,db,data,p):
 
 
 def active_runtime_prompts(store,namespace=NS):
-    """Read only current validated prompts for the next real BOSS runtime turn."""
-    output=[]
     with store.connect() as db:
+        db.execute("BEGIN")
         store.active(db,namespace)
-        data=store.get(db,namespace,"initial","snapshot")
-        for kind in KINDS:
-            active=obj(db,"prompt_active",kind)
-            if not active or not active["enabled"]:continue
-            draft=obj(db,"prompt_draft",active["prompt_id"])
-            if not draft or draft["version"]!=active["prompt_version"] or (
-                draft["content_sha256"]!=active["content_sha256"]
-            ) or draft["validation_status"]!="VALIDATED_STATIC_ONLY":continue
-            healthy=True
-            for ref in draft["source_refs"]:
-                d=obj(db,"document",ref["source_id"])
-                if not d or d.get("withdrawn") or (
-                    d.get("access_scope")!=data["owner_id"]
-                ) or d["version"]!=ref["version"]:
-                    healthy=False
-                    break
-            if healthy:
-                output.append({"kind":kind,"prompt_id":draft["prompt_id"],
-                               "prompt_version":draft["version"],
-                               "active_version":active["active_version"],
-                               "instruction_text":draft["instruction_text"],
-                               "source_refs":draft["source_refs"]})
+        return _select_runtime_prompts(store, db, namespace)
+
+
+def _select_runtime_prompts(store, db, namespace):
+    output = []
+    data = store.get(db, namespace, "initial", "snapshot")
+    clock = store.get(db, namespace, "clock", "current")["at"]
+    for kind in KINDS:
+        active = obj(db, "prompt_active", kind, namespace)
+        if not active or not active["enabled"]:
+            continue
+        draft = obj(db, "prompt_draft", active["prompt_id"], namespace)
+        if not draft or draft["version"] != active["prompt_version"] or (
+            draft["content_sha256"] != active["content_sha256"]
+        ) or draft["validation_status"] != "VALIDATED_STATIC_ONLY":
+            continue
+        healthy = True
+        for ref in draft["source_refs"]:
+            document = obj(db, "document", ref["source_id"], namespace)
+            if not document or document.get("withdrawn") or (
+                document.get("access_scope") != data["owner_id"]
+            ) or document.get("source_type") != "SIMULATED" or document["version"] != ref["version"] or source_validity(document, clock) != "VALID":
+                healthy = False
+                break
+        if healthy:
+            output.append({"kind": kind, "prompt_id": draft["prompt_id"],
+                           "prompt_version": draft["version"],
+                           "active_version": active["active_version"],
+                           "instruction_text": draft["instruction_text"],
+                           "source_refs": draft["source_refs"]})
     return output
 
+
+def load_runtime_prompts(store, namespace=NS):
+    # 选择与记录使用同一事务，返回本次真正有效的配置。
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        store.active(db, namespace)
+        selected = _select_runtime_prompts(store, db, namespace)
+        _record_runtime_context_load(store, db, selected, namespace)
+        return selected
+
+
+def _record_runtime_context_load(store, db, selected, namespace):
+    for entry in selected:
+        active = obj(db, "prompt_active", entry["kind"], namespace)
+        identifier = active["prompt_id"] + ":" + active["prompt_version"]
+        previous = obj(db, "prompt_context_use", identifier, namespace)
+        store.put(db, namespace, "prompt_context_use", identifier, {
+            "kind": entry["kind"], "prompt_id": active["prompt_id"],
+            "prompt_version": active["prompt_version"],
+            "active_version": active["active_version"],
+            "content_sha256": active["content_sha256"], "at": now(),
+            "context_load_count": previous["context_load_count"] + 1 if previous else 1,
+            "observation": "RUNTIME_CONTEXT_PROVIDER_INVOKED",
+            "model_completion_verified": False,
+            "technical_configuration_grants_business_authority": False,
+        })
 
 
 def record_runtime_context_load(store, runtime_prompts, namespace=NS):
@@ -175,29 +217,6 @@ def record_runtime_context_load(store, runtime_prompts, namespace=NS):
     with store.connect() as db:
         db.execute("BEGIN IMMEDIATE")
         store.active(db, namespace)
-        for entry in runtime_prompts:
-            kind=entry.get("kind")
-            if kind not in KINDS:
-                continue
-            active=obj(db,"prompt_active",kind)
-            if not active or not active.get("enabled"):
-                continue
-            if active["prompt_id"]!=entry.get("prompt_id") or (
-                active["prompt_version"]!=entry.get("prompt_version")
-            ) or active["active_version"]!=entry.get("active_version"):
-                continue
-            identifier=active["prompt_id"]+":"+active["prompt_version"]
-            previous=obj(db,"prompt_context_use",identifier)
-            entry_record={
-                "kind":kind,
-                "prompt_id":active["prompt_id"],
-                "prompt_version":active["prompt_version"],
-                "active_version":active["active_version"],
-                "content_sha256":active["content_sha256"],
-                "at":now(),
-                "context_load_count":(previous["context_load_count"]+1) if previous else 1,
-                "observation":"RUNTIME_CONTEXT_PROVIDER_INVOKED",
-                "model_completion_verified":False,
-                "technical_configuration_grants_business_authority":False,
-            }
-            store.put(db,namespace,"prompt_context_use",identifier,entry_record)
+        current = _select_runtime_prompts(store, db, namespace)
+        selected = [entry for entry in current if entry in runtime_prompts]
+        _record_runtime_context_load(store, db, selected, namespace)

@@ -1,0 +1,340 @@
+openapi: 3.1.0
+info:
+  title: BI公开查询与原始依据扩展
+  version: 0.3.0
+  description: 经营范围、继承追问、原始依据和持久请求恢复；公开生产者采用实际SDK与受限工具，外部事件SIMULATED。完整FC02二十项等待独立验收。
+x-reception: {state: IN_REVIEW, owner: N3, core_version: 1.8.0}
+security: [{BearerAuth: []}]
+paths:
+  /api/boss/ui/admin/bi-scenarios:
+    get:
+      operationId: publicMaintainerBIScenarios
+      x-role: MAINTAINER
+      responses:
+        '200': {description: 正式生成目录及当前空间已载入版本, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioCatalog'}}}}
+        '401': {description: 未认证}
+        '403': {description: 仅维护身份可读取}
+  /api/boss/ui/admin/bi-scenario-receipt:
+    get:
+      operationId: publicMaintainerBIScenarioReceipt
+      x-role: MAINTAINER
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 原载入回执；未知结果不重新执行载入, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioLoadReceipt'}}}}
+        '401': {description: 未认证}
+        '403': {description: 仅维护身份可读取}
+  /api/boss/ui/bi/scenarios:
+    get:
+      operationId: publicOwnerLoadedBIScenarios
+      x-role: BOSS
+      responses:
+        '200': {description: 本人当前空间已载入场景与来源元信息, content: {application/json: {schema: {$ref: '#/components/schemas/ScenarioList'}}}}
+        '401': {description: 未认证}
+        '403': {description: 本人或数据范围不符}
+  /api/boss/ui/bi/dimensions:
+    get:
+      operationId: publicBIDimensions
+      x-role: BOSS
+      parameters:
+        - {name: scenario_id, in: query, required: false, schema: {type: string, minLength: 1}}
+        - {name: source_ids, in: query, required: false, style: form, explode: true, schema: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}}
+      responses:
+        '200': {description: 当前许可来源提供的维度与覆盖, content: {application/json: {schema: {$ref: '#/components/schemas/Dimensions'}}}}
+        '401': {description: 未认证}
+        '403': {description: 身份权限不足}
+  /api/boss/ui/bi/query:
+    get:
+      operationId: publicBIQueryRead
+      x-role: BOSS
+      parameters:
+        - {name: query_id, in: query, required: true, schema: {type: string, minLength: 1}}
+        - {name: historical, in: query, required: false, schema: {enum: ['true', 'false'], default: 'false'}}
+      responses:
+        '200': {description: 当前采用或明确的历史快照, content: {application/json: {schema: {$ref: '#/components/schemas/QueryRead'}}}}
+        '401': {description: 未认证}
+        '403': {description: 身份或查询范围不符}
+        '404': {description: 查询不存在}
+        '409': {description: 当前采用需要重新查询}
+        '410': {description: 当前来源已经失效}
+  /api/boss/ui/bi/receipt:
+    get:
+      operationId: publicBIRequestRead
+      x-role: BOSS
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {$ref: '#/components/schemas/RequestID'}}
+      responses:
+        '200': {description: 真实运行状态及原查询回执，读取不重新执行, content: {application/json: {schema: {$ref: '#/components/schemas/PublicReceipt'}}}}
+        '401': {description: 未认证}
+        '403': {description: 身份或请求范围不符}
+        '404': {description: 当前存储没有该请求}
+  /api/boss/ui/bi/history:
+    get:
+      operationId: publicBIRequestHistory
+      x-role: BOSS
+      responses:
+        '200': {description: 当前本人数据范围的请求编号列表, content: {application/json: {schema: {$ref: '#/components/schemas/History'}}}}
+        '401': {description: 未认证}
+        '403': {description: 身份权限不足}
+  /api/boss/ui/metrics:
+    get:
+      operationId: publicBusinessMetrics
+      x-role: BOSS
+      description: 当前产品范围传给正式query_metrics，其余参数从当前获准数据读取。额外字段及重复参数拒绝。
+      parameters:
+        - {name: products, in: query, required: false, schema: {type: string, minLength: 1}}
+      responses:
+        '200': {description: 当前确定性计算结果, content: {application/json: {schema: {$ref: '#/components/schemas/MetricProjection'}}}}
+        '400': {description: 请求范围或参数不受支持}
+        '401': {description: 未认证}
+        '403': {description: 当前本人范围不符}
+        '409': {description: 来源或数据版本需要复核}
+        '410': {description: 来源撤销或过期}
+  /api/boss/ui/metrics-evidence:
+    get:
+      operationId: publicMetricQueryEvidence
+      x-role: BOSS
+      description: 从持久查询读取实际明细和来源标识，正式read_evidence再次核查本人范围、版本及来源摘要。
+      parameters:
+        - {name: query_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 128}}
+      responses:
+        '200': {description: 与当前查询绑定的原始依据, content: {application/json: {schema: {$ref: '#/components/schemas/EvidenceProjection'}}}}
+        '400': {description: 缺少查询编号、额外字段或重复参数}
+        '401': {description: 未认证}
+        '403': {description: 查询不属于当前本人范围}
+        '404': {description: 查询不存在}
+        '409': {description: 来源或明细变化，需要重新查询}
+        '410': {description: 来源撤销或过期}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
+  schemas:
+    ScenarioMetadata:
+      type: object
+      additionalProperties: false
+      required: [scenario_id, version, source_ids, generator_version, seed, manifest_sha256, allowed_use, record_count, sources]
+      properties:
+        scenario_id: {type: string}
+        version: {type: string}
+        source_ids: {type: array, items: {type: string}}
+        generator_version: {const: FC02-BI-1}
+        seed: {const: 20261024}
+        manifest_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        allowed_use: {const: FC02_BEHAVIOR_VALIDATION}
+        record_count: {type: integer, minimum: 1}
+        sources: {type: array, items: {$ref: '#/components/schemas/SourceOption'}}
+    ScenarioList:
+      type: object
+      additionalProperties: false
+      required: [source_type, scenarios]
+      properties:
+        source_type: {const: SIMULATED}
+        scenarios: {type: array, items: {$ref: '#/components/schemas/ScenarioMetadata'}}
+    ScenarioCatalog:
+      type: object
+      additionalProperties: false
+      required: [source_type, generator_version, seed, allowed_use, author_kind, real_enterprise_data, third_party_authorization, description, scenarios, loaded_scenarios]
+      properties:
+        source_type: {const: SIMULATED}
+        generator_version: {const: FC02-BI-1}
+        seed: {const: 20261024}
+        allowed_use: {const: FC02_BEHAVIOR_VALIDATION}
+        author_kind: {const: SIMULATED_GENERATOR}
+        real_enterprise_data: {const: false}
+        third_party_authorization: {const: false}
+        description: {type: string}
+        scenarios: {type: object, additionalProperties: {type: object, required: [purpose, series], properties: {purpose: {type: string}, series: {type: array, minItems: 1, items: {type: object}}}}}
+        loaded_scenarios: {type: array, items: {$ref: '#/components/schemas/ScenarioMetadata'}}
+    ScenarioLoadReceipt:
+      type: object
+      additionalProperties: false
+      required: [action, client_request_id, outcome, result]
+      properties:
+        action: {const: boss.simulation.bi_scenario.load}
+        client_request_id: {type: string}
+        outcome: {enum: [RECORDED, NOT_FOUND_IN_CURRENT_STORE]}
+        result: {oneOf: [{type: 'null'}, {$ref: './bi-scenario-input.schema.json#/$defs/LoadResult'}]}
+    RequestID: {type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+    BusinessScope:
+      type: object
+      additionalProperties: false
+      properties:
+        scenario_id: {type: string, minLength: 1}
+        source_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
+        region_id: {type: string, minLength: 1}
+        region_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
+        product_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
+        metric_ids: {type: array, minItems: 1, uniqueItems: true, items: {enum: [sales_quantity, revenue, cost, gross_profit, gross_margin, gross_profit_per_tonne]}}
+        legal_entity_id: {type: string, minLength: 1}
+        customer_id: {type: [string, 'null'], minLength: 1}
+        ownership_type: {enum: [COMPANY, CUSTOMER, COOPERATION, null]}
+        asset_owner_id: {type: [string, 'null'], minLength: 1}
+        cost_owner_id: {type: [string, 'null'], minLength: 1}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
+        quantity_unit: {type: string, minLength: 1}
+        trade_scope: {enum: [EXTERNAL_SALES, INTERNAL_CONSUMPTION]}
+        definition_version: {type: string, minLength: 1}
+        target_version: {type: [string, 'null'], minLength: 1}
+        business_basis: {type: string, minLength: 1}
+        settlement_state: {enum: [SETTLED, UNSETTLED, ALL]}
+        period_start: {type: string, format: date}
+        period_end: {type: string, format: date}
+        comparison_start: {type: string, format: date}
+        comparison_end: {type: string, format: date}
+        comparison_scope:
+          allOf:
+            - {$ref: '#/components/schemas/BusinessScope'}
+            - not: {anyOf: [{required: [scenario_id]}, {required: [metric_ids]}, {required: [period_start]}, {required: [period_end]}, {required: [comparison_start]}, {required: [comparison_end]}, {required: [comparison_scope]}]}
+    FullScope:
+      allOf:
+        - {$ref: '#/components/schemas/BusinessScope'}
+        - required: [metric_ids, region_id, product_ids, legal_entity_id, period_start, period_end, comparison_start, comparison_end, currency, quantity_unit, trade_scope, definition_version, business_basis, settlement_state]
+    QueryRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, question, scope]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        question: {type: string, minLength: 1, maxLength: 4000}
+        scope: {$ref: '#/components/schemas/FullScope'}
+    FollowUpRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, question, parent_query_id, overrides]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        question: {type: string, minLength: 1, maxLength: 4000}
+        parent_query_id: {type: string, minLength: 1}
+        overrides: {$ref: '#/components/schemas/BusinessScope'}
+    CancelRequest:
+      type: object
+      additionalProperties: false
+      required: [client_request_id]
+      properties: {client_request_id: {$ref: '#/components/schemas/RequestID'}}
+    ScopedQuery:
+      allOf:
+        - {$ref: './openapi.yaml#/components/schemas/QueryResult'}
+        - type: object
+          required: [context_snapshot, coverage, comparison, parent_query_id, overridden_fields, source_type, queried_at]
+          properties:
+            context_snapshot:
+              type: object
+              required: [envelope, query_mode, question]
+              properties: {envelope: {type: object}, query_mode: {const: SCOPED}, question: {type: string}}
+              description: 完整范围与服务端envelope；正式校验入口为组合后的scoped_query_input。
+            coverage:
+              type: object
+              additionalProperties: false
+              required: [state, periods, missing_regions, delayed_regions, unsynchronized_regions]
+              properties:
+                state: {enum: [PARTIAL, UNAVAILABLE]}
+                periods: {type: object, additionalProperties: {type: object, required: [record_count, region_ids, period_start, period_end], properties: {record_count: {type: integer, minimum: 0}, region_ids: {type: array, items: {type: string}}, period_start: {type: string, format: date}, period_end: {type: string, format: date}}}}
+                missing_regions: {type: array, items: {type: string}}
+                delayed_regions: {type: [array, 'null'], items: {type: string}}
+                unsynchronized_regions: {type: [array, 'null'], items: {type: string}}
+            comparison: {type: object, additionalProperties: false, required: [state, reasons], properties: {state: {enum: [COMPARABLE, INCOMPARABLE, INSUFFICIENT_EVIDENCE]}, reasons: {type: array, items: {type: string}}}}
+            parent_query_id: {type: [string, 'null']}
+            overridden_fields: {type: array, uniqueItems: true, items: {type: string}}
+            source_type: {const: SIMULATED}
+            queried_at: {type: string, format: date-time}
+    QueryRead:
+      type: object
+      additionalProperties: false
+      required: [adoption_state, result]
+      properties:
+        adoption_state: {enum: [CURRENT, HISTORICAL_CURRENT, HISTORICAL_REQUIRES_REQUERY]}
+        result: {$ref: '#/components/schemas/ScopedQuery'}
+    PublicReceipt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, request_state, receipt, run_id]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        request_state: {enum: [RUNNING, FAILED_BEFORE_RUNTIME, QUEUED, WAITING_INPUT, SUCCEEDED, FAILED, CANCELED, TIMED_OUT]}
+        run_id: {type: [string, 'null']}
+        cancel_requested: {type: boolean}
+        receipt:
+          oneOf:
+            - {type: 'null'}
+            - type: object
+              additionalProperties: false
+              required: [request_id, session_id, outcome, query]
+              properties:
+                request_id: {type: string, minLength: 1}
+                session_id: {type: string, minLength: 1}
+                outcome: {enum: [RECORDED, NOT_FOUND_IN_CURRENT_STORE]}
+                query: {oneOf: [{type: 'null'}, {$ref: '#/components/schemas/QueryRead'}]}
+    History:
+      type: object
+      additionalProperties: false
+      required: [source_type, requests]
+      properties:
+        source_type: {const: SIMULATED}
+        requests: {type: array, items: {type: object, additionalProperties: false, required: [client_request_id, created_at, run_id], properties: {client_request_id: {$ref: '#/components/schemas/RequestID'}, created_at: {type: string, format: date-time}, run_id: {type: [string, 'null']}}}}
+    Dimensions:
+      type: object
+      additionalProperties: false
+      required: [source_type, available_dimensions, periods, metric_definitions, source_id, source_version, coverage_state, missing_fields]
+      properties:
+        source_type: {const: SIMULATED}
+        available_dimensions: {type: object, additionalProperties: {type: array, uniqueItems: true, items: {type: string}}}
+        periods: {type: object, required: [BASE, CURRENT], additionalProperties: {type: array, minItems: 2, maxItems: 2, items: {type: string, format: date}}}
+        metric_definitions: {type: array, minItems: 1, items: {type: object, required: [metric_id, definition_version], properties: {metric_id: {type: string}, definition_version: {type: string}}}}
+        source_id: {type: string, minLength: 1}
+        source_version: {type: string, minLength: 1}
+        scenario_id: {type: string, minLength: 1}
+        source_ids: {type: array, uniqueItems: true, items: {type: string, minLength: 1}}
+        source_options: {type: array, items: {$ref: '#/components/schemas/SourceOption'}}
+        coverage_state: {const: PARTIAL}
+        missing_fields: {type: array, items: {type: string}}
+    SourceOption:
+      type: object
+      additionalProperties: false
+      required: [source_id, version, business_basis, author_kind, author_display_name, allowed_use, validity_state]
+      properties:
+        source_id: {type: string}
+        version: {type: string}
+        business_basis: {type: [string, 'null']}
+        author_kind: {type: [string, 'null']}
+        author_display_name: {type: [string, 'null']}
+        allowed_use: {type: [string, 'null']}
+        validity_state: {type: string}
+    MetricProjection:
+      type: object
+      additionalProperties: false
+      required: [source_type, result, read_at]
+      properties:
+        source_type: {const: SIMULATED}
+        result: {$ref: './openapi.yaml#/components/schemas/QueryResult'}
+        read_at: {type: string, format: date-time}
+    EvidenceProjection:
+      type: object
+      additionalProperties: false
+      required: [source_type, query_id, result, read_at]
+      properties:
+        source_type: {const: SIMULATED}
+        query_id: {type: string, minLength: 1, maxLength: 128}
+        result: {$ref: '#/components/schemas/QueryEvidenceResult'}
+        read_at: {type: string, format: date-time}
+    QueryEvidenceResult:
+      type: object
+      additionalProperties: false
+      required: [sources, original_records, definition_version, conflicts, missing_fields]
+      properties:
+        sources: {type: array, minItems: 1, items: {$ref: './openapi.yaml#/components/schemas/QueryResult/properties/sources/items'}}
+        original_records:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [record_id, version, content]
+            properties: {record_id: {type: string, minLength: 1}, version: {type: string, minLength: 1}, content: {type: object}}
+        definition_version: {type: string, minLength: 1}
+        conflicts: {type: array, items: {type: string}}
+        missing_fields: {type: array, items: {type: string}}
+      x-authoritative-validation-schema: selection-probe.json io_schema as standalone schema root evidence_output
+x-websocket-operations:
+  - {operationId: publicMaintainerBIScenarioLoad, action: boss.simulation.bi_scenario.load, role: MAINTAINER, input: './bi-scenario-input.schema.json#/$defs/Load', output: './bi-scenario-input.schema.json#/$defs/LoadResult', replay_after_reconnect: false, recovery: '/api/boss/ui/admin/bi-scenario-receipt'}
+  - {operationId: publicBIQuery, action: boss.bi.query, role: BOSS, input: '#/components/schemas/QueryRequest', output: '#/components/schemas/PublicReceipt'}
+  - {operationId: publicBIFollowUp, action: boss.bi.follow_up, role: BOSS, input: '#/components/schemas/FollowUpRequest', output: '#/components/schemas/PublicReceipt'}
+  - {operationId: publicBICancel, action: boss.bi.cancel, role: BOSS, input: '#/components/schemas/CancelRequest', output: '#/components/schemas/PublicReceipt'}

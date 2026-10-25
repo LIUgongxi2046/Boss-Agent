@@ -1,0 +1,355 @@
+{
+  "status": "PASS",
+  "run_id": "fc02-boundary-176212af-9f94-49fc-891f-04f8a7441691",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-boundary-176212af-9f94-49fc-891f-04f8a7441691",
+  "ports": {
+    "business": 9841,
+    "webui": 9842,
+    "gateway": 19841
+  },
+  "proxy_port": 9843,
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-boundary-dist",
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "authenticated_scenario_load_and_unknown_receipt",
+      "scenario_ids": [
+        "basis-conflict",
+        "delayed-records",
+        "missing-numbers",
+        "unsynchronized-records",
+        "weighted-ratios",
+        "zero-denominators"
+      ],
+      "original_client_request_id": "f8aee512-29bc-4e1d-8b2f-115a0c5abe90",
+      "recorded_version": "1",
+      "load_replayed": false,
+      "transport_events": [
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "47cbfdc8-7e1f-4bfd-ac9e-ba7ea123080a",
+          "client_request_id": "f8aee512-29bc-4e1d-8b2f-115a0c5abe90",
+          "scenario_id": "weighted-ratios"
+        },
+        {
+          "event": "actual_load_result_connection_closed",
+          "request_id": "47cbfdc8-7e1f-4bfd-ac9e-ba7ea123080a",
+          "client_request_id": "f8aee512-29bc-4e1d-8b2f-115a0c5abe90",
+          "scenario_id": "weighted-ratios",
+          "version": "1",
+          "sha256": "5b7f07c629f9d71b2266c378a5627fec00d8d177fe02281ad137cf11a9bdf3bb"
+        },
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "4cef9ee4-f473-4b5a-a431-21ce0bb6a522",
+          "client_request_id": "7a70f1fe-9705-4fad-897b-da2c5995c807",
+          "scenario_id": "zero-denominators"
+        },
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "aa1efe3e-fcf3-4b95-a414-5c81dcfe338c",
+          "client_request_id": "473c2e84-5ddd-4acc-8609-db626549a689",
+          "scenario_id": "missing-numbers"
+        },
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "b3a51193-eaab-4432-b2c1-6f7420944bc6",
+          "client_request_id": "5ccc0d6a-f256-4226-ad0e-87f82a0aa2e8",
+          "scenario_id": "delayed-records"
+        },
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "2e35abcf-b419-436b-b544-69e9099af63f",
+          "client_request_id": "63fdd81b-6dd7-46a9-b70a-04b3c5cfddce",
+          "scenario_id": "unsynchronized-records"
+        },
+        {
+          "event": "actual_load_forwarded",
+          "request_id": "29c05de6-de09-4092-8b35-2be06445fea5",
+          "client_request_id": "56bcf4ba-790d-4f4a-b43e-61b5a973d232",
+          "scenario_id": "basis-conflict"
+        }
+      ]
+    },
+    {
+      "check": "all_formal_boundary_queries_and_both_bases",
+      "query_ids": [
+        "26c501ea-1753-4785-8436-54ba9acee4f6",
+        "99426738-95d7-4480-abd3-46c38352a2c9",
+        "8e8fbd25-e3dd-41db-9ad7-4b02e3af7cde",
+        "eb893dd1-6d06-400e-8bfb-22bddec74a2c",
+        "3b8fc491-a3aa-4461-9563-f51352b0a2af",
+        "b206f7a9-a1d7-4f6d-92ce-209f89875ab3",
+        "81d0e0c0-6ffc-4fd2-9d0f-6d4775558c7d"
+      ],
+      "weighted_margin": 14,
+      "zero_denominator": null,
+      "missing_profit": null,
+      "delayed_regions": [
+        "region-1"
+      ],
+      "unsynchronized_regions": [
+        "region-1"
+      ],
+      "financial_revenue": "100",
+      "business_revenue": "120",
+      "pinned_queries_persist": true
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "boundary_dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "actual_registry_initial_snapshot_and_business_permissions",
+      "initial_matches_generator": true,
+      "counts": {
+        "query": 7,
+        "runtime_run": 7,
+        "bi_scenario": 6,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      },
+      "runs": [
+        {
+          "run_id": "run-09fad6c8-146c-4735-b541-f59d599caed9",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-660905f4-bfc7-4a03-b8b3-8301ff9dc657",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-ad82edf6-625b-4b23-a9f8-058e401d2866",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-b1e239ea-e099-437c-b357-fdc92beb5b10",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-ca8f1957-e664-4ddb-ba01-ad22cf799fea",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-e35eda48-dd62-46b0-ae68-9e5d941bc2d7",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        },
+        {
+          "run_id": "run-f2aed7a2-5c16-4ac9-8c59-6014b11bc2e2",
+          "status": "SUCCEEDED",
+          "tools": [
+            "query_metrics",
+            "read_evidence"
+          ],
+          "feature_id": "FC02",
+          "usage": null,
+          "cost_total": null
+        }
+      ],
+      "renderer_errors": 0
+    }
+  ]
+}

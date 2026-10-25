@@ -1,0 +1,163 @@
+{
+  "title": "F01 · 今日工作 | Boss Agent",
+  "loaded": "complete",
+  "has_grid": true,
+  "has_builder": true,
+  "has_page": true,
+  "scripts": [
+    {
+      "src": null,
+      "type": ""
+    },
+    {
+      "src": "../design-v6-panels.js",
+      "type": ""
+    },
+    {
+      "src": "../design-v6.js",
+      "type": ""
+    }
+  ],
+  "headings": [
+    "业务日期与资料范围",
+    "今天需要我参与的事",
+    "交给 Boss Agent",
+    "选中事项与关联对象",
+    "保存与返回"
+  ],
+  "body_class": "v6-body",
+  "layouts": [
+    {
+      "width": 1440,
+      "height": 1024,
+      "zoom": 1,
+      "columns": "814px 310px",
+      "gap": "14px",
+      "main": {
+        "x": 250,
+        "y": 364.390625,
+        "width": 814,
+        "height": 822
+      },
+      "aside": {
+        "x": 1078,
+        "y": 364.390625,
+        "width": 310,
+        "height": 756
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1440,
+      "height": 1024,
+      "zoom": 2,
+      "columns": "599.734px",
+      "gap": "14px",
+      "main": {
+        "x": 83.6328125,
+        "y": 345.21875,
+        "width": 599.734375,
+        "height": 950
+      },
+      "aside": {
+        "x": 83.6328125,
+        "y": 1309.21875,
+        "width": 599.734375,
+        "height": 637
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "zoom": 1,
+      "columns": "657.281px 310px",
+      "gap": "14px",
+      "main": {
+        "x": 248.359375,
+        "y": 362.75,
+        "width": 657.28125,
+        "height": 844
+      },
+      "aside": {
+        "x": 919.640625,
+        "y": 362.75,
+        "width": 310,
+        "height": 756
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "zoom": 2,
+      "columns": "521px",
+      "gap": "14px",
+      "main": {
+        "x": 83,
+        "y": 373.3984375,
+        "width": 521,
+        "height": 1039
+      },
+      "aside": {
+        "x": 83,
+        "y": 1426.3984375,
+        "width": 521,
+        "height": 647
+      },
+      "main_gap": "13px",
+      "panel_padding": "15px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "zoom": 1,
+      "columns": "898.438px",
+      "gap": "14px",
+      "main": {
+        "x": 87.28125,
+        "y": 337.671875,
+        "width": 898.4375,
+        "height": 907
+      },
+      "aside": {
+        "x": 87.28125,
+        "y": 1258.671875,
+        "width": 898.4375,
+        "height": 615
+      },
+      "main_gap": "13px",
+      "panel_padding": "18px 20px",
+      "panel_radius": "15px"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "zoom": 2,
+      "columns": "393px",
+      "gap": "14px",
+      "main": {
+        "x": 83,
+        "y": 425.1875,
+        "width": 393,
+        "height": 1061
+      },
+      "aside": {
+        "x": 83,
+        "y": 1500.1875,
+        "width": 393,
+        "height": 647
+      },
+      "main_gap": "13px",
+      "panel_padding": "15px",
+      "panel_radius": "15px"
+    }
+  ]
+}

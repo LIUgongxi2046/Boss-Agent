@@ -1,0 +1,57 @@
+openapi: 3.1.0
+info:
+  title: FC01 本人准备与采用公共扩展
+  version: 1.0.0
+  description: 外部模型事件明确SIMULATED；准备不签发授权，采用由当前本人认证执行。
+paths: {}
+x-reception: {state: IN_REVIEW, owner: N3, core_version: 1.8.0}
+components:
+  schemas:
+    CoordinateContent:
+      type: object
+      additionalProperties: false
+      required: [interface_id, origin_entity_type, origin_record_id, origin_version, review_sha256, purpose, coordinator_id, due_at, timezone, evidence_requirements]
+      properties:
+        interface_id: {enum: [SI09, SI10]}
+        origin_entity_type: {$ref: './simulated-supply-quality.schema.json#/$defs/InputRecord/properties/entity_type'}
+        origin_record_id: {$ref: './simulated-supply-quality.schema.json#/$defs/Id'}
+        origin_version: {$ref: './simulated-supply-quality.schema.json#/$defs/Version'}
+        review_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        purpose: {$ref: './simulated-supply-quality.schema.json#/$defs/Text'}
+        coordinator_id: {$ref: './simulated-supply-quality.schema.json#/$defs/Id'}
+        due_at: {$ref: './simulated-supply-quality.schema.json#/$defs/Time'}
+        timezone: {$ref: './simulated-supply-quality.schema.json#/$defs/ShortText'}
+        evidence_requirements: {type: array, minItems: 1, maxItems: 8, items: {$ref: './simulated-supply-quality.schema.json#/$defs/ShortText'}}
+    Prepare:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, coordinate_input]
+      properties:
+        client_request_id: {$ref: './simulated-supply-quality.schema.json#/$defs/ClientId'}
+        coordinate_input: {$ref: '#/components/schemas/CoordinateContent'}
+    Status:
+      type: object
+      additionalProperties: false
+      required: [client_request_id]
+      properties:
+        client_request_id: {$ref: './simulated-supply-quality.schema.json#/$defs/ClientId'}
+    Adopt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, preparation_request_id, coordinate_input]
+      properties:
+        client_request_id: {$ref: './simulated-supply-quality.schema.json#/$defs/ClientId'}
+        preparation_request_id: {$ref: './simulated-supply-quality.schema.json#/$defs/ClientId'}
+        coordinate_input: {$ref: '#/components/schemas/CoordinateContent'}
+x-websocket-operations:
+  - {operationId: fc01Prepare, action: boss.fc01.prepare, role: BOSS, input: '#/components/schemas/Prepare', output_authority: 'sop_write_tools.fc01.contract.interface_contract.preparation_output plus run_id/client_request_id'}
+  - {operationId: fc01PreparationStatus, action: boss.fc01.status, role: BOSS, input: '#/components/schemas/Status'}
+  - {operationId: fc01OwnerAdopt, action: boss.fc01.coordinate, role: BOSS, input: '#/components/schemas/Adopt', output: './supply-quality-results.schema.json#/$defs/CoordinateResult'}
+x-runtime-policy:
+  provider: SIMULATED
+  tool_grants: current enabled configuration intersect current authenticated request
+  preparation_binding: created before Runtime from current authenticated input and source digest
+  owner_adoption: exact preparation request and content; actual domain authorization and CAS
+  transmission: no external model or delivery request
+  unknown_usage: null
+  unknown_cost: null

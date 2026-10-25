@@ -1,0 +1,33 @@
+{
+  "status": "FAILED_CHECK",
+  "run_id": "navigation-focus-5ef86722-5aa8-4ca4-8cbb-9226a61b4749",
+  "at": "2026-10-23T08:24:44.589Z",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "359c561c93be6df73e3104d519375934c091e880288284e13770ea689649e13f"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "99405b72d834014e7c5d6efa29abd1d8377e71875cf570ebed29b1451b478b29"
+    },
+    {
+      "path": "validation/desktop/check-navigation-focus.cjs",
+      "sha256": "56c03061a5fdb7c6608c7df25d231b5e7bac5a08dd327bec72eb149d1cbb230c"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "f6e1625916c5314bd97703f702b6c5dca2a77aeff91bd01b886d68999041531e"
+    }
+  ],
+  "records": [
+    {
+      "check": "uncaught_failure",
+      "name": "TimeoutError"
+    }
+  ],
+  "business_write_requested": false,
+  "model_requested": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A08_A11_accepted": false
+}

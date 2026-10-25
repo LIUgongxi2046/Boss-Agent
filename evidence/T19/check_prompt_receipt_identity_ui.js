@@ -1,0 +1,28 @@
+async (page) => {
+  await page.getByRole("tab", {name: "任务提示 1", exact: true}).click();
+  const choices = page.getByRole("combobox", {name: "当前类别已保存的版本", exact: true});
+  const available = await choices.locator("option").evaluateAll(items => items.map(item => item.value).filter(Boolean));
+  if (available.length !== 1) throw Error("没有取得实际Prompt版本");
+  await choices.selectOption(available[0]);
+  await page.getByRole("button", {name: "启用已校验版本", exact: true}).click();
+  const dialog = page.getByRole("dialog", {name: "启用当前已校验版本", exact: true});
+  await dialog.waitFor();
+  const revoked = await page.evaluate(async () => {
+    const token = document.querySelector('meta[name="maintainer-token"]').content;
+    return (await fetch("/component/session/revoke", {method: "POST", headers: {Authorization: "Bearer " + token}})).status;
+  });
+  if (revoked !== 200) throw Error("本机维护会话没有实际撤销");
+  const [response] = await Promise.all([
+    page.waitForResponse(item => item.url().includes("/api/boss/ui/operation-status?")),
+    dialog.getByRole("button", {name: "核查原请求回执", exact: true}).click(),
+  ]);
+  if (response.status() !== 401) throw Error("已撤销身份没有拒绝回执读取");
+  await page.getByRole("alert").filter({hasText: "HTTP 401"}).waitFor();
+  if (await page.getByRole("dialog").count()) throw Error("身份失效后仍保留待确认操作");
+  if (await page.getByRole("textbox", {name: "版本正文（20—5000 字）", exact: true}).inputValue())
+    throw Error("身份失效后仍保留配置正文");
+  if (await choices.locator("option").count() !== 1) throw Error("身份失效后仍保留旧版本");
+  return {status: "PASS", check_id: "A05-REVOKED-RECEIPT-IDENTITY", upstream_provider_used: true,
+    actual_receipt_read_status: response.status(), pending_confirmation_cleared: true,
+    business_mutation_performed: false, model_requests: 0};
+}

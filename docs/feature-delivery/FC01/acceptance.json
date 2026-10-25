@@ -1,0 +1,21 @@
+{
+  "feature_id": "FC01",
+  "result": "PASS",
+  "release_decision": "GO",
+  "candidate_commit": "c4bc67355611bc019f3fa1ab5e6fee19e8b2af10",
+  "integration_head_verified": "c4bc67355611bc019f3fa1ab5e6fee19e8b2af10",
+  "verified_on": "2026-10-24",
+  "verified_checkpoints": 18,
+  "total_checkpoints": 18,
+  "checkpoint_ids": ["FC01.C01","FC01.C02","FC01.C03","FC01.C04","FC01.C05","FC01.C06","FC01.C07","FC01.C08","FC01.C09","FC01.C10","FC01.C11","FC01.C12","FC01.C13","FC01.C14","FC01.C15","FC01.C16","FC01.C17","FC01.C18"],
+  "independent_verdict": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/feature-delivery/FC01/verdict.json",
+  "independent_verdict_sha256": "f7976a5e02c5c7c8e0778f90ac42162b9fd25731bf0a4dbfbf17991093f46515",
+  "preflight_sha256": "645376ef856be4b0f3f45ec48655818610ead33f7a8c0220b6e7d81f92f2e5a1",
+  "independent_body_tokens_sha256": "2a07f15ef8db8e4c1f5b793a0ed49331356e9952c923335ad9a4c0f9b0f306d5",
+  "manifest_sha256": "b35ffd1880cfc1ad42d1626b6e3c6bd5115977ef741b726b725e52905b258d8c",
+  "index_sha256": "06918aeef643bc4fef211bf3143709fdf4d44ec8d71113a5816a225eff6d46a7",
+  "evidence_policy": "十六项不变业务依赖经N4核实复用，C15在准确候选实际独立复验，C18一致性判定通过；本次没有重复业务全量检查",
+  "scope": "FC01全部十八项限定SIMULATED_FIRST功能，本地认证/授权/领域/Runtime/SQLite实际执行，DOM/文字Token/键盘验证",
+  "limits": {"visual":"NOT_RUN","real_model_quality":"NOT_RUN","external_delivery":"NOT_RUN","device_installation":"NOT_RUN","legacy_parent_tasks_accepted":false},
+  "next_feature_id": "FC02"
+}

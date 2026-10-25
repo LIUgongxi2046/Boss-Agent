@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:bi-scenario-input:1.0.0",
+  "$defs": {
+    "LoadResult": {"type": "object", "additionalProperties": false,
+      "required": ["action", "client_request_id", "scenario_id", "version", "source_type", "source_ids", "source_versions", "record_count", "generator_version", "seed", "manifest_sha256", "allowed_use", "external_service_invoked"],
+      "properties": {
+        "action": {"const": "boss.simulation.bi_scenario.load"}, "client_request_id": {"type": "string", "minLength": 1},
+        "scenario_id": {"$ref": "#/$defs/Load/properties/scenario_id"}, "version": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "source_type": {"const": "SIMULATED"}, "source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "source_versions": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "pattern": "^[1-9][0-9]*$"}},
+        "record_count": {"type": "integer", "minimum": 1}, "generator_version": {"const": "FC02-BI-1"}, "seed": {"const": 20261024},
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "allowed_use": {"const": "FC02_BEHAVIOR_VALIDATION"}, "external_service_invoked": {"const": false}
+      }},
+    "Load": {"type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "mode", "scenario_id", "generator_version", "seed", "expected_version"],
+      "properties": {
+        "client_request_id": {"type": "string", "minLength": 1, "maxLength": 128}, "mode": {"const": "SIMULATED"},
+        "scenario_id": {"enum": ["weighted-ratios", "zero-denominators", "missing-numbers", "delayed-records", "unsynchronized-records", "basis-conflict"]},
+        "generator_version": {"const": "FC02-BI-1"}, "seed": {"const": 20261024}, "expected_version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"}
+      }},
+    "Record": {"type": "object", "additionalProperties": false,
+      "required": ["record_id", "version", "source_id", "source_version", "source_type", "scenario_id", "period", "period_start", "period_end", "region_id", "product_id", "legal_entity_id", "trade_type", "quantity_tonnes", "revenue_cny", "cost_cny", "currency", "quantity_unit", "definition_version", "business_basis", "settlement_state", "sync_state"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1}, "version": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "source_id": {"type": "string", "minLength": 1}, "source_version": {"type": "string", "pattern": "^[1-9][0-9]*$"}, "source_type": {"const": "SIMULATED"},
+        "scenario_id": {"type": "string", "minLength": 1}, "period": {"enum": ["BASE", "CURRENT"]},
+        "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"},
+        "region_id": {"const": "region-1"}, "product_id": {"enum": ["product-1", "product-2"]}, "legal_entity_id": {"const": "entity-1"},
+        "trade_type": {"const": "EXTERNAL_SALES"}, "currency": {"const": "CNY"}, "quantity_unit": {"const": "tonne"}, "definition_version": {"const": "1"},
+        "business_basis": {"enum": ["SIMULATED_BOUNDARY", "FINANCIAL_REPORTED", "BUSINESS_REPORTED"]}, "settlement_state": {"const": "SETTLED"},
+        "sync_state": {"enum": ["SYNCHRONIZED", "DELAYED", "UNSYNCHRONIZED"]},
+        "quantity_tonnes": {"$ref": "#/$defs/Number"}, "revenue_cny": {"$ref": "#/$defs/Number"}, "cost_cny": {"$ref": "#/$defs/Number"}
+      }},
+    "Number": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?$"}]}
+  },
+  "$ref": "#/$defs/Load"
+}

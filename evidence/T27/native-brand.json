@@ -1,0 +1,16 @@
+{
+  "status": "PASS_NATIVE_HIDDEN_HOST_ONLY",
+  "result": {
+    "name": "Boss Agent",
+    "title": "Boss Agent",
+    "imageSize": {
+      "width": 1332,
+      "height": 1181
+    },
+    "image": true,
+    "profile": "/Users/liuhaoxian/.codex/worktrees/boss-login-polish/Boss-Agent/validation/.work/t27-native-zoom/host/profile"
+  },
+  "icon_reference": "Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png",
+  "installed_application": "NOT_RUN",
+  "visual": "NOT_RUN"
+}

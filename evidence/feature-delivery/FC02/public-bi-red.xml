@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="3.546" timestamp="2026-10-24T01:14:02.375685+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_bi_queries" name="test_public_bi_rejects_extra_scope_or_repeated_values_before_query[products=product-1&amp;owner_id=other]" time="0.049"><failure message="assert 200 == 400">api = &lt;boss_page_api.BossPageAPI object at 0x10907ba10&gt;
+query = 'products=product-1&amp;owner_id=other'
+
+    @pytest.mark.parametrize("query", ["products=product-1&amp;owner_id=other", "products=product-1&amp;namespace=other", "products=product-1&amp;dataset_id=other", "products=product-1&amp;products=product-2"])
+    def test_public_bi_rejects_extra_scope_or_repeated_values_before_query(api, query):
+        with api.store.connect() as db:
+            before = tuple(db.iterdump())
+&gt;       assert api.serve("BOSS", "/api/boss/ui/metrics", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_bi_queries.py:14: AssertionError</failure></testcase><testcase classname="app.tests.test_product_bi_queries" name="test_public_bi_rejects_extra_scope_or_repeated_values_before_query[products=product-1&amp;namespace=other]" time="0.019"><failure message="assert 200 == 400">api = &lt;boss_page_api.BossPageAPI object at 0x1090b86e0&gt;
+query = 'products=product-1&amp;namespace=other'
+
+    @pytest.mark.parametrize("query", ["products=product-1&amp;owner_id=other", "products=product-1&amp;namespace=other", "products=product-1&amp;dataset_id=other", "products=product-1&amp;products=product-2"])
+    def test_public_bi_rejects_extra_scope_or_repeated_values_before_query(api, query):
+        with api.store.connect() as db:
+            before = tuple(db.iterdump())
+&gt;       assert api.serve("BOSS", "/api/boss/ui/metrics", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_bi_queries.py:14: AssertionError</failure></testcase><testcase classname="app.tests.test_product_bi_queries" name="test_public_bi_rejects_extra_scope_or_repeated_values_before_query[products=product-1&amp;dataset_id=other]" time="0.019"><failure message="assert 200 == 400">api = &lt;boss_page_api.BossPageAPI object at 0x108382c00&gt;
+query = 'products=product-1&amp;dataset_id=other'
+
+    @pytest.mark.parametrize("query", ["products=product-1&amp;owner_id=other", "products=product-1&amp;namespace=other", "products=product-1&amp;dataset_id=other", "products=product-1&amp;products=product-2"])
+    def test_public_bi_rejects_extra_scope_or_repeated_values_before_query(api, query):
+        with api.store.connect() as db:
+            before = tuple(db.iterdump())
+&gt;       assert api.serve("BOSS", "/api/boss/ui/metrics", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_bi_queries.py:14: AssertionError</failure></testcase><testcase classname="app.tests.test_product_bi_queries" name="test_public_bi_rejects_extra_scope_or_repeated_values_before_query[products=product-1&amp;products=product-2]" time="0.017"><failure message="assert 200 == 400">api = &lt;boss_page_api.BossPageAPI object at 0x1090d1ac0&gt;
+query = 'products=product-1&amp;products=product-2'
+
+    @pytest.mark.parametrize("query", ["products=product-1&amp;owner_id=other", "products=product-1&amp;namespace=other", "products=product-1&amp;dataset_id=other", "products=product-1&amp;products=product-2"])
+    def test_public_bi_rejects_extra_scope_or_repeated_values_before_query(api, query):
+        with api.store.connect() as db:
+            before = tuple(db.iterdump())
+&gt;       assert api.serve("BOSS", "/api/boss/ui/metrics", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_bi_queries.py:14: AssertionError</failure></testcase><testcase classname="app.tests.test_product_bi_queries" name="test_public_bi_evidence_reads_only_current_query_details_and_reopens_database" time="0.015"><failure message="AssertionError: {'error': 'API_NOT_FOUND'}&#10;assert 404 == 200">api = &lt;boss_page_api.BossPageAPI object at 0x1090ba0f0&gt;
+
+    def test_public_bi_evidence_reads_only_current_query_details_and_reopens_database(api):
+        code, queried = api.serve("BOSS", "/api/boss/ui/metrics", "products=product-1")
+        assert code == 200
+        query = queried["result"]
+        reopened = BossPageAPI(ControlStore(api.store.path))
+        route = "/api/boss/ui/metrics-evidence"
+        code, evidence = reopened.serve("BOSS", route, urlencode({"query_id":query["query_id"]}))
+&gt;       assert code == 200, evidence
+E       AssertionError: {'error': 'API_NOT_FOUND'}
+E       assert 404 == 200
+
+app/tests/test_product_bi_queries.py:26: AssertionError</failure></testcase></testsuite></testsuites>

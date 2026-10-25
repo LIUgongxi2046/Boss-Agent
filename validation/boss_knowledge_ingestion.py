@@ -13,6 +13,8 @@ import json
 from datetime import date
 
 from aiohttp import web
+from lxml.html import fragment_fromstring
+from markdown_it import MarkdownIt
 
 from business import now, require
 
@@ -64,11 +66,18 @@ def _read(db, source_id):
 
 
 def _reindex(db, source_id, text):
+    indexed_text = None
+    if text is not None:
+        rendered = MarkdownIt("commonmark", {"html": False}).render(text)
+        require(bool(rendered.strip()), "资料缺少可检索正文", web.HTTPBadRequest)
+        document = fragment_fromstring(rendered, create_parent="div")
+        indexed_text = "\n".join(document.itertext()).strip()
+        require(bool(indexed_text), "资料缺少可检索正文", web.HTTPBadRequest)
     db.execute("DELETE FROM knowledge WHERE namespace=? AND source_id=?", (NS, source_id))
     if text is not None:
         db.execute(
             "INSERT INTO knowledge(namespace,source_id,content) VALUES(?,?,?)",
-            (NS, source_id, text),
+            (NS, source_id, indexed_text),
         )
 
 

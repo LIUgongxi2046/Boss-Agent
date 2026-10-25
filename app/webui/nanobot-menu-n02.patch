@@ -1,0 +1,455 @@
+*** Begin Patch
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+-interface ThreadComposerProps {
++export type ComposerDraftController={hasDraft:boolean;discard:()=>void};
++
++interface ThreadComposerProps {
+@@
+   pendingQueueKey?: string | null;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
+@@
+   pendingQueueKey = null,
++  persistQueuedPrompts = true,
++  onDraftController,
+@@
+-  useEffect(() => {
+-    if (!value.trim()) return;
+-    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
+-    window.addEventListener("beforeunload",protect);
+-    return () => window.removeEventListener("beforeunload",protect);
+-  }, [value]);
+@@
+-    () => queuedPromptsStorageKey(pendingQueueKey),
+-    [pendingQueueKey],
++    () => persistQueuedPrompts ? queuedPromptsStorageKey(pendingQueueKey) : null,
++    [pendingQueueKey,persistQueuedPrompts],
+@@
+   }, [resizeTextarea]);
++
++  const hasDraft=Boolean(value.trim()||images.length||queuedPrompts.length||normalizedQuotedContext);
++  useEffect(()=>{
++    onDraftController?.({hasDraft,discard:()=>{clear();clearComposerText(false);setQueuedPrompts([]);onQuotedContextChange?.(null);}});
++    return()=>onDraftController?.(null);
++  },[hasDraft,onDraftController,clear,clearComposerText,onQuotedContextChange]);
++  useEffect(()=>{
++    if(!hasDraft)return;
++    const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return()=>window.removeEventListener("beforeunload",protect);
++  },[hasDraft]);
+ 
+   const queueGuidancePrompt = useCallback(() => {
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+-import { ThreadComposer } from "@/components/thread/ThreadComposer";
++import { ThreadComposer,type ComposerDraftController } from "@/components/thread/ThreadComposer";
+@@
+   transcriptionEnabled?: boolean;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
+@@
+   transcriptionEnabled = true,
++  persistQueuedPrompts = true,
++  onDraftController,
+@@
+         <ThreadComposer
+           onSend={handleThreadSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+@@
+         <ThreadComposer
+           onSend={handleWelcomeSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+*** Update File: webui/src/App.tsx
+@@
+ import type { SettingsExitGuard } from "@/components/settings/contracts";
++import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
+@@
+   const [pendingNativeNavigation, setPendingNativeNavigation] = useState<(() => void) | null>(null);
++  const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const registerNativeDraft=useCallback((key:string,controller:ComposerDraftController|null)=>{
++    if(controller)nativeDrafts.current.set(key,controller);else nativeDrafts.current.delete(key);
++  },[]);
+@@
+-      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
+       if (!options?.sending && currentShellRouteRef.current.view === "chat" &&
+-          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
+-        setPendingNativeNavigation(() => leave);
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        setPendingNativeNavigation(() => ()=>{draft.discard();leave();});
+@@
+-      const draft = document.querySelector<HTMLTextAreaElement>('.boss-native-surface textarea');
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
+       if (currentShellRouteRef.current.view === "chat" &&
+-          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.value.trim()) {
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
+@@
+         setPendingNativeNavigation(() => () => {
++          draft.discard();
+@@
+         onBeforeLeaveNative={leave => {
+-          if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++          const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++          if(view==="chat"&&draft?.hasDraft)setPendingNativeNavigation(()=>()=>{draft.discard();leave();});
++          else if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
+@@
+                             transcriptionEnabled={false}
++                            persistQueuedPrompts={false}
++                            onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
+@@
+                           transcriptionEnabled={false}
++                          persistQueuedPrompts={false}
++                          onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
+*** Update File: webui/src/App.tsx
+@@
+ import { BossDesktop } from "./boss-agent/BossDesktop";
++import {BossConversationWorkspace} from "./boss-agent/BossConversationWorkspace";
+@@
+       <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onNewConversation={onNewChat}
+@@
+-      {(role,nativeVisible) => <>
+-      <div className="boss-native-toolbar" aria-label={role === "BOSS" ? "会话操作" : "设置分类"}>
+-        {role === "BOSS" ? <>
+-          <label>当前会话<select aria-label="当前会话" value={activeKey ?? ""} onChange={event => event.target.value ? onSelectChat(event.target.value) : onNewChat()}>
+-            <option value="">新会话</option>{topicSessions.map(session => <option key={session.key} value={session.key}>{displayTitle(session,sidebarState.title_overrides,t("chat.newChat"))}</option>)}
+-          </select></label>
+-          <button className="boss-btn" onClick={onNewChat}>新建会话</button>
+-          <button className="boss-btn" onClick={onOpenSessionSearch}>搜索会话</button>
+-          {view !== "chat" && <button className="boss-btn" onClick={onBackToChat}>返回当前会话</button>}
+-        </> : <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
++      {(role,nativeVisible,conversationActions) => <>
++      {role === "MAINTAINER" && <div className="boss-native-toolbar" aria-label="设置分类">
++        <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
+           {SETTINGS_SECTION_KEYS.filter(section => section !== "voice").map(section => <option key={section} value={section}>{t(`settings.nav.${section}`)}</option>)}
+-        </select></label>}
+-      </div>
++        </select></label>
++      </div>}
++      <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        sessions={topicSessions.map(session=>({key:session.key,chatId:session.chatId,title:displayTitle(session,sidebarState.title_overrides,t("chat.newChat")),updatedAt:session.updatedAt??"更新时间未知"}))}
++        onNewChat={onNewChat} onSelectChat={onSelectChat} onSearch={onOpenSessionSearch} actions={conversationActions}>
+@@
+-      </>}
++      </BossConversationWorkspace>
++      </>}
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full transition-transform",
++                "thread-composer-action thread-composer-submit-action thread-composer-round-action touch-target rounded-full transition-transform",
+*** Update File: webui/src/lib/nanobot-client.ts
+@@
+-      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
++      if (["boss.conversation.task.prepare", "boss.conversation.task.bind", "boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback", "boss.simulation.message.reply"].includes(pending.action) || pending.action.startsWith("boss.message.") || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+   useEffect,
++  useId,
+@@
+   inputAriaLabel?: string;
++  inputLabel?: string;
++  submitLabel?: string;
+@@
+   inputAriaLabel,
++  inputLabel,
++  submitLabel,
+@@
+ }: ThreadComposerProps) {
+   const { t } = useTranslation();
++  const inputId=useId();
+@@
+         <GoalStateStrip goalState={goalState} />
++        {inputLabel&&<label className="boss-n02-composer-label" htmlFor={inputId}>{inputLabel}</label>}
+@@
+           <textarea
++            id={inputId}
+@@
+-            aria-label={inputAriaLabel ?? t("thread.composer.inputAria")}
++            aria-label={inputLabel?(inputAriaLabel?inputLabel+" · "+inputAriaLabel:inputLabel):inputAriaLabel??t("thread.composer.inputAria")}
+@@
+-                    : t("thread.composer.send")
++                    : submitLabel??t("thread.composer.send")
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   composerInputAriaLabel?: string;
++  composerInputLabel?: string;
++  composerSubmitLabel?: string;
+@@
+   composerInputAriaLabel,
++  composerInputLabel,
++  composerSubmitLabel,
+@@
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
+@@
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
+*** Update File: webui/src/App.tsx
+@@
+                             persistQueuedPrompts={false}
++                            composerInputLabel={role==="BOSS"?"本次消息":undefined}
++                            composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
+                             onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
+@@
+                           persistQueuedPrompts={false}
++                          composerInputLabel={role==="BOSS"?"本次消息":undefined}
++                          composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
+                           onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+   submitLabel?: string;
++  attachmentLabel?: string;
+@@
+   submitLabel,
++  attachmentLabel,
+@@
+-            aria-label={t("thread.composer.attachImage")}
++            aria-label={attachmentLabel??t("thread.composer.attachImage")}
+@@
+-              aria-label={t("thread.composer.attachImage")}
++              aria-label={attachmentLabel??t("thread.composer.attachImage")}
+@@
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
++                "thread-composer-action thread-composer-attachment-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   composerSubmitLabel?: string;
++  composerAttachmentLabel?: string;
++  composerPlaceholder?: string;
+@@
+   composerSubmitLabel,
++  composerAttachmentLabel,
++  composerPlaceholder,
+@@
+           submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+@@
+-            composerVariant === "hero"
++            composerPlaceholder??(composerVariant === "hero"
+               ? t("thread.composer.placeholderHero")
+-              : t("thread.composer.placeholderThread")
++              : t("thread.composer.placeholderThread"))
+@@
+           submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+@@
+-              : t("thread.composer.placeholderHero")
++              : composerPlaceholder??t("thread.composer.placeholderHero")
+*** Update File: webui/src/App.tsx
+@@
+                             composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
++                            composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}
++                            composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}
+@@
+                           composerSubmitLabel={role==="BOSS"?"提交需求":undefined}
++                          composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}
++                          composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}
+*** Update File: webui/src/App.tsx
+@@
+   const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const windowCloseGuard=useRef<((close:()=>void)=>void)|null>(null);
++  const registerWindowCloseGuard=useCallback((guard:((close:()=>void)=>void)|null)=>{windowCloseGuard.current=guard;},[]);
++  useEffect(()=>{
++    const bridge=(window as Window&{bossDesktop?:{onCloseRequested?:(listener:()=>void)=>()=>void;confirmClose?:()=>Promise<unknown>}}).bossDesktop;
++    if(!bridge?.onCloseRequested||!bridge.confirmClose)return;
++    const confirm=bridge.confirmClose;
++    return bridge.onCloseRequested(()=>{
++      const close=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{void confirm();}));
++      const guard=windowCloseGuard.current;
++      if(guard)guard(close);else close();
++    });
++  },[]);
+@@
+       <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onRegisterCloseGuard={registerWindowCloseGuard}
+*** Update File: webui/src/App.tsx
+@@
+         onNewConversation={onNewChat}
++        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
++        onOpenTaskConversation={chatId=>onSelectChat("websocket:"+chatId)}
+*** Update File: webui/src/components/thread/ThreadViewport.tsx
+@@
+-export interface ThreadViewportHandle {
++export interface ThreadReadingPosition {conversationKey:string;promptId:string;offsetTop:number}
++export interface ThreadReadingController {
++  captureReadingPosition:()=>ThreadReadingPosition|null;
++  restoreReadingPosition:(position:ThreadReadingPosition,signal:AbortSignal)=>Promise<void>;
++}
++interface PendingReadingPosition {
++  position:ThreadReadingPosition;resolve:()=>void;reject:(error:Error)=>void;cleanup:()=>void;
++  loading:boolean;lastBoundary:string|null;
++}
++export interface ThreadViewportHandle extends ThreadReadingController {
+@@
+   const historyScrollAnchorRef = useRef<HistoryScrollAnchor | null>(null);
++  const pendingReadingPosition=useRef<PendingReadingPosition|null>(null);
++  const [readingRevision,setReadingRevision]=useState(0);
+@@
+   const yieldCameraToUser = useCallback(() => {
++    const pending=pendingReadingPosition.current;
++    if(pending){pendingReadingPosition.current=null;pending.cleanup();pending.reject(new DOMException("本人已经调整阅读位置","AbortError"));}
+     threadMotionRef.current?.takeUserControl();
+@@
+   const cancelAutoScroll = useCallback(() => {
+     threadMotionRef.current?.takeUserControl();
+   }, []);
++
++  const captureReadingPosition=useCallback(()=>{
++    const scroller=scrollRef.current;
++    if(!conversationReady||!conversationKey||!scroller||!hasMessages)return null;
++    const prompts=Array.from(scroller.querySelectorAll<HTMLElement>("[data-user-prompt-id]"));
++    if(!prompts.length)return null;
++    const top=scroller.getBoundingClientRect().top;
++    const prompt=prompts.filter(element=>element.getBoundingClientRect().top<=top).at(-1)??prompts[0];
++    const promptId=prompt.dataset.userPromptId;
++    if(!promptId)throw new Error("原消息缺少稳定标识");
++    threadMotionRef.current?.takeUserControl();
++    return {conversationKey,promptId,offsetTop:prompt.getBoundingClientRect().top-top};
++  },[conversationKey,conversationReady,hasMessages]);
++  const finishReading=useCallback((pending:PendingReadingPosition,error?:Error)=>{
++    if(pendingReadingPosition.current!==pending)return;
++    pendingReadingPosition.current=null;pending.cleanup();
++    if(error)pending.reject(error);else pending.resolve();
++  },[]);
++  const restoreReadingPosition=useCallback((position:ThreadReadingPosition,signal:AbortSignal)=>{
++    if(position.conversationKey!==conversationKey||!position.promptId||!Number.isFinite(position.offsetTop))return Promise.reject(new Error("原阅读位置不属于当前会话"));
++    if(signal.aborted)return Promise.reject(new DOMException("阅读位置恢复已经取消","AbortError"));
++    const previous=pendingReadingPosition.current;
++    if(previous)finishReading(previous,new DOMException("阅读位置恢复已经替换","AbortError"));
++    return new Promise<void>((resolve,reject)=>{
++      const pending:PendingReadingPosition={position,resolve,reject,cleanup:()=>signal.removeEventListener("abort",abort),loading:false,lastBoundary:null};
++      const abort=()=>finishReading(pending,new DOMException("阅读位置恢复已经取消","AbortError"));
++      pendingReadingPosition.current=pending;signal.addEventListener("abort",abort,{once:true});setReadingRevision(value=>value+1);
++    });
++  },[conversationKey,finishReading]);
+@@
+       cancelAutoScroll,
++      captureReadingPosition,
++      restoreReadingPosition,
+     }),
+-    [cancelAutoScroll, jumpToUserPrompt],
++    [cancelAutoScroll, jumpToUserPrompt,captureReadingPosition,restoreReadingPosition],
+@@
+   useLayoutEffect(() => {
+     threadMotionRef.current?.invalidateGeometry();
+   }, [composer, hasMessages, visibleMessages.length]);
++
++  useLayoutEffect(()=>{
++    const pending=pendingReadingPosition.current;
++    if(!pending)return;
++    if(pending.position.conversationKey!==conversationKey){finishReading(pending,new DOMException("当前会话已经变化","AbortError"));return;}
++    if(!conversationReady)return;
++    const index=messages.findIndex(message=>message.role==="user"&&message.id===pending.position.promptId);
++    if(index<0){
++      if(loadingOlder||pending.loading)return;
++      if(!hasMoreBefore||!onLoadOlder){finishReading(pending,new Error("原消息当前无法读取，请核查原会话历史"));return;}
++      const boundary=messages[0]?.id??"EMPTY";
++      if(pending.lastBoundary===boundary){finishReading(pending,new Error("原会话历史读取没有前进"));return;}
++      pending.lastBoundary=boundary;pending.loading=true;
++      void Promise.resolve(onLoadOlder()).then(()=>{if(pendingReadingPosition.current===pending){pending.loading=false;setReadingRevision(value=>value+1);}}).catch(error=>finishReading(pending,error instanceof Error?error:new Error(String(error))));
++      return;
++    }
++    const scroller=scrollRef.current,prompt=scroller?findPromptElement(scroller,pending.position.promptId):null;
++    if(!scroller||!prompt){setVisibleMessageCount(count=>Math.max(count,messages.length-index));return;}
++    const key=prompt.dataset.threadDisplayUnit;
++    if(!key){finishReading(pending,new Error("原消息缺少原生显示标识"));return;}
++    pendingConversationScrollRef.current=false;pendingPromptJumpRef.current=null;
++    threadMotionRef.current?.takeUserControl();setAtBottom(false);
++    historyScrollAnchorRef.current={key,offsetTop:pending.position.offsetTop};
++    if(!reconcileHistoryScrollAnchor()){finishReading(pending,new Error("原消息阅读位置未能恢复"));return;}
++    finishReading(pending);
++  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
++  useEffect(()=>()=>{const pending=pendingReadingPosition.current;if(pending)finishReading(pending,new DOMException("原生阅读视图已经退出","AbortError"));},[finishReading]);
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+-import { ThreadViewport, type ThreadViewportHandle } from "@/components/thread/ThreadViewport";
++import { ThreadViewport, type ThreadViewportHandle,type ThreadReadingController } from "@/components/thread/ThreadViewport";
+@@
+   onDraftController?: (controller:ComposerDraftController|null)=>void;
++  onReadingController?: (controller:ThreadReadingController|null)=>void;
+@@
+   onDraftController,
++  onReadingController,
+@@
+   const viewportRef = useRef<ThreadViewportHandle | null>(null);
++  useEffect(()=>{
++    onReadingController?.({
++      captureReadingPosition:()=>viewportRef.current?.captureReadingPosition()??null,
++      restoreReadingPosition:(position,signal)=>{
++        if(!viewportRef.current)return Promise.reject(new Error("当前原生阅读视图尚未就绪"));
++        return viewportRef.current.restoreReadingPosition(position,signal);
++      },
++    });
++    return()=>onReadingController?.(null);
++  },[historyKey,onReadingController]);
+*** Update File: webui/src/App.tsx
+@@
+ import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
++import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
+@@
+   const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const nativeReading=useRef(new Map<string,ThreadReadingController>());
++  const registerNativeReading=useCallback((key:string,controller:ThreadReadingController|null)=>{
++    if(controller)nativeReading.current.set(key,controller);else nativeReading.current.delete(key);
++  },[]);
+@@
+       <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        captureReadingPosition={()=>nativeReading.current.get(activeKey??"new-conversation")?.captureReadingPosition()??null}
++        restoreReadingPosition={(position,signal)=>{
++          const reader=nativeReading.current.get(position.conversationKey);
++          if(!reader)return Promise.reject(new Error("当前原生会话阅读服务尚未就绪"));
++          return reader.restoreReadingPosition(position,signal);
++        }}
+@@
+                             onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
++                            onReadingController={controller=>registerNativeReading(activeKey??"new-conversation",controller)}
+@@
+                           onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
++                          onReadingController={controller=>registerNativeReading(paneSession.key,controller)}
+*** Update File: webui/src/App.tsx
+@@
+ import {BossConversationWorkspace} from "./boss-agent/BossConversationWorkspace";
++import {writeConversationPosition} from "./boss-agent/BossConversationPosition";
+@@
+   const onNewChat = useCallback(() => {
++    writeConversationPosition(null);
+     navigate(defaultShellRoute());
+@@
+   const onSelectChat = useCallback(
+     (key: string) => {
++      writeConversationPosition(null);
+       const selectedTemporary = temporarySessionsRef.current[key];
+*** Update File: webui/src/components/thread/ThreadViewport.tsx
+@@
+   onLoadOlder?: () => Promise<void> | void;
++  readingHistoryPending?: boolean;
++  readingHistoryError?: string|null;
+@@
+   onLoadOlder,
++  readingHistoryPending = false,
++  readingHistoryError = null,
+@@
+     const index=messages.findIndex(message=>message.role==="user"&&message.id===pending.position.promptId);
+     if(index<0){
+-      if(loadingOlder||pending.loading)return;
++      if(readingHistoryError){finishReading(pending,new Error(readingHistoryError));return;}
++      if(readingHistoryPending||loadingOlder||pending.loading)return;
+@@
+-  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
++  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingHistoryPending,readingHistoryError,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
+*** Update File: webui/src/components/thread/ThreadShell.tsx
+@@
+   const displayMessages = useMemo(() => projectWebuiThreadMessages(messages), [messages]);
++  const readingMessageIds=useMemo(()=>new Set(displayMessages.map(message=>message.id)),[displayMessages]);
++  const readingHistoryPending=loading||loadingOlder||historical.some(message=>message.role==="user"&&!readingMessageIds.has(message.id));
+@@
+             onLoadOlder={loadOlder}
++            readingHistoryPending={readingHistoryPending}
++            readingHistoryError={historyError}
+*** End Patch

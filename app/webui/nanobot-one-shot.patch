@@ -1,0 +1,22 @@
+*** Begin Patch
+*** Update File: .work/product/nanobot/webui/src/lib/nanobot-client.ts
+@@
+ interface PendingWebUIRequest extends PendingRequest<unknown> {
++  action: string;
+   serializedFrame: string;
+@@
+       this.pendingWebUIRequests.set(requestId, {
++        action,
+         resolve: (value) => resolve(value as T),
+@@
+-    for (const pending of this.pendingWebUIRequests.values()) {
++    for (const [requestId, pending] of this.pendingWebUIRequests) {
++      // 场景载入在连接中断后仅允许读取原回执。
++      if (pending.action === "boss.simulation.bi_scenario.load") {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "连接已经中断，请读取原载入回执"));
++        continue;
++      }
+       this.rawSendSerialized(pending.serializedFrame);
+*** End Patch

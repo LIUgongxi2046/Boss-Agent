@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="3.188" timestamp="2026-10-23T18:22:44.886738+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_skills" name="test_public_native_skill_read_requires_maintainer_and_live_service[None-401]" time="0.016" /><testcase classname="app.tests.test_product_skills" name="test_public_native_skill_read_requires_maintainer_and_live_service[BOSS-403]" time="0.014"><failure message="assert 404 == 403">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-skills-red/test_public_native_skill_read_1')
+role = 'BOSS', status = 403
+
+    @pytest.mark.parametrize("role,status", [(None, 401), ("BOSS", 403), ("MAINTAINER", 503)])
+    def test_public_native_skill_read_requires_maintainer_and_live_service(tmp_path, role, status):
+        store = ControlStore(tmp_path / "skills-public.sqlite")
+        store.initialize("ui-check")
+        pages = BossPageAPI(store)
+&gt;       assert pages.serve(role, "/api/boss/ui/admin/skills")[0] == status
+E       assert 404 == 403
+
+app/tests/test_product_skills.py:18: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skills" name="test_public_native_skill_read_requires_maintainer_and_live_service[MAINTAINER-503]" time="0.014"><failure message="assert 403 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-skills-red/test_public_native_skill_read_2')
+role = 'MAINTAINER', status = 503
+
+    @pytest.mark.parametrize("role,status", [(None, 401), ("BOSS", 403), ("MAINTAINER", 503)])
+    def test_public_native_skill_read_requires_maintainer_and_live_service(tmp_path, role, status):
+        store = ControlStore(tmp_path / "skills-public.sqlite")
+        store.initialize("ui-check")
+        pages = BossPageAPI(store)
+&gt;       assert pages.serve(role, "/api/boss/ui/admin/skills")[0] == status
+E       assert 403 == 503
+
+app/tests/test_product_skills.py:18: AssertionError</failure></testcase></testsuite></testsuites>

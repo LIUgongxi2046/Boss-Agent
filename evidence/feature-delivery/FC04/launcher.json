@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "launcher": "scripts/run_fc04.command",
+  "scope": "BOSS-PRIORITY-ITERATION",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-public-d24a8871-f68f-4f21-aaea-556670765593",
+  "ports": {
+    "business": 10111,
+    "webui": 10112,
+    "gateway": 20111
+  },
+  "manifest_sha256": "d5d2a2954ed7ffc59ca56b403c3bccf4f169d1075956979ba7c9cfa295312ce7",
+  "actual_boss_login": true,
+  "first_page": "F02",
+  "existing_business_rows_unchanged": 33,
+  "automatic_configuration_changes": false,
+  "automatic_business_rule_or_event_creation": false,
+  "retained_owner_plan_state": "CANCELED",
+  "independent_validation_directory": true,
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN"
+}

@@ -1237,15 +1237,16 @@
         "T03",
         "T07"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/LLD-frontend.md",
+        "docs/development/T08.md",
         "specs/page-service-map.json",
         "docs/README.md",
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["已接收T05/T06版本1.1.0和T07版本0.3.0-draft；T03视觉、全量字段/事件/页面状态语义与实际行为仍需核查，A08保持NOT_RUN。"]
     },
     {
       "id": "T09",
@@ -1255,12 +1256,17 @@
       "depends_on": [
         "T08"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/设计评审.md",
         "docs/测试与验收计划.md",
         "docs/安全检查计划.md",
         "specs/acceptance-cases.json",
+        "scripts/check_acceptance_inventory.py",
+        "validation/check_runtime_events.py",
+        "validation/check_product_log.py",
+        "validation/check_evidence_privacy.py",
+        "docs/development/T09.md",
         "docs/PRD.md",
         "docs/HLD.md",
         "docs/LLD-data.md",
@@ -1271,7 +1277,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["REV01：真实stream_end的turn_phase/turn_seq尚未通过当前事件Schema；完整语义审查、全量用例和安全执行未完成。"]
     },
     {
       "id": "T10",
@@ -1281,7 +1287,7 @@
       "depends_on": [
         "T09"
       ],
-      "state": "TODO",
+      "state": "IN_PROGRESS",
       "allowed_paths": [
         "docs/Boss-Agent项目计划.md",
         "specs/implementation-map.json",
@@ -1290,7 +1296,7 @@
         "evidence/",
         "delivery-ledger.json"
       ],
-      "blockers": []
+      "blockers": ["T09完整评审未通过；历史E00-STRATEGY环境绝对路径与当前独立目录不同，全量台账校验尚未通过。"]
     },
     {
       "id": "T11",
@@ -1314,6 +1320,14 @@
         "delivery-ledger.json",
         "app/",
         "validation/boss_page_api.py",
+        "validation/application.py",
+        "validation/role_channel.py",
+        "validation/check_product_access.py",
+        "validation/check_research_runtime.py",
+        "validation/export_runtime_transport.py",
+        "validation/desktop/",
+        "app/tests/test_product_admin_access.py",
+        "app/tests/test_boss_prompt_context_adoption.py",
         ".github/workflows/boss-agent-desktop.yml",
         "scripts/prepare_boss_webui.py",
         "scripts/run_boss_local.sh",
@@ -1321,7 +1335,7 @@
       ],
       "blockers": [
         "T05—T10 专业 LLD、OpenAPI、前端服务映射与设计评审尚未 ACCEPTED；本批为用户已授权、可回滚的研发实施切片，不得将 T11 完整验收标为通过。",
-        "开发者目标 macOS Intel 的真实 Electron 启动、DeepSeek 端到端、系统权限与截图像素对照未在本次云工具环境执行；T11/A11 运行证据尚不完整。",
+        "目标 macOS Intel 已完成真实 Electron 登录、角色权限、内容视口、身份过期、退出及重启的局部检查；全部72页面、561状态、E01—E06、系统权限和安装迁移仍需验证，视觉验收 NOT_RUN；T11/A11 证据尚不完整。",
         "上游 npm 锁定版本依赖存在审计告警，需在正式分发前分类评估影响、修复方案与回归验证，不能仅因编译成功视为安全通过。"
       ]
     },
@@ -1685,8 +1699,8 @@
       "id": "T27",
       "acceptance_ids": ["A27"],
       "depends_on": ["T11"],
-      "state": "TODO",
-      "allowed_paths": ["app/webui/BossLogin.tsx","app/webui/boss-login.css","validation/boss_account_auth.py","validation/desktop/branding.cjs","validation/desktop/branding/","scripts/provision_boss_accounts.py","app/tests/test_boss_account_auth.py","validation/desktop/check-login-polish.cjs","design/T27/","docs/development/T27.md","evidence/T27/"],
+      "state": "IN_PROGRESS",
+      "allowed_paths": ["app/webui/BossLogin.tsx", "app/webui/boss-login.css", "validation/boss_account_auth.py", "validation/desktop/branding.cjs", "validation/desktop/branding/", "scripts/provision_boss_accounts.py", "app/tests/test_boss_account_auth.py", "validation/desktop/check-login-polish.cjs", "design/T27/", "docs/development/T27.md", "evidence/T27/"],
       "blockers": []
     }
   ],
@@ -1811,7 +1825,9 @@
       "用户 2026-10-21 要求审查待确认事项与需求承接，增加逐功能线框，核查六类 Agent 组件，用户端和管理端基于开源项目扩展；docs/项目决策记录.md D01、D08、D16",
       "用户 2026-10-21 指定执行 T03，使用 S003-1/S003-2 形成交互与页面规范，继承 48 个线框；T02 形成前继续业务定义，框架绑定等待复用证据，当前不调用视觉功能。",
       "用户 2026-10-21 明确要求最终交付高保真设计稿和素材包；docs/交互与页面规范.md 第 13 节、docs/项目决策记录.md D08。",
-      "用户 2026-10-22 要求先做电脑桌面端产品并更新相关内容；docs/项目决策记录.md D17。"
+      "用户 2026-10-22 要求先做电脑桌面端产品并更新相关内容；docs/项目决策记录.md D17。",
+      "用户2026-10-23新增T27登录和桌面改进；项目计划第13.12—13.15节，停止监督不取消开发。",
+      "用户2026-10-23持续授权相同DeepSeek服务和现有SIMULATED selection范围检查；项目计划第13.16节。"
     ]
   }
 }

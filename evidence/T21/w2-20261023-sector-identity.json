@@ -1,0 +1,154 @@
+{
+  "status": "PASS_SECTOR_SCOPE_AND_IDENTITY_COMPONENT",
+  "task_id": "T21",
+  "related_tasks": [
+    "T22",
+    "T23"
+  ],
+  "source_commit": "a6625b9",
+  "working_changes_included": true,
+  "source_type": "SIMULATED",
+  "external_api_mode": "SIMULATED_FIRST",
+  "checks": [
+    {
+      "check_id": "SECTOR-PAGE-FILTER-BOUNDARY",
+      "status": "PASS",
+      "source": "evidence/T21/w2-20261023-sector-scope-ui.txt",
+      "sha256": "cfcdefcd06caddd16d957a7e1bb8f92d2b09191d10fd90bbf2c2e4df3d2b566c"
+    },
+    {
+      "check_id": "SECTOR-ACTUAL-PENDING-PAGE-CHANGE",
+      "status": "PASS_PENDING",
+      "source": "evidence/T21/w2-20261023-sector-pending-ui.txt",
+      "sha256": "6d6911ca461cfd83e65eee0ce1949ae1e3204bc8ea475cc6eae952cd63644626"
+    },
+    {
+      "check_id": "SECTOR-RESUMED-READ-CURRENT-PAGE",
+      "status": "PASS",
+      "source": "evidence/T21/w2-20261023-sector-resumed-ui.txt",
+      "sha256": "04a22cc30a9aefd05dfd52cbb0260f89a872d27d21fc93061ac4216b6ce62d9b"
+    },
+    {
+      "check_id": "SECTOR-PROVIDER-IDENTITY-BOUNDARY",
+      "status": "PASS",
+      "source": "evidence/T21/w2-20261023-sector-identity-ui.txt",
+      "sha256": "f101e4199d3334deeb57c109d396f0ecebd6e1fbbff71410250ceb4f45d0966c"
+    }
+  ],
+  "all_page_observations": [
+    {
+      "page_id": "F14",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F15",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F16",
+      "filter_count": 3,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F17",
+      "filter_count": 3,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F18",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F19",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F20",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F21",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F22",
+      "filter_count": 6,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "F23",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "V19-BEEF",
+      "filter_count": 5,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "V19-EGG",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    },
+    {
+      "page_id": "V19-MILK",
+      "filter_count": 4,
+      "unknown_metrics_preserved": true
+    }
+  ],
+  "page_count": 13,
+  "actual_database_matches_original_initialization": true,
+  "audit_count": 0,
+  "object_counts": {
+    "task": 0,
+    "outbox": 0,
+    "message_outbox": 0,
+    "runtime_run": 0
+  },
+  "new_model_requests": 0,
+  "new_stt_requests": 0,
+  "new_external_api_requests": 0,
+  "actual_upstream_provider_used": true,
+  "upstream_source_revision": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+  "upstream_source_sha256": {
+    "webui/src/providers/ClientProvider.tsx": "ea80a6b993abfc28169b68dec37e692a2294fbf80074db289a28d85320b24850",
+    "webui/src/lib/nanobot-client.ts": "d77cb44be9562591f72f87c0e3c37557f2ee8d23ca04443b949dbd326741b46a",
+    "webui/src/lib/runtime.ts": "23381ec8c4d538dfb82946bebcc938e896764b88d9a26f25307b7805229c9a07",
+    "webui/src/lib/types.ts": "fa72bcd12f5a42be81bfdbb192d75d6b5bbcc43b1a14490c6fb6d31e4918cfd1"
+  },
+  "source_sha256": {
+    "app/webui/BossSectorView.tsx": "5b7602740cbf88f88a6666e0c12794c8e371544f4619d21a6780cc664f16e072",
+    "validation/boss_sector_api.py": "5b5ad75cde87bd11fcde265a15b38ac45d670f45cd959c6299b9d3f5f3744b3b",
+    "validation/controls.py": "ab7c891334530425a9d5b8f3e69f2d691086fa7ccbf72349eb6b9e989bbcf9de",
+    "validation/business.py": "f96822557b6b2e24a68ab0511c311d91f30dae17871b5d1f2d9293f98870b8cd",
+    "evidence/T21/check_sector_identity_results.py": "13998c37c547046c5846db3cec60e5adaf1b4e3e062c545b45935852f2331bc2",
+    "evidence/T21/check_sector_identity_server.py": "c4ac4ab38fcc042a8585295942ea7fa92795826d6f01f09b078a415d440a3ff9",
+    "evidence/T21/check_sector_identity_ui.js": "abd9c5d78d796c6667d44fe36e4256b32f895663215bc296731631628a2777eb",
+    "evidence/T21/check_sector_pending.sh": "c5fcb0ebd33f4b91339d45aec3ec94efae60d54d773614f36ec896b141499a34",
+    "evidence/T21/check_sector_pending_ui.js": "bacc3f8a9efc2881179160f00589c7d73eb2743c6f230642f9f6408397020de8",
+    "evidence/T21/check_sector_resumed_ui.js": "61e38d68f4d0464e19b71970a87417612cadb72471276871b00f22769ebbb30a",
+    "evidence/T21/check_sector_scope_ui.js": "79b7ade1236109574027eea0a0d6646280f443ac945c7be967fad7ec06f85b55",
+    "evidence/T21/sector-ui/index.html": "9ffea2caca74ccef9808c37cf17363455e4adecdeea6648e19a47d1bc6cfb360",
+    "evidence/T21/sector-ui/main.tsx": "7b55253e5285448f31bf4e108c5d5ac911ebb5116cb49f65f9e7619c112950bb",
+    "evidence/T21/sector-ui/tsconfig.json": "7c2f60166e93f8c04a11ae8f9a1dcc4efe4784a689aa308d5d2bd5cf0300807b",
+    "evidence/T21/sector-ui/vite.config.mjs": "a32132a4139698e7a425b6d263e4bce86b2eacec06cd69a82ae1d6387c16922a"
+  },
+  "build_sha256": {
+    ".work/w2-checks/sector-ui/dist/assets/index-C1LrfUq5.js": "d7a85418189e83c54161a133d751a5f79e7f61541ebeab83d1963c6953191188",
+    ".work/w2-checks/sector-ui/dist/assets/index-Da2yoTAn.css": "36603aafc587d43f50a2d6ab2a548c3f6fe00968b03b1682c8615d869aa6ded1"
+  },
+  "screenshots_taken": false,
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "visual_acceptance": "NOT_RUN",
+  "model_conversation_integration": "NOT_RUN",
+  "sector_calculation_acceptance": "NOT_RUN",
+  "full_A21_accepted": false,
+  "full_A22_accepted": false,
+  "full_A23_accepted": false
+}

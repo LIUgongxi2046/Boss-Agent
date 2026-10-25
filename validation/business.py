@@ -2,15 +2,20 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from datetime import datetime, timezone
-from decimal import Decimal
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parent
 SPEC = json.loads((ROOT.parent / "specs/selection-probe.json").read_text())
+TOOL_SCHEMA_EXTENSION = json.loads((ROOT.parent / "specs/business-tools.schema.json").read_text())
+BI_SCHEMA = json.loads((ROOT.parent / "specs/bi-query.schema.json").read_text())
+LEGACY_BI_DEFS = {"legacy_query_input": SPEC["io_schema"]["$defs"]["query_input"], "legacy_query_output": SPEC["io_schema"]["$defs"]["query_output"]}
+SPEC["io_schema"] = {**SPEC["io_schema"], "$id": TOOL_SCHEMA_EXTENSION["$id"],
+                     "$defs": {**SPEC["io_schema"]["$defs"], **TOOL_SCHEMA_EXTENSION["$defs"], **LEGACY_BI_DEFS, **BI_SCHEMA["$defs"]}}
 OPERATIONS = {item["operation_id"]: item for item in SPEC["operations"]}
 
 
@@ -108,12 +113,18 @@ class Store:
         require(row is not None and row[0] == 1, "执行空间已失效")
 
     def authorize(self, ns, action, payload):
-        require(action in ("create_assignment", "send_assignment", "extend_assignment", "complete_assignment"), "动作无效", web.HTTPBadRequest)
-        auth_id = str(uuid.uuid4())
         with self.connect() as db:
-            self.active(db, ns)
-            self.put(db, ns, "authorization", auth_id, {"authorization_id": auth_id, "owner_id": "boss-1", "issuer_identity": "BOSS", "issuer": "boss-1", "source_instruction_id": str(uuid.uuid4()), "source_instruction": encode(payload), "action": action, "target_id": payload.get("task_id", "new-assignment"), "content_version": payload.get("content_version", "1"), "scope": ns, "payload": payload, "version": "1", "revoked": False, "revoked_at": None, "valid_from": now(), "valid_until": "2027-01-01T00:00:00+08:00"})
-            self.put(db, ns, "authorization_binding", action, {"authorization_id": auth_id, "idempotency_key": checksum({"action": action, "payload": payload})})
+            db.execute("BEGIN IMMEDIATE")
+            return self.authorize_in_transaction(db, ns, action, payload)
+
+    def authorize_in_transaction(self, db, ns, action, payload):
+        require(action in ("create_assignment", "send_assignment", "extend_assignment", "complete_assignment"), "动作无效", web.HTTPBadRequest)
+        self.active(db, ns)
+        data = self.get(db, ns, "initial", "snapshot")
+        auth_id = str(uuid.uuid4())
+        issued = datetime.now(timezone.utc)
+        self.put(db, ns, "authorization", auth_id, {"authorization_id": auth_id, "owner_id": data["owner_id"], "issuer_identity": "BOSS", "issuer": data["owner_id"], "source_instruction_id": str(uuid.uuid4()), "source_instruction": encode(payload), "action": action, "target_id": payload.get("task_id", "new-assignment"), "content_version": payload.get("content_version", payload.get("task_version", "1")), "scope": ns, "payload": payload, "version": "1", "revoked": False, "revoked_at": None, "valid_from": issued.isoformat(), "valid_until": (issued + timedelta(minutes=15)).isoformat()})
+        self.put(db, ns, "authorization_binding", action, {"authorization_id": auth_id, "idempotency_key": checksum({"action": action, "payload": payload})})
         return auth_id
 
     def invoke(self, operation, payload):
@@ -127,78 +138,213 @@ class Store:
             self.active(db, ns)
             data = self.get(db, ns, "initial", "snapshot")
             if operation in ("create_assignment", "send_assignment"):
-                auth = self.get(db, ns, "authorization", payload["authorization_id"])
-                require(not auth["revoked"] and auth["action"] == operation and datetime.fromisoformat(auth["valid_until"]) > datetime.now(timezone.utc), "授权无效", web.HTTPForbidden)
                 content = {k: v for k, v in payload.items() if k not in ("envelope", "authorization_id", "idempotency_key")}
-                require(content == auth["payload"], "授权对象或内容版本不符", web.HTTPForbidden)
                 digest = checksum(content)
                 previous = db.execute("SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?", (ns, operation, payload["idempotency_key"])).fetchone()
                 if previous:
                     require(previous[0] == digest, "幂等内容冲突")
                     return json.loads(previous[1])
+                auth = self.get(db, ns, "authorization", payload["authorization_id"])
+                require(auth["authorization_id"] == payload["authorization_id"], "授权标识与当前对象不符", web.HTTPForbidden)
+                self.require_current_authorization(auth, ns, data, operation, content)
+                require(content == auth["payload"], "授权对象或内容版本不符", web.HTTPForbidden)
+                used = db.execute("SELECT id FROM objects WHERE namespace=? AND kind=? AND json_extract(body,'$.authorization_id')=?",
+                                  (ns, "task" if operation == "create_assignment" else "outbox", payload["authorization_id"])).fetchone()
+                require(used is None, "当前授权已经产生业务结果，请查询原请求回执")
             result = getattr(self, operation)(db, ns, data, payload)
             validate(OPERATIONS[operation]["output_schema"].rsplit("/", 1)[1], result)
             if operation in ("create_assignment", "send_assignment"):
                 db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (ns, operation, payload["idempotency_key"], digest, encode(result)))
-            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(payload), encode(result), now()))
+            audit_input = {"request_id": env["request_id"], "session_id": env["session_id"],
+                           "owner_id": env["owner_id"], "dataset_id": env["dataset_id"], "dataset_version": env["dataset_version"],
+                           **{key: payload[key] for key in ("authorization_id", "idempotency_key", "task_id", "query_id") if key in payload}}
+            audit_output = {key: result[key] for key in (
+                "task_id", "query_id", "status", "version", "message_id", "message_status",
+                "task_status", "task_version", "authorization_id", "execution_namespace",
+            ) if key in result}
+            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, operation, encode(audit_input), encode(audit_output), now()))
         return result
 
-    def source(self):
-        return {"source_id": "finance-note", "source_type": "SIMULATED", "version": "1", "locator": "sqlite:documents/finance-note", "business_as_of": "2026-10-10T23:59:59+08:00", "source_updated_at": "2026-10-11T08:00:00+08:00", "read_at": now(), "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": "COMPLETE"}
+    def require_current_authorization(self, authorization, ns, data, operation, content):
+        require(authorization.get("owner_id") == data["owner_id"] and authorization.get("scope") == ns
+                and authorization.get("issuer_identity") == "BOSS" and authorization.get("issuer") == data["owner_id"]
+                and authorization.get("action") == operation and authorization.get("revoked") is False
+                and authorization.get("target_id") == content.get("task_id", "new-assignment")
+                and authorization.get("content_version") == content.get("content_version", content.get("task_version", "1")),
+                "授权身份、范围或内容版本不符", web.HTTPForbidden)
+        start = datetime.fromisoformat(authorization["valid_from"])
+        end = datetime.fromisoformat(authorization["valid_until"])
+        require(start.tzinfo is not None and end.tzinfo is not None and start <= datetime.now(timezone.utc) < end,
+                "当前授权尚未生效或已经到期", web.HTTPForbidden)
+
+    def assignment_sources(self, db, ns, data, source_ids):
+        from boss_source_access import require_current_simulated_source
+        require(source_ids and len(set(source_ids)) == len(source_ids), "交办来源缺少或重复", web.HTTPBadRequest)
+        clock = self.get(db, ns, "clock", "current")["at"]
+        documents = {source_id: require_current_simulated_source(self.get(db, ns, "document", source_id), data["owner_id"], clock)
+                     for source_id in source_ids}
+        from boss_supply_quality import DEFINITION, require_external_source_dependencies, external_adoption
+        for document in documents.values():
+            if document.get("simulation_definition") == DEFINITION:
+                require_external_source_dependencies(self, db, ns, data, document)
+            elif document.get("simulation_definition") == "FC04-ALERT-1":
+                require(external_adoption(db, ns, data, clock, document)["state"] == "CURRENT", "经营报告的原始依据已变化，需要重新载入当前资料")
+        return documents
+
+    def require_current_assignment_sources(self, db, ns, data, task):
+        documents = self.assignment_sources(db, ns, data, task["source_refs"])
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='assignment_source_binding' AND id=?", (ns, task["task_id"])).fetchone()
+        require(row is not None, "交办缺少创建时来源绑定，需要本人重新核查")
+        binding = json.loads(row[0])
+        require(binding["task_id"] == task["task_id"] and binding["owner_id"] == data["owner_id"] and binding["dataset_id"] == data["dataset_id"]
+                and binding["dataset_version"] == data["dataset_version"], "交办来源绑定不属于当前范围", web.HTTPForbidden)
+        require(set(binding["source_versions"]) == set(documents) == set(binding["source_fingerprints"])
+                and all(binding["source_versions"][identifier] == document["version"]
+                        and binding["source_fingerprints"][identifier] == checksum(document) for identifier, document in documents.items()),
+                "交办来源版本或内容已经变化，需要重新核查")
+        if task.get("origin_source_id"):
+            source_id = task["origin_source_id"]
+            origin = self.assignment_sources(db, ns, data, [source_id])[source_id]
+            require(binding.get("origin_source") == {"source_id": source_id, "version": origin["version"], "sha256": checksum(origin)},
+                    "交办原始纪要的来源已经变化，需要重新核查")
+
+    def require_current_coordinator(self, db, ns, data, coordinator_id):
+        contacts = [contact for contact in data["contacts"] if contact["contact_id"] == coordinator_id]
+        require(len(contacts) == 1, "负责人不在当前获准资料内", web.HTTPForbidden)
+        today = datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]).astimezone(ZoneInfo(data["boss_profile"]["timezone"])).date()
+        require(date.fromisoformat(contacts[0]["valid_from"]) <= today <= date.fromisoformat(contacts[0]["valid_until"]),
+                "负责人在当前业务时间已经失效", web.HTTPForbidden)
+
+    def _metric_source(self, db, ns, data):
+        from boss_source_access import require_current_simulated_source
+        document = self.get(db, ns, "document", "finance-note")
+        require(document["source_id"] == "finance-note", "资料标识与当前引用不符", web.HTTPForbidden)
+        return require_current_simulated_source(document, data["owner_id"], self.get(db, ns, "clock", "current")["at"])
+
+    def source(self, document, data, quality_state):
+        as_of = datetime.combine(date.fromisoformat(data["periods"]["CURRENT"][1]), time(23, 59, 59), ZoneInfo(data["boss_profile"]["timezone"]))
+        return {"source_id": document["source_id"], "source_type": document["source_type"], "version": document["version"],
+                "locator": document["original_locator"], "business_as_of": as_of.isoformat(),
+                "source_updated_at": document["published_at"], "read_at": now(),
+                "coverage": "region-1 水产饲料外销，两个十日期间", "quality_state": quality_state}
 
     def query_metrics(self, db, ns, data, p):
-        document = self.get(db, ns, "document", "finance-note")
-        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
+        if p.get("query_mode") == "SCOPED":
+            from boss_bi_queries import query_metrics
+            return query_metrics(self, db, ns, data, p)
+        from boss_metrics import aggregate_metrics, compare_metrics
+        document = self._metric_source(db, ns, data)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
         require([p["period_start"], p["period_end"]] == data["periods"]["CURRENT"] and [p["comparison_start"], p["comparison_end"]] == data["periods"]["BASE"], "期间不可比", web.HTTPBadRequest)
         require(set(p["product_ids"]) <= {"product-1", "product-2"}, "产品资料缺少", web.HTTPBadRequest)
         records = [r for r in data["details"] if r["product_id"] in p["product_ids"]]
         values = []
+        missing = []
+        period_metrics = {}
         for period in ("BASE", "CURRENT"):
             group = [r for r in records if r["period"] == period]
-            q, r, c = [sum(Decimal(row[key]) for row in group) for key in ("quantity_tonnes", "revenue_cny", "cost_cny")]
-            metrics = {"sales_quantity": (q, "吨", "SUM(quantity_tonnes)"), "revenue": (r, "CNY", "SUM(revenue_cny)"), "cost": (c, "CNY", "SUM(cost_cny)"), "gross_profit": (r-c, "CNY", "revenue-cost"), "gross_margin": ((r-c)/r*100 if r else None, "%", "gross_profit/revenue*100"), "gross_profit_per_tonne": ((r-c)/q if q else None, "CNY/吨", "gross_profit/quantity")}
+            computed = aggregate_metrics(group)
+            metrics = computed["metrics"]
+            period_metrics[period] = metrics
+            missing.extend(period + ":" + field for field in computed["missing_fields"])
             for metric in p["metric_ids"]:
                 value, unit, formula = metrics[metric]
                 values.append({"metric_id": metric, "period_scope": period, "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
-        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source()], "missing_fields": [], "unexplained_causes": ["原因贡献明细尚未提供"]}
+        for metric, (value, unit, formula) in compare_metrics(period_metrics["BASE"], period_metrics["CURRENT"]).items():
+            if metric in p["metric_ids"]:
+                values.append({"metric_id": metric, "period_scope": "CHANGE", "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
+        result = {"query_id": str(uuid.uuid4()), "envelope": p["envelope"], "values": values, "detail_refs": [r["record_id"] for r in records], "sources": [self.source(document, data, "INCOMPLETE" if missing else "COMPLETE")], "missing_fields": missing, "unexplained_causes": ["原因贡献明细尚未提供"]}
         self.put(db, ns, "query", result["query_id"], result)
+        self.put(db, ns, "query_source_binding", result["query_id"], {
+            "query_id": result["query_id"], "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
+            "source_id": document["source_id"], "source_version": document["version"], "source_sha256": checksum(document),
+            "detail_fingerprints": {row["record_id"]: checksum(row) for row in records},
+        })
         return result
 
     def read_evidence(self, db, ns, data, p):
         query = self.get(db, ns, "query", p["query_id"])
+        if "context_snapshot" in query:
+            from boss_bi_queries import read_evidence
+            return read_evidence(self, db, ns, data, p, query)
         require(set(p["detail_refs"]) <= set(query["detail_refs"]) and p["source_ids"] == ["finance-note"], "依据范围不符", web.HTTPForbidden)
-        document = self.get(db, ns, "document", "finance-note")
-        require(not document.get("withdrawn", False), "资料已经撤销", web.HTTPGone)
-        return {"sources": [self.source()], "original_records": [{"record_id": r["record_id"], "version": r["version"], "content": r} for r in data["details"] if r["record_id"] in p["detail_refs"]] + [{"record_id": "finance-note", "version": "1", "content": document}], "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
+        document = self._metric_source(db, ns, data)
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='query_source_binding' AND id=?", (ns, p["query_id"])).fetchone()
+        require(row is not None, "查询缺少完整来源绑定，需要重新查询")
+        binding = json.loads(row[0])
+        require(binding["owner_id"] == data["owner_id"] and binding["dataset_id"] == data["dataset_id"]
+                and binding["dataset_version"] == data["dataset_version"], "查询绑定不属于当前范围", web.HTTPForbidden)
+        require(binding["source_id"] == document["source_id"] and binding["source_version"] == document["version"]
+                and binding["source_sha256"] == checksum(document), "来源版本或内容已经变化，需要重新查询")
+        records = [record for record in data["details"] if record["record_id"] in p["detail_refs"]]
+        require(len(records) == len(p["detail_refs"]) and all(binding["detail_fingerprints"][record["record_id"]] == checksum(record) for record in records),
+                "明细版本或内容已经变化，需要重新查询")
+        return {"sources": [self.source(document, data, query["sources"][0]["quality_state"])],
+                "original_records": [{"record_id": record["record_id"], "version": record["version"], "content": record} for record in records]
+                + [{"record_id": document["source_id"], "version": document["version"], "content": document}],
+                "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
 
     def create_assignment(self, db, ns, data, p):
-        require(p["coordinator_id"] == "coordinator-1" and p["related_meeting_id"] == "meeting-1" and p["related_event_ids"] == ["event-1"], "关联对象不符", web.HTTPBadRequest)
-        require(p["timezone"] == "Asia/Shanghai" and set(p["source_refs"]) == {"finance-note"}, "时区或来源不符", web.HTTPBadRequest)
+        from boss_supply_quality import DEFINITION
+        require(p["coordinator_id"] == "coordinator-1", "负责人不属于当前业务范围", web.HTTPBadRequest)
+        if p["related_meeting_id"] is not None:
+            row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='meeting' AND id=?", (ns, p["related_meeting_id"])).fetchone()
+            meeting = json.loads(row[0]) if row else data["meeting"]
+            require(meeting["meeting_id"] == p["related_meeting_id"] and meeting["owner_id"] == data["owner_id"], "关联会议不属于当前本人范围", web.HTTPForbidden)
+        require(len(set(p["related_event_ids"])) == len(p["related_event_ids"]), "关联事件重复", web.HTTPBadRequest)
+        for identifier in p["related_event_ids"]:
+            row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event' AND id=?", (ns, identifier)).fetchone()
+            event = json.loads(row[0]) if row else data["event"]
+            # 正式维护事件从当前namespace继承本人；显式归属仍必须一致。
+            require(event["event_id"] == identifier and event.get("owner_id", data["owner_id"]) == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
+        documents = self.assignment_sources(db, ns, data, p["source_refs"])
+        require(all(identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1") for identifier, document in documents.items()),
+                "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
+        self.require_current_coordinator(db, ns, data, p["coordinator_id"])
+        due = datetime.fromisoformat(p["due_at"])
+        from zoneinfo import available_timezones
+        require(p["timezone"] in available_timezones(), "交办时区无效", web.HTTPBadRequest)
+        require(due.astimezone(ZoneInfo(p["timezone"])).utcoffset() == due.utcoffset(), "交办期限与时区不符", web.HTTPBadRequest)
+        require(due.tzinfo is not None and due > datetime.fromisoformat(self.get(db, ns, "clock", "current")["at"]),
+                "交办期限必须晚于当前业务时间", web.HTTPBadRequest)
         task_id = str(uuid.uuid4())
         task = {k: p[k] for k in ("purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements", "authorization_id", "related_meeting_id", "related_event_ids", "source_refs")}
+        task["source_versions"] = {identifier: document["version"] for identifier, document in documents.items()}
         task.update(task_id=task_id, status="OPEN", version="1", message_ids=[], feedback_ids=[], completion_authorization_id=None, execution_namespace=ns)
         self.put(db, ns, "task", task_id, task)
+        self.put(db, ns, "assignment_source_binding", task_id, {
+            "task_id": task_id, "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
+            "source_versions": {identifier: document["version"] for identifier, document in documents.items()},
+            "source_fingerprints": {identifier: checksum(document) for identifier, document in documents.items()},
+        })
         return {"task_id": task_id, "status": "OPEN", "version": "1", "authorization_id": p["authorization_id"], "execution_namespace": ns, "persisted_at": now()}
 
     def send_assignment(self, db, ns, data, p):
         task = self.get(db, ns, "task", p["task_id"])
         require(task["version"] == p["task_version"] and task["status"] == "OPEN", "任务版本或状态冲突")
         require(task["coordinator_id"] == p["recipient_id"], "收件人不符", web.HTTPForbidden)
-        result = {"message_id": str(uuid.uuid4()), "task_id": p["task_id"], "message_status": "SENT", "task_status": "WAITING_FEEDBACK", "task_version": "2", "source_type": "SIMULATED", "sent_at": now()}
+        self.require_current_coordinator(db, ns, data, p["recipient_id"])
+        self.require_current_assignment_sources(db, ns, data, task)
+        new_version = str(int(task["version"]) + 1)
+        result = {"message_id": str(uuid.uuid4()), "task_id": p["task_id"], "message_status": "SENT", "task_status": "WAITING_FEEDBACK", "task_version": new_version, "source_type": "SIMULATED", "sent_at": now()}
         self.put(db, ns, "outbox", result["message_id"], {**p, **result})
-        task.update(status="WAITING_FEEDBACK", version="2", message_ids=[result["message_id"]])
+        task.update(status="WAITING_FEEDBACK", version=new_version, message_ids=[result["message_id"]])
         self.put(db, ns, "task", p["task_id"], task)
         return result
 
     def read_assignment(self, db, ns, data, p):
-        return self.get(db, ns, "task", p["task_id"])
+        task = self.get(db, ns, "task", p["task_id"])
+        fields = SPEC["io_schema"]["$defs"]["read_output"]["properties"]
+        return {field: task[field] for field in fields if field in task}
 
     def context(self, ns):
+        from boss_memory import confirmed_memory
         with self.connect() as db:
+            db.execute("BEGIN")
             self.active(db, ns)
             memory = self.get(db, ns, "memory", "current")
-            return {"memory": memory if memory["confirmation_state"] == "CONFIRMED" else None, "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
+            data = self.get(db, ns, "initial", "snapshot")
+            return {"memory": confirmed_memory(db, ns, memory, data["owner_id"]), "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
 
     def notify(self, ns, event_id):
         with self.connect() as db:

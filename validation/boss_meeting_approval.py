@@ -17,6 +17,8 @@ from datetime import datetime
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_meetings import meeting_materials
+from boss_source_access import require_current_business_source
 
 NS = "ui-check"
 ENTRY_KINDS = frozenset({"OPINION", "SUGGESTION", "DECISION", "ASSIGNMENT_DRAFT"})
@@ -41,6 +43,7 @@ def valid_source(api, db, owner_id, source_id, version):
     require(isinstance(source_id, str) and isinstance(version, str),
             "来源和版本缺少", web.HTTPBadRequest)
     doc = api._require_current_source(db, {"owner_id": owner_id}, source_id)
+    require_current_business_source(api.store, db, NS, owner_id, source_id)
     require(doc["version"] == version, "来源版本已经变化")
     return doc
 
@@ -57,6 +60,7 @@ def currency_amount(value):
 
 
 def minutes_save(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "meeting_id", "meeting_version",
         "source_id", "source_version", "expected_version", "entries",
@@ -124,6 +128,7 @@ def minutes_save(api, db, data, payload):
 
 
 def minutes_confirm(api, db, data, payload):
+    data = meeting_materials(db, data)
     api._exact(payload, {
         "client_request_id", "meeting_id", "expected_version",
         "source_id", "source_version",
@@ -178,6 +183,7 @@ def minutes_assignment_create(api, db, data, payload, key):
         "entry_id", "purpose", "coordinator_id", "due_at",
         "timezone", "evidence_requirements",
     })
+    data = meeting_materials(db, data)
     meeting = data["meeting"]
     require(payload["meeting_id"] == meeting["meeting_id"],
             "交办草稿所属会议不符", web.HTTPBadRequest)
@@ -240,6 +246,9 @@ def minutes_assignment_create(api, db, data, payload, key):
     task = api.store.get(db, NS, "task", task_id)
     task.update(origin)
     api.store.put(db, NS, "task", task_id, task)
+    binding = api.store.get(db, NS, "assignment_source_binding", task_id)
+    binding["origin_source"] = {"source_id": doc["source_id"], "version": doc["version"], "sha256": checksum(doc)}
+    api.store.put(db, NS, "assignment_source_binding", task_id, binding)
     link = {
         "link_id": link_id,
         "meeting_id": meeting["meeting_id"],
@@ -302,6 +311,8 @@ def application_seed(api, db, data, payload):
         "author_contact_id": payload["applicant_contact_id"],
         "access_scope": data["owner_id"],
         "published_at": now(), "withdrawn": False,
+        "valid_from": api.store.get(db, NS, "clock", "current")["at"],
+        "valid_until": None, "validity_state": "VALID",
         "original_locator": "sqlite:applications/" + source_id,
         "content": attachment,
     }
@@ -372,6 +383,9 @@ def application_revise(api, db, data, payload):
     doc["version"] = str(int(doc["version"]) + 1)
     doc["content"] = attachment
     doc["published_at"] = now()
+    doc["valid_from"] = api.store.get(db, NS, "clock", "current")["at"]
+    doc["valid_until"] = None
+    doc["validity_state"] = "VALID"
     doc["withdrawn"] = False
     doc["withdrawn_at"] = None
     doc["replaced_source_version"] = old_version

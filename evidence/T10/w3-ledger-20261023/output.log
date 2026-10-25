@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py", line 125, in <module>
+    main()
+  File "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py", line 121, in main
+    print(json.dumps(validate(args.ledger.resolve(strict=True), args.require_complete), ensure_ascii=False, indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py", line 97, in validate
+    receipts[eid] = verify_receipt(item, data["baseline"], path.parent)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py", line 37, in verify_receipt
+    require(any(Path(item["path"]).resolve(strict=True) == environment for item in receipt["inputs"]), "UNBOUND_ENVIRONMENT", evidence["id"])
+  File "/Users/liuhaoxian/.agents/skills/haonan-s000-pmp/scripts/validate_delivery.py", line 12, in require
+    raise ValueError(f"{code}: {detail}")
+ValueError: UNBOUND_ENVIRONMENT: E00-STRATEGY

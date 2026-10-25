@@ -56,6 +56,8 @@ def synchronize_task_due(store, db, task, *, reason):
         "transition_reason": reason,
         "automatic_external_delivery": False,
     }
+    if old and old.get("owner_plan_id"):
+        data["owner_plan_id"] = old["owner_plan_id"]
     store.put(db, NS, "event", event_id, data)
     return {
         "event_id": event_id, "event_version": version,

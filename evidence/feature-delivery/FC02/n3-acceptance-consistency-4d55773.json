@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "producer": "N3",
+  "candidate_commit": "4d55773baad5aad218771146b98c399041983b5e",
+  "implementation_commit": "d9b5b45467a56671ca6c212a292a25af1850d050",
+  "independent_result": "PASS",
+  "release_decision": "GO",
+  "verified_checkpoints": 20,
+  "total_checkpoints": 20,
+  "unchanged_dependencies": 317,
+  "prepared_sources": 41,
+  "source_sha256": {
+    "app/webui/BossBIView.tsx": "b63576e42de40803ac2ee192fb5c2109834d96ede111d547244cec6e386b97a9",
+    "app/webui/BossDesktop.tsx": "f7ce3d8253c115f42e4d440c8961113f857cc70e3204d528a3e8722732c790c2",
+    "app/webui/boss-v6.css": "44d42f713499bc4142912bbe108cf86e5d95ad4832e2f9522a6d662441d58b33",
+    "app/webui/BIBasisComparison.tsx": "6d477bfca1b02af98eca3beef6783a735da2027b28bb8ebfc8c7854fd4b06f14",
+    "app/webui/MaintainerBIScenarios.tsx": "b0ad69c322d19aee5694dcde7e21969dfe873ff87ab0e2d306b5c8fa99f9dc30",
+    "app/webui/nanobot-one-shot.patch": "98137a7b05abecf3ace02cff41d03f0243e248de898376727075a9765edadbcd",
+    "validation/boss_bi_queries.py": "1a6237d88e51e6dbc660c0385ccdcdd02dd68c708238de636a3eef32a685317e",
+    "app/tests/test_fc02_followup_sources.py": "c8b6247dca4352fa1d4923d42e3f5c5b4ab879bc3dfc18e4febced89a6a7a7cc"
+  },
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "index_sha256": "8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6",
+  "native_client_sha256": "48ae362a2d6ae0a3d817765a4e34459c3b77255e70bebd0205b7403c2fbe5527",
+  "independent_cases": {
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independent_evidence_sha256": {
+    "docs/feature-delivery/FC02/verdict.json": "528ba1fe942bbde42f9e0c34de04e78825e1539d85d5328a5fc6e5d5f95cc64d",
+    "docs/feature-delivery/FC02/qa.md": "7af7699bcc023ba0469e1cd161b9cf5ca395030d35260e60be7b844333f84f0c",
+    "evidence/feature-delivery/FC02/preflight-4d55773.json": "461b6be6596bc256579c5a29135541e202a6acfbd969b197b73a45d6f183a2ef",
+    "evidence/feature-delivery/FC02/followup-targets-4d55773.xml": "1c7919b82b256070efe08eaa5d0c237d1114ee842b4cb8ffbe19ede6c9a9658c",
+    "evidence/feature-delivery/FC02/followup-public-4d55773.json": "1c6b238a87568a6657d8f63eac569d11b72f9306a4c31611c90ed96ef3aaff37",
+    "evidence/feature-delivery/FC02/verdict-consistency-4d55773.json": "5caffcff20f9c54c6e7cad436d1c13c3b19f2595b42226f57e4c2d0e2fb79f31"
+  },
+  "failure_response_evidence": {
+    "child_source_failed_runtime": "FAILED",
+    "child_source_tool_error": "query_metrics/HTTPGone",
+    "child_source_websocket_response": null,
+    "immediate_error_response_verified": false,
+    "native_client_timeout_ms": 20000,
+    "observed_submission_and_dom_ms": 21022,
+    "observed_duration_is_sla": false,
+    "native_same_page_error_and_original_id_displayed": true,
+    "same_page_read_only_receipt": "FAILED/NOT_FOUND_IN_CURRENT_STORE",
+    "failed_request_replayed": false,
+    "query_count_before_and_after_recovery": 2,
+    "criterion": "E01—E06要求真实终态、失败位置、依赖终止、不伪报成功和原请求恢复；当前通过原生超时/错误提示及只读恢复实际验证，没有即时错误帧通过声明"
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "legacy_parent_tasks_accepted": false
+}

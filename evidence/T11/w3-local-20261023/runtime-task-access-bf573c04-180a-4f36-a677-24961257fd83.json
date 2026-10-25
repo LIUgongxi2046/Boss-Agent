@@ -1,0 +1,82 @@
+{
+  "status": "PASS_PUBLIC_RUNTIME_TASK_REFERENCE_ACTUAL_STORE",
+  "run_id": "runtime-task-access-bf573c04-180a-4f36-a677-24961257fd83",
+  "at": "2026-10-23T10:15:09.220Z",
+  "inputs": [
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "f33c1f8ecbb5842e838022e38aebff4bf59b6e9929425d7d8acad07e0e89a930"
+    },
+    {
+      "path": "validation/runtime_records_query.py",
+      "sha256": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502"
+    },
+    {
+      "path": "validation/desktop/check-runtime-task-access.cjs",
+      "sha256": "badee16d183b63528e49c893a03cebc8d7dbc2db940906572fea38fd99251b17"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "d8c9e9def8d13488ab0288948f7d9458da930461a93d09b25d0bcb60776d7eb9"
+    }
+  ],
+  "records": [
+    {
+      "check": "authenticated_actual_run_current_task_metadata",
+      "role": "BOSS",
+      "result": {
+        "projection": "runtime-task-reference",
+        "source_type": "RUNTIME_RECORD",
+        "task_source_type": "SIMULATED",
+        "namespace": "ui-check",
+        "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "task_id": "1d4ca9c1-67eb-4547-8b2b-c3e0d11b7107",
+        "task_version": "1",
+        "task_status": "OPEN",
+        "read_at": "2026-10-23T10:15:09.038789+00:00",
+        "private_body_available_here": false,
+        "business_mutation_performed": false
+      }
+    },
+    {
+      "check": "authenticated_actual_run_current_task_metadata",
+      "role": "MAINTAINER",
+      "result": {
+        "projection": "runtime-task-reference",
+        "source_type": "RUNTIME_RECORD",
+        "task_source_type": "SIMULATED",
+        "namespace": "ui-check",
+        "run_id": "run-ac2e1d0b-5efa-4b41-ae9a-33b73578f47b",
+        "dataset_id": "selection",
+        "dataset_version": "1",
+        "task_id": "1d4ca9c1-67eb-4547-8b2b-c3e0d11b7107",
+        "task_version": "1",
+        "task_status": "OPEN",
+        "read_at": "2026-10-23T10:15:09.065637+00:00",
+        "private_body_available_here": false,
+        "business_mutation_performed": false
+      }
+    },
+    {
+      "check": "strict_query_link_permissions_logout_and_zero_business_mutation",
+      "invalid_query": 400,
+      "unknown_run": 404,
+      "unrelated_task": 403,
+      "anonymous_and_logged_out": 401,
+      "business_sha256": {
+        "task": "c7d06914e1f4dade45409bb5f7e4217f90461d452f60973c5dc7ba190036e3e1",
+        "outbox": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  ],
+  "prior_evidence": {
+    "path": "evidence/T11/w3-local-20261023/runtime-application-c6e06b70-5c16-4d4c-bbad-b76aaddf70e1.json",
+    "sha256": "a5b8a3153697cb4dc56fc1af06345eb234b0ca31d650f3a57dcc3d97394871ee"
+  },
+  "model_requested": false,
+  "business_write_requested": false,
+  "private_body_recorded": false,
+  "visual_acceptance": "NOT_RUN"
+}

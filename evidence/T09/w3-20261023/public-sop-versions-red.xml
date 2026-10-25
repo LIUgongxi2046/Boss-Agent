@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="11" time="2.514" timestamp="2026-10-23T19:15:26.087517+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_editor_requires_maintainer_and_runtime[None-401]" time="0.015" /><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_editor_requires_maintainer_and_runtime[BOSS-403]" time="0.009"><failure message="assert 404 == 403">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_editor_requ1')
+role = 'BOSS', status = 403
+
+    @pytest.mark.parametrize("role,status", [(None, 401), ("BOSS", 403), ("MAINTAINER", 503)])
+    def test_public_method_editor_requires_maintainer_and_runtime(tmp_path, role, status):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossPageAPI(store).serve(role, "/api/boss/ui/admin/sop-method", "sop_id=SOP03")[0] == status
+E       assert 404 == 403
+
+app/tests/test_product_skill_versions.py:18: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_editor_requires_maintainer_and_runtime[MAINTAINER-503]" time="0.014"><failure message="assert 403 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_editor_requ2')
+role = 'MAINTAINER', status = 503
+
+    @pytest.mark.parametrize("role,status", [(None, 401), ("BOSS", 403), ("MAINTAINER", 503)])
+    def test_public_method_editor_requires_maintainer_and_runtime(tmp_path, role, status):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossPageAPI(store).serve(role, "/api/boss/ui/admin/sop-method", "sop_id=SOP03")[0] == status
+E       assert 403 == 503
+
+app/tests/test_product_skill_versions.py:18: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[save]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re0')
+action = 'save'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[validate]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re1')
+action = 'validate'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[activate]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re2')
+action = 'activate'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[enable]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re3')
+action = 'enable'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[disable]" time="0.012"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re4')
+action = 'disable'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[restore]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re5')
+action = 'restore'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[recover]" time="0.010"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re6')
+action = 'recover'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_method_commands_require_connected_runtime[cancel]" time="0.011"><failure message="assert 404 == 503">tmp_path = PosixPath('/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/.work/pytest-public-sop-versions-red/test_public_method_commands_re7')
+action = 'cancel'
+
+    @pytest.mark.parametrize("action", ["save", "validate", "activate", "enable", "disable", "restore", "recover", "cancel"])
+    def test_public_method_commands_require_connected_runtime(tmp_path, action):
+        store = ControlStore(tmp_path / "versions.sqlite")
+        store.initialize("ui-check")
+&gt;       assert BossCommandAPI(store).execute("MAINTAINER", "boss.sop." + action, {})[0] == 503
+E       assert 404 == 503
+
+app/tests/test_product_skill_versions.py:25: AssertionError</failure></testcase></testsuite></testsuites>

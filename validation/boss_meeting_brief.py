@@ -7,14 +7,17 @@ transaction; viewing does not silently mutate or send message requests.
 from __future__ import annotations
 
 import json
-from decimal import Decimal
 from datetime import datetime
 
 from aiohttp import web
-from business import now, require
+from business import checksum, now, require
 from boss_travel import meeting_impacts
 from boss_people import meeting_impacts as people_meeting_impacts
 from boss_owner_preferences import owner_goal_reference
+from boss_metrics import aggregate_metrics
+from boss_meetings import meeting_materials
+from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS="ui-check"
 
@@ -36,13 +39,17 @@ def _documents(db, data):
                             "source_type":"SIMULATED","excerpt":None})
             continue
         authorized=document.get("access_scope")==data["owner_id"] and document.get("source_type")=="SIMULATED"
-        withdrawn=bool(document.get("withdrawn"))
-        status="CURRENT" if authorized and not withdrawn else "WITHDRAWN" if withdrawn else "FORBIDDEN"
+        clock=_get(db,"clock","current")["at"]
+        validity=source_validity(document,clock) if authorized else "FORBIDDEN"
+        adoption=external_adoption(db,NS,data,clock,document) if authorized else {"state":"NOT_APPLICABLE"}
+        status="NEEDS_REVIEW" if validity=="VALID" and adoption["state"]=="NEEDS_REIMPORT" else "CURRENT" if validity=="VALID" else validity
         results.append({
             "source_id":source_id,"status":status,
             "version":document.get("version"),
             "source_type":"SIMULATED",
             "published_at":document.get("published_at"),
+            "valid_from":document.get("valid_from"),"valid_until":document.get("valid_until"),
+            "source_sha256":checksum(document) if status=="CURRENT" else None,
             "author_contact_id":document.get("author_contact_id"),
             "excerpt":document.get("content","")[:220] if status=="CURRENT" else None,
         })
@@ -58,21 +65,14 @@ def _metrics(data, approved):
     for period in ("BASE","CURRENT"):
         group=[r for r in details if r["period"]==period and
                r["region_id"]=="region-1" and r["trade_type"]=="EXTERNAL_SALES"]
-        q=sum((Decimal(r["quantity_tonnes"]) for r in group),Decimal(0))
-        revenue=sum((Decimal(r["revenue_cny"]) for r in group),Decimal(0))
-        costs=sum((Decimal(r["cost_cny"]) for r in group),Decimal(0))
-        profit=revenue-costs
-        gm=(profit/revenue*100) if revenue else None
+        computed=aggregate_metrics(group)
         result.append({
             "period_scope":period,"date_range":data["periods"][period],
             "source_id":"finance-note","source_version":approved["version"],
             "definition_version":"1","source_type":"SIMULATED",
-            "metrics":{
-                "sales_quantity":{"value":str(q),"unit":"吨"},
-                "revenue":{"value":str(revenue),"unit":"CNY"},
-                "gross_profit":{"value":str(profit),"unit":"CNY"},
-                "gross_margin":{"value":str(gm) if gm is not None else None,"unit":"%"},
-            },
+            "metrics":{metric:{"value":str(computed["metrics"][metric][0]) if computed["metrics"][metric][0] is not None else None,
+                               "unit":computed["metrics"][metric][1]}
+                       for metric in ("sales_quantity","revenue","gross_profit","gross_margin")},
             "detail_refs":[r["record_id"] for r in group],
         })
     return {"available":True,"values":result,
@@ -80,9 +80,12 @@ def _metrics(data, approved):
 
 
 def compile_brief(db,data):
+    data=meeting_materials(db,data)
     meeting=data["meeting"]
     current_docs=_documents(db,data)
     missing=[d["source_id"] for d in current_docs if d["status"]!="CURRENT"]
+    if meeting.get("state") == "CANCELED":
+        missing.append("meeting:CANCELED")
     contacts=[]
     clock=_get(db,"clock","current")
     today=datetime.fromisoformat(clock["at"]).date().isoformat() if clock else ""
@@ -125,7 +128,9 @@ def compile_brief(db,data):
     meeting_event=_get(db,"event",data["event"]["event_id"])
     return {
         "meeting":{"meeting_id":meeting["meeting_id"],"version":meeting["version"],
-                   "starts_at":meeting["starts_at"],"timezone":meeting["timezone"]},
+                   "starts_at":meeting["starts_at"],"timezone":meeting["timezone"],
+                   "ends_at":meeting.get("ends_at"),"state":meeting.get("state","DRAFT"),
+                   "preparation_due_at":meeting.get("preparation_due_at")},
         "participants":contacts,
         "sources":current_docs,
         "commitments":commitments,
@@ -147,6 +152,7 @@ def compile_brief(db,data):
 
 
 def prepare(api,db,data,payload):
+    data=meeting_materials(db,data)
     api._exact(payload,{"client_request_id","meeting_id","meeting_version",
                         "expected_version"})
     meeting=data["meeting"]
@@ -172,7 +178,7 @@ def prepare(api,db,data,payload):
         "compiled":compiled,
         "prepared_at":now(),
         "reviewed_by_owner":False,
-        "meeting_occurred":False,
+        "meeting_occurred":meeting.get("state")=="HELD",
         "message_sent":False,
         "source_type":"SIMULATED",
     }
@@ -183,7 +189,7 @@ def prepare(api,db,data,payload):
         "state":state,"source_count":len(compiled["sources"]),
         "missing_count":len(compiled["missing_items"]),
         "historical_commitment_count":len(compiled["commitments"]),
-        "message_sent":False,"meeting_occurred":False,
+        "message_sent":False,"meeting_occurred":record["meeting_occurred"],
     }
 
 
@@ -195,22 +201,23 @@ def briefing_projection(db,data):
             "saved":False,"saved_brief":None,
             "current":current,"current_status":"NOT_PREPARED",
             "needs_review":True,
-            "meeting_occurred":False,"material_request_sent":False,
+            "meeting_occurred":current["meeting"]["state"]=="HELD","material_request_sent":False,
             "revisions":[],
         }
     old=stored["compiled"]
-    pinned={doc["source_id"]:(doc["version"],doc["status"])
+    pinned={doc["source_id"]:(doc["version"],doc["status"],doc.get("source_sha256"))
             for doc in old["sources"]}
-    available={doc["source_id"]:(doc["version"],doc["status"])
+    available={doc["source_id"]:(doc["version"],doc["status"],doc.get("source_sha256"))
                for doc in current["sources"]}
     source_changed=pinned!=available
     participant_changed=old["participants"]!=current["participants"]
+    meeting_changed=old["meeting"]!=current["meeting"]
     # Other changes (e.g. new task or simulated event state) also need review.
     business_changed=(old["commitments"]!=current["commitments"] or old["event"]!=current["event"]
                       or old.get("travel_impacts",[])!=current["travel_impacts"]
                       or old.get("people_meeting_impacts",[])!=current["people_meeting_impacts"]
                       or old.get("owner_goal_reference",{})!=current["owner_goal_reference"])
-    changed=source_changed or participant_changed or business_changed or old["metrics"]!=current["metrics"]
+    changed=source_changed or participant_changed or meeting_changed or business_changed or old["metrics"]!=current["metrics"]
     status="NEEDS_REVIEW" if changed or current["needs_review"] else stored["state"]
     revisions=[
         {"version":row["version"],"state":row["state"],
@@ -228,7 +235,7 @@ def briefing_projection(db,data):
     latest={doc["source_id"]:doc for doc in current["sources"]}
     for old_doc in display_snapshot["compiled"]["sources"]:
         live=latest.get(old_doc["source_id"])
-        if not live or live["status"]!="CURRENT" or live["version"]!=old_doc["version"]:
+        if not live or live["status"]!="CURRENT" or live["version"]!=old_doc["version"] or live.get("source_sha256")!=old_doc.get("source_sha256"):
             old_doc["excerpt"]=None
             old_doc["display_redacted_due_to_source_change"]=True
     old_finance=next((doc for doc in display_snapshot["compiled"]["sources"]
@@ -245,7 +252,8 @@ def briefing_projection(db,data):
         "needs_review":status=="NEEDS_REVIEW",
         "source_changed":source_changed,
         "participant_changed":participant_changed,
+        "meeting_changed":meeting_changed,
         "business_changed":business_changed,
-        "meeting_occurred":False,"material_request_sent":False,
+        "meeting_occurred":current["meeting"]["state"]=="HELD","material_request_sent":False,
         "revisions":revisions,
     }

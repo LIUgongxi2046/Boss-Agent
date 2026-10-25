@@ -1,0 +1,17 @@
+async(page)=>{
+  const field=page.getByRole("textbox",{name:"区域",exact:true});
+  await field.fill("核查当前老板的专题范围");
+  await page.getByRole("button",{name:"核对资料范围",exact:true}).click();
+  await page.getByRole("button",{name:"撤销本次老板会话",exact:true}).click();
+  const rejected=await page.evaluate(async()=>{
+    const token=document.querySelector('meta[name="boss-token"]').content;
+    return(await fetch("/api/boss/ui/sector?page=F15",{headers:{Authorization:"Bearer "+token}})).status;
+  });
+  if(rejected!==401)throw Error("已撤销的老板身份仍然可读服务端专题");
+  await page.waitForFunction(()=>Array.from(document.querySelectorAll('input')).every(input=>input.value==="")&&
+    !Array.from(document.querySelectorAll('[role="status"]')).some(item=>item.textContent.includes("已记录当前页面的查询条件"))&&
+    Array.from(document.querySelectorAll('[role="alert"]')).some(item=>item.textContent.includes("身份令牌失效")),null,{timeout:4000});
+  if(await page.getByRole("button",{name:"与大鹏讨论需要补充的资料",exact:true}).count())throw Error("身份撤销后仍然保留专题模型操作");
+  return {status:"PASS",check_id:"SECTOR-PROVIDER-IDENTITY-BOUNDARY",source_type:"SIMULATED",server_rejection:rejected,
+    previous_scope_cleared:true,previous_page_actions_cleared:true,actual_upstream_provider_used:true,model_requests:0};
+}

@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-f01-native-1c9659e1-d64c-48ec-a027-6d7885eec37e",
+  "ports": {
+    "business": 10531,
+    "webui": 10532,
+    "gateway": 20531
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-f01-n3-dist",
+  "manifest_sha256": "e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_binding_handoff_cancellation_keeps_question_and_sends_no_message",
+      "binding_id": "morning-bind-09ba430c-2917-4259-80be-b767ba570f00",
+      "original_query_cancel_requested": false,
+      "question_sent": false
+    },
+    {
+      "check": "actual_native_stop_cancels_current_turn_without_new_query",
+      "request_id": "morning-native-81c8c2ddc5e95b5574948c218423bf7c624da6e5de33a3a0c9812a0d0e4bd1fa",
+      "run_id": "run-51e6ab70-1370-44aa-8c4b-cdb70c3a0630",
+      "state": "CANCELED",
+      "extra_stop_query": false,
+      "preserved_list_id": "morning-f6db3e32-73db-4c08-aab3-aa8a956db49d"
+    },
+    {
+      "check": "actual_native_two_turns_current_item_runtime_history_and_return",
+      "first_binding_id": "morning-bind-3d2ed594-133e-488d-a59f-9f98f227ddb1",
+      "selected_binding_id": "morning-bind-9346d691-d148-4a97-99bd-4fc8257f4694",
+      "session_id": "websocket:2cf9f58e-72b8-4c1c-8480-0d8bae1a6271",
+      "list_id": "morning-f6db3e32-73db-4c08-aab3-aa8a956db49d",
+      "item_id": "meeting:meeting-1",
+      "run_ids": [
+        "run-6098139f-5570-4320-8f2f-2efabef6c944",
+        "run-c32a6500-6bf5-492f-ab41-510962254921",
+        "run-4e6d7b0c-fccb-49e6-80b1-cc1dc8ff75e8"
+      ],
+      "renderer_errors": [],
+      "private_input_in_ordinary_storage": false,
+      "binding_interrupted_after_actual_save": true,
+      "binding_replayed": false,
+      "first_question_sent_after_explicit_recovery": true
+    },
+    {
+      "check": "native_context_failure_preserves_original_list_and_maintainer_denied",
+      "state": "FAILED",
+      "run_id": null,
+      "domain_list_id": "morning-f6db3e32-73db-4c08-aab3-aa8a956db49d",
+      "private_input_or_password_in_technical_logs": false,
+      "password_in_assets": false
+    }
+  ]
+}

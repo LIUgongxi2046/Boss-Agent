@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="61.678" timestamp="2026-10-23T11:52:14.425133+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_boss_runtime" name="test_live_iteration_budget_stops_further_model_turns" time="22.053" /></testsuite></testsuites>

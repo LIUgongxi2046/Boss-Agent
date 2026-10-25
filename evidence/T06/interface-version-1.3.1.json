@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.3.1",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "source_base": "0d0a5a2",
+  "source_scope": "W1 commit containing this evidence",
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-v131-verified -p no:cacheprovider --junitxml=.work/w1-v131-verified.xml", "status": "PASS", "result": "465 passed in 13.34s", "raw_result": ".work/w1-v131-verified.xml"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v131-verified", "status": "PASS", "actual_sqlite_receipts": 659, "declared_actions_observed": 67, "baseline_role_mappings": 58},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v131", "status": "PASS", "result": "16 passed in 1.59s; each of 58 baseline public actions has at least one valid declared input and actual result"},
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation and duplicate YAML key validation"}
+  ],
+  "tool_source_authorization_cases": 58,
+  "verified": [
+    "direct create/send reject six noncurrent source states and unauthorized owner scope",
+    "direct create/send check coordinator validity against the approved business clock",
+    "creation persists assignment_source_binding with exact source version and SHA256 in the same transaction",
+    "send and completion recheck current source against the creation binding",
+    "confirmed-minute assignments pin their original minute source and reject expiry, revision and same-version metadata changes",
+    "direct Tool authorization checks owner, namespace, BOSS issuer, action, target, content version, exact payload, revocation and full validity window",
+    "completion control shares owner authorization checks with content version bound to the task version",
+    "one creation authorization produces one task when different request keys run concurrently",
+    "committed create/send receipts remain readable after authorization revocation and database reopen",
+    "read_assignment returns the declared Tool result fields while stored task metadata is retained",
+    "SQLite native backup preserves assignment/query source bindings and source withdrawal with object integrity"
+  ],
+  "business_input_source": "initial_materials T02-3 / seed 20261022 and existing approved test inputs",
+  "new_agricultural_facts": false,
+  "external_model_or_message_calls": false,
+  "parent_acceptance": "NOT_RUN",
+  "w3_reception": {
+    "call": "Store.require_current_assignment_sources(db, namespace, data, task)",
+    "location": "BossCommandAPI._require_current_task_sources inside the existing transaction",
+    "consumers": ["independent nudges", "send", "completion", "other current task-source consumers"],
+    "files": ["validation/business.py", "validation/controls.py", "validation/boss_meeting_approval.py", "specs/data-dictionary.json", "specs/openapi.yaml", "specs/runtime-events.schema.json"],
+    "committed_prior_source_policy": "W3 received 1.3.0 as 7454049; public source checks are in progress"
+  },
+  "pending": [
+    "W3 integration and same-version public/runtime write verification",
+    "explicit owner review for legacy assignments without creation-time bindings and complete migration",
+    "runtime field reception, independent semantic review and all business variants",
+    "complete fourteen simulated interfaces and approved missing agricultural sources",
+    "all authorization consumers, session/cache propagation, E01-E06 and cross-page flows",
+    "morning model tasks, recurring plans, system notifications, sleep recovery and full parent acceptance"
+  ]
+}

@@ -168,7 +168,7 @@ def test_nudge_rejects_withdrawn_origin_and_regular_source(services):
     sent = send(api, created)
     api.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
     assert command(api, "BOSS", "boss.assignment.nudge", "nudge-old-source",
-                   **nudge_input(created, sent["task_version"]))[0] == 403
+                   **nudge_input(created, sent["task_version"]))[0] == 410
 
 
 def test_nudge_rejects_result_submitted_without_changing_result(services):

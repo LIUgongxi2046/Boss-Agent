@@ -1,0 +1,45 @@
+{
+  "status": "FAIL",
+  "run_id": "fc03-order-01a66cb5-63f9-432d-acd9-3f99f3956a92",
+  "ports": {
+    "business": 9941,
+    "webui": 9942,
+    "gateway": 19941
+  },
+  "proxy_port": 9943,
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc03-order-01a66cb5-63f9-432d-acd9-3f99f3956a92",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-boundary-dist",
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_order_result_interrupted",
+      "events": [
+        {
+          "event": "actual_order_forwarded",
+          "request_id": "34f69470-3a6c-4fc2-bb5a-24374a9fe2fc",
+          "client_request_id": "today-6e801b4c-96dd-40ea-b07e-a6452751f737"
+        },
+        {
+          "event": "actual_order_result_connection_closed",
+          "request_id": "34f69470-3a6c-4fc2-bb5a-24374a9fe2fc",
+          "version": "1",
+          "sha256": "0ee79615c9385efcb1beb62bc1d6cffae27495dd930944724575ab1cd7b48765"
+        },
+        {
+          "event": "actual_order_forwarded",
+          "request_id": "34f69470-3a6c-4fc2-bb5a-24374a9fe2fc",
+          "client_request_id": "today-6e801b4c-96dd-40ea-b07e-a6452751f737"
+        }
+      ],
+      "connections": 2,
+      "dropped": true
+    },
+    {
+      "check": "failure",
+      "name": "Error",
+      "message": "expect(locator).toBeEnabled() failed\n\nLocator:  getByRole('button', { name: '读取排序原请求结果', exact: true })\nExpected: enabled\nReceived: <element(s) not found>\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"to.be.enabled\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: '读取排序原请求结果', exact: true })\u001b[22m\n"
+    }
+  ]
+}

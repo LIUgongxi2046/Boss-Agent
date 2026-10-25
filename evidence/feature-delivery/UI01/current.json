@@ -1,0 +1,313 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-journey-363ffb4f-9bd0-4add-bd26-c3ba02fd78af",
+  "ports": {
+    "business": 10211,
+    "webui": 10212,
+    "gateway": 20211
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui01-n3-dist",
+  "manifest_sha256": "fb3e415625b7dbc7bbf3721dbc68db05e8a513b5a8115d329ce52259e2d9c8a1",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "credentials_recorded": false,
+  "records": [
+    {
+      "check": "login_background_brand_removed_text_and_equal_controls",
+      "background": {
+        "background": "radial-gradient(at 12% 18%, rgb(217, 237, 255) 0px, rgba(0, 0, 0, 0) 48%), radial-gradient(at 85% 78%, rgb(221, 248, 237) 0px, rgba(0, 0, 0, 0) 44%), linear-gradient(135deg, rgb(242, 248, 255), rgb(255, 255, 255) 48%, rgb(237, 249, 244))",
+        "before": "\"\"",
+        "after": "\"\""
+      },
+      "controls": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 1,
+          "measured": [
+            {
+              "width": 199,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 199,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 2,
+          "measured": [
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "measured": [
+            {
+              "width": 199,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 199,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "measured": [
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "measured": [
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "measured": [
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            },
+            {
+              "width": 207,
+              "height": 44,
+              "font": "16px",
+              "line": "24px",
+              "padding": "10px 12px",
+              "border": "1px solid rgb(220, 228, 237)",
+              "borderRadius": "9px"
+            }
+          ],
+          "help_does_not_change_button_size": true
+        }
+      ],
+      "visual": "NOT_RUN"
+    },
+    {
+      "check": "completed_menu_three_sizes_zoom_and_keyboard",
+      "layouts": [
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 1,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1440,
+            "height": 900
+          },
+          "zoom": 2,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 1,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "zoom": 2,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 1,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        },
+        {
+          "size": {
+            "width": 1024,
+            "height": 768
+          },
+          "zoom": 2,
+          "entry": "search_directory",
+          "visible_pages": 10,
+          "horizontal_overflow": false
+        }
+      ],
+      "mobile_directory_verified": true
+    },
+    {
+      "check": "boss_completed_navigation_and_unavailable_old_link",
+      "pages": [
+        "F01 · 采购成本协调",
+        "F02 · 经营提醒",
+        "F03 · 经营查询与追问",
+        "F06 · 交办管理",
+        "F14 · 原料与饲料报告",
+        "F21 · 食品与品质报告",
+        "N05 · 任务与承诺",
+        "N06 · 通知中心",
+        "N08 · 本人通知设置",
+        "N09 · 本人计划"
+      ],
+      "source_dependency": true,
+      "picker_dependency": true,
+      "old_link": "F12"
+    },
+    {
+      "check": "actual_other_window_ipc_denied",
+      "denied": true
+    },
+    {
+      "check": "demo_injection_rejects_other_window_subframe_and_external_origin",
+      "other_window_denied": true,
+      "subframe_has_no_bridge": true,
+      "external_origin_denied": true
+    },
+    {
+      "check": "maintainer_completed_navigation_account_fill_and_role_boundary",
+      "pages": [
+        "A03 · 模拟业务资料",
+        "A04 · 查询场景与交办反馈",
+        "A08 · 模型运行配置",
+        "A13 · 调度与经营规则",
+        "A15 · 运行记录"
+      ],
+      "boss_and_maintainer_filled_without_login": true,
+      "normal_authentication_and_invalid_password": true,
+      "other_window_and_invalid_role_denied": true
+    },
+    {
+      "check": "normal_entry_has_no_injection_and_preserves_manual_authentication",
+      "injection_available": false,
+      "manual_login": true
+    },
+    {
+      "check": "existing_business_and_accounts_preserved_no_credential_artifacts",
+      "business_rows": 52,
+      "credentials_unchanged": true,
+      "credentials_in_logs_static_assets_url_or_storage": false
+    }
+  ]
+}

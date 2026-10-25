@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="4.923" timestamp="2026-10-24T04:41:41.749076+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_bi_scenarios" name="test_maintainer_public_scenario_catalog_load_receipt_and_permissions" time="0.961"><failure message="assert 403 == 200">app/tests/test_product_bi_scenarios.py:27: in test_maintainer_public_scenario_catalog_load_receipt_and_permissions
+    assert status == 200
+E   assert 403 == 200</failure></testcase><testcase classname="app.tests.test_product_bi_scenarios" name="test_formal_scenarios_execute_in_actual_public_runtime_and_keep_frozen_context" time="0.135"><failure message="assert 404 == 200">app/tests/test_product_bi_scenarios.py:56: in test_formal_scenarios_execute_in_actual_public_runtime_and_keep_frozen_context
+    assert commands.execute("MAINTAINER",ACTION,load_payload(identifier))[0] == 200
+E   assert 404 == 200</failure></testcase></testsuite></testsuites>

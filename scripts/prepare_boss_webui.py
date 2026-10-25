@@ -13,6 +13,8 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
+import yaml
+from boss_auth_overlay import apply_auth_overlay
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_REV = "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
@@ -90,6 +92,9 @@ def copy_overlay() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
+        ("BossLogin.tsx", "BossLogin.tsx"),
+        ("BossToday.tsx", "BossToday.tsx"),
+        ("BossOwnerPlans.tsx", "BossOwnerPlans.tsx"),
         ("BossAssignmentFlow.tsx", "BossAssignmentFlow.tsx"),
         ("BossWorkspaceView.tsx", "BossWorkspaceView.tsx"),
         ("BossSectorView.tsx", "BossSectorView.tsx"),
@@ -98,6 +103,7 @@ def copy_overlay() -> None:
         ("BossMeetingApproval.tsx", "BossMeetingApproval.tsx"),
         ("BossMinutesAssignmentActions.tsx", "BossMinutesAssignmentActions.tsx"),
         ("BossMeetingBrief.tsx", "BossMeetingBrief.tsx"),
+        ("BossMeetingArrangement.tsx", "BossMeetingArrangement.tsx"),
         ("BossTravelView.tsx", "BossTravelView.tsx"),
         ("BossPeopleMeeting.tsx", "BossPeopleMeeting.tsx"),
         ("BossOwnerPreferences.tsx", "BossOwnerPreferences.tsx"),
@@ -106,21 +112,38 @@ def copy_overlay() -> None:
         ("BossPersonalCommitments.tsx", "BossPersonalCommitments.tsx"),
         ("MaintainerPromptVersion.tsx", "MaintainerPromptVersion.tsx"),
         ("BossResearchView.tsx", "BossResearchView.tsx"),
+        ("MaintainerRuntimeRecords.tsx", "MaintainerRuntimeRecords.tsx"),
+        ("RuntimeTaskTechnicalView.tsx", "RuntimeTaskTechnicalView.tsx"),
+        ("ProductRuntimeConfiguration.tsx", "ProductRuntimeConfiguration.tsx"),
+        ("MaintainerMemoryStatus.tsx", "MaintainerMemoryStatus.tsx"),
+        ("MaintainerSkills.tsx", "MaintainerSkills.tsx"),
+        ("MaintainerSkillVersions.tsx", "MaintainerSkillVersions.tsx"),
+        ("MaintainerSimulationInspect.tsx", "MaintainerSimulationInspect.tsx"),
+        ("BossAssignmentSourceReview.tsx", "BossAssignmentSourceReview.tsx"),
+        ("BossSupplyQualityPanel.tsx", "BossSupplyQualityPanel.tsx"),
+        ("BossSupplyQualityView.tsx", "BossSupplyQualityView.tsx"),
+        ("MaintainerSupplyQuality.tsx", "MaintainerSupplyQuality.tsx"),
         ("BossCommunicationCalendar.tsx", "BossCommunicationCalendar.tsx"),
         ("MaintainerMessageReply.tsx", "MaintainerMessageReply.tsx"),
         ("MaintainerKnowledgeEditor.tsx", "MaintainerKnowledgeEditor.tsx"),
         ("MaintainerScheduler.tsx", "MaintainerScheduler.tsx"),
         ("boss-v6.css", "boss-v6.css"),
+        ("boss-login.css", "boss-login.css"),
     ]:
         shutil.copy2(ROOT / "app" / "webui" / source_name, BOSS_DIR / target_name)
     (BOSS_DIR / "page-meta.json").write_text(
         json.dumps(catalogue, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
     )
+    shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")
+    (BOSS_DIR / "supply-quality-v1.json").write_text(
+        json.dumps(yaml.safe_load((ROOT / "data/simulation/supply-quality-v1.yaml").read_text()), ensure_ascii=False) + "\n", encoding="utf-8",
+    )
     for filename in ASSETS:
         shutil.copy2(DESIGN / "assets" / filename, ASSET_DIR / filename)
     for filename in ANIMATIONS:
         shutil.copy2(DESIGN / "animation" / filename, ASSET_DIR / filename)
+    shutil.copy2(ROOT / "design/T27/assets/boss-flight-sprite.png", ASSET_DIR / "boss-flight-sprite.png")
 
     # Read the pristine pinned source from Git every time for idempotence.
     original = subprocess.run(
@@ -148,9 +171,11 @@ def copy_overlay() -> None:
         '      </div>\n      </BossDesktop>\n    </ThemeProvider>\n  );\n}\n',
         "closing Shell boundary",
     )
+    previous_overlay = patched
+    patched = apply_auth_overlay(patched, one_replace)
     app_file = SRC / "App.tsx"
     existing = app_file.read_text(encoding="utf-8")
-    if existing != original and existing != patched:
+    if existing not in (original, previous_overlay, patched):
         raise RuntimeError("上游 App.tsx 存在非本工具改动；已拒绝覆盖。")
     app_file.write_text(patched, encoding="utf-8")
 

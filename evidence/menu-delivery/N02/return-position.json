@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "scope": "N02_ACTUAL_MESSAGE_POSITION_AFTER_UNKNOWN_SEND_REFRESH",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-return-position-f904153f-e561-4c89-afef-16ade0e72a08",
+  "ports": {
+    "business": 10831,
+    "webui": 10832,
+    "gateway": 20831
+  },
+  "proxy_port": 10833,
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_history_reading_captured_as_identifiers_and_coordinates",
+      "chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "run_id": "run-e6dc3f09-9232-43cb-94b9-f62e4fc9cbbd",
+      "reading": {
+        "conversationKey": "websocket:3962fd9f-4a9e-4a52-ae34-9876f937619e",
+        "promptId": "u-8d12576b17c0ffcc",
+        "offsetTop": -77
+      },
+      "workspace_top": 35,
+      "thread": {
+        "scrollTop": 93,
+        "scrollHeight": 15698,
+        "clientHeight": 147
+      },
+      "actual_runtime_count": 32
+    },
+    {
+      "check": "unknown_send_refresh_return_restores_original_message_run_scroll_and_focus",
+      "chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "run_id": "run-e6dc3f09-9232-43cb-94b9-f62e4fc9cbbd",
+      "client_request_id": "boss-704a0a01-6e8e-4ac7-986d-be0a678fafbb",
+      "reading": {
+        "conversationKey": "websocket:3962fd9f-4a9e-4a52-ae34-9876f937619e",
+        "promptId": "u-8d12576b17c0ffcc",
+        "offsetTop": -77
+      },
+      "restored": {
+        "promptFound": true,
+        "offsetTop": -77,
+        "scrollTop": 93,
+        "scrollHeight": 15521,
+        "clientHeight": 147
+      },
+      "workspace_top": 35,
+      "focus_restored": true,
+      "actual_older_history_reads": 1,
+      "simulation_send_count": 1,
+      "additional_runtime_count": 0,
+      "private_body_or_password_in_ordinary_storage": false
+    },
+    {
+      "check": "actual_older_history_response_does_not_replace_explicit_new_conversation_or_input",
+      "original_chat_id": "3962fd9f-4a9e-4a52-ae34-9876f937619e",
+      "actual_response_bytes": 7280,
+      "request_terminals": [
+        "requestfailed"
+      ],
+      "original_position_intent_cleared": true,
+      "new_input_retained": true,
+      "old_messages_in_new_conversation": false,
+      "additional_runtime_count": 0,
+      "additional_send_count": 0
+    }
+  ]
+}

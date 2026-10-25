@@ -17,9 +17,11 @@ from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.loader import load_config, resolve_config_env_vars
 
-from business import OPERATIONS, ROOT, Store, encode, now
+from business import OPERATIONS, ROOT, Store, checksum, encode, now
+from boss_runtime_records import RuntimeRecorder, runtime_records
 from connection import RecordedProvider, settings
 from model_probe import BusinessTool
+from safe_diagnostics import RedactedEventList
 
 
 QUERY = "查询 region-1 的 product-1，比较 2026-10-01 至 2026-10-10 与 2026-09-01 至 2026-09-10，CNY、EXTERNAL_SALES、definition_version=1。需要 sales_quantity、revenue、cost、gross_profit、gross_margin、gross_profit_per_tonne，并读取依据。原因资料缺少时明确说明未知。"
@@ -67,7 +69,7 @@ class HTTPTool(BusinessTool):
 
 
 @asynccontextmanager
-async def runtime(name, output, rounds=12, close_after_write=False, http=False):
+async def runtime(name, output, rounds=12, close_after_write=False, http=False, record_runtime=False):
     ns = name + "-" + str(uuid.uuid4())
     work = ROOT / ".work" / ns
     work.mkdir(parents=True)
@@ -75,16 +77,27 @@ async def runtime(name, output, rounds=12, close_after_write=False, http=False):
     evidence.mkdir()
     store = Store(work / "business.sqlite")
     baseline = store.initialize(ns)
+    if record_runtime and rounds != 12:
+        with store.connect() as db:
+            current = store.get(db, ns, "configuration", "current")
+            store.put(db, ns, "configuration", "current", {**current, "max_tool_rounds": rounds, "version": "2"})
     config_path = work / "config.json"
     config_path.write_text(encode({"agents": {"defaults": {"provider": "deepseek", "model": "deepseek-flash", "workspace": str(work / "workspace"), "maxToolIterations": rounds, "maxTokens": 4096, "dream": {"enabled": False}, "idleCompactAfterMinutes": 0}}, "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com"}}, "gateway": {"heartbeat": {"enabled": False}}, "tools": {"restrictToWorkspace": True}}))
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
     registry = ToolRegistry()
-    provider = RecordedProvider(settings(), evidence / "http-requests.json")
+    recorder = RuntimeRecorder(store, ns, registry, lambda: {
+        "provider": "deepseek", "model_id": "deepseek-flash", "api_type": "chat_completions",
+        "max_tool_rounds": rounds, "max_output_tokens": 4096, "timeout": 120,
+        "config_sha256": checksum(json.loads(config_path.read_text())),
+    }) if record_runtime else None
+    provider = RecordedProvider(settings(), evidence / "http-requests.json", redact_payload=record_runtime,
+                                transport_observer=recorder.observe_transport if recorder else None)
     provider.generation = config.resolve_preset().to_generation_settings()
-    loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider)
+    loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider,
+                                 hook_factories=[recorder.hook_factory] if recorder else [])
     for tool in list(registry.tool_names):
         registry.unregister(tool)
-    records, bindings = [], {}
+    records, bindings = RedactedEventList() if record_runtime else [], {}
     envelope = {"request_id": ns, "owner_id": "boss-1", "execution_namespace": ns, "dataset_id": "selection", "dataset_version": "1", "session_id": ns}
     for operation in OPERATIONS:
         registry.register((HTTPTool if http else BusinessTool)(operation, store, envelope, bindings, records))
@@ -93,7 +106,13 @@ async def runtime(name, output, rounds=12, close_after_write=False, http=False):
         async def context(request):
             return RuntimeContextBlock(source="confirmed-business-state", content=encode(store.context(ns)))
         bot.runtime.add_context_provider(context)
-        yield {"bot": bot, "store": store, "ns": ns, "work": work, "evidence": evidence, "provider": provider, "records": records, "bindings": bindings, "trace": trace, "baseline": baseline, "envelope": envelope}
+        if recorder:
+            bot.runtime.add_context_provider(recorder.context)
+        try:
+            yield {"bot": bot, "store": store, "ns": ns, "work": work, "evidence": evidence, "provider": provider, "records": records, "bindings": bindings, "trace": trace, "baseline": baseline, "envelope": envelope, "runtime_recorder": recorder}
+        finally:
+            if recorder:
+                (evidence / "runtime-records.json").write_text(encode(runtime_records(store, "MAINTAINER", ns)))
 
 
 def objects(case, kind):

@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from aiohttp import web
 
 from business import now, require, checksum
+from boss_source_access import require_current_simulated_source, require_current_business_source
 
 NS="ui-check"
 FINAL={"COMPLETED_CONFIRMED","CANCELED"}
@@ -33,7 +34,8 @@ def _source_refs(api, db, data, refs, *, allow_empty=True):
         require(ref["source_id"] not in ids,
                 "重复来源不能代表两份不同证据",web.HTTPBadRequest)
         ids.add(ref["source_id"])
-        doc=api._require_current_source(db,data,ref["source_id"])
+        doc=require_current_business_source(api.store,db,NS,data["owner_id"],ref["source_id"])
+        require_current_simulated_source(doc,data["owner_id"],api.store.get(db,NS,"clock","current")["at"])
         require(doc["version"]==ref["version"],
                 "当前证据来源版本已变更")
         result.append({"source_id":doc["source_id"],"version":doc["version"]})
@@ -72,6 +74,8 @@ def _event(api,db,row,reason):
         "commitment_version":row["version"],"transition_reason":reason,
         "external_delivery_created":False,
     }
+    if previous and previous.get("owner_plan_id"):
+        record["owner_plan_id"] = previous["owner_plan_id"]
     api.store.put(db,NS,"event",event_id,record)
     return {"event_id":event_id,"event_version":version,
             "state":state,"due_at":row["due_at"],
@@ -93,7 +97,7 @@ def create(api,db,data,p):
                 for x in p["evidence_requirements"]),
             "必须明确后续核查证据要求",web.HTTPBadRequest)
     _due(api,db,p["due_at"],p["timezone"])
-    refs=_source_refs(api,db,data,p["source_refs"])
+    refs=_source_refs(api,db,data,p["source_refs"],allow_empty=False)
     ident="owner-task-"+str(uuid.uuid4())
     authorization=api._authorize(db,"commitment.create",{
         "commitment_id":ident,
@@ -142,6 +146,7 @@ def extend(api,db,data,p):
     _ensure(api,p,{"client_request_id","commitment_id",
                    "expected_version","due_at","reason"})
     row=_current(api,db,data,p)
+    _source_refs(api,db,data,row["source_refs"])
     require(isinstance(p["reason"],str) and
             1<=len(p["reason"].strip())<=500,
             "调整期限须由本人填写原因",web.HTTPBadRequest)
@@ -173,6 +178,7 @@ def complete(api,db,data,p):
     _ensure(api,p,{"client_request_id","commitment_id",
                    "expected_version","evidence_refs"})
     row=_current(api,db,data,p)
+    _source_refs(api,db,data,row["source_refs"])
     refs=_source_refs(api,db,data,p["evidence_refs"],allow_empty=False)
     authorization=api._authorize(db,"commitment.complete",{
         "commitment_id":row["commitment_id"],

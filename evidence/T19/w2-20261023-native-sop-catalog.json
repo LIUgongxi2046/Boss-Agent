@@ -1,0 +1,485 @@
+{
+  "status": "PASS_LOCAL_NATIVE_SKILL_LIFECYCLE",
+  "task_id": "T19",
+  "related_task_id": "T07",
+  "source_commit": "0c62568",
+  "working_changes_included": true,
+  "packages": {
+    "nanobot-ai": "0.3.5",
+    "packaging": "26.3",
+    "markdown-it-py": "4.2.0"
+  },
+  "before": {
+    "projection": "sop-technical-status",
+    "items": [
+      {
+        "sop_id": "SOP01",
+        "name": "boss-sop01",
+        "requirement_id": "FR-01",
+        "version": "0.1.0",
+        "content_sha256": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "todayRead",
+          "ownerPlansRead",
+          "bossDashboardRead"
+        ],
+        "command_operations": [
+          "todayReorder"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "bossDashboardRead",
+          "ownerPlansRead",
+          "todayRead",
+          "todayReorder"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP02",
+        "name": "boss-sop02",
+        "requirement_id": "FR-02",
+        "version": "0.1.0",
+        "content_sha256": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead"
+        ],
+        "command_operations": [
+          "boss.reminder.ack",
+          "boss.reminder.snooze",
+          "boss.reminder.close"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.reminder.ack",
+          "boss.reminder.close",
+          "boss.reminder.snooze",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP03",
+        "name": "boss-sop03",
+        "requirement_id": "FR-03",
+        "version": "0.1.0",
+        "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "query_metrics",
+          "read_evidence"
+        ],
+        "command_operations": [],
+        "human_only_operations": [],
+        "missing_tools": [],
+        "tool_references_resolved": true,
+        "context_eligible": true,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP04",
+        "name": "boss-sop04",
+        "requirement_id": "FR-04",
+        "version": "0.1.0",
+        "content_sha256": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossMeetingsRead",
+          "bossEvidenceRead",
+          "meetingArrangementRead"
+        ],
+        "command_operations": [
+          "boss.meeting.brief.prepare",
+          "meetingDraftSave",
+          "meetingConfirm",
+          "meetingCancel",
+          "meetingHeld"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.meeting.brief.prepare",
+          "bossEvidenceRead",
+          "bossMeetingsRead",
+          "meetingArrangementRead",
+          "meetingCancel",
+          "meetingConfirm",
+          "meetingDraftSave",
+          "meetingHeld"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP05",
+        "name": "boss-sop05",
+        "requirement_id": "FR-05",
+        "version": "0.1.0",
+        "content_sha256": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossMeetingsRead",
+          "bossWorkspaceRead"
+        ],
+        "command_operations": [
+          "boss.minutes.save",
+          "boss.minutes.confirm",
+          "boss.minutes.assignment.create"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.minutes.assignment.create",
+          "boss.minutes.confirm",
+          "boss.minutes.save",
+          "bossMeetingsRead",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP06",
+        "name": "boss-sop06",
+        "requirement_id": "FR-06",
+        "version": "0.1.0",
+        "content_sha256": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "read_assignment",
+          "bossTasksRead",
+          "ownerPlansRead",
+          "assignmentSourcesRead"
+        ],
+        "command_operations": [
+          "create_assignment",
+          "send_assignment",
+          "boss.assignment.nudge",
+          "boss.assignment.extend",
+          "boss.assignment.complete",
+          "boss.assignment.cancel",
+          "assignmentSourcesConfirm"
+        ],
+        "human_only_operations": [
+          "assignmentSourcesConfirm"
+        ],
+        "missing_tools": [
+          "assignmentSourcesRead",
+          "boss.assignment.cancel",
+          "boss.assignment.complete",
+          "boss.assignment.extend",
+          "boss.assignment.nudge",
+          "bossTasksRead",
+          "ownerPlansRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP07",
+        "name": "boss-sop07",
+        "requirement_id": "FR-07",
+        "version": "0.1.0",
+        "content_sha256": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead",
+          "bossEvidenceRead"
+        ],
+        "command_operations": [
+          "boss.approval.decide"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.approval.decide",
+          "bossEvidenceRead",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP08",
+        "name": "boss-sop08",
+        "requirement_id": "FR-08",
+        "version": "0.1.0",
+        "content_sha256": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead"
+        ],
+        "command_operations": [
+          "boss.message.draft.save",
+          "boss.message.send"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.message.draft.save",
+          "boss.message.send",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP09",
+        "name": "boss-sop09",
+        "requirement_id": "FR-09",
+        "version": "0.1.0",
+        "content_sha256": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "read_evidence",
+          "bossWorkspaceRead"
+        ],
+        "command_operations": [
+          "boss.research.prepare"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.research.prepare",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP10",
+        "name": "boss-sop10",
+        "requirement_id": "FR-10",
+        "version": "0.1.0",
+        "content_sha256": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead",
+          "bossMeetingsRead"
+        ],
+        "command_operations": [
+          "boss.people.prepare",
+          "boss.people.attach",
+          "boss.people.detach"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.people.attach",
+          "boss.people.detach",
+          "boss.people.prepare",
+          "bossMeetingsRead",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP11",
+        "name": "boss-sop11",
+        "requirement_id": "FR-11",
+        "version": "0.1.0",
+        "content_sha256": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossCalendarConflictRead",
+          "bossWorkspaceRead"
+        ],
+        "command_operations": [
+          "boss.travel.review",
+          "boss.travel.confirm",
+          "boss.travel.cancel"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.travel.cancel",
+          "boss.travel.confirm",
+          "boss.travel.review",
+          "bossCalendarConflictRead",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP12",
+        "name": "boss-sop12",
+        "requirement_id": "FR-12",
+        "version": "0.1.0",
+        "content_sha256": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead",
+          "bossCalendarSharePreview"
+        ],
+        "command_operations": [
+          "boss.calendar.save",
+          "boss.calendar.share",
+          "boss.calendar.share.revoke",
+          "boss.calendar.delete"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.calendar.delete",
+          "boss.calendar.save",
+          "boss.calendar.share",
+          "boss.calendar.share.revoke",
+          "bossCalendarSharePreview",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      },
+      {
+        "sop_id": "SOP13",
+        "name": "boss-sop13",
+        "requirement_id": "FR-13",
+        "version": "0.1.0",
+        "content_sha256": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369",
+        "enabled": true,
+        "native_available": true,
+        "read_operations": [
+          "bossWorkspaceRead",
+          "read_evidence"
+        ],
+        "command_operations": [
+          "boss.memory.confirm",
+          "boss.memory.delete"
+        ],
+        "human_only_operations": [],
+        "missing_tools": [
+          "boss.memory.confirm",
+          "boss.memory.delete",
+          "bossWorkspaceRead"
+        ],
+        "tool_references_resolved": false,
+        "context_eligible": false,
+        "business_authorization_granted": false,
+        "model_adoption_verified": false
+      }
+    ],
+    "configuration_source": "NATIVE_SKILL_FILES_AND_DISABLED_SKILLS",
+    "configuration_mutation_performed": false,
+    "private_body_available_here": false,
+    "business_authorization_granted": false,
+    "model_adoption_verified": false
+  },
+  "disabled_action": {
+    "name": "boss-sop03",
+    "enabled": false,
+    "deleted": false,
+    "sop_id": "SOP03",
+    "version": "0.1.0",
+    "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+    "activation_policy": "NEXT_CONTEXT_LOAD",
+    "business_authorization_granted": false,
+    "model_adoption_verified": false
+  },
+  "after_reopen_disabled": {
+    "sop_id": "SOP03",
+    "name": "boss-sop03",
+    "requirement_id": "FR-03",
+    "version": "0.1.0",
+    "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+    "enabled": false,
+    "native_available": false,
+    "read_operations": [
+      "query_metrics",
+      "read_evidence"
+    ],
+    "command_operations": [],
+    "human_only_operations": [],
+    "missing_tools": [],
+    "tool_references_resolved": true,
+    "context_eligible": false,
+    "business_authorization_granted": false,
+    "model_adoption_verified": false
+  },
+  "enabled_action": {
+    "name": "boss-sop03",
+    "enabled": true,
+    "deleted": false,
+    "sop_id": "SOP03",
+    "version": "0.1.0",
+    "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+    "activation_policy": "NEXT_CONTEXT_LOAD",
+    "business_authorization_granted": false,
+    "model_adoption_verified": false
+  },
+  "after_reopen_references": [
+    {
+      "sop_id": "SOP03",
+      "name": "boss-sop03",
+      "version": "0.1.0",
+      "content_sha256": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b"
+    }
+  ],
+  "native_context_source": "explicit_skills",
+  "native_context_sha256": "2ac2b1a87a01095b77ef5df92258bc2c9d068fb0598d88120bde219a120f41f5",
+  "source_sha256": {
+    "validation/boss_native_skills.py": "89f8f1ca878f9ab88ab4cc064e3f1a72eff004b91405985e02212eb2d64bc20a",
+    "app/tests/test_boss_native_skills.py": "fbc7e0fe6fdf8b4cc494396b4ac3d7698005433191164e80aa4d7cb9088ff6f1",
+    "specs/agent-assets.json": "68287940e4c309cdf508f64d9dead6dba727d29ee320cd3519b102683ce827fb",
+    "validation/pyproject.toml": "848035bda5d787606581a701cc6e876f5a67eb2d65171fb15e0a3a8be7d3960e",
+    "validation/uv.lock": "962514185ab89ae0775f200e0880d07f78672bef43ef2015307e5f8366c0a307",
+    "evidence/T19/check_native_sop_catalog.py": "0c74da36ad5015f2878a35591e8f2139a582f0e901f3d911d7cfec4aa58e5a95",
+    "agent/skills/boss-sop01/SKILL.md": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+    "agent/skills/boss-sop02/SKILL.md": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+    "agent/skills/boss-sop03/SKILL.md": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+    "agent/skills/boss-sop04/SKILL.md": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+    "agent/skills/boss-sop05/SKILL.md": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+    "agent/skills/boss-sop06/SKILL.md": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+    "agent/skills/boss-sop07/SKILL.md": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+    "agent/skills/boss-sop08/SKILL.md": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+    "agent/skills/boss-sop09/SKILL.md": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+    "agent/skills/boss-sop10/SKILL.md": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+    "agent/skills/boss-sop11/SKILL.md": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+    "agent/skills/boss-sop12/SKILL.md": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+    "agent/skills/boss-sop13/SKILL.md": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369"
+  },
+  "business_database_unchanged": true,
+  "business_object_counts": {
+    "task": 0,
+    "outbox": 0,
+    "message_outbox": 0
+  },
+  "external_request_count": 0,
+  "stt_request_count": 0,
+  "model_adoption": "PENDING_EXPLICIT_TECHNICAL_CONTENT_AUTHORIZATION",
+  "public_integration": "PENDING_W3",
+  "full_A07_accepted": false,
+  "full_A19_accepted": false
+}

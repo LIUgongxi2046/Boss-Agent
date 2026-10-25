@@ -1,0 +1,131 @@
+{
+  "status": "PASS_RECEIVED_SOURCE_BINDING_AND_BASELINE_SCHEMA",
+  "full_A07_accepted": false,
+  "backend_version": "1.5.0",
+  "received_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
+  "received_source_sha256": {
+    "specs/openapi.yaml": "f8ad3608fc0d5fde292b5c6d51198a836f6e3ee682dc8fd4c772508b462ff6f0",
+    "specs/data-dictionary.json": "331dc3b0bd440b12e260daf5cbb3474243080aeb8be7b2955c81c44c57036c2f",
+    "specs/runtime-events.schema.json": "ab6f912b3ff72b9887bc9225b345774343f738b6f54b3e62246909e600585f93",
+    "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/controls.py": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d",
+    "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
+  },
+  "backend_specification_source": "FROZEN_GIT_OBJECTS",
+  "recorded_tool_counts": {
+    "query_metrics": 4,
+    "read_evidence": 4,
+    "create_assignment": 4,
+    "send_assignment": 4,
+    "read_assignment": 12
+  },
+  "runs": [
+    {
+      "run_id": "deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-0-648b1933-2c71-46ac-991e-398043220d43",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-1-02b44774-b245-4771-b533-9c2e251979eb",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    },
+    {
+      "run_id": "deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8",
+      "tool_result_count": 7,
+      "task_state_reread": "WAITING_FEEDBACK",
+      "message_reference_matches": true
+    }
+  ],
+  "input_evidence_sha256": {
+    "evidence/T16/deepseek-0-52111f59-8dc7-43cb-8582-cbdc7c4c36d0/events.json": "af0c272953df0a0e9d3ea3a9c2fef4b0212a25e79fb44a3af24ff85dda3bd976",
+    "evidence/T16/deepseek-0-648b1933-2c71-46ac-991e-398043220d43/events.json": "980b6b468b4c837c64ca94e20df15ff7bf4c8c0ed44f19df679ae9f8b20acdb5",
+    "evidence/T16/deepseek-1-02b44774-b245-4771-b533-9c2e251979eb/events.json": "c55a78ebac2b8d682f4466f8e52c8cbc08d31b5944136a2ccf31729c90458f4f",
+    "evidence/T16/deepseek-1-61cb06df-ba32-45f5-a900-13186e6899d8/events.json": "fed31dfbfeef56f2d101a7e9483856a93f2cd9afbac93b971168638754ab2aef"
+  },
+  "source_code_sha256": {
+    "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/model_probe.py": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873"
+  },
+  "source_revision_check": {
+    "source_id": "finance-note",
+    "current_document_version": "2",
+    "reported_source_version": "2",
+    "source_version_matches": true,
+    "body_changed": false,
+    "external_request_sent": false,
+    "earlier_query_status": 409,
+    "fresh_query_created": true,
+    "missing_binding_status": 409,
+    "same_version_metadata_change_status": 409,
+    "state_checks": [
+      {
+        "state": "RECEIVED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "INCOMPLETE",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "CONFLICTED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "SUPERSEDED",
+        "query_status": 409,
+        "evidence_status": 409
+      },
+      {
+        "state": "WITHDRAWN",
+        "query_status": 410,
+        "evidence_status": 410
+      },
+      {
+        "state": "EXPIRED",
+        "query_status": 410,
+        "evidence_status": 410
+      }
+    ],
+    "withdrawn_query_status": 410,
+    "failed_tool_results_released": false,
+    "source_scope_rejection_status": 403,
+    "tool_adapter": "W2 BusinessTool with W1 1.5.0 ControlStore"
+  },
+  "assignment_adapter_checks": [
+    {
+      "source_changed_after_create": false,
+      "task_count": 1,
+      "outbox_count": 1,
+      "new_send_status": 200,
+      "duplicate_creation_rejected": true,
+      "original_creation_replayed_without_new_write": true,
+      "task_id": "d9951dab-3ff3-4a8b-9575-b41a207d826c"
+    },
+    {
+      "source_changed_after_create": true,
+      "task_count": 1,
+      "outbox_count": 0,
+      "new_send_status": 409,
+      "duplicate_creation_rejected": true,
+      "original_creation_replayed_without_new_write": true,
+      "task_id": "f9af53c5-d039-448a-a7c6-8901e455875e"
+    }
+  ],
+  "new_external_model_requests": 0,
+  "new_task_count": 2,
+  "new_outbox_count": 1
+}

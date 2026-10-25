@@ -26,8 +26,13 @@ if [[ ! -d "$ROOT/validation/desktop/node_modules" ]]; then
   echo "缺少 Electron 依赖。请先执行 npm --prefix validation/desktop ci。" >&2
   exit 2
 fi
+APPLICATION_WORK="${BOSS_APPLICATION_WORK_DIR:-$ROOT/validation/.work/application}"
+if [[ ! -f "$APPLICATION_WORK/accounts/accounts.sqlite" ]]; then
+  echo "本机账号尚未初始化。请使用 scripts/provision_boss_accounts.py 在当前应用目录的 accounts 目录创建账号。" >&2
+  exit 2
+fi
 export BOSS_VALIDATION_ROOT="$ROOT/validation"
 export BOSS_PRODUCT_UI=1
-echo "启动 Boss-Agent v6 React + nanobot 本地研发环境（联网 DeepSeek，不是离线模型）。"
+echo "启动 Boss Agent 本机研发环境。"
 cd "$ROOT"
 exec npm --prefix validation/desktop run start

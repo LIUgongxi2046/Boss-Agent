@@ -1,0 +1,228 @@
+{
+  "status": "PASS",
+  "run_id": "fc02-bi-4f402a77-eb22-449c-982e-b039010b1a40",
+  "ports": {
+    "business": 9671,
+    "webui": 9672,
+    "gateway": 19671
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-bi-4f402a77-eb22-449c-982e-b039010b1a40",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-query-dist",
+  "manifest_sha256": "c3aae3a090d420976bd4ab0b30a9f4e88f8080a1b8778c32a34176d33118db31",
+  "inputs": [
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "f838f28e385b06ad2abd31c2a2e3514861e68904ba7a7921e8a5c27fda9b8ccc"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "a22a00ab5aae7b2644e7cc014abb8a8b3ae7b3fb2145f2716237824e9ea3b58c"
+    },
+    {
+      "path": "validation/boss_page_api.py",
+      "sha256": "51bfcce906cabb226b44865b60b2318e81ba2c9085bf8552ec53870615efc132"
+    },
+    {
+      "path": "specs/product-bi.openapi.yaml",
+      "sha256": "c41ecd5185ca08a63e4cf11f9e36a65e17d83c4a9c957a677d207ca0605f1268"
+    }
+  ],
+  "scope": "当前公开产品范围、变化、精度、公式和原查询依据；完整FC02二十项尚未验收",
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requests": 0,
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "query_change_precision_and_scoped_evidence",
+      "query_ids": [
+        "9f725df3-8f42-483e-ba9d-e5a90e56281d",
+        "e6248b37-8bc3-418e-a5ac-3fe7d6aa467c"
+      ],
+      "matching_detail_count": 4,
+      "unauthenticated": 401,
+      "maintainer": 403,
+      "extra_scope": 400
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "dom_bounds",
+      "page_id": "D01",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "tokens_keyboard_renderer",
+      "table": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "source": {
+        "font": "16px",
+        "line": "24px"
+      },
+      "field": {
+        "font": "14px",
+        "line": "22px",
+        "input": "16px"
+      },
+      "enter": true,
+      "tab": true,
+      "renderer_errors": 0
+    }
+  ]
+}

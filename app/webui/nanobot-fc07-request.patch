@@ -1,0 +1,6 @@
+*** Begin Patch
+*** Update File: .work/product/nanobot/webui/src/lib/nanobot-client.ts
+@@
+-      if (["boss.today.reorder", "boss.morning.query", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate"].includes(pending.action)) {
++      if (["boss.today.reorder", "boss.morning.query", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.")) {
+*** End Patch

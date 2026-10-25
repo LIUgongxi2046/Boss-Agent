@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "launcher": "scripts/run_mvp01.command",
+  "scope": "BOSS-MVP-1",
+  "origin": "http://127.0.0.1:9962",
+  "ports": {
+    "business": 9961,
+    "webui": 9962,
+    "gateway": 19961
+  },
+  "manifest_sha256": "279dfb0372e8abd63ae079cadf66ec6137deb6aabbb10da87c211afce5aae8cd",
+  "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/mvp01-experience",
+  "credential_path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/mvp01-experience/accounts/credentials.json",
+  "actual_boss_login": true,
+  "hidden_window": true,
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN"
+}

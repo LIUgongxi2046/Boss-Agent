@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K09-OPENAPI-170",
+  "kind": "STRUCTURE",
+  "baseline_id": "boss-agent-w3-api-170-8292824",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    ".work/openapi-venv/bin/python",
+    "evidence/T06/validate_openapi.py"
+  ],
+  "started_at": "2026-10-23T13:37:23.761292+00:00",
+  "ended_at": "2026-10-23T13:37:28.337678+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/openapi.yaml",
+      "sha256": "ca2df8e87002f1c4bc0ec1b1ce0a98ee1f50926bc6aba3defe322f41ab9a8d3f"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/simulated-supply-quality.schema.json",
+      "sha256": "9379ff9734b966308d24390cb2618d072611efd8d17968fcc2735abcf75d257b"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/supply-quality-results.schema.json",
+      "sha256": "9dee1f3caca598c3066a4e69f8c96a13e05687b5cb3c4029b4db6bd980ed8494"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/business-tools.schema.json",
+      "sha256": "6fd9235253e39300da85080679e8c109cfd5b70adbcf09f7662385a90d34be8d"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/simulation-query.schema.json",
+      "sha256": "00a8f7de6797d01b9dffb3c43667cc58c534a84a9cce68d4de6c82686e9a86a0"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/assignment-source-review.schema.json",
+      "sha256": "990cc11203c6e33fea1ff8ce48096ad7dd41e8be73f39c3aafadae5a89c6b95b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T09/w3-openapi-1.7.0/output.log",
+      "sha256": "de916c7aa510bd59bc0e706c50517ee2e6f4a57c13bb04edbde7fe5345949089"
+    }
+  ]
+}

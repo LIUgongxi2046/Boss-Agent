@@ -1,0 +1,687 @@
+{
+  "work_item_id": "T07-SOP-READ-ADAPTERS",
+  "checked_at": "2026-10-23T19:54:26.472584+08:00",
+  "code_base_commit": "78b87c6b697fa62a659d68de349db20b61147330",
+  "source_commit": "7aab4405b77887b3a2f242dde8c256247c0926f1",
+  "source_distribution": "IMMUTABLE_COMMITTED_W3_BACKEND",
+  "formal_read_contract_version": "1.6.0",
+  "operations": {
+    "bossDashboardRead": {
+      "path": "/api/boss/ui/dashboard",
+      "method": "GET",
+      "parameters": []
+    },
+    "bossMeetingsRead": {
+      "path": "/api/boss/ui/meetings",
+      "method": "GET",
+      "parameters": []
+    },
+    "bossEvidenceRead": {
+      "path": "/api/boss/ui/evidence",
+      "method": "GET",
+      "parameters": [
+        {
+          "name": "source",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      ]
+    }
+  },
+  "result": "PASS_LOCAL_READ_ADAPTERS",
+  "tests": 63,
+  "seconds": 14.455,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "test_three_read_operations_are_present_in_actual_registry",
+      "seconds": 2.652
+    },
+    {
+      "name": "test_native_sop_catalog_resolves_only_registered_read_operations",
+      "seconds": 0.497
+    },
+    {
+      "name": "test_actual_registry_reads_formal_projection_without_writes[bossDashboardRead-parameters0]",
+      "seconds": 0.474
+    },
+    {
+      "name": "test_actual_registry_reads_formal_projection_without_writes[bossMeetingsRead-parameters1]",
+      "seconds": 0.373
+    },
+    {
+      "name": "test_actual_registry_reads_formal_projection_without_writes[bossEvidenceRead-parameters2]",
+      "seconds": 0.41
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[None-401-BossDashboardReadTool]",
+      "seconds": 0.016
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[None-401-BossMeetingsReadTool]",
+      "seconds": 0.014
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[None-401-BossEvidenceReadTool]",
+      "seconds": 0.016
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[MAINTAINER-403-BossDashboardReadTool]",
+      "seconds": 0.026
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[MAINTAINER-403-BossMeetingsReadTool]",
+      "seconds": 0.016
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[MAINTAINER-403-BossEvidenceReadTool]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[CONTACT-403-BossDashboardReadTool]",
+      "seconds": 0.013
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[CONTACT-403-BossMeetingsReadTool]",
+      "seconds": 0.02
+    },
+    {
+      "name": "test_read_construction_rejects_other_roles[CONTACT-403-BossEvidenceReadTool]",
+      "seconds": 0.013
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[namespace-bossDashboardRead]",
+      "seconds": 0.011
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[namespace-bossEvidenceRead]",
+      "seconds": 0.01
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[namespace-bossMeetingsRead]",
+      "seconds": 0.011
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[owner_id-bossDashboardRead]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[owner_id-bossEvidenceRead]",
+      "seconds": 0.024
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[owner_id-bossMeetingsRead]",
+      "seconds": 0.014
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[role-bossDashboardRead]",
+      "seconds": 0.013
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[role-bossEvidenceRead]",
+      "seconds": 0.009
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[role-bossMeetingsRead]",
+      "seconds": 0.014
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[envelope-bossDashboardRead]",
+      "seconds": 0.009
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[envelope-bossEvidenceRead]",
+      "seconds": 0.011
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[envelope-bossMeetingsRead]",
+      "seconds": 0.01
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[authorization_id-bossDashboardRead]",
+      "seconds": 0.01
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[authorization_id-bossEvidenceRead]",
+      "seconds": 0.013
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[authorization_id-bossMeetingsRead]",
+      "seconds": 0.028
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[idempotency_key-bossDashboardRead]",
+      "seconds": 0.015
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[idempotency_key-bossEvidenceRead]",
+      "seconds": 0.011
+    },
+    {
+      "name": "test_model_cannot_supply_scope_or_authority[idempotency_key-bossMeetingsRead]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments0]",
+      "seconds": 0.035
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments1]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments2]",
+      "seconds": 0.011
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments3]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments4]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments5]",
+      "seconds": 0.009
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments6]",
+      "seconds": 0.026
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments7]",
+      "seconds": 0.012
+    },
+    {
+      "name": "test_evidence_accepts_only_formal_source_field[arguments8]",
+      "seconds": 0.01
+    },
+    {
+      "name": "test_server_owner_and_execution_space_remain_bound[BossDashboardReadTool]",
+      "seconds": 0.043
+    },
+    {
+      "name": "test_server_owner_and_execution_space_remain_bound[BossMeetingsReadTool]",
+      "seconds": 0.028
+    },
+    {
+      "name": "test_server_owner_and_execution_space_remain_bound[BossEvidenceReadTool]",
+      "seconds": 0.018
+    },
+    {
+      "name": "test_inactive_space_rejected_without_write[BossDashboardReadTool]",
+      "seconds": 0.019
+    },
+    {
+      "name": "test_inactive_space_rejected_without_write[BossMeetingsReadTool]",
+      "seconds": 0.02
+    },
+    {
+      "name": "test_inactive_space_rejected_without_write[BossEvidenceReadTool]",
+      "seconds": 0.019
+    },
+    {
+      "name": "test_unknown_or_locator_source_is_not_read_or_fetched[missing-source]",
+      "seconds": 0.026
+    },
+    {
+      "name": "test_unknown_or_locator_source_is_not_read_or_fetched[../../boss agent.md]",
+      "seconds": 0.016
+    },
+    {
+      "name": "test_unknown_or_locator_source_is_not_read_or_fetched[https://example.invalid/finance-note]",
+      "seconds": 0.019
+    },
+    {
+      "name": "test_unknown_or_locator_source_is_not_read_or_fetched[finance-note&role=MAINTAINER]",
+      "seconds": 0.027
+    },
+    {
+      "name": "test_dashboard_uses_confirmed_current_goals_and_ignores_draft",
+      "seconds": 0.038
+    },
+    {
+      "name": "test_current_meeting_changes_only_after_explicit_fixture_confirmation",
+      "seconds": 0.055
+    },
+    {
+      "name": "test_current_evidence_create_revise_withdraw_and_reopen",
+      "seconds": 0.057
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change0-403]",
+      "seconds": 0.017
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change1-403]",
+      "seconds": 0.023
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change2-409]",
+      "seconds": 0.017
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change3-409]",
+      "seconds": 0.038
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change4-409]",
+      "seconds": 0.017
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change5-409]",
+      "seconds": 0.019
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change6-410]",
+      "seconds": 0.023
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change7-410]",
+      "seconds": 0.016
+    },
+    {
+      "name": "test_actual_persisted_source_policy_rejects_unavailable_body[change8-410]",
+      "seconds": 2.861
+    }
+  ],
+  "implementation_sha256": {
+    "validation/runtime_page_read_tools.py": "38d79de92970cc6bfafa8c5d187e45bc766886956ae1ff5654eb493e18203fd8",
+    "evidence/T07/test_sop_read_tools.py": "84bba92a7835ef7c2a3b9f6f01ed747ebc0e71e54d64bc4ca7ab97011d08309d",
+    "evidence/T07/check_sop_read_tools.py": "ef0a499e6d8e99fdc977fe60e3517a7a64b8e10b422d467de0f78f890a839481",
+    "specs/agent-assets.json": "7b9ad376b37e949b77cd59af4b09233035f88fff5922c37de45f9e81b3638582"
+  },
+  "source_files": {
+    "specs/acceptance-cases.json": "0aa5bd2add4f88e349071e31c38c8eba6f8e913860eb3890d0c1d506ed0dab15",
+    "specs/agent-assets.json": "aee41abdc3aa8bcc5409158edfc0795be4a08e3d8e491f46eb648f721d3b2e9a",
+    "specs/assignment-source-review.schema.json": "d3b5020476b1ab292237923eafb40eea0aef138b7b7e15c09f21beb767b58f24",
+    "specs/data-dictionary.json": "ff6228331ab4055c99082fc8f1834d393b9793a6e0d184488c1608874852ebeb",
+    "specs/hld-72-page-map.json": "b1a8b18e4585cfb0427d47a9a188d37f83349e9a83addeb79e2647d0732c6f2f",
+    "specs/implementation-map.json": "70afe6997ceffa5c94af47bdf6a3c1cafb4a5d75301d52a252a9e42fc834c51a",
+    "specs/openapi.yaml": "e32c60cad37374e75a8f800ca0e6e8eb77aa7d25e7036fcc9a73a2d383ad5493",
+    "specs/page-service-map.json": "ffaf4bd2effab760cbde8aa781287c172f8543f15dc26796a282760c7f88475e",
+    "specs/product-runtime.openapi.yaml": "f83da557653d662cc54e2b64a1b533cdc08b240588a2809c8278f4d4927a2ebf",
+    "specs/product-skills.openapi.yaml": "3736b3e86e823225d24876f16f8ff15a96597c9701e12af01b5767af1e4b3d53",
+    "specs/runtime-events.schema.json": "922a9bd8e05d4aeb579c679257085b57a3e1e2ebdf3f8a34066588f351a11fa5",
+    "specs/runtime-records.schema.json": "9566d6d5126d7e5d5f7d2d4659e56166333f7e3b13b6d0d451a425bcc24b77f2",
+    "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27",
+    "specs/simulation-query.schema.json": "52307e247933fad63b50bd3e3e185d451957c7245000d6a6a46f49a0fbb9dd54",
+    "specs/value-validation.json": "6970d39b8512bac35e7b7a61399da8f3777a539644167c07d20119ee3113f678",
+    "validation/application.py": "cbfe2f5f25b392ce98729d567c22ad9b3bb9ebcfa10f44709d92c6ca5b414602",
+    "validation/application_paths.py": "9a4e5cef7359dac9e682d591282eb6e0f4a8e7e6999893582c02a2f4713b0cce",
+    "validation/audit_evidence.py": "7799b8c32732d8fea331d614b706cc166eb4741951671c2fe38c98b97165a4f7",
+    "validation/bind_saved_checks.py": "9a3cb1c8940c3e09a494805afa82c1b20ca9db11498ebda08be36dc7d31001ab",
+    "validation/boss_admin_config.py": "8c31fea3e7c58d8b45d1382c7e30df927118a356619499d627e705f352a306c9",
+    "validation/boss_agent_read_tools.py": "3624e56c601a698798d2b2eaf2a0a4152d198967051ab3c82463142560ac1da4",
+    "validation/boss_assignment_nudge.py": "221b0754b47187ea6261a1b49c7533335e51d2e360ee9b7a86f8833a98662e29",
+    "validation/boss_assignment_sources.py": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752",
+    "validation/boss_command_api.py": "12173f2f2810cce0530607067df443ed342a69d604e4598a8ad373ac664b27c3",
+    "validation/boss_knowledge_ingestion.py": "d6000576b0f782849f6eaa9c9ccc6b24db3716c757e4231f39fd348facdc2dc2",
+    "validation/boss_meeting_approval.py": "ce2bc66d37288ad6a5a15b1d76c916891fdba6e0bbfaa597fb14f06b50f508f1",
+    "validation/boss_meeting_brief.py": "f60cf8ba5ef7ebb271ca31299184ed33adf0531f076874acb513d2ad72f6d2c5",
+    "validation/boss_meetings.py": "1b0c43f0963373bf5484a1f4e39dc21db592c10b3c4aba8fc8d45cedb89a0e3c",
+    "validation/boss_memory.py": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631",
+    "validation/boss_memory_runtime.py": "54cec2f005d2c593f559e0c55a8fea30864780ac7ec1a8205b026f496f749b64",
+    "validation/boss_message_calendar.py": "ab7bd3ee7bffe1e81c88827103b3245d43144b0e7cc72b23208379e3a0e1ddd1",
+    "validation/boss_metrics.py": "3b9c9939b46961e09383397746b07b5d2a865151f16cbf4a5d5a7e3b514e8e92",
+    "validation/boss_native_skills.py": "5802c2fd2de192bbc57176a9de4e3640942f3b25d88781eba5d4cf6517c81b14",
+    "validation/boss_owner_authorizations.py": "526bf5c5591405431958e84cdb803817fb2c5395abe85d6a6c3a3e16d18ff107",
+    "validation/boss_owner_plans.py": "a29cfbcd8bc0ab32f8c0ecfd0a44333a09014df9658ad39c1a52c2bbba18f1b8",
+    "validation/boss_owner_preferences.py": "a392f2de5495074b911d5f27e0a714d94c0f4a1fdce3d8a599eb8bc4f4513e04",
+    "validation/boss_page_api.py": "ca838d8ea80da9c351946dc6099eb2f4ac54cb46d91f25c0b2fc2afbbe247b35",
+    "validation/boss_people.py": "6befcfb57e55d136d6d2d860aed5cb1b1210eb689645dfc9479d4c6e51b8d392",
+    "validation/boss_prompt_config.py": "273ebaa346f217cb348682915c6c3fb3e0de8bc60d9d3bba5dc8e673b19f0b9a",
+    "validation/boss_recovery_api.py": "6ddfafff83154c6f2c91f4352a96518cf053e34fa9f5c2e451cc6598ad6d08ef",
+    "validation/boss_research.py": "f6246b04d78541180b50b0d4f6dafb799dfb77c630d1aafd1fdcde307aaefd68",
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "validation/boss_scheduler_config.py": "b0e1f92ede51f5336178605f9381034ac7e274610c1a39746ee65fc83c98aa3c",
+    "validation/boss_sector_api.py": "5b5ad75cde87bd11fcde265a15b38ac45d670f45cd959c6299b9d3f5f3744b3b",
+    "validation/boss_self_commitments.py": "db3093b3fde0d3bc86e58228420f3fefee440cc219d8e9384ee2cfe92f1230bf",
+    "validation/boss_simulation_api.py": "1552c07daeb952b104fd79b885701bd5d28d283c9b1e7a31e464a8c8bbb29794",
+    "validation/boss_skill_drafts.py": "04c765f0a2adf63a880e9d655705eb5f5353b9bf4289c2f629cbab92530a8394",
+    "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896",
+    "validation/boss_task_reminders.py": "95d56ac5097b115f0aefcbfb326fcada5ad2b3f9ac98ce44763a50d3235bd835",
+    "validation/boss_today.py": "a6073095326b8be0ac16ea58bccd346bb095f8e89e50077250989286aeb15f18",
+    "validation/boss_transcription.py": "337a9ef40be26618115f45713e73caad4e6c668da92e25d8dbcb31441744f0c1",
+    "validation/boss_travel.py": "d83ddbee276e4bf5e6171a5958fbccfab65f437a5535e5d2432db7d0667ac2d7",
+    "validation/boss_workspace_api.py": "b35a3292f80d3537e05cfd32aecce98de0786f7ed96a3ecd9b2acbd685118c73",
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/capture_reuse.py": "ce0d8184fc8e7f8d4c289f3d6228d9f577ca8ef55797d33f0ef9abe09efbfd9c",
+    "validation/capture_validation.py": "a70d5f3b36a22aca3ca53f319c5f04a96b8f981f9e85392cc0dc1f19a10aa789",
+    "validation/check_admin.py": "78c903a54539f108f2fd0f5725037502bd341097c285e40187003417e0f355fc",
+    "validation/check_controls.py": "a5a1c3837fe6c7f20e11a31d3b55bea0a5f9f6079854be594b4ec97e3b565e3a",
+    "validation/check_evidence_privacy.py": "7ab7e723b95a1b9f52ddff8d783d929f87e5354f027fca8cc79ffac0d741362a",
+    "validation/check_handoff.py": "24a0f3ab45be4a8442022c00379e1b3d785ac69124d9f5bce801c852e00fd205",
+    "validation/check_historical_receipts.py": "6a3e63120620339212241eaa80c4d435340e6351175cae924b8da95089783650",
+    "validation/check_local.py": "4bb38ccc5c6048d511b36b54028a0e3dd6b0928a97ec33017c4573691aef5fe0",
+    "validation/check_materials.py": "4b6a85b777226356f9e8d0f520cd4013cedeb496cfdd34094ec36b0bac63d4ea",
+    "validation/check_product_access.py": "d97473e26c0add5b71ad30e05e91706c292ce87d60ac13ed90cf12743c5f5be1",
+    "validation/check_product_log.py": "8dcfa4bc4dffbd0753b6bfa800bba654c06001bd42c6cbf5da8b0ec5d7a38b2a",
+    "validation/check_public_runtime_evidence.py": "c8241daa724d8902c0c7dbb2ebcd7e655feb6c3f6dafdebb46a3bdac20c9b73e",
+    "validation/check_research_runtime.py": "a757e06d74b05a928911690f26d78d63ebfea0c3aac5757c0ff36876ee01f7f0",
+    "validation/check_reuse.py": "17a35be877ccdb84bc41f0b7fc30b4e7d35447a510e86aeb88cea88604cd7d5d",
+    "validation/check_runtime.py": "ae8ffeec1106bb751ebc05abc874e3e1e9aa3b637eb1120975c4bc2674866a01",
+    "validation/check_runtime_events.py": "a65d97afd4d59f974361fb6d94b739c616abd878a417f6c54b3ad05e12f2139b",
+    "validation/check_scheduler.py": "1c6c75f270c65d718550631eecbc2ad6d9b205a713f351aca89a75b558d609ff",
+    "validation/check_ui_business.py": "887394faf5f999d1058e84795776a34f009c19f7119c5022df93ed7b3661859a",
+    "validation/connection.py": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89",
+    "validation/controls.py": "925a2dcccc9b3c6a4a13726a5df4a747802de72a6104fff6184429be98990648",
+    "validation/dom_probe.py": "ab58a378eb578fb6639c933afa013f492939c2778f8a9de6971dc74bdc00daf5",
+    "validation/export_observed_runtime_fixture.py": "2415cd53ee77bf3d935f1db112dbf72e5cde6e575309894859283656f480a0ed",
+    "validation/export_public_store_fixture.py": "6c757a5d52258735924a7abbb9fe4bb01ef3eb74fa6eba739e02c5423c3ee481",
+    "validation/export_runtime_transport.py": "f761d145aee7b0a27d60561f249a709122bba39f5bbad4a3afd8ed1571ac5311",
+    "validation/fault_probe.py": "63f3f445c92a6ec98285c4fb64f59f73c8c92d589f9606f6e335a4b30ce8f668",
+    "validation/inspect_ui.py": "7b4db4de2b18662927d293eaa73083332fcb0a86058c50dd5c17dc1b746243b6",
+    "validation/inventory.py": "1fea6c8b758a352758f43de3e26a8b48dfe3a63a324828b9565d64b1a562c68d",
+    "validation/legacy_assignment_fixture.py": "aa28fb89902f35274de7c7822770751749faf964864c69db3358dc944d55fbc7",
+    "validation/model_probe.py": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873",
+    "validation/product_runtime.py": "1e3ed4d25fb9a116ff2483b4971550bc52e8f36b24559d7349b4117059d81dfc",
+    "validation/product_skills.py": "699b498ba4876c39a121d19633d632dbe61eadba58c9f8f4f789bcc3e33cab9c",
+    "validation/role_channel.py": "54bf8f70140833258d54b114bd4d72432e4e09d4bbc6a64cb1965c3c094d3329",
+    "validation/runtime_assignment_source_tool.py": "16e4547cdbc61f6c59c1e4c61fd9996f8af6cfa7162cbbe64738a594b47c6188",
+    "validation/runtime_meeting_tool.py": "6b4f6ce2a034065e2951adcd3b3978b4eab07c3f4fdba62ae1f200934132ae04",
+    "validation/runtime_owner_read_tools.py": "b35961b0c7f2cdd14a541e7bf6b74655c0458d7dbb0865050a3dabe7e679d452",
+    "validation/runtime_records_query.py": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502",
+    "validation/safe_diagnostics.py": "4176d2047b3ea5a076feecc57ad3a1ea138a03b2d3b3439ee71cff8c294a4ade",
+    "validation/service.py": "aa20876ef01fe357eea3de434de1a48e6c12573188bc0ce9298f351ef901bf79",
+    "validation/source_audit.py": "d0b581af1367260af2e23b1bdf67630912a81471be87d17c0bc552d6796ad1d5",
+    "validation/summarize_evidence.py": "8bc3737c1e82c6961c422ee47cc54aec55e4c18a580021fe8ee17e188fc3fc70",
+    "validation/upstream.py": "55d11be8727d5d3f47320abfe90b307c3b5035b101c3c3b6ce37ea5360288987",
+    "validation/verify_saved_check.py": "61e0a3188b90c7483869a085fba74644b3daabd47607f04ff54db22e43c47d1b"
+  },
+  "actual_imports": {
+    "business": {
+      "path": "validation/business.py",
+      "sha256": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3"
+    },
+    "boss_source_policy": {
+      "path": "validation/boss_source_policy.py",
+      "sha256": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
+    },
+    "boss_source_access": {
+      "path": "validation/boss_source_access.py",
+      "sha256": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33"
+    },
+    "boss_meetings": {
+      "path": "validation/boss_meetings.py",
+      "sha256": "1b0c43f0963373bf5484a1f4e39dc21db592c10b3c4aba8fc8d45cedb89a0e3c"
+    },
+    "boss_travel": {
+      "path": "validation/boss_travel.py",
+      "sha256": "d83ddbee276e4bf5e6171a5958fbccfab65f437a5535e5d2432db7d0667ac2d7"
+    },
+    "boss_owner_preferences": {
+      "path": "validation/boss_owner_preferences.py",
+      "sha256": "a392f2de5495074b911d5f27e0a714d94c0f4a1fdce3d8a599eb8bc4f4513e04"
+    },
+    "boss_people": {
+      "path": "validation/boss_people.py",
+      "sha256": "6befcfb57e55d136d6d2d860aed5cb1b1210eb689645dfc9479d4c6e51b8d392"
+    },
+    "boss_metrics": {
+      "path": "validation/boss_metrics.py",
+      "sha256": "3b9c9939b46961e09383397746b07b5d2a865151f16cbf4a5d5a7e3b514e8e92"
+    },
+    "boss_meeting_brief": {
+      "path": "validation/boss_meeting_brief.py",
+      "sha256": "f60cf8ba5ef7ebb271ca31299184ed33adf0531f076874acb513d2ad72f6d2c5"
+    },
+    "boss_prompt_config": {
+      "path": "validation/boss_prompt_config.py",
+      "sha256": "273ebaa346f217cb348682915c6c3fb3e0de8bc60d9d3bba5dc8e673b19f0b9a"
+    },
+    "boss_research": {
+      "path": "validation/boss_research.py",
+      "sha256": "f6246b04d78541180b50b0d4f6dafb799dfb77c630d1aafd1fdcde307aaefd68"
+    },
+    "controls": {
+      "path": "validation/controls.py",
+      "sha256": "925a2dcccc9b3c6a4a13726a5df4a747802de72a6104fff6184429be98990648"
+    },
+    "boss_message_calendar": {
+      "path": "validation/boss_message_calendar.py",
+      "sha256": "ab7bd3ee7bffe1e81c88827103b3245d43144b0e7cc72b23208379e3a0e1ddd1"
+    },
+    "boss_assignment_nudge": {
+      "path": "validation/boss_assignment_nudge.py",
+      "sha256": "221b0754b47187ea6261a1b49c7533335e51d2e360ee9b7a86f8833a98662e29"
+    },
+    "boss_scheduler_config": {
+      "path": "validation/boss_scheduler_config.py",
+      "sha256": "b0e1f92ede51f5336178605f9381034ac7e274610c1a39746ee65fc83c98aa3c"
+    },
+    "boss_knowledge_ingestion": {
+      "path": "validation/boss_knowledge_ingestion.py",
+      "sha256": "d6000576b0f782849f6eaa9c9ccc6b24db3716c757e4231f39fd348facdc2dc2"
+    },
+    "boss_owner_authorizations": {
+      "path": "validation/boss_owner_authorizations.py",
+      "sha256": "526bf5c5591405431958e84cdb803817fb2c5395abe85d6a6c3a3e16d18ff107"
+    },
+    "boss_task_reminders": {
+      "path": "validation/boss_task_reminders.py",
+      "sha256": "95d56ac5097b115f0aefcbfb326fcada5ad2b3f9ac98ce44763a50d3235bd835"
+    },
+    "boss_self_commitments": {
+      "path": "validation/boss_self_commitments.py",
+      "sha256": "db3093b3fde0d3bc86e58228420f3fefee440cc219d8e9384ee2cfe92f1230bf"
+    },
+    "boss_meeting_approval": {
+      "path": "validation/boss_meeting_approval.py",
+      "sha256": "ce2bc66d37288ad6a5a15b1d76c916891fdba6e0bbfaa597fb14f06b50f508f1"
+    },
+    "boss_command_api": {
+      "path": "validation/boss_command_api.py",
+      "sha256": "12173f2f2810cce0530607067df443ed342a69d604e4598a8ad373ac664b27c3"
+    },
+    "boss_recovery_api": {
+      "path": "validation/boss_recovery_api.py",
+      "sha256": "6ddfafff83154c6f2c91f4352a96518cf053e34fa9f5c2e451cc6598ad6d08ef"
+    },
+    "boss_memory": {
+      "path": "validation/boss_memory.py",
+      "sha256": "3873741ccb40a7c8bb1c25c7455aa03c69390193d9415ff8ceae8a578cb2e631"
+    },
+    "boss_workspace_api": {
+      "path": "validation/boss_workspace_api.py",
+      "sha256": "b35a3292f80d3537e05cfd32aecce98de0786f7ed96a3ecd9b2acbd685118c73"
+    },
+    "boss_sector_api": {
+      "path": "validation/boss_sector_api.py",
+      "sha256": "5b5ad75cde87bd11fcde265a15b38ac45d670f45cd959c6299b9d3f5f3744b3b"
+    },
+    "boss_admin_config": {
+      "path": "validation/boss_admin_config.py",
+      "sha256": "8c31fea3e7c58d8b45d1382c7e30df927118a356619499d627e705f352a306c9"
+    },
+    "boss_owner_plans": {
+      "path": "validation/boss_owner_plans.py",
+      "sha256": "a29cfbcd8bc0ab32f8c0ecfd0a44333a09014df9658ad39c1a52c2bbba18f1b8"
+    },
+    "boss_today": {
+      "path": "validation/boss_today.py",
+      "sha256": "a6073095326b8be0ac16ea58bccd346bb095f8e89e50077250989286aeb15f18"
+    },
+    "runtime_records_query": {
+      "path": "validation/runtime_records_query.py",
+      "sha256": "e441ac2a9ba5696c162f4c9af230d376e4e5cd469f8397e744fb4239136bf502"
+    },
+    "boss_runtime_records": {
+      "path": "validation/boss_runtime_records.py",
+      "sha256": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe"
+    },
+    "boss_assignment_sources": {
+      "path": "validation/boss_assignment_sources.py",
+      "sha256": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752"
+    },
+    "boss_simulation_api": {
+      "path": "validation/boss_simulation_api.py",
+      "sha256": "1552c07daeb952b104fd79b885701bd5d28d283c9b1e7a31e464a8c8bbb29794"
+    },
+    "boss_page_api": {
+      "path": "validation/boss_page_api.py",
+      "sha256": "ca838d8ea80da9c351946dc6099eb2f4ac54cb46d91f25c0b2fc2afbbe247b35"
+    },
+    "connection": {
+      "path": "validation/connection.py",
+      "sha256": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89"
+    },
+    "model_probe": {
+      "path": "validation/model_probe.py",
+      "sha256": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873"
+    },
+    "boss_native_skills": {
+      "path": "validation/boss_native_skills.py",
+      "sha256": "5802c2fd2de192bbc57176a9de4e3640942f3b25d88781eba5d4cf6517c81b14"
+    }
+  },
+  "socket_connect_attempts": [],
+  "data_source": "EXISTING_COMMITTED_SIMULATED_SELECTION_AND_FORMAL_LOCAL_ACTIONS",
+  "read_mutation_check": "FULL_SQLITE_LOGICAL_DUMP_EQUAL_BEFORE_AFTER_EVERY_SUCCESS_AND_DENIAL",
+  "fixture_actions": "独立资料库中的BOSS目标和会议确认，以及MAINTAINER来源新增、换版与撤销；各项读取前后单独比较完整资料库",
+  "external_requests": 0,
+  "stt": "DEFERRED_BY_USER",
+  "public_runtime_registration": "NOT_RUN",
+  "model_adoption": "NOT_RUN",
+  "parent_A07_accepted": false,
+  "parent_A16_accepted": false,
+  "registry": "ACTUAL_NANOBOT_TOOL_REGISTRY_WITH_FIVE_EXISTING_TOOLS_AND_THREE_NEW_READ_TOOLS",
+  "native_sop_coverage": [
+    {
+      "sop_id": "SOP01",
+      "missing_tools": [
+        "ownerPlansRead",
+        "todayRead",
+        "todayReorder"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP02",
+      "missing_tools": [
+        "boss.reminder.ack",
+        "boss.reminder.close",
+        "boss.reminder.snooze",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP03",
+      "missing_tools": [],
+      "context_eligible": true
+    },
+    {
+      "sop_id": "SOP04",
+      "missing_tools": [
+        "boss.meeting.brief.prepare",
+        "meetingArrangementRead",
+        "meetingCancel",
+        "meetingConfirm",
+        "meetingDraftSave",
+        "meetingHeld"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP05",
+      "missing_tools": [
+        "boss.minutes.assignment.create",
+        "boss.minutes.confirm",
+        "boss.minutes.save",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP06",
+      "missing_tools": [
+        "assignmentSourcesRead",
+        "boss.assignment.cancel",
+        "boss.assignment.complete",
+        "boss.assignment.extend",
+        "boss.assignment.nudge",
+        "bossTasksRead",
+        "ownerPlansRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP07",
+      "missing_tools": [
+        "boss.approval.decide",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP08",
+      "missing_tools": [
+        "boss.message.draft.save",
+        "boss.message.send",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP09",
+      "missing_tools": [
+        "boss.research.prepare",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP10",
+      "missing_tools": [
+        "boss.people.attach",
+        "boss.people.detach",
+        "boss.people.prepare",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP11",
+      "missing_tools": [
+        "boss.travel.cancel",
+        "boss.travel.confirm",
+        "boss.travel.review",
+        "bossCalendarConflictRead",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP12",
+      "missing_tools": [
+        "boss.calendar.delete",
+        "boss.calendar.save",
+        "boss.calendar.share",
+        "boss.calendar.share.revoke",
+        "bossCalendarSharePreview",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    },
+    {
+      "sop_id": "SOP13",
+      "missing_tools": [
+        "boss.memory.confirm",
+        "boss.memory.delete",
+        "bossWorkspaceRead"
+      ],
+      "context_eligible": false
+    }
+  ],
+  "remaining": "W3在正式配置许可范围注册工具，在同一集成版本验证完整SOP和页面业务采用"
+}

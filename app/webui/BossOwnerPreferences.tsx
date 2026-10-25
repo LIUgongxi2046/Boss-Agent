@@ -6,6 +6,8 @@ import {
   History, Loader2, RefreshCw, ShieldCheck, SlidersHorizontal,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
+import {useTransaction} from "./BossAssignmentFlow";
+import {deliveredPage} from "./delivered-navigation";
 
 type GoalSettings = {
   goals: string[]; topics: string[]; reading_requirement: string;
@@ -104,15 +106,16 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
   const [checking,setChecking]=useState(false);
   const modalRef=useRef<HTMLElement|null>(null);
   const reload=()=>setRevision(x=>x+1);
+  const noticeTx=useTransaction(()=>{setDirty(false);onDirtyChange(false);reload();},undefined,undefined,isGoal?"ownerGoalsReadonly":"ownerNotice");
 
-  useEffect(()=>{onDirtyChange(dirty);},[dirty,onDirtyChange]);
+  useEffect(()=>{onDirtyChange(dirty||(!isGoal&&noticeTx.busy));},[dirty,isGoal,noticeTx.busy,onDirtyChange]);
   useEffect(()=>{
     const onBeforeUnload=(event:BeforeUnloadEvent)=>{
-      if(dirty||pending){event.preventDefault();event.returnValue="";}
+      if(dirty||pending||(!isGoal&&noticeTx.busy)){event.preventDefault();event.returnValue="";}
     };
     window.addEventListener("beforeunload",onBeforeUnload);
     return ()=>window.removeEventListener("beforeunload",onBeforeUnload);
-  },[dirty,pending]);
+  },[dirty,pending,isGoal,noticeTx.busy]);
 
   function hydrate(record:RecordState|null){
     if(!record)return;
@@ -183,6 +186,7 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
   }
   function propose(action:string,payload:Record<string,unknown>,
                    title:string,details:string[]){
+    if(!isGoal){if(noticeTx.busy)return;if(action!=="boss.owner.notice.save"&&action!=="boss.owner.notice.confirm")throw new Error("当前通知设置动作无效");noticeTx.propose(action,payload,title,details);return;}
     setPending({action,payload,title,details,key:"boss-"+crypto.randomUUID()});
     setApproved(false);setError("");setNotice("");
   }
@@ -292,7 +296,7 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
     finally{setChecking(false);}
   }
 
-  return <>
+  return <div className={!isGoal?"boss-fc04-reminders":undefined}>
     <div className="boss-workspace-toolbar">
       <span className="boss-workspace-note">
         <span className="boss-tag boss-tag-amber">SIMULATED · BOSS ONLY</span>
@@ -317,6 +321,7 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
       <div className="boss-column">
         <Panel title={isGoal?"目标、关注主题及长期阅读要求":"通知时间、升级与阅读格式"}
           note="Desktop v6 原版编辑表单 · 保存 / 本人确认分离">
+          <fieldset className="boss-owner-setting-fields" disabled={busy||(!isGoal&&noticeTx.busy)}>
           {isGoal?<>
             <label className="boss-field">
               <span>目标内容（每行一项，最多8项）</span>
@@ -399,6 +404,7 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
               <ShieldCheck size={15}/> 本人确认启用当前草稿
             </button>
           </div>
+          </fieldset>
         </Panel>
         <Panel title={isGoal?"当前要求与版本状态":"通知策略当前版本"}
           note="草稿、有效版本、实际采用分别记录">
@@ -443,17 +449,17 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
               <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>
                 <FileClock size={15}/> 查看晨间工作
               </button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
-                查看会前材料</button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F13")}>
-                个人记忆</button>
+              {deliveredPage("F04","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
+                查看会前材料</button>}
+              {deliveredPage("F13","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F13")}>
+                个人记忆</button>}
             </>:<>
               <button type="button" className="boss-btn" onClick={()=>onNavigate("N06")}>
                 <BellRing size={15}/> 查看通知记录</button>
               <button type="button" className="boss-btn" onClick={()=>onNavigate("N09")}>
                 查看本人计划</button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
-                查看私人日程授权</button>
+              {deliveredPage("F12","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
+                查看私人日程授权</button>}
             </>}
           </div>
         </Panel>
@@ -468,6 +474,9 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
         </Panel>
       </div>
     </div>
+    {!isGoal&&noticeTx.notice&&<p className="boss-status boss-status-ok" role="status">{noticeTx.notice}</p>}
+    {!isGoal&&noticeTx.dialog}
+    {!isGoal&&noticeTx.recovery}
     {pending&&<div className="boss-confirm-backdrop">
       <section ref={modalRef} role="dialog" aria-modal="true" tabIndex={-1}
         className="boss-confirm" aria-labelledby="boss-owner-setting-title">
@@ -494,5 +503,5 @@ export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
         </footer>
       </section>
     </div>}
-  </>;
+  </div>;
 }

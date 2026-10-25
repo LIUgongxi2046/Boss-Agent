@@ -1,0 +1,4 @@
+{
+  "extends": "../runtime-ui/tsconfig.json",
+  "include": ["main.tsx", "../../../app/webui/MaintainerMemoryStatus.tsx", "../../../app/webui/MaintainerRuntimeRecords.tsx"]
+}

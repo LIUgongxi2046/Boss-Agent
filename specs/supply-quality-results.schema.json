@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:supply-quality-results:1.8.0",
+  "$ref": "#/$defs/Projection",
+  "$defs": {
+    "Id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "Time": {"type": "string", "format": "date-time"},
+    "Strings": {"type": "array", "items": {"type": "string"}},
+    "Value": {"type": ["string", "null"], "pattern": "^-?[0-9]+([.][0-9]+)?$"},
+    "RecordIdentity": {
+      "type": "object", "additionalProperties": false, "required": ["entity_type", "record_id", "version", "source_id"],
+      "properties": {"entity_type": {"type": "string"}, "record_id": {"$ref": "#/$defs/Id"}, "version": {"type": "string"}, "source_id": {"$ref": "#/$defs/Id"}}
+    },
+    "ImportResult": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_type", "simulation_definition", "execution_namespace", "import_id", "state", "error_code", "record_count", "external_service_invoked", "received_at", "records"],
+      "properties": {"source_type": {"const": "SIMULATED"}, "simulation_definition": {"const": "si09-si10-business-v1"}, "execution_namespace": {"$ref": "#/$defs/Id"}, "import_id": {"$ref": "#/$defs/Id"},
+        "state": {"enum": ["SUCCESS", "EMPTY", "FAILED", "TIMED_OUT"]}, "error_code": {"enum": [null, "SIMULATED_UPSTREAM_FAILURE", "SIMULATED_UPSTREAM_TIMEOUT"]}, "record_count": {"type": "integer", "minimum": 0, "maximum": 64},
+        "external_service_invoked": {"const": false}, "received_at": {"$ref": "#/$defs/Time"}, "records": {"type": "array", "items": {"$ref": "#/$defs/RecordIdentity"}}}
+    },
+    "WithdrawResult": {
+      "type": "object", "additionalProperties": false, "required": ["source_type", "entity_type", "record_id", "version", "record_state", "source_id", "external_service_invoked"],
+      "properties": {"source_type": {"const": "SIMULATED"}, "entity_type": {"type": "string"}, "record_id": {"$ref": "#/$defs/Id"}, "version": {"type": "string"}, "record_state": {"const": "WITHDRAWN"}, "source_id": {"$ref": "#/$defs/Id"}, "external_service_invoked": {"const": false}}
+    },
+    "CoordinationLink": {
+      "type": "object", "additionalProperties": false, "required": ["link_id", "task_id", "interface_id", "origin_entity_type", "origin_record_id", "origin_version", "review_sha256", "created_at", "source_type"],
+      "properties": {"link_id": {"$ref": "#/$defs/Id"}, "task_id": {"$ref": "#/$defs/Id"}, "interface_id": {"enum": ["SI09", "SI10"]}, "origin_entity_type": {"type": "string"}, "origin_record_id": {"$ref": "#/$defs/Id"}, "origin_version": {"type": "string"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "created_at": {"$ref": "#/$defs/Time"}, "source_type": {"const": "SIMULATED"}}
+    },
+    "CoordinateResult": {
+      "type": "object", "additionalProperties": false, "required": ["task_id", "status", "version", "authorization_id", "execution_namespace", "persisted_at", "source_type", "coordination_link", "external_service_invoked", "purchase_executed", "quality_release_executed"],
+      "properties": {"task_id": {"$ref": "#/$defs/Id"}, "status": {"const": "OPEN"}, "version": {"type": "string"}, "authorization_id": {"$ref": "#/$defs/Id"}, "execution_namespace": {"$ref": "#/$defs/Id"}, "persisted_at": {"$ref": "#/$defs/Time"}, "source_type": {"const": "SIMULATED"}, "coordination_link": {"$ref": "#/$defs/CoordinationLink"}, "external_service_invoked": {"const": false}, "purchase_executed": {"const": false}, "quality_release_executed": {"const": false}}
+    },
+    "Receipt": {
+      "type": "object", "additionalProperties": false, "required": ["source_type", "action", "client_request_id", "outcome", "result"],
+      "properties": {"source_type": {"const": "SIMULATED"}, "action": {"enum": ["boss.simulation.supply_quality.import", "boss.simulation.supply_quality.withdraw", "boss.supply_quality.coordinate"]}, "client_request_id": {"$ref": "#/$defs/Id"}, "outcome": {"enum": ["RECORDED", "NOT_FOUND_IN_CURRENT_STORE"]}, "result": {"oneOf": [{"$ref": "#/$defs/ImportResult"}, {"$ref": "#/$defs/WithdrawResult"}, {"$ref": "#/$defs/CoordinateResult"}, {"type": "null"}]}}
+    },
+    "StoredRecord": {
+      "type": "object", "additionalProperties": false,
+      "required": ["record_id", "entity_type", "version", "record_state", "state", "owner_id", "dataset_id", "dataset_version", "execution_namespace", "source_type", "simulation_definition", "observed_at", "valid_from", "valid_until", "author_contact_id", "received_at", "source_id", "source_version", "data"],
+      "properties": {"record_id": {"$ref": "#/$defs/Id"}, "entity_type": {"type": "string"}, "version": {"type": "string"}, "record_state": {"enum": ["ACTIVE", "WITHDRAWN"]}, "state": {"type": "string"}, "owner_id": {"$ref": "#/$defs/Id"}, "dataset_id": {"$ref": "#/$defs/Id"}, "dataset_version": {"type": "string"}, "execution_namespace": {"$ref": "#/$defs/Id"}, "source_type": {"const": "SIMULATED"}, "simulation_definition": {"const": "si09-si10-business-v1"}, "observed_at": {"$ref": "#/$defs/Time"}, "valid_from": {"$ref": "#/$defs/Time"}, "valid_until": {"type": ["string", "null"], "format": "date-time"}, "author_contact_id": {"$ref": "#/$defs/Id"}, "received_at": {"$ref": "#/$defs/Time"}, "source_id": {"$ref": "#/$defs/Id"}, "source_version": {"type": "string"}, "data": {"type": "object"}}
+    },
+    "PlanRequirement": {
+      "type": "object", "additionalProperties": false, "required": ["capacity_id", "formula_id", "period_start", "period_end", "quantity"],
+      "properties": {"capacity_id": {"$ref": "#/$defs/Id"}, "formula_id": {"$ref": "#/$defs/Id"}, "period_start": {"$ref": "#/$defs/Time"}, "period_end": {"$ref": "#/$defs/Time"}, "quantity": {"$ref": "#/$defs/Value"}}
+    },
+    "CostReportSummary": {
+      "type": "object", "additionalProperties": false, "required": ["report_id", "source_id", "source_version", "period_start", "period_end", "inventory_ids", "quantity", "total_cost", "unit_cost"],
+      "properties": {"report_id": {"$ref": "#/$defs/Id"}, "source_id": {"$ref": "#/$defs/Id"}, "source_version": {"type": "string"}, "period_start": {"$ref": "#/$defs/Time"}, "period_end": {"$ref": "#/$defs/Time"}, "inventory_ids": {"$ref": "#/$defs/Strings"}, "quantity": {"$ref": "#/$defs/Value"}, "total_cost": {"$ref": "#/$defs/Value"}, "unit_cost": {"$ref": "#/$defs/Value"}}
+    },
+    "CostReportComparison": {
+      "type": "object", "additionalProperties": false, "required": ["material_id", "legal_entity_id", "asset_owner_id", "cost_owner_id", "ownership_type", "customer_id", "cost_type", "report_scope_id", "cost_basis_id", "quantity_unit", "currency", "scope_description", "current", "baseline", "comparison_state", "unit_cost_change", "total_cost_change", "missing_fields", "formula"],
+      "properties": {"material_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "asset_owner_id": {"$ref": "#/$defs/Id"}, "cost_owner_id": {"type": ["string", "null"]}, "ownership_type": {"type": "string"}, "customer_id": {"type": ["string", "null"]}, "cost_type": {"enum": ["INBOUND_RECEIPT", "ACTUAL_CONSUMPTION"]}, "report_scope_id": {"$ref": "#/$defs/Id"}, "cost_basis_id": {"$ref": "#/$defs/Id"}, "quantity_unit": {"type": "string"}, "currency": {"type": "string"}, "scope_description": {"type": "string"}, "current": {"$ref": "#/$defs/CostReportSummary"}, "baseline": {"oneOf": [{"$ref": "#/$defs/CostReportSummary"}, {"type": "null"}]}, "comparison_state": {"enum": ["COMPARABLE", "NO_BASELINE", "INCOMPARABLE_PERIODS", "UNKNOWN_COST_OWNER"]}, "unit_cost_change": {"$ref": "#/$defs/Value"}, "total_cost_change": {"$ref": "#/$defs/Value"}, "missing_fields": {"$ref": "#/$defs/Strings"}, "formula": {"type": "string"}}
+    },
+    "Supply": {
+      "type": "object", "additionalProperties": false,
+      "required": ["material_id", "legal_entity_id", "asset_owner_id", "ownership_type", "customer_id", "quantity_unit", "currency", "available_quantity", "daily_quantity", "coverage_days", "consumption_assumptions", "excluded_inventory", "quote_price_difference", "quote_ids", "contract_unit_prices", "actual_cost_change", "cost_reports", "plan_requirements", "required_quantity", "quantity_gap", "hypothetical_plan_quote_difference", "calculation_basis"],
+      "properties": {"material_id": {"$ref": "#/$defs/Id"}, "legal_entity_id": {"$ref": "#/$defs/Id"}, "asset_owner_id": {"$ref": "#/$defs/Id"}, "ownership_type": {"type": "string"}, "customer_id": {"type": ["string", "null"]}, "quantity_unit": {"type": "string"}, "currency": {"type": "string"},
+        "available_quantity": {"$ref": "#/$defs/Value"}, "daily_quantity": {"$ref": "#/$defs/Value"}, "coverage_days": {"$ref": "#/$defs/Value"}, "consumption_assumptions": {"$ref": "#/$defs/Strings"},
+        "excluded_inventory": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["inventory_id", "reason"], "properties": {"inventory_id": {"$ref": "#/$defs/Id"}, "reason": {"type": "string"}}}},
+        "quote_price_difference": {"$ref": "#/$defs/Value"}, "quote_ids": {"$ref": "#/$defs/Strings"}, "contract_unit_prices": {"type": "array", "items": {"$ref": "#/$defs/Value"}}, "actual_cost_change": {"type": "null"}, "plan_requirements": {"type": "array", "items": {"$ref": "#/$defs/PlanRequirement"}},
+        "cost_reports": {"type": "array", "items": {"$ref": "#/$defs/CostReportComparison"}},
+        "required_quantity": {"$ref": "#/$defs/Value"}, "quantity_gap": {"$ref": "#/$defs/Value"}, "hypothetical_plan_quote_difference": {"$ref": "#/$defs/Value"}, "calculation_basis": {"type": "string"}}
+    },
+    "ProcessingTotal": {
+      "type": "object", "additionalProperties": false, "required": ["processing_id", "input_quantity", "output_quantity", "loss_quantity", "quantity_unit"],
+      "properties": {"processing_id": {"$ref": "#/$defs/Id"}, "input_quantity": {"$ref": "#/$defs/Value"}, "output_quantity": {"$ref": "#/$defs/Value"}, "loss_quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"type": "string"}}
+    },
+    "Trace": {
+      "type": "object", "additionalProperties": false, "required": ["processing_totals", "confirmed_inventory", "confirmed_customers", "unconfirmed_relationships", "relationships_by_state", "causal_conclusion"],
+      "properties": {"processing_totals": {"type": "array", "items": {"$ref": "#/$defs/ProcessingTotal"}},
+        "confirmed_inventory": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["inventory_id", "batch_id", "quantity", "quantity_unit"], "properties": {"inventory_id": {"$ref": "#/$defs/Id"}, "batch_id": {"$ref": "#/$defs/Id"}, "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"type": "string"}}}},
+        "confirmed_customers": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["customer_id", "quantity", "quantity_unit"], "properties": {"customer_id": {"$ref": "#/$defs/Id"}, "quantity": {"$ref": "#/$defs/Value"}, "quantity_unit": {"type": "string"}}}},
+        "unconfirmed_relationships": {"type": "array", "items": {"$ref": "./simulated-supply-quality.schema.json#/$defs/quality_trace"}},
+        "relationships_by_state": {"type": "object", "additionalProperties": false, "required": ["CONFIRMED", "POSSIBLE", "MISSING", "CONFLICTED"], "properties": {"CONFIRMED": {"type": "array", "items": {"$ref": "./simulated-supply-quality.schema.json#/$defs/quality_trace"}}, "POSSIBLE": {"type": "array", "items": {"$ref": "./simulated-supply-quality.schema.json#/$defs/quality_trace"}}, "MISSING": {"type": "array", "items": {"$ref": "./simulated-supply-quality.schema.json#/$defs/quality_trace"}}, "CONFLICTED": {"type": "array", "items": {"$ref": "./simulated-supply-quality.schema.json#/$defs/quality_trace"}}}}, "causal_conclusion": {"type": "null"}}
+    },
+    "Projection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_type", "simulation_definition", "interface_id", "dataset_id", "dataset_version", "execution_namespace", "records", "source_statuses", "availability", "last_import", "missing_fields", "supply", "trace", "events", "coordination_links", "review_sha256", "business_at", "read_at", "external_service_invoked", "purchase_executed", "quality_release_executed"],
+      "properties": {"source_type": {"const": "SIMULATED"}, "simulation_definition": {"const": "si09-si10-business-v1"}, "interface_id": {"enum": ["SI09", "SI10"]}, "dataset_id": {"$ref": "#/$defs/Id"}, "dataset_version": {"type": "string"}, "execution_namespace": {"$ref": "#/$defs/Id"},
+        "records": {"type": "array", "items": {"$ref": "#/$defs/StoredRecord"}}, "source_statuses": {"type": "array", "items": {"$ref": "./simulation-query.schema.json#/$defs/Record"}}, "availability": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "last_import": {"oneOf": [{"$ref": "#/$defs/ImportResult"}, {"type": "null"}]}, "missing_fields": {"$ref": "#/$defs/Strings"}, "supply": {"type": "array", "items": {"$ref": "#/$defs/Supply"}}, "trace": {"oneOf": [{"$ref": "#/$defs/Trace"}, {"type": "null"}]}, "events": {"type": "array", "items": {"$ref": "#/$defs/StoredRecord"}}, "coordination_links": {"type": "array", "items": {"$ref": "#/$defs/CoordinationLink"}},
+        "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "business_at": {"$ref": "#/$defs/Time"}, "read_at": {"$ref": "#/$defs/Time"}, "external_service_invoked": {"const": false}, "purchase_executed": {"const": false}, "quality_release_executed": {"const": false}}
+    }
+  }
+}

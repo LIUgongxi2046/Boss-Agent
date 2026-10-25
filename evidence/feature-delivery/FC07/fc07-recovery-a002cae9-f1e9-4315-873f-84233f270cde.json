@@ -1,0 +1,124 @@
+{
+  "status": "PASS",
+  "run_id": "fc07-recovery-a002cae9-f1e9-4315-873f-84233f270cde",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc07-n3-dist",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc07-recovery-a002cae9-f1e9-4315-873f-84233f270cde",
+  "ports": {
+    "business": 10081,
+    "webui": 10082,
+    "gateway": 20081
+  },
+  "proxy_port": 10083,
+  "visual": "NOT_RUN",
+  "external_api_mode": "SIMULATED_FIRST",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "current_controls",
+      "url": "http://127.0.0.1:10083/?bossPage=F06",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "唯一负责人请选择陈明 · 合成区域 · 业务统筹李文 · 合成财务 · 财务材料作者陈明 · 合成客户 · 客户联系人",
+          "type": null
+        },
+        {
+          "tag": "INPUT",
+          "label": "期限（Asia/Shanghai）",
+          "type": "datetime-local"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": null
+        },
+        {
+          "tag": "INPUT",
+          "type": null
+        }
+      ]
+    },
+    {
+      "check": "actual_send_interrupted",
+      "transport": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "9a9fd52e-8251-4793-a07b-03019d66c303",
+          "action": "boss.assignment.send",
+          "client_request_id": "boss-59a97b8f-2399-43c1-9390-bbc59370ae3d"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "9a9fd52e-8251-4793-a07b-03019d66c303",
+          "action": "boss.assignment.send",
+          "client_request_id": "boss-59a97b8f-2399-43c1-9390-bbc59370ae3d",
+          "response_sha256": "ecb1d2de33f6c3e9545855f717f0d167cd2e32bc813fa2567da5d0c603256c05"
+        }
+      ]
+    },
+    {
+      "check": "readonly_recovery_after_reload",
+      "client_request_id": "boss-59a97b8f-2399-43c1-9390-bbc59370ae3d",
+      "task_id": "4bd875b8-b6a4-4cac-8edd-4c7ac10794b9",
+      "status": "WAITING_FEEDBACK",
+      "message_count": 1
+    },
+    {
+      "check": "source_confirmation_and_commitment_original_receipts",
+      "source_task_id": "9647cb6d-e79a-4557-9ffe-66b2446208cd",
+      "source_request": "source-review-fd68827e-b766-4dc7-83a9-b17c40626226",
+      "source_version": "2",
+      "source_history_count": 1,
+      "commitment_request": "boss-db363262-39ae-42e1-ba3d-e7a177c789a3",
+      "commitment_id": "owner-task-f5294f32-4068-4b85-8040-40e27273c15b",
+      "commitment_count": 1,
+      "original_approved_source": "finance-note",
+      "transport": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "9a9fd52e-8251-4793-a07b-03019d66c303",
+          "action": "boss.assignment.send",
+          "client_request_id": "boss-59a97b8f-2399-43c1-9390-bbc59370ae3d"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "9a9fd52e-8251-4793-a07b-03019d66c303",
+          "action": "boss.assignment.send",
+          "client_request_id": "boss-59a97b8f-2399-43c1-9390-bbc59370ae3d",
+          "response_sha256": "ecb1d2de33f6c3e9545855f717f0d167cd2e32bc813fa2567da5d0c603256c05"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "cf7f5261-f57f-4efe-9d8a-fc1827f4d394",
+          "action": "boss.fc01.coordinate",
+          "client_request_id": "fc07-recovery-a002cae9-f1e9-4315-873f-84233f270cde-source-task"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "ac7823a6-7320-4e1c-a375-2e2b87a39a1c",
+          "action": "boss.assignment.sources.confirm",
+          "client_request_id": "source-review-fd68827e-b766-4dc7-83a9-b17c40626226"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "ac7823a6-7320-4e1c-a375-2e2b87a39a1c",
+          "action": "boss.assignment.sources.confirm",
+          "client_request_id": "source-review-fd68827e-b766-4dc7-83a9-b17c40626226",
+          "response_sha256": "5918e11a3fc61ff5b65b9aa84112b7c6356720865677e8f66d19307c97fd9d19"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "05660b1d-47bd-4c4c-91a0-503f93fe9c28",
+          "action": "boss.commitment.create",
+          "client_request_id": "boss-db363262-39ae-42e1-ba3d-e7a177c789a3"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "05660b1d-47bd-4c4c-91a0-503f93fe9c28",
+          "action": "boss.commitment.create",
+          "client_request_id": "boss-db363262-39ae-42e1-ba3d-e7a177c789a3",
+          "response_sha256": "cb1386185f636d8efb4469a6368a172c8956bde6e5eafc6cf1051c089185dade"
+        }
+      ]
+    }
+  ]
+}

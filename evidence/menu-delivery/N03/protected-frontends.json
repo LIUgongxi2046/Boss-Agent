@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "scope": "MENU_N03_PROTECTED_FRONTENDS_ONLY",
+  "protected_frontends": {
+    "historical_menu_f01": {
+      "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-f01-n3-dist",
+      "manifest_sha256": "e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c",
+      "index_sha256": "11a935970330ddfa87e50faeb5f266cd27163f11750945e01797be25d3396b1f"
+    },
+    "historical_menu_f01_rework": {
+      "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-f01-rework-n3-dist",
+      "manifest_sha256": "ee1b543a5258a12ad01676eed39e2923e6c55ed6aba4f857d78890016e32296a",
+      "index_sha256": "fe9842f392bf853f217294d83dcad3918d2046afb62dfdbdac33ccee21ccff22"
+    },
+    "historical_menu_n02": {
+      "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n02-n3-dist",
+      "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
+      "index_sha256": "d48741e7cb653318a8cf275a93b1ae2680e2a280de7079d7c6d0f2d34b447139"
+    },
+    "historical_ui02": {
+      "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui02-n3-dist",
+      "manifest_sha256": "2b95fb287e88aef5bf3aadbca0ae416262ed077ca3555ac4346616ffbc885523",
+      "index_sha256": "4c9600fa1341688ac2e4f5ae3a68aa2d71bd3d5bf651249853fe997fa409f38e"
+    },
+    "historical_mvp01": {
+      "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/mvp01-n3-dist",
+      "manifest_sha256": "279dfb0372e8abd63ae079cadf66ec6137deb6aabbb10da87c211afce5aae8cd",
+      "index_sha256": "34a0b8f52ba9fe06d9a0479db6a6f59d5b3ff21163ae39bbd803a10612a4cbd0"
+    }
+  },
+  "business_data_accessed": false,
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN"
+}

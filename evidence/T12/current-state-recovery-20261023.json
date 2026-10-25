@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-23",
+  "work_item_id": "T12-CURRENT-STATE-RECOVERY",
+  "interface_version": "1.5.0",
+  "source_base": "f854b07",
+  "source_scope": "W1 commit containing this evidence",
+  "checks": [
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests/test_boss_simulation.py app/tests/test_boss_control_privacy.py app/tests/test_boss_message_calendar.py --basetemp=.work/pytest-w1-review-recovery-green -p no:cacheprovider --junitxml=.work/w1-review-recovery-green.xml --tb=short", "status": "PASS", "result": "21 passed in 0.89s"},
+    {"command": "validation/.venv/bin/python -m pytest -q app/tests --basetemp=.work/pytest-w1-recovery-verified -p no:cacheprovider --junitxml=.work/w1-recovery-verified.xml --tb=short", "status": "PASS", "tests": 506, "errors": 0, "failures": 0, "skipped": 0, "junit_seconds": 12.191},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-recovery-verified", "status": "PASS", "actual_sqlite_receipts": 740, "declared_actions_observed": 68}
+  ],
+  "verified": [
+    "private calendar control reads the current owner-saved object and version",
+    "deleted current calendar returns 410 after reopening the database",
+    "native SQLite backup preserves all objects, idempotency, audit and spaces fields row for row and passes integrity_check",
+    "source-review history and original receipt survive backup and reopening",
+    "withdrawn sources do not expose excerpts or restore FTS content after recovery",
+    "deleted memory remains empty and excluded from context after recovery",
+    "reset preserves old review history while creating an isolated active namespace with approved initial materials",
+    "old namespace rejects new operations and the new namespace cannot read the old assignment"
+  ],
+  "new_agricultural_facts": false,
+  "new_external_requests": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": ["complete old-version migration", "all domain recovery", "fourteen simulation interfaces", "public product recovery and device checks"]
+}

@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "scope": "F01_ACTUAL_NATIVE_ITEM_ENTRY_AND_RETURN",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-f01-rework-morning-entry-059c5c85-684a-4194-9a1a-56cf4864000d",
+  "ports": {
+    "business": 10841,
+    "webui": 10842,
+    "gateway": 20841
+  },
+  "manifest_sha256": "6094fd56d16e1d50a10094a9d7c8c477972b8cf0c772ae5de4989bea2860ebfe",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "f01_refresh_return_keeps_original_selected_item_and_discuss_focus",
+      "item_id": "meeting:meeting-1",
+      "focus_id": "morning-discuss",
+      "category": "COORDINATE",
+      "scroll_top": 419,
+      "private_question_persisted": false
+    },
+    {
+      "check": "actual_f01_morning_and_selected_item_enter_n02_keep_fixed_context_after_refresh_and_return",
+      "binding_id": "morning-bind-b0a16c46-c5b1-41f1-8667-166c760ccd84",
+      "selected_binding_id": "morning-bind-5e06a466-e7ef-45d5-bf1c-e6ed61364fb0",
+      "list_id": "morning-190d4f31-1abe-4d66-bec0-759e3886134b",
+      "item_id": "meeting:meeting-1",
+      "object_id": "meeting-1",
+      "object_version": "1",
+      "source_refs": [
+        {
+          "id": "meeting-1",
+          "kind": "meeting",
+          "version": "1"
+        },
+        {
+          "id": "event-1",
+          "kind": "event",
+          "version": "1"
+        },
+        {
+          "id": "finance-note",
+          "kind": "document",
+          "version": "1"
+        },
+        {
+          "id": "meeting-minutes",
+          "kind": "document",
+          "version": "1"
+        }
+      ],
+      "run_ids": [
+        "run-b6e891d3-ba6d-4a07-b5e4-32aa01a5794f",
+        "run-60592ca7-3897-4140-b186-ff5f0b4366be",
+        "run-352e7aac-ff94-4e50-9321-47b218508915"
+      ],
+      "f01_full_design_and_focus_acceptance": "NOT_RUN",
+      "morning_tool_count": 4
+    },
+    {
+      "check": "explicit_new_conversation_uses_general_seven_tool_scope_without_prior_morning_context",
+      "run_id": "run-82332a26-215d-43f0-a7db-6038d0903fd8",
+      "session_id": "websocket:3fc4b73c-4e60-4636-b3e4-4a3d05d64220",
+      "morning_request_count": 3,
+      "additional_morning_requests": 0,
+      "ordinary_tool_count": 7,
+      "private_input_or_password_in_ordinary_storage": false
+    }
+  ]
+}

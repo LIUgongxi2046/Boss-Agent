@@ -1,0 +1,50 @@
+*** Begin Patch
+*** Update File: webui/src/App.tsx
+@@
+ import { BossDesktop } from "./boss-agent/BossDesktop";
++import type {MorningConversationRequest,MorningBindingReceipt} from "./boss-agent/BossMorningView";
+@@
+   const onPendingAutomationMessageConsumed = useCallback((id: string) => {
+     setPendingAutomationMessage((current) => current?.id === id ? null : current);
+   }, []);
++
++  const onStartMorningChat=useCallback(async(value:MorningConversationRequest,signal:AbortSignal):Promise<MorningBindingReceipt>=>{
++    if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
++    let binding:MorningBindingReceipt;
++    if(value.binding_id){
++      const response=await fetch("/api/boss/ui/morning/binding?"+new URLSearchParams({client_request_id:value.binding_id}),{headers:{Authorization:"Bearer "+getToken()},cache:"no-store"});
++      if(!response.ok)throw new Error("晨间原生绑定读取失败，HTTP "+response.status);
++      binding=await response.json();
++      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.date!==value.date||binding.result.timezone!==value.timezone||binding.result.item_id!==(value.item_id??null))throw new Error("当前问题与原生绑定不符");
++    }else{
++      const chatId=await onCreateChat(undefined,value.question);
++      if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
++      if(!chatId)throw new Error("原生会话尚未创建，问题保留在今日工作。");
++      const {question:submittedQuestion,binding_id:existingBinding,...scope}=value;
++      void submittedQuestion;void existingBinding;
++      binding=await client.requestMutation<MorningBindingReceipt>("boss.morning.bind",{...scope,chat_id:chatId});
++      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.chat_id!==chatId)throw new Error("原生晨间绑定尚未取得有效回执");
++    }
++    if(!signal.aborted){
++      if(value.binding_id)navigate({view:"chat",activeKey:binding.result.session_id,settingsSection:"overview"},{sending:true});
++      setPendingAutomationMessage({id:crypto.randomUUID(),chatId:binding.result.chat_id,content:value.question});
++    }
++    return binding;
++  },[client,getToken,navigate,onCreateChat]);
+@@
+-      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat}
++      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onOpenMorning={chatId=>onSelectChat("websocket:"+chatId)}
+*** Update File: webui/src/lib/nanobot-client.ts
+@@
+-      if (["boss.today.reorder", "boss.morning.query", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
++      if (["boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback"].includes(pending.action) || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
+*** Update File: webui/src/boss-agent/BossMorningView.tsx
+@@
+-export {BossMorningView,type MorningReference} from "../../../../../../app/webui/BossMorningView";
++export {BossMorningView,type MorningReference,type MorningConversationRequest,type MorningBindingReceipt} from "../../../../../../app/webui/BossMorningView";
+*** Update File: webui/src/boss-agent/BossMorningPreparation.tsx
+@@
+-export {BossMorningPreparation} from "../../../../../../app/webui/BossMorningPreparation";
++export {BossMorningPreparation,type MorningPreparationContext} from "../../../../../../app/webui/BossMorningPreparation";
+*** End Patch

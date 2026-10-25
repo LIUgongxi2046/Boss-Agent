@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "scope": "F01_ACTUAL_LAUNCHER_AND_CONTROLLED_ACCOUNT_FILL",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-f01-rework-launcher-check-65dcfaac-2f02-4e77-93a0-bcb16a152dcf",
+  "ports": {
+    "business": 10791,
+    "webui": 10792,
+    "gateway": 20791
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-f01-rework-n3-dist",
+  "manifest_sha256": "ee1b543a5258a12ad01676eed39e2923e6c55ed6aba4f857d78890016e32296a",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "fresh_isolated_initializer_uses_actual_registered_tools",
+      "configuration_version": "2",
+      "tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossSupplyQualityPrepare",
+        "bossSupplyQualityQuery",
+        "bossSupplyQualityRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "morningDetailRead",
+        "morningListRead",
+        "morningSourceRead",
+        "query_metrics",
+        "todayRead"
+      ]
+    },
+    {
+      "check": "actual_launcher_active_fourteen_tools_and_native_scope_seven",
+      "status": "PASS",
+      "schema_id": "urn:boss-agent:runtime-records:1.13.0",
+      "runtime_count": 1,
+      "tool_scopes": [
+        [
+          "bossDashboardRead",
+          "bossEvidenceRead",
+          "bossMeetingsRead",
+          "bossTasksRead",
+          "bossWorkspaceRead",
+          "conversationRead",
+          "query_metrics"
+        ]
+      ],
+      "configuration_versions": [
+        "2"
+      ],
+      "active_tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossSupplyQualityPrepare",
+        "bossSupplyQualityQuery",
+        "bossSupplyQualityRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "morningDetailRead",
+        "morningListRead",
+        "morningSourceRead",
+        "query_metrics",
+        "todayRead"
+      ],
+      "active_configuration_version": "2"
+    },
+    {
+      "check": "f01_quick_start_respects_d06_keep_and_explicit_discard",
+      "question_submitted_by_shortcut": false,
+      "discarded_question_restored": false
+    },
+    {
+      "check": "controlled_main_window_role_account_fill_requires_explicit_login",
+      "role": "BOSS",
+      "account_filled_without_login": true,
+      "ordinary_storage_contains_password": false,
+      "same_window": true
+    },
+    {
+      "check": "controlled_main_window_role_account_fill_requires_explicit_login",
+      "role": "MAINTAINER",
+      "account_filled_without_login": true,
+      "ordinary_storage_contains_password": false,
+      "same_window": true
+    },
+    {
+      "check": "existing_prepared_data_config_and_credential_file_preserved",
+      "business_rows": 2,
+      "credential_file_unchanged": true,
+      "setup_unchanged": true,
+      "protected_user_instances_used": false
+    }
+  ]
+}

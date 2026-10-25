@@ -195,6 +195,31 @@ def test_same_key_rejected_if_content_changed(services):
     assert request(cmd, "MAINTAINER", "boss.knowledge.source.create", altered)[0] == 409
 
 
+def test_formatting_without_document_text_is_rejected(services):
+    cmd, _ = services
+    payload = create_input(content="***\n" * 12)
+    assert request(cmd, "MAINTAINER", "boss.knowledge.source.create", payload)[0] == 400
+    with cmd.store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='document' AND id=?",
+                          (payload["source_id"],)).fetchone()[0] == 0
+
+
+def test_markdown_ingestion_preserves_approved_original_and_indexes_text(services):
+    cmd, page = services
+    with cmd.store.connect() as db:
+        approved = cmd.store.get(db, "ui-check", "document", "finance-note")["content"]
+    content = "> " + approved
+    payload = create_input(content=content)
+    assert request(cmd, "MAINTAINER", "boss.knowledge.source.create", payload)[0] == 200
+    with cmd.store.connect() as db:
+        indexed = db.execute("SELECT content FROM knowledge WHERE source_id=?",
+                             (payload["source_id"],)).fetchone()[0]
+        assert indexed == approved
+    status, source = page.serve("BOSS", "/api/boss/ui/evidence", "source=" + payload["source_id"])
+    assert status == 200
+    assert source["content"] == content
+
+
 def test_simulated_author_is_not_granted_business_identity(services):
     cmd, page = services
     assert request(cmd, "MAINTAINER", "boss.knowledge.source.create",

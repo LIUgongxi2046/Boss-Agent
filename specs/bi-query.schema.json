@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:bi-query:1.0.0",
+  "x-base-schema": "selection-probe.json#/io_schema；正式验证入口为组合后的business.SPEC.io_schema",
+  "description": "FC02正式范围查询；由business.SPEC组合既有工具定义，公共身份由服务端产生。",
+  "$defs": {
+    "scope_fields": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "region_id": {"type": "string", "minLength": 1},
+        "region_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "product_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "metric_ids": {"$ref": "#/$defs/legacy_query_input/properties/metric_ids"},
+        "legal_entity_id": {"type": "string", "minLength": 1},
+        "customer_id": {"type": ["string", "null"], "minLength": 1},
+        "ownership_type": {"enum": ["COMPANY", "CUSTOMER", "COOPERATION", null]},
+        "asset_owner_id": {"type": ["string", "null"], "minLength": 1},
+        "cost_owner_id": {"type": ["string", "null"], "minLength": 1},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "quantity_unit": {"type": "string", "minLength": 1},
+        "trade_scope": {"enum": ["EXTERNAL_SALES", "INTERNAL_CONSUMPTION"]},
+        "definition_version": {"type": "string", "minLength": 1},
+        "target_version": {"type": ["string", "null"], "minLength": 1},
+        "business_basis": {"type": "string", "minLength": 1},
+        "settlement_state": {"enum": ["SETTLED", "UNSETTLED", "ALL"]},
+        "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"},
+        "comparison_start": {"type": "string", "format": "date"}, "comparison_end": {"type": "string", "format": "date"}
+      }
+    },
+    "scoped_query_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["query_mode", "envelope", "question", "metric_ids", "region_id", "product_ids", "legal_entity_id", "period_start", "period_end", "comparison_start", "comparison_end", "currency", "quantity_unit", "trade_scope", "definition_version", "business_basis", "settlement_state"],
+      "properties": {
+        "query_mode": {"const": "SCOPED"}, "envelope": {"$ref": "#/$defs/envelope"},
+        "scenario_id": {"$ref": "#/$defs/scope_fields/properties/scenario_id"},
+        "source_ids": {"$ref": "#/$defs/scope_fields/properties/source_ids"},
+        "question": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "metric_ids": {"$ref": "#/$defs/scope_fields/properties/metric_ids"},
+        "region_id": {"$ref": "#/$defs/scope_fields/properties/region_id"},
+        "region_ids": {"$ref": "#/$defs/scope_fields/properties/region_ids"},
+        "product_ids": {"$ref": "#/$defs/scope_fields/properties/product_ids"},
+        "legal_entity_id": {"$ref": "#/$defs/scope_fields/properties/legal_entity_id"},
+        "customer_id": {"$ref": "#/$defs/scope_fields/properties/customer_id"},
+        "ownership_type": {"$ref": "#/$defs/scope_fields/properties/ownership_type"},
+        "asset_owner_id": {"$ref": "#/$defs/scope_fields/properties/asset_owner_id"},
+        "cost_owner_id": {"$ref": "#/$defs/scope_fields/properties/cost_owner_id"},
+        "currency": {"$ref": "#/$defs/scope_fields/properties/currency"},
+        "quantity_unit": {"$ref": "#/$defs/scope_fields/properties/quantity_unit"},
+        "trade_scope": {"$ref": "#/$defs/scope_fields/properties/trade_scope"},
+        "definition_version": {"$ref": "#/$defs/scope_fields/properties/definition_version"},
+        "target_version": {"$ref": "#/$defs/scope_fields/properties/target_version"},
+        "business_basis": {"$ref": "#/$defs/scope_fields/properties/business_basis"},
+        "settlement_state": {"$ref": "#/$defs/scope_fields/properties/settlement_state"},
+        "period_start": {"$ref": "#/$defs/scope_fields/properties/period_start"}, "period_end": {"$ref": "#/$defs/scope_fields/properties/period_end"},
+        "comparison_start": {"$ref": "#/$defs/scope_fields/properties/comparison_start"}, "comparison_end": {"$ref": "#/$defs/scope_fields/properties/comparison_end"},
+        "comparison_scope": {"allOf": [{"$ref": "#/$defs/scope_fields"}, {"not": {"anyOf": [{"required": ["scenario_id"]}, {"required": ["metric_ids"]}, {"required": ["period_start"]}, {"required": ["period_end"]}, {"required": ["comparison_start"]}, {"required": ["comparison_end"]}]}}]},
+        "parent_query_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "query_input": {"oneOf": [{"$ref": "#/$defs/legacy_query_input"}, {"$ref": "#/$defs/scoped_query_input"}]},
+    "query_output": {"oneOf": [{"$ref": "#/$defs/legacy_query_output"}, {"$ref": "#/$defs/scoped_query_output"}]},
+    "scoped_query_output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["query_id", "envelope", "values", "detail_refs", "sources", "missing_fields", "unexplained_causes", "context_snapshot", "coverage", "comparison", "parent_query_id", "overridden_fields", "source_type", "queried_at"],
+      "properties": {
+        "query_id": {"$ref": "#/$defs/identifier"}, "envelope": {"$ref": "#/$defs/envelope"},
+        "values": {"$ref": "#/$defs/legacy_query_output/properties/values"},
+        "detail_refs": {"$ref": "#/$defs/legacy_query_output/properties/detail_refs"},
+        "sources": {"$ref": "#/$defs/legacy_query_output/properties/sources"},
+        "missing_fields": {"type": "array", "items": {"type": "string"}},
+        "unexplained_causes": {"type": "array", "items": {"type": "string"}},
+        "context_snapshot": {"$ref": "#/$defs/scoped_query_input"},
+        "coverage": {"type": "object", "additionalProperties": false, "required": ["state", "periods", "missing_regions", "delayed_regions", "unsynchronized_regions"], "properties": {
+          "state": {"enum": ["PARTIAL", "UNAVAILABLE"]}, "periods": {"type": "object"},
+          "missing_regions": {"type": "array", "items": {"type": "string"}}, "delayed_regions": {"type": ["array", "null"], "items": {"type": "string"}}, "unsynchronized_regions": {"type": ["array", "null"], "items": {"type": "string"}}
+        }},
+        "comparison": {"type": "object", "additionalProperties": false, "required": ["state", "reasons"], "properties": {"state": {"enum": ["COMPARABLE", "INCOMPARABLE", "INSUFFICIENT_EVIDENCE"]}, "reasons": {"type": "array", "items": {"type": "string"}}}},
+        "parent_query_id": {"type": ["string", "null"]}, "overridden_fields": {"type": "array", "items": {"type": "string"}},
+        "source_type": {"const": "SIMULATED"}, "queried_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "evidence_input": {
+      "type": "object", "additionalProperties": false, "required": ["envelope", "query_id", "source_ids", "detail_refs"],
+      "properties": {"envelope": {"$ref": "#/$defs/envelope"}, "query_id": {"$ref": "#/$defs/identifier"},
+        "source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "detail_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}}}
+    },
+    "bi_read": {
+      "type": "object", "additionalProperties": false, "required": ["adoption_state", "result"],
+      "properties": {"adoption_state": {"enum": ["CURRENT", "HISTORICAL_CURRENT", "HISTORICAL_REQUIRES_REQUERY"]}, "result": {"$ref": "#/$defs/scoped_query_output"}}
+    },
+    "bi_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["request_id", "session_id", "outcome", "query"],
+      "properties": {"request_id": {"$ref": "#/$defs/identifier"}, "session_id": {"$ref": "#/$defs/identifier"}, "outcome": {"enum": ["RECORDED", "NOT_FOUND_IN_CURRENT_STORE"]}, "query": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/bi_read"}]}}
+    },
+    "bi_follow_up": {
+      "type": "object", "additionalProperties": false, "required": ["envelope", "parent_query_id", "question", "overrides"],
+      "properties": {"envelope": {"$ref": "#/$defs/envelope"}, "parent_query_id": {"type": "string", "minLength": 1}, "question": {"type": "string", "minLength": 1}, "overrides": {
+        "type":"object","additionalProperties":false,"properties":{
+          "scenario_id":{"$ref":"#/$defs/scope_fields/properties/scenario_id"},
+          "source_ids":{"$ref":"#/$defs/scope_fields/properties/source_ids"},
+          "region_id":{"$ref":"#/$defs/scope_fields/properties/region_id"},
+          "region_ids":{"$ref":"#/$defs/scope_fields/properties/region_ids"},
+          "product_ids":{"$ref":"#/$defs/scope_fields/properties/product_ids"},
+          "metric_ids":{"$ref":"#/$defs/scope_fields/properties/metric_ids"},
+          "legal_entity_id":{"$ref":"#/$defs/scope_fields/properties/legal_entity_id"},
+          "customer_id":{"$ref":"#/$defs/scope_fields/properties/customer_id"},
+          "ownership_type":{"$ref":"#/$defs/scope_fields/properties/ownership_type"},
+          "asset_owner_id":{"$ref":"#/$defs/scope_fields/properties/asset_owner_id"},
+          "cost_owner_id":{"$ref":"#/$defs/scope_fields/properties/cost_owner_id"},
+          "currency":{"$ref":"#/$defs/scope_fields/properties/currency"},
+          "quantity_unit":{"$ref":"#/$defs/scope_fields/properties/quantity_unit"},
+          "trade_scope":{"$ref":"#/$defs/scope_fields/properties/trade_scope"},
+          "definition_version":{"$ref":"#/$defs/scope_fields/properties/definition_version"},
+          "target_version":{"$ref":"#/$defs/scope_fields/properties/target_version"},
+          "business_basis":{"$ref":"#/$defs/scope_fields/properties/business_basis"},
+          "settlement_state":{"$ref":"#/$defs/scope_fields/properties/settlement_state"},
+          "period_start":{"$ref":"#/$defs/scope_fields/properties/period_start"},
+          "period_end":{"$ref":"#/$defs/scope_fields/properties/period_end"},
+          "comparison_start":{"$ref":"#/$defs/scope_fields/properties/comparison_start"},
+          "comparison_end":{"$ref":"#/$defs/scope_fields/properties/comparison_end"},
+          "comparison_scope":{"$ref":"#/$defs/scoped_query_input/properties/comparison_scope"}
+        }
+      }}
+    }
+  }
+}

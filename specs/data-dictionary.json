@@ -1,0 +1,618 @@
+{
+  "version": "1.8.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "task_id": "T05",
+  "acceptance_state": "NOT_RUN",
+  "source_commit": "63e6295b94f93b35fdbb9949706298526bf5bcc6",
+  "authority": "docs/LLD-data.md",
+  "field_policy": {
+    "compatibility": "1.8.0保留既有动作和五项Tool名称、原initial与21条模拟输入；新增material_cost_report与SI09.supply.cost_reports。入库和实际领用按明确范围、口径及可比期间计算，报价/合同/计划假设与完整企业成本分别表达。当前Tool Schema由business.SPEC提供，原selection-probe.json保持。既有回执保持原结果；当前消费者接收相同版本的结果Schema。",
+    "external_business_storage": "simulation_definition=si09-si10-business-v1的记录统一使用external_business_record，业务字段位于data，其严格类型由simulated-supply-quality.schema.json的x-entity-config与同名$defs决定。对应同名实体中的planned定义保留完整业务设计范围；当前模拟服务覆盖由该版本化Schema明确。",
+    "authorization_window": "一次性授权按valid_until限制新提交；记忆、本人目标/通知、本人计划、忙碌分享、经营提醒规则/暂缓和本人事项次序的持续采用受当前对象状态、业务期限及撤销控制，原确认窗口到期后仍允许本人撤销。",
+    "required": "fields中的字段默认必需；optional=true表示仅在对应业务变化后存在；inherits/inherits_metadata显式复用指定实体字段。",
+    "nullability": "type数组包含null或type_ref指向允许null的类型时可空；其余字段不可空。未知数值保持null，不以零替代。",
+    "scope_binding": "objects.namespace与initial/snapshot绑定owner_id、dataset_id和dataset_version；客户端不能指定权限归属。",
+    "source_binding": "业务来源属于SIMULATED/PUBLIC_SOURCE，真实执行记录属于RUNTIME_RECORD；Prompt等技术配置另标TECHNICAL_CONFIG。",
+    "revision_binding": "*_revision对象保留原实体相同字段与版本，存储ID追加版本；历史字段不成为当前有效授权。",
+    "nested_property_notation": "嵌套properties中的string、integer、boolean、instant、date、identifier、version和decimal采用types或标准JSON类型；or null表示可空，[]表示数组，范围位于冒号之后。"
+  },
+  "types": {
+    "identifier": {"type": "string", "nullable": false, "meaning": "当前空间内稳定对象编号"},
+    "version": {"type": "string", "pattern": "^[0-9]+$", "nullable": false, "meaning": "提交后递增版本"},
+    "decimal": {"type": ["string", "null"], "meaning": "Decimal 原始精度；缺少保持 null"},
+    "instant": {"type": "string", "format": "date-time", "meaning": "含时区 ISO8601"},
+    "private_text": {"type": "string", "access": "BOSS_ONLY", "audit": "HASH_OR_IDENTIFIER_ONLY"}
+  },
+  "scope": {
+    "owner_id": {"type_ref": "identifier", "source": "initial/snapshot.owner_id", "client_writable": false},
+    "execution_namespace": {"type_ref": "identifier", "source": "spaces.namespace", "client_writable": false},
+    "dataset_id": {"type_ref": "identifier", "source": "initial/snapshot.dataset_id"},
+    "dataset_version": {"type_ref": "version", "source": "initial/snapshot.dataset_version"},
+    "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}
+  },
+  "entities": {
+    "material_cost_report": {
+      "storage": "objects/material_cost_report", "access": "MAINTAINER_EXPLICIT_SIMULATED_IMPORT_BOSS_CURRENT_READ", "version": "1.8.0", "inherits": "external_business_record",
+      "fields": {"data": {"type": "object", "schema_ref": "simulated-supply-quality.schema.json#/$defs/material_cost_report"}},
+      "business_policy": "只记录外部报告的入库或实际领用成本；引用库存保持同归属、单位、币种与当前采用状态，不执行采购、记账或库存扣减。"
+    },
+    "external_business_record": {
+      "storage": "objects/{entity_type}/{record_id}", "access": "MAINTAINER_EXPLICIT_SIMULATED_IMPORT_BOSS_CURRENT_READ", "version": "1.7.0",
+      "schema_ref": "supply-quality-results.schema.json#/$defs/StoredRecord",
+      "fields": {"record_id": {"type_ref": "identifier"}, "entity_type": {"type": "string"}, "version": {"type_ref": "version"}, "record_state": {"type": "string", "enum": ["ACTIVE", "WITHDRAWN"]}, "state": {"type": "string"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"}, "source_type": {"type": "string", "const": "SIMULATED"}, "simulation_definition": {"type": "string", "const": "si09-si10-business-v1"}, "observed_at": {"type_ref": "instant"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "author_contact_id": {"type_ref": "identifier"}, "received_at": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "data": {"type": "object", "schema_ref": "simulated-supply-quality.schema.json#/$defs/{entity_type}"}}
+    },
+    "external_record_binding": {
+      "storage": "objects/external_record_binding", "access": "SERVER_CURRENT_ADOPTION", "version": "1.7.0",
+      "fields": {"entity_type": {"type": "string"}, "record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"}, "sources": {"type": "array", "meaning": "自身及传递引用的source_id/version/source_sha256；完整摘要参与当前采用检查"}}
+    },
+    "external_import": {
+      "storage": "objects/external_import", "access": "MAINTAINER_RECEIPT_BOSS_CURRENT_STATUS", "version": "1.7.0",
+      "schema_ref": "supply-quality-results.schema.json#/$defs/ImportResult",
+      "fields": {"source_type": {"type": "string", "const": "SIMULATED"}, "simulation_definition": {"type": "string"}, "execution_namespace": {"type_ref": "identifier"}, "import_id": {"type_ref": "identifier"}, "state": {"type": "string", "enum": ["SUCCESS", "EMPTY", "FAILED", "TIMED_OUT"]}, "error_code": {"type": ["string", "null"]}, "record_count": {"type": "integer"}, "external_service_invoked": {"type": "boolean", "const": false}, "received_at": {"type_ref": "instant"}, "records": {"type": "array", "meaning": "仅记录导入对象类别、编号、版本与来源编号"}}
+    },
+    "supply_quality_coordination": {
+      "storage": "objects/supply_quality_coordination", "access": "BOSS", "version": "1.7.0", "schema_ref": "supply-quality-results.schema.json#/$defs/CoordinationLink",
+      "fields": {"link_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "interface_id": {"type": "string"}, "origin_entity_type": {"type": "string"}, "origin_record_id": {"type_ref": "identifier"}, "origin_version": {"type_ref": "version"}, "review_sha256": {"type": "string"}, "created_at": {"type_ref": "instant"}, "source_type": {"type": "string", "const": "SIMULATED"}}
+    },
+    "owner_plan": {
+      "storage": "objects/owner_plan", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "plan_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "owner_id": {"type_ref": "identifier", "source": "server"},
+        "purpose": {"type_ref": "private_text", "maxLength": 400},
+        "event_ids": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "relation": "event.event_id"},
+        "event_versions": {"type": "object", "meaning": "保存时各 event_id 的获准版本"},
+        "not_before": {"type_ref": "instant", "clock": "BUSINESS", "meaning": "最早允许执行时间，实际仍需满足事件期限与规则"},
+        "timezone": {"type": "string", "enum": ["Asia/Shanghai"]},
+        "state": {"type": "string", "enum": ["ACTIVE", "PAUSED", "CANCELED"]},
+        "authorization_id": {"type_ref": "identifier", "relation": "authorization.authorization_id"},
+        "updated_at": {"type_ref": "instant", "clock": "WALL"},
+        "execution_owner": {"type": "string", "const": "CronService"}
+      }
+    },
+    "today_order": {
+      "storage": "objects/today_order", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "date": {"type": "string", "format": "date", "meaning": "本人时区的业务日期"},
+        "timezone": {"type": "string", "optional": true, "meaning": "正式逐日排序使用IANA时区；既有日期键保留"},
+        "list_id": {"type_ref": "identifier", "optional": true}, "list_version": {"type_ref": "version", "optional": true},
+        "snapshot_sha256": {"type": "string", "optional": true},
+        "version": {"type_ref": "version"},
+        "item_ids": {"type": "array", "uniqueItems": true, "meaning": "当前完整事项集合的本人次序"},
+        "authorization_id": {"type_ref": "identifier", "relation": "authorization.authorization_id"}
+      },
+      "write_preconditions": ["snapshot_sha256 matches current projection", "expected_version matches current order", "exact item set"],
+      "adoption": "当前读取核查本人/空间/动作/对象/版本与完整事项次序确认。撤销后停止采用并保留原记录、回执与CAS版本。"
+    },
+    "morning_list": {
+      "storage": "objects/morning_list", "access": "BOSS_ONLY", "version": "1.1.0",
+      "fields": {"owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
+        "execution_namespace": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "client_request_id": {"type_ref": "identifier"},
+        "result": {"type": "object", "schema_ref": "morning.schema.json#/$defs/View"}, "binding": {"type": "object", "meaning": "同一事务的获准对象和原文快照；私人内容仅本人可以采用"}},
+      "read_policy": "当前对象、来源、目标、经营规则及关联变化使原清单需要重新查询；历史保持编号版本，失效正文、分类计数和覆盖内容隐藏。"
+    },
+    "morning_sequence": {
+      "storage": "objects/morning_sequence", "access": "SERVER", "version": "1.1.0",
+      "fields": {"version": {"type_ref": "version"}}, "meaning": "按业务日期和IANA时区递增清单版本；查询回执与清单同一事务保存。"
+    },
+    "authorization": {
+      "storage": "objects/authorization", "access": "BOSS_BODY_MAINTAINER_METADATA", "version": "1",
+      "fields": {
+        "authorization_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "owner_id": {"type_ref": "identifier"}, "issuer_identity": {"type": "string", "const": "BOSS"},
+        "action": {"type_ref": "identifier"}, "target_id": {"type_ref": "identifier"},
+        "content_version": {"type_ref": "version"}, "scope": {"type_ref": "identifier", "relation": "spaces.namespace"},
+        "payload": {"type": "object", "meaning": "已获准动作参数；敏感正文使用摘要"},
+        "valid_from": {"type_ref": "instant", "clock": "WALL"}, "valid_until": {"type_ref": "instant", "clock": "WALL"},
+        "revoked": {"type": "boolean"}, "revoked_at": {"type": ["string", "null"], "clock": "WALL"}
+      }
+    },
+    "contact": {
+      "storage": "initial/snapshot.contacts", "access": "BOSS_WORK_SOURCE", "version": "1",
+      "fields": {"contact_id": {"type_ref": "identifier"}, "name": {"type": "string"}, "organization": {"type": "string"}, "responsibility": {"type": "string"}, "valid_from": {"type": "string", "format": "date"}, "valid_until": {"type": "string", "format": "date"}},
+      "relations": {"contact_id": ["task.coordinator_id", "feedback.author_contact_id", "message.recipient_id", "document.author_contact_id"]},
+      "identity_policy": "联系人属于资料对象，不具有账号、角色或凭据"
+    },
+    "task": {
+      "storage": "objects/task", "access": "BOSS_BODY_MAINTAINER_SIMULATION_METADATA", "version": "1",
+      "prd_state_enum": ["DRAFT", "WAITING_AUTH", "OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "WAITING_MATERIAL", "RESULT_SUBMITTED", "COMPLETED_CONFIRMED", "CANCELED"],
+      "pending_state_implementation": ["DRAFT", "WAITING_AUTH", "WAITING_MATERIAL"],
+      "fields": {
+        "task_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
+        "coordinator_id": {"type_ref": "identifier", "relation": "contact.contact_id"},
+        "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string", "format": "IANA"},
+        "status": {"type": "string", "enum": ["OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED", "CANCELED", "COMPLETED_CONFIRMED"]},
+        "evidence_requirements": {"type": "array", "items": "string"}, "authorization_id": {"type_ref": "identifier"},
+        "related_meeting_id": {"type_ref": "identifier"}, "related_event_ids": {"type": "array", "items": "event.event_id"},
+        "source_refs": {"type": "array", "items": "document.source_id"}, "source_versions": {"type": "object", "values": "version", "meaning": "当前本人确认采用的来源版本；原始创建绑定及后续复核分别保存历史"},
+        "message_ids": {"type": "array", "items": "outbox.message_id"}, "feedback_ids": {"type": "array", "items": "feedback.feedback_id"},
+        "completion_authorization_id": {"type": ["string", "null"]}, "execution_namespace": {"type_ref": "identifier"},
+        "accepted_extension_feedback_ids": {"type": "array", "items": "feedback.feedback_id", "optional": true},
+        "origin_minute_id": {"type_ref": "identifier", "optional": true}, "origin_minute_version": {"type_ref": "version", "optional": true},
+        "origin_entry_id": {"type_ref": "identifier", "optional": true}, "origin_source_id": {"type_ref": "identifier", "optional": true}, "origin_source_version": {"type_ref": "version", "optional": true, "meaning": "原始纪要创建交办时的历史版本；当前采用读取assignment_source_binding.origin_source"},
+        "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason": {"type_ref": "private_text", "optional": true}, "canceled_at": {"type_ref": "instant", "clock": "WALL", "optional": true}
+      }
+    },
+    "assignment_source_binding": {
+      "storage": "objects/assignment_source_binding; id=task_id", "access": "SERVER_ONLY", "version": "1",
+      "fields": {"task_id": {"type_ref": "identifier", "relation": "task.task_id"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
+        "source_versions": {"type": "object", "values": "version"}, "source_fingerprints": {"type": "object", "values": "SHA256"},
+        "origin_source": {"type": "object", "optional": true, "properties": {"source_id": "identifier", "version": "version", "sha256": "SHA256"}, "meaning": "当前本人确认采用的原始纪要来源；task.origin_source_version保留创建时历史"},
+        "confirmation_authorization_id": {"type_ref": "identifier", "optional": true}, "confirmed_task_version": {"type_ref": "version", "optional": true},
+        "confirmed_at": {"type_ref": "instant", "clock": "WALL", "optional": true}, "review_sha256": {"type": "string", "optional": true},
+        "review_reason": {"type_ref": "private_text", "optional": true}, "previous_binding_sha256": {"type": ["string", "null"], "optional": true}},
+      "policy": "初始绑定与创建同一事务保存；本人重新确认时保存已知旧绑定并更新当前采用范围，不改变业务状态。发送或完成决定校验当前本人、数据集、来源版本及完整摘要；原始回执继续可读。旧对象缺少绑定时通过AssignmentSourcesAPI独立核查当前来源，不推测历史。"
+    },
+    "assignment_source_binding_revision": {
+      "storage": "objects/assignment_source_binding_revision; id=task_id:v<before_task_version>", "access": "SERVER_ONLY_WITH_BOSS_HISTORY_METADATA", "version": "1",
+      "fields": {"task_id": {"type_ref": "identifier"}, "before_task_version": {"type_ref": "version"}, "binding": {"type": "object", "inherits": "assignment_source_binding"}, "archived_at": {"type_ref": "instant", "clock": "WALL"}},
+      "policy": "仅归档确认前实际存在的绑定；没有旧绑定时不生成历史版本。before_task_version表示归档时读取的任务版本，不推测原始创建时间。"
+    },
+    "assignment_extension_decision": {
+      "storage": "objects/assignment_extension_decision; id=task_id:feedback_id", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"decision_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "feedback_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"},
+        "decision": {"type": "string", "enum": ["APPROVE", "REJECT"]}, "old_due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "new_due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS"},
+        "request_reason": {"type_ref": "private_text"}, "reason": {"type": ["string", "null"]}, "previous_task_version": {"type_ref": "version"}, "task_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "decided_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}},
+      "policy": "同一申请只能产生一次本人决定；拒绝保持期限和提醒，批准才更新。旧批准入口缺少本人理由时保留null，申请原文独立保存；不为既有决定补造历史。"
+    },
+    "task_revision": {
+      "storage": "objects/task_revision; id=task_id:v<before_version>", "access": "BOSS_ONLY", "version": "1", "inherits": "task",
+      "fields": {},
+      "policy": "body直接保存本人延期决定或完成之前实际读取的任务对象；只有真实状态变更才保存，不补造旧版本。"
+    },
+    "self_commitment": {
+      "storage": "objects/self_commitment", "access": "BOSS_ONLY", "version": "1",
+      "fields": {
+        "commitment_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "purpose": {"type_ref": "private_text"},
+        "status": {"type": "string", "enum": ["ACTIVE", "COMPLETED_CONFIRMED", "CANCELED"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"},
+        "importance": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "evidence_requirements": {"type": "array", "items": "string"},
+        "source_refs": {"type": "array", "minItems": 1, "items": {"source_id": "identifier", "version": "version"}, "meaning": "新建必须具有当前有效来源；已有无来源对象保持历史，不补造来源"}, "completion_evidence": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
+        "authorization_id": {"type_ref": "identifier"}, "completion_authorization_id": {"type": ["string", "null"]},
+        "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "external_message_sent": {"type": "boolean", "const": false},
+        "last_extension_authorization_id": {"type_ref": "identifier", "optional": true}, "completed_at": {"type_ref": "instant", "optional": true}, "canceled_at": {"type_ref": "instant", "optional": true},
+        "cancellation_authorization_id": {"type_ref": "identifier", "optional": true}, "cancellation_reason_sha256": {"type": "string", "optional": true}
+      }
+    },
+    "feedback": {
+      "storage": "objects/feedback", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"feedback_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"},
+        "kind": {"type": "string", "enum": ["PROGRESS", "EXTENSION_REQUEST", "RESULT_SUBMITTED"]}, "content": {"type_ref": "private_text"}, "evidence_refs": {"type": "array", "items": "document.source_id"},
+        "evidence_versions": {"type": "object", "values": "version", "optional": true}, "evidence_fingerprints": {"type": "object", "values": "SHA256", "optional": true}, "evidence_states": {"type": "object", "values": "source validity state", "optional": true},
+        "proposed_due_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "submitted_at": {"type_ref": "instant", "clock": "WALL"}, "source_type": {"type": "string", "const": "SIMULATED"}, "historical_only": {"type": "boolean", "optional": true, "meaning": "取消后到达的反馈仅存历史，不恢复交办或催办；旧记录缺少该字段时按当前任务状态核查"}},
+      "binding_policy": "当前新反馈保存提交时证据版本、完整摘要和有效状态；结果完成前逐项重验。旧反馈没有完整绑定时409要求重新提交，不根据当前来源补充历史。历史反馈保留失效资料的当时标识和状态，仍需核查类型、标识和owner范围。"
+    },
+    "message_draft": {
+      "storage": "objects/message_draft", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"draft_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["DRAFT", "SENT_SIMULATED"]},
+        "recipient_id": {"type_ref": "identifier"}, "recipient_name_at_save": {"type": "string"}, "organization_at_save": {"type": "string"}, "related_task_id": {"type": ["string", "null"]},
+        "body": {"type_ref": "private_text", "maxLength": 2400}, "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}},
+        "visibility": {"type": "string", "const": "RECIPIENT_ONLY"}, "content_sha256": {"type": "string"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "message_id": {"type": ["string", "null"]}}
+    },
+    "message": {
+      "storage": "objects/message_outbox", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["DRAFT", "WAITING_AUTH", "READY", "SENDING", "SENT", "FAILED", "CANCELED"],
+      "state_mapping": {"DRAFT": "message_draft.status=DRAFT", "SENT": "send_state=SENT_SIMULATED; delivery_state独立", "WAITING_AUTH|READY|SENDING|FAILED|CANCELED": "完整产品执行状态仍待实现，不能按模型文字填写"},
+      "fields": {"message_id": {"type_ref": "identifier"}, "draft_id": {"type_ref": "identifier"}, "draft_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "related_task_id": {"type": ["string", "null"]},
+        "body": {"type_ref": "private_text"}, "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "RECIPIENT_ONLY"}, "authorization_id": {"type_ref": "identifier"},
+        "sent_at": {"type_ref": "instant", "clock": "WALL"}, "send_state": {"type": "string", "const": "SENT_SIMULATED"}, "delivery_state": {"type": "string", "const": "NOT_VERIFIED"}, "reply_state": {"type": "string", "enum": ["NOT_RECEIVED", "RECEIVED_SIMULATED"]},
+        "external_channel_invoked": {"type": "boolean", "const": false}, "reply_id": {"type_ref": "identifier", "optional": true}}
+    },
+    "message_reply": {
+      "storage": "objects/message_reply", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"reply_id": {"type_ref": "identifier"}, "reply_to": {"type_ref": "identifier", "relation": "message.message_id"}, "author_contact_id": {"type_ref": "identifier"}, "text": {"type_ref": "private_text"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "related_task_id": {"type": ["string", "null"]},
+        "task_completion_confirmed": {"type": "boolean", "const": false}, "task_feedback_id": {"type": ["string", "null"]}, "task_status_after_reply": {"type": ["string", "null"]}}
+    },
+    "outbox": {
+      "storage": "objects/outbox", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"message_id": {"type_ref": "identifier"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "body": {"type_ref": "private_text"}, "content_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "idempotency_key": {"type": "string"}, "envelope": {"type": "object", "meaning": "服务端绑定 owner/dataset/namespace/session/request"}, "message_status": {"type": "string", "const": "SENT"}, "task_status": {"type": "string", "const": "WAITING_FEEDBACK"}, "sent_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
+    "application": {
+      "storage": "objects/application", "access": "BOSS_BODY_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "prd_state_enum": ["WAITING_MATERIAL", "PENDING_DECISION", "EXECUTING", "APPROVED", "REJECTED", "SUPPLEMENT_REQUESTED", "FAILED", "CANCELED"],
+      "state_mapping": {"APPROVED": "APPROVED_RECORDED", "REJECTED": "REJECTED_RECORDED", "SUPPLEMENT_REQUESTED": "WAITING_MATERIAL with REQUEST_MORE decision", "EXECUTING|FAILED|CANCELED": "异步执行状态待完整实现"},
+      "fields": {"application_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "title": {"type_ref": "private_text", "maxLength": 100}, "description": {"type_ref": "private_text", "maxLength": 1500}, "applicant_contact_id": {"type_ref": "identifier"},
+        "amount": {"type_ref": "decimal", "unit": "CNY", "scale": 2}, "currency": {"type": "string", "const": "CNY"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"},
+        "state": {"type": "string", "enum": ["PENDING_DECISION", "WAITING_MATERIAL", "APPROVED_RECORDED", "REJECTED_RECORDED"]}, "seeded_by_role": {"type": "string", "const": "MAINTAINER"}, "decision_id": {"type": ["string", "null"]},
+        "decision_authorization_id": {"type_ref": "identifier", "optional": true}, "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "optional": true}, "funds_transferred": {"type": "boolean", "const": false}, "professional_release_issued": {"type": "boolean", "const": false}}
+    },
+    "application_decision": {
+      "storage": "objects/application_decision", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"decision_id": {"type_ref": "identifier"}, "application_id": {"type_ref": "identifier"}, "application_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "amount": {"type_ref": "decimal", "unit": "CNY"}, "currency": {"type": "string", "const": "CNY"},
+        "action": {"type": "string", "enum": ["APPROVE", "REJECT", "REQUEST_MORE"]}, "comment": {"type_ref": "private_text", "maxLength": 1200}, "authorization_id": {"type_ref": "identifier"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}, "funds_transferred": {"type": "boolean", "const": false}, "professional_release_issued": {"type": "boolean", "const": false}}
+    },
+    "meeting": {
+      "storage": "objects/meeting; initial/snapshot.meeting保存初始来源", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"meeting_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "participant_ids": {"type": "array", "items": "contact.contact_id"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "material_ids": {"type": "array", "items": "document.source_id or event.event_id"}, "historical_commitment_ids": {"type": "array", "items": "task.task_id"},
+        "state": {"type": "string", "enum": ["DRAFT", "SCHEDULED", "HELD", "CANCELED"], "optional": true, "meaning": "初始来源没有状态时投影为DRAFT"},
+        "purpose": {"type_ref": "private_text", "optional": true}, "ends_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "preparation_due_at": {"type_ref": "instant", "clock": "BUSINESS", "nullable": true, "optional": true},
+        "source_refs": {"type": "array", "items": "source_reference", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "updated_at": {"type_ref": "instant", "clock": "WALL", "optional": true},
+        "external_attendance_verified": {"type": "boolean", "const": false, "optional": true}, "decision_reason": {"type_ref": "private_text", "optional": true}},
+      "unknown_fields": {"ends_at": "初始获准资料未提供；本人确认完整时间后使用该版本，不能推断未知结束时间"},
+      "consumers": ["meeting_materials", "MeetingAPI", "briefing", "minutes", "people", "travel", "private_calendar", "today", "recovery"],
+      "terminal_states": ["HELD", "CANCELED"]
+    },
+    "meeting_draft": {
+      "storage": "objects/meeting_draft; revisions=meeting_draft_revision", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT", "CONFIRMED"]},
+        "details": {"type": "object", "properties": {"purpose": "private_text", "starts_at": "instant BUSINESS", "ends_at": "instant BUSINESS", "timezone": "IANA", "preparation_due_at": "instant BUSINESS or null", "participant_ids": "contact.contact_id[]", "source_refs": "source_reference[]"}},
+        "impact": {"type": "object", "meaning": "私人占用版本与冲突、关联行程标识、准备期限覆盖和本人确认条件，不含私人正文"}, "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "saved_at": {"type_ref": "instant", "clock": "WALL"}, "confirmed_meeting_version": {"type_ref": "version", "optional": true}},
+      "confirmation_conditions": ["current meeting version", "current draft version", "matching source/contact/calendar/travel/clock digest", "explicit owner acknowledgement of conflict"],
+      "projection_only": {"review_current": "boolean; 不保存为来源事实"}
+    },
+    "minutes": {
+      "storage": "objects/minutes", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"minute_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "version": {"type_ref": "version"},
+        "entries": {"type": "array", "items": {"entry_id": "identifier", "kind": "OPINION|SUGGESTION|DECISION|ASSIGNMENT_DRAFT", "text": "private_text", "source_anchor": "string", "source_id": "identifier", "source_version": "version", "task_created": "boolean", "message_sent": "boolean"}},
+        "state": {"type": "string", "enum": ["DRAFT_REVIEW", "CONFIRMED"]}, "confirmed_at": {"type": ["string", "null"], "clock": "WALL"}, "confirmation_authorization_id": {"type": ["string", "null"]}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "task_count_created": {"type": "integer"}, "message_count_sent": {"type": "integer"}}
+    },
+    "minutes_assignment_link": {
+      "storage": "objects/minutes_assignment_link", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"link_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "minute_id": {"type_ref": "identifier"}, "minute_version": {"type_ref": "version"}, "entry_id": {"type_ref": "identifier"}, "entry_kind": {"type": "string", "const": "ASSIGNMENT_DRAFT"}, "entry_text_sha256": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}, "task_id": {"type_ref": "identifier"}, "authorization_id": {"type_ref": "identifier"}, "linked_at": {"type_ref": "instant", "clock": "WALL"}, "task_status_at_link": {"type": "string", "const": "OPEN"}, "message_sent_at_link": {"type": "boolean", "const": false}}
+    },
+    "private_calendar": {
+      "storage": "objects/private_calendar or initial/snapshot.private_calendar", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"calendar_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "starts_at": {"type_ref": "instant", "clock": "BUSINESS"}, "ends_at": {"type_ref": "instant", "clock": "BUSINESS"}, "timezone": {"type": "string"}, "private_body": {"type_ref": "private_text", "maxLength": 2000}, "title": {"type_ref": "private_text", "maxLength": 160}, "location": {"type_ref": "private_text", "maxLength": 240},
+        "attachment_refs": {"type": "array", "items": {"source_id": "identifier", "version": "version"}}, "visibility": {"type": "string", "const": "PRIVATE"}, "status": {"type": "string", "enum": ["ACTIVE", "DELETED"]}, "updated_at": {"type_ref": "instant", "optional": true}, "calendar_conflict_proven_absent": {"type": "boolean", "optional": true, "meaning": "仅在当前获准会议覆盖范围内判定"}, "meeting_end_unknown": {"type": "boolean", "optional": true}}
+    },
+    "calendar_share": {
+      "storage": "objects/calendar_share", "access": "BOSS_ONLY_WITH_SCOPED_BUSY_PREVIEW", "version": "1",
+      "fields": {"share_id": {"type_ref": "identifier"}, "calendar_id": {"type_ref": "identifier"}, "calendar_version": {"type_ref": "version"}, "recipient_id": {"type_ref": "identifier"}, "purpose_sha256": {"type": "string"}, "busy": {"type": "boolean", "const": true}, "starts_at": {"type_ref": "instant"}, "ends_at": {"type_ref": "instant"}, "timezone": {"type": "string"}, "expires_at": {"type_ref": "instant", "clock": "BUSINESS"}, "authorization_id": {"type_ref": "identifier"}, "revoked": {"type": "boolean"}, "revoked_at": {"type": ["string", "null"], "clock": "WALL"}, "revocation_reason": {"type": "string", "optional": true}, "external_delivery_created": {"type": "boolean", "const": false}}
+    },
+    "document": {
+      "storage": "objects/document + FTS5 knowledge", "access": "OWNER_SCOPE", "version": "1",
+      "prd_validity_enum": ["RECEIVED", "VALID", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED"],
+      "current_validity_mapping": "W2的source_validity按当前业务时间判断，访问范围及类型另外校验；仅VALID可用于当前引用。撤销和到期返回410，冲突/替代/缺少条件/尚未生效返回409。",
+      "fields": {"source_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE"]}, "author_contact_id": {"type_ref": "identifier"}, "content": {"type_ref": "private_text"}, "access_scope": {"type_ref": "identifier", "meaning": "获准 owner_id"}, "original_locator": {"type": "string"}, "published_at": {"type": "string", "anyOf": [{"format": "date"}, {"format": "date-time"}], "meaning": "来源提供的日期，或明确模拟版本的实际生成时间"}, "valid_from": {"type": "string", "anyOf": [{"format": "date"}, {"format": "date-time"}], "clock": "BUSINESS", "optional": true},
+        "valid_until": {"type": ["string", "null"], "anyOf": [{"type": "null"}, {"type": "string", "format": "date"}, {"type": "string", "format": "date-time"}], "clock": "BUSINESS", "optional": true, "meaning": "到达终点后停止采用；日期按当前业务时间的时区解释"},
+        "validity_state": {"type": "string", "enum": ["RECEIVED", "VALID", "INCOMPLETE", "CONFLICTED", "SUPERSEDED", "WITHDRAWN", "EXPIRED"], "optional": true, "meaning": "当前来源可采用状态，不代表专业结论已经得到确认"},
+        "observed_at": {"type_ref": "instant", "optional": true}, "withdrawn": {"type": "boolean", "optional": true}, "withdrawn_at": {"type": ["string", "null"], "optional": true}, "replaced_source_version": {"type_ref": "version", "optional": true}, "index_state": {"type": "string", "optional": true}, "title": {"type": "string", "optional": true}, "created_by_role": {"type": "string", "optional": true}}
+    },
+    "memory": {
+      "storage": "objects/memory/current", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["PROPOSED", "CONFIRMED", "SUPERSEDED", "DELETED"],
+      "fields": {"memory_id": {"type_ref": "identifier"}, "memory_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "confirmation_state": {"type": "string", "enum": ["CONFIRMED", "DELETED"]}, "text": {"type_ref": "private_text", "maxLength": 4000}, "authorization_id": {"type_ref": "identifier", "optional": true}},
+      "adoption": "Store.context在同一只读事务内调用confirmed_memory。现有确认按memory_id、owner、scope、BOSS身份及授权content_version/expected_version与当前版本的递增关系识别唯一授权；撤销停止后续采用，历史状态和正文保持。显式authorization_id存在时必须一致；初始获准记忆保留来源确认。",
+      "pending_validation": "公共确认可显式保存authorization_id；W2/W3还需核查全部直接读取、已有会话和缓存传播。"
+    },
+    "schedule": {
+      "storage": "objects/schedule/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",
+      "fields": {"schedule_id": {"type_ref": "identifier"}, "schedule_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "trigger": {"type": "string", "const": "EVENT_OR_TIME"}, "timezone": {"type": "string", "const": "Asia/Shanghai"}, "enabled": {"type": "boolean"}, "canceled": {"type": "boolean"}, "active_draft_version": {"type_ref": "version", "optional": true}, "last_configured_at": {"type_ref": "instant", "optional": true}}
+    },
+    "rules": {
+      "storage": "objects/rules/current", "access": "MAINTAINER_WITH_BOSS_SAFE_PROJECTION", "version": "1",
+      "fields": {"version": {"type_ref": "version"}, "cooldown_seconds": {"type": "integer", "unit": "second", "minimum": 0, "maximum": 86400}, "quiet_start": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "quiet_end": {"type": "integer", "unit": "hour", "minimum": 0, "maximum": 23}, "timezone": {"type": "string", "const": "Asia/Shanghai"}, "important_escalation": {"type": "boolean"}}
+    },
+    "business_alert_rule": {
+      "storage": "objects/business_alert_rule/current; business_alert_rule_draft/current; business_alert_rule_revision/<version>", "access": "BOSS_ONLY_WITH_MAINTAINER_OWN_DEMONSTRATION_RULES", "version": "1",
+      "fields": {"version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT", "VALIDATED", "ACTIVE", "DISABLED"]}, "configuration": {"type": "object", "schema": "business-alert.schema.json#/$defs/Configuration"},
+        "owner_id": {"type_ref": "identifier"}, "namespace": {"type_ref": "identifier"}, "created_by_role": {"type": "string", "enum": ["BOSS", "MAINTAINER"]}, "definition_version": {"type": "string", "const": "FC04-ALERT-1"},
+        "validated_sha256": {"type": "string", "optional": true}, "authorization_id": {"type": ["string", "null"], "optional": true}, "last_action_authorization_id": {"type_ref": "identifier", "optional": true},
+        "draft_version": {"type_ref": "version", "optional": true}, "activated_at": {"type_ref": "instant", "clock": "WALL", "optional": true}},
+      "policy": "保存与启用分开；维护仅固定获准参数且不能修改本人规则。本人启停分别确认，持续采用允许撤销，技术计划与本人通知继续独立限制。"
+    },
+    "business_alert_observation": {
+      "storage": "objects/business_alert_observation/<event_id>:v<version>; current body in objects/event", "access": "BOSS_CURRENT_SOURCE_ADOPTION_ONLY", "version": "1", "inherits": "event",
+      "fields": {"owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"}, "execution_namespace": {"type_ref": "identifier"},
+        "facts": {"type": "object", "schema": "business-alert.schema.json#/$defs/Facts"},
+        "observed_at": {"type_ref": "instant", "clock": "BUSINESS"}, "data_as_of": {"type_ref": "instant", "clock": "BUSINESS"}, "basis_sha256": {"type": "string"},
+        "source_refs": {"type": "array", "items": "source_reference"}, "source_fingerprints": {"type": "object", "values": "SHA256"}},
+      "policy": "FC04-ALERT-1明确模拟输入，原始selection保持。每次观察与原文/版本同事务保存，连续依据不包含单纯时钟外推；来源失效隐藏派生事实。"
+    },
+    "business_alert_tracking": {
+      "storage": "objects/business_alert_tracking/<event_id>", "access": "SERVER_ONLY", "version": "1",
+      "fields": {"episode": {"type": "integer"}, "incident_open": {"type": "boolean"}, "sent_episode": {"type": "integer", "optional": true}, "sent_mode": {"type": "string", "enum": ["ALERT", "RECOVERY"], "optional": true},
+        "last_impact": {"type": "string", "optional": true}, "delivered_at": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}, "last_snooze_until": {"type_ref": "instant", "clock": "BUSINESS", "optional": true}}
+    },
+    "business_alert_recovery": {
+      "storage": "objects/business_alert_recovery/<event_id>:<episode>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "owner_id": {"type_ref": "identifier"}, "episode": {"type": "integer"}, "rule_version": {"type_ref": "version"},
+        "condition_since": {"type_ref": "instant", "clock": "BUSINESS"}, "recovered_at": {"type_ref": "instant", "clock": "BUSINESS"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"},
+        "source_refs": {"type": "array", "items": "source_reference"}, "task_completed": {"type": "boolean", "const": false}}
+    },
+    "business_alert_summary": {
+      "storage": "objects/business_alert_summary/<event_id>", "access": "BOSS_ONLY", "version": "1", "inherits": "dispatch",
+      "fields": {"observed_at": {"type_ref": "instant", "clock": "BUSINESS"}}, "policy": "一般进展进入可查询汇总，不冒充即时通知。"
+    },
+    "business_alert_delivery": {
+      "storage": "objects/business_alert_delivery/<result_sha256>", "access": "BOSS_ONLY", "version": "1", "inherits": "notification", "fields": {},
+      "policy": "每次实际通知中心保存独立保留，当前通知按event_id合并；不证明系统或外部送达。"
+    },
+    "business_alert_action": {
+      "storage": "objects/business_alert_action/<operation>:<client_request_id>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "action": {"type": "string"}, "authorization_id": {"type_ref": "identifier"},
+        "previous_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}, "payload_sha256": {"type": "string"}}
+    },
+    "dispatch_history": {
+      "storage": "objects/dispatch_history/<result_sha256>", "access": "BOSS_WITH_SAFE_TECHNICAL_METADATA", "version": "1", "inherits": "dispatch",
+      "fields": {"dispatch_id": {"type_ref": "identifier"}, "recorded_at": {"type_ref": "instant", "clock": "WALL"}}, "policy": "同一结果只保存一次，实际不同抑制/允许理由全部保留。"
+    },
+    "notification_revision": {"storage": "objects/notification_revision/<notification_id>:<version>", "access": "BOSS_ONLY", "version": "1", "inherits": "notification", "fields": {}},
+    "reminder_revision": {"storage": "objects/reminder_revision/<event_id>:<version>", "access": "BOSS_ONLY", "version": "1", "inherits": "reminder", "fields": {}},
+    "notification_meeting_link": {
+      "storage": "objects/notification_meeting_link/<event_id>:<event_version>:<meeting_id>:<meeting_version>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "source_refs": {"type": "array", "items": "source_reference"}, "created_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
+    "notification_assignment_reference": {
+      "storage": "objects/notification_assignment_reference/<event_id>:<episode>", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "episode": {"type": "integer"}, "task_id": {"type_ref": "identifier"}, "task_version": {"type_ref": "version"},
+        "authorization_id": {"type_ref": "identifier"}, "reminder_authorization_id": {"type_ref": "identifier"}, "created_at": {"type_ref": "instant", "clock": "WALL"}}
+    },
+    "event": {
+      "storage": "objects/event", "access": "BOSS_WITH_MAINTAINER_SIMULATION_WRITE", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["OPEN", "RECOVERED", "CANCELED"]}, "impact": {"type": "string", "enum": ["NORMAL", "IMPORTANT"]}, "due_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "task_id": {"type_ref": "identifier", "optional": true}, "task_version": {"type_ref": "version", "optional": true}, "commitment_id": {"type_ref": "identifier", "optional": true}, "commitment_version": {"type_ref": "version", "optional": true}, "generated_by": {"type": "string", "optional": true}, "updated_at": {"type_ref": "instant", "optional": true}, "transition_reason": {"type": "string", "optional": true}, "automatic_external_delivery": {"type": "boolean", "const": false, "optional": true}, "external_delivery_created": {"type": "boolean", "const": false, "optional": true}}
+    },
+    "reminder": {
+      "storage": "objects/reminder", "access": "BOSS_ONLY", "version": "1",
+      "prd_state_enum": ["PENDING", "DELIVERED", "ACKNOWLEDGED", "SNOOZED", "CLOSED", "CANCELED", "FAILED"],
+      "state_mapping": "本人处理使用reminder.state；内部投递使用dispatch/delivery/notification；完整系统投递FAILED与待发送状态仍待验证",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version", "optional": true}, "version": {"type_ref": "version", "optional": true}, "state": {"type": "string", "enum": ["DELIVERED", "SNOOZED", "CLOSED", "ACKNOWLEDGED"]}, "until": {"type": ["string", "null"], "clock": "BUSINESS"}, "authorization_id": {"type_ref": "identifier", "optional": true}, "last_action_authorization_id": {"type_ref": "identifier", "optional": true}}
+    },
+    "dispatch": {
+      "storage": "objects/dispatch", "access": "BOSS_WITH_MAINTAINER_TECHNICAL_METADATA", "version": "1",
+      "fields": {"event_id": {"type_ref": "identifier"}, "event_version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SUPPRESSED", "DELIVERED"]}, "reason": {"type": ["string", "null"]}, "rule_version": {"type_ref": "version", "nullable": true}, "schedule_version": {"type_ref": "version"}, "business_at": {"type_ref": "instant", "clock": "BUSINESS"}, "owner_plan_id": {"type_ref": "identifier", "optional": true}, "owner_notice_version": {"type_ref": "version", "optional": true, "nullable": true}}
+    },
+    "notification": {
+      "storage": "objects/notification and objects/delivery", "access": "BOSS_WITH_REDACTED_SYSTEM_NOTIFICATION", "version": "1", "inherits": "dispatch",
+      "fields": {"delivered_at": {"type_ref": "instant", "clock": "BUSINESS"}, "source_type": {"type": "string", "const": "SIMULATED"}},
+      "delivery_semantics": "DELIVERED 表示内部通知已保存；不能证明系统通知或外部人员送达"
+    },
+    "meeting_brief": {
+      "storage": "objects/meeting_brief", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"brief_id": {"type_ref": "identifier"}, "meeting_id": {"type_ref": "identifier"}, "meeting_version": {"type_ref": "version"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["READY_FOR_REVIEW", "NEEDS_REVIEW"]},
+        "compiled": {"type": "object", "properties": {"meeting": "meeting_reference", "participants": "contact[]", "sources": "source_reference[]", "commitments": "task_reference[]", "event": "event_reference", "metrics": "metric_result", "travel_impacts": "travel_reference[]", "people_meeting_impacts": "person_brief_reference[]", "owner_goal_reference": "owner_goal_version", "missing_items": "string[]", "needs_review": "boolean", "prepared_for_owner": "identifier", "source_type": "SIMULATED"}},
+        "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "reviewed_by_owner": {"type": "boolean", "const": false}, "meeting_occurred": {"type": "boolean", "const": false}, "message_sent": {"type": "boolean", "const": false}}
+    },
+    "research": {
+      "storage": "objects/research", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"research_id": {"type_ref": "identifier"}, "owner_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["SOURCE_REVIEW_REQUIRED", "NEEDS_REVIEW"]},
+        "scope": {"type": "object", "properties": {"question": "string:2..160", "period": "string:0..60", "country": "string:0..60", "business_relation": "string:0..160", "cutoff_date": "date"}},
+        "matched_sources": {"type": "array", "items": {"source_id": "identifier", "version": "version", "published_at": "instant or date", "author_contact_id": "identifier or null", "original_locator": "string", "quote_start": "integer", "quote_end": "integer", "quote": "private_text", "match_start": "integer", "claim_kind": "UNVERIFIED_SOURCE_EXCERPT", "source_text_is_untrusted_instruction": "boolean"}},
+        "coverage": {"type": "object", "meaning": "可用/匹配/拒绝数量、20条上限、来源覆盖，公开搜索与语义检索当前 false"}, "facts_confirmed": {"type": "array", "const": []}, "author_opinions_confirmed": {"type": "array", "const": []}, "model_inferences": {"type": "array", "const": []}, "missing_items": {"type": "array", "items": "string"},
+        "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "published_conclusions": {"type": "boolean", "const": false}, "external_message_sent": {"type": "boolean", "const": false}}
+    },
+    "person_brief": {
+      "storage": "objects/person_brief", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"brief_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["READY_FOR_REVIEW", "MATERIALS_MISSING", "ATTACHED_TO_MEETING_AGENDA", "UNLINKED_FROM_MEETING_AGENDA"]},
+        "compiled": {"type": "object", "properties": {"contact": "contact", "purpose": "private_text", "meeting": "meeting_reference or null", "goals": "string[]", "sources": "source_reference[]", "tasks": "task_reference[]", "feedback": "feedback_reference[]", "questions": "object[]", "has_original_evidence": "boolean", "external_meeting_updated": "false", "personal_traits_inferred": "false"}},
+        "compiled_sha256": {"type": "string"}, "linked_meeting_version": {"type": ["string", "null"]}, "prepared_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "unlink_reason": {"type_ref": "private_text", "optional": true}}
+    },
+    "travel_plan": {
+      "storage": "objects/travel_plan", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"travel_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "status": {"type": "string", "enum": ["DRAFT_REVIEWED", "CONFIRMED", "CANCELED"]},
+        "current": {"type": ["object", "null"], "properties": {"origin": "private_text", "destination": "private_text", "starts_at": "instant", "ends_at": "instant", "starts_at_utc": "instant", "ends_at_utc": "instant", "timezone": "IANA", "host_contact_id": "identifier", "host_responsibility": "string", "buffer_minutes": "integer:0..360", "transport_refs": "source_reference[]"}},
+        "pending": {"type": ["object", "null"], "properties": {"details": "travel_plan.current", "impact": "travel_impact", "review_sha256": "string", "reviewed_at": "instant"}},
+        "impact_at_confirmation": {"type": "object", "meaning": "会议起始/结束未知、私人占用、任务期限、已确认行程、资料缺口与覆盖范围", "optional": true},
+        "created_at": {"type_ref": "instant", "clock": "WALL"}, "updated_at": {"type_ref": "instant", "clock": "WALL"}, "authorization_id": {"type_ref": "identifier", "optional": true}, "cancel_reason": {"type_ref": "private_text", "optional": true}}
+    },
+    "owner_goals": {
+      "storage": "objects/owner_goals_draft and owner_goals_active", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "state": {"type": "string", "enum": ["DRAFT_NOT_EFFECTIVE", "CONFIRMED"]},
+        "content": {"type": "object", "properties": {"goals": "string[1..8], each 1..160", "topics": "string[0..10], each 1..120", "reading_requirement": "string:1..800", "scope": "OWNER_WORKSPACE|DAILY_BRIEF|MEETING_PREP", "valid_until": "instant or null, BUSINESS clock", "source": "OWNER_EXPLICIT_INPUT"}},
+        "content_sha256": {"type": "string"}, "author_identity": {"type": "string", "const": "BOSS"}, "saved_at": {"type_ref": "instant", "optional": true}, "confirmed": {"type": "boolean", "optional": true}, "source_draft_version": {"type_ref": "version", "optional": true}, "authorization_id": {"type_ref": "identifier", "optional": true}, "confirmed_at": {"type_ref": "instant", "optional": true}}
+    },
+    "owner_notice": {
+      "storage": "objects/owner_notice_draft and owner_notice_active", "access": "BOSS_ONLY", "version": "1", "inherits_metadata": "owner_goals",
+      "fields": {"content": {"type": "object", "properties": {"timezone": "IANA", "quiet_start": "integer:0..23", "quiet_end": "integer:0..23", "notifications_enabled": "boolean", "important_during_quiet": "boolean", "reading_format": "ACTIONS_FIRST|SUMMARY|DETAIL", "visibility": "BOSS_ONLY", "calendar_share_limit": "BUSY_ONLY", "valid_until": "instant or null, BUSINESS clock", "source": "OWNER_EXPLICIT_INPUT"}}}
+    },
+    "prompt": {
+      "storage": "objects/prompt_draft, prompt_active, prompt_context_use", "access": "MAINTAINER_CONFIG_WITH_BOSS_RUNTIME_USE", "version": "1",
+      "fields": {"prompt_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "kind": {"type": "string", "enum": ["SECRETARY_ROLE", "EXPRESSION", "TASK_HINTS"]}, "title": {"type": "string", "maxLength": 120}, "instruction_text": {"type": "string", "minLength": 20, "maxLength": 5000}, "change_note": {"type": "string", "maxLength": 360}, "source_refs": {"type": "array", "items": "source_reference"}, "content_sha256": {"type": "string"},
+        "validation_status": {"type": "string", "enum": ["DRAFT_UNVALIDATED", "VALIDATED_STATIC_ONLY"]}, "validated_content_sha256": {"type": ["string", "null"]}, "validated_at": {"type": ["string", "null"]}, "updated_at": {"type_ref": "instant"}, "actual_model_evaluation_passed": {"type": "boolean", "const": false}},
+      "active_fields": {"kind": "prompt.kind", "active_version": "version", "prompt_id": "identifier", "prompt_version": "version", "content_sha256": "string", "enabled": "boolean", "activated_at": "instant", "deactivated_at": "instant optional", "adoption_policy": "NEXT_BOSS_TURN_ONLY", "actual_model_evaluation_passed": "false"},
+      "adoption_fields": {"kind": "prompt.kind", "prompt_id": "identifier", "prompt_version": "version", "active_version": "version", "content_sha256": "string", "at": "instant WALL", "context_load_count": "integer", "observation": "RUNTIME_CONTEXT_PROVIDER_INVOKED", "model_completion_verified": "false", "technical_configuration_grants_business_authority": "false"}
+    },
+    "configuration": {
+      "storage": "objects/configuration/current", "access": "SERVER_ONLY_WITH_REDACTED_MAINTAINER_STATUS", "version": "1",
+      "fields": {"config_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "provider": {"type": "string", "const": "deepseek"}, "api_type": {"type": "string", "const": "chat_completions"}, "model_id": {"type": "string"}, "credential_ref": {"type": "string", "access": "SERVER_ONLY"}, "tool_scope": {"type": "array", "items": "operationId"}, "max_tool_rounds": {"type": "integer"}, "timeout": {"type": "integer", "unit": "second"}, "enabled": {"type": "boolean"}},
+      "runtime_policy": "RuntimeRecorder逐项核查当前SQLite配置和实际启用参数并记录版本；完整请求覆盖与模型行为另行验收，配置记录本身不证明业务完成。"
+    },
+    "scheduler_draft": {
+      "storage": "objects/scheduler_draft/current", "access": "MAINTAINER_ONLY", "version": "1",
+      "fields": {"draft_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "configuration": {"type": "object", "properties": {"trigger": "EVENT_OR_TIME", "timezone": "Asia/Shanghai", "quiet_start": "integer:0..23", "quiet_end": "integer:0..23", "cooldown_seconds": "integer:0..86400", "important_escalation": "boolean"}}, "validation_state": {"type": "string", "enum": ["DRAFT", "VALIDATED", "ACTIVE"]}, "validated_at": {"type": ["string", "null"]}, "activated_at": {"type": ["string", "null"]}, "saved_at": {"type_ref": "instant"}, "schedule_activated": {"type": "boolean"}, "schedule_version_at_validation": {"type_ref": "version", "optional": true}}
+    },
+    "query": {
+      "storage": "objects/query", "access": "BOSS_ONLY", "version": "1",
+      "fields": {"query_id": {"type_ref": "identifier"}, "envelope": {"type": "object", "properties": {"request_id": "identifier", "owner_id": "identifier", "execution_namespace": "identifier", "dataset_id": "identifier", "dataset_version": "version", "session_id": "identifier"}},
+        "values": {"type": "array", "items": {"metric_id": "identifier", "period_scope": "BASE|CURRENT|CHANGE", "scope_description": "string", "value": "decimal or null", "unit": "string", "formula": "string", "definition_version": "version", "display_rounding": "string"}},
+        "detail_refs": {"type": "array", "items": "metric_detail.record_id"}, "sources": {"type": "array", "items": "source_reference_with_freshness"}, "missing_fields": {"type": "array", "items": "string"}, "unexplained_causes": {"type": "array", "items": "string"}}
+    },
+    "query_source_binding": {
+      "storage": "objects/query_source_binding; id=query_id", "access": "SERVER_ONLY_WITH_BOSS_REFERENCE_RESULTS", "version": "1",
+      "fields": {"query_id": {"type_ref": "identifier", "relation": "query.query_id"}, "owner_id": {"type_ref": "identifier"}, "dataset_id": {"type_ref": "identifier"}, "dataset_version": {"type_ref": "version"},
+        "source_id": {"type_ref": "identifier", "relation": "document.source_id"}, "source_version": {"type_ref": "version"}, "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$", "meaning": "当前document完整JSON的SHA256，使用business.checksum"},
+        "detail_fingerprints": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "meaning": "每项实际查询明细的完整JSON摘要"}},
+      "lifecycle": "与query同一事务创建，不随原文修改更新；后续读取校验当前权限、状态、来源版本/摘要和明细摘要。旧查询缺少绑定时要求重新查询。"
+    },
+    "source_registration": {
+      "storage": "objects/source_registration, planned", "access": "BOSS_SOURCE_BODY_WITH_MAINTAINER_PROVENANCE_METADATA", "version": "1", "design_status": "PROVENANCE_BINDING_REQUIRED",
+      "fields": {"source_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "source_type": {"type": "string", "enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}, "origin_uri": {"type": "string"}, "author_contact_id": {"type": ["string", "null"]}, "published_at": {"type": ["string", "null"]}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "permission_basis": {"type": "string"}, "license_identifier": {"type": ["string", "null"]}, "license_uri": {"type": ["string", "null"]}, "content_sha256": {"type": "string"}, "access_scope": {"type_ref": "identifier"}, "valid_from": {"type": ["string", "null"]}, "valid_until": {"type": ["string", "null"]}, "withdrawn": {"type": "boolean"}, "withdrawn_at": {"type": ["string", "null"]}},
+      "source_policy": "既有SIMULATED事实使用明确的批准依据；公开材料需要核查出处与许可，缺少授权不得推断可以摄取或分发。"
+    },
+    "voice_transcript": {
+      "storage": "W2 TranscriptionResult and protected voice records", "access": "BOSS_ONLY", "version": "1", "design_status": "W2_PROVIDER_RESULT_DEFINED_PRODUCT_REVIEW_BINDING_PENDING",
+      "fields": {"text": {"type_ref": "private_text", "meaning": "真实服务原始转写；业务采用前需本人核查"}, "request_id": {"type_ref": "identifier"}, "provider_log_id": {"type": "string"}, "source_sha256": {"type": "string"}, "local_duration_ms": {"type": "integer", "unit": "millisecond"}, "provider_duration_ms": {"type": "integer", "unit": "millisecond"}, "elapsed_ms": {"type": "integer", "unit": "millisecond"}, "provider": {"type": "string", "const": "doubao"}, "resource_id": {"type": "string"}, "cost_total": {"type_ref": "decimal"}, "cost_coverage": {"type": "string"}},
+      "source": "W2 validation/boss_transcription.py TranscriptionResult; no credential or recording read",
+      "pending_product_fields": ["owner-reviewed text version", "confirmation authorization", "related business request ID", "cancellation and recording retention state"]
+    },
+    "runtime_run": {
+      "storage": "objects/runtime_run; id=run_id", "access": "BOSS_AND_MAINTAINER_TECHNICAL_METADATA_ONLY", "version": "1", "design_status": "W2_PRODUCER_BOUND_PUBLIC_INTEGRATION_RECHECK_PENDING",
+      "schema_ref": "runtime-records.schema.json#/$defs/RuntimeRun", "current_producer_schema_ref": "runtime-records.schema.json#/$defs/CurrentRuntimeRun",
+      "producer": "W2 boss_runtime_records.RuntimeRecorder and RuntimeRecordHook; commit 1d13d77",
+      "fields": {
+        "run_id": {"type_ref": "identifier"}, "session_id": {"type_ref": "identifier"}, "request_id": {"type_ref": "identifier"},
+        "request_id_source": {"type": "string", "enum": ["MESSAGE", "TURN", "SERVER_GENERATED"]},
+        "chat_id": {"type": ["string", "null"]}, "turn_id": {"type": ["string", "null"]}, "namespace": {"type_ref": "identifier", "relation": "objects.namespace"},
+        "dataset_id": {"type_ref": "identifier", "optional": true, "meaning": "当前生产者必需；旧记录未保存时保持缺少"},
+        "dataset_version": {"type_ref": "version", "optional": true}, "configuration_id": {"type_ref": "identifier"}, "configuration_version": {"type_ref": "version"},
+        "runtime": {"type": "object", "schema_ref": "runtime-records.schema.json#/$defs/RuntimeSnapshot", "meaning": "实际Provider、模型、API类型、轮数、输出Token限制、请求timeout及配置摘要"},
+        "prompt_versions": {"type": "array", "items": "runtime-records.schema.json#/$defs/PromptVersion"},
+        "memory_reference": {"type": ["object", "null"], "optional": true, "schema_ref": "runtime-records.schema.json#/$defs/MemoryReference", "meaning": "当前生产者必需且可空；只有记忆ID、版本、确认状态及采用资格，无正文"},
+        "tool_config_sha256": {"type": "string"}, "tool_configuration": {"type": "array", "items": "runtime-records.schema.json#/$defs/ToolConfiguration"},
+        "model_requests": {"type": "array", "items": "runtime-records.schema.json#/$defs/ModelRequest"}, "tool_results": {"type": "array", "items": "runtime-records.schema.json#/$defs/ToolResultReference"},
+        "status": {"type": "string", "enum": ["QUEUED", "RUNNING", "WAITING_INPUT", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"]}, "stop_reason": {"type": ["string", "null"]},
+        "started_at": {"type_ref": "instant", "clock": "WALL"}, "finished_at": {"type": ["string", "null"], "clock": "WALL"},
+        "termination_source": {"type": "string", "optional": true, "enum": ["CALLER_DEADLINE_EXPIRED"]},
+        "usage": {"type": ["object", "null"], "schema_ref": "runtime-records.schema.json#/$defs/Usage"}, "cost_total": {"type_ref": "decimal"}, "price_version": {"type": ["string", "null"]},
+        "usage_coverage": {"type": "string", "enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]}, "model_attempts_coverage": {"type": "string", "const": "HTTP_REQUESTS_OBSERVED_ONLY"},
+        "private_body_recorded": {"type": "boolean", "const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"}
+      },
+      "legacy_policy": "旧记录缺少dataset绑定或memory_reference时保留当时原记录，不根据当前资料或配置补充。当前新记录使用CurrentRuntimeRun，数据集两字段同时提供。",
+      "state_policy": "SDK完成不代表业务完成；WAITING_INPUT需要明确服务端事件，当前不从模型文字推断。",
+      "usage_policy": "实际HTTP已报告用量求和；缓存Token缺少时保持未知；COMPLETE_OBSERVED_REQUESTS仅覆盖已观察请求。未核查价格及全部尝试时cost_total与price_version为null。"
+    },
+    "agriculture_batch": {
+      "storage": "objects/agriculture_batch, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"batch_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type": ["string", "null"]}, "ownership_type": {"type": "string", "enum": ["COMPANY", "CUSTOMER", "COOPERATION"]}, "asset_owner_id": {"type_ref": "identifier"}, "cost_owner_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string"}, "stage": {"type": "string"}, "unit_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "quality_state": {"type": "string"}, "settlement_state": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "agriculture_transfer": {
+      "storage": "objects/agriculture_transfer, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"transfer_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "from_batch_id": {"type_ref": "identifier"}, "to_batch_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "transferred_at": {"type_ref": "instant", "clock": "BUSINESS"}, "relationship_state": {"type": "string", "enum": ["CONFIRMED", "PENDING_REVIEW", "CONFLICTED"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "agriculture_observation": {
+      "storage": "objects/agriculture_observation, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"observation_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "unit_id": {"type_ref": "identifier"}, "observed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "measurement_method": {"type": "string"}, "metric_id": {"type_ref": "identifier"}, "value": {"type_ref": "decimal"}, "unit": {"type": "string"}, "coverage": {"type": "string"}, "estimation_status": {"type": "string", "enum": ["OBSERVED", "ESTIMATED", "CONFIRMED", "UNKNOWN"]}, "error_range": {"type": ["object", "null"]}, "professional_state": {"type": "string"}, "author_contact_id": {"type_ref": "identifier"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "exchange_rate": {
+      "storage": "objects/exchange_rate, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"rate_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "currency_from": {"type": "string"}, "currency_to": {"type": "string"}, "exchange_rate": {"type_ref": "decimal"}, "exchange_rate_date": {"type": "string", "format": "date"}, "rate_type": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "experiment": {
+      "storage": "objects/experiment, planned", "access": "BOSS_WITH_MAINTAINER_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"experiment_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "objective": {"type": "string"}, "treatment": {"type": "object"}, "control": {"type": ["object", "null"]}, "sample_size": {"type": ["integer", "null"]}, "denominator": {"type_ref": "decimal"}, "observation_window": {"type": "object", "properties": {"starts_at": "instant", "ends_at": "instant"}}, "conditions": {"type": "object"}, "outcome": {"type": "object"}, "applicability": {"type": "string"}, "review_source_id": {"type_ref": "identifier"}, "review_source_version": {"type_ref": "version"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "material_quote": {
+      "storage": "objects/material_quote, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"quote_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "material_id": {"type_ref": "identifier"}, "supplier_contact_id": {"type_ref": "identifier"}, "region_id": {"type_ref": "identifier"}, "price": {"type_ref": "decimal"}, "currency": {"type": "string"}, "price_unit": {"type": "string"}, "quality_grade": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "material_contract": {
+      "storage": "objects/material_contract, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"contract_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "supplier_contact_id": {"type_ref": "identifier"}, "material_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "unit_price": {"type_ref": "decimal"}, "currency": {"type": "string"}, "delivery_window": {"type": "object", "properties": {"starts_at": "instant", "ends_at": "instant"}}, "settlement_state": {"type": "string"}, "quality_requirements": {"type": ["object", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "inventory_lot": {
+      "storage": "objects/inventory_lot, planned", "access": "BOSS_WITH_APPROVED_SOURCE_IMPORT", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"inventory_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "material_id": {"type_ref": "identifier"}, "warehouse_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "asset_owner_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "available_quantity": {"type_ref": "decimal"}, "quality_state": {"type": "string"}, "expires_at": {"type": ["string", "null"]}, "in_transit": {"type": "boolean"}, "observed_at": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "feed_formula": {
+      "storage": "objects/feed_formula, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"formula_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "product_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string"}, "stage": {"type": "string"}, "professional_state": {"type": "string"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "ingredients": {"type": "array", "items": {"material_id": "identifier", "ratio": "decimal or null", "ratio_unit": "string", "quality_requirement": "object or null"}}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "仅作为成本与资源协调的来源，系统没有配方发布能力"
+    },
+    "business_order": {
+      "storage": "objects/business_order, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"order_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"}, "region_id": {"type_ref": "identifier"}, "quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "trade_type": {"type": "string"}, "due_at": {"type_ref": "instant"}, "amount": {"type_ref": "decimal"}, "currency": {"type": "string"}, "status": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "season_curve": {
+      "storage": "objects/season_curve, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"curve_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "region_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "channel_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"}, "points": {"type": "array", "items": {"date": "date", "value": "decimal or null", "unit": "string", "estimation_status": "string"}}, "coverage": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "transport_record": {
+      "storage": "objects/transport_record, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"transport_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "transfer_id": {"type_ref": "identifier"}, "departed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant"}, "received_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "receiver_contact_id": {"type_ref": "identifier"}, "observations": {"type": "array", "items": "agriculture_observation.observation_id"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "professional_record": {
+      "storage": "objects/professional_record, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"professional_record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "author_contact_id": {"type_ref": "identifier"}, "batch_id": {"type": ["string", "null"]}, "event_id": {"type": ["string", "null"]}, "observation_ids": {"type": "array", "items": "agriculture_observation.observation_id"}, "state": {"type": "string", "enum": ["OBSERVED", "PENDING_REVIEW", "PROFESSIONALLY_CONFIRMED", "ACTION_REPORTED", "FOLLOWUP_PENDING", "REVIEW_RESULT_REPORTED"]}, "applicability": {"type": "string"}, "content": {"type_ref": "private_text"}, "followup_at": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "本人交办与专业状态分别保存，完成交办不能修改专业确认"
+    },
+    "cycle_cost": {
+      "storage": "objects/cycle_cost, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"cost_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "cycle_id": {"type_ref": "identifier"}, "batch_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "cost_owner_id": {"type_ref": "identifier"}, "cost_category": {"type": "string"}, "amount": {"type_ref": "decimal"}, "currency": {"type": "string"}, "period_start": {"type": "string", "format": "date"}, "period_end": {"type": "string", "format": "date"}, "settlement_state": {"type": "string", "enum": ["PLANNED", "ACTIVE", "PARTIALLY_SETTLED", "SETTLED"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "livestock_output": {
+      "storage": "objects/livestock_output, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"output_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "batch_id": {"type_ref": "identifier"}, "cycle_id": {"type_ref": "identifier"}, "species": {"type": "string"}, "purpose": {"type": "string", "enum": ["BROILER", "EGG", "MILK", "BEEF"]}, "stage": {"type": "string"}, "age_days": {"type": ["integer", "null"], "unit": "day"}, "feed_quantity": {"type_ref": "decimal"}, "feed_unit": {"type": "string"}, "output_quantity": {"type_ref": "decimal"}, "output_unit": {"type": "string"}, "eligible_output_quantity": {"type_ref": "decimal"}, "observation_start": {"type_ref": "instant"}, "observation_end": {"type_ref": "instant"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}},
+      "business_policy": "四种用途分别查询；单位、阶段或期间不相容时拒绝合并"
+    },
+    "equipment_relation": {
+      "storage": "objects/equipment_relation, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"relation_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "equipment_id": {"type_ref": "identifier"}, "unit_id": {"type_ref": "identifier"}, "batch_id": {"type_ref": "identifier"}, "legal_entity_id": {"type_ref": "identifier"}, "asset_owner_id": {"type_ref": "identifier"}, "valid_from": {"type_ref": "instant"}, "valid_until": {"type": ["string", "null"]}, "relation_state": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "quality_trace": {
+      "storage": "objects/quality_trace, planned", "access": "BOSS_READ_ONLY_APPROVED_PROFESSIONAL_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"trace_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "complaint_id": {"type_ref": "identifier"}, "input_batch_id": {"type_ref": "identifier"}, "output_batch_id": {"type_ref": "identifier"}, "processing_id": {"type_ref": "identifier"}, "inventory_id": {"type": ["string", "null"]}, "customer_id": {"type": ["string", "null"]}, "input_quantity": {"type_ref": "decimal"}, "output_quantity": {"type_ref": "decimal"}, "loss_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "trace_state": {"type": "string", "enum": ["CONFIRMED", "POSSIBLE", "MISSING", "CONFLICTED"]}, "inspection_state": {"type": "string"}, "professional_record_id": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "cash_receivable": {
+      "storage": "objects/cash_receivable, planned", "access": "BOSS_READ_ONLY_APPROVED_FINANCE_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"finance_record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type": ["string", "null"]}, "order_id": {"type": ["string", "null"]}, "record_type": {"type": "string", "enum": ["CASH", "RECEIVABLE", "PAYMENT", "SETTLEMENT"]}, "amount_local": {"type_ref": "decimal"}, "currency": {"type": "string"}, "due_at": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "settlement_state": {"type": "string"}, "exchange_rate_id": {"type": ["string", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "production_capacity": {
+      "storage": "objects/production_capacity, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"capacity_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "legal_entity_id": {"type_ref": "identifier"}, "country": {"type": "string"}, "factory_id": {"type_ref": "identifier"}, "process_stage_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"}, "period_start": {"type_ref": "instant"}, "period_end": {"type_ref": "instant"}, "timezone": {"type": "string"}, "capacity_quantity": {"type_ref": "decimal"}, "planned_quantity": {"type_ref": "decimal"}, "quantity_unit": {"type": "string"}, "changeover_conditions": {"type": ["object", "null"]}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "customer_feedback": {
+      "storage": "objects/customer_feedback, planned", "access": "BOSS_READ_ONLY_APPROVED_SOURCE", "version": "1", "design_status": "SOURCE_REQUIRED",
+      "fields": {"feedback_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"}, "customer_id": {"type_ref": "identifier"}, "author_contact_id": {"type_ref": "identifier"}, "batch_id": {"type": ["string", "null"]}, "experiment_id": {"type": ["string", "null"]}, "application_version": {"type": ["string", "null"]}, "observed_at": {"type_ref": "instant"}, "received_at": {"type_ref": "instant", "clock": "WALL"}, "content": {"type_ref": "private_text"}, "coverage": {"type": "string"}, "source_id": {"type_ref": "identifier"}, "source_version": {"type_ref": "version"}}
+    },
+    "metric_detail": {
+      "storage": "initial/snapshot.details", "access": "BOSS", "version": "1",
+      "fields": {
+        "record_id": {"type_ref": "identifier"}, "version": {"type_ref": "version"},
+        "region_id": {"type_ref": "identifier"}, "product_id": {"type_ref": "identifier"},
+        "legal_entity_id": {"type_ref": "identifier"}, "customer_id": {"type_ref": "identifier"},
+        "factory_id": {"type_ref": "identifier"}, "period": {"type": "string", "enum": ["BASE", "CURRENT"]},
+        "quantity_tonnes": {"type_ref": "decimal", "unit": "tonne"},
+        "revenue_cny": {"type_ref": "decimal", "unit": "CNY"}, "cost_cny": {"type_ref": "decimal", "unit": "CNY"},
+        "trade_type": {"type": "string", "enum": ["EXTERNAL_SALES"]}
+      },
+      "source": "既有获准 initial_materials T02-3 / seed 20261022"
+    }
+  },
+  "metrics": {
+    "sales_quantity": {"formula": "SUM(quantity_tonnes)", "unit": "tonne", "definition_version": "1"},
+    "revenue": {"formula": "SUM(revenue_cny)", "unit": "CNY", "definition_version": "1"},
+    "cost": {"formula": "SUM(cost_cny)", "unit": "CNY", "definition_version": "1"},
+    "gross_profit": {"formula": "revenue-cost", "unit": "CNY", "definition_version": "1"},
+    "gross_margin": {"formula": "gross_profit/revenue*100", "unit": "%", "definition_version": "1", "zero_denominator": null},
+    "gross_profit_per_tonne": {"formula": "gross_profit/sales_quantity", "unit": "CNY/tonne", "definition_version": "1", "zero_denominator": null}
+  },
+  "time_semantics": {
+    "observed_at": "来源观察时间", "received_at": "服务收到资料的真实时间",
+    "valid_from": "允许采用起始时间", "valid_until": "允许采用终止时间",
+    "business_at": "模拟业务时间", "created_at": "真实创建时间", "read_at": "真实查询时间"
+  },
+  "read_projections": {
+    "simulation_query": {
+      "schema": "specs/simulation-query.schema.json",
+      "storage": "READ_ONLY; no new object or table",
+      "scope": "unique spaces.active namespace and approved selection/1 for boss-1",
+      "body": "BOSS_ONLY current canonical object or stored snapshot; invalid source or inactive content is null",
+      "technical": "MAINTAINER independent SQL metadata projection; data=null, no source body or cached snapshot",
+      "records": "record_id=entity_type:object_id; object_id is the business ID, storage_id is the resource key; entity_type, version, state, content_state, source_refs and business_authorization_granted=false; initial nested records retain their approved source ID as the resource key",
+      "source_policy": "current scope, validity, pinned version and available full source/detail fingerprints; cached domain context is independently checked",
+      "initial_policy": "current object takes precedence; a deletion marker prevents initial text from returning",
+      "unknown_policy": "all fourteen interfaces remain PARTIAL or UNAVAILABLE until complete approved materials and integrations exist"
+    }
+  },
+  "pending_entities": [],
+  "requirement_entities": {
+    "R01": ["morning_list", "morning_sequence", "today_order", "meeting", "task", "self_commitment", "event", "owner_goals", "application", "private_calendar", "travel_plan", "document"],
+    "R02": ["event", "rules", "schedule", "owner_plan", "owner_notice", "reminder", "notification", "business_alert_rule", "business_alert_observation", "business_alert_tracking", "business_alert_recovery", "business_alert_summary", "business_alert_delivery", "business_alert_action", "dispatch_history", "notification_revision", "reminder_revision", "notification_meeting_link", "notification_assignment_reference"],
+    "R03": ["query", "query_source_binding", "metric_detail"], "R04": ["meeting", "meeting_draft", "meeting_brief", "document", "task"],
+    "R05": ["minutes", "minutes_assignment_link", "task", "authorization"],
+    "R06": ["task", "assignment_source_binding", "assignment_source_binding_revision", "self_commitment", "feedback", "outbox", "event"],
+    "R07": ["application", "application_decision", "document", "authorization"],
+    "R08": ["contact", "message_draft", "message", "message_reply", "authorization"],
+    "R09": ["document", "research"], "R10": ["contact", "person_brief", "task", "feedback"],
+    "R11": ["travel_plan", "meeting", "private_calendar", "document"],
+    "R12": ["private_calendar", "calendar_share", "authorization"], "R13": ["memory", "authorization", "application_decision", "document"],
+    "R14": ["material_quote", "material_contract", "inventory_lot", "material_cost_report", "feed_formula", "business_order", "production_capacity"],
+    "R15": ["season_curve", "business_order", "agriculture_batch", "agriculture_observation"],
+    "R16": ["agriculture_batch", "agriculture_transfer", "transport_record", "customer_feedback"],
+    "R17": ["agriculture_observation", "professional_record", "task", "feedback"],
+    "R18": ["agriculture_batch", "agriculture_transfer", "cycle_cost", "cash_receivable"],
+    "R19": ["agriculture_batch", "livestock_output", "customer_feedback", "person_brief"],
+    "R20": ["equipment_relation", "agriculture_batch", "agriculture_observation", "professional_record", "cycle_cost"],
+    "R21": ["quality_trace", "inventory_lot", "agriculture_batch", "professional_record", "customer_feedback"],
+    "R22": ["business_order", "production_capacity", "cash_receivable", "exchange_rate", "meeting", "travel_plan"],
+    "R23": ["experiment", "professional_record", "customer_feedback", "application_decision", "task"],
+    "R24": ["runtime_run", "configuration", "query", "task"], "R25": ["metric_detail", "document", "event", "feedback"],
+    "R26": ["owner_goals", "owner_notice", "configuration", "authorization"], "R27": ["voice_transcript", "runtime_run", "authorization", "task"],
+    "R28": ["authorization", "document", "private_calendar", "calendar_share"], "R29": ["authorization", "runtime_run", "task"],
+    "R30": ["runtime_run", "configuration", "query"], "R31": ["runtime_run", "query", "metric_detail"], "R32": ["runtime_run", "configuration", "schedule"]
+  },
+  "pending_validation": ["migration and restore", "source deletion propagation", "independent semantic review", "public runtime record integration and voice review binding"]
+}

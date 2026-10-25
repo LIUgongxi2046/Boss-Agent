@@ -125,6 +125,104 @@ def test_replaced_source_blocks_next_turn_context_adoption(service):
     assert catalog(reads)[1]["active"][0]["context_load_count"]==0
 
 
+def test_source_withdrawal_between_selection_and_recording(service):
+    api, reads = service
+    setup_active(service)
+    selected = active_runtime_prompts(api.store)
+    api.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    record_runtime_context_load(api.store, selected)
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 0
+
+
+@pytest.mark.parametrize("state", ["EXPIRED", "CONFLICTED", "SUPERSEDED", "RECEIVED"])
+def test_source_validity_prevents_new_prompt_context_and_adoption_count(service, state):
+    from boss_prompt_config import load_runtime_prompts
+
+    api, reads = service
+    setup_active(service)
+    with api.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        source = api.store.get(db, "ui-check", "document", "finance-note")
+        source["validity_state"] = state
+        api.store.put(db, "ui-check", "document", "finance-note", source)
+    assert load_runtime_prompts(api.store) == []
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 0
+
+
+def test_expired_source_blocks_prompt_draft_change_without_new_version(service):
+    api, reads = service
+    item, checked, activated = setup_active(service)
+    with api.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        draft = api.store.get(db, "ui-check", "prompt_draft", item["prompt_id"])
+        source = api.store.get(db, "ui-check", "document", "finance-note")
+        source["valid_until"] = api.store.get(db, "ui-check", "clock", "current")["at"]
+        api.store.put(db, "ui-check", "document", "finance-note", source)
+    result = call(api, "MAINTAINER", "boss.prompt.save", "prompt-expired-source-01",
+        prompt_id=draft["prompt_id"], expected_version=draft["version"], kind=draft["kind"],
+        title=draft["title"], instruction_text=draft["instruction_text"],
+        change_note=draft["change_note"], source_ids=["finance-note"])
+    assert result[0] == 410
+    with api.store.connect() as db:
+        assert api.store.get(db, "ui-check", "prompt_draft", item["prompt_id"])["version"] == draft["version"]
+
+
+def test_prompt_technical_status_reports_expiration_without_body_or_adoption_write(service):
+    from boss_admin_config import prompt_technical_status
+
+    api, reads = service
+    item, checked, activated = setup_active(service)
+    before = prompt_technical_status(api.store, "MAINTAINER")
+    entry = next(row for row in before["items"] if row["kind"] == "SECRETARY_ROLE")
+    assert entry["future_context_eligible"] is True
+    with api.store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        source = api.store.get(db, "ui-check", "document", "finance-note")
+        source["valid_until"] = api.store.get(db, "ui-check", "clock", "current")["at"]
+        api.store.put(db, "ui-check", "document", "finance-note", source)
+        text = api.store.get(db, "ui-check", "prompt_draft", item["prompt_id"])["instruction_text"]
+    after = prompt_technical_status(api.store, "MAINTAINER")
+    entry = next(row for row in after["items"] if row["kind"] == "SECRETARY_ROLE")
+    assert entry["future_context_eligible"] is False
+    assert entry["exclusion_reasons"] == ["SOURCE_EXPIRED"]
+    assert text not in json.dumps(after, ensure_ascii=False)
+    assert source["content"] not in json.dumps(after, ensure_ascii=False)
+    assert after["model_adoption_verified"] is False
+    assert after["context_load_recorded"] is False
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 0
+
+
+@pytest.mark.parametrize("role", [None, "BOSS", "finance-1"])
+def test_prompt_technical_status_rejects_non_maintainer(service, role):
+    from aiohttp import web
+    from boss_admin_config import prompt_technical_status
+
+    api, _ = service
+    with pytest.raises(web.HTTPUnauthorized if role is None else web.HTTPForbidden):
+        prompt_technical_status(api.store, role)
+
+
+def test_prompt_selection_is_scoped_to_execution_namespace(service):
+    api, reads = service
+    setup_active(service)
+    api.store.initialize("independent-runtime")
+    assert active_runtime_prompts(api.store, "independent-runtime") == []
+
+
+def test_atomic_context_selection_survives_database_reopen(service):
+    from boss_prompt_config import load_runtime_prompts
+
+    api, reads = service
+    item, checked, activated = setup_active(service)
+    selected = load_runtime_prompts(api.store)
+    assert selected[0]["prompt_id"] == item["prompt_id"]
+    reopened = ControlStore(api.store.path)
+    assert catalog(BossPageAPI(reopened))[1]["active"][0]["context_load_count"] == 1
+    reopened.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    assert load_runtime_prompts(reopened) == []
+    assert catalog(reads)[1]["active"][0]["context_load_count"] == 1
+
+
 def test_duplicate_or_stale_context_record_not_exposed_to_business_owner(service):
     api,reads=service
     setup_active(service)
@@ -143,8 +241,7 @@ def test_duplicate_or_stale_context_record_not_exposed_to_business_owner(service
 
 def test_actual_runtime_hook_uses_version_selection_and_records_metadata_only():
     source=(ROOT/"validation/application.py").read_text()
-    assert 'active_runtime_prompts(store, "ui-check")' in source
-    assert 'record_runtime_context_load(store, selected_prompts, "ui-check")' in source
+    assert 'load_runtime_prompts(store, "ui-check")' in source
     assert 'source="boss-confirmed-memory"' in source
     assert "guidance_authority_boundary" in source
     assert "technical prompts do not grant" in source.lower() or "Technical prompts do not grant" in source

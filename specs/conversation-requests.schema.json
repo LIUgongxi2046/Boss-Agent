@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:boss-agent:conversation-requests:1.0.0",
+  "$defs":{
+    "Id":{"type":"string","minLength":1,"maxLength":200},
+    "NullableId":{"oneOf":[{"$ref":"#/$defs/Id"},{"type":"null"}]},
+    "Receipt":{"type":"object","additionalProperties":false,
+      "required":["source_type","client_request_id","outcome","request_state","run_id","chat_id","session_id","turn_id","write_performed_by_lookup","business_authority_granted"],
+      "properties":{
+        "source_type":{"const":"RUNTIME_RECORD"},"client_request_id":{"$ref":"#/$defs/Id"},
+        "outcome":{"enum":["RECORDED","NOT_FOUND_IN_CURRENT_STORE"]},"request_state":{"$ref":"#/$defs/Id"},
+        "run_id":{"$ref":"#/$defs/NullableId"},"chat_id":{"$ref":"#/$defs/NullableId"},
+        "session_id":{"$ref":"#/$defs/NullableId"},"turn_id":{"$ref":"#/$defs/NullableId"},
+        "write_performed_by_lookup":{"const":false},"business_authority_granted":{"const":false}}},
+    "History":{"type":"array","items":{"$ref":"#/$defs/Receipt"}}
+  }
+}

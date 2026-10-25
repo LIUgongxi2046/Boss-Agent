@@ -1,0 +1,41 @@
+{
+  "source_type": "SIMULATED",
+  "generator_version": "FC02-BI-1",
+  "seed": 20261024,
+  "allowed_use": "FC02_BEHAVIOR_VALIDATION",
+  "author_kind": "SIMULATED_GENERATOR",
+  "real_enterprise_data": false,
+  "third_party_authorization": false,
+  "description": "用户授权的程序行为验证资料，由本地确定性生成器生成；没有真实企业数据或第三方作者声明。数值为显式场景参数，seed仅标识可复现配置，不使用随机采样。",
+  "scenarios": {
+    "weighted-ratios": {"purpose": "核查不同数量和收入权重的重新聚合比例", "series": [
+      {"business_basis": "SIMULATED_BOUNDARY", "sync_state": "SYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": "1", "revenue_cny": "100", "cost_cny": "50"},
+        {"product_id": "product-2", "quantity_tonnes": "9", "revenue_cny": "900", "cost_cny": "810"}
+      ]}]},
+    "zero-denominators": {"purpose": "核查明确零分母及零基期的未定义结果", "series": [
+      {"business_basis": "SIMULATED_BOUNDARY", "sync_state": "SYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": "0", "revenue_cny": "0", "cost_cny": "0"}
+      ]}]},
+    "missing-numbers": {"purpose": "核查明确缺少数量和成本，未知数值不能填零", "series": [
+      {"business_basis": "SIMULATED_BOUNDARY", "sync_state": "SYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": null, "revenue_cny": "100", "cost_cny": null}
+      ]}]},
+    "delayed-records": {"purpose": "核查明确延迟资料只表达已观察的局部结果", "series": [
+      {"business_basis": "SIMULATED_BOUNDARY", "sync_state": "DELAYED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": "2", "revenue_cny": "100", "cost_cny": "80"}
+      ]}]},
+    "unsynchronized-records": {"purpose": "核查明确未同步范围及数值缺少", "series": [
+      {"business_basis": "SIMULATED_BOUNDARY", "sync_state": "UNSYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": null, "revenue_cny": null, "cost_cny": null}
+      ]}]},
+    "basis-conflict": {"purpose": "核查同期间与指标的财务和业务两种模拟口径及各自来源，不根据职位选取数值", "series": [
+      {"business_basis": "FINANCIAL_REPORTED", "sync_state": "SYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": "10", "revenue_cny": "100", "cost_cny": "70"}
+      ]},
+      {"business_basis": "BUSINESS_REPORTED", "sync_state": "SYNCHRONIZED", "rows": [
+        {"product_id": "product-1", "quantity_tonnes": "10", "revenue_cny": "120", "cost_cny": "72"}
+      ]}
+    ]}
+  }
+}

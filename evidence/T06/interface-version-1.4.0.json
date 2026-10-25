@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-23",
+  "interface_version": "1.4.0",
+  "schema_state": "FROZEN_FOR_IMPLEMENTATION",
+  "source_base": "5b34dcf",
+  "source_scope": "W1 commit containing this evidence",
+  "change_scope": "Runtime producer field reception, actual-record schemas and read API definition; no production business implementation change",
+  "runtime_field_evidence": "evidence/T05/runtime-binding-1.4.0.json",
+  "checks": [
+    {"command": ".work/design-venv/bin/python evidence/T06/validate_openapi.py", "status": "PASS", "result": "OpenAPI3.1 standard validation including runtime-records schema reference; duplicate YAML key validation"},
+    {"command": "validation/.venv/bin/python evidence/T06/check_design.py --receipts .work/pytest-w1-v131-verified", "status": "PASS", "actual_sqlite_receipts": 659, "declared_actions_observed": 67, "baseline_role_mappings": 58, "schema_versions": ["data-dictionary 1.4.0", "openapi 1.4.0", "runtime-events 1.4.0", "runtime-records 1.4.0"]},
+    {"command": "validation/.venv/bin/python evidence/T06/check_actual_inputs.py --run-dir .work/api-inputs-v14", "status": "PASS", "result": "16 passed in 1.35s; each of 58 baseline public actions has at least one valid declared input and actual result"},
+    {"command": "git diff --quiet 5b34dcf -- validation/business.py validation/controls.py validation/boss_meeting_approval.py", "status": "PASS", "result": "business implementation unchanged from verified 465-test revision"},
+    {"command": "evidence/T05/check_runtime_bindings.py with explicit W2 records/provider paths", "status": "PASS", "actual_runs": 9, "current_producer_records": 4, "query_schema_matches_implementation": true}
+  ],
+  "business_regression": {"source_revision": "5b34dcf", "result": "465 passed in 13.34s", "raw_result": ".work/w1-v131-verified.xml", "scope": "unchanged production business code; current design and schema checks are reported separately"},
+  "runtime_schema": {"path": "specs/runtime-records.schema.json", "legacy_record": "RuntimeRun", "current_producer": "CurrentRuntimeRun", "query": "RuntimeRecordsQuery", "output": "RuntimeRecordsProjection"},
+  "runtime_api": {"operationId": "runtimeRecordsRead", "method": "GET", "path": "/api/boss/ui/runtime-records", "roles": ["BOSS", "MAINTAINER"], "effect": "READ_ONLY_TECHNICAL_METADATA", "producer": "W2 RuntimeRecorder and runtime_records_query", "public_route_owner": "W3", "current_schema_public_recheck": "PENDING"},
+  "legacy_policy": "absent historical dataset or memory reference fields remain absent; current records require explicit dataset pair and nullable memory reference",
+  "new_external_requests": false,
+  "new_agricultural_facts": false,
+  "parent_acceptance": "NOT_RUN",
+  "pending": ["W3 public/runtime schema verification and A15 UI", "1.3.1 assignment source binding at all public consumers", "legacy assignment owner review and complete migration", "independent semantics and all business variants", "complete fourteen simulated interfaces", "voice review and real service authorization", "all authorization consumers, caches and E01-E06", "morning/recurring tasks, device behavior and full parent acceptance"]
+}

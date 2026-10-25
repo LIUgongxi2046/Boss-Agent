@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="6.373" timestamp="2026-10-23T19:55:03.807561+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_product_skill_versions" name="test_public_original_receipt_query_matches_current_identifier_schema[action=activate&amp;client_request_id=not%20permitted]" time="1.329"><failure message="assert 200 == 400">methods = (&lt;product_skills.ProductSkills object at 0x10f2166f0&gt;, &lt;boss_command_api.BossCommandAPI object at 0x10fb360f0&gt;, &lt;boss_page_api.BossPageAPI object at 0x10f9359d0&gt;)
+query = 'action=activate&amp;client_request_id=not%20permitted'
+
+    @pytest.mark.parametrize("query", ["action=activate&amp;client_request_id=not%20permitted", "action=save&amp;client_request_id=received%3A1"])
+    def test_public_original_receipt_query_matches_current_identifier_schema(methods, query):
+&gt;       assert methods[2].serve("MAINTAINER", "/api/boss/ui/admin/sop-operation-status", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_skill_versions.py:145: AssertionError</failure></testcase><testcase classname="app.tests.test_product_skill_versions" name="test_public_original_receipt_query_matches_current_identifier_schema[action=save&amp;client_request_id=received%3A1]" time="0.189"><failure message="assert 200 == 400">methods = (&lt;product_skills.ProductSkills object at 0x10ff08d70&gt;, &lt;boss_command_api.BossCommandAPI object at 0x10ff77e00&gt;, &lt;boss_page_api.BossPageAPI object at 0x10ff75a30&gt;)
+query = 'action=save&amp;client_request_id=received%3A1'
+
+    @pytest.mark.parametrize("query", ["action=activate&amp;client_request_id=not%20permitted", "action=save&amp;client_request_id=received%3A1"])
+    def test_public_original_receipt_query_matches_current_identifier_schema(methods, query):
+&gt;       assert methods[2].serve("MAINTAINER", "/api/boss/ui/admin/sop-operation-status", query)[0] == 400
+E       assert 200 == 400
+
+app/tests/test_product_skill_versions.py:145: AssertionError</failure></testcase></testsuite></testsuites>

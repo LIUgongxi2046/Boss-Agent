@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "run_id": "fc03-order-e9244282-e72d-4a7e-9d59-1fdbe2fbb55b",
+  "ports": {
+    "business": 9941,
+    "webui": 9942,
+    "gateway": 19941
+  },
+  "proxy_port": 9943,
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc03-order-e9244282-e72d-4a7e-9d59-1fdbe2fbb55b",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc03-n3-order-dist",
+  "manifest_sha256": "e60089dfdb81777241d7615a92ab3a12e1580271513a4819cbd8828345098fcd",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_order_result_interrupted",
+      "events": [
+        {
+          "event": "actual_order_forwarded",
+          "request_id": "ee18462b-ba6e-446b-96e1-5754da3af297",
+          "client_request_id": "today-5491a0cc-124a-4de2-94ce-0d9e844fed07"
+        },
+        {
+          "event": "actual_order_result_connection_closed",
+          "request_id": "ee18462b-ba6e-446b-96e1-5754da3af297",
+          "version": "1",
+          "sha256": "a43f7a3bb410d46ba29494dd874e603198d7964a47c791e374533696212a533e"
+        }
+      ],
+      "connections": 2,
+      "dropped": true
+    },
+    {
+      "check": "original_order_receipt_read_only_and_refresh",
+      "client_request_id": "today-5491a0cc-124a-4de2-94ce-0d9e844fed07",
+      "order_version": "1",
+      "item_ids": [
+        "historical_task:historical-1",
+        "meeting:meeting-1",
+        "private_calendar:private-1"
+      ],
+      "write_performed_by_lookup": false,
+      "request_replayed": false,
+      "transport_events": [
+        {
+          "event": "actual_order_forwarded",
+          "request_id": "ee18462b-ba6e-446b-96e1-5754da3af297",
+          "client_request_id": "today-5491a0cc-124a-4de2-94ce-0d9e844fed07"
+        },
+        {
+          "event": "actual_order_result_connection_closed",
+          "request_id": "ee18462b-ba6e-446b-96e1-5754da3af297",
+          "version": "1",
+          "sha256": "a43f7a3bb410d46ba29494dd874e603198d7964a47c791e374533696212a533e"
+        }
+      ],
+      "unknown_request_remains_unknown": true,
+      "maintainer_status": 403,
+      "anonymous_status": 401
+    }
+  ]
+}

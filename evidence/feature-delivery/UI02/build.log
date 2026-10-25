@@ -1,0 +1,392 @@
+
+> nanobot-webui@0.1.0 build
+> tsc -p tsconfig.build.json && vite build --outDir ../../../../ui02-n3-dist
+
+vite v5.4.21 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 2995 modules transformed.
+rendering chunks...
+computing gzip size...
+../../../../ui02-n3-dist/assets/imageEncode.worker-Cs1P3eq4.js                2.29 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size3-Regular-CTq5MqoE.woff             4.42 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2            4.93 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2            5.21 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2            5.47 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size4-Regular-BF-4gkZK.woff             5.98 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size2-Regular-oD1tc_U0.woff             6.19 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size1-Regular-C195tn64.woff             6.50 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2      6.91 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2         6.91 kB
+../../../../ui02-n3-dist/index.html                                           7.31 kB │ gzip:   2.58 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf              7.59 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff       7.66 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff          7.72 kB
+../../../../ui02-n3-dist/assets/KaTeX_Script-Regular-D3wIWfF6.woff2           9.64 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2       10.34 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size4-Regular-DWFBv043.ttf             10.36 kB
+../../../../ui02-n3-dist/assets/KaTeX_Script-Regular-D5yQViql.woff           10.59 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2         11.32 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2            11.35 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf             11.51 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2        12.03 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2          12.22 kB
+../../../../ui02-n3-dist/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf             12.23 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff        12.32 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf       12.34 kB
+../../../../ui02-n3-dist/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf          12.37 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff          13.21 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff             13.30 kB
+../../../../ui02-n3-dist/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2      13.57 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff         14.11 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff           14.41 kB
+../../../../ui02-n3-dist/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff       16.03 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2         16.40 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-Italic-t53AETM-.woff2             16.44 kB
+../../../../ui02-n3-dist/assets/KaTeX_Script-Regular-C5JkGWo-.ttf            16.65 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2         16.78 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2             16.99 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff          18.67 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-Italic-DA0__PXp.woff              18.75 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff          19.41 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf         19.44 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Regular-CB_wures.ttf           19.57 kB
+../../../../ui02-n3-dist/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf              19.58 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Italic-BMLOBm91.woff              19.68 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf          22.36 kB
+../../../../ui02-n3-dist/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf            24.50 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Bold-Cx986IdX.woff2               25.32 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Regular-B22Nviop.woff2            26.27 kB
+../../../../ui02-n3-dist/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf        27.56 kB
+../../../../ui02-n3-dist/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2             28.08 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Bold-Jm3AIy58.woff                29.91 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Regular-Dr94JaBh.woff             30.77 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf           31.20 kB
+../../../../ui02-n3-dist/assets/KaTeX_Math-Italic-flOr_0UB.ttf               31.31 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf           32.97 kB
+../../../../ui02-n3-dist/assets/KaTeX_AMS-Regular-DMm9YOAa.woff              33.52 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Italic-3WenGoN9.ttf               33.58 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Bold-waoOVXN0.ttf                 51.34 kB
+../../../../ui02-n3-dist/assets/KaTeX_Main-Regular-ypZvNtVU.ttf              53.58 kB
+../../../../ui02-n3-dist/assets/KaTeX_AMS-Regular-DRggAlZN.ttf               63.63 kB
+../../../../ui02-n3-dist/asset-manifest.json                                 89.44 kB │ gzip:  11.84 kB
+../../../../ui02-n3-dist/assets/markdown-vendor-Yd9OhMyU.css                  0.36 kB │ gzip:   0.20 kB
+../../../../ui02-n3-dist/assets/katex-wklAmtGL.css                           29.24 kB │ gzip:   8.04 kB
+../../../../ui02-n3-dist/assets/index-10Vc_oPd.css                          215.39 kB │ gzip:  38.78 kB
+../../../../ui02-n3-dist/assets/markdown-diagrams-DoUSBMlx.js                 0.15 kB │ gzip:   0.14 kB
+../../../../ui02-n3-dist/assets/textarea-C68tGuCE.js                          0.41 kB │ gzip:   0.31 kB
+../../../../ui02-n3-dist/assets/external-link-Bi7PwNBA.js                     0.42 kB │ gzip:   0.30 kB
+../../../../ui02-n3-dist/assets/markdown-code-ykfBPQiQ.js                     0.53 kB │ gzip:   0.35 kB
+../../../../ui02-n3-dist/assets/clipboard-C_SoI3kI.js                         0.58 kB │ gzip:   0.34 kB
+../../../../ui02-n3-dist/assets/csv-Rv8yui2J.js                               0.58 kB │ gzip:   0.41 kB
+../../../../ui02-n3-dist/assets/hsts-CCroWkTZ.js                              0.65 kB │ gzip:   0.46 kB
+../../../../ui02-n3-dist/assets/hpkp-ClzaqIBn.js                              0.69 kB │ gzip:   0.49 kB
+../../../../ui02-n3-dist/assets/arff-40yusHPs.js                              0.70 kB │ gzip:   0.50 kB
+../../../../ui02-n3-dist/assets/t4-vb-D4ZhGphE.js                             0.70 kB │ gzip:   0.46 kB
+../../../../ui02-n3-dist/assets/t4-cs-D5QbaxCI.js                             0.72 kB │ gzip:   0.47 kB
+../../../../ui02-n3-dist/assets/gcode-DfJ-vfOW.js                             0.73 kB │ gzip:   0.51 kB
+../../../../ui02-n3-dist/assets/brainfuck-HROaIjVa.js                         0.74 kB │ gzip:   0.48 kB
+../../../../ui02-n3-dist/assets/git-ZBrqj_zu.js                               0.74 kB │ gzip:   0.53 kB
+../../../../ui02-n3-dist/assets/jsonp-CUcel48e.js                             0.77 kB │ gzip:   0.51 kB
+../../../../ui02-n3-dist/assets/nand2tetris-hdl-buefkBmB.js                   0.78 kB │ gzip:   0.55 kB
+../../../../ui02-n3-dist/assets/properties-Dsm1CF2Z.js                        0.79 kB │ gzip:   0.51 kB
+../../../../ui02-n3-dist/assets/bnf-Dv65pJWg.js                               0.81 kB │ gzip:   0.52 kB
+../../../../ui02-n3-dist/assets/yang-ueRkwK8q.js                              0.81 kB │ gzip:   0.55 kB
+../../../../ui02-n3-dist/assets/xml-doc-DXY2BhWE.js                           0.81 kB │ gzip:   0.50 kB
+../../../../ui02-n3-dist/assets/racket-CzB0OSps.js                            0.84 kB │ gzip:   0.54 kB
+../../../../ui02-n3-dist/assets/prolog-sRKXkJ7w.js                            0.85 kB │ gzip:   0.58 kB
+../../../../ui02-n3-dist/assets/editorconfig-BjhBmVRv.js                      0.86 kB │ gzip:   0.55 kB
+../../../../ui02-n3-dist/assets/false-D6FMwQU3.js                             0.87 kB │ gzip:   0.59 kB
+../../../../ui02-n3-dist/assets/ebnf-DkBbZqhL.js                              0.88 kB │ gzip:   0.58 kB
+../../../../ui02-n3-dist/assets/ignore-DqmMapJG.js                            0.88 kB │ gzip:   0.54 kB
+../../../../ui02-n3-dist/assets/php-extras-C2bWeYqY.js                        0.90 kB │ gzip:   0.63 kB
+../../../../ui02-n3-dist/assets/go-module-BMkemrRS.js                         0.93 kB │ gzip:   0.58 kB
+../../../../ui02-n3-dist/assets/tsx-JPCMbeTc.js                               0.94 kB │ gzip:   0.57 kB
+../../../../ui02-n3-dist/assets/matlab-C_fLbtj3.js                            0.94 kB │ gzip:   0.65 kB
+../../../../ui02-n3-dist/assets/tap-D3MvBmDO.js                               0.94 kB │ gzip:   0.63 kB
+../../../../ui02-n3-dist/assets/roboconf-CMNttb4r.js                          0.96 kB │ gzip:   0.59 kB
+../../../../ui02-n3-dist/assets/json5-CzWV1-_D.js                             0.96 kB │ gzip:   0.64 kB
+../../../../ui02-n3-dist/assets/bbcode-C1RQeTgW.js                            0.96 kB │ gzip:   0.55 kB
+../../../../ui02-n3-dist/assets/json-B4MgcWvo.js                              0.97 kB │ gzip:   0.59 kB
+../../../../ui02-n3-dist/assets/hoon-v9hbe0j1.js                              0.97 kB │ gzip:   0.64 kB
+../../../../ui02-n3-dist/assets/processing-BQwyu5oM.js                        1.00 kB │ gzip:   0.66 kB
+../../../../ui02-n3-dist/assets/jexl-CizrNTCk.js                              1.03 kB │ gzip:   0.63 kB
+../../../../ui02-n3-dist/assets/etlua-CCSPDeeI.js                             1.03 kB │ gzip:   0.60 kB
+../../../../ui02-n3-dist/assets/gedcom-DAsXzez6.js                            1.03 kB │ gzip:   0.55 kB
+../../../../ui02-n3-dist/assets/r-BgAG0GaS.js                                 1.03 kB │ gzip:   0.71 kB
+../../../../ui02-n3-dist/assets/ejs-CHCoVbNM.js                               1.04 kB │ gzip:   0.61 kB
+../../../../ui02-n3-dist/assets/RenameChatDialog-BPu-zdVI.js                  1.04 kB │ gzip:   0.58 kB
+../../../../ui02-n3-dist/assets/llvm-DYO-z5Ik.js                              1.06 kB │ gzip:   0.70 kB
+../../../../ui02-n3-dist/assets/n4js-CqGkITKy.js                              1.07 kB │ gzip:   0.67 kB
+../../../../ui02-n3-dist/assets/birb-gGix_3ZU.js                              1.08 kB │ gzip:   0.72 kB
+../../../../ui02-n3-dist/assets/rego-Cy2XQI1k.js                              1.09 kB │ gzip:   0.68 kB
+../../../../ui02-n3-dist/assets/diff-C40bM44J.js                              1.11 kB │ gzip:   0.69 kB
+../../../../ui02-n3-dist/assets/lua-BA1DxvG_.js                               1.11 kB │ gzip:   0.73 kB
+../../../../ui02-n3-dist/assets/ini-DZNtfvnw.js                               1.11 kB │ gzip:   0.59 kB
+../../../../ui02-n3-dist/assets/apl-B-HHsHDh.js                               1.12 kB │ gzip:   0.89 kB
+../../../../ui02-n3-dist/assets/warpscript-DT-aMgS6.js                        1.13 kB │ gzip:   0.79 kB
+../../../../ui02-n3-dist/assets/erb-ChWbDeNE.js                               1.13 kB │ gzip:   0.66 kB
+../../../../ui02-n3-dist/assets/bison-SICsuwSr.js                             1.14 kB │ gzip:   0.70 kB
+../../../../ui02-n3-dist/assets/smalltalk-DJqQgZkH.js                         1.15 kB │ gzip:   0.72 kB
+../../../../ui02-n3-dist/assets/t4-templating-Bw5veNTI.js                     1.15 kB │ gzip:   0.71 kB
+../../../../ui02-n3-dist/assets/disclosure-fFXbzDoI.js                        1.16 kB │ gzip:   0.61 kB
+../../../../ui02-n3-dist/assets/less-rbEnboMC.js                              1.18 kB │ gzip:   0.68 kB
+../../../../ui02-n3-dist/assets/nasm-C3d7c3T2.js                              1.21 kB │ gzip:   0.80 kB
+../../../../ui02-n3-dist/assets/solution-file-COWqefDQ.js                     1.21 kB │ gzip:   0.70 kB
+../../../../ui02-n3-dist/assets/idris-D8xibNfK.js                             1.21 kB │ gzip:   0.76 kB
+../../../../ui02-n3-dist/assets/agda-0d4zRMNc.js                              1.23 kB │ gzip:   0.80 kB
+../../../../ui02-n3-dist/assets/nginx-DWY5fzlM.js                             1.24 kB │ gzip:   0.70 kB
+../../../../ui02-n3-dist/assets/markdown-math-BsQo7DpF.js                     1.24 kB │ gzip:   0.72 kB
+../../../../ui02-n3-dist/assets/objectivec-Beoni-1u.js                        1.24 kB │ gzip:   0.79 kB
+../../../../ui02-n3-dist/assets/systemd-Z4dZVVo0.js                           1.26 kB │ gzip:   0.73 kB
+../../../../ui02-n3-dist/assets/erlang-CWn__q5u.js                            1.27 kB │ gzip:   0.77 kB
+../../../../ui02-n3-dist/assets/ichigojam-DI3i1zq1.js                         1.27 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/phpdoc-B0f6eE7J.js                            1.27 kB │ gzip:   0.76 kB
+../../../../ui02-n3-dist/assets/jsstacktrace-DAedP2ZW.js                      1.27 kB │ gzip:   0.72 kB
+../../../../ui02-n3-dist/assets/rip-DpKfj2CN.js                               1.28 kB │ gzip:   0.74 kB
+../../../../ui02-n3-dist/assets/firestore-security-rules-BITmC4hk.js          1.29 kB │ gzip:   0.73 kB
+../../../../ui02-n3-dist/assets/openqasm-DnOaEubo.js                          1.30 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/pcaxis-DtWbswEQ.js                            1.31 kB │ gzip:   0.71 kB
+../../../../ui02-n3-dist/assets/reason-wbrqyNK2.js                            1.32 kB │ gzip:   0.84 kB
+../../../../ui02-n3-dist/assets/j-CoIdFwcm.js                                 1.32 kB │ gzip:   0.84 kB
+../../../../ui02-n3-dist/assets/oz-D6RLleyL.js                                1.33 kB │ gzip:   0.86 kB
+../../../../ui02-n3-dist/assets/dns-zone-file-7Fud9XAg.js                     1.33 kB │ gzip:   0.84 kB
+../../../../ui02-n3-dist/assets/actionscript-DPFz4SpM.js                      1.33 kB │ gzip:   0.81 kB
+../../../../ui02-n3-dist/assets/autoit-BSxGr0MJ.js                            1.34 kB │ gzip:   0.86 kB
+../../../../ui02-n3-dist/assets/parigp-BiqHkvkk.js                            1.35 kB │ gzip:   0.82 kB
+../../../../ui02-n3-dist/assets/dataweave-DLKSZDsN.js                         1.36 kB │ gzip:   0.84 kB
+../../../../ui02-n3-dist/assets/wolfram-GslZvLms.js                           1.37 kB │ gzip:   0.86 kB
+../../../../ui02-n3-dist/assets/asm6502-DEbPMlzF.js                           1.37 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/javadoclike-BtdFyBk6.js                       1.38 kB │ gzip:   0.78 kB
+../../../../ui02-n3-dist/assets/ada-D2CZ51W_.js                               1.38 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/monkey-BkAnAh09.js                            1.39 kB │ gzip:   0.90 kB
+../../../../ui02-n3-dist/assets/abnf-DP6cFNq1.js                              1.40 kB │ gzip:   0.80 kB
+../../../../ui02-n3-dist/assets/flow-D1uUo14i.js                              1.41 kB │ gzip:   0.78 kB
+../../../../ui02-n3-dist/assets/turtle-CZ64qvKl.js                            1.42 kB │ gzip:   0.82 kB
+../../../../ui02-n3-dist/assets/gdscript-O4HYFCgK.js                          1.43 kB │ gzip:   0.90 kB
+../../../../ui02-n3-dist/assets/icon-4fQs1ffF.js                              1.44 kB │ gzip:   0.93 kB
+../../../../ui02-n3-dist/assets/handlebars-CkvjQXcT.js                        1.45 kB │ gzip:   0.83 kB
+../../../../ui02-n3-dist/assets/makefile-W7B0ZM-9.js                          1.45 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/twig-DJvHV8QM.js                              1.45 kB │ gzip:   0.88 kB
+../../../../ui02-n3-dist/assets/eiffel-DAtOQ5mT.js                            1.45 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/go-Cztc9OeU.js                                1.46 kB │ gzip:   0.93 kB
+../../../../ui02-n3-dist/assets/toml-rbTCyg3-.js                              1.47 kB │ gzip:   0.81 kB
+../../../../ui02-n3-dist/assets/keyman-DCyiyT4O.js                            1.48 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/excel-formula-D0cElMz6.js                     1.49 kB │ gzip:   0.82 kB
+../../../../ui02-n3-dist/assets/protobuf-iEg_Vqaj.js                          1.49 kB │ gzip:   0.82 kB
+../../../../ui02-n3-dist/assets/avro-idl-CLaD3Yzj.js                          1.50 kB │ gzip:   0.85 kB
+../../../../ui02-n3-dist/assets/julia-DoajbNrC.js                             1.50 kB │ gzip:   0.97 kB
+../../../../ui02-n3-dist/assets/qore-D_IG3wnu.js                              1.51 kB │ gzip:   0.93 kB
+../../../../ui02-n3-dist/assets/neon-BXsSB9nX.js                              1.51 kB │ gzip:   0.80 kB
+../../../../ui02-n3-dist/assets/sparql-6o9zNv4P.js                            1.51 kB │ gzip:   1.01 kB
+../../../../ui02-n3-dist/assets/elm-BkEh5EHz.js                               1.52 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/gap-jnMfhOnX.js                               1.52 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/shell-session-bK_zqKtS.js                     1.54 kB │ gzip:   0.89 kB
+../../../../ui02-n3-dist/assets/cypher-BaFmb-lj.js                            1.54 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/latex-wcaqkZuf.js                             1.55 kB │ gzip:   0.80 kB
+../../../../ui02-n3-dist/assets/aql-DlhGLMNH.js                               1.55 kB │ gzip:   0.98 kB
+../../../../ui02-n3-dist/assets/mizar-D1t67mQT.js                             1.55 kB │ gzip:   0.95 kB
+../../../../ui02-n3-dist/assets/gn-Bq7fgWLW.js                                1.56 kB │ gzip:   0.86 kB
+../../../../ui02-n3-dist/assets/solidity-DUHvPPpA.js                          1.57 kB │ gzip:   0.97 kB
+../../../../ui02-n3-dist/assets/squirrel-I9Zev0W9.js                          1.59 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/brightscript-N0xR4Izd.js                      1.59 kB │ gzip:   0.89 kB
+../../../../ui02-n3-dist/assets/markup-templating-CyAEBIWQ.js                 1.59 kB │ gzip:   0.84 kB
+../../../../ui02-n3-dist/assets/sass-26TNpjNf.js                              1.59 kB │ gzip:   0.77 kB
+../../../../ui02-n3-dist/assets/aspnet-C2gUrTN7.js                            1.61 kB │ gzip:   0.85 kB
+../../../../ui02-n3-dist/assets/bro-CRsyeqC6.js                               1.62 kB │ gzip:   1.02 kB
+../../../../ui02-n3-dist/assets/xojo-Dzc5Y2Pp.js                              1.63 kB │ gzip:   1.06 kB
+../../../../ui02-n3-dist/assets/magma-DqrVMdxb.js                             1.63 kB │ gzip:   0.95 kB
+../../../../ui02-n3-dist/assets/nim-B3ZV66re.js                               1.65 kB │ gzip:   0.99 kB
+../../../../ui02-n3-dist/assets/glsl-BGnOMII1.js                              1.65 kB │ gzip:   0.90 kB
+../../../../ui02-n3-dist/assets/wiki-B0O0hMTd.js                              1.66 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/lolcode-B9rUsTQn.js                           1.67 kB │ gzip:   1.01 kB
+../../../../ui02-n3-dist/assets/ocaml-DzqXqO_5.js                             1.68 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/jq-5Zkk0dDF.js                                1.69 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/latte-CNPG8S1h.js                             1.70 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/antlr4-B49AA4cO.js                            1.71 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/wasm-CjPE1zca.js                              1.71 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/dot-D-JkCzBJ.js                               1.72 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/django-BDhECACO.js                            1.72 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/cfscript-D8FI382Q.js                          1.73 kB │ gzip:   1.01 kB
+../../../../ui02-n3-dist/assets/chaiscript-B9u7qweh.js                        1.74 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/csp-kJz6Lunn.js                               1.74 kB │ gzip:   0.92 kB
+../../../../ui02-n3-dist/assets/uri-Dp-okTiJ.js                               1.74 kB │ gzip:   0.86 kB
+../../../../ui02-n3-dist/assets/velocity-Cne1p76r.js                          1.74 kB │ gzip:   0.87 kB
+../../../../ui02-n3-dist/assets/dhall-BTYinhBv.js                             1.75 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/promql-D5xk61FS.js                            1.75 kB │ gzip:   0.97 kB
+../../../../ui02-n3-dist/assets/tt2-Y4fITSBw.js                               1.76 kB │ gzip:   1.01 kB
+../../../../ui02-n3-dist/assets/peoplecode-BSt7OLPb.js                        1.76 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/fortran-DlNRYiv8.js                           1.77 kB │ gzip:   1.15 kB
+../../../../ui02-n3-dist/assets/nix-DwDXbjUC.js                               1.78 kB │ gzip:   1.08 kB
+../../../../ui02-n3-dist/assets/lilypond-BCrfY9qH.js                          1.79 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/bicep-3D1MOO76.js                             1.79 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/scala-BSPAdCCt.js                             1.80 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/regex-S-ndfALU.js                             1.81 kB │ gzip:   0.93 kB
+../../../../ui02-n3-dist/assets/typescript-DXPc5y-F.js                        1.82 kB │ gzip:   0.89 kB
+../../../../ui02-n3-dist/assets/scss-FJVUkUNM.js                              1.82 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/iecst-DoTGNXwf.js                             1.83 kB │ gzip:   1.20 kB
+../../../../ui02-n3-dist/assets/vhdl-BjWuq1WS.js                              1.84 kB │ gzip:   1.12 kB
+../../../../ui02-n3-dist/assets/wren-BdNKrkg0.js                              1.85 kB │ gzip:   0.98 kB
+../../../../ui02-n3-dist/assets/pascaligo-DtX7U6zq.js                         1.86 kB │ gzip:   1.00 kB
+../../../../ui02-n3-dist/assets/smali-CPLGAcMF.js                             1.87 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/crystal-AvhN8Lrq.js                           1.87 kB │ gzip:   1.09 kB
+../../../../ui02-n3-dist/assets/hcl-B6X4VPh1.js                               1.90 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/typoscript-BLkzOefH.js                        1.90 kB │ gzip:   1.05 kB
+../../../../ui02-n3-dist/assets/qml-C6MuoqS8.js                               1.94 kB │ gzip:   0.90 kB
+../../../../ui02-n3-dist/assets/parser-qWmSA14V.js                            1.94 kB │ gzip:   0.97 kB
+../../../../ui02-n3-dist/assets/coffeescript-Bhn5mZy7.js                      1.94 kB │ gzip:   0.96 kB
+../../../../ui02-n3-dist/assets/bsl-DrXkmo7U.js                               1.95 kB │ gzip:   1.09 kB
+../../../../ui02-n3-dist/assets/jolie-DDLAa-Pw.js                             1.97 kB │ gzip:   1.11 kB
+../../../../ui02-n3-dist/assets/kumir-B55WJ4VR.js                             1.99 kB │ gzip:   1.14 kB
+../../../../ui02-n3-dist/assets/robotframework-phl8tsod.js                    2.01 kB │ gzip:   0.91 kB
+../../../../ui02-n3-dist/assets/tcl-DYZC1b5E.js                               2.01 kB │ gzip:   1.17 kB
+../../../../ui02-n3-dist/assets/stan-BLKdOXeH.js                              2.03 kB │ gzip:   1.15 kB
+../../../../ui02-n3-dist/assets/javadoc-D8EMcKJ7.js                           2.04 kB │ gzip:   0.98 kB
+../../../../ui02-n3-dist/assets/kusto-DDsb_273.js                             2.04 kB │ gzip:   1.22 kB
+../../../../ui02-n3-dist/assets/sml-Cdiv6mLo.js                               2.04 kB │ gzip:   1.08 kB
+../../../../ui02-n3-dist/assets/jsdoc-A4xA8s4h.js                             2.05 kB │ gzip:   1.01 kB
+../../../../ui02-n3-dist/assets/javastacktrace-CNDQpkvg.js                    2.06 kB │ gzip:   0.94 kB
+../../../../ui02-n3-dist/assets/haxe-Dbz62ytX.js                              2.06 kB │ gzip:   1.10 kB
+../../../../ui02-n3-dist/assets/docker-wegnoZLe.js                            2.08 kB │ gzip:   1.02 kB
+../../../../ui02-n3-dist/assets/dart-BAswVyGI.js                              2.10 kB │ gzip:   1.12 kB
+../../../../ui02-n3-dist/assets/tremor-CPCxnXfY.js                            2.10 kB │ gzip:   1.14 kB
+../../../../ui02-n3-dist/assets/FeishuAssistantsPanel-CDr5H4IN.js             2.13 kB │ gzip:   0.95 kB
+../../../../ui02-n3-dist/assets/groovy-Bx3as2uz.js                            2.16 kB │ gzip:   1.22 kB
+../../../../ui02-n3-dist/assets/maxscript-Cey12IeJ.js                         2.18 kB │ gzip:   1.18 kB
+../../../../ui02-n3-dist/assets/soy-jxFKT5sz.js                               2.18 kB │ gzip:   1.16 kB
+../../../../ui02-n3-dist/assets/batch-BNgonYPZ.js                             2.18 kB │ gzip:   0.97 kB
+../../../../ui02-n3-dist/assets/hlsl-DxVl7Hea.js                              2.21 kB │ gzip:   1.22 kB
+../../../../ui02-n3-dist/assets/splunk-spl-CbdTsy9A.js                        2.21 kB │ gzip:   1.24 kB
+../../../../ui02-n3-dist/assets/q-Dy-549Oi.js                                 2.22 kB │ gzip:   1.34 kB
+../../../../ui02-n3-dist/assets/io-CKwyoKR2.js                                2.22 kB │ gzip:   1.37 kB
+../../../../ui02-n3-dist/assets/asmatmel-CIR-sKST.js                          2.24 kB │ gzip:   1.36 kB
+../../../../ui02-n3-dist/assets/applescript-D1Is7dGb.js                       2.27 kB │ gzip:   1.28 kB
+../../../../ui02-n3-dist/assets/vbnet-JYOdSIUa.js                             2.29 kB │ gzip:   1.42 kB
+../../../../ui02-n3-dist/assets/naniscript-CDAAqiWV.js                        2.30 kB │ gzip:   1.07 kB
+../../../../ui02-n3-dist/assets/n1ql-B_a-urBN.js                              2.30 kB │ gzip:   1.46 kB
+../../../../ui02-n3-dist/assets/unrealscript-Q5SQBg7o.js                      2.31 kB │ gzip:   1.25 kB
+../../../../ui02-n3-dist/assets/elixir-BL8gkIvc.js                            2.34 kB │ gzip:   1.18 kB
+../../../../ui02-n3-dist/assets/basic-D0Drogdr.js                             2.35 kB │ gzip:   1.50 kB
+../../../../ui02-n3-dist/assets/c-ZbNzTYXx.js                                 2.37 kB │ gzip:   1.27 kB
+../../../../ui02-n3-dist/assets/visual-basic-D88_liKE.js                      2.38 kB │ gzip:   1.39 kB
+../../../../ui02-n3-dist/assets/ftl-OLjQ97uL.js                               2.38 kB │ gzip:   1.13 kB
+../../../../ui02-n3-dist/assets/v-BwP5Qcry.js                                 2.38 kB │ gzip:   1.30 kB
+../../../../ui02-n3-dist/assets/concurnas-D2H_Vsvp.js                         2.39 kB │ gzip:   1.26 kB
+../../../../ui02-n3-dist/assets/xeora-BpYbFaFe.js                             2.41 kB │ gzip:   0.89 kB
+../../../../ui02-n3-dist/assets/pascal-DkzbxgV9.js                            2.42 kB │ gzip:   1.30 kB
+../../../../ui02-n3-dist/assets/http-B_XtcCSS.js                              2.44 kB │ gzip:   1.19 kB
+../../../../ui02-n3-dist/assets/kotlin-CtZhXZfO.js                            2.44 kB │ gzip:   1.25 kB
+../../../../ui02-n3-dist/assets/powerquery-D_hKfJxt.js                        2.45 kB │ gzip:   1.34 kB
+../../../../ui02-n3-dist/assets/yaml-C3OY6KI2.js                              2.46 kB │ gzip:   1.18 kB
+../../../../ui02-n3-dist/assets/livescript-D5ExPdM-.js                        2.46 kB │ gzip:   1.25 kB
+../../../../ui02-n3-dist/assets/nevod-6AdJruCl.js                             2.48 kB │ gzip:   1.06 kB
+../../../../ui02-n3-dist/assets/vala-DBxAuvWU.js                              2.49 kB │ gzip:   1.29 kB
+../../../../ui02-n3-dist/assets/qsharp-B4BnHbOD.js                            2.54 kB │ gzip:   1.36 kB
+../../../../ui02-n3-dist/assets/moonscript-5ZhvqjEH.js                        2.55 kB │ gzip:   1.40 kB
+../../../../ui02-n3-dist/assets/smarty-B5spqESl.js                            2.57 kB │ gzip:   1.24 kB
+../../../../ui02-n3-dist/assets/icu-message-format-BGQwJkce.js                2.59 kB │ gzip:   1.14 kB
+../../../../ui02-n3-dist/assets/mermaid-B0VaqqmG.js                           2.59 kB │ gzip:   1.23 kB
+../../../../ui02-n3-dist/assets/verilog-Dv2jNE_W.js                           2.61 kB │ gzip:   1.42 kB
+../../../../ui02-n3-dist/assets/fsharp-CgX42izF.js                            2.61 kB │ gzip:   1.43 kB
+../../../../ui02-n3-dist/assets/python-ceUVGdns.js                            2.61 kB │ gzip:   1.40 kB
+../../../../ui02-n3-dist/assets/cil-C4kDkGIU.js                               2.62 kB │ gzip:   1.44 kB
+../../../../ui02-n3-dist/assets/java-Cl05OYef.js                              2.64 kB │ gzip:   1.34 kB
+../../../../ui02-n3-dist/assets/apex-D4_YEvLx.js                              2.64 kB │ gzip:   1.45 kB
+../../../../ui02-n3-dist/assets/liquid-D6JF6y8M.js                            2.66 kB │ gzip:   1.42 kB
+../../../../ui02-n3-dist/assets/powershell-HtQGPT3r.js                        2.66 kB │ gzip:   1.59 kB
+../../../../ui02-n3-dist/assets/d-C8OPlWBz.js                                 2.73 kB │ gzip:   1.58 kB
+../../../../ui02-n3-dist/assets/web-idl-CrCb64xD.js                           2.73 kB │ gzip:   1.29 kB
+../../../../ui02-n3-dist/assets/perl-Po72EAeq.js                              2.74 kB │ gzip:   1.33 kB
+../../../../ui02-n3-dist/assets/WeixinConnectFlow-DKt7-nj-.js                 2.75 kB │ gzip:   1.31 kB
+../../../../ui02-n3-dist/assets/haml-CfVM2DSX.js                              2.79 kB │ gzip:   1.14 kB
+../../../../ui02-n3-dist/assets/zig-BNCLgt6-.js                               2.82 kB │ gzip:   1.50 kB
+../../../../ui02-n3-dist/assets/purescript-DB4AVXvF.js                        2.86 kB │ gzip:   1.52 kB
+../../../../ui02-n3-dist/assets/uorazor-qouvLnqA.js                           2.90 kB │ gzip:   1.53 kB
+../../../../ui02-n3-dist/assets/jsx-BciZTroJ.js                               2.93 kB │ gzip:   1.26 kB
+../../../../ui02-n3-dist/assets/purebasic-DKf6zlhB.js                         2.95 kB │ gzip:   1.46 kB
+../../../../ui02-n3-dist/assets/js-extras-I01QhU3Y.js                         2.96 kB │ gzip:   1.29 kB
+../../../../ui02-n3-dist/assets/rust-ChUs20IV.js                              2.99 kB │ gzip:   1.48 kB
+../../../../ui02-n3-dist/assets/log-4Sv9pfqu.js                               3.02 kB │ gzip:   1.48 kB
+../../../../ui02-n3-dist/assets/graphql-Dl8DMwqn.js                           3.03 kB │ gzip:   1.44 kB
+../../../../ui02-n3-dist/assets/puppet-CYaQXjID.js                            3.05 kB │ gzip:   1.39 kB
+../../../../ui02-n3-dist/assets/cshtml-DYEvCn-f.js                            3.10 kB │ gzip:   1.41 kB
+../../../../ui02-n3-dist/assets/al-HI2MBSQM.js                                3.12 kB │ gzip:   1.63 kB
+../../../../ui02-n3-dist/assets/js-templates-CBDGfLNC.js                      3.14 kB │ gzip:   1.52 kB
+../../../../ui02-n3-dist/assets/lisp-BLx7tirs.js                              3.16 kB │ gzip:   1.36 kB
+../../../../ui02-n3-dist/assets/cpp-DqpxGehi.js                               3.18 kB │ gzip:   1.55 kB
+../../../../ui02-n3-dist/assets/plsql-C5IuK9SR.js                             3.29 kB │ gzip:   1.91 kB
+../../../../ui02-n3-dist/assets/pug-BiuNRNzo.js                               3.34 kB │ gzip:   1.28 kB
+../../../../ui02-n3-dist/assets/haskell-BNrijfzw.js                           3.49 kB │ gzip:   1.87 kB
+../../../../ui02-n3-dist/assets/swift-C0Ccwm7r.js                             3.52 kB │ gzip:   1.63 kB
+../../../../ui02-n3-dist/assets/coq-DjZmCrwW.js                               3.54 kB │ gzip:   1.94 kB
+../../../../ui02-n3-dist/assets/clojure-Bb4j-sUb.js                           3.55 kB │ gzip:   1.83 kB
+../../../../ui02-n3-dist/assets/psl-O0JYKyTL.js                               3.68 kB │ gzip:   1.97 kB
+../../../../ui02-n3-dist/assets/DeleteConfirm-BK_jb9Fj.js                     3.72 kB │ gzip:   1.45 kB
+../../../../ui02-n3-dist/assets/css-extras-HAjpAts1.js                        3.76 kB │ gzip:   1.79 kB
+../../../../ui02-n3-dist/assets/sql-CifL3gCx.js                               3.77 kB │ gzip:   2.23 kB
+../../../../ui02-n3-dist/assets/inform7-BI493Qcj.js                           3.84 kB │ gzip:   1.81 kB
+../../../../ui02-n3-dist/assets/mongodb-CQpiO1sL.js                           3.93 kB │ gzip:   1.84 kB
+../../../../ui02-n3-dist/assets/dax-BWnSeAv9.js                               3.94 kB │ gzip:   2.01 kB
+../../../../ui02-n3-dist/assets/pure-DpeYqkKa.js                              3.95 kB │ gzip:   2.00 kB
+../../../../ui02-n3-dist/assets/textile-BGontCW0.js                           4.03 kB │ gzip:   1.48 kB
+../../../../ui02-n3-dist/assets/rest-CDoi10As.js                              4.04 kB │ gzip:   1.40 kB
+../../../../ui02-n3-dist/assets/ruby-BMRsTiXU.js                              4.08 kB │ gzip:   1.78 kB
+../../../../ui02-n3-dist/assets/nsis-BfogJzXi.js                              4.22 kB │ gzip:   2.38 kB
+../../../../ui02-n3-dist/assets/stylus-BLxtYEkB.js                            4.24 kB │ gzip:   1.93 kB
+../../../../ui02-n3-dist/assets/SessionSearchDialog-DTN0oIb7.js               4.34 kB │ gzip:   1.87 kB
+../../../../ui02-n3-dist/assets/xquery-B9ADvBlm.js                            4.43 kB │ gzip:   1.95 kB
+../../../../ui02-n3-dist/assets/arduino-DZ5WmkHX.js                           4.48 kB │ gzip:   2.28 kB
+../../../../ui02-n3-dist/assets/scheme-BfvqJSkJ.js                            4.54 kB │ gzip:   1.96 kB
+../../../../ui02-n3-dist/assets/alert-dialog-Cm67Ahi7.js                      4.61 kB │ gzip:   1.75 kB
+../../../../ui02-n3-dist/assets/renpy-DTMwWkBX.js                             4.79 kB │ gzip:   2.31 kB
+../../../../ui02-n3-dist/assets/asciidoc-BU1_3FPi.js                          5.07 kB │ gzip:   1.94 kB
+../../../../ui02-n3-dist/assets/cobol-DqOWS39U.js                             5.60 kB │ gzip:   2.77 kB
+../../../../ui02-n3-dist/assets/markdown-yNtPgL84.js                          5.76 kB │ gzip:   2.31 kB
+../../../../ui02-n3-dist/assets/avisynth-E-08MMKd.js                          5.83 kB │ gzip:   2.97 kB
+../../../../ui02-n3-dist/assets/keepalived-BVjKI6Qw.js                        6.16 kB │ gzip:   2.55 kB
+../../../../ui02-n3-dist/assets/bash-CuSoM2KM.js                              6.49 kB │ gzip:   3.29 kB
+../../../../ui02-n3-dist/assets/WeixinPanel-Ul665gbB.js                       6.57 kB │ gzip:   2.81 kB
+../../../../ui02-n3-dist/assets/php-DKPhKom-.js                               6.90 kB │ gzip:   2.32 kB
+../../../../ui02-n3-dist/assets/csharp-BuFTfGaP.js                            7.02 kB │ gzip:   2.80 kB
+../../../../ui02-n3-dist/assets/sas-DResWZnq.js                               8.02 kB │ gzip:   3.34 kB
+../../../../ui02-n3-dist/assets/gherkin-kTgzRFOa.js                           8.04 kB │ gzip:   5.71 kB
+../../../../ui02-n3-dist/assets/abap-CgoC5m2O.js                              8.42 kB │ gzip:   4.17 kB
+../../../../ui02-n3-dist/assets/gml-B5Pya7ro.js                               8.67 kB │ gzip:   4.05 kB
+../../../../ui02-n3-dist/assets/apacheconf-B6Z7L4OY.js                        8.69 kB │ gzip:   3.86 kB
+../../../../ui02-n3-dist/assets/autohotkey-CyqoEPYi.js                        9.64 kB │ gzip:   4.50 kB
+../../../../ui02-n3-dist/assets/ChannelIdentity-CHjfMWT-.js                  10.42 kB │ gzip:   3.66 kB
+../../../../ui02-n3-dist/assets/opencl-DrO96L51.js                           10.47 kB │ gzip:   4.56 kB
+../../../../ui02-n3-dist/assets/factor-DWtLL9tt.js                           10.57 kB │ gzip:   3.91 kB
+../../../../ui02-n3-dist/assets/cmake-BCE-yf3E.js                            11.15 kB │ gzip:   4.49 kB
+../../../../ui02-n3-dist/assets/ChannelInstancesPanel-DyPWHkwM.js            11.89 kB │ gzip:   4.21 kB
+../../../../ui02-n3-dist/assets/vim-BBlWuyff.js                              14.71 kB │ gzip:   6.21 kB
+../../../../ui02-n3-dist/assets/MarkdownTextRenderer-CJJEhiim.js             16.54 kB │ gzip:   6.02 kB
+../../../../ui02-n3-dist/assets/mel-DoUgurz9.js                              17.30 kB │ gzip:   7.04 kB
+../../../../ui02-n3-dist/assets/media-B35BSUw4.js                            17.30 kB │ gzip:   6.56 kB
+../../../../ui02-n3-dist/assets/sqf-BcNlZ9Dt.js                              33.88 kB │ gzip:  11.39 kB
+../../../../ui02-n3-dist/assets/locale-zh-CN-Cki76ojk.js                     55.53 kB │ gzip:  27.00 kB
+../../../../ui02-n3-dist/assets/locale-zh-TW-C215G-nY.js                     55.78 kB │ gzip:  27.20 kB
+../../../../ui02-n3-dist/assets/locale-ko-xAZ333MJ.js                        61.98 kB │ gzip:  27.18 kB
+../../../../ui02-n3-dist/assets/locale-ja-BvdAYsNf.js                        63.29 kB │ gzip:  28.69 kB
+../../../../ui02-n3-dist/assets/locale-en-DHTjF-1o.js                        80.06 kB │ gzip:  24.28 kB
+../../../../ui02-n3-dist/assets/locale-vi-BFjYQZij.js                        84.15 kB │ gzip:  26.77 kB
+../../../../ui02-n3-dist/assets/locale-id-BUhfMXeC.js                        85.21 kB │ gzip:  25.07 kB
+../../../../ui02-n3-dist/assets/locale-pt-BR-Clvkyb-5.js                     89.50 kB │ gzip:  26.61 kB
+../../../../ui02-n3-dist/assets/locale-es-BPdxQF4E.js                        91.26 kB │ gzip:  26.80 kB
+../../../../ui02-n3-dist/assets/locale-fr-CRLHDJUC.js                        93.14 kB │ gzip:  27.50 kB
+../../../../ui02-n3-dist/assets/syntax-highlight-B0xtoSrJ.js                132.57 kB │ gzip:  35.95 kB
+../../../../ui02-n3-dist/assets/react-vendor-CenIYebu.js                    143.77 kB │ gzip:  46.30 kB
+../../../../ui02-n3-dist/assets/mcp-preset-events-Dm8vFBl2.js               180.44 kB │ gzip:  54.27 kB
+../../../../ui02-n3-dist/assets/ThreadShell--nTigIGh.js                     200.63 kB │ gzip:  60.44 kB
+../../../../ui02-n3-dist/assets/katex-BSBacQyE.js                           255.97 kB │ gzip:  76.92 kB
+../../../../ui02-n3-dist/assets/SettingsView-DaCLfC4O.js                    296.43 kB │ gzip:  76.60 kB
+../../../../ui02-n3-dist/assets/markdown-vendor-C5pBvAHd.js                 484.86 kB │ gzip: 152.90 kB
+../../../../ui02-n3-dist/assets/index-DKyQPBGL.js                         1,048.55 kB │ gzip: 332.71 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 19.60s

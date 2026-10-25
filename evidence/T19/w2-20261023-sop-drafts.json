@@ -1,0 +1,168 @@
+{
+  "status": "PASS_LOCAL_DRAFT_DOMAIN_AND_COMPONENT_SCOPE",
+  "task_id": "T19",
+  "related_task_id": "T07",
+  "source_commit": "2812813",
+  "working_changes_included": true,
+  "external_api_mode": "SIMULATED_FIRST",
+  "checks": [
+    {
+      "check_id": "A06-DRAFT-HISTORY-NATIVE-LIFECYCLE",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-sop-drafts-ui.txt",
+      "sha256": "852e13fff021e2eafdcaf1c9d2a023040db08909f89c81dc7e790934cfd7983a"
+    },
+    {
+      "check_id": "A06-PREPARED-ACTIVATION",
+      "status": "PASS_PREPARED_FOR_ACTUAL_SERVER_RESTART",
+      "source": "evidence/T19/w2-20261023-sop-drafts-prepare-restart.txt",
+      "sha256": "d7839513e7ece12517c4155516ea6f258ba2d5772877ff5d91b558dade138e48"
+    },
+    {
+      "check_id": "A06-ACTUAL-RESTART-RECOVERY-CANCEL",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-sop-drafts-recovery-ui.txt",
+      "sha256": "8f9a785e81860d80a5a18e0417178a1f98e02f7648e1dc8a734008d4346030a5"
+    },
+    {
+      "check_id": "A06-CANCEL-ACTUAL-PENDING-READ",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-sop-drafts-cancel-ui.txt",
+      "sha256": "514cf44186bb93fd613317776760b4e7e6f9d134268574aa605dfae516c9bccd"
+    },
+    {
+      "check_id": "A06-OFFLINE-ORIGINAL-RECEIPT-IDENTITY",
+      "status": "PASS",
+      "source": "evidence/T19/w2-20261023-sop-drafts-errors-ui.txt",
+      "sha256": "6f1fae2e8c36338202c88b614b99d0b8f251d454e359d80154be0bf6e87fc85e"
+    }
+  ],
+  "test_reports": {
+    "domain": {
+      "tests": "37",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "12.122",
+      "source": "evidence/T19/w2-20261023-sop-drafts-domain.xml",
+      "sha256": "62b824ecf81a6db4dbca02b65fbe84fcfff3240a2e68239f652f8f4bb9c65143"
+    },
+    "receipts": {
+      "tests": "17",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "8.175",
+      "source": "evidence/T19/w2-20261023-sop-drafts-receipts.xml",
+      "sha256": "1a3e85c0dcdeade48c0af2c5b7557806ec62592b06e2bff62d9b6632a71b8703"
+    }
+  },
+  "unique_test_case_count": 37,
+  "receipt_checks_overlap_domain": true,
+  "current_native_version": "0.1.3",
+  "current_native_sha256": "3e7f52d0fbf7b08d4d25c064369854097f8cf2aa739704caceeecc742ed2285f",
+  "current_draft_version": "6",
+  "current_draft_method_version": "0.1.5",
+  "native_context_references": [
+    {
+      "sop_id": "SOP03",
+      "name": "boss-sop03",
+      "version": "0.1.3",
+      "content_sha256": "3e7f52d0fbf7b08d4d25c064369854097f8cf2aa739704caceeecc742ed2285f"
+    }
+  ],
+  "native_context_read_verified": true,
+  "model_adoption_verified": false,
+  "object_counts": {
+    "task": 0,
+    "outbox": 0,
+    "message_outbox": 0,
+    "runtime_run": 0,
+    "sop_draft": 1,
+    "sop_history": 9,
+    "sop_activation": 4
+  },
+  "audit_operations": [
+    "boss.sop.save",
+    "boss.sop.validate",
+    "boss.sop.activate",
+    "boss.sop.restore",
+    "boss.sop.disable",
+    "boss.sop.validate",
+    "boss.sop.activate",
+    "boss.sop.save",
+    "boss.sop.validate",
+    "boss.sop.save",
+    "boss.sop.validate",
+    "boss.sop.prepare",
+    "boss.sop.activate",
+    "boss.sop.recover",
+    "boss.sop.save",
+    "boss.sop.validate",
+    "boss.sop.prepare",
+    "boss.sop.activate",
+    "boss.sop.cancel",
+    "boss.sop.disable",
+    "boss.sop.enable",
+    "boss.sop.save"
+  ],
+  "pending_activation_count": 0,
+  "actual_database_reopened": true,
+  "final_context_and_read_do_not_write": true,
+  "external_request_count": 0,
+  "stt_request_count": 0,
+  "cost_total": null,
+  "packages": {
+    "nanobot-ai": "0.3.5",
+    "PyYAML": "6.0.3",
+    "markdown-it-py": "4.2.0",
+    "packaging": "26.3"
+  },
+  "source_sha256": {
+    "validation/boss_skill_drafts.py": "04c765f0a2adf63a880e9d655705eb5f5353b9bf4289c2f629cbab92530a8394",
+    "validation/boss_native_skills.py": "5802c2fd2de192bbc57176a9de4e3640942f3b25d88781eba5d4cf6517c81b14",
+    "validation/pyproject.toml": "67a499fc41202f7c04b82669dd91002546b190d18e9688033215d202688bf052",
+    "validation/uv.lock": "bae810a4c8d9698da413283f1921f60d9781471d5d7f0540660fab7c9b69b13f",
+    "app/webui/MaintainerSkillVersions.tsx": "7b6b8d4a909910e0bee193739d1147b75f470e359c350a6eecf49934fe2da2cc",
+    "app/tests/test_boss_skill_drafts.py": "c5ec054f1326bed4470f018e637016c55e78e433187335af7e991af8361c89fb",
+    "app/tests/test_boss_native_skills.py": "fbc7e0fe6fdf8b4cc494396b4ac3d7698005433191164e80aa4d7cb9088ff6f1",
+    "specs/agent-assets.json": "aee41abdc3aa8bcc5409158edfc0795be4a08e3d8e491f46eb648f721d3b2e9a",
+    "evidence/T19/check_skill_ui_cancel.js": "bc30a8728c51eb9e07fde43fe653d36eeb894c389e2c7dee9051bb29050502fe",
+    "evidence/T19/check_skill_ui_cancel.sh": "74efb8a61f6acb0129c3f749e8c090ee4b748e0fc6d9783cb2ee52deef3dbd17",
+    "evidence/T19/check_skill_ui_errors.js": "e65efa7af7b5f5f23e51e6b58f215f2199c21df8e53798cb381003b1a5dfdc4a",
+    "evidence/T19/check_skill_ui_lifecycle.js": "15a3480ede0c795c07f9a27748d34ccbd83b1cef1352d6ff135b67095f31bb0f",
+    "evidence/T19/check_skill_ui_prepare_restart.js": "6bbc71609d2aba0a5450f624c83ad05f418ee118d6d4958004ea6c3b91b94c0a",
+    "evidence/T19/check_skill_ui_recovery.js": "8259557fa65577fdf7de3ed273b09d8a60c0e874b0619b9f1b74b49326b02a2a",
+    "evidence/T19/check_skill_ui_results.py": "69c249970fe018410ba81d28328794838169f5cd9721c9a7db5a8c9ec72d9707",
+    "evidence/T19/check_skill_ui_server.py": "030ee323c4b6422a7379cc5382d5ad6458e268604c7d929c0e65be445db637b9",
+    "evidence/T19/skill-ui/index.html": "48bfbfcfc9887c4b7a4e824b089bca8678cefbfa88bf58c91c07098e8c985003",
+    "evidence/T19/skill-ui/main.tsx": "9cdccdec0c61bdb606decd60400ec132729a13cf41055bd66a477f6261339bbe",
+    "evidence/T19/skill-ui/tsconfig.json": "f05a8d73ec850f89489c7350b3b03014204f03085849769d18f014b561b8dde6",
+    "evidence/T19/skill-ui/vite.config.mjs": "3f41f434c3779d1cbce12e8e1403899231f0772b5acc8c507488b9eed82286a5",
+    "agent/skills/boss-sop01/SKILL.md": "882b5accfa46782de345379c1d79501d87406d8d9ad78852505fa57828b4a49e",
+    "agent/skills/boss-sop02/SKILL.md": "e6b47f620c11a82b55cbbaaacb59146528b8faa48d2f058599d2654a5b6e9638",
+    "agent/skills/boss-sop03/SKILL.md": "dce8c0f643e36167ae7c19937da7617773f05b8eb4b00b49aecc5233c244f81b",
+    "agent/skills/boss-sop04/SKILL.md": "8759de3ee429eb93f86392c9f46a36c24a43db7c17900169ba432ab4e75e8eef",
+    "agent/skills/boss-sop05/SKILL.md": "4a7369d57851ed509fb9082965034ba40af0a5236f8778190512b1fc60732b04",
+    "agent/skills/boss-sop06/SKILL.md": "b8d9481c343e1b8aae713836b97166f96a5aa903fa1bb20e8bccbc5889176d41",
+    "agent/skills/boss-sop07/SKILL.md": "e530548f28ea04d831c17c50dbd47f08e486bd93f05a83f95d644debbe42856d",
+    "agent/skills/boss-sop08/SKILL.md": "1f32312d50e4e5d1aa688970d7b4e7db8c6aa70705c69e4945856c4c125ca525",
+    "agent/skills/boss-sop09/SKILL.md": "738cfeb73fe05d3ae73aa406e69fb37aaaa30ee6118e248b1e8c4a07dacc6536",
+    "agent/skills/boss-sop10/SKILL.md": "3f3e137555894b0142878e1c35ccdcc1336faedbfd820c32849b8a6532d9cce3",
+    "agent/skills/boss-sop11/SKILL.md": "8e04aeae17b4f6260dfda5bafe7f10c4aa7068cbde3fcb092c200fc5d2b11494",
+    "agent/skills/boss-sop12/SKILL.md": "6a85a2cbeca72134291c89f7e5587c24d5fd3d78f49ad08926f48628135098d8",
+    "agent/skills/boss-sop13/SKILL.md": "2df32c365ba843b4ad3b0cfe55af3f3e45af26391d8fe475249ea68864f16369"
+  },
+  "build_sha256": {
+    ".work/w2-checks/skill-ui/lifecycle-index-ZmtbLt1k.js": "6a2713948089d2f8f4ffabd79be5d0da9b16a9aa771e78df78ccfceb4cfb0d3d",
+    ".work/w2-checks/skill-ui/dist/assets/index-C0nNkFGr.js": "2122fc8b24a2719d19c67200abf0a8ae55d114ea24505f42b9077e08ffc19f51",
+    ".work/w2-checks/skill-ui/dist/assets/index-Da2yoTAn.css": "36603aafc587d43f50a2d6ab2a548c3f6fe00968b03b1682c8615d869aa6ded1"
+  },
+  "foreign_worktree_modules_loaded": [],
+  "screenshots_taken": false,
+  "public_rolechannel_acceptance": "NOT_RUN",
+  "visual_acceptance": "NOT_RUN",
+  "real_external_service_validation": "NOT_RUN",
+  "full_A07_accepted": false,
+  "full_A19_accepted": false
+}

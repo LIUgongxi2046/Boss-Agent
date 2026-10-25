@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="2.684" timestamp="2026-10-25T08:22:49.591927+08:00" hostname="192.168.0.20"><testcase classname="app.tests.test_menu_n03_public" name="test_current_public_reads_adopt_same_scope_and_remain_readonly" time="0.012"><failure message="assert 404 == 200">app/tests/test_menu_n03_public.py:33: in test_current_public_reads_adopt_same_scope_and_remain_readonly
+    assert status == 200
+E   assert 404 == 200</failure></testcase><testcase classname="app.tests.test_menu_n03_public" name="test_current_public_dimensions_http_and_strict_scope_rejection" time="0.012"><failure message="assert 404 == 200">app/tests/test_menu_n03_public.py:48: in test_current_public_dimensions_http_and_strict_scope_rejection
+    assert status == 200
+E   assert 404 == 200</failure></testcase><testcase classname="app.tests.test_menu_n03_public" name="test_current_public_source_change_rejects_old_snapshot_and_keeps_history" time="0.008"><failure message="assert 404 == 200">app/tests/test_menu_n03_public.py:62: in test_current_public_source_change_rejects_old_snapshot_and_keeps_history
+    assert status == 200
+E   assert 404 == 200</failure></testcase></testsuite></testsuites>

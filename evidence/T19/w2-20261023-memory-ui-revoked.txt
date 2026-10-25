@@ -1,0 +1,29 @@
+### Result
+{"status":"PASS","check_id":"A12-REVOCATION-AND-HISTORY","current_version":"4","history_version":"3","future_context_eligible":false,"dom":"- main:\n  - region \"记忆技术状态查询\":\n    - heading \"记忆技术维护\" [level=2]\n    - text: RUNTIME_RECORD · 只读技术状态\n    - button \"检查技术状态\":\n      - img\n      - text: 检查技术状态\n    - button \"取消查询\" [disabled]:\n      - img\n      - text: 取消查询\n    - button \"查看获准记录\"\n    - button \"定位保存或索引失败\"\n  - region \"当前记忆确认\":\n    - heading \"当前记忆与确认\" [level=2]\n    - text: 本人范围与当前版本 老板范围\n    - strong: boss-1\n    - text: 执行空间\n    - strong: ui-check\n    - text: 数据集及版本\n    - strong: selection · v1\n    - text: 记忆来源类型\n    - strong: SIMULATED\n    - text: 记忆标识\n    - strong: memory-1\n    - text: 当前记忆版本\n    - strong: \"4\"\n    - text: 本人确认状态\n    - strong: CONFIRMED\n    - text: 有效期限\n    - strong: 未知\n    - text: 当前确认权限检查\n    - strong: 已经检查\n    - text: 当前采用条件\n    - strong: 停止采用\n    - text: 新任务可采用版本\n    - strong: 没有可采用版本\n    - text: 最近检查时间\n    - strong: 2026-10-23T07:43:12.823757+00:00\n    - img\n    - text: 本人内容的确认、修改和删除在老板入口完成。当前页面只读取技术元信息。\n  - region \"删除传播范围\":\n    - heading \"删除传播与索引\" [level=2]\n    - text: 各项范围独立核查 当前删除传播状态\n    - strong: NOT_REQUESTED\n    - text: 当前记忆内容\n    - strong: NOT_REQUESTED\n    - text: 派生记忆索引\n    - strong: 未使用派生索引\n    - text: 原始获准来源\n    - strong: RETAINED\n    - text: 已载入历史会话\n    - strong: 尚未验证清理\n    - text: 备份传播\n    - strong: 尚未验证清理\n    - text: 物理安全擦除\n    - strong: 尚未验证\n    - text: 正文访问\n    - strong: 不提供正文\n    - text: 维护修改能力\n    - strong: 不允许修改本人内容\n  - complementary \"新会话与技术核查\":\n    - heading \"新会话与实际选择记录\" [level=2]\n    - text: 当前条件及历史观察分别显示 当前选择规则\n    - strong: CURRENT_CONFIRMATION_REQUIRED\n    - text: 已记录选择次数\n    - strong: \"3\"\n    - text: 最近 run_id\n    - strong: run-3219b732-37f2-449f-aa13-a7a67460e653\n    - text: 该次记忆版本\n    - strong: \"3\"\n    - text: 该次选择结果\n    - strong: 该次符合选择条件\n    - text: 该次选择时间\n    - strong: 2026-10-23T06:04:04.130452+00:00\n    - text: 该次运行状态\n    - strong: SUCCEEDED\n    - text: 与当前记忆版本一致\n    - strong: 版本已经变化\n    - text: 该次模型完成观察\n    - strong: 已经观察\n    - button \"查看关联运行记录\"\n    - text: 当前模型遵从验证\n    - strong: 本次技术读取没有执行模型验证\n    - img\n    - text: 当前确认条件已经停止后续采用；上方记录保留当次上下文选择结果。"}
+### Ran Playwright code
+```js
+await (async (page) => {
+  await page.getByRole("link", {name: "返回记忆技术维护", exact: true}).click();
+  const [response] = await Promise.all([
+    page.waitForResponse(item => item.url().endsWith("/api/boss/ui/admin/memory-status")),
+    page.getByRole("button", {name: "检查技术状态", exact: true}).click(),
+  ]);
+  if (response.status() !== 200) throw Error("撤销后技术状态重读未成功");
+  const result = await response.json();
+  if (result.memory.version !== "4" || result.memory.confirmation_state !== "CONFIRMED" ||
+    result.future_context_eligible || result.next_context_memory_version !== null || !result.latest_context_selection.eligible)
+    throw Error("当前确认撤销与历史选择未分别显示");
+  const current = page.getByRole("region", {name: "当前记忆确认", exact: true});
+  await current.getByText("停止采用", {exact: true}).waitFor();
+  await current.getByText("没有可采用版本", {exact: true}).waitFor();
+  await page.getByText("当前确认条件已经停止后续采用；上方记录保留当次上下文选择结果。", {exact: true}).waitFor();
+  if ((await page.locator("main").innerText()).includes("简报优先展示现金")) throw Error("撤销后投影包含正文");
+  return {status: "PASS", check_id: "A12-REVOCATION-AND-HISTORY", current_version: result.memory.version,
+    history_version: result.latest_context_selection.memory_version, future_context_eligible: false,
+    dom: await page.locator("main").ariaSnapshot()};
+}
+)(page);
+```
+### Page
+- Page URL: http://127.0.0.1:51599/
+- Page Title: 记忆技术维护组件检查

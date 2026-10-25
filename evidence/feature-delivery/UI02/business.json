@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc04-journey-363ffb4f-9bd0-4add-bd26-c3ba02fd78af",
+  "ports": {
+    "business": 10211,
+    "webui": 10212,
+    "gateway": 20211
+  },
+  "proxy_port": 10213,
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/ui02-n3-dist",
+  "manifest_sha256": "2b95fb287e88aef5bf3aadbca0ae416262ed077ca3555ac4346616ffbc885523",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "business_unsaved_native_navigation_and_keyboard",
+      "input_preserved": true,
+      "focus_contained": true
+    },
+    {
+      "check": "native_maintenance_route_rejected_for_owner",
+      "private_settings_not_rendered": true,
+      "same_identity_retained": true
+    },
+    {
+      "check": "actual_save_unknown_receipt_navigation_and_separate_owner_adoption",
+      "client_request_id": "boss-0bd64720-dccd-4fe5-894e-fe19d5ee4897",
+      "forwarded_once": true,
+      "saved_draft_version": "2",
+      "active_version": "2",
+      "explicit_confirmation": true,
+      "actual_success_interrupted": true,
+      "navigation_did_not_activate": true,
+      "transport": [
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "ee283aab-90db-48dc-92a6-9601e3cba705",
+          "action": "boss.owner.notice.save",
+          "client_request_id": "boss-0bd64720-dccd-4fe5-894e-fe19d5ee4897"
+        },
+        {
+          "event": "actual_success_delivery_interrupted",
+          "request_id": "ee283aab-90db-48dc-92a6-9601e3cba705",
+          "action": "boss.owner.notice.save",
+          "client_request_id": "boss-0bd64720-dccd-4fe5-894e-fe19d5ee4897",
+          "response_sha256": "5f92710c648e28eabd166874d4457d54476d4b953667a5f1f976ef589276471a"
+        },
+        {
+          "event": "actual_request_forwarded",
+          "request_id": "facae725-a07d-43da-8405-f7cd43a07c53",
+          "action": "boss.owner.notice.confirm",
+          "client_request_id": "boss-b08ad47d-32b9-4af6-b274-d481047ef491"
+        }
+      ]
+    }
+  ]
+}

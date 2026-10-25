@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import re
+import uuid
 from pathlib import Path
 
 import httpx
@@ -11,12 +12,13 @@ from nanobot.providers.registry import find_by_name
 from openai import AsyncOpenAI
 from openai.resources.chat.completions import AsyncCompletions
 
-from business import ROOT, now
+from business import ROOT, checksum, now
 
 
 class RecordedStream:
     def __init__(self, stream, recorder):
         self.stream, self.recorder = stream, recorder
+        self.model_request_id = stream.response.request.extensions["boss_model_request_id"]
 
     async def __aiter__(self):
         first = True
@@ -24,8 +26,7 @@ class RecordedStream:
             async for chunk in self.stream:
                 finished = any(choice.finish_reason is not None for choice in chunk.choices)
                 if first or chunk.usage is not None or finished:
-                    self.recorder.requests.append({"at": now(), "type": "stream_metadata", "response_id": chunk.id, "model": chunk.model, "created": chunk.created, "usage": chunk.usage.model_dump(mode="json") if chunk.usage else None, "finish_reasons": [choice.finish_reason for choice in chunk.choices if choice.finish_reason is not None]})
-                    self.recorder.save()
+                    self.recorder.record({"at": now(), "type": "stream_metadata", "model_request_id": self.model_request_id, "response_id": chunk.id, "model": chunk.model, "created": chunk.created, "usage": chunk.usage.model_dump(mode="json") if chunk.usage else None, "finish_reasons": [choice.finish_reason for choice in chunk.choices if choice.finish_reason is not None]})
                     first = False
                 yield chunk
         finally:
@@ -61,8 +62,9 @@ def settings():
 
 
 class RecordedProvider(OpenAICompatProvider):
-    def __init__(self, config, output, *, redact_payload=False):
+    def __init__(self, config, output, *, redact_payload=False, transport_observer=None):
         self.redact_payload = redact_payload
+        self.transport_observer = transport_observer
         super().__init__(api_key=os.environ["DEEPSEEK_API_KEY"], api_base=config["base_url"], default_model=config["model_id"], spec=find_by_name("deepseek"), extra_body={"thinking": {"type": config["thinking"]}}, provider_name="deepseek")
         self.output = Path(output)
         loaded = json.loads(self.output.read_text()) if self.output.exists() else []
@@ -79,6 +81,7 @@ class RecordedProvider(OpenAICompatProvider):
             "type", "at", "method", "url", "model", "stream", "max_tokens",
             "status", "request_id", "content_type", "response_id", "created",
             "request_sha256", "request_bytes", "message_count", "tool_count",
+            "run_id", "session_id", "runtime_request_id", "configuration_version", "model_request_id", "tool_config_sha256",
         }
         result = {
             key: value for key, value in record.items()
@@ -90,7 +93,8 @@ class RecordedProvider(OpenAICompatProvider):
         usage = record.get("usage")
         if isinstance(usage, dict):
             result["usage"] = {
-                k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens")
+                k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens",
+                                     "prompt_cache_hit_tokens", "prompt_cache_miss_tokens")
                 if isinstance(usage.get(k), (int, float))
             }
         reasons = record.get("finish_reasons")
@@ -100,6 +104,12 @@ class RecordedProvider(OpenAICompatProvider):
             result["error_present"] = True
         result["private_contents_recorded"] = False
         return result
+
+    def record(self, event):
+        if self.transport_observer is not None:
+            event.update(self.transport_observer(event))
+        self.requests.append(event)
+        self.save()
 
     def save(self):
         payload = json.dumps(self.requests, ensure_ascii=False, indent=2)
@@ -115,9 +125,13 @@ class RecordedProvider(OpenAICompatProvider):
     def _build_client(self):
         async def request_hook(request):
             body = json.loads(request.content)
+            request.extensions["boss_model_request_id"] = "model-request-" + str(uuid.uuid4())
             record = {"at": now(), "type": "request", "method": request.method, "url": str(request.url),
                       "model": body.get("model"), "stream": body.get("stream", False),
-                      "max_tokens": body.get("max_tokens"), "thinking": body.get("thinking")}
+                      "max_tokens": body.get("max_tokens"), "thinking": body.get("thinking"),
+                      "model_request_id": request.extensions["boss_model_request_id"],
+                      "request_sha256": hashlib.sha256(request.content).hexdigest(),
+                      "tool_config_sha256": checksum(body.get("tools") or [])}
             if self.redact_payload:
                 record.update({
                     "request_sha256": hashlib.sha256(request.content).hexdigest(),
@@ -128,24 +142,23 @@ class RecordedProvider(OpenAICompatProvider):
                 })
             else:
                 record["input"] = body
-            self.requests.append(record)
-            self.save()
+            self.record(record)
 
         async def response_hook(response):
-            record = {"at": now(), "type": "response", "status": response.status_code, "url": str(response.request.url), "request_id": response.headers.get("x-request-id"), "content_type": response.headers.get("content-type")}
+            record = {"at": now(), "type": "response", "status": response.status_code, "url": str(response.request.url), "request_id": response.headers.get("x-request-id"), "content_type": response.headers.get("content-type"), "model_request_id": response.request.extensions["boss_model_request_id"]}
             if not response.request.url.path.endswith("/chat/completions"):
                 raise ValueError("实际请求使用了未获准的模型协议路径")
             if response.headers.get("content-type", "").startswith("application/json"):
                 await response.aread()
                 body = response.json()
                 record.update(response_id=body.get("id"), model=body.get("model"), usage=body.get("usage"))
+                record["finish_reasons"] = [choice["finish_reason"] for choice in body.get("choices", []) if choice.get("finish_reason")]
                 if self.redact_payload:
                     if body.get("error"):
                         record["error_present"] = True
                 else:
                     record["error"] = body.get("error")
-            self.requests.append(record)
-            self.save()
+            self.record(record)
 
         self._client = AsyncOpenAI(api_key=os.environ["DEEPSEEK_API_KEY"], base_url=self._effective_base, max_retries=0, timeout=120, http_client=httpx.AsyncClient(timeout=120, event_hooks={"request": [request_hook], "response": [response_hook]}))
         self._client.chat.completions = RecordedCompletions(self._client, self)

@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-read-b4953024-af2c-47c5-9d82-fa5a84a2dd48",
+  "ports": {
+    "business": 10741,
+    "webui": 10742,
+    "gateway": 20741
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "scope": "N02_AUTHENTICATED_CONVERSATION_READ",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_authenticated_attached_chat_runtime_and_artifact_read",
+      "chat_id": "3978e62f-7963-49ab-b34d-fcf0341175c5",
+      "session_id": "websocket:3978e62f-7963-49ab-b34d-fcf0341175c5",
+      "run_id": "run-05be8ada-abf5-477d-ac0f-3a2806f67447",
+      "artifact": {
+        "kind": "morning_list",
+        "id": "morning-ca7dd181-1ba1-4f05-b9a7-2d8ed8cc7c94"
+      },
+      "read_only_repeat_unchanged": true
+    },
+    {
+      "check": "actual_native_upload_metadata_saved_and_current_saved_session_read",
+      "attachment_id": "attachment-35d049b339d036ed337743fdbd1212d344774c6341a3c89c91bd94127efac6d6",
+      "original_name": "morning-coverage.json",
+      "mime_type": "application/json",
+      "size_bytes": 548,
+      "content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+      "business_source_authority_granted": false
+    },
+    {
+      "check": "unattached_connection_maintainer_injected_identity_and_unrelated_artifact_rejected",
+      "unattached_status": 403,
+      "maintainer_status": 403,
+      "injected_fields_status": 400,
+      "unrelated_artifact_status": 403
+    }
+  ]
+}

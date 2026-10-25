@@ -1,0 +1,179 @@
+{
+  "status": "PASS",
+  "defect_id": "FC02-N4-UI-HISTORY-01",
+  "run_id": "fc02-history-e57dfd21-2416-4c3d-a46a-7d64b1973079",
+  "ports": {
+    "business": 9761,
+    "webui": 9762,
+    "gateway": 19761
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc02-history-e57dfd21-2416-4c3d-a46a-7d64b1973079",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc02-n3-history-dist",
+  "manifest_sha256": "b1445dca6829bd7471c9748c14854a05bc0e4a1ac8865f69c03c6a8a124ecdb6",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "records": [
+    {
+      "check": "valid_query_and_evidence",
+      "client_request_id": "976785ae-cfbf-4397-8b0b-cfd4b51884fa",
+      "query_id": "6ab5b73c-7a25-42e2-9725-1e28f66801b3",
+      "counts": {
+        "query": 2,
+        "runtime_run": 2,
+        "bi_public_request": 2,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      }
+    },
+    {
+      "check": "withdrawn_initial_state",
+      "api": {
+        "dimensions": 410,
+        "history": 200,
+        "receipt": 200
+      },
+      "history_count": 2,
+      "history_buttons": 2,
+      "restore_disabled": false
+    },
+    {
+      "check": "withdrawn_history_receipt_refresh_restart",
+      "client_request_id": "976785ae-cfbf-4397-8b0b-cfd4b51884fa",
+      "query_id": "6ab5b73c-7a25-42e2-9725-1e28f66801b3",
+      "current_source_status": 410,
+      "historical_state": "HISTORICAL_REQUIRES_REQUERY",
+      "counts": {
+        "query": 2,
+        "runtime_run": 2,
+        "bi_public_request": 2,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      }
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 1,
+      "width": 1024,
+      "scroll": 1024
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1024,
+      "native_height": 768,
+      "zoom": 2,
+      "width": 512,
+      "scroll": 512
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 1,
+      "width": 1280,
+      "scroll": 1280
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1280,
+      "native_height": 800,
+      "zoom": 2,
+      "width": 640,
+      "scroll": 640
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 1,
+      "width": 1440,
+      "scroll": 1440
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "F03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "historical_dom_bounds",
+      "page_id": "N03",
+      "native_width": 1440,
+      "native_height": 1024,
+      "zoom": 2,
+      "width": 720,
+      "scroll": 720
+    },
+    {
+      "check": "expired_logout_maintainer",
+      "expired_status": 401,
+      "maintainer_status": 403,
+      "protected_history_cleared": true,
+      "reauthentication_restored": true,
+      "counts": {
+        "query": 2,
+        "runtime_run": 2,
+        "bi_public_request": 2,
+        "task": 0,
+        "authorization": 0,
+        "outbox": 0
+      }
+    }
+  ]
+}

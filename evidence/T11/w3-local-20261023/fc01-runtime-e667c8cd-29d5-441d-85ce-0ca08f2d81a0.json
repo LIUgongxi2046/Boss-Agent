@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "run_id": "fc01-runtime-e667c8cd-29d5-441d-85ce-0ca08f2d81a0",
+  "ports": {
+    "business": 9371,
+    "webui": 9372,
+    "gateway": 19371
+  },
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/fc01-runtime-e667c8cd-29d5-441d-85ce-0ca08f2d81a0",
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/fc01-n3-runtime-dist",
+  "build_manifest_sha256": "2ed4feb29e03162f3ff2c5580d3379c55d71284933c8afaaab1b0df6442b665e",
+  "inputs": [
+    {
+      "path": "validation/product_fc01.py",
+      "sha256": "1bb97a1e48e210b8c85616d8f0dadc7e35c09ddc2e98376327198eec92c4b804"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "f8abd826120606c2b77c2421fd2ac3595e74e81b795e291cb8fef66bfa0b9678"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "aac6740a778ed2ddffaad96be39e8d692eb6761187b8f7a147bff9d5597741a1"
+    },
+    {
+      "path": "specs/runtime-records.schema.json",
+      "sha256": "93db02391d8473b1a5005a4b47352869bbcd30ff954e72cc38ff281dbd5d2293"
+    },
+    {
+      "path": "app/webui/BossSupplyQualityPanel.tsx",
+      "sha256": "7254d1972446515024e4af8b9ff8d2e9bac08b926295ae177ae31a8d10f0e313"
+    },
+    {
+      "path": "app/webui/boss-v6.css",
+      "sha256": "3230e8a68dde85f79f506fef207382285d5c53651de3f24c5cdc59e43af0718c"
+    }
+  ],
+  "external_api_mode": "SIMULATED_FIRST",
+  "external_model_requested": false,
+  "visual": "NOT_RUN",
+  "checks": [
+    {
+      "check": "runtime_actual_tools_and_private_records",
+      "run_id": "run-a006c42e-3a3d-400b-9c56-83f3521622ba",
+      "configuration_version": "2",
+      "tools": [
+        "bossSupplyQualityRead",
+        "bossSupplyQualityQuery",
+        "bossEvidenceRead",
+        "bossSupplyQualityPrepare"
+      ]
+    },
+    {
+      "check": "owner_adoption_same_task_d06_tokens",
+      "run_id": "run-a006c42e-3a3d-400b-9c56-83f3521622ba",
+      "task_id": "1b37e954-469a-44dd-8af8-7eab8cfe9c7d",
+      "styles": {
+        "font": "16px",
+        "line": "24px",
+        "field": "14px"
+      },
+      "renderer_errors": 0
+    }
+  ]
+}

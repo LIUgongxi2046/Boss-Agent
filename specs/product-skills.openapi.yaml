@@ -1,0 +1,376 @@
+openapi: 3.1.0
+info:
+  title: Boss-Agent 公共原生方法扩展
+  version: 0.3.0
+  description: 当前实际本地文件、配置与上下文接口，完整T06正式接收待完成；没有外部模型请求。
+x-reception:
+  state: IN_REVIEW
+  core_version: 1.8.0
+  owner: W3
+  receiver: W1/T06
+  authority: native workspace/skills files and agents.defaults.disabled_skills
+  business_authorization_granted: false
+paths:
+  /api/boss/ui/admin/sop-method:
+    get:
+      operationId: productSopMethodRead
+      x-role: MAINTAINER
+      parameters:
+        - {name: sop_id, in: query, required: true, schema: {$ref: '#/components/schemas/SopID'}}
+      responses:
+        '200': {description: 当前原生方法、独立草稿、历史与全局待恢复状态, content: {application/json: {schema: {$ref: '#/components/schemas/MethodEditor'}}}}
+        default: {description: 参数400、认证401、角色403、未知方法404、范围409及服务未准备503}
+  /api/boss/ui/admin/sop-history:
+    get:
+      operationId: productSopHistoryRead
+      x-role: MAINTAINER
+      parameters:
+        - {name: sop_id, in: query, required: true, schema: {$ref: '#/components/schemas/SopID'}}
+        - {name: history_id, in: query, required: true, schema: {$ref: '#/components/schemas/HistoryID'}}
+      responses:
+        '200': {description: 当前方法的不可变历史正文, content: {application/json: {schema: {$ref: '#/components/schemas/HistoryBody'}}}}
+        default: {description: 参数400、认证401、角色403、未知历史404、摘要或范围409及服务未准备503}
+  /api/boss/ui/admin/sop-operation-status:
+    get:
+      operationId: productSopOperationStatus
+      x-role: MAINTAINER
+      parameters:
+        - {name: action, in: query, required: true, schema: {enum: [save, validate, activate, enable, disable, restore, recover, cancel, prepare]}}
+        - {name: client_request_id, in: query, required: true, schema: {$ref: '#/components/schemas/RequestID'}}
+      responses:
+        '200': {description: 原请求的RECORDED、PREPARED或当前未查到状态, content: {application/json: {schema: {$ref: '#/components/schemas/OperationStatus'}}}}
+        default: {description: 参数400、认证401、角色403、范围409及服务未准备503}
+  /api/boss/ui/admin/skills:
+    get:
+      operationId: productNativeSkillsRead
+      x-role: MAINTAINER
+      responses:
+        '200':
+          description: 十三项方法当前版本、摘要、启停及实际工具引用状态；没有正文
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Projection'}
+        '400': {description: 任何查询参数均被拒绝}
+        '401': {description: 身份未认证或令牌失效}
+        '403': {description: 需要技术维护身份}
+        '409': {description: 当前原生文件或其引用无法核验}
+        '503': {description: 当前方法服务尚未准备}
+components:
+  schemas:
+    Sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    Name: {enum: [boss-sop01, boss-sop02, boss-sop03, boss-sop04, boss-sop05, boss-sop06, boss-sop07, boss-sop08, boss-sop09, boss-sop10, boss-sop11, boss-sop12, boss-sop13]}
+    SopID: {enum: [SOP01, SOP02, SOP03, SOP04, SOP05, SOP06, SOP07, SOP08, SOP09, SOP10, SOP11, SOP12, SOP13]}
+    Operations: {type: array, uniqueItems: true, items: {type: string, minLength: 1}}
+    RequestID: {type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9_.-]+$'}
+    HistoryID: {type: string, minLength: 1, maxLength: 256}
+    DraftVersion: {type: string, pattern: '^[0-9]+$'}
+    MethodVersion: {type: string, minLength: 1, maxLength: 64, x-parser: packaging.version.Version}
+    Pending:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, draft_version, state, prepared_at]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        state: {const: PREPARED}
+        prepared_at: {type: string, format: date-time}
+    AssessmentError:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code: {enum: [TOOL_REFERENCES_CHANGED, REQUIRED_SECTIONS_MISSING]}
+        missing: {$ref: '#/components/schemas/Operations'}
+        unknown: {$ref: '#/components/schemas/Operations'}
+        sections: {$ref: '#/components/schemas/Operations'}
+    Assessment:
+      type: object
+      additionalProperties: false
+      required: [validation_status, errors, missing_tools, tool_config_sha256, model_adoption_verified]
+      properties:
+        validation_status: {enum: [VALIDATED_STATIC_ONLY, INVALID]}
+        errors: {type: array, items: {$ref: '#/components/schemas/AssessmentError'}}
+        missing_tools: {$ref: '#/components/schemas/Operations'}
+        tool_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        model_adoption_verified: {const: false}
+    Draft:
+      type: object
+      additionalProperties: false
+      required: [sop_id, draft_version, method_version, description, body, raw_markdown, content_sha256, base_active_sha256, change_note, state, validation_status, restored_from, saved_at]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        description: {type: string}
+        body: {type: string}
+        raw_markdown: {type: string}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        base_active_sha256: {$ref: '#/components/schemas/Sha256'}
+        change_note: {type: string}
+        state: {enum: [DRAFT, ACTIVE]}
+        validation_status: {enum: [NOT_RUN, VALIDATED_STATIC_ONLY, INVALID]}
+        restored_from: {oneOf: [{$ref: '#/components/schemas/HistoryID'}, {type: 'null'}]}
+        saved_at: {type: string, format: date-time}
+        validated_at: {type: string, format: date-time}
+        errors: {type: array, items: {$ref: '#/components/schemas/AssessmentError'}}
+        missing_tools: {$ref: '#/components/schemas/Operations'}
+        tool_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        model_adoption_verified: {const: false}
+    History:
+      type: object
+      additionalProperties: false
+      required: [history_id, method_version, content_sha256, recorded_at, origin]
+      properties:
+        history_id: {$ref: '#/components/schemas/HistoryID'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        recorded_at: {type: string, format: date-time}
+        origin: {enum: [NATIVE_CURRENT, ACTIVATED_DRAFT, DRAFT_REVISION]}
+    HistoryBody:
+      type: object
+      additionalProperties: false
+      required: [history_id, sop_id, method_version, content_sha256, recorded_at, origin, description, body, source_type, external_api_mode]
+      properties:
+        history_id: {$ref: '#/components/schemas/HistoryID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        recorded_at: {type: string, format: date-time}
+        origin: {enum: [NATIVE_CURRENT, ACTIVATED_DRAFT, DRAFT_REVISION]}
+        description: {type: string}
+        body: {type: string}
+        source_type: {const: RUNTIME_RECORD}
+        external_api_mode: {const: SIMULATED}
+    MethodEditor:
+      type: object
+      additionalProperties: false
+      required: [projection, source_type, external_api_mode, namespace, sop_id, active, draft, history, pending_activations, global_pending_activations, read_operations, command_operations, sections, active_assessment, current_dependencies, model_adoption_verified, business_authorization_granted]
+      properties:
+        projection: {const: sop-method-editor}
+        source_type: {const: RUNTIME_RECORD}
+        external_api_mode: {const: SIMULATED}
+        namespace: {type: string}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        active:
+          type: object
+          additionalProperties: false
+          required: [name, version, description, body, content_sha256, enabled]
+          properties:
+            name: {$ref: '#/components/schemas/Name'}
+            version: {$ref: '#/components/schemas/MethodVersion'}
+            description: {type: string}
+            body: {type: string}
+            content_sha256: {$ref: '#/components/schemas/Sha256'}
+            enabled: {type: boolean}
+        draft: {oneOf: [{$ref: '#/components/schemas/Draft'}, {type: 'null'}]}
+        history: {type: array, items: {$ref: '#/components/schemas/History'}}
+        pending_activations: {type: array, items: {$ref: '#/components/schemas/Pending'}}
+        global_pending_activations: {type: array, items: {$ref: '#/components/schemas/Pending'}}
+        read_operations: {$ref: '#/components/schemas/Operations'}
+        command_operations: {$ref: '#/components/schemas/Operations'}
+        sections:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [heading, body]
+            properties: {heading: {type: string}, body: {type: string}}
+        active_assessment: {$ref: '#/components/schemas/Assessment'}
+        current_dependencies:
+          type: object
+          additionalProperties: false
+          required: [missing_tools, missing_projections, tool_references_resolved, projection_references_resolved, context_eligible]
+          properties:
+            missing_tools: {$ref: '#/components/schemas/Operations'}
+            missing_projections: {$ref: '#/components/schemas/Operations'}
+            tool_references_resolved: {type: boolean}
+            projection_references_resolved: {type: boolean}
+            context_eligible: {type: boolean}
+        model_adoption_verified: {const: false}
+        business_authorization_granted: {const: false}
+    Save:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_draft_version, expected_active_sha256, method_version, description, body, change_note]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        expected_draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        expected_active_sha256: {$ref: '#/components/schemas/Sha256'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        description: {type: string, minLength: 1, maxLength: 1024}
+        body: {type: string, minLength: 1, maxLength: 32000}
+        change_note: {type: string, minLength: 1, maxLength: 360}
+    Validate:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_draft_version, expected_content_sha256]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        expected_draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+    Activate:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_draft_version, expected_content_sha256, expected_active_sha256]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        expected_draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+        expected_active_sha256: {$ref: '#/components/schemas/Sha256'}
+    Enable:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_active_sha256]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        expected_active_sha256: {$ref: '#/components/schemas/Sha256'}
+    Disable: {$ref: '#/components/schemas/Enable'}
+    Restore:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_draft_version, expected_active_sha256, method_version, history_id, change_note]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        expected_draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        expected_active_sha256: {$ref: '#/components/schemas/Sha256'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        history_id: {$ref: '#/components/schemas/HistoryID'}
+        change_note: {type: string, minLength: 1, maxLength: 360}
+    Recover:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, activation_request_id]
+      properties:
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        activation_request_id: {$ref: '#/components/schemas/RequestID'}
+    Cancel: {$ref: '#/components/schemas/Recover'}
+    SaveResult:
+      type: object
+      additionalProperties: false
+      required: [sop_id, draft_version, method_version, content_sha256, state, validation_status, restored_from]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        state: {const: DRAFT}
+        validation_status: {const: NOT_RUN}
+        restored_from: {oneOf: [{$ref: '#/components/schemas/HistoryID'}, {type: 'null'}]}
+    ValidationResult:
+      type: object
+      additionalProperties: false
+      required: [sop_id, draft_version, validation_status, errors, missing_tools, tool_config_sha256, model_adoption_verified]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        validation_status: {enum: [VALIDATED_STATIC_ONLY, INVALID]}
+        errors: {type: array, items: {$ref: '#/components/schemas/AssessmentError'}}
+        missing_tools: {$ref: '#/components/schemas/Operations'}
+        tool_config_sha256: {$ref: '#/components/schemas/Sha256'}
+        model_adoption_verified: {const: false}
+    ActivationResult:
+      type: object
+      additionalProperties: false
+      required: [sop_id, draft_version, state, method_version, content_sha256, model_adoption_verified, business_authorization_granted]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        draft_version: {$ref: '#/components/schemas/DraftVersion'}
+        state: {enum: [ACTIVE, CANCELED]}
+        method_version: {$ref: '#/components/schemas/MethodVersion'}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        model_adoption_verified: {const: false}
+        business_authorization_granted: {const: false}
+    OperationStatus:
+      type: object
+      additionalProperties: false
+      required: [action, client_request_id, outcome, result]
+      properties:
+        action: {enum: [save, validate, activate, enable, disable, restore, recover, cancel, prepare]}
+        client_request_id: {$ref: '#/components/schemas/RequestID'}
+        outcome: {enum: [RECORDED, PREPARED, NOT_FOUND_IN_CURRENT_STORE]}
+        result: {oneOf: [{$ref: '#/components/schemas/SaveResult'}, {$ref: '#/components/schemas/ValidationResult'}, {$ref: '#/components/schemas/ActivationResult'}, {$ref: '#/components/schemas/Result'}, {type: object, required: [client_request_id, sop_id, draft_version, state], additionalProperties: false, properties: {client_request_id: {$ref: '#/components/schemas/RequestID'}, sop_id: {$ref: '#/components/schemas/SopID'}, draft_version: {$ref: '#/components/schemas/DraftVersion'}, state: {const: PREPARED}}}, {type: 'null'}]}
+    Item:
+      type: object
+      additionalProperties: false
+      required: [sop_id, name, requirement_id, version, content_sha256, enabled, native_available, read_operations, command_operations, human_only_operations, missing_tools, missing_projections, tool_references_resolved, projection_references_resolved, context_eligible, business_authorization_granted, model_adoption_verified]
+      properties:
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        name: {$ref: '#/components/schemas/Name'}
+        requirement_id: {type: string, pattern: '^FR-[0-9]{2}$'}
+        version: {type: string, minLength: 1}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        enabled: {type: boolean}
+        native_available: {type: boolean}
+        read_operations: {$ref: '#/components/schemas/Operations'}
+        command_operations: {$ref: '#/components/schemas/Operations'}
+        human_only_operations: {$ref: '#/components/schemas/Operations'}
+        missing_tools: {$ref: '#/components/schemas/Operations'}
+        tool_references_resolved: {type: boolean}
+        missing_projections: {$ref: '#/components/schemas/Operations'}
+        projection_references_resolved: {type: boolean}
+        context_eligible: {type: boolean}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+    Projection:
+      type: object
+      additionalProperties: false
+      required: [projection, items, configuration_source, configuration_mutation_performed, private_body_available_here, business_authorization_granted, model_adoption_verified, native_configuration_sha256, runtime_admission_ready, pending_activations]
+      properties:
+        projection: {const: sop-technical-status}
+        items: {type: array, minItems: 13, maxItems: 13, items: {$ref: '#/components/schemas/Item'}}
+        configuration_source: {const: NATIVE_SKILL_FILES_AND_DISABLED_SKILLS}
+        configuration_mutation_performed: {const: false}
+        private_body_available_here: {const: false}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+        native_configuration_sha256: {$ref: '#/components/schemas/Sha256'}
+        runtime_admission_ready: {type: boolean}
+        pending_activations: {type: array, items: {$ref: '#/components/schemas/Pending'}}
+    Update:
+      type: object
+      additionalProperties: false
+      required: [name, enabled, expected_content_sha256]
+      properties:
+        name: {$ref: '#/components/schemas/Name'}
+        enabled: {type: boolean}
+        expected_content_sha256: {$ref: '#/components/schemas/Sha256'}
+    Result:
+      type: object
+      additionalProperties: false
+      required: [name, enabled, deleted, sop_id, version, content_sha256, activation_policy, business_authorization_granted, model_adoption_verified]
+      properties:
+        name: {$ref: '#/components/schemas/Name'}
+        enabled: {type: boolean}
+        deleted: {const: false}
+        sop_id: {$ref: '#/components/schemas/SopID'}
+        version: {type: string, minLength: 1}
+        content_sha256: {$ref: '#/components/schemas/Sha256'}
+        activation_policy: {const: NEXT_CONTEXT_LOAD}
+        business_authorization_granted: {const: false}
+        model_adoption_verified: {const: false}
+x-websocket-operations:
+  boss.sop.save: {role: MAINTAINER, request_schema: '#/components/schemas/Save', response_schema: '#/components/schemas/SaveResult'}
+  boss.sop.validate: {role: MAINTAINER, request_schema: '#/components/schemas/Validate', response_schema: '#/components/schemas/ValidationResult'}
+  boss.sop.activate: {role: MAINTAINER, request_schema: '#/components/schemas/Activate', response_schema: '#/components/schemas/ActivationResult'}
+  boss.sop.enable: {role: MAINTAINER, request_schema: '#/components/schemas/Enable', response_schema: '#/components/schemas/Result'}
+  boss.sop.disable: {role: MAINTAINER, request_schema: '#/components/schemas/Disable', response_schema: '#/components/schemas/Result'}
+  boss.sop.restore: {role: MAINTAINER, request_schema: '#/components/schemas/Restore', response_schema: '#/components/schemas/SaveResult'}
+  boss.sop.recover: {role: MAINTAINER, request_schema: '#/components/schemas/Recover', response_schema: '#/components/schemas/ActivationResult'}
+  boss.sop.cancel: {role: MAINTAINER, request_schema: '#/components/schemas/Cancel', response_schema: '#/components/schemas/ActivationResult'}
+  skill.update:
+    role: MAINTAINER
+    request_schema: '#/components/schemas/Update'
+    response_schema: '#/components/schemas/Result'
+    serialization: same native configuration file lock
+    scope: exact current boss-sop01 through boss-sop13 names only
+    persistence: native disabled_skills; desired boolean state is idempotent
+    adoption: apply native skill_state_action and current Runtime snapshot before response
+    errors: [400, 401, 403, 404, 409, 503]
+    recovery: read current file and state after an uncertain response; does not use business operation receipts

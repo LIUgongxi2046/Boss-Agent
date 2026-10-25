@@ -1,0 +1,157 @@
+{
+  "status": "PASS_ASSIGNMENT_SOURCE_READ_ADAPTER",
+  "received_commit": "f854b07a66a153fc4a92c95c86cce788d009cffe",
+  "task_id": "c44842bf-beec-4451-bb0a-7c94ec3dd6c0",
+  "task_count": 1,
+  "outbox_count": 0,
+  "role_rejections": [
+    {
+      "role": null,
+      "http_status": 401
+    },
+    {
+      "role": "MAINTAINER",
+      "http_status": 403
+    },
+    {
+      "role": "CONTACT",
+      "http_status": 403
+    }
+  ],
+  "observations": [
+    {
+      "stage": "current",
+      "binding_state": "CURRENT",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "1",
+      "source_status": "VALID",
+      "excerpt_available": true,
+      "result_sha256": "22eb7f2a18ba8d8314fbe5a87a48721e9ab738c32ab91ea1d7679ec0e4ecb122"
+    },
+    {
+      "stage": "revised",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": true,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "VALID",
+      "excerpt_available": true,
+      "result_sha256": "a6cc810ac1e08d7a1cb49c4b0f81b7f15439991fafcd1816b79713664e0a3d75"
+    },
+    {
+      "stage": "RECEIVED",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "RECEIVED",
+      "excerpt_available": false,
+      "result_sha256": "ee714f9809f1240eb6e731a2373606fdf1873de3b5bbce4437682685d43b498d"
+    },
+    {
+      "stage": "INCOMPLETE",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "INCOMPLETE",
+      "excerpt_available": false,
+      "result_sha256": "1d9eb62682a4109472b2ea0a596c1926dfb9fc7bd56a2e1e2b70bcb6cfb3fd50"
+    },
+    {
+      "stage": "CONFLICTED",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "CONFLICTED",
+      "excerpt_available": false,
+      "result_sha256": "008a078b76402247f7bee9ef36c6b90a800d3ca5f81118d1dd665352313e67ce"
+    },
+    {
+      "stage": "SUPERSEDED",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "SUPERSEDED",
+      "excerpt_available": false,
+      "result_sha256": "5091a2f3e2bd987ede2af898b66a658f62583f0c689f2f08958172bfd33115ff"
+    },
+    {
+      "stage": "WITHDRAWN",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "WITHDRAWN",
+      "excerpt_available": false,
+      "result_sha256": "89e6cc45298e712f5cb8ac25ee99f0e9c9f83422269022f7045fe972bf3b58c5"
+    },
+    {
+      "stage": "EXPIRED",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": "2",
+      "source_status": "EXPIRED",
+      "excerpt_available": false,
+      "result_sha256": "4e14fbf18445580aa6013ddbfaa99230acadba0ba0b56084d8c0dec5b63da2a0"
+    },
+    {
+      "stage": "forbidden",
+      "binding_state": "NEEDS_REVIEW",
+      "can_confirm": false,
+      "pinned_version": "1",
+      "current_version": null,
+      "source_status": "FORBIDDEN",
+      "excerpt_available": false,
+      "result_sha256": "4c2f9d057903881bc529125ef8d6ac1c97685a21a0b307fe49937c3d26715173"
+    }
+  ],
+  "read_actions_changed_database": false,
+  "source_confirmation_performed": false,
+  "new_external_requests": 0,
+  "business_payload_sha256": "a99970940b3728c857769317dc6272ec23b1e4bfe8941b6eebb1c50535ee55c3",
+  "received_source_sha256": {
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/controls.py": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d",
+    "validation/boss_assignment_sources.py": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752",
+    "validation/boss_command_api.py": "0f21113c8d28408a47552a64728dec3b42b0746721e7fc10f29cfd803440b36a",
+    "validation/boss_source_access.py": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33",
+    "validation/boss_source_policy.py": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896",
+    "specs/assignment-source-review.schema.json": "0b0ea12378cb359e955aeb88048a59677f76082d3a4097930751f10bb966c0b0",
+    "specs/selection-probe.json": "d741dabea9f288951423c776e88f628773d271bcce8db4cf5cd1e08d06d6bc27"
+  },
+  "actual_loaded_modules": {
+    "business": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/business.py",
+      "sha256": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3"
+    },
+    "controls": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/controls.py",
+      "sha256": "5a456822db935cc170c1423d5b6919851d78b08715706c12daeed8ff74f0446d"
+    },
+    "boss_assignment_sources": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/boss_assignment_sources.py",
+      "sha256": "4047aa4b98b70414cab4368fc92d3464a09665ed3f1ffb46aa0046a3e9f1f752"
+    },
+    "boss_command_api": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/validation/boss_command_api.py",
+      "sha256": "0f21113c8d28408a47552a64728dec3b42b0746721e7fc10f29cfd803440b36a"
+    },
+    "boss_source_access": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/boss_source_access.py",
+      "sha256": "2e8a2fc5c63444f301f8387bd79dadf2cad41d5af6aa82bf01ea6764a67dca33"
+    },
+    "boss_source_policy": {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/validation/boss_source_policy.py",
+      "sha256": "6565c180348dc23f60c80e9b4947ab4e46c1e4a83a0fd0ee22d2d1bd0d681896"
+    }
+  },
+  "adapter_sha256": "16e4547cdbc61f6c59c1e4c61fd9996f8af6cfa7162cbbe64738a594b47c6188",
+  "public_registration": "NOT_RUN",
+  "model_adoption": "NOT_RUN",
+  "full_A07_accepted": false
+}

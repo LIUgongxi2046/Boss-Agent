@@ -1,0 +1,204 @@
+{
+  "feature_id": "FC02",
+  "role": "N3",
+  "status": "ACCEPTED_SIMULATED_FIRST",
+  "implementation_commit": "d9b5b45467a56671ca6c212a292a25af1850d050",
+  "base_candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+  "candidate_authority": "/Users/liuhaoxian/Downloads/我的/AI项目/Boss-Agent/specs/feature-delivery.json",
+  "domain_commits": [
+    "fe3010563c6986eff6f0c26c1b5b2554d061cff6",
+    "4bcb0a937eaac5ae64031105ccfd2f7de413c8bb",
+    "9f44a1d4cb247c90afd5d7df5c8f9d62f884c7d3",
+    "2731df3fb9a6f6ffc405846a301505f0141ff1d5",
+    "c707df80260c5181fd86861f284eaa8e63e567f7"
+  ],
+  "integrated_scenario_commits": [
+    "f515905",
+    "4e6b8d6"
+  ],
+  "agent_commits": [
+    "15aeb1d1c61c50e5958565e2bb5c021c2b35fc79",
+    "738f5616ae03c951bd97c9abb4154de7937b79ef"
+  ],
+  "repair_commits": [
+    "abcee1b97de02be4d9ca59473e2d779ec5be8328",
+    "60c282689dc5ab705861e00363bc7718700b5fc4",
+    "d9b5b45467a56671ca6c212a292a25af1850d050"
+  ],
+  "repair_records": [
+    "history-recovery.md",
+    "async-recovery.md",
+    "boundary-adoption.md",
+    "followup-recovery.md"
+  ],
+  "scope": "完整FC02二十项范围；默认父查询按自身来源/明细/定义/会话核查后读取子场景，父子来源有效性、权限、摘要、幂等和持久原回执保持；当前九项必要领域回归与真实公共SDK/WebSocket、界面读取及同库重启通过；前端/Schema/Agent/公共入口/原生Client不变，复用准确制品",
+  "frontend_directory": "fc02-n3-boundary-dist",
+  "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411",
+  "index_sha256": "8418c85706ae46de4c34896339eccd45b4c8af0f24850a9da9fcf2d45e84bfd6",
+  "source_sha256": {
+    "app/webui/BossBIView.tsx": "b63576e42de40803ac2ee192fb5c2109834d96ede111d547244cec6e386b97a9",
+    "app/webui/BossDesktop.tsx": "f7ce3d8253c115f42e4d440c8961113f857cc70e3204d528a3e8722732c790c2",
+    "app/webui/boss-v6.css": "44d42f713499bc4142912bbe108cf86e5d95ad4832e2f9522a6d662441d58b33",
+    "app/webui/BIBasisComparison.tsx": "6d477bfca1b02af98eca3beef6783a735da2027b28bb8ebfc8c7854fd4b06f14",
+    "app/webui/MaintainerBIScenarios.tsx": "b0ad69c322d19aee5694dcde7e21969dfe873ff87ab0e2d306b5c8fa99f9dc30",
+    "app/webui/nanobot-one-shot.patch": "98137a7b05abecf3ace02cff41d03f0243e248de898376727075a9765edadbcd"
+  },
+  "native_client": {
+    "path": ".work/product/nanobot/webui/src/lib/nanobot-client.ts",
+    "sha256": "48ae362a2d6ae0a3d817765a4e34459c3b77255e70bebd0205b7403c2fbe5527",
+    "patch": "app/webui/nanobot-one-shot.patch",
+    "applied": true,
+    "replay_after_reconnect": false,
+    "action": "boss.simulation.bi_scenario.load"
+  },
+  "build": {
+    "result": "PASS",
+    "seconds": 15.14,
+    "command": "npm run build -- --outDir ../../../../fc02-n3-boundary-dist",
+    "directory": ".work/product/nanobot/webui",
+    "source_mirrors": "五份正式前端文件与构建输入逐份SHA256相同；全新构建通过文件编辑工具采用正式文件及原生Client patch",
+    "record": "followup-recovery.md#制品与关联影响",
+    "executed_candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "rebuild_performed_for_current_candidate": false,
+    "adoption": "五份前端、patch、原生Client、manifest及index SHA256核查相同；本次领域修复不要求重新构建"
+  },
+  "checks": [
+    {
+      "result": "PASS",
+      "cases": 9,
+      "scope": "当前组合六项父子来源/跨场景/会话/幂等/历史检查和三项受影响回归",
+      "seconds": 5.2,
+      "evidence": "evidence/feature-delivery/FC02/followup-integration.xml"
+    },
+    {
+      "result": "PASS",
+      "scope": "真实维护载入及默认父查询，经公共boss.bi.follow_up和实际SDK切换weighted-ratios；准确父/子编号、继承期间、明确覆盖字段、14%及原文、父CURRENT；刷新/同库独立重启、原回执/历史、成功幂等/同键冲突、父子来源失效、FAILED只读恢复、零业务写入与renderer错误",
+      "evidence": "evidence/feature-delivery/FC02/fc02-followup-e01e4b7a-3cf6-4881-aa78-add4d2b8f485.json"
+    },
+    {
+      "result": "PASS",
+      "scope": "当前五份前端、patch、原生Client和制品摘要相同，产品差异仅领域两行新增/一行移除；保留原制品和已验收DOM证据",
+      "evidence": "docs/feature-delivery/FC02/followup-recovery.md"
+    },
+    {
+      "result": "PASS",
+      "scope": "git diff --check"
+    }
+  ],
+  "previous_independent_verdict": {
+    "candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "result": "FAIL",
+    "release_decision": "NO_GO",
+    "verified_checkpoints": 17,
+    "total_checkpoints": 20,
+    "record": "docs/feature-delivery/FC02/independent-983b728.json",
+    "manifest_sha256": "633f8825cd5e62d2e2f5302e8b1ecd3df5cb1619bfcea10015e6cb404570b411"
+  },
+  "evidence_reuse_policy": "N4对983b728的17/20、FAIL/NO_GO是原候选事实；当前领域局部修复及必要公共行为已有新证据，N4按准确差异核查C03/C16及受影响范围，所有二十项满足后才能完整PASS。",
+  "required_input_checkpoints": [],
+  "formal_input_checkpoints_received": [
+    "FC02.C05",
+    "FC02.C08",
+    "FC02.C11"
+  ],
+  "test_ports": {
+    "business": 9921,
+    "webui": 9922,
+    "gateway": 19921
+  },
+  "history_ports": {
+    "business": 9761,
+    "webui": 9762,
+    "gateway": 19761
+  },
+  "timing_ports": {
+    "business": 9751,
+    "webui": 9752,
+    "gateway": 19751,
+    "proxy": 9753
+  },
+  "test_data_policy": "独立账号、当前正式生成器、SQLite及端口；保留用户预览和其他角色进程",
+  "external_api_mode": "SIMULATED_FIRST",
+  "usage": null,
+  "cost_total": null,
+  "visual": "NOT_RUN",
+  "real_model_quality": "NOT_RUN",
+  "device_installation": "NOT_RUN",
+  "third_party_delivery": "NOT_RUN",
+  "independent_feature_verdict": "PASS",
+  "verified_feature_checkpoints": 20,
+  "total_feature_checkpoints": 20,
+  "fc03_started": true,
+  "received_domain_fixes": [
+    {
+      "commit": "c707df80260c5181fd86861f284eaa8e63e567f7",
+      "record_commit": "31b6313db73bd1b379796f469121dfcb32e0c145",
+      "adoption": "逐项采用两个文件的局部差异，保留当前公开扩展；仅领域文件2行新增/1行移除",
+      "files": [
+        "validation/boss_bi_queries.py",
+        "app/tests/test_fc02_followup_sources.py"
+      ],
+      "domain_sha256": "1a6237d88e51e6dbc660c0385ccdcdd02dd68c708238de636a3eef32a685317e",
+      "test_sha256": "c8b6247dca4352fa1d4923d42e3f5c5b4ab879bc3dfc18e4febced89a6a7a7cc"
+    }
+  ],
+  "domain_source_sha256": {
+    "validation/boss_bi_queries.py": "1a6237d88e51e6dbc660c0385ccdcdd02dd68c708238de636a3eef32a685317e",
+    "app/tests/test_fc02_followup_sources.py": "c8b6247dca4352fa1d4923d42e3f5c5b4ab879bc3dfc18e4febced89a6a7a7cc"
+  },
+  "reused_evidence": {
+    "candidate_commit": "983b7287cf0e4c7050a109bc458f603308045f2d",
+    "checkpoint_score_transferred": false,
+    "checkpoint_ids": [
+      "FC02.C01",
+      "FC02.C02",
+      "FC02.C04",
+      "FC02.C05",
+      "FC02.C06",
+      "FC02.C07",
+      "FC02.C08",
+      "FC02.C09",
+      "FC02.C10",
+      "FC02.C11",
+      "FC02.C12",
+      "FC02.C13",
+      "FC02.C14",
+      "FC02.C15",
+      "FC02.C17",
+      "FC02.C18",
+      "FC02.C19"
+    ],
+    "independent_record": "docs/feature-delivery/FC02/independent-983b728.json",
+    "scope": "原候选17项及C05/C08/C11通过事实按准确依赖保留；新候选分子待N4核查。未重复72/74项、FC01全量、无变化构建或整套DOM。"
+  },
+  "adopted_sdk_evidence": {
+    "executed_by": "N1",
+    "code_combination": "固定983b728且仅采用c707df8领域差异，领域文件SHA256与当前相同",
+    "cases": 3,
+    "result": "PASS",
+    "seconds": 6.92,
+    "record": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent/.work/fc02-followup-sdk.xml",
+    "sha256": "ee033971f54b929c90e35c25b3a8f7ea131342a63a6f17ec05e3f77f6749a135",
+    "scope": "默认父查询切换场景、同场景继承、模型来源替换拒绝；没有声明N3重跑；当前公共SDK另行执行"
+  },
+  "current_record": "docs/feature-delivery/FC02/followup-recovery.md",
+  "accepted_candidate_commit": "4d55773baad5aad218771146b98c399041983b5e",
+  "n3_version_confirmation": "PASS",
+  "acceptance_record": "docs/feature-delivery/FC02/acceptance.json",
+  "independent_verdict_snapshot": "docs/feature-delivery/FC02/independent-4d55773.json",
+  "next_feature_id": "FC03",
+  "failure_response_evidence": {
+    "child_source_failed_runtime": "FAILED",
+    "child_source_tool_error": "query_metrics/HTTPGone",
+    "child_source_websocket_response": null,
+    "immediate_error_response_verified": false,
+    "native_client_timeout_ms": 20000,
+    "observed_submission_and_dom_ms": 21022,
+    "observed_duration_is_sla": false,
+    "native_same_page_error_and_original_id_displayed": true,
+    "same_page_read_only_receipt": "FAILED/NOT_FOUND_IN_CURRENT_STORE",
+    "failed_request_replayed": false,
+    "query_count_before_and_after_recovery": 2,
+    "criterion": "E01—E06要求真实终态、失败位置、依赖终止、不伪报成功和原请求恢复；当前通过原生超时/错误提示及只读恢复实际验证，没有即时错误帧通过声明"
+  }
+}

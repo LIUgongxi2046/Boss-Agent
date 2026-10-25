@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "captured_by": "haonan-s000-capture-check/v1",
+  "check_id": "K00",
+  "kind": "STATIC",
+  "baseline_id": "boss-agent-t00-design-20261021",
+  "cwd": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+  "command": [
+    "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.venv/bin/python",
+    "evidence/T00/check_strategy.py"
+  ],
+  "started_at": "2026-10-23T08:14:38.665822+00:00",
+  "ended_at": "2026-10-23T08:14:52.725541+00:00",
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/Boss-Agent需求输入.md",
+      "sha256": "854e6e6d49397874d6ed22583b249d753a3caa84135ad20922fab970af1e11e4"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/Boss-Agent项目计划.md",
+      "sha256": "e41836868e189dd4aea1ceee668c630e7769157f78d286cb6d39704ad669d327"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/项目决策记录.md",
+      "sha256": "73d34aa8916dc65854e279c190ab9254743c63db98d0e4b48873dc3d65050ffc"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/specs/value-validation.json",
+      "sha256": "6970d39b8512bac35e7b7a61399da8f3777a539644167c07d20119ee3113f678"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/README.md",
+      "sha256": "fa26e13fbcf7cf8f7b11af9c1a295bd497e45bf8c0f2f4f9547bcd51c37be9d2"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/计划环境记录.md",
+      "sha256": "4a0fc70f989d7fc3568e30789eeadbd71875830a5e10527448cb9b842eb08b76"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T01/run_design_checks.py",
+      "sha256": "f384a1c95b95c6dc9d013c9c4c47163f9afc58ccedd2c19e872f97be4eb88bd3"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T00/run_design_check.py",
+      "sha256": "83168509d6a8c9a73ea15e549b4bc932b6f09b8b49391498fbfb6bf6059397f0"
+    },
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T00/check_strategy.py",
+      "sha256": "6b41e873b291b4ec6323c6a3dee8c64bdb7c9ba9075710b3c65dc5ddbc3ac2e5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/evidence/T01/w3-20261023-current-design/prerequisite/output.log",
+      "sha256": "5e05905bbafe858f5be8d9ebad5bd87eaa6cb8fb75852ab5fce26e50ef48a6c6"
+    }
+  ]
+}

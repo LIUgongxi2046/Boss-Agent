@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: FC04 经营提醒、规则、读取准备与安全通知返回
+  version: 1.0.0
+  description: 当前本人读取正式经营投影；规则生效、本人决定、会议关联、交办与发送分别核查，模型读取不授予业务权限。
+security: [{BearerAuth: []}]
+paths:
+  /api/boss/ui/business-alerts:
+    get:
+      operationId: currentBusinessAlerts
+      x-role: BOSS
+      parameters:
+        - {name: event_id, in: query, required: false, schema: {type: string, minLength: 1, maxLength: 200}}
+      responses:
+        '200': {description: 当前正式领域详情，来源失效时停止返回原文及派生事实, content: {application/json: {schema: {$ref: './business-alert.schema.json#/$defs/Read'}}}}
+        '400': {description: 额外或重复查询参数}
+        '401': {description: 未认证}
+        '403': {description: 当前本人或范围不符}
+  /api/boss/ui/business-alert-rules:
+    get:
+      operationId: businessAlertRules
+      x-roles: [BOSS, MAINTAINER]
+      responses:
+        '200': {description: 当前角色允许的草稿与生效版本，维护不读取本人自定义正文, content: {application/json: {schema: {$ref: './business-alert.schema.json#/$defs/RuleRead'}}}}
+  /api/boss/ui/admin/business-alert-input:
+    get:
+      operationId: businessAlertInputCatalog
+      x-role: MAINTAINER
+      responses:
+        '200': {description: 获准定义、当前事件版本和业务时钟，无私人正文或本人授权}
+  /api/boss/ui/reminder-preparation:
+    get:
+      operationId: reminderPreparationReceipt
+      x-role: BOSS
+      parameters:
+        - {name: client_request_id, in: query, required: true, schema: {$ref: './product-fc01.openapi.yaml#/components/schemas/Status/properties/client_request_id'}}
+      responses:
+        '200': {description: 原请求状态及当前可采用投影, content: {application/json: {schema: {$ref: '#/components/schemas/Receipt'}}}}
+        '400': {description: 缺少字段、重复或额外参数}
+        '401': {description: 未认证}
+        '403': {description: 当前本人或资料范围不符}
+        '404': {description: 原请求不存在}
+        '409': {description: 当前范围无法读取}
+  /api/boss/ui/notification-target:
+    get:
+      operationId: currentNotificationTarget
+      x-role: BOSS
+      parameters:
+        - {name: event_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
+        - {name: event_version, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
+      responses:
+        '200': {description: 当前已保存通知的无正文目标, content: {application/json: {schema: {$ref: '#/components/schemas/NotificationTarget'}}}}
+        '400': {description: 缺少、重复或额外参数}
+        '401': {description: 未认证}
+        '403': {description: 无本人权限}
+        '404': {description: 事件不存在}
+        '409': {description: 版本变化、取消、关闭、暂缓或尚未形成通知}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
+  schemas:
+    Receipt:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, run_id, request_state, adoption_state, projection_sha256, preparation, write_performed_by_lookup]
+      properties:
+        client_request_id: {$ref: './product-fc01.openapi.yaml#/components/schemas/Status/properties/client_request_id'}
+        run_id: {type: [string, 'null']}
+        request_state: {type: string, description: 复用实际Runtime状态；尚未运行时为PREPARED}
+        adoption_state: {enum: [CURRENT, HISTORICAL_REQUIRES_REQUERY]}
+        projection_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        preparation: {oneOf: [{type: 'null'}, {$ref: '#/components/schemas/Preparation'}]}
+        write_performed_by_lookup: {const: false}
+    Preparation:
+      type: object
+      additionalProperties: false
+      required: [source_type, projection, owner_decision_required, business_authority_granted]
+      properties:
+        source_type: {const: SIMULATED}
+        projection:
+          type: object
+          description: BossWorkspaceAPI当前notifications正式投影，保留领域扩展字段；不另建提醒状态。
+          required: [source_type, namespace, data_version, projection, read_at, events, notifications, reminders, rules, dispatches, business_alerts]
+          properties:
+            source_type: {const: SIMULATED}
+            namespace: {const: ui-check}
+            data_version: {type: string}
+            projection: {const: notifications}
+            read_at: {type: string, format: date-time}
+            events: {type: array, items: {type: object}}
+            notifications: {type: array, items: {type: object}}
+            reminders: {type: array, items: {type: object}}
+            rules: {type: array, items: {type: object}}
+            dispatches: {type: array, items: {type: object}}
+            business_alerts: {$ref: './business-alert.schema.json#/$defs/Read'}
+        owner_decision_required: {const: true}
+        business_authority_granted: {const: false}
+    NotificationTarget:
+      type: object
+      additionalProperties: false
+      required: [source_type, event_id, event_version, category, page_id, notification_saved, system_delivery_verified]
+      properties:
+        source_type: {const: SIMULATED}
+        event_id: {type: string, minLength: 1}
+        event_version: {type: string, minLength: 1}
+        category: {const: 经营提醒}
+        page_id: {const: F02}
+        notification_saved: {const: true}
+        system_delivery_verified: {const: false}
+x-websocket-operations:
+  - {action: boss.simulation.alert.load, role: MAINTAINER, input: './business-alert.schema.json#/$defs/Load', output: './business-alert.schema.json#/$defs/LoadResult', replay_after_reconnect: false}
+  - {actions: [boss.alert.ack, boss.alert.close], role: BOSS, input: './business-alert.schema.json#/$defs/Decision', output: './business-alert.schema.json#/$defs/ActionResult', replay_after_reconnect: false}
+  - {action: boss.alert.snooze, role: BOSS, input: './business-alert.schema.json#/$defs/Snooze', output: './business-alert.schema.json#/$defs/ActionResult', replay_after_reconnect: false}
+  - {action: boss.alert.meeting.link, role: BOSS, input: './business-alert.schema.json#/$defs/MeetingLink', output: './business-alert.schema.json#/$defs/ActionResult', replay_after_reconnect: false}
+  - {action: boss.alert.assignment.create, role: BOSS, input: './business-alert.schema.json#/$defs/Assignment', output: './business-alert.schema.json#/$defs/ActionResult', replay_after_reconnect: false}
+  - {prefixes: [boss.alert.rule., boss.simulation.alert.rule.], roles: [BOSS, MAINTAINER], actions: {save: RuleSave, validate: RuleVersion, activate: RuleActivate, disable: RuleVersion}, schema: './business-alert.schema.json', replay_after_reconnect: false}
+  - {operationId: reminderPrepare, action: boss.reminder.prepare, role: BOSS, input: './product-fc01.openapi.yaml#/components/schemas/Status', output: '#/components/schemas/Receipt', replay_after_reconnect: false}
+x-runtime-policy:
+  provider: SIMULATED
+  tools: [bossWorkspaceRead]
+  allowed_projections: [notifications]
+  trusted_binding: authenticated owner and dataset/version plus current projection digest
+  owner_authorization: preparation does not create owner decisions or schedule execution
+  unknown_usage: null
+  unknown_cost: null
+x-desktop-capabilities:
+  notify_event: current BOSS token plus event_id/event_version; backend revalidates saved notification before requesting native display
+  retry_notification: explicit owner request for a native FAILED result only; current target is revalidated, no automatic retry
+  notification_status: native observed state only; explicit system refusal is DENIED_BY_SYSTEM, unavailable permission information is NOT_REPORTED_BY_SYSTEM
+  notification_open: renderer revalidates current BOSS token and object before navigation; no private body enters native notification

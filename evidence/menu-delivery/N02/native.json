@@ -1,0 +1,201 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-n02-native-d4b10e8a-4dda-42ee-8039-6522ffdf3e47",
+  "ports": {
+    "business": 10761,
+    "webui": 10762,
+    "gateway": 20761
+  },
+  "manifest_sha256": "b2b0d845349e0a87d5263a501f2821c4e6a64223bcca37e2d7443c7e5166d6b4",
+  "scope": "N02_PUBLIC_NATIVE_CONVERSATION",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "actual_public_native_three_turns_input_dependent_parameters_single_runtime",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
+      "session_id": "websocket:7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
+      "runs": [
+        {
+          "run_id": "run-8a92e482-4d82-4b4e-b14d-ef595d24c8cc",
+          "source_id": "finance-note",
+          "version": "1"
+        },
+        {
+          "run_id": "run-d0865dd9-3821-4141-ba16-e27619fb5119",
+          "source_id": "meeting-minutes",
+          "version": "1"
+        },
+        {
+          "run_id": "run-b4895dda-e1e3-472e-8771-fdf4de9daaab",
+          "source_id": "meeting-minutes",
+          "version": "1"
+        }
+      ]
+    },
+    {
+      "check": "public_original_turn_deduplication_unknown_lookup_and_actual_document_upload",
+      "original_request_id": "conversation-bce183145bb08cd0a9d0d39daf86941dad01e88e453be96c23f203e526c3faed",
+      "duplicate_replayed": false,
+      "unknown_write": false,
+      "file_run_id": "run-4ddf00bf-6eb4-4cdf-a84d-fdec25c01959",
+      "attachment_id": "attachment-c13a7e0b69c3d1a9157e042497ec04af2b9b863ec2ec6295c5346e02086d2b5b",
+      "content_sha256": "13d6488075fad82313ea8a7a2c89fd611b0f36ccac176282cc918c204243fb7f",
+      "waiting_run_id": "run-642ec698-d89e-4b89-ada0-bb09c27d5e94",
+      "continued_run_id": "run-b319973c-baa6-4e07-ab5e-68146d7b60a8"
+    },
+    {
+      "check": "public_attachment_only_required_inputs_actual_query_scope_and_followup",
+      "attachment_only_run_id": "run-f9b19d63-49bc-405b-9d9c-1e8109a18d96",
+      "missing_conditions_run_id": "run-5f8e5341-9095-4bbb-afe3-27fcb72aec1c",
+      "query_id": "9d4d5069-5b57-430f-978f-31250d64c15d",
+      "followup_query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
+      "parent_query_id": "9d4d5069-5b57-430f-978f-31250d64c15d",
+      "first_parameters_sha256": "4e36eeeddcdaa9b48641c1c73cec7bf93c37f12e8f433665a68c686dc55b024c",
+      "followup_parameters_sha256": "00f3074dfabeccb5af8d98193e46e74ef1ef9af441cdb168f05560063acaa730",
+      "current_reference": {
+        "id": "finance-note",
+        "recorded_version": "1",
+        "current_version": "1",
+        "adoption_state": "CURRENT"
+      },
+      "write_authorization_granted": false
+    },
+    {
+      "check": "current_reference_metadata_query_full_values_and_dialog_focus_return",
+      "query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
+      "value_count": 3,
+      "focus_restored": true
+    },
+    {
+      "check": "actual_native_history_selection_and_ordinary_storage_privacy",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
+      "history_question_preserved": true,
+      "private_input_in_ordinary_storage": false
+    },
+    {
+      "check": "shared_message_draft_current_owner_send_reply_and_original_conversation_return",
+      "draft_id": "draft-72e19abc-afa4-4790-be57-e807578fce88",
+      "message_id": "sim-msg-86dbb4cb-c66b-4e2a-a633-57326623a8dc",
+      "reply_to": "sim-msg-86dbb4cb-c66b-4e2a-a633-57326623a8dc",
+      "delivery_state": "NOT_VERIFIED",
+      "reply_state": "RECEIVED_SIMULATED",
+      "send_count": 1,
+      "external_channel_invoked": false,
+      "return_focus_restored": true,
+      "return_selection_restored": true,
+      "return_scroll_restored": true,
+      "message_runtime_run_id": "run-8f21dd32-a334-4ab3-a8c7-1f2d40aaf65d"
+    },
+    {
+      "check": "actual_query_artifact_source_original_and_conversation_return",
+      "query_id": "ca1fafba-bc89-41c1-bd0b-7cb24559861d",
+      "source_id": "finance-note",
+      "return_focus_restored": true,
+      "return_selection_restored": true,
+      "return_scroll_restored": true
+    },
+    {
+      "check": "shared_assignment_missing_conditions_cancel_owner_create_and_native_binding",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
+      "version": "1",
+      "task_status": "OPEN",
+      "task_runtime_run_id": "run-2f87ae97-5f1b-43ac-8cde-525134e380a0",
+      "prepare_and_cancel_created_task": false,
+      "creation_sent_message": false,
+      "run_finished_task": false,
+      "return_focus_restored": true
+    },
+    {
+      "check": "actual_task_tool_reference_artifact_details_and_conversation_return",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
+      "recorded_version": "1",
+      "current_version": "1",
+      "return_focus_restored": true,
+      "return_selection_restored": true,
+      "return_scroll_restored": true
+    },
+    {
+      "check": "actual_public_task_preparation_saved_native_session_binding_and_readonly_receipt",
+      "client_request_id": "59591059-50d8-474c-b783-cf6ced7fe5bb",
+      "preparation_id": "task-entry-6484e71fb8fe2f839c08612c48682284f4a247ff48cdb02323ca2cf0e74d8b06",
+      "chat_id": "d540384a-bf59-4da3-90d4-fef832a643cc",
+      "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
+      "task_version": "1",
+      "return_reference": {
+        "page_id": "F06",
+        "task_id": "d3d19b47-964d-4a96-9900-34541337102d",
+        "task_version": "1"
+      },
+      "metadata_only": true,
+      "runtime_count": 0,
+      "duplicate_binding_reused": true,
+      "old_conversation_unbound": true,
+      "unattached_and_maintenance_rejected": true,
+      "used_conversation_rejected": true
+    },
+    {
+      "check": "actual_configuration_preparation_failure_original_request_history_and_permission",
+      "failed_client_request_id": "conversation-dcba1dd3d8d9bb416cbed35cc10c9392af6b8e3376bafd6c0b9d6c4fffc90ca8",
+      "failed_run_id": null,
+      "request_count": 15,
+      "lookup_replayed": false,
+      "maintenance_and_unattached_rejected": true
+    },
+    {
+      "check": "same_database_service_restart_preserves_original_native_history_runtime_and_file",
+      "chat_id": "7e5cd1a4-3ffb-4170-85e3-75ca6afe3e6f",
+      "run_ids": [
+        "run-8a92e482-4d82-4b4e-b14d-ef595d24c8cc",
+        "run-d0865dd9-3821-4141-ba16-e27619fb5119",
+        "run-b4895dda-e1e3-472e-8771-fdf4de9daaab",
+        "run-4ddf00bf-6eb4-4cdf-a84d-fdec25c01959",
+        "run-642ec698-d89e-4b89-ada0-bb09c27d5e94",
+        "run-b319973c-baa6-4e07-ab5e-68146d7b60a8",
+        "run-f9b19d63-49bc-405b-9d9c-1e8109a18d96",
+        "run-692ebb0b-09e4-48fc-8e25-06f2f1b43177",
+        "run-5f8e5341-9095-4bbb-afe3-27fcb72aec1c",
+        "run-bff1978b-db50-404d-8651-a82f1c64fe76",
+        "run-44ba2c83-2120-4d56-bc45-a1fadc4fcdbd",
+        "run-8f21dd32-a334-4ab3-a8c7-1f2d40aaf65d",
+        "run-2f87ae97-5f1b-43ac-8cde-525134e380a0",
+        "run-3bf67fc6-e8ec-47fa-9a5e-c0db5c457bca"
+      ],
+      "original_request_id": "conversation-bce183145bb08cd0a9d0d39daf86941dad01e88e453be96c23f203e526c3faed",
+      "original_request_count": 15,
+      "lookup_replayed": false
+    },
+    {
+      "check": "actual_public_runtime_current_strict_schema",
+      "status": "PASS",
+      "schema_id": "urn:boss-agent:runtime-records:1.13.0",
+      "runtime_count": 14,
+      "tool_scopes": [
+        [
+          "bossDashboardRead",
+          "bossEvidenceRead",
+          "bossMeetingsRead",
+          "bossTasksRead",
+          "bossWorkspaceRead",
+          "conversationRead",
+          "query_metrics"
+        ]
+      ],
+      "configuration_versions": [
+        "2",
+        "4"
+      ],
+      "active_tool_scope": [
+        "bossDashboardRead",
+        "bossEvidenceRead",
+        "bossMeetingsRead",
+        "bossTasksRead",
+        "bossWorkspaceRead",
+        "conversationRead",
+        "query_metrics"
+      ],
+      "active_configuration_version": "4"
+    }
+  ]
+}

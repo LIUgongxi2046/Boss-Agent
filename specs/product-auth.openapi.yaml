@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Boss Agent 公共本机账号认证扩展
+  version: 0.1.0
+  description: 本机账号核验与固定nanobot0.3.5会话机制，T06正式接收待完成。
+x-reception: {state: IN_REVIEW, owner: N3, receiver: N1/T06, core_version: 1.8.0}
+paths:
+  /webui/bootstrap:
+    get:
+      operationId: productAccountBootstrap
+      description: 三项账号headers同时提供，或者使用仍有效的Bearer API token刷新；拒绝查询参数、外部Origin及旧内部secret。账号身份由本机数据库确定，客户端入口仅限制所选身份。
+      security:
+        - AccountUsername: []
+          AccountPassword: []
+          AccountRole: []
+        - ApiToken: []
+      responses:
+        '200':
+          description: 原生会话与当前传输能力，Cache-Control为no-store；没有模型调用
+          headers:
+            Cache-Control: {schema: {const: no-store}}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Bootstrap'}
+        '401': {description: 账号、密码、入口、Origin、查询参数或原令牌无效}
+        '429': {description: 原生令牌数量达到当前限制}
+  /api/boss/identity:
+    get:
+      operationId: productAccountIdentity
+      security: [{ApiToken: []}]
+      responses:
+        '200':
+          description: 当前服务端已认证角色
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Identity'}
+        '401': {description: 令牌缺少、过期或已经撤销}
+        '403': {description: 没有当前身份范围}
+components:
+  securitySchemes:
+    AccountUsername: {type: apiKey, in: header, name: X-Boss-Username}
+    AccountPassword: {type: apiKey, in: header, name: X-Boss-Password}
+    AccountRole: {type: apiKey, in: header, name: X-Boss-Role, description: BOSS或MAINTAINER}
+    ApiToken: {type: http, scheme: bearer}
+  schemas:
+    Identity:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [role, owner_id]
+          properties: {role: {const: BOSS}, owner_id: {const: boss-1}}
+        - type: object
+          additionalProperties: false
+          required: [role, owner_id]
+          properties: {role: {const: MAINTAINER}, owner_id: {type: 'null'}}
+    Bootstrap:
+      type: object
+      additionalProperties: false
+      required: [token, api_token, terminal, ws_path, ws_url, expires_in, limits, model_name, runtime_surface, runtime_capabilities]
+      properties:
+        token: {type: string, minLength: 1, readOnly: true}
+        api_token: {type: string, minLength: 1, readOnly: true}
+        terminal:
+          type: object
+          additionalProperties: false
+          required: [protocolVersion, gatewayId]
+          properties: {protocolVersion: {const: 1}, gatewayId: {type: string, minLength: 1}}
+        ws_path: {type: string, minLength: 1}
+        ws_url: {type: [string, 'null']}
+        expires_in: {type: integer, minimum: 1}
+        model_name: {type: [string, 'null']}
+        runtime_surface: {enum: [browser, native]}
+        runtime_capabilities:
+          type: object
+          additionalProperties: false
+          required: [can_restart_engine, can_pick_folder, can_open_logs, can_export_diagnostics]
+          properties:
+            can_restart_engine: {type: boolean}
+            can_pick_folder: {type: boolean}
+            can_open_logs: {type: boolean}
+            can_export_diagnostics: {type: boolean}
+        limits:
+          type: object
+          additionalProperties: false
+          required: [transport, message, attachments]
+          properties:
+            transport:
+              type: object
+              additionalProperties: false
+              required: [max_frame_bytes, envelope_reserve_bytes]
+              properties: {max_frame_bytes: {type: integer, minimum: 1}, envelope_reserve_bytes: {type: integer, minimum: 0}}
+            message:
+              type: object
+              additionalProperties: false
+              required: [max_text_bytes]
+              properties: {max_text_bytes: {type: integer, minimum: 0}}
+            attachments:
+              type: object
+              additionalProperties: false
+              required: [max_count, max_file_bytes, max_total_bytes]
+              properties:
+                max_count: {type: integer, minimum: 0}
+                max_file_bytes: {type: integer, minimum: 0}
+                max_total_bytes: {type: integer, minimum: 0}
+    LogoutResult:
+      type: object
+      additionalProperties: false
+      required: [signed_out]
+      properties: {signed_out: {const: true}}
+x-websocket-operations:
+  boss.auth.logout:
+    role: [BOSS, MAINTAINER]
+    request_payload: {type: object, description: 当前页面提交空对象；身份由连接确定}
+    response_schema: '#/components/schemas/LogoutResult'
+    effect: 撤销当前身份全部api_tokens和issued_tokens及对应角色关联，关闭同一身份的本机连接；业务记录保持
+    automatic_business_replay: false

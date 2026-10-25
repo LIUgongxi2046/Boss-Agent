@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:assignment-extension:1.0.0",
+  "$defs": {
+    "Id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "Version": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+    "DecisionInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "task_id", "task_version", "feedback_id", "decision", "due_at", "reason"],
+      "properties": {
+        "client_request_id": {"$ref": "#/$defs/Id"}, "task_id": {"$ref": "#/$defs/Id"}, "task_version": {"$ref": "#/$defs/Version"},
+        "feedback_id": {"$ref": "#/$defs/Id"}, "decision": {"enum": ["APPROVE", "REJECT"]},
+        "due_at": {"type": ["string", "null"], "format": "date-time"}, "reason": {"type": "string", "minLength": 1, "maxLength": 500}
+      },
+      "allOf": [{"if": {"properties": {"decision": {"const": "APPROVE"}}}, "then": {"properties": {"due_at": {"type": "string"}}}, "else": {"properties": {"due_at": {"type": "null"}}}}]
+    },
+    "Result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_type", "task_id", "version", "status", "decision_id", "decision", "feedback_id", "old_due_at", "due_at", "authorization_id", "task_due_event"],
+      "properties": {
+        "source_type": {"const": "SIMULATED"}, "task_id": {"$ref": "#/$defs/Id"}, "version": {"$ref": "#/$defs/Version"}, "status": {"enum": ["WAITING_FEEDBACK", "IN_PROGRESS", "RESULT_SUBMITTED"]},
+        "decision_id": {"$ref": "#/$defs/Id"}, "decision": {"enum": ["APPROVE", "REJECT"]}, "feedback_id": {"$ref": "#/$defs/Id"},
+        "old_due_at": {"type": "string", "format": "date-time"}, "due_at": {"type": "string", "format": "date-time"},
+        "authorization_id": {"$ref": "#/$defs/Id"}, "task_due_event": {"type": ["object", "null"]}
+      }
+    }
+  }
+}

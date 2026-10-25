@@ -1,20 +1,28 @@
+import argparse
 import asyncio
 import copy
 import hashlib
 import json
 import os
+import sys
 import uuid
 from pathlib import Path
+
+from loguru import logger
+from aiohttp import web
 
 from nanobot import Nanobot, RuntimeContextBlock
 from nanobot.agent.hook import AgentHook
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.base import Tool
+from nanobot.agent.tools.context import current_request_context
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.loader import load_config, resolve_config_env_vars
 
-from business import OPERATIONS, ROOT, SPEC, Store, encode, now
+from business import OPERATIONS, ROOT, SPEC, Store, encode, now, require
 from connection import RecordedProvider, settings
+from boss_runtime_records import ATTRIBUTE, RuntimeBinding
+from boss_source_policy import source_validity
 
 
 class BusinessTool(Tool):
@@ -28,21 +36,47 @@ class BusinessTool(Tool):
 
     @property
     def description(self):
-        return {"query_metrics": "查询已授权经营明细并计算指标。", "read_evidence": "读取已有查询对应的原始资料和明细。", "create_assignment": "按当前老板授权创建交办。", "send_assignment": "按当前老板授权模拟发送交办。", "read_assignment": "重新查询交办的正式状态。"}[self.operation]
+        return {"query_metrics": "查询当前获准经营明细并计算指标，保存当前来源绑定并返回新的query_id。", "read_evidence": "读取已有查询对应的当前原始资料和明细。来源变化或查询缺少绑定时返回409，须重新query_metrics取得新query_id；撤销或到期来源停止采用。", "create_assignment": "按当前老板授权创建交办，校验来源、负责人及有效期限，并保存创建时来源绑定。", "send_assignment": "按当前老板授权模拟发送交办，重新核查创建时来源和当前负责人；来源变化或缺少绑定时停止，已提交结果查询原请求回执。", "read_assignment": "重新查询交办的正式状态；读取状态不产生本人完成授权。"}[self.operation]
 
     @property
     def parameters(self):
         ref = OPERATIONS[self.operation]["input_schema"].rsplit("/", 1)[1]
-        schema = copy.deepcopy(SPEC["io_schema"]["$defs"][ref])
+        definitions = copy.deepcopy(SPEC["io_schema"]["$defs"])
         injected = {"envelope", "authorization_id", "idempotency_key"}
-        schema["properties"] = {k: v for k, v in schema["properties"].items() if k not in injected}
-        schema["required"] = [k for k in schema["required"] if k not in injected]
-        schema["$defs"] = {"identifier": SPEC["io_schema"]["$defs"]["identifier"]}
-        return schema
+        for name in (ref, "legacy_query_input", "scoped_query_input"):
+            definition = definitions.get(name)
+            if definition is not None and "properties" in definition:
+                definition["properties"] = {key: value for key, value in definition["properties"].items() if key not in injected}
+                definition["required"] = [key for key in definition.get("required", []) if key not in injected]
+        return {"$ref": "#/$defs/" + ref, "$defs": definitions}
 
     async def execute(self, **kwargs):
-        payload = {**kwargs, "envelope": self.envelope, **self.bindings.get(self.operation, {})}
+        envelope = self.envelope
+        request = current_request_context()
+        binding = request.attributes.get(ATTRIBUTE) if request is not None else None
+        if binding is not None:
+            if not isinstance(binding, RuntimeBinding) or binding.recorder.namespace != envelope["execution_namespace"] or binding.recorder.store.path.resolve() != self.store.path.resolve():
+                raise ValueError("工具与当前运行的执行空间不符")
+            envelope = {**envelope, "request_id": binding.request_id, "session_id": binding.session_id}
+        payload = {**kwargs, "envelope": envelope, **self.bindings.get(self.operation, {})}
         result = self.store.invoke(self.operation, payload)
+        if self.operation in {"query_metrics", "read_evidence"}:
+            with self.store.connect() as db:
+                db.execute("BEGIN")
+                namespace = envelope["execution_namespace"]
+                self.store.active(db, namespace)
+                owner = self.store.get(db, namespace, "initial", "snapshot")["owner_id"]
+                clock = self.store.get(db, namespace, "clock", "current")["at"]
+                for source in result["sources"]:
+                    document = self.store.get(db, namespace, "document", source["source_id"])
+                    require(document.get("access_scope") == owner and document.get("source_type") == source["source_type"] == "SIMULATED",
+                            "模型来源超出当前访问范围", web.HTTPForbidden)
+                    require(document["version"] == source["version"], "返回来源版本与当前资料不符，需要重读")
+                    require(source_validity(document, clock) == "VALID", "当前来源不能作为模型依据")
+                for original in result.get("original_records", []):
+                    content = original["content"]
+                    if isinstance(content, dict) and "source_id" in content:
+                        require(original["version"] == content["version"], "原文记录与引用版本不符")
         self.records.append({"type": "tool", "name": self.operation, "input": payload, "output": result, "at": now()})
         return encode(result)
 
@@ -81,10 +115,12 @@ class Audit(AgentHook):
         raise RuntimeError("业务工具执行失败")
 
 
-async def run_once(model, iteration):
+async def run_once(model, iteration, *, task_id="T02"):
+    if task_id not in {"T02", "T16"}:
+        raise ValueError("检查任务标识无效")
     run_id = f"deepseek-{iteration}-{uuid.uuid4()}"
     work = ROOT / ".work" / run_id
-    output = ROOT.parent / "evidence/T02" / run_id
+    output = ROOT.parent / "evidence" / task_id / run_id
     work.mkdir(parents=True)
     output.mkdir(parents=True)
     input_files = [ROOT / "model_probe.py", ROOT / "business.py", ROOT / "connection.py", ROOT / "uv.lock", ROOT.parent / "specs/selection-probe.json"]
@@ -96,7 +132,7 @@ async def run_once(model, iteration):
     config_path.write_text(encode({"agents": {"defaults": {"provider": "deepseek", "model": model, "workspace": str(work / "workspace"), "maxToolIterations": 12, "maxTokens": 4096, "dream": {"enabled": False}, "idleCompactAfterMinutes": 0, "timezone": "Asia/Shanghai"}}, "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": os.environ["DEEPSEEK_BASE_URL"], "extraBody": {"thinking": {"type": "disabled"}}}}, "gateway": {"heartbeat": {"enabled": False}}, "tools": {"restrictToWorkspace": True}}))
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
     registry = ToolRegistry()
-    provider = RecordedProvider(settings(), output / "http-requests.json")
+    provider = RecordedProvider(settings(), output / "http-requests.json", redact_payload=task_id == "T16")
     provider.generation = config.resolve_preset().to_generation_settings()
     loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider)
     for name in list(registry.tool_names):
@@ -145,17 +181,17 @@ async def run_once(model, iteration):
         response_ids = sorted({record["response_id"] for record in provider.requests if record.get("response_id")})
         assert response_ids, "服务响应标识缺少"
         assert all(hashlib.sha256(path.read_bytes()).hexdigest() == inputs[str(path.relative_to(ROOT.parent))] for path in input_files), "模型检查期间输入文件发生变化"
-        (output / "result.json").write_text(json.dumps({"status": "PASS", "scope": "SDK 共同任务；完整 A02 仍需其他断言", "provider": "deepseek", "model_id": model, "observed_api_type": "chat_completions", "transport_evidence": "http-requests.json", "baseline": baseline, "state": saved, "cost": None, "at": now()}, ensure_ascii=False, indent=2))
+        (output / "result.json").write_text(json.dumps({"status": "PASS", "scope": "SDK 共同任务；完整 " + ("A16" if task_id == "T16" else "A02") + " 仍需其他断言", "provider": "deepseek", "model_id": model, "observed_api_type": "chat_completions", "transport_evidence": "http-requests.json", "baseline": baseline, "state": saved, "cost": None, "at": now()}, ensure_ascii=False, indent=2))
         print(json.dumps({"run_id": run_id, "status": "PASS", "evidence": str(output)}, ensure_ascii=False))
 
 
-async def main():
+async def main(task_id="T02"):
     settings()
     required = ("DEEPSEEK_API_KEY", "DEEPSEEK_MODEL", "DEEPSEEK_BASE_URL")
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
         result = {"status": "BLOCKED", "provider": "deepseek", "request_sent": False, "missing_configuration": missing, "usage": None, "cost": None, "at": now()}
-        output = ROOT.parent / "evidence/T02"
+        output = ROOT.parent / "evidence" / task_id
         output.mkdir(parents=True, exist_ok=True)
         content = json.dumps(result, ensure_ascii=False, indent=2)
         (output / ("model-preflight-" + str(uuid.uuid4()) + ".json")).write_text(content)
@@ -164,8 +200,14 @@ async def main():
     if os.environ["DEEPSEEK_MODEL"] != "deepseek-flash":
         raise ValueError("当前接入定义仅核查 deepseek-flash；其他型号需要重新核查实际协议")
     for iteration in range(2):
-        await run_once(os.environ["DEEPSEEK_MODEL"], iteration)
+        await run_once(os.environ["DEEPSEEK_MODEL"], iteration, task_id=task_id)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--task-id", choices=("T02", "T16"), default="T02")
+    arguments = parser.parse_args()
+    if arguments.task_id == "T16":
+        logger.remove()
+        logger.add(sys.stderr, level="WARNING", diagnose=False, backtrace=False)
+    asyncio.run(main(arguments.task_id))

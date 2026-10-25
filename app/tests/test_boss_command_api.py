@@ -121,7 +121,7 @@ def test_invalid_reference_and_outdated_source_never_create(demo):
         code, _ = demo.execute("BOSS", "boss.assignment.create", create_input(key, **changed))
         assert code == 400, key
     demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
-    assert demo.execute("BOSS", "boss.assignment.create", create_input("after-withdraw"))[0] == 403
+    assert demo.execute("BOSS", "boss.assignment.create", create_input("after-withdraw"))[0] == 410
     with demo.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0] == 0
 
@@ -192,7 +192,7 @@ def test_complete_requires_feedback_evidence_and_explicit_owner(demo):
         assert task["completion_authorization_id"] == completed["authorization_id"]
 
 
-def test_cancel_preserves_sent_message_and_blocks_late_feedback(demo):
+def test_cancel_preserves_sent_message_and_records_late_feedback_as_history(demo):
     created = create(demo)
     sent = demo.execute("BOSS", "boss.assignment.send", send_input(created))[1]
     status, canceled = demo.execute("BOSS", "boss.assignment.cancel", {
@@ -205,12 +205,16 @@ def test_cancel_preserves_sent_message_and_blocks_late_feedback(demo):
     assert canceled["status"] == "CANCELED"
     assert canceled["authorization_id"]
     assert canceled["previous_message_ids"] == [sent["message_id"]]
-    assert demo.execute("MAINTAINER", "boss.simulation.feedback", feedback_input({
+    status, feedback = demo.execute("MAINTAINER", "boss.simulation.feedback", feedback_input({
         "task_id": created["task_id"], "version": canceled["version"]
-    }))[0] == 409
+    }))
+    assert status == 200
+    assert feedback["historical_only"] is True
+    assert feedback["task"]["status"] == "CANCELED"
     with demo.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 1
         assert demo.store.get(db, "ui-check", "task", created["task_id"])["cancellation_authorization_id"] == canceled["authorization_id"]
+        assert demo.store.get(db, "ui-check", "event", "task-due:" + created["task_id"])["state"] == "CANCELED"
 
 
 def test_progress_and_extension_request_do_not_change_due_automatically(demo):
@@ -256,7 +260,7 @@ def test_source_withdrawn_after_create_prevents_send(demo):
     created = create(demo)
     demo.store.control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
     status, _ = demo.execute("BOSS", "boss.assignment.send", send_input(created))
-    assert status == 403
+    assert status == 410
     with demo.store.connect() as db:
         task = demo.store.get(db, "ui-check", "task", created["task_id"])
         assert task["status"] == "OPEN"
@@ -286,7 +290,7 @@ def test_completed_evidence_withdrawn_before_owner_confirmation_is_blocked(demo)
         "task_version": response["task"]["version"],
         "feedback_id": response["feedback_id"],
     })
-    assert code == 403
+    assert code == 410
     with demo.store.connect() as db:
         assert demo.store.get(db, "ui-check", "task", created["task_id"])["status"] == "RESULT_SUBMITTED"
 

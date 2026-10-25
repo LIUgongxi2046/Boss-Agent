@@ -1,0 +1,277 @@
+{
+  "status": "PASS_PUBLIC_ACCOUNT_LOGIN_ROLES_BRANDING_AND_RESTART",
+  "run_id": "account-public-8be5224e-aa1b-42cb-abe1-e0e1dfbf0716",
+  "at": "2026-10-23T12:19:05.094Z",
+  "application_directory": "validation/.work/account-public-8be5224e-aa1b-42cb-abe1-e0e1dfbf0716",
+  "inputs": [
+    {
+      "path": "app/webui/BossLogin.tsx",
+      "sha256": "7bd7ed92859ed291252f777b7a3a0d678072601c2012044af3659a9ea5e00b8e"
+    },
+    {
+      "path": "app/webui/boss-login.css",
+      "sha256": "c2572f06a2d14dea2c6edf87a25ec3bb18171196fa827ab2c0a18549ccb1bbef"
+    },
+    {
+      "path": "app/webui/BossDesktop.tsx",
+      "sha256": "d2a0d2c8516140e82daf5d8e4255515a82ad3d0dfd409966f85ddaad244f4639"
+    },
+    {
+      "path": "validation/application.py",
+      "sha256": "e33b76d8791810c0493607e6c79fe8ed28674de1c605b0df618d18cca0243e6c"
+    },
+    {
+      "path": "validation/boss_account_auth.py",
+      "sha256": "a8e4f0851ecfa82bd99abdf7ba08694af231fd25a3e8868898bc77e994d84d6d"
+    },
+    {
+      "path": "validation/role_channel.py",
+      "sha256": "0284cd1c76fd5a88153990a9051b2764fa6c2794cc8766c67aa5b32b8c174ba9"
+    },
+    {
+      "path": "validation/desktop/main.cjs",
+      "sha256": "199c56bfc5b33460cb04985931ea1fce918c0c10ca90f668e7eb57d543bcda90"
+    },
+    {
+      "path": "validation/desktop/branding.cjs",
+      "sha256": "3292dce1a14e0788318295d6db8115875a2d1069b080bcd6b39688aef735d710"
+    },
+    {
+      "path": "validation/desktop/account-access.cjs",
+      "sha256": "4a51b580e52b3e0b4f8b324c72b636f3034d7dd7633e64ef42d57ccc4b63a604"
+    },
+    {
+      "path": "validation/desktop/check-account-public.cjs",
+      "sha256": "a927cf3d712f20ead74c9b09e97213fbecb51fe3f4508823fa26268cd8f416c5"
+    },
+    {
+      "path": "validation/pyproject.toml",
+      "sha256": "229a744589f8ef3e6ae8683824074f627935686aebb4d8f802381a19bdefb5f1"
+    },
+    {
+      "path": "validation/uv.lock",
+      "sha256": "b3ac0a15d7d642d8abe44c775684031015c3740c9ad7e9a4cc68f958c2a8035c"
+    },
+    {
+      "path": "validation/check_product_access.py",
+      "sha256": "829ad9828c816f96ff811e4d948bc919802c2760902736e6e696968cb1deb778"
+    },
+    {
+      "path": ".work/product/nanobot/nanobot/web/dist/asset-manifest.json",
+      "sha256": "199824707145d41aaba4d6e9226fcbffe9d41af5299f0027ce0c9bdc580416a3"
+    }
+  ],
+  "records": [
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 1,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1024,
+        "bottom": 768,
+        "width": 1024,
+        "height": 768,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 1,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1280,
+        "bottom": 800,
+        "width": 1280,
+        "height": 800,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 1,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 1440,
+        "bottom": 1024,
+        "width": 1440,
+        "height": 1024,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 2,
+      "size": [
+        1024,
+        768
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 512,
+        "bottom": 384,
+        "width": 512,
+        "height": 384,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 2,
+      "size": [
+        1280,
+        800
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 640,
+        "bottom": 400,
+        "width": 640,
+        "height": 400,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_login_native_viewport",
+      "zoom": 2,
+      "size": [
+        1440,
+        1024
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "right": 720,
+        "bottom": 512,
+        "width": 720,
+        "height": 512,
+        "horizontal_overflow": false
+      }
+    },
+    {
+      "check": "public_account_owner_maintenance_roles_reload_and_logout",
+      "legacy_secret": 401,
+      "owner_technical": 403,
+      "maintenance_business": 403,
+      "old_token": 401,
+      "password_absent_from_browser_storage": true,
+      "native_brand": {
+        "name": "Boss Agent",
+        "title": "Boss Agent"
+      }
+    },
+    {
+      "check": "current_command_line_authentication_and_cross_role_access",
+      "result": {
+        "checks": [
+          {
+            "route": "/webui/bootstrap",
+            "role": "UNAUTHENTICATED",
+            "status": 401
+          },
+          {
+            "route": "/api/boss/identity",
+            "role": "UNAUTHENTICATED",
+            "status": 401
+          },
+          {
+            "route": "/api/boss/ui/dashboard",
+            "role": "UNAUTHENTICATED",
+            "status": 401
+          },
+          {
+            "route": "/api/boss/ui/dashboard",
+            "role": "BOSS",
+            "status": 200
+          },
+          {
+            "route": "/webui/bootstrap",
+            "role": "EXTERNAL_CONTACT",
+            "status": 401
+          },
+          {
+            "route": "/api/boss/ui/admin/memory-status",
+            "role": "BOSS",
+            "status": 403
+          },
+          {
+            "action": "boss.simulation.feedback",
+            "role": "BOSS",
+            "status": 403
+          },
+          {
+            "action": "boss.auth.logout",
+            "role": "BOSS",
+            "status": 401
+          },
+          {
+            "route": "/api/boss/ui/dashboard",
+            "role": "MAINTAINER",
+            "status": 403
+          },
+          {
+            "route": "/api/boss/ui/admin/memory-status",
+            "role": "MAINTAINER",
+            "status": 200
+          },
+          {
+            "action": "boss.assignment.create",
+            "role": "MAINTAINER",
+            "status": 403
+          },
+          {
+            "action": "boss.auth.logout",
+            "role": "MAINTAINER",
+            "status": 401
+          }
+        ],
+        "application_directory": ".work/account-public-8be5224e-aa1b-42cb-abe1-e0e1dfbf0716",
+        "model_invoked": false,
+        "business_write": false,
+        "visual_acceptance": "NOT_RUN"
+      }
+    },
+    {
+      "check": "public_restart_credentials_and_business_data_continuity",
+      "account_database_sha256": "eaad42666e01065b1f311ae4c310e751101b3d20c26da6f02091560d16beeabb",
+      "business_tables_sha256": {
+        "objects": "2ed8651de633df5e1643eb98d9a03baa17706d3fac1607423cedbd255838acdc",
+        "idempotency": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "audit": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "spaces": "d798685ccca71422816488e1fc0f955702c1339f3b17788f8808e2a621c47714",
+        "knowledge": "ab1e289dce9b5b4071db0519d24b32abdb34efcbaba3da4566f7d880ce75794f"
+      },
+      "initial_snapshot_sha256": "75e5c19645f0e7cd1f5036a0a441de0a1a59c8eb1b9d1be5137ef0414eb2f345",
+      "previous_token": 401,
+      "renderer_errors": [],
+      "password_absent_from_access_audit": true
+    }
+  ],
+  "ports": {
+    "business": 8971,
+    "webui": 8972,
+    "gateway": 18971
+  },
+  "external_api_mode": "SIMULATED_FIRST",
+  "model_requested": false,
+  "external_delivery_requested": false,
+  "credentials_recorded": false,
+  "visual_acceptance": "NOT_RUN",
+  "full_A11_A27_accepted": false
+}

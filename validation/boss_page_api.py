@@ -12,11 +12,28 @@ from pathlib import Path
 from urllib.parse import parse_qs
 from aiohttp import web
 
-from business import now
+from business import now, require
 from boss_workspace_api import BossWorkspaceAPI
 from boss_sector_api import BossSectorAPI
 from boss_recovery_api import BossRecoveryAPI
 from boss_owner_preferences import owner_profile
+from boss_admin_config import memory_technical_status, prompt_technical_status
+from boss_owner_plans import OwnerPlansAPI
+from boss_today import TodayAPI
+from boss_meetings import MeetingAPI, meeting_materials
+from boss_source_access import require_current_business_source
+from boss_source_policy import source_validity
+from boss_runtime_records import runtime_records
+from runtime_records_query import read_runtime_task_reference
+from boss_assignment_sources import AssignmentSourcesAPI
+from boss_simulation_api import SimulationAPI
+from boss_bi_scenarios import BIScenarioAPI
+from public_bi_scenarios import maintainer_catalog
+from public_morning import morning_read, morning_coverage_read
+from public_notification_target import notification_target
+from public_business_alerts import read_alerts, read_rules, input_catalog
+from boss_business_overview import BusinessOverviewAPI
+from boss_supply_quality import SupplyQualityAPI, external_adoption
 
 DEMO_NAMESPACE = "ui-check"
 METRIC_IDS = (
@@ -32,12 +49,14 @@ class BossPageAPI:
     nanobot gateway, expose secrets or grant owner authority to maintainers.
     """
 
-    def __init__(self, store, namespace: str = DEMO_NAMESPACE):
+    def __init__(self, store, namespace: str = DEMO_NAMESPACE, runtime_control=None, skills=None):
         self.store = store
         self.namespace = namespace
         self.workspace = BossWorkspaceAPI(store, namespace)
         self.sectors = BossSectorAPI(store, namespace)
         self.recovery = BossRecoveryAPI(store, namespace)
+        self.runtime_control = runtime_control
+        self.skills = skills
 
     @staticmethod
     def _items(db, namespace, kind):
@@ -50,12 +69,12 @@ class BossPageAPI:
     def _snapshot(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            return self.store.get(db, self.namespace, "initial", "snapshot")
+            return meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
 
     def _dashboard(self):
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             clock = self.store.get(db, self.namespace, "clock", "current")
             tasks = self._items(db, self.namespace, "task")
             notifications = self._items(db, self.namespace, "notification")
@@ -101,20 +120,24 @@ class BossPageAPI:
             "task_id", "status", "version", "purpose", "coordinator_id",
             "due_at", "timezone", "evidence_requirements", "related_meeting_id",
             "related_event_ids", "source_refs", "feedback_ids", "message_ids",
-            "execution_namespace", "origin_minute_id", "origin_minute_version",
+            "execution_namespace", "source_versions", "origin_minute_id", "origin_minute_version",
             "origin_entry_id", "origin_source_id", "origin_source_version",
         )
         return {key: item[key] for key in keys if key in item}
 
     def _tasks(self):
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
+            business_at = self.store.get(db, self.namespace, "clock", "current")["at"]
             task_messages = [{
                 "message_id": row["message_id"],
                 "task_id": row["task_id"],
                 "type": "ASSIGNMENT_SEND",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "send_state": "SENT_SIMULATED",
                 "delivery_state": "NOT_VERIFIED",
@@ -128,6 +151,8 @@ class BossPageAPI:
                 "task_id": row["related_task_id"],
                 "type": "FOLLOWUP_MESSAGE",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "send_state": row["send_state"],
                 "delivery_state": row["delivery_state"],
@@ -141,6 +166,8 @@ class BossPageAPI:
                 "task_id": row["task_id"],
                 "type": "ASSIGNMENT_NUDGE",
                 "recipient_id": row["recipient_id"],
+                "body": row["body"],
+                "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "business_at": row["business_at"],
                 "send_state": row["message_status"],
@@ -185,36 +212,24 @@ class BossPageAPI:
                 self._items(db, self.namespace, "document")
             }
             tasks = []
+            source_reviews = AssignmentSourcesAPI(self.store)
             for task in self._items(db, self.namespace, "task"):
                 item = self._public_task(task)
-                pinned = task.get("source_versions")
-                violations = []
-                sources = task.get("source_refs", [])
-                if not isinstance(pinned, dict) or set(pinned) != set(sources):
-                    violations.append("UNPINNED_SOURCE_VERSION")
-                for source_id in sources:
-                    doc = available.get(source_id)
-                    if doc is None or doc.get("withdrawn") or (
-                        doc.get("access_scope") != data["owner_id"]
-                        or doc.get("source_type") != "SIMULATED"
-                    ):
-                        violations.append("SOURCE_UNAVAILABLE")
-                    elif isinstance(pinned, dict) and doc.get("version") != pinned.get(source_id):
-                        violations.append("SOURCE_VERSION_CHANGED")
-                original_id = task.get("origin_source_id")
-                if original_id:
-                    doc = available.get(original_id)
-                    if doc is None or doc.get("withdrawn") or (
-                        doc.get("access_scope") != data["owner_id"]
-                        or doc.get("source_type") != "SIMULATED"
-                    ):
-                        violations.append("MINUTE_SOURCE_UNAVAILABLE")
-                    elif doc.get("version") != task.get("origin_source_version"):
-                        violations.append("MINUTE_VERSION_CHANGED")
-                item["source_reference_state"] = (
-                    "NEEDS_REVIEW" if violations else "CURRENT"
-                )
-                item["source_reference_reasons"] = sorted(set(violations))
+                review = source_reviews.project_in_transaction("BOSS", db, task["task_id"])
+                item["source_reference_state"] = "CURRENT" if review["binding_state"] == "CURRENT" else "NEEDS_REVIEW"
+                reasons = []
+                if review["binding_state"] != "CURRENT":
+                    reasons.append("SOURCE_BINDING_" + review["binding_state"])
+                    for source in review["sources"]:
+                        prefix = "MINUTE" if source["is_minute_origin"] else "SOURCE"
+                        if source["source_status"] != "VALID":
+                            reasons.append(prefix + "_UNAVAILABLE")
+                        if source["pinned_version"] is None:
+                            reasons.append("UNPINNED_SOURCE_VERSION")
+                        elif source["current_version"] is not None and source["pinned_version"] != source["current_version"]:
+                            reasons.append(prefix + "_VERSION_CHANGED")
+                item["source_reference_reasons"] = list(dict.fromkeys(reasons))
+                item["result_evidence_requires_resubmission"] = review["result_evidence_requires_resubmission"]
                 tasks.append(item)
             return {
                 "source_type": "SIMULATED",
@@ -226,7 +241,7 @@ class BossPageAPI:
                     {key: item[key] for key in (
                         "feedback_id", "task_id", "kind", "content",
                         "evidence_refs", "author_contact_id", "submitted_at",
-                        "source_type", "proposed_due_at",
+                        "source_type", "proposed_due_at", "evidence_versions", "evidence_states", "historical_only", "task_version",
                     ) if key in item}
                     for item in self._items(db, self.namespace, "feedback")
                 ],
@@ -239,16 +254,20 @@ class BossPageAPI:
                         "source_type",
                     ) if k in item},
                     "source_reference_state": (
-                        "CURRENT" if all(
+                        "CURRENT" if item.get("source_refs") and all(
                             ref["source_id"] in available
                             and available[ref["source_id"]].get("version") == ref["version"]
                             and not available[ref["source_id"]].get("withdrawn")
                             and available[ref["source_id"]].get("access_scope") == data["owner_id"]
                             and available[ref["source_id"]].get("source_type") == "SIMULATED"
+                            and source_validity(available[ref["source_id"]], business_at) == "VALID"
+                            and external_adoption(db, self.namespace, data, business_at, available[ref["source_id"]])["state"] != "NEEDS_REIMPORT"
                             for ref in (item.get("source_refs", []) + item.get("completion_evidence", []))
                         ) else "NEEDS_REVIEW"
                     ),
                 } for item in self._items(db, self.namespace, "self_commitment")],
+                "self_commitment_revisions": [{key: item[key] for key in ("commitment_id", "purpose", "version", "status", "due_at", "timezone", "importance", "evidence_requirements", "source_refs", "completion_evidence") if key in item}
+                    for item in self._items(db, self.namespace, "self_commitment_revision")],
                 "self_due_events": [{
                     "event_id": row["event_id"],
                     "commitment_id": row["commitment_id"],
@@ -279,8 +298,9 @@ class BossPageAPI:
         if not source_id or len(source_id) > 100:
             return 400, {"error": "SOURCE_REQUIRED"}
         with self.store.connect() as db:
+            db.execute("BEGIN")
             self.store.active(db, self.namespace)
-            data = self.store.get(db, self.namespace, "initial", "snapshot")
+            data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             # Current documented records are the source of truth, including
             # applications created later by the authorized simulation editor.
             # Never trust an arbitrary client locator or path.
@@ -291,22 +311,22 @@ class BossPageAPI:
             if row is None:
                 return 404, {"error": "SOURCE_NOT_FOUND"}
             doc = json.loads(row[0])
-            if doc.get("access_scope") != data["owner_id"]:
-                return 403, {"error": "SOURCE_FORBIDDEN"}
-            if doc.get("withdrawn"):
-                return 410, {"error": "SOURCE_WITHDRAWN", "source_id": source_id}
+            require_current_business_source(self.store, db, self.namespace, data["owner_id"], source_id)
             return 200, {
                 "source_type": doc["source_type"],
                 "source_id": doc["source_id"],
                 "version": doc["version"],
                 "published_at": doc.get("published_at"),
                 "author_contact_id": doc.get("author_contact_id"),
+                **{field:doc[field] for field in ("author_kind","author_display_name","generator_version","business_basis","allowed_use","valid_from","valid_until") if field in doc},
                 "original_locator": doc.get("original_locator"),
                 "content": doc["content"],
                 "read_at": now(),
             }
 
     def _metrics(self, query):
+        require(set(query) <= {"products"} and all(len(values) == 1 for values in query.values()),
+                "查询字段或重复参数无效", web.HTTPBadRequest)
         data = self._snapshot()
         raw = query.get("products", ["product-1,product-2"])[0]
         products = [v.strip() for v in raw.split(",") if v.strip()]
@@ -341,6 +361,26 @@ class BossPageAPI:
             "result": result,
             "read_at": now(),
         }
+
+    def _metrics_evidence(self, query):
+        require(set(query) == {"query_id"} and len(query["query_id"]) == 1,
+                "原始依据需要唯一查询编号", web.HTTPBadRequest)
+        query_id = query["query_id"][0]
+        require(isinstance(query_id, str) and 1 <= len(query_id) <= 128, "查询编号无效", web.HTTPBadRequest)
+        with self.store.connect() as db:
+            db.execute("BEGIN")
+            self.store.active(db, self.namespace)
+            initial = self.store.get(db, self.namespace, "initial", "snapshot")
+            original = self.store.get(db, self.namespace, "query", query_id)
+            envelope = original["envelope"]
+            require(envelope["owner_id"] == initial["owner_id"] and envelope["execution_namespace"] == self.namespace
+                    and all(envelope[key] == initial[key] for key in ("dataset_id", "dataset_version")),
+                    "查询不属于当前本人范围", web.HTTPForbidden)
+            require(bool(original["detail_refs"]), "当前查询没有可读取的明细", web.HTTPConflict)
+            source_ids = [source["source_id"] for source in original["sources"]]
+        result = self.store.invoke("read_evidence", {"envelope": {**envelope, "request_id":str(uuid.uuid4()), "session_id":"boss-ui"},
+                    "query_id":query_id, "source_ids":source_ids, "detail_refs":original["detail_refs"]})
+        return 200, {"source_type":"SIMULATED", "query_id":query_id, "result":result, "read_at":now()}
 
     def _model_runtime(self, role: str):
         """Project metadata-only model/probe log; never return prompts or API keys."""
@@ -448,10 +488,103 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            if path == '/api/boss/ui/business-overview/dimensions':
+                require(not query_string, '经营范围选项不接受URL参数', web.HTTPBadRequest)
+                return 200, BusinessOverviewAPI(self.store).dimensions(role)
+            if path.startswith("/api/boss/ui/morning/"):
+                return 200, morning_read(self.store,role,path,query_string)
+            if path in {"/api/boss/ui/admin/morning-coverage","/api/boss/ui/admin/morning-coverage-receipt"}:
+                return 200, morning_coverage_read(self.store,role,path,query_string)
+            if path in {"/api/boss/ui/admin/bi-scenarios","/api/boss/ui/admin/bi-scenario-receipt"}:
+                if role != "MAINTAINER":
+                    return 403, {"error":"FORBIDDEN"}
+                parameters = parse_qs(query_string,keep_blank_values=True)
+                expected = set() if path.endswith("bi-scenarios") else {"client_request_id"}
+                if set(parameters) != expected or any(len(values) != 1 or not values[0] for values in parameters.values()):
+                    return 400, {"error":"INVALID_QUERY_PARAMETERS"}
+                return 200, maintainer_catalog(self.store,role) if not expected else BIScenarioAPI(self.store).receipt(role,parameters["client_request_id"][0])
+            if path in {"/api/boss/ui/admin/sop-method", "/api/boss/ui/admin/sop-history", "/api/boss/ui/admin/sop-operation-status"}:
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if self.skills is None:
+                    return 503, {"error": "SKILL_SERVICE_NOT_READY"}
+                fields = {"sop_id"} if path.endswith("sop-method") else {"sop_id", "history_id"} if path.endswith("sop-history") else {"action", "client_request_id"}
+                parameters = parse_qs(query_string, keep_blank_values=True)
+                if set(parameters) != fields or any(len(value) != 1 or not value[0] for value in parameters.values()):
+                    return 400, {"error": "INVALID_QUERY_PARAMETERS"}
+                values = {key: value[0] for key, value in parameters.items()}
+                self.skills.validate_query(path, values)
+                service = self.skills.drafts
+                if path.endswith("sop-method"):
+                    return 200, self.skills.method(role, **values)
+                if path.endswith("sop-history"):
+                    return 200, service.read_history(role, **values)
+                return 200, service.operation_status(role, **values)
+            if path == "/api/boss/ui/supply-quality":
+                return 200, SupplyQualityAPI(self.store).read_http(role, query_string)
+            if path == "/api/boss/ui/supply-quality-receipt":
+                return 200, SupplyQualityAPI(self.store).receipt_http(role, query_string)
+            if path == "/api/boss/ui/simulation-query":
+                return 200, SimulationAPI(self.store).query_http(role, query_string)
+            if path == "/api/boss/ui/simulation-inspect":
+                return 200, SimulationAPI(self.store).inspect_http(role, query_string)
+            if path == "/api/boss/ui/admin/skills":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if query_string:
+                    return 400, {"error": "INVALID_QUERY_PARAMETERS"}
+                if self.skills is None:
+                    return 503, {"error": "SKILL_SERVICE_NOT_READY"}
+                return 200, self.skills.read(role)
+            if path in {"/api/boss/ui/assignment-source-review", "/api/boss/ui/runtime-records/task"}:
+                if path == "/api/boss/ui/assignment-source-review" and role != "BOSS":
+                    return 403, {"error": "FORBIDDEN"}
+                query = parse_qs(query_string, keep_blank_values=True)
+                keys = {"task_id"} if path == "/api/boss/ui/assignment-source-review" else {"run_id", "task_id"}
+                if set(query) != keys or any(len(values) != 1 or not values[0] for values in query.values()):
+                    return 400, {"error": "INVALID_QUERY_PARAMETERS"}
+                if self.namespace != DEMO_NAMESPACE:
+                    return 409, {"error": "EXECUTION_SCOPE_UNAVAILABLE"}
+                if path == "/api/boss/ui/assignment-source-review":
+                    return 200, AssignmentSourcesAPI(self.store).read(role, query["task_id"][0])
+                return 200, read_runtime_task_reference(self.store, role, self.namespace, query["run_id"][0], query["task_id"][0])
+            if path == "/api/boss/ui/admin/runtime-configuration":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                if self.runtime_control is None:
+                    return 503, {"error": "RUNTIME_NOT_READY"}
+                return 200, self.runtime_control.read()
+            if path == "/api/boss/ui/runtime-records":
+                query = parse_qs(query_string, keep_blank_values=True)
+                if any(len(values) != 1 for values in query.values()):
+                    return 400, {"error": "DUPLICATE_QUERY_PARAMETER"}
+                parameters = {key: values[0] for key, values in query.items()}
+                if set(parameters) == {"run_id"}:
+                    return 200, runtime_records(self.store, role, self.namespace, run_id=parameters["run_id"])
+                return 200, runtime_records(self.store, role, self.namespace, query=parameters)
+            if path == "/api/boss/ui/admin/memory-status":
+                if role != "MAINTAINER":
+                    return 403, {"error": "FORBIDDEN"}
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                return 200, memory_technical_status(self.store, role, self.namespace)
+            if path == "/api/boss/ui/business-alert-rules":
+                return 200, read_rules(self.store, role, self.namespace, query_string)
+            if path == "/api/boss/ui/admin/business-alert-input":
+                return 200, input_catalog(self.store, role, self.namespace, query_string)
+            if path == "/api/boss/ui/business-alerts":
+                return 200, read_alerts(self.store, role, self.namespace, query_string)
             if path in ("/api/boss/ui/operation-status", "/api/boss/ui/calendar-share-preview", "/api/boss/ui/calendar-conflict"):
                 return self.recovery.serve(role, path, query_string)
             if path.startswith("/api/boss/ui/workspace/"):
-                return self.workspace.serve(role, path, query_string)
+                status, result = self.workspace.serve(role, path, query_string)
+                if status == 200 and path == "/api/boss/ui/workspace/prompt-versions":
+                    if query_string:
+                        return 400, {"error": "INVALID_INPUT"}
+                    result["runtime_eligibility"] = prompt_technical_status(self.store, role, self.namespace)
+                return status, result
             if path == "/api/boss/ui/sector":
                 return self.sectors.serve(role, query_string)
             if path == "/api/boss/ui/maintenance":
@@ -464,8 +597,25 @@ class BossPageAPI:
                 return 200, self._model_runtime(role)
             if role != "BOSS":
                 return 403, {"error": "FORBIDDEN"}
+            if path == "/api/boss/ui/notification-target":
+                return 200, notification_target(self.store, role, self.namespace, query_string)
+            if path in ("/api/boss/ui/today", "/api/boss/ui/owner-plans", "/api/boss/ui/meeting-arrangement"):
+                if query_string:
+                    return 400, {"error": "INVALID_INPUT"}
+                if path == "/api/boss/ui/today":
+                    return 200, TodayAPI(self.store).read(role)
+                if path == "/api/boss/ui/meeting-arrangement":
+                    return 200, MeetingAPI(self.store).read(role)
+                return 200, OwnerPlansAPI(self.store).read(role)
             if path == "/api/boss/ui/dashboard":
                 return 200, self._dashboard()
+            if path == "/api/boss/ui/assignment-extensions":
+                require(role == "BOSS", "延期决定仅限本人读取", web.HTTPForbidden)
+                query = parse_qs(query_string, keep_blank_values=True)
+                require(set(query) == {"task_id"} and len(query["task_id"]) == 1 and bool(query["task_id"][0]), "延期读取字段无效", web.HTTPBadRequest)
+                require(self.namespace == DEMO_NAMESPACE, "当前执行范围不可用", web.HTTPConflict)
+                from boss_assignment_extensions import AssignmentExtensionAPI
+                return 200, AssignmentExtensionAPI(self.store).read(role, query["task_id"][0])
             if path == "/api/boss/ui/model-health":
                 return 200, self._model_runtime(role)
             if path == "/api/boss/ui/tasks":
@@ -477,6 +627,8 @@ class BossPageAPI:
                 return self._evidence(query)
             if path == "/api/boss/ui/metrics":
                 return self._metrics(query)
+            if path == "/api/boss/ui/metrics-evidence":
+                return self._metrics_evidence(query)
             return 404, {"error": "API_NOT_FOUND"}
         except web.HTTPException as error:
             # No stack traces or sensitive object text in the renderer.

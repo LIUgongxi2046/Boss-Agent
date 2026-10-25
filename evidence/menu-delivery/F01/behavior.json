@@ -1,0 +1,457 @@
+{
+  "status": "PASS",
+  "application_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/validation/.work/menu-f01-behavior-8839c6a5-f1b9-4d20-9b09-b47b2c842f63",
+  "ports": {
+    "business": 10521,
+    "webui": 10522,
+    "gateway": 20521
+  },
+  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-f01-n3-dist",
+  "manifest_sha256": "e3b36c80baac9bbba869d5012b53d38c43b2a05d1869ec9ce10a0c365bafd62c",
+  "external_api_mode": "SIMULATED_FIRST",
+  "visual": "NOT_RUN",
+  "user_acceptance": "NOT_RUN",
+  "records": [
+    {
+      "check": "current_scope_sources_meeting_and_actual_sort_recovery",
+      "status": "PASS"
+    },
+    {
+      "check": "formal_scope_categories_same_version_sources_meeting_sort_recovery",
+      "request_id": "menu-f01-query-85014044-1c7c-4ac8-9aaf-eda2a25d637a",
+      "run_id": "run-93a9391c-87f4-4e5e-8b90-f79cd64737ef",
+      "list_id": "morning-6a4f1d8f-fede-4bc5-97ec-c150e71f8f8d",
+      "item_id": "meeting:meeting-1",
+      "source_id": "finance-note",
+      "source_version": "1",
+      "order_version": "1",
+      "input_kinds": [
+        "owner_goals",
+        "task",
+        "self_commitment",
+        "application",
+        "meeting",
+        "event",
+        "private_calendar",
+        "travel_plan"
+      ],
+      "layouts": [
+        {
+          "width": 1440,
+          "height": 1024,
+          "zoom": 1,
+          "actual": {
+            "grid": {
+              "x": 232,
+              "y": 228,
+              "width": 1185,
+              "height": 3586
+            },
+            "main": {
+              "x": 232,
+              "y": 228,
+              "width": 861,
+              "height": 1892
+            },
+            "aside": {
+              "x": 1107,
+              "y": 228,
+              "width": 310,
+              "height": 3586
+            },
+            "columns": "861px 310px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "14px",
+            "document_width": 1440,
+            "document_scroll": 1440
+          },
+          "reference": {
+            "width": 1440,
+            "height": 1024,
+            "zoom": 1,
+            "columns": "814px 310px",
+            "gap": "14px",
+            "main": {
+              "x": 250,
+              "y": 364.390625,
+              "width": 814,
+              "height": 822
+            },
+            "aside": {
+              "x": 1078,
+              "y": 364.390625,
+              "width": 310,
+              "height": 756
+            },
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "15px"
+          }
+        },
+        {
+          "width": 1440,
+          "height": 1024,
+          "zoom": 2,
+          "actual": {
+            "grid": {
+              "x": 74,
+              "y": 204,
+              "width": 632,
+              "height": 4957
+            },
+            "main": {
+              "x": 74,
+              "y": 204,
+              "width": 632,
+              "height": 2095
+            },
+            "aside": {
+              "x": 74,
+              "y": 2313,
+              "width": 632,
+              "height": 2848
+            },
+            "columns": "632px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "14px",
+            "document_width": 720,
+            "document_scroll": 720
+          },
+          "reference": {
+            "width": 1440,
+            "height": 1024,
+            "zoom": 2,
+            "columns": "599.734px",
+            "gap": "14px",
+            "main": {
+              "x": 83.6328125,
+              "y": 345.21875,
+              "width": 599.734375,
+              "height": 950
+            },
+            "aside": {
+              "x": 83.6328125,
+              "y": 1309.21875,
+              "width": 599.734375,
+              "height": 637
+            },
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "15px"
+          }
+        },
+        {
+          "width": 1280,
+          "height": 800,
+          "zoom": 1,
+          "actual": {
+            "grid": {
+              "x": 232,
+              "y": -265,
+              "width": 1025,
+              "height": 3586
+            },
+            "main": {
+              "x": 232,
+              "y": -265,
+              "width": 701,
+              "height": 1914
+            },
+            "aside": {
+              "x": 947,
+              "y": -265,
+              "width": 310,
+              "height": 3586
+            },
+            "columns": "701px 310px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "14px",
+            "document_width": 1280,
+            "document_scroll": 1280
+          },
+          "reference": {
+            "width": 1280,
+            "height": 800,
+            "zoom": 1,
+            "columns": "657.281px 310px",
+            "gap": "14px",
+            "main": {
+              "x": 248.359375,
+              "y": 362.75,
+              "width": 657.28125,
+              "height": 844
+            },
+            "aside": {
+              "x": 919.640625,
+              "y": 362.75,
+              "width": 310,
+              "height": 756
+            },
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "15px"
+          }
+        },
+        {
+          "width": 1280,
+          "height": 800,
+          "zoom": 2,
+          "actual": {
+            "grid": {
+              "x": 9,
+              "y": -281,
+              "width": 622,
+              "height": 5270
+            },
+            "main": {
+              "x": 9,
+              "y": -281,
+              "width": 622,
+              "height": 2324
+            },
+            "aside": {
+              "x": 9,
+              "y": 2057,
+              "width": 622,
+              "height": 2932
+            },
+            "columns": "622px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "15px",
+            "panel_radius": "14px",
+            "document_width": 640,
+            "document_scroll": 640
+          },
+          "reference": {
+            "width": 1280,
+            "height": 800,
+            "zoom": 2,
+            "columns": "521px",
+            "gap": "14px",
+            "main": {
+              "x": 83,
+              "y": 373.3984375,
+              "width": 521,
+              "height": 1039
+            },
+            "aside": {
+              "x": 83,
+              "y": 1426.3984375,
+              "width": 521,
+              "height": 647
+            },
+            "main_gap": "13px",
+            "panel_padding": "15px",
+            "panel_radius": "15px"
+          }
+        },
+        {
+          "width": 1024,
+          "height": 768,
+          "zoom": 1,
+          "actual": {
+            "grid": {
+              "x": 74,
+              "y": -588,
+              "width": 936,
+              "height": 4751
+            },
+            "main": {
+              "x": 74,
+              "y": -588,
+              "width": 936,
+              "height": 2003
+            },
+            "aside": {
+              "x": 74,
+              "y": 1429,
+              "width": 936,
+              "height": 2734
+            },
+            "columns": "936px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "14px",
+            "document_width": 1024,
+            "document_scroll": 1024
+          },
+          "reference": {
+            "width": 1024,
+            "height": 768,
+            "zoom": 1,
+            "columns": "898.438px",
+            "gap": "14px",
+            "main": {
+              "x": 87.28125,
+              "y": 337.671875,
+              "width": 898.4375,
+              "height": 907
+            },
+            "aside": {
+              "x": 87.28125,
+              "y": 1258.671875,
+              "width": 898.4375,
+              "height": 615
+            },
+            "main_gap": "13px",
+            "panel_padding": "18px 20px",
+            "panel_radius": "15px"
+          }
+        },
+        {
+          "width": 1024,
+          "height": 768,
+          "zoom": 2,
+          "actual": {
+            "grid": {
+              "x": 9,
+              "y": -117,
+              "width": 494,
+              "height": 5588
+            },
+            "main": {
+              "x": 9,
+              "y": -117,
+              "width": 494,
+              "height": 2372
+            },
+            "aside": {
+              "x": 9,
+              "y": 2269,
+              "width": 494,
+              "height": 3202
+            },
+            "columns": "494px",
+            "gap": "14px",
+            "main_gap": "13px",
+            "panel_padding": "15px",
+            "panel_radius": "14px",
+            "document_width": 512,
+            "document_scroll": 512
+          },
+          "reference": {
+            "width": 1024,
+            "height": 768,
+            "zoom": 2,
+            "columns": "393px",
+            "gap": "14px",
+            "main": {
+              "x": 83,
+              "y": 425.1875,
+              "width": 393,
+              "height": 1061
+            },
+            "aside": {
+              "x": 83,
+              "y": 1500.1875,
+              "width": 393,
+              "height": 647
+            },
+            "main_gap": "13px",
+            "panel_padding": "15px",
+            "panel_radius": "15px"
+          }
+        }
+      ]
+    },
+    {
+      "check": "return_focus_observation",
+      "focus_events": [
+        {
+          "id": "morning-prepare",
+          "tag": "BUTTON",
+          "role": null
+        },
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "role": null
+        },
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "role": null
+        },
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "role": null
+        },
+        {
+          "id": "morning-prepare",
+          "tag": "BUTTON",
+          "role": null
+        },
+        {
+          "id": "morning-prepare",
+          "tag": "BUTTON",
+          "role": null
+        }
+      ],
+      "active_id": "morning-prepare",
+      "active_tag": "BUTTON"
+    },
+    {
+      "check": "actual_delayed_read_rejection_and_cas_edit_preservation",
+      "released_reads": [
+        {
+          "event": "actual_read_released",
+          "path": "/api/boss/ui/morning/detail",
+          "field": "item_id",
+          "value": "meeting:meeting-1",
+          "actual_status": 200,
+          "response_sha256": "5472345e442fa984f59d4f5cfd8c5490a3da00b597133e0872b7cbb88be40c2d"
+        },
+        {
+          "event": "actual_read_released",
+          "path": "/api/boss/ui/morning/source",
+          "field": "source_id",
+          "value": "finance-note",
+          "actual_status": 200,
+          "response_sha256": "776598fe5edd257360ef14c60abf8756599b730d4999b5de8aa2d33622687cda"
+        }
+      ],
+      "concurrent_order_version": "2",
+      "invalid_timezone_not_counted_as_empty": true
+    },
+    {
+      "check": "preparation_return_and_no_automatic_business_write",
+      "task_count": 0,
+      "renderer_errors": [],
+      "sort_replayed": false
+    },
+    {
+      "check": "same_database_independent_service_reopen",
+      "list_id": "morning-6a4f1d8f-fede-4bc5-97ec-c150e71f8f8d",
+      "current_order_version": "2",
+      "same_saved_view": true
+    },
+    {
+      "check": "explicit_owner_confirmation_persists_current_morning_assignment",
+      "task_id": "ff5719ec-c020-4a09-aef0-f1f1bdcc0cec",
+      "task_version": "1",
+      "state": "OPEN",
+      "morning_reference": {
+        "list_id": "morning-6a4f1d8f-fede-4bc5-97ec-c150e71f8f8d",
+        "list_version": "1",
+        "item_id": "meeting:meeting-1",
+        "snapshot_sha256": "7594b764d767c68da653f0a08a047d8ec056279825de5976755d7923bf6b8057"
+      },
+      "automatic_send": false,
+      "current_list_after_business_change": "HISTORICAL_REQUIRES_REQUERY"
+    },
+    {
+      "check": "unknown_order_read_only_and_explicit_leave",
+      "unknown_original_replayed": false,
+      "original_id_retained_after_explicit_leave": true
+    }
+  ]
+}

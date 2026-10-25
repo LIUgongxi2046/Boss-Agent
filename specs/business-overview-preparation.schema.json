@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:business-overview-preparation:1.1.0",
+  "$defs": {
+    "Id": {"type":"string","minLength":1,"maxLength":200},
+    "Sha256": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "Reference": {"type":"object","additionalProperties":false,"required":["kind","id","version"],"properties":{
+      "kind":{"$ref":"#/$defs/Id"},"id":{"$ref":"#/$defs/Id"},"version":{"$ref":"#/$defs/Id"}}},
+    "Input": {"type":"object","additionalProperties":false,"required":["applied_scope","topic_reference","snapshot_sha256","object_reference","action"],"properties":{
+      "applied_scope":{"$ref":"business-overview.schema.json#/$defs/Scope"},
+      "topic_reference":{"$ref":"business-overview.schema.json#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "object_reference":{"anyOf":[{"$ref":"#/$defs/Reference"},{"type":"null"}]},"action":{"enum":["ASSIGNMENT_REVIEW","MEETING_PREPARATION"]}}},
+    "AssignmentContext": {"type":["object","null"],"additionalProperties":false,"required":["task_reference","review_sha256","binding_state","task_state","result_evidence_current","result_evidence_requires_resubmission"],"properties":{
+      "task_reference":{"$ref":"#/$defs/Reference"},"review_sha256":{"$ref":"#/$defs/Sha256"},"binding_state":{"enum":["CURRENT","NEEDS_REVIEW","MISSING"]},
+      "task_state":{"$ref":"#/$defs/Id"},"result_evidence_current":{"type":["boolean","null"]},"result_evidence_requires_resubmission":{"type":"boolean"}}},
+    "MeetingContext": {"type":["object","null"],"additionalProperties":false,"required":["meeting_reference","relation","state","source_scope_current"],"properties":{
+      "meeting_reference":{"$ref":"#/$defs/Reference"},"relation":{"const":"EXPLICIT_TASK_MEETING_REFERENCE"},"state":{"$ref":"#/$defs/Id"},"source_scope_current":{"type":"boolean"}}},
+    "AssignmentHandoff": {"type":"object","additionalProperties":false,"required":["page_id","operation","parameters","required_inputs"],"properties":{
+      "page_id":{"const":"F06"},"operation":{"const":"boss.assignment.prepare"},
+      "parameters":{"type":"object","additionalProperties":false,"required":["task_id","task_version"],"properties":{"task_id":{"$ref":"#/$defs/Id"},"task_version":{"$ref":"#/$defs/Id"}}},
+      "required_inputs":{"const":["client_request_id"]}}},
+    "MeetingSelection":{"allOf":[{"$ref":"#/$defs/Input"},{"properties":{"action":{"const":"MEETING_PREPARATION"}}}]},
+    "MeetingInput":{"type":"object","additionalProperties":false,"required":["selection","context_sha256"],"properties":{
+      "selection":{"$ref":"#/$defs/MeetingSelection"},"context_sha256":{"$ref":"#/$defs/Sha256"}}},
+    "MeetingHandoff":{"type":"object","additionalProperties":false,"required":["page_id","operation","parameters","required_inputs"],"properties":{
+      "page_id":{"const":"F04"},"operation":{"const":"boss.business.meeting.prepare"},
+      "parameters":{"type":"object","additionalProperties":false,"required":["selection"],"properties":{"selection":{"$ref":"#/$defs/MeetingSelection"}}},
+      "required_inputs":{"const":["context_sha256"]}}},
+    "Handoff":{"anyOf":[{"$ref":"#/$defs/AssignmentHandoff"},{"$ref":"#/$defs/MeetingHandoff"},{"type":"null"}]},
+    "Material":{"type":"object","additionalProperties":false,"required":["source_reference","source_type","author_contact_id","published_at","observed_at","valid_from","valid_until","content"],"properties":{
+      "source_reference":{"$ref":"business-overview.schema.json#/$defs/EntrySource"},"source_type":{"const":"SIMULATED"},
+      "author_contact_id":{"type":["string","null"]},"published_at":{"type":["string","null"]},"observed_at":{"type":["string","null"]},
+      "valid_from":{"type":["string","null"]},"valid_until":{"type":["string","null"]},"content":{"type":"string"}}},
+    "MeetingPreparation":{"type":"object","additionalProperties":false,"required":["source_type","applied_scope","topic_reference","snapshot_sha256","meeting","task","participants","materials","metrics","metric_scope","metric_coverage","metric_missing_fields","topic_missing_fields","scope_application","coverage_state","business_at","owner_decision_required","business_authorization_granted","business_mutation_performed","invitation_sent","message_sent","task_completed","meeting_occurred","preparation_sha256"],"properties":{
+      "source_type":{"const":"SIMULATED"},"applied_scope":{"$ref":"business-overview.schema.json#/$defs/Scope"},
+      "topic_reference":{"$ref":"business-overview.schema.json#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "meeting":{"type":"object","additionalProperties":false,"required":["meeting_id","version","state","purpose","starts_at","ends_at","timezone","preparation_due_at"],"properties":{
+        "meeting_id":{"$ref":"#/$defs/Id"},"version":{"$ref":"#/$defs/Id"},"state":{"enum":["DRAFT","SCHEDULED"]},"purpose":{"type":["string","null"]},
+        "starts_at":{"type":"string","format":"date-time"},"ends_at":{"type":["string","null"],"format":"date-time"},"timezone":{"$ref":"#/$defs/Id"},"preparation_due_at":{"type":["string","null"],"format":"date-time"}}},
+      "task":{"type":"object","additionalProperties":false,"required":["task_id","version","status","purpose","coordinator_id","due_at","timezone","evidence_requirements"],"properties":{
+        "task_id":{"$ref":"#/$defs/Id"},"version":{"$ref":"#/$defs/Id"},"status":{"$ref":"#/$defs/Id"},"purpose":{"type":"string"},
+        "coordinator_id":{"$ref":"#/$defs/Id"},"due_at":{"type":"string","format":"date-time"},"timezone":{"$ref":"#/$defs/Id"},"evidence_requirements":{"type":"array","items":{"type":"string"}}}},
+      "participants":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["contact_id","name","organization","responsibility","state"],"properties":{
+        "contact_id":{"$ref":"#/$defs/Id"},"name":{"type":"string"},"organization":{"type":"string"},"responsibility":{"type":"string"},"state":{"const":"CURRENT"}}}},
+      "materials":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/Material"}},"metrics":{"type":"array","items":{"type":"object"}},
+      "metric_scope":{"type":["string","null"]},"metric_coverage":{"type":["object","null"]},"metric_missing_fields":{"type":"array","items":{"type":"string"}},
+      "topic_missing_fields":{"type":"array","items":{"type":"string"}},"scope_application":{"type":"object"},"coverage_state":{"const":"PARTIAL"},"business_at":{"type":"string"},
+      "owner_decision_required":{"const":true},"business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false},
+      "invitation_sent":{"const":false},"message_sent":{"const":false},"task_completed":{"const":false},"meeting_occurred":{"const":false},"preparation_sha256":{"$ref":"#/$defs/Sha256"}}},
+    "MeetingResult":{"type":"object","additionalProperties":false,"required":["source_type","context_sha256","preparation_sha256","preparation","read_at","business_authorization_granted","business_mutation_performed"],"properties":{
+      "source_type":{"const":"SIMULATED"},"context_sha256":{"$ref":"#/$defs/Sha256"},"preparation_sha256":{"$ref":"#/$defs/Sha256"},"preparation":{"$ref":"#/$defs/MeetingPreparation"},
+      "read_at":{"type":"string","format":"date-time"},"business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false}}},
+    "View": {"type":"object","additionalProperties":false,"required":["source_type","applied_scope","topic_reference","snapshot_sha256","object_reference","action","state","candidates","task_candidates","source_references","assignment_context","meeting_context","meeting_preparation","handoff","missing_conditions","required_inputs","business_at","read_at","current_use_verified","owner_decision_required","business_authorization_granted","business_mutation_performed","message_sent","task_completed","context_sha256"],"properties":{
+      "source_type":{"const":"SIMULATED"},"applied_scope":{"$ref":"business-overview.schema.json#/$defs/Scope"},
+      "topic_reference":{"$ref":"business-overview.schema.json#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "object_reference":{"anyOf":[{"$ref":"#/$defs/Reference"},{"type":"null"}]},"action":{"enum":["ASSIGNMENT_REVIEW","MEETING_PREPARATION"]},
+      "state":{"enum":["READY_FOR_REVIEW","WAITING_INPUT"]},"candidates":{"type":"array","items":{"$ref":"#/$defs/Reference"}},
+      "task_candidates":{"type":"array","items":{"$ref":"#/$defs/Reference"}},
+      "source_references":{"type":"array","items":{"$ref":"business-overview.schema.json#/$defs/EntrySource"}},
+      "assignment_context":{"$ref":"#/$defs/AssignmentContext"},"meeting_context":{"$ref":"#/$defs/MeetingContext"},
+      "meeting_preparation":{"anyOf":[{"$ref":"#/$defs/MeetingPreparation"},{"type":"null"}]},"handoff":{"$ref":"#/$defs/Handoff"},
+      "missing_conditions":{"type":"array","items":{"$ref":"#/$defs/Id"},"uniqueItems":true},"required_inputs":{"type":"array","items":{"$ref":"#/$defs/Id"},"uniqueItems":true},
+      "business_at":{"type":"string"},"read_at":{"type":"string","format":"date-time"},"current_use_verified":{"type":"boolean"},
+      "owner_decision_required":{"const":true},"business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false},
+      "message_sent":{"const":false},"task_completed":{"const":false},"context_sha256":{"$ref":"#/$defs/Sha256"}}}
+  }
+}

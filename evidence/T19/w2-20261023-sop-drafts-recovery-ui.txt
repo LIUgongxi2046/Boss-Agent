@@ -1,0 +1,65 @@
+### Result
+{"status":"PASS","check_id":"A06-ACTUAL-RESTART-RECOVERY-CANCEL","source_type":"RUNTIME_RECORD","external_api_mode":"SIMULATED","recovered_request_id":"sop-restart-02c9e087-dc28-4498-aaa5-38ca2c2ae7a7","recovered_version":"0.1.3","canceled_request_id":"sop-cancel-6ab20912-2b37-4a3c-8f25-13ccb3e6ed1b","cancel_result":"CANCELED","final_native_version":"0.1.3","final_native_sha256":"3e7f52d0fbf7b08d4d25c064369854097f8cf2aa739704caceeecc742ed2285f","final_draft_version":"5","native_reenable_without_new_draft":true,"pending_count":0,"observed_request_count":20,"observed_external_request_count":0,"real_model_quality_verified":false,"public_integration_verified":false}
+### Ran Playwright code
+```js
+await (async(page)=>{
+  const requests=[];
+  page.on("request",request=>requests.push(new URL(request.url()).hostname));
+  async function current(){return await page.evaluate(async()=>{
+    const token=document.querySelector('meta[name="maintainer-token"]').content;
+    const response=await fetch("/api/boss/ui/admin/sop-method?sop_id=SOP03",{headers:{Authorization:"Bearer "+token},cache:"no-store"});
+    if(!response.ok)throw Error("实际方法读取失败");return await response.json();
+  });}
+  async function confirm(action){
+    const dialog=page.getByRole("dialog");
+    await dialog.getByRole("checkbox",{name:"已核查当前方法、版本和操作范围",exact:true}).check();
+    const [response]=await Promise.all([page.waitForResponse(response=>response.url().endsWith("/component/sop-command")&&response.request().postDataJSON().action===action),
+      dialog.getByRole("button",{name:"确认执行技术操作",exact:true}).click()]);
+    const result=await response.json();if(response.status()!==200)throw Error(action+"失败："+JSON.stringify(result));
+    await page.getByRole("dialog").waitFor({state:"hidden"});
+    await page.waitForFunction(()=>!Array.from(document.querySelectorAll('[role="status"]')).some(item=>item.textContent.includes("正在读取当前配置")));
+    return result;
+  }
+  await page.getByRole("button",{name:"读取当前方法",exact:true}).click();
+  await page.getByRole("button",{name:"继续原启用操作",exact:true}).waitFor();
+  const before=await current();
+  if(before.pending_activations.length!==1||before.active.version!=="0.1.2"||before.draft.draft_version!=="4")throw Error("重启后没有保留原准备操作与版本");
+  if(!await page.getByText("待恢复，当前不可采用",{exact:true}).isVisible())throw Error("当前页面没有呈现待恢复采用条件");
+  await page.getByRole("button",{name:"继续原启用操作",exact:true}).click();
+  const recovered=await confirm("recover");
+  let view=await current();
+  if(recovered.state!=="ACTIVE"||view.active.version!=="0.1.3"||view.pending_activations.length!==0)throw Error("原启用操作没有继续完成");
+  await page.getByRole("textbox",{name:"新方法版本",exact:true}).fill("0.1.4");
+  await page.getByRole("textbox",{name:"变更说明",exact:true}).fill("核查待处理启用的取消与此前方法保留");
+  await page.getByRole("button",{name:"保存方法草稿",exact:true}).click();await confirm("save");
+  await page.getByRole("button",{name:"校验当前草稿",exact:true}).click();await confirm("validate");
+  const prepared=await page.evaluate(async()=>{
+    const token=document.querySelector('meta[name="maintainer-token"]').content;
+    const headers={Authorization:"Bearer "+token,"Content-Type":"application/json"};
+    const view=await(await fetch("/api/boss/ui/admin/sop-method?sop_id=SOP03",{headers})).json();
+    const requestId="sop-cancel-"+crypto.randomUUID();
+    const response=await fetch("/component/sop-command",{method:"POST",headers,body:JSON.stringify({action:"prepare",payload:{client_request_id:requestId,
+      sop_id:"SOP03",expected_draft_version:view.draft.draft_version,expected_content_sha256:view.draft.content_sha256,expected_active_sha256:view.active.content_sha256}})});
+    const result=await response.json();if(response.status!==200||result.state!=="PREPARED")throw Error("实际取消检查前置操作没有保存");
+    return {activation_request_id:requestId,active_sha256:view.active.content_sha256};
+  });
+  await page.getByRole("button",{name:"读取当前方法",exact:true}).click();
+  await page.getByRole("button",{name:"取消原启用",exact:true}).waitFor();
+  await page.getByRole("button",{name:"取消原启用",exact:true}).click();
+  const canceled=await confirm("cancel");
+  view=await current();
+  if(canceled.state!=="CANCELED"||view.active.version!=="0.1.3"||view.active.content_sha256!==prepared.active_sha256||view.pending_activations.length!==0)throw Error("取消后没有保留此前原生方法");
+  await page.getByRole("button",{name:"停用当前方法",exact:true}).click();await confirm("disable");
+  await page.getByRole("button",{name:"启用当前方法",exact:true}).click();await confirm("enable");
+  view=await current();
+  if(!view.active.enabled||view.active.version!=="0.1.3"||view.draft.draft_version!=="5")throw Error("原生方法重新启用改变了草稿或正文版本");
+  const external=requests.filter(host=>host!=="127.0.0.1");if(external.length)throw Error("发现外部网络请求");
+  return {status:"PASS",check_id:"A06-ACTUAL-RESTART-RECOVERY-CANCEL",source_type:"RUNTIME_RECORD",external_api_mode:"SIMULATED",
+    recovered_request_id:before.pending_activations[0].client_request_id,recovered_version:recovered.method_version,
+    canceled_request_id:prepared.activation_request_id,cancel_result:canceled.state,final_native_version:view.active.version,
+    final_native_sha256:view.active.content_sha256,final_draft_version:view.draft.draft_version,
+    native_reenable_without_new_draft:true,pending_count:view.pending_activations.length,observed_request_count:requests.length,
+    observed_external_request_count:external.length,real_model_quality_verified:false,public_integration_verified:false};
+}
+)(page);
+```

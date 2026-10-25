@@ -14,6 +14,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from aiohttp import web
 
 from business import checksum, now, require
+from boss_meetings import meeting_materials
+from boss_source_access import require_current_business_source
 
 NS = "ui-check"
 FINAL_STATES = ("CONFIRMED", "CANCELED")
@@ -103,6 +105,7 @@ def _details(api, db, data, payload):
                 and source.get("access_scope") == data["owner_id"]
                 and source.get("source_type") == "SIMULATED",
                 "交通资料已撤销或不在本人当前获准范围", web.HTTPForbidden)
+        require_current_business_source(api.store, db, NS, data["owner_id"], ref["source_id"])
         require(source["version"] == ref["version"],
                 "交通来源已换版，须重新核查", web.HTTPConflict)
         checked.append({"source_id": ref["source_id"], "version": source["version"]})
@@ -120,18 +123,20 @@ def _details(api, db, data, payload):
 
 
 def _impact(api, db, data, details, exclude_travel_id=None):
+    data = meeting_materials(db, data)
     start = datetime.fromisoformat(details["starts_at"]) - timedelta(
         minutes=details["buffer_minutes"])
     end = datetime.fromisoformat(details["ends_at"]) + timedelta(
         minutes=details["buffer_minutes"])
     meeting = data["meeting"]
     meeting_start = datetime.fromisoformat(meeting["starts_at"])
-    meeting_inside = start <= meeting_start < end
+    meeting_active = meeting.get("state", "DRAFT") not in ("CANCELED", "HELD")
+    meeting_end = datetime.fromisoformat(meeting["ends_at"]) if meeting.get("ends_at") else None
+    meeting_inside = meeting_active and (start <= meeting_start < end if meeting_end is None else start < meeting_end and end > meeting_start)
     meeting_near = abs((meeting_start - end).total_seconds()) < 86400 or (
         0 <= (start - meeting_start).total_seconds() < 86400
     )
-    # Selected fixture knows a meeting start but not its end.
-    meeting_risk = meeting_inside or meeting_near
+    meeting_risk = meeting_inside or (meeting_active and meeting_end is None and meeting_near)
     private = _get(db, "private_calendar", "private-1") or {
         **data["private_calendar"], "version": "1", "status": "ACTIVE",
     }
@@ -172,7 +177,8 @@ def _impact(api, db, data, details, exclude_travel_id=None):
             "meeting_id": meeting["meeting_id"],
             "version": meeting["version"],
             "starts_at": meeting["starts_at"],
-            "end_known": False, "requires_review": meeting_risk,
+            "ends_at": meeting.get("ends_at"), "state": meeting.get("state", "DRAFT"),
+            "end_known": meeting_end is not None, "requires_review": meeting_risk,
             "start_overlap": meeting_inside,
         },
         "private_calendar": {
@@ -324,6 +330,9 @@ def meeting_impacts(db, meeting):
     """Stable dependency for F04; do not mix withdrawn or draft trip with facts."""
     start = datetime.fromisoformat(meeting["starts_at"])
     result = []
+    if meeting.get("state", "DRAFT") in ("CANCELED", "HELD"):
+        return result
+    end = datetime.fromisoformat(meeting["ends_at"]) if meeting.get("ends_at") else None
     for plan in _plans(db):
         if plan["status"] != "CONFIRMED" or not plan.get("current"):
             continue
@@ -332,15 +341,17 @@ def meeting_impacts(db, meeting):
             minutes=detail["buffer_minutes"])
         window_end = datetime.fromisoformat(detail["ends_at"]) + timedelta(
             minutes=detail["buffer_minutes"])
-        if window_start <= start < window_end or (
+        overlap = window_start <= start < window_end if end is None else window_start < end and window_end > start
+        if overlap or (
             0 <= (window_start - start).total_seconds() < 86400
         ) or (0 <= (start - window_end).total_seconds() < 86400):
             result.append({"travel_id": plan["travel_id"],
-                           "version": plan["version"], "meeting_end_known": False})
+                           "version": plan["version"], "meeting_end_known": meeting.get("ends_at") is not None})
     return sorted(result, key=lambda entry: entry["travel_id"])
 
 
 def projection(api, db, data):
+    data = meeting_materials(db, data)
     plans = []
     for record in _plans(db):
         result = dict(record)
@@ -371,7 +382,9 @@ def projection(api, db, data):
             "meeting_id": data["meeting"]["meeting_id"],
             "version": data["meeting"]["version"],
             "starts_at": data["meeting"]["starts_at"],
-            "end_known": False,
+            "ends_at": data["meeting"].get("ends_at"),
+            "state": data["meeting"].get("state", "DRAFT"),
+            "end_known": data["meeting"].get("ends_at") is not None,
         },
         "real_transport_bookings": False,
         "real_weather_retrieval": False,

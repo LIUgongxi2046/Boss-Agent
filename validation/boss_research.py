@@ -12,6 +12,8 @@ import re
 from datetime import date, datetime
 from aiohttp import web
 from business import now, require
+from boss_source_policy import source_validity
+from boss_supply_quality import external_adoption
 
 NS="ui-check"
 REPORT_ID="research-current"
@@ -57,8 +59,11 @@ def _source_quotes(db, data, scope):
         (NS,),
     ).fetchall()
     matched=[]
+    conflicted=[]
+    source_issues=[]
     covered=0
-    rejected={"withdrawn":0,"forbidden":0,"after_cutoff":0,"no_match":0}
+    rejected={"withdrawn":0,"forbidden":0,"after_cutoff":0,"no_match":0,"not_current":0}
+    clock=_find(db,"clock","current")["at"]
     token=scope["question"].casefold()
     for row in records:
         doc=json.loads(row[0])
@@ -79,7 +84,12 @@ def _source_quotes(db, data, scope):
         except ValueError:
             rejected["after_cutoff"]+=1
             continue
-        covered+=1
+        validity=source_validity(doc,clock)
+        adoption=external_adoption(db,NS,data,clock,doc)
+        if validity=="VALID" and adoption["state"]!="NEEDS_REIMPORT":
+            covered+=1
+        else:
+            rejected["not_current"]+=1
         content=doc.get("content","")
         if not isinstance(content,str):
             rejected["no_match"]+=1
@@ -88,10 +98,25 @@ def _source_quotes(db, data, scope):
         if begin<0:
             rejected["no_match"]+=1
             continue
-        # Preserve exact, inspectable offset in this specific source version.
+        if adoption["state"]=="NEEDS_REIMPORT":
+            source_issues.append({
+                "source_id":doc["source_id"],"version":doc["version"],
+                "validity_state":validity,"eligible_as_current_evidence":False,
+                "adoption_state":adoption["state"],"adoption_dependencies":adoption["dependencies"],
+                "valid_from":doc.get("valid_from"),"valid_until":doc.get("valid_until"),
+            })
+            continue
+        if validity!="VALID":
+            source_issues.append({
+                "source_id":doc["source_id"],"version":doc["version"],
+                "validity_state":validity,"eligible_as_current_evidence":False,
+                "valid_from":doc.get("valid_from"),"valid_until":doc.get("valid_until"),
+            })
+            if validity!="CONFLICTED":
+                continue
         end=min(len(content),begin+max(len(scope["question"]),90))
         start=max(0,begin-45)
-        matched.append({
+        excerpt={
             "source_id":doc["source_id"],
             "source_type":"SIMULATED",
             "version":doc["version"],
@@ -103,15 +128,22 @@ def _source_quotes(db, data, scope):
             "match_start":begin,
             "claim_kind":"UNVERIFIED_SOURCE_EXCERPT",
             "source_text_is_untrusted_instruction":True,
-        })
+            "validity_state":validity,
+            "eligible_as_current_evidence":validity=="VALID",
+        }
+        (matched if validity=="VALID" else conflicted).append(excerpt)
     missing=[]
     if not matched:missing.append("NO_APPROVED_SOURCE_MATCH")
+    if source_issues:missing.append("CURRENT_SOURCE_VALIDITY_REQUIRES_REVIEW")
+    if conflicted:missing.append("SOURCE_CONFLICT_REQUIRES_REVIEW")
     if scope["country"]:missing.append("COUNTRY_TO_BUSINESS_RELATION_NOT_VERIFIED")
     if scope["period"]:missing.append("REQUESTED_PERIOD_NOT_VERIFIED_AGAINST_SOURCE")
     if scope["business_relation"]:missing.append("BUSINESS_CAUSAL_LINK_NOT_VERIFIED")
     missing.append("CAUSE_ATTRIBUTION_AND_EXPERT_CONFIRMATION_MISSING")
     return {
         "matched_sources":matched[:20],
+        "conflicted_sources":conflicted[:20],
+        "source_issues":source_issues,
         "coverage":{
             "current_approved_sources":covered,
             "matched_source_count":len(matched),
@@ -194,12 +226,14 @@ def project(db,data):
         }
     current_versions=signatures(latest["matched_sources"])
     prior_versions=signatures(saved["matched_sources"])
-    status=("CURRENT_SOURCE_EXCERPTS" if current_versions==prior_versions
+    status=("CURRENT_SOURCE_EXCERPTS" if current_versions==prior_versions and not latest["source_issues"]
             else "NEEDS_REVIEW")
     # Always re-check source withdrawal and version before returning text.
     # Historic excerpts never survive a changed or withdrawn reference.
     safe=dict(saved)
     safe["matched_sources"]=latest["matched_sources"]
+    safe["conflicted_sources"]=latest["conflicted_sources"]
+    safe["source_issues"]=latest["source_issues"]
     safe["coverage"]=latest["coverage"]
     safe["missing_items"]=latest["missing_items"]
     safe["facts_confirmed"]=[]

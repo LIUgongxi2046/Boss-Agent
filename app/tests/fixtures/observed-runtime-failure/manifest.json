@@ -1,0 +1,31 @@
+{
+  "status": "ACTUAL_RUNTIME_NATIVE_SQLITE_BACKUP",
+  "producer_commit": "ccfca967de2a7025c7efe44da0cc1d970a29d546",
+  "source_type": "SIMULATED",
+  "namespace": "w2-written-client-closed-46964241-72fe-4253-b264-eea886c23ae6",
+  "run_id": "run-7b051faa-8cc7-436a-9eda-145547ee18a1",
+  "task_id": "b76b3721-50ff-4975-b5ab-0896a4160899",
+  "source_database_sha256": "d13ed9ccb5d68a57711530ac99d3bd36ce7791c2734d663e9d934eaeda8698d3",
+  "source_report_sha256": "374dcdf210d27fe5b3e067a2b00cd029fafb96d1bcbb24b1a2ad9fba39964a69",
+  "fixture_database_sha256": "5ae1f555c718656d65418161883ac25d2941e521088727d6f2623f31f5a4fa6e",
+  "logical_copy_identical": true,
+  "integrity_check": "ok",
+  "source_sha256": {
+    "validation/fault_probe.py": "63f3f445c92a6ec98285c4fb64f59f73c8c92d589f9606f6e335a4b30ce8f668",
+    "validation/model_probe.py": "60c71c13208eff8c9086f3655370fa45a6062e7f876cc1e973a2e3a11f0aa873",
+    "validation/business.py": "b3fd5e25220023b2f7ca4b861ac4334a47a0240d53f21718599be4eb0934f0d3",
+    "validation/boss_runtime_records.py": "0719169a82d16004349a6d97a272f87ee80b581a33081ee1e0d7208db78c03fe",
+    "validation/connection.py": "e96a9f76c112b5496fd2157d3aab466e50ba753399916c21c91feecccef47e89",
+    "validation/uv.lock": "fb258e6c0f6f7e8ed991c6d3c0641ef6fefa08564947bf5f1a6723787fbad401",
+    "app/tests/test_boss_runtime.py": "52fa456a4ff2913cb1a852dd530040cf3dc2abf49b0b1f8352837967c961079d",
+    "validation/export_observed_runtime_fixture.py": "2415cd53ee77bf3d935f1db112dbf72e5cde6e575309894859283656f480a0ed"
+  },
+  "schema_sha256": "a13753ddf8c30dbc98499bacc616a1449c3928587f5f0333132e2d07617f13ff",
+  "fixture_sha256": {
+    "runtime-records.json": "374dcdf210d27fe5b3e067a2b00cd029fafb96d1bcbb24b1a2ad9fba39964a69",
+    "http-requests.json": "47ffe15d795af72fa476b79488e7a3c3f010dd80dd5b6ae586273dcc81914777"
+  },
+  "source_modified": false,
+  "export_requested_model_calls": false,
+  "cost_total": null
+}

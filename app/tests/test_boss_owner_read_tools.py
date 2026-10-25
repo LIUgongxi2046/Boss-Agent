@@ -1,0 +1,80 @@
+import asyncio
+import hashlib
+import importlib
+import json
+import sqlite3
+import sys
+from pathlib import Path
+
+import pytest
+import yaml
+from aiohttp import web
+from jsonschema import Draft202012Validator, FormatChecker
+from nanobot.agent.tools.registry import ToolRegistry
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "validation"))
+
+from controls import ControlStore
+
+
+@pytest.fixture
+def existing_owner_store(tmp_path):
+    sources = {ROOT / "validation" / (name + ".py"): (ROOT / "validation" / (name + ".py")).read_bytes()
+               for name in ("boss_today", "boss_owner_plans", "boss_meetings")}
+    fixture = ROOT / "app/tests/fixtures/observed-owner-state"
+    source = fixture / "business.sqlite"
+    manifest = json.loads((fixture / "manifest.json").read_text())
+    assert manifest["status"] == "ACTUAL_PUBLIC_GUI_NATIVE_SQLITE_BACKUP"
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == manifest["fixture_database_sha256"]
+    with sqlite3.connect(source.as_uri() + "?mode=ro&immutable=1", uri=True) as original:
+        with sqlite3.connect(tmp_path / "owner-read.sqlite") as copied:
+            original.backup(copied)
+    yield ControlStore(tmp_path / "owner-read.sqlite")
+    for path, content in sources.items():
+        assert path.read_bytes() == content
+
+
+@pytest.mark.parametrize("class_name,operation,path", [
+    ("BossTodayReadTool", "todayRead", "/api/boss/ui/today"),
+    ("BossOwnerPlansReadTool", "ownerPlansRead", "/api/boss/ui/owner-plans"),
+])
+def test_owner_read_adapter_uses_current_domain_result_without_writes(existing_owner_store, class_name, operation, path):
+    module = importlib.import_module("runtime_owner_read_tools")
+    tool = getattr(module, class_name)(existing_owner_store, "BOSS")
+    registry = ToolRegistry()
+    registry.register(tool)
+    assert registry.tool_names == [operation]
+    assert tool.parameters == {"type": "object", "properties": {}, "additionalProperties": False}
+    for parameters in ({"namespace": "ui-check"}, {"role": "BOSS"}, {"owner_id": "boss-1"}):
+        _, _, error = registry.prepare_call(operation, parameters)
+        assert error
+    with existing_owner_store.connect() as db:
+        before = tuple(db.iterdump())
+    result = json.loads(asyncio.run(tool.execute()))
+    backend = yaml.safe_load((ROOT / "specs/openapi.yaml").read_text())
+    assert backend["info"]["version"] == "1.7.0"
+    response = backend["paths"][path]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    Draft202012Validator({**backend, **response}, format_checker=FormatChecker()).validate(result)
+    assert result["source_type"] == "SIMULATED"
+    if operation == "todayRead":
+        assert result["items"] and result["coverage_state"] == "PARTIAL"
+        assert {item["object_id"] for item in result["items"]} >= {"meeting-1", "historical-1"}
+        assert result["missing_sources"] and result["conflict_state"] == "INSUFFICIENT_EVIDENCE"
+    else:
+        assert result["plans"] == []
+        assert result["execution_owner"] == "CronService" and result["external_delivery_verified"] is False
+    reopened = ControlStore(existing_owner_store.path)
+    other = json.loads(asyncio.run(getattr(module, class_name)(reopened, "BOSS").execute()))
+    assert other == result
+    with existing_owner_store.connect() as db:
+        assert tuple(db.iterdump()) == before
+
+
+@pytest.mark.parametrize("class_name", ["BossTodayReadTool", "BossOwnerPlansReadTool"])
+@pytest.mark.parametrize("role,status", [(None, 401), ("MAINTAINER", 403), ("CONTACT", 403)])
+def test_owner_read_adapter_rejects_other_identities(existing_owner_store, class_name, role, status):
+    module = importlib.import_module("runtime_owner_read_tools")
+    with pytest.raises(web.HTTPException) as failure:
+        getattr(module, class_name)(existing_owner_store, role)
+    assert failure.value.status == status
