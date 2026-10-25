@@ -54,6 +54,25 @@ def object_text(kind, data):
 
 
 def result_text(name, data):
+    if name == "businessOverviewRead":
+        scope = data["applied_scope"]
+        lines = ["经营范围：法人 " + scope["legal_entity_id"] + "；区域 " + (scope["region_id"] or "不限制区域")
+            + "；期间 " + scope["period_start"] + " 至 " + scope["period_end"] + "；关注条件 " + scope["attention"],
+            "业务截至：" + data["business_at"] + "；读取时间：" + data["read_at"]]
+        topics = [data["topic"]] if "topic" in data else data["topics"]
+        if "topic_reference" in data:
+            lines.append("当前用途：" + (data["topic_reference"]["use"] or "未选择具体用途"))
+        for topic in topics:
+            lines.append(topic["page_id"] + " · " + topic["title"] + "；可读状态 " + topic["availability"])
+            lines.extend("资料缺口：" + value for value in topic["missing_fields"])
+            lines.extend("正式对象：" + row["kind"] + " / " + row["id"] + "；版本 " + str(row["version"])
+                + "；状态 " + str(row["state"]) + "；采用状态 " + row["adoption_state"] for row in topic["records"])
+        if "metrics" in data:
+            lines.append("指标采用范围：" + data["metric_scope"])
+            lines.extend(METRIC_NAMES[row["metric_id"]] + "：" + (row["value"] + " " + row["unit"] if row["value"] is not None else "当前资料无法确定") for row in data["metrics"])
+            lines.append("本人参与提醒：" + str(len(data["alerts"])) + " 项；关联事项：" + str(len(data["associations"])) + " 项")
+        lines.extend("已应用范围的来源：" + row["source_id"] + "；版本 " + str(row["version"]) + "；状态 " + row["status"] for row in data["sources"])
+        return lines
     if name == "query_metrics":
         return query_text(data)
     if name == "bossEvidenceRead":

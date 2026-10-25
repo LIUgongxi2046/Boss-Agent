@@ -32,7 +32,7 @@ CHAT = "n02-native-current"
 
 
 @pytest.fixture
-def native(tmp_path):
+def native(tmp_path, request):
     logger.remove()
     logger.add(sys.stderr, level="WARNING", diagnose=False, backtrace=False)
     store = ControlStore(tmp_path / "native.sqlite")
@@ -47,7 +47,8 @@ def native(tmp_path):
     registry = FeatureToolRegistry()
     snapshot = {"provider": "deepseek", "model_id": "deepseek-flash", "api_type": "chat_completions",
         "max_tool_rounds": 12, "max_output_tokens": 700, "timeout": 120, "config_sha256": checksum(config.model_dump(mode="json"))}
-    agent = NativeConversationAgent(store, registry, lambda: snapshot, attachments)
+    agent_class = request.param if hasattr(request, "param") else NativeConversationAgent
+    agent = agent_class(store, registry, lambda: snapshot, attachments)
     agent.provider.generation = config.resolve_preset().to_generation_settings()
     loop = AgentLoop.from_config(config, session_manager=sessions, provider=agent.provider, tool_registry=registry,
         hook_factories=[agent.recorder.hook_factory])

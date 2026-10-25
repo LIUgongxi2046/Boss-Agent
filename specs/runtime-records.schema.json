@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:runtime-records:1.13.0",
+  "$id": "urn:boss-agent:runtime-records:1.14.0",
   "title": "实际 Runtime 记录及受限读取",
   "$ref": "#/$defs/RuntimeRecordsProjection",
   "$defs": {
@@ -104,6 +104,31 @@
         }
       }
     },
+    "BusinessScope": {
+      "type":"object","additionalProperties":false,"required":["legal_entity_id","region_id","period_start","period_end","timezone","attention"],
+      "properties":{"legal_entity_id":{"$ref":"#/$defs/TaskEntryIdentifier"},"region_id":{"type":["string","null"],"minLength":1},
+        "period_start":{"type":"string","format":"date"},"period_end":{"type":"string","format":"date"},
+        "timezone":{"$ref":"#/$defs/TaskEntryIdentifier"},"attention":{"enum":["ALL","OWNER_INVOLVEMENT","SOURCE_REVIEW"]}}
+    },
+    "BusinessTopic": {
+      "type":["object","null"],"additionalProperties":false,"required":["page_id","use"],
+      "properties":{"page_id":{"enum":["F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"]},"use":{"enum":[null,"BROILER","EGG","MILK","BEEF"]}}
+    },
+    "BusinessEntry": {
+      "type":"object","additionalProperties":false,
+      "required":["store_reference","preparation_id","client_request_id","preparation_sha256","applied_scope","scope_sha256","topic_reference","topic_sha256","snapshot_sha256","source_references","business_at","return_reference"],
+      "properties":{
+        "store_reference":{"type":"string","format":"uuid"},"preparation_id":{"$ref":"#/$defs/TaskEntryIdentifier"},
+        "client_request_id":{"type":"string","minLength":8,"maxLength":128,"pattern":"^[A-Za-z0-9_.-]+$"},
+        "preparation_sha256":{"$ref":"#/$defs/Sha256"},"applied_scope":{"$ref":"#/$defs/BusinessScope"},"scope_sha256":{"$ref":"#/$defs/Sha256"},
+        "topic_reference":{"$ref":"#/$defs/BusinessTopic"},"topic_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+        "source_references":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["kind","id","version","content_sha256","status"],
+          "properties":{"kind":{"const":"document"},"id":{"$ref":"#/$defs/TaskEntryIdentifier"},"version":{"type":["string","null"]},
+            "content_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},"status":{"$ref":"#/$defs/TaskEntryIdentifier"}}}},
+        "business_at":{"type":"string"},"return_reference":{"type":"object","additionalProperties":false,"required":["page_id","applied_scope","topic_reference","snapshot_sha256"],
+          "properties":{"page_id":{"const":"N03"},"applied_scope":{"$ref":"#/$defs/BusinessScope"},"topic_reference":{"$ref":"#/$defs/BusinessTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"}}}
+      }
+    },
     "ConversationContext": {
       "type": "object", "additionalProperties": false,
       "required": ["input_sha256", "allowed_call_refs", "references"],
@@ -113,6 +138,7 @@
         "media_sha256": {"$ref": "#/$defs/Sha256"},
         "required_input_count": {"type": "integer", "minimum": 0},
         "task_entry": {"$ref": "#/$defs/ConversationTaskEntry"},
+        "business_entry": {"$ref": "#/$defs/BusinessEntry"},
         "attachment_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
           "required": ["attachment_id", "content_sha256", "processing_state"],
           "properties": {"attachment_id": {"$ref": "#/$defs/Identifier"},

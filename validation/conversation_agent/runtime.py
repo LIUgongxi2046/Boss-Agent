@@ -7,6 +7,7 @@ from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, encode, require
 from boss_runtime_records import ATTRIBUTE, RuntimeRecordHook
+from product_bi import PREPARING_REQUEST
 from conversation_agent import ConversationReadTool
 from sop_write_tools.fc01.runtime import Fc01RuntimeRecorder, Fc01RuntimeHook, Fc01SimulatedProvider
 
@@ -39,6 +40,13 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
         self.deadlines = {}
 
     async def context(self, request):
+        token = PREPARING_REQUEST.set(request)
+        try:
+            return await self._context_for_request(request)
+        finally:
+            PREPARING_REQUEST.reset(token)
+
+    async def _context_for_request(self, request):
         context = self.scope.current(request, require_runtime=False)
         require(set(self.registry.tool_names) == context.allowed_tools, "公共Registry尚未采用会话当前工具范围")
         require(all(isinstance(self.registry.get(name), ConversationReadTool) for name in context.allowed_tools),

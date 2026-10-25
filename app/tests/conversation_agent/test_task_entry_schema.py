@@ -108,14 +108,14 @@ def test_actual_unbound_runtime_keeps_optional_task_entry_absent(native):
     current_validator().validate(run)
 
 
-def test_runtime_schema_preserves_exact_product_112_baseline():
-    base = json.loads(subprocess.run(["git", "show", "def38c666c6b653aa939062540e692ba2dbd0e5a:specs/runtime-records.schema.json"],
+def test_runtime_schema_preserves_exact_product_113_baseline():
+    base = json.loads(subprocess.run(["git", "show", "72f0a7f5af190eadded4f93e385abfa4d067be2a:specs/runtime-records.schema.json"],
         cwd=ROOT, check=True, capture_output=True, text=True).stdout)
-    assert base["$id"] == "urn:boss-agent:runtime-records:1.12.0"
+    assert base["$id"] == "urn:boss-agent:runtime-records:1.13.0"
     schema = json.loads(SCHEMA_PATH.read_text())
-    assert schema["$id"] == "urn:boss-agent:runtime-records:1.13.0"
+    assert schema["$id"] == "urn:boss-agent:runtime-records:1.14.0"
     schema["$id"] = base["$id"]
-    del schema["$defs"]["ConversationContext"]["properties"]["task_entry"]
-    del schema["$defs"]["ConversationTaskEntry"]
-    del schema["$defs"]["TaskEntryIdentifier"]
+    del schema["$defs"]["ConversationContext"]["properties"]["business_entry"]
+    for name in ("BusinessScope", "BusinessTopic", "BusinessEntry"):
+        del schema["$defs"][name]
     assert schema == base

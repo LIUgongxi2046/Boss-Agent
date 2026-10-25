@@ -38,7 +38,7 @@ class ConversationQueries:
     def __init__(self, store, conversation):
         self.store, self.conversation, self.api = store, conversation, BIQueryAPI(store)
 
-    def plan(self, text, query, pending_scope=None):
+    def plan(self, text, query, pending_scope=None, *, applied_parameters=None):
         followup = any(word in text for word in ("继续", "改为", "调整", "只看", "仅看", "补充", "沿用"))
         metric_words = sorted([*METRICS, *METRICS.values()], key=len, reverse=True)
         metrics = re.findall("|".join(r"(?<![A-Za-z0-9_])" + re.escape(word) + r"(?![A-Za-z0-9_])"
@@ -54,11 +54,17 @@ class ConversationQueries:
         parent = self.conversation.artifact("BOSS", {**query, "run_id": selected[0], "kind": "query", "id": selected[1]["id"]}) if selected else None
         base = {key: value for key, value in parent["data"]["context_snapshot"].items()
             if key not in {"envelope", "question", "parent_query_id", "query_mode"}} if parent else json.loads(pending_scope) if pending_scope and "重新" not in text else {}
+        if applied_parameters is not None:
+            base = {**applied_parameters, **base}
         scenarios = loaded_scenarios(self.store, "BOSS")["scenarios"]
+        if applied_parameters is not None and any(identifier not in {item["scenario_id"] for item in scenarios}
+                for identifier in re.findall(r"(?<![A-Za-z0-9_-])scenario-[A-Za-z0-9_-]+", text)):
+            return QueryPlan(required_inputs=("当前已应用范围没有该正式经营资料编号，请核查原来源或明确重新应用",))
         scenario_ids = [item["scenario_id"] for item in scenarios if mentioned(text, item["scenario_id"])]
         require(len(scenario_ids) <= 1, "请明确当前唯一经营资料范围", web.HTTPBadRequest)
         scenario_id = scenario_ids[0] if scenario_ids else base.get("scenario_id")
-        dimensions = dimension_options(self.store, "BOSS", self.api.dimensions("BOSS", scenario_id))
+        dimensions = dimension_options(self.store, "BOSS", self.api.dimensions("BOSS", scenario_id,
+            source_ids=applied_parameters["source_ids"] if applied_parameters is not None else None))
         available = dimensions["available_dimensions"]
         updates, required = {}, []
         if scenario_id is not None:
@@ -70,7 +76,7 @@ class ConversationQueries:
             if selected_values:
                 if field in {"product_id", "region_id"}:
                     updates["product_ids" if field == "product_id" else "region_id"] = selected_values if field == "product_id" else selected_values[0]
-                    if field == "region_id" and len(selected_values) > 1:
+                    if field == "region_id" and (len(selected_values) > 1 or applied_parameters is not None or "region_ids" in base):
                         updates["region_ids"] = selected_values
                 else:
                     require(len(selected_values) == 1, "当前经营条件包含多个不兼容值，请明确" + LABELS.get(field, field), web.HTTPBadRequest)
@@ -119,6 +125,14 @@ class ConversationQueries:
         if parent is not None and not updates and "沿用当前查询范围" not in text:
             required.append("请明确本次经营条件，或明确沿用当前查询范围")
         scope = {**base, **updates}
+        if applied_parameters is not None:
+            fixed = set(applied_parameters) - {"product_ids", "region_id", "region_ids", "comparison_start", "comparison_end"}
+            if (any(scope.get(field) != applied_parameters[field] for field in fixed)
+                    or scope.get("scenario_id") != applied_parameters.get("scenario_id")
+                    or not set(scope["product_ids"]) <= set(applied_parameters["product_ids"])
+                    or not set(scope["region_ids"]) <= set(applied_parameters["region_ids"])
+                    or scope["region_id"] not in scope["region_ids"]):
+                return QueryPlan(required_inputs=("本次条件超出正式已应用范围，请明确重新应用并采用新的经营会话入口",))
         required.extend("请补充" + LABELS[field] for field in LABELS if field not in scope)
         valid_fields = {key: value for key, value in scope.items() if key in SPEC["io_schema"]["$defs"]["scoped_query_input"]["properties"]
             and key not in {"envelope", "question", "parent_query_id", "query_mode"}}

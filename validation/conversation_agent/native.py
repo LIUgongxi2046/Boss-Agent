@@ -16,11 +16,12 @@ from boss_simulation_api import _context
 from boss_source_access import require_current_business_source
 from runtime_page_read_tools import BossDashboardReadTool, BossEvidenceReadTool, BossMeetingsReadTool
 from runtime_sop_read_tools import BossTasksReadTool, BossWorkspaceReadTool
-from conversation_agent import CONVERSATION_REQUEST, CONVERSATION_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
+from conversation_agent import CONVERSATION_REQUEST, CONVERSATION_TOOLS, READ_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
 from conversation_agent.domain import ConversationPlanner, ConversationDomainReadTool, artifact_digest
 from conversation_agent.runtime import ConversationRuntimeRecorder, ConversationSimulatedProvider
 from conversation_agent.queries import ConversationQueryTool
 from conversation_agent.presentation import render_conversation
+from conversation_agent.business import BUSINESS_READ, BUSINESS_TOOLS, BusinessOverviewReadTool, entry_pin, plan_business
 from fc02_agent import Fc02Context, Fc02Tool
 
 
@@ -37,6 +38,7 @@ class ConversationGrant:
     dataset_id: str
     dataset_version: str
     task_entry_json: str | None = None
+    business_entry_json: str | None = None
 
 
 class NativeConversationAgent:
@@ -46,12 +48,14 @@ class NativeConversationAgent:
         self.pending_media = {}
         self.planner = ConversationPlanner(store)
         self.task_entry = self.planner.api.task_entry(attachments.sessions)
+        self.business_entry = self.planner.api.business_entry(attachments.sessions)
         self.scope = ConversationScope(store, self.context_provider, self.validate_context)
         api = BossPageAPI(store)
         self.delegates = [BossDashboardReadTool(api, "BOSS"), BossTasksReadTool(api, "BOSS"),
             BossMeetingsReadTool(api, "BOSS"), BossEvidenceReadTool(api, "BOSS"),
             BossWorkspaceReadTool(api, "BOSS", allowed_projections=["notifications", "travel", "calendar", "research"]),
             ConversationDomainReadTool(api, self.scope, attachments)]
+        self.delegates.append(BusinessOverviewReadTool(store, self.scope, self.business_entry))
         self.provider = ConversationSimulatedProvider(self.events, self.scope)
         self.recorder = ConversationRuntimeRecorder(self.scope, registry, runtime_snapshot, intent_adapter=self)
 
@@ -79,16 +83,51 @@ class NativeConversationAgent:
                 "会话原意图不属于当前本人资料范围", web.HTTPForbidden)
 
     def morning_claimed(self, chat_id):
+        if self.business_claimed(chat_id):
+            return False
         with self.store.connect() as db:
             return db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='morning_native_binding' AND json_extract(body,'$.chat_id')=?", (chat_id,)).fetchone() is not None
 
     def tools(self):
-        return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates] + [
+        return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates if delegate.name in READ_TOOLS] + [
             ConversationQueryTool(Fc02Tool(self.store, self.query_context, "query_metrics"), self.scope)]
 
-    def admit(self, role, chat_id, turn_id, content, *, media_sha256, attached, active):
+    def business_tools(self):
+        return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates if delegate.name == BUSINESS_READ]
+
+    def business_claimed(self, chat_id):
+        with self.store.connect() as db:
+            return db.execute("SELECT 1 FROM objects WHERE kind='conversation_business_binding' AND json_extract(body,'$.chat_id')=?", (chat_id,)).fetchone() is not None
+
+    def business_admission(self, role, chat_id, *, attached, active):
+        self._authorize(role, active)
+        require(callable(attached) and attached(chat_id), "当前连接未采用该经营会话", web.HTTPForbidden)
+        view = self.business_entry.read(role, {"session_id": webui_session_key(chat_id), "chat_id": chat_id})
+        pin = entry_pin(view)
+        require(pin is not None or not self.business_claimed(chat_id), "经营绑定不属于当前资料范围", web.HTTPForbidden)
+        self._authorize(role, active)
+        require(attached(chat_id), "经营入口检查期间连接已经变化", web.HTTPForbidden)
+        return pin is not None
+
+    def admit_business(self, role, chat_id, turn_id, content, *, media_sha256, attached, active, selection_current=None):
         if isinstance(content, str) and not builtin_command_starts_agent_turn(content):
             return None
+        if not self.business_claimed(chat_id):
+            return None
+        return self.admit(role, chat_id, turn_id, content, media_sha256=media_sha256, attached=attached, active=active,
+            selection_current=selection_current)
+
+    def admit(self, role, chat_id, turn_id, content, *, media_sha256, attached, active, selection_current=None):
+        if isinstance(content, str) and not builtin_command_starts_agent_turn(content):
+            return None
+        if self.business_claimed(chat_id):
+            require(self.business_admission(role, chat_id, attached=attached, active=active), "经营会话缺少当前入口证明", web.HTTPForbidden)
+            require(callable(selection_current), "经营会话缺少当前已应用选择的服务端证明", web.HTTPForbidden)
+            current = self.business_entry.read("BOSS", {"session_id": webui_session_key(chat_id), "chat_id": chat_id})["entry"]
+            selected = (current["preparation_id"], current["preparation_sha256"])
+            require(selection_current() == selected, "当前页面选择与原始经营绑定不符", web.HTTPConflict)
+            authenticated = active
+            active = lambda: bool(authenticated() and selection_current() == selected)
         if self.morning_claimed(chat_id):
             return None
         self._authorize(role, active)
@@ -236,7 +275,14 @@ class NativeConversationAgent:
                         last_source_ref = None
                 pending_query_scope = old.get("pending_query_scope")
             query = {"session_id": request.session_key, "chat_id": request.chat_id}
+            business_view = self.business_entry.read("BOSS", query)
+            business_entry_json = entry_pin(business_view)
+            for old in previous:
+                if "business_entry" in old:
+                    require((encode(old["business_entry"]) if old["business_entry"] is not None else None) == business_entry_json,
+                            "本会话经营入口与原始固定选择不符", web.HTTPConflict)
             task_entry_json = self.task_entry_pin(query)
+            require(business_entry_json is None or task_entry_json is None, "会话存在其他入口绑定", web.HTTPConflict)
             for old in previous:
                 if "task_entry" in old:
                     require((encode(old["task_entry"]) if old["task_entry"] is not None else None) == task_entry_json,
@@ -247,11 +293,20 @@ class NativeConversationAgent:
             require(row["media_sha256"] == checksum([]) or key in self.pending_media,
                     "本轮媒体尚无原生成功上传的正式元信息", web.HTTPConflict)
             media = tuple(sorted(set(media) | set(self.pending_media.get(key, ()))))
-            plan = self.planner.plan(request.original_user_text, query, (last_source_ref,) if last_source_ref else (), tuple(artifacts), last_source_id,
-                has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope, task_entry=task_entry)
+            if business_entry_json is not None:
+                plan = plan_business(self.store, self.planner.api, request.original_user_text, query, business_view, pending_query_scope)
+                for parameters, digest in plan.artifact_checks:
+                    selected = json.loads(parameters)
+                    for old_parameters, old_digest in artifacts:
+                        old = json.loads(old_parameters)
+                        if all(old[field] == selected[field] for field in ("kind", "id")):
+                            require(old_digest == digest, "经营追问产物与原始摘要不符", web.HTTPConflict)
+            else:
+                plan = self.planner.plan(request.original_user_text, query, (last_source_ref,) if last_source_ref else (), tuple(artifacts), last_source_id,
+                    has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope, task_entry=task_entry)
             self.validate_artifacts(plan, query)
             grant = ConversationGrant(key, request.chat_id, row["turn_id"], row["text_sha256"], proof[0], plan, media,
-                row["owner_id"], row["dataset_id"], row["dataset_version"], task_entry_json)
+                row["owner_id"], row["dataset_id"], row["dataset_version"], task_entry_json, business_entry_json)
             require(CONVERSATION_REQUEST not in request.attributes, "请求已经包含会话采用上下文", web.HTTPForbidden)
             request.attributes[CONVERSATION_REQUEST] = grant
             self.scope.current(request, require_runtime=False)
@@ -263,6 +318,7 @@ class NativeConversationAgent:
                     last_source_ref = next(ref for ref in reversed(plan.references) if ref[0] == "document" and ref[1] == current_sources[-1])
                 row.update(references=plan.references, attachment_refs=media, artifact_checks=plan.artifact_checks,
                            pending_query_scope=plan.pending_query_scope, task_entry=task_entry,
+                           business_entry=json.loads(business_entry_json) if business_entry_json is not None else None,
                            last_source_id=current_sources[-1] if current_sources else last_source_id,
                            last_source_ref=last_source_ref,
                            plan_sha256=checksum({"calls": plan.calls, "required_inputs": plan.required_inputs}))
@@ -280,10 +336,13 @@ class NativeConversationAgent:
                 and grant.key == self.turn_key(request.chat_id, grant.turn_id), "会话采用上下文不属于本轮输入", web.HTTPForbidden)
         require(self.task_entry_pin({"session_id": request.session_key, "chat_id": request.chat_id}) == grant.task_entry_json,
                 "任务入口与本轮固定准备摘要不符", web.HTTPConflict)
+        require(entry_pin(self.business_entry.read("BOSS", {"session_id": request.session_key, "chat_id": request.chat_id})) == grant.business_entry_json,
+                "经营入口与本轮原始选择不符", web.HTTPConflict)
         binding = request.attributes.get(ATTRIBUTE)
         return ConversationContext("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else request.message_id or request.turn_id, request.session_key,
-            request.chat_id, request.turn_id, bool(grant.key in self.proofs and grant.active()), grant.text_sha256, CONVERSATION_TOOLS,
+            request.chat_id, request.turn_id, bool(grant.key in self.proofs and grant.active()), grant.text_sha256,
+            BUSINESS_TOOLS if grant.business_entry_json is not None else CONVERSATION_TOOLS,
             frozenset((name, checksum(json.loads(params))) for name, params in grant.plan.calls), grant.plan.references)
 
     def validate_context(self, context):
@@ -320,10 +379,11 @@ class NativeConversationAgent:
     async def scope_context(self, request):
         if self.handles(request):
             configured = getattr(self.registry, "configured_tool_names", self.registry.tool_names)
-            require(CONVERSATION_TOOLS <= set(configured), "当前配置未启用一般会话七项正式工具", web.HTTPConflict)
+            tools = BUSINESS_TOOLS if request.attributes[CONVERSATION_REQUEST].business_entry_json is not None else CONVERSATION_TOOLS
+            require(tools <= set(configured), "当前配置未启用本次正式会话工具", web.HTTPConflict)
             require(self.recorder.runtime_snapshot()["max_tool_rounds"] >= len(request.attributes[CONVERSATION_REQUEST].plan.calls) + 1,
                     "当前实际轮次配置不足以执行本次正式读取", web.HTTPConflict)
-            request.attributes["product_feature_tool_scope"] = CONVERSATION_TOOLS
+            request.attributes["product_feature_tool_scope"] = tools
 
     def query_context(self):
         request = current_request_context()
@@ -354,6 +414,8 @@ class NativeConversationAgent:
                 "required_input_count": len(grant.plan.required_inputs)}
         if grant.task_entry_json is not None:
             result["task_entry"] = json.loads(grant.task_entry_json)
+        if grant.business_entry_json is not None:
+            result["business_entry"] = json.loads(grant.business_entry_json)
         return result
 
     def bind_runtime(self, request, binding):
