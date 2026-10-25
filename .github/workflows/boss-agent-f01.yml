@@ -33,7 +33,7 @@ jobs:
       - name: Create private project-local test directories
         run: mkdir -p .work/ci-pytest .work/ci-tmp
       - name: F01 sorting and original-receipt behavior regression
-        run: node --test app/tests/f01_today_order.test.mjs
+        run: node --test app/tests/f01_today_order.test.mjs app/tests/f01_return_point.test.mjs
       - name: F01 native morning agent and fixed-source permission regression
         env:
           FC03_NATIVE_DOMAIN_ROOT: ${{ github.workspace }}
