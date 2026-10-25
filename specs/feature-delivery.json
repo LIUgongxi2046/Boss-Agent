@@ -29,8 +29,8 @@
     },
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
-    "independent_current_main_build": "F01_SHARED_PINNED_REACT_BUILD_PASSED_N02_OPERATIONAL_E2E_NOT_RUN",
-    "latest_clean_build_run_id": 40195931205,
+    "independent_current_main_build": "N02_SCOPED_NATIVE_REACT_BUILD_PASSED__COMPREHENSIVE_LEGACY_N03_PYTHON_FAILED",
+    "latest_clean_build_run_id": 40202750383,
     "paused_menu": "MENU-N03",
     "f01_deferral": {
       "status": "ENGINEERING_FROZEN_AND_V7_GUI_ACCEPTANCE_DEFERRED_BY_EXPLICIT_NEXT_MENU_INSTRUCTION",
@@ -43,11 +43,65 @@
       "no_waiver_of_criteria": true
     },
     "scoped_engineering_evidence": {
-      "native_base": "F01_SHARED_NATIVE_BUILD_ONLY",
+      "native_base": "HKUDS_NANOBOT_V0_3_5_1bb712d_PINNED",
+      "n02_source_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
+      "n02_repaired": {
+        "status": "SCOPED_IMPLEMENTED_AND_VALIDATED",
+        "source_commits": [
+          "50759cb0e02414aae72a6f37dbb6da6c2ad3a9ae",
+          "f672af7d33e5f04594233668683af8199be53358",
+          "11244464db6eba3fd638530abd90299ce55d7f7b",
+          "ba9b2f28f40ae36c750cfc0dd4018c65eea87de4",
+          "d1436abc614dbfeb842421b5b1bdefe53d9d5df9"
+        ],
+        "affected_checkpoints": [
+          "MENU-N02.C07",
+          "MENU-N02.C09",
+          "MENU-N02.C15",
+          "MENU-N02.C18",
+          "MENU-N02.C20",
+          "MENU-N02.C21",
+          "MENU-N02.C23",
+          "MENU-N02.C25"
+        ],
+        "guarantees": [
+          "STALE_TASK_CONTEXT_HIDDEN_ON_FAILED_OR_INACTIVE_READ",
+          "CROSS_CHAT_ACCOUNT_LATE_BUSINESS_REPLIES_REJECTED",
+          "ORIGINAL_MESSAGE_RETRY_RETAINS_SAVED_LOCATION_AND_TAB_ACCESS",
+          "RUNS_FILES_AND_ORIGINAL_RECEIPTS_CLEARED_WHEN_CONNECTION_INVALID"
+        ]
+      },
+      "n02_current_scoped_tests": {
+        "run_id": 40202750401,
+        "node": "4_PASSED",
+        "sqlite_domain_task_source": "37_PASSED",
+        "nanobot_agentloop_native": "59_PASSED",
+        "total": 100,
+        "result": "PASS_CURRENT_SOURCE_GITHUB_CI_SIMULATED_NO_GUI"
+      },
+      "n02_current_build": {
+        "run_id": 40202750383,
+        "job_id": 121197182866,
+        "result": "PASS_REACT_JOB_ONLY",
+        "scope": "PINNED_NANOBOT_PATCHES_TYPESCRIPT_VITE_SHA_MANIFEST_REPEAT_ELECTRON_SYNTAX"
+      },
+      "n02_build_artifact": {
+        "artifact_id": 12603035088,
+        "name": "boss-agent-frontend-d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
+        "source_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
+        "archive_sha256": "d436ac9bc8684d0a26a2c1b4f0e03a5b622a3d90d86b330e0cf782f37a019f3a",
+        "size_bytes": 10786200,
+        "expires_at": "2026-11-08T14:33:45Z",
+        "scope": "FRONTEND_STATIC_BUNDLE_ONLY_NOT_MAC_INSTALLATION"
+      },
       "n02_current_gui": "NOT_RUN",
       "n02_current_v7_dom": "NOT_RUN",
-      "n02_current_all_26": "NOT_RUN"
-    }
+      "n02_current_all_26": "NOT_RUN",
+      "n03_legacy_comprehensive_pytest": "FAIL_RETAINED_NOT_SUPPRESSED",
+      "visual": "NOT_RUN",
+      "user_acceptance": "PENDING_USER_ACCEPTANCE"
+    },
+    "full_checklist_record": "docs/menu-delivery/N02/integration.md"
   },
   "suspended_current_menu": {
     "active_feature_id": "MENU-N03",
@@ -298,7 +352,7 @@
   "active_ticket": "docs/menu-delivery/N02.md",
   "current_stage": "MENU_N02_V7_REVALIDATION_AND_IMPLEMENTATION",
   "candidate_commit": null,
-  "implementation_commit": null,
+  "implementation_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
   "baseline_commit": "7527537830f6c011c328dc3bb6b7567ff262c20b",
   "development_record": "docs/menu-delivery/N02/integration.md",
   "delivery_record": null,
