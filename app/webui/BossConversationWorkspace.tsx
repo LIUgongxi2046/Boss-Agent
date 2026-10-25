@@ -82,7 +82,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
     }
     const ready=role==="BOSS"&&visible&&Boolean(chatId)&&connectionStatus==="open";
     setTaskContextChecking(ready);
-    if(!ready){setTaskContext(null);setTaskContextError("");return;}
+    if(!ready||!chatId){setTaskContext(null);setTaskContextError("");return;}
     // Do not leave the previously adopted task actionable while re-checking
     // this exact chat, including refresh, re-connect and explicit retry.
     setTaskContext(null);setTaskContextError("");
