@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { currentMorningDetailScope } from "../webui/morning-detail-scope.ts";
+import { currentMorningDetailScope,shouldClearMorningSelectionOnFilter } from "../webui/morning-detail-scope.ts";
 
 test("a date preview cannot enter pending privileged item-detail reads", () => {
   assert.equal(currentMorningDetailScope(null, {list_id: null}), false);
@@ -27,4 +27,16 @@ test("even a CURRENT status without a persisted list identifier is not sufficien
     {adoption_state:"CURRENT",result:{list_id:""}},{list_id:""}),false);
   assert.equal(currentMorningDetailScope(
     {adoption_state:"CURRENT",result:{list_id:null}},{list_id:null}),false);
+});
+
+test("F01 filter change cannot keep an offscreen selected item as an action target",()=>{
+  const items=[
+    {item_id:"task:one",category:"DECIDE"},
+    {item_id:"event:two",category:"INFORM"},
+  ];
+  assert.equal(shouldClearMorningSelectionOnFilter("INFORM","task:one",items),true);
+  assert.equal(shouldClearMorningSelectionOnFilter("INFORM","event:two",items),false);
+  assert.equal(shouldClearMorningSelectionOnFilter("ALL","task:one",items),false);
+  assert.equal(shouldClearMorningSelectionOnFilter("ALL","stale:missing",items),true);
+  assert.equal(shouldClearMorningSelectionOnFilter("DECIDE","",items),false);
 });
