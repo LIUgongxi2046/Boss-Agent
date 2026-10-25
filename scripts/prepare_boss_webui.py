@@ -254,7 +254,7 @@ def main() -> None:
         }
         record = ROOT / ".work" / "product" / "boss-compiled-build.json"
         record.write_text(
-            json.dumps(product, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8"
+            json.dumps(product, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         print("构建完成：" + str(dist))
         print("制品校验：" + str(record))
