@@ -39,7 +39,7 @@ jobs:
           MENU_N02_PRODUCT_ROOT: ${{ github.workspace }}
           PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
         run: >-
-          uv run --project validation --no-sync python -m pytest -q
+          uv run --project validation --no-sync python -m pytest -q --basetemp .work/ci-pytest/n03
           app/tests/test_menu_n03_overview.py
           app/tests/test_menu_n03_entry.py
           app/tests/test_menu_n03_preparation.py
@@ -49,7 +49,7 @@ jobs:
           app/tests/test_menu_n03_public_entry.py
           app/tests/test_menu_n03_public_meeting.py
       - name: Scoped role/business tests
-        run: uv run --project validation --no-sync python -m pytest -q app/tests/test_boss_page_api.py app/tests/test_boss_command_api.py app/tests/test_boss_assignment_nudge.py app/tests/test_boss_scheduler_config.py app/tests/test_v6_scheduler_ui.py app/tests/test_boss_workspace_api.py app/tests/test_boss_memory_notifications.py app/tests/test_boss_meeting_approval.py app/tests/test_boss_knowledge_ingestion.py app/tests/test_boss_prompt_context_adoption.py app/tests/test_boss_minutes_assignment_chain.py app/tests/test_boss_task_center.py app/tests/test_boss_self_commitments.py app/tests/test_boss_task_reminders.py app/tests/test_boss_meeting_brief.py app/tests/test_boss_travel.py app/tests/test_boss_people.py app/tests/test_boss_owner_preferences.py app/tests/test_boss_owner_authorizations.py app/tests/test_boss_research.py app/tests/test_boss_fr04_09_full_flow.py app/tests/test_v6_research_ui.py app/tests/test_v6_meeting_brief_ui.py app/tests/test_v6_minutes_approval_ui.py app/tests/test_boss_message_calendar.py app/tests/test_boss_recovery.py app/tests/test_v6_communication_calendar_ui.py app/tests/test_boss_sector_api.py app/tests/test_v6_contract.py app/tests/test_v6_owner_preferences_ui.py app/tests/test_local_deepseek_setup.py app/tests/test_product_privacy.py
+        run: uv run --project validation --no-sync python -m pytest -q --basetemp .work/ci-pytest/core app/tests/test_boss_page_api.py app/tests/test_boss_command_api.py app/tests/test_boss_assignment_nudge.py app/tests/test_boss_scheduler_config.py app/tests/test_v6_scheduler_ui.py app/tests/test_boss_workspace_api.py app/tests/test_boss_memory_notifications.py app/tests/test_boss_meeting_approval.py app/tests/test_boss_knowledge_ingestion.py app/tests/test_boss_prompt_context_adoption.py app/tests/test_boss_minutes_assignment_chain.py app/tests/test_boss_task_center.py app/tests/test_boss_self_commitments.py app/tests/test_boss_task_reminders.py app/tests/test_boss_meeting_brief.py app/tests/test_boss_travel.py app/tests/test_boss_people.py app/tests/test_boss_owner_preferences.py app/tests/test_boss_owner_authorizations.py app/tests/test_boss_research.py app/tests/test_boss_fr04_09_full_flow.py app/tests/test_v6_research_ui.py app/tests/test_v6_meeting_brief_ui.py app/tests/test_v6_minutes_approval_ui.py app/tests/test_boss_message_calendar.py app/tests/test_boss_recovery.py app/tests/test_v6_communication_calendar_ui.py app/tests/test_boss_sector_api.py app/tests/test_v6_contract.py app/tests/test_v6_owner_preferences_ui.py app/tests/test_local_deepseek_setup.py app/tests/test_product_privacy.py
 
   react-webui-build:
     runs-on: ubuntu-latest
