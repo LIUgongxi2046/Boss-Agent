@@ -24,6 +24,28 @@ def test_morning_preparation_does_not_require_unselected_business_links(store):
         assert store.get(db, "ui-check", "morning_assignment_reference", created["task_id"])["morning_reference"] == reference
 
 
+def test_current_meeting_source_can_be_pinned_without_old_finance_fixture(store):
+    """F01 must not reject another authorized simulated source solely by name."""
+    morning, commands = MorningAPI(store), BossCommandAPI(store)
+    view = query(morning, key="morning-meeting-only-list", date="2026-10-23")
+    item = next(row for row in view["items"] if row["kind"] == "meeting")
+    refs = {ref["id"]: ref["version"] for ref in item["source_refs"]
+            if ref["kind"] == "document"}
+    assert "meeting-minutes" in refs and refs["meeting-minutes"]
+    reference = {field: view[field] for field in ("list_id", "list_version", "snapshot_sha256")}
+    reference["item_id"] = item["item_id"]
+    payload = create_input("f01-meeting-source-only", morning_reference=reference,
+        source_refs=["meeting-minutes"], related_meeting_id=None, related_event_ids=[])
+    status, created = commands.execute("BOSS", "boss.assignment.create", payload)
+    assert status == 200, created
+    with store.connect() as db:
+        saved = store.get(db, "ui-check", "task", created["task_id"])
+        assert saved["source_refs"] == ["meeting-minutes"]
+        assert saved["source_versions"] == {"meeting-minutes": refs["meeting-minutes"]}
+        assert saved["status"] == "OPEN"
+        assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
+
+
 def test_public_morning_day_preview_is_actual_and_strict(store):
     pages = BossPageAPI(store)
     days = [{"date": "2026-10-23", "timezone": "Asia/Shanghai"}, DAY]
