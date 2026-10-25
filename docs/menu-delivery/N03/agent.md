@@ -1,6 +1,6 @@
 # MENU-N03-N2 正式经营绑定消费者
 
-task_id=MENU-N03-N2；marker=MENU-N03-N2-BOUND-CONSUMER-20261025；decision_id=D-MENU-DELIVERY-20261024；CURRENT；last_verified=2026-10-25。模块VERSION=1.4.0，Runtime Schema=1.14.0；模块状态MODULE_CHECKS_PASSED，公共接收PENDING_N3。本记录登记N2消费者和限定证据；公共RoleChannel/application/配置/绑定与界面接收由N3维护。完整C01—C26、用户及视觉验收状态唯一来源为原始项目specs/feature-delivery.json。
+task_id=MENU-N03-N2；marker=MENU-N03-N2-MORNING-MUTUAL-EXCLUSION-20261025；decision_id=D-MENU-DELIVERY-20261024；CURRENT；last_verified=2026-10-25。会话模块VERSION=1.4.0，NativeMorningAdapter VERSION=1.1.0，Runtime Schema=1.14.0；模块状态MODULE_CHECKS_PASSED，公共接收PENDING_N3。本记录登记N2消费者和限定证据；公共RoleChannel/application/配置/绑定与界面接收由N3维护。完整C01—C26、用户及视觉验收状态唯一来源为原始项目specs/feature-delivery.json。
 
 ## 准确输入与责任
 
@@ -58,7 +58,7 @@ N3把business_tools()返回的真实工具加入available目录和启用配置�
 5. RoleChannel在晨间候选及morning.native.admit之前调用admit_business，传入实际content、turn_id、media摘要、当前role/active/attach与selection_current。返回非None时采用同一普通原生发布路径，enqueue=false只查原编号；禁止继续进入晨间候选或第二次一般admit。非Agent命令保留SDK路径。
 6. Context provider顺序继续晨间native_context、一般native_context、当前配置/Skills/Memory、各受限scope和对应Recorder；N03当前没有晨间绑定，晨间provider返回None。后续provider使用guard_context，实际运行采用同一Provider/Recorder。
 
-晨间新增绑定事务必须在保存前调用business_entry.require_available_in_transaction(db,{session_id,chat_id})，检查与保存位于同一BEGIN IMMEDIATE；N1已经让任务入口检查经营占用。N2的morning_claimed对已占用经营chat不选择晨间分支，随后正式Entry.read拒绝任何真实冲突绑定。该模块保护不能替代公共晨间保存事务检查。公共前置方法、选择证明和共享事务接收均由N3完成；当前记录不宣称RoleChannel整条生产链路已经验收。
+NativeMorningAdapter.bind在保存新增绑定前强制调用business_entry.require_available_in_transaction(db,{session_id,chat_id})，检查与保存位于同一BEGIN IMMEDIATE；N1已经让任务入口检查经营占用。N2的morning_claimed对已占用经营chat不选择晨间分支，随后正式Entry.read拒绝任何真实冲突绑定。公共前置方法、选择证明、实际SessionManager注入及完整链路接收由N3完成；当前记录不宣称RoleChannel整条生产链路已经验收。
 
 ## 参数、专题和当前引用
 
@@ -108,8 +108,30 @@ env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/
 
 ## N3接收与环境保护
 
-N3下一动作是接收准确工具及1.14.0 Schema，将admit_business及可信selection_current放在晨间候选之前，配置工具目录与当前受限包装，完成共享晨间绑定事务检查；然后验证真实公共prepare/new_chat/bind/read、原生发布、范围切换、取消、未知恢复及返回UI。全26项和当前唯一菜单不变，N2模块证据不表示完整菜单、未来专题或用户验收通过。
+N3接收准确工具及1.14.0 Schema，将admit_business及可信selection_current放在晨间候选之前，配置工具目录与当前受限包装，并按下节注入晨间实际SessionManager；然后验证真实公共prepare/new_chat/bind/read、原生发布、范围切换、取消、未知恢复及返回UI。全26项和当前唯一菜单不变，N2模块证据不表示完整菜单、未来专题或用户验收通过。
 
-当前PRODUCT尚未包含本主记录路径；本次提交以6d9eacf记录为前置。接收时可按顺序接收6d9eacf与本次消费者提交，代码依赖采用上述准确72f0a7f领域。本次git diff --check通过，N1正式源码和相关Schema在验证结束时与准确输入一致。
+经营绑定消费者提交为68d9b269e74f046b2c66be624a3d227ee2e21e43，记录前置为6d9eacf；N3已接收为当前PRODUCT a7a3992c5b59e1ca21db29c4a6d34bc03f3f44fa。本次git diff --check通过，限定核查的N1正式入口及ProductMorning与72f0a7f准确输入一致。
+
+## 晨间共享占用检查与实际生命周期
+
+本次接续仅修改validation/fc03_agent/native.py、必要限定用例与同一记录；没有修改N1领域或N3 public_conversation/role_channel/application/product_conversation/前端。读取PRODUCT a7a3992c5b59e1ca21db29c4a6d34bc03f3f44fa；正式boss_business_overview_entry.py blob=e03b99c4bfa2454a8a6bc60b80c5bceffab63c8d，原fc03_agent/native.py blob=70da5ade0deedc7c66287fe516d124dfa4625b17。
+
+新增NativeMorningAdapter.bind_sessions(native_sessions)。参数必须是实际nanobot.session.manager.SessionManager，采用后保存在native_sessions属性；相同实例重复注入合法，替换为其他实例409。ProductMorning仍可在SessionManager创建之前构造，native_sessions初始None；每次新增bind在实际写入事务中强制核查实际SessionManager，缺少注入503，不存在跳过检查的选项。
+
+N3 application当前顺序为ProductMorning(store)、实际sessions=SessionManager(config.workspace_path)、ConversationAttachments(sessions,...)以及AgentLoop.from_config(...,session_manager=sessions)。N3在创建该sessions之后、开放任何晨间新增绑定之前调用morning.native.bind_sessions(sessions)。调用放在product_mode且morning非空的分支即可；不要重新创建SessionManager、Session或另一个Loop。没有额外构造参数、客户端字段或公开Schema变化。
+
+新增bind完成身份与原始输入校验后，进入原有BEGIN IMMEDIATE，在self.store.put之前通过ConversationAPI(self.store).business_entry(self.native_sessions)调用N1 require_available_in_transaction。使用当前同一个db及规范session_id/chat_id，正式检查所有namespace的经营绑定、任务绑定、晨间绑定、真实conversation_intent/runtime_run占用；冲突409，事务不保存部分结果，也不捕获领域错误。
+
+旧同键路径保持：先按原client_request_id读取原绑定，核查身份与payload摘要后返回binding_receipt。该路径不执行新增占用检查，不要求重建服务注入SessionManager，不因自身已有绑定、真实运行或来源变化而拒绝历史读取；回执仍明确NOT_REVALIDATED_BY_LOOKUP，没有恢复执行proof。同键异内容保持409，新键不能接管原会话。
+
+test_morning_exclusion.py从实际ProductMorning构造器消费当前NativeMorningAdapter，使用标准importlib加载当前自有模块，其余领域仍来自准确PRODUCT。验证真实经营绑定、本人正式任务绑定、实际admit意图、已完成SDK会话均拒绝；拒绝前后完整objects/audit/idempotency逐项相同。并发正式经营绑定与晨间绑定只有一方成功，另一方409，最终只存在一份绑定。没有编写替代占用SQL或伪造Runtime。
+
+未占用晨间流程通过同一实际SessionManager执行两轮真实Nanobot/AgentLoop，使用正式FeatureProvider、FeatureRecorder、四项FormalMorningTool及Native Hook。保存两份FC03运行、一个晨间清单，工具步骤分别4项和3项；原输入保留于实际Session，模型没有生成授权或发送。服务重建后原绑定编号和最后原意图仍可读取。没有制造异常、模型响应或业务结果。
+
+morning-check.xml记录35 passed、22.44秒，包含九项共享检查、既有晨间优先检查及25项N03绑定消费者限定回归。测试仅使用本目录独立数据及已存在的实际SDK SessionManager，不读取用户会话，socket.connect审计始终拒绝，零网络/GUI/自动登录/凭据访问。N3 application注入及整条公共链路仍待接收，完整26项不变。
+
+```bash
+env PYTHONDONTWRITEBYTECODE=1 CONVERSATION_DOMAIN_ROOT=/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent validation/.venv/bin/python -m pytest app/tests/conversation_agent/test_morning_exclusion.py app/tests/conversation_agent/test_native.py::test_morning_binding_keeps_priority app/tests/conversation_agent/test_business_consumer.py -q -p no:cacheprovider -o junit_family=xunit1 --basetemp=validation/.work/n03-morning-delivery --tb=short --junitxml=docs/menu-delivery/N03/morning-check.xml
+```
 
 磁盘生成前检查232MiB及后续197MiB；没有创建仓库副本。原F01的10611/10612/20611、新F01的10621/10622/20621、N02的10711/10712/20711、UI02的10411/10412/20411、MVP的9961/9962/19961及其制品、桌面和用户资料均未用于验证。N03端口10811/10812/20811及独立制品由N3管理，本次未启动。STT/F27/FC28与视觉保持暂停；没有新聊天、子代理或向其他聊天发送消息。公共索引由N3接收本主记录的稳定路径。

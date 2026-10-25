@@ -4,15 +4,17 @@ import json
 from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 from nanobot.agent.hook import AgentHook
+from nanobot.session.manager import SessionManager
 from nanobot.webui.session_identity import is_valid_webui_chat_id, webui_session_key
 from nanobot.webui.transcript import normalize_webui_turn_id
 
 from business import checksum, now, require
 from boss_morning import SCHEMA
 from boss_simulation_api import _context
+from boss_conversation import ConversationAPI
 
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 BIND_SCHEMA = {"type": "object", "additionalProperties": False, "$defs": SCHEMA["$defs"],
     "required": ["chat_id", "date", "timezone"], "properties": {
         "chat_id": {"type": "string"}, **SCHEMA["$defs"]["Day"]["properties"],
@@ -36,6 +38,13 @@ class NativeMorningAdapter:
         self.service, self.store = service, service.store
         self.request_attribute = request_attribute
         self.proofs = {}
+        self.native_sessions = None
+
+    def bind_sessions(self, native_sessions):
+        require(isinstance(native_sessions, SessionManager), "晨间绑定需要实际原生SessionManager", web.HTTPBadRequest)
+        require(self.native_sessions is None or self.native_sessions is native_sessions,
+                "晨间绑定已经采用其他原生会话服务", web.HTTPConflict)
+        self.native_sessions = native_sessions
 
     def _identity(self, db):
         self.store.active(db, NS)
@@ -113,6 +122,10 @@ class NativeMorningAdapter:
             require(self._binding(db, row["chat_id"]) is None, "当前会话已经绑定晨间范围", web.HTTPConflict)
             require(db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='morning_native_binding' AND id=?",
                                (NS, client_request_id)).fetchone() is None, "原绑定编号已经存在，请读取原结果", web.HTTPConflict)
+            require(isinstance(self.native_sessions, SessionManager), "晨间新增绑定尚未接收实际原生会话服务", web.HTTPServiceUnavailable)
+            # 占用检查与保存共用当前写入事务，其他入口不能同时接管同一会话。
+            ConversationAPI(self.store).business_entry(self.native_sessions).require_available_in_transaction(
+                db, {"session_id": row["session_id"], "chat_id": row["chat_id"]})
             self.store.put(db, NS, "morning_native_binding", client_request_id, row)
         return self.binding_receipt(role, client_request_id, active=active)
 

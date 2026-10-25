@@ -12,6 +12,11 @@ module = importlib.util.module_from_spec(spec)
 sys.modules["conversation_agent"] = module
 spec.loader.exec_module(module)
 
+native_spec = importlib.util.spec_from_file_location("fc03_agent.native", ROOT / "validation/fc03_agent/native.py")
+native_module = importlib.util.module_from_spec(native_spec)
+sys.modules["fc03_agent.native"] = native_module
+native_spec.loader.exec_module(native_module)
+
 
 def prohibit_network(event, args):
     if event == "socket.connect":

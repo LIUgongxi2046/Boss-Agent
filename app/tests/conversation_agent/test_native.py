@@ -157,6 +157,7 @@ def test_stop_has_no_new_intent_or_business_lookup(native):
 def test_morning_binding_keeps_priority(native):
     from product_morning import ProductMorning
     morning = ProductMorning(native[0])
+    morning.native.bind_sessions(native[2].sessions)
     morning.native.bind("BOSS", "n02-morning-priority", {"chat_id": CHAT, "date": "2026-10-24", "timezone": "Asia/Shanghai"},
         attached=lambda chat: True, active=lambda: True)
     assert native[1].admit("BOSS", CHAT, str(uuid4()), "读取资料", media_sha256=checksum([]), attached=lambda chat: True, active=lambda: True) is None
