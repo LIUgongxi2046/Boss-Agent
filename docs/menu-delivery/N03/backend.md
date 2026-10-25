@@ -2,6 +2,8 @@
 
 task_id=MENU-N03-N1；marker=MENU-N03-START-20261025；依据原始docs/menu-delivery/N03.md的C01—C26及完整产品FR-02/03/14—23。当前唯一菜单N03，正式状态由N3维护specs/feature-delivery.json，本记录不登记完整菜单或用户验收通过。last_verified=2026-10-25，领域状态MODULE_CHECKS_PASSED。原五项未提交内容保持。
 
+实施提交a38bf9b41f5b1f88d08ebbac10b62a2610962515，分支codex/business，共6份领域、Schema、检查、记录及索引文件。N3/N2按该准确增量接收，公共路由和实际Agent消费仍待各自接收。
+
 ## 当前依据与边界
 
 完整读取当前工单和适用AGENTS，沿用S008任务记录、实施与接口检查规范。核查准确PRODUCT基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57的BossSectorAPI、正式BI计算、SimulationAPI、供应品质、经营提醒、任务和来源规则；验证时PRODUCT HEAD为ba59c33bc3cc6b914bdd0b0792aeedc49b3f2220，相关领域文件与基准相同。PRODUCT目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，仅作只读依赖。记忆索引没有本任务相关证据。
