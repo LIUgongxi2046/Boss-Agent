@@ -77,27 +77,7 @@ jobs:
           python scripts/prepare_boss_webui.py
           cmp .work/product/boss-native-patches.json .work/product/boss-native-patches-first.json
       - name: Verify distributable matches recorded source and content hashes
-        run: |
-          python - <<'PY'
-          import hashlib, json, subprocess
-          from pathlib import Path
-          root = Path(".work/product")
-          info = json.loads((root / "boss-compiled-build.json").read_text())
-          assert info["format"] == "BOSS_AGENT_DIST_SHA256_V1"
-          assert info["repo_commit"] == subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-          assert info["nanobot_commit"] == "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
-          assert info["result"] == "BUILT_NOT_MAC_GUI_ACCEPTED"
-          assert info["desktop_v7_verified"] is False
-          dist = root / "nanobot/nanobot/web/dist"
-          actual = {
-              str(p.relative_to(dist)): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in dist.rglob("*") if p.is_file()
-          }
-          assert info["assets"] and actual == info["assets"]
-          assert actual["index.html"] == info["index_html_sha256"]
-          assert hashlib.sha256((root / "boss-build-manifest.json").read_bytes()).hexdigest() == info["overlay_manifest_sha256"]
-          print("compiled bundle digest validated", len(actual), "files")
-          PY
+        run: python scripts/verify_f01_candidate.py --bundle .work/product --require-head
       - name: Archive immutable F01 integration candidate for manual Mac review
         uses: actions/upload-artifact@v4
         with:
