@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -75,6 +76,85 @@ def patch_blocks(text: str):
     return blocks
 
 
+def normalize_native_threads(content: str) -> str:
+    """Resolve duplicated historic hunks for both *real* native thread panes.
+
+    The historical patches included a pair of ambiguous 'transcriptionEnabled'
+    hunks; context-only matching can insert both callbacks on the first pane.
+    Assign the callbacks to the actual existing session of each ThreadShell.
+    """
+    pattern = re.compile(r"(?m)^(?P<prefix>\\s*<ThreadShell\\n)(?P<body>[\\s\\S]*?)^(?P<close>\\s*/>)")
+    found = []
+
+    def repair(match):
+        body = match.group("body")
+        if "session={activeSession}" in body:
+            key = 'activeKey??"new-conversation"'
+        elif "session={paneSession}" in body:
+            key = "paneSession.key"
+        else:
+            raise RuntimeError("原生会话面板缺少合法session对象")
+        lines = body.split("\\n")
+        attributes = (
+            "persistQueuedPrompts", "composerInputLabel", "composerSubmitLabel",
+            "composerAttachmentLabel", "composerPlaceholder", "onDraftController",
+            "onReadingController",
+        )
+        lines = [line for line in lines if not re.match(
+            r"^\\s*(?:" + "|".join(attributes) + r")=", line
+        )]
+        anchor = next((i for i, line in enumerate(lines) if "transcriptionEnabled={false}" in line), None)
+        if anchor is None:
+            raise RuntimeError("原生页面没有继承暂停语音的声明")
+        indent = re.match(r"^\\s*", lines[anchor]).group()
+        props = [
+            "persistQueuedPrompts={false}",
+            'composerInputLabel={role==="BOSS"?"本次消息":undefined}',
+            'composerSubmitLabel={role==="BOSS"?"提交需求":undefined}',
+            'composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}',
+            'composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}',
+            f"onDraftController={{controller=>registerNativeDraft({key},controller)}}",
+            f"onReadingController={{controller=>registerNativeReading({key},controller)}}",
+        ]
+        lines[anchor+1:anchor+1] = [indent + value for value in props]
+        found.append(key)
+        return match.group("prefix") + "\\n".join(lines) + match.group("close")
+
+    result = pattern.sub(repair, content)
+    if found != ['activeKey??"new-conversation"', "paneSession.key"]:
+        raise RuntimeError("原生会话非预期布局，拒绝修剪历史补丁：" + str(found))
+    return result
+
+
+def normalize_native_composers(content: str) -> str:
+    """Both existing ThreadComposer instances require accessible field labels."""
+    pattern = re.compile(r"(?m)^(?P<prefix>\\s*<ThreadComposer\\n)(?P<body>[\\s\\S]*?)^(?P<close>\\s*/>)")
+    found = []
+
+    def repair(match):
+        lines = match.group("body").split("\\n")
+        props = ("inputLabel", "submitLabel", "attachmentLabel")
+        lines = [line for line in lines if not re.match(
+            r"^\\s*(?:" + "|".join(props) + r")=", line
+        )]
+        anchor = next((i for i, line in enumerate(lines) if "inputAriaLabel={composerInputAriaLabel}" in line), None)
+        if anchor is None:
+            raise RuntimeError("原生编辑器缺少输入可访问名称的正式来源")
+        indent = re.match(r"^\\s*", lines[anchor]).group()
+        lines[anchor+1:anchor+1] = [
+            indent + "inputLabel={composerInputLabel}",
+            indent + "submitLabel={composerSubmitLabel}",
+            indent + "attachmentLabel={composerAttachmentLabel}",
+        ]
+        found.append("session" if "onSend={handleThreadSend}" in match.group("body") else "new")
+        return match.group("prefix") + "\\n".join(lines) + match.group("close")
+
+    result = pattern.sub(repair, content)
+    if found != ["session", "new"]:
+        raise RuntimeError("原生输入框数量与实际流程不符：" + str(found))
+    return result
+
+
 def apply_native_overlay(root: Path, checkout: Path, app_overlay: str, upstream_app: str) -> dict:
     """Validate every source/patch first, then write only reproducible candidates."""
     patch_root = root / "app" / "webui"
@@ -122,6 +202,11 @@ def apply_native_overlay(root: Path, checkout: Path, app_overlay: str, upstream_
                 working = working[:offset] + after + working[offset + len(before):]
                 count += 1
             candidate[path] = working
+
+    candidate["webui/src/App.tsx"] = normalize_native_threads(candidate["webui/src/App.tsx"])
+    candidate["webui/src/components/thread/ThreadShell.tsx"] = normalize_native_composers(
+        candidate["webui/src/components/thread/ThreadShell.tsx"]
+    )
 
     required = {
         "webui/src/App.tsx": (
