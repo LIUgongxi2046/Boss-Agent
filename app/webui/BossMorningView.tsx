@@ -4,6 +4,7 @@ import {BossToday,morningReason,morningState,type TodayItem,type TodayOrderRecei
 import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogClose} from "@/components/ui/dialog";
 import {CheckCircle2,ClipboardList,Info,Send,X} from "lucide-react";
 import {isSafeMorningFocusId,readMorningReturnPoint} from "./morning-return";
+import {currentMorningDetailScope} from "./morning-detail-scope";
 import "./boss-morning.css";
 import "./boss-f01-shell.css";
 
@@ -129,8 +130,11 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     return()=>abort.abort();
   },[day,revision,refreshVersion,read,clearDetailForRead]);
   useEffect(()=>{
-    if(!selected||!list||list.adoption_state!=="CURRENT"||!view?.list_id)return;
-    const abort=new AbortController(),current=epoch.current,version=generation.current,listId=view.list_id;
+    if(!selected||!currentMorningDetailScope(list,view)){
+      setDetail(null);setDetailLoading(false);setDetailError("");
+      return;
+    }
+    const abort=new AbortController(),current=epoch.current,version=generation.current,listId=view!.list_id!;
     const active=()=>current===epoch.current&&version===generation.current&&!abort.signal.aborted;
     clearDetailForRead();setDocument(null);setDetailLoading(true);
     void read<Detail>("/api/boss/ui/morning/detail?"+new URLSearchParams({list_id:listId,item_id:selected}),abort.signal).then(value=>{
@@ -184,7 +188,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   }
   async function recover(key=requestId,adoptDay=false){if(!key||orderDirty||deniedRef.current)return;const current=epoch.current;generation.current++;setError("");setDetail(null);setDocument(null);setSelected("");setSourceId("");remember({morningRequest:key,morningItem:null,morningSource:null});await restore(key,undefined,adoptDay).then(()=>{if(current===epoch.current&&!deniedRef.current)setRevision(value=>value+1);},failure=>{if(current===epoch.current)setError(failure.message);});}
   function cancelHandoff(){handoff.current?.abort();setHandoffCanceled(true);setError("会话交接取消已请求；等待原绑定结果，当前问题不会自动发送。");}
-  const current=list?.adoption_state==="CURRENT",order=list?.current_order;
+  const current=currentMorningDetailScope(list,view),order=current?list?.current_order:null;
   useEffect(()=>{
     if(!visible||!returnPending.current||loading||(Boolean(selected)&&!detail&&!detailError))return;
     const point=returnPoint.current;if(!point)return;
@@ -205,7 +209,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const disabled=busy||uncertain||orderDirty||denied;
   const actualCounts={DECIDE:0,COORDINATE:0,INFORM:0};for(const item of view?.items??[])actualCounts[item.category]++;
   const counts=view?.category_counts??actualCounts;
-  const chooseItem=(item:TodayItem)=>{if(selected===item.item_id&&!detail)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(true);setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
+  const chooseItem=(item:TodayItem)=>{if(selected===item.item_id&&!detail)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(currentMorningDetailScope(list,view));setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
   const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setError("");setSourceId(id);setDocument(null);remember({morningSource:id});};
   const readOrder=useCallback((key:string,signal?:AbortSignal)=>read<TodayOrderReceipt>("/api/boss/ui/morning/receipt?"+new URLSearchParams({action:"boss.today.reorder",client_request_id:key}),signal),[read]);
   const categories=[{id:"DECIDE" as const,title:"待决定",Icon:ClipboardList},{id:"COORDINATE" as const,title:"待协调",Icon:CheckCircle2},{id:"INFORM" as const,title:"需要知晓",Icon:Info}];
@@ -253,8 +257,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         {detail.documents.length===0&&<p>当前事项尚未提供原文材料。</p>}
         {view?.preparation_materials.filter(value=>value.item_id===selected).map(value=><div key={value.item_id}><p>准备期限 {value.preparation_due_at??"尚未提供"}</p>{value.requirements.map(text=><p key={text}>{text}</p>)}</div>)}
         </details>
-      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在核查":detailError?"当前读取失败":current?"尚未取得详情":"需重新查询清单":"尚未选择事项"}</dd></div>)}</dl>
-        <p>{selected?detailLoading?"正在核查当前事项与来源版本。":detailError?"详情读取失败，原有清单仍在；请重新核查该事项。":current?"当前事项尚未取得可采用详情，请核查来源。":"当前清单需要重新查询，历史内容不可直接操作。":current?"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>
+      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在核查":detailError?"当前读取失败":current?"尚未取得详情":list?"需重新查询清单":"仅为日期预览":"尚未选择事项"}</dd></div>)}</dl>
+        <p>{selected?detailLoading?"正在核查当前事项与来源版本。":detailError?"详情读取失败，原有清单仍在；请重新核查该事项。":current?"当前事项尚未取得可采用详情，请核查来源。":list?"当前清单需要重新查询，历史内容不可直接操作。":"此项仅为日期预览，尚不能读取正式详情或绑定交办。请先通过“本次需求”提交晨间问题，取得正式清单后核查事项。":current?"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>
         {detailError&&current&&selected&&<div className="boss-status boss-status-error" role="alert"><span>{detailError}</span><button id="morning-detail-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setDetailRevision(value=>value+1)}>重新核查当前事项</button></div>}</>}</Panel>
       <Panel title="保存与返回"><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
       <div className="boss-actions"><button id="morning-tasks" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N05","");}}>任务与承诺</button><button id="morning-notifications" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N06","");}}>通知中心</button></div>
