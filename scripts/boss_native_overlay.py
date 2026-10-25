@@ -83,7 +83,7 @@ def normalize_native_threads(content: str) -> str:
     hunks; context-only matching can insert both callbacks on the first pane.
     Assign the callbacks to the actual existing session of each ThreadShell.
     """
-    pattern = re.compile(r"(?m)^(?P<prefix>\\s*<ThreadShell\\n)(?P<body>[\\s\\S]*?)^(?P<close>\\s*/>)")
+    pattern = re.compile(r"(?m)^(?P<prefix>\s*<ThreadShell\n)(?P<body>[\s\S]*?)^(?P<close>\s*/>)")
     found = []
 
     def repair(match):
@@ -94,19 +94,19 @@ def normalize_native_threads(content: str) -> str:
             key = "paneSession.key"
         else:
             raise RuntimeError("原生会话面板缺少合法session对象")
-        lines = body.split("\\n")
+        lines = body.split("\n")
         attributes = (
             "persistQueuedPrompts", "composerInputLabel", "composerSubmitLabel",
             "composerAttachmentLabel", "composerPlaceholder", "onDraftController",
             "onReadingController",
         )
         lines = [line for line in lines if not re.match(
-            r"^\\s*(?:" + "|".join(attributes) + r")=", line
+            r"^\s*(?:" + "|".join(attributes) + r")=", line
         )]
         anchor = next((i for i, line in enumerate(lines) if "transcriptionEnabled={false}" in line), None)
         if anchor is None:
             raise RuntimeError("原生页面没有继承暂停语音的声明")
-        indent = re.match(r"^\\s*", lines[anchor]).group()
+        indent = re.match(r"^\s*", lines[anchor]).group()
         props = [
             "persistQueuedPrompts={false}",
             'composerInputLabel={role==="BOSS"?"本次消息":undefined}',
@@ -118,7 +118,7 @@ def normalize_native_threads(content: str) -> str:
         ]
         lines[anchor+1:anchor+1] = [indent + value for value in props]
         found.append(key)
-        return match.group("prefix") + "\\n".join(lines) + match.group("close")
+        return match.group("prefix") + "\n".join(lines) + match.group("close")
 
     result = pattern.sub(repair, content)
     if found != ['activeKey??"new-conversation"', "paneSession.key"]:
@@ -128,26 +128,26 @@ def normalize_native_threads(content: str) -> str:
 
 def normalize_native_composers(content: str) -> str:
     """Both existing ThreadComposer instances require accessible field labels."""
-    pattern = re.compile(r"(?m)^(?P<prefix>\\s*<ThreadComposer\\n)(?P<body>[\\s\\S]*?)^(?P<close>\\s*/>)")
+    pattern = re.compile(r"(?m)^(?P<prefix>\s*<ThreadComposer\n)(?P<body>[\s\S]*?)^(?P<close>\s*/>)")
     found = []
 
     def repair(match):
-        lines = match.group("body").split("\\n")
+        lines = match.group("body").split("\n")
         props = ("inputLabel", "submitLabel", "attachmentLabel")
         lines = [line for line in lines if not re.match(
-            r"^\\s*(?:" + "|".join(props) + r")=", line
+            r"^\s*(?:" + "|".join(props) + r")=", line
         )]
         anchor = next((i for i, line in enumerate(lines) if "inputAriaLabel={composerInputAriaLabel}" in line), None)
         if anchor is None:
             raise RuntimeError("原生编辑器缺少输入可访问名称的正式来源")
-        indent = re.match(r"^\\s*", lines[anchor]).group()
+        indent = re.match(r"^\s*", lines[anchor]).group()
         lines[anchor+1:anchor+1] = [
             indent + "inputLabel={composerInputLabel}",
             indent + "submitLabel={composerSubmitLabel}",
             indent + "attachmentLabel={composerAttachmentLabel}",
         ]
         found.append("session" if "onSend={handleThreadSend}" in match.group("body") else "new")
-        return match.group("prefix") + "\\n".join(lines) + match.group("close")
+        return match.group("prefix") + "\n".join(lines) + match.group("close")
 
     result = pattern.sub(repair, content)
     if found != ["session", "new"]:
