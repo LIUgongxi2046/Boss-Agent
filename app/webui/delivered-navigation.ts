@@ -1,6 +1,10 @@
-type Role="BOSS"|"MAINTAINER";
-type Entry={title:string;feature:string;directory:boolean};
-export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
+import designPages from "../../Boss-Agent-Desktop-Complete-v6/meta/页面配置.json";
+
+export type Role="BOSS"|"MAINTAINER";
+type FeatureReference={title:string;feature:string;directory:boolean};
+export type NavigationEntry={id:string;title:string;group:string;feature:string;directory:boolean;state:"DEVELOPED"|"IN_PROGRESS"|"PARTIAL"|"PAUSED"|"AUTHENTICATION";stateLabel:string;accepted:false;variantLabel:string|null};
+type PrimaryEntry={id:string;title:string};
+const FEATURE_REFERENCES:Record<Role,Record<string,FeatureReference>>={
   BOSS:{
     NATIVE:{title:"聊天交办",feature:"MENU-N02",directory:false},
     N02:{title:"聊天交办",feature:"MENU-N02",directory:true},
@@ -32,7 +36,36 @@ export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
     A15:{title:"运行记录",feature:"SHARED_DELIVERED",directory:true},
   },
 };
-export function deliveredPage(page:string,role:Role,mvp=false):Entry|undefined{
-  if(mvp&&!(role==="BOSS"?["F01"]:["A03","A08","A15"]).includes(page))return undefined;
-  return DELIVERED_NAVIGATION[role][page];
+const PRIMARY_NAVIGATION:Record<Role,PrimaryEntry[]>={
+  BOSS:[{id:"F01",title:"今日工作"},{id:"N02",title:"聊天交办"},{id:"N03",title:"经营关注"},{id:"N04",title:"会议与资料"},{id:"N05",title:"任务与承诺"},{id:"N06",title:"通知与设置"}],
+  MAINTAINER:[{id:"A01",title:"档案与访问"},{id:"F25",title:"模拟中心"},{id:"A08",title:"Agent配置"},{id:"A15",title:"运行与评测"}],
+};
+const PUBLIC_GROUP="公共状态与登录";
+const SHARED_PAGES=new Set(["D06","D07"]);
+const AUTHENTICATION_PAGES=new Set(["N01","D08"]);
+const VARIANTS:Record<string,string>={"V19-EGG":"蛋禽","V19-MILK":"奶畜","V19-BEEF":"肉用牛羊"};
+const STATE_LABELS:Record<NavigationEntry["state"],string>={DEVELOPED:"已开发，待用户验收",IN_PROGRESS:"开发中，完整菜单待验收",PARTIAL:"已有实现，完整功能待验收",PAUSED:"语音暂停",AUTHENTICATION:"认证状态入口"};
+
+export const DELIVERED_NAVIGATION:Record<Role,Record<string,NavigationEntry>>={BOSS:{},MAINTAINER:{}};
+for(const role of ["BOSS","MAINTAINER"] as const){
+  for(const [id,metadata] of Object.entries(designPages)){
+    const authentication=AUTHENTICATION_PAGES.has(id);
+    if(!authentication&&!SHARED_PAGES.has(id)&&(metadata.technical?"MAINTAINER":"BOSS")!==role)continue;
+    const group=PRIMARY_NAVIGATION[role].some(item=>item.title===metadata.module)?metadata.module:PUBLIC_GROUP;
+    const state:NavigationEntry["state"]=authentication?"AUTHENTICATION":id==="F27"?"PAUSED":["F01","N02"].includes(id)?"DEVELOPED":id==="N03"?"IN_PROGRESS":"PARTIAL";
+    DELIVERED_NAVIGATION[role][id]={id,title:metadata.title,group,feature:FEATURE_REFERENCES[role][id]?.feature??"PARTIAL_PAGE_BINDING",directory:true,state,stateLabel:STATE_LABELS[state],accepted:false,variantLabel:VARIANTS[id]??null};
+  }
+}
+DELIVERED_NAVIGATION.BOSS.MVP01={id:"MVP01",title:"采购成本协调",group:"今日工作",feature:"MVP01",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
+DELIVERED_NAVIGATION.BOSS.NATIVE={...DELIVERED_NAVIGATION.BOSS.N02,id:"NATIVE",directory:false};
+DELIVERED_NAVIGATION.MAINTAINER.NATIVE={id:"NATIVE",title:"应用设置",group:"Agent配置",feature:"UI02",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
+
+export function deliveredPage(page:string,role:Role,_mvp=false):NavigationEntry|undefined{
+  if(role!=="BOSS"&&role!=="MAINTAINER")return undefined;
+  return Object.hasOwn(DELIVERED_NAVIGATION[role],page)?DELIVERED_NAVIGATION[role][page]:undefined;
+}
+export function primaryNavigation(role:Role):readonly PrimaryEntry[]{return PRIMARY_NAVIGATION[role];}
+export function navigationGroups(role:Role,search=""): {title:string;pages:NavigationEntry[]}[]{
+  const filter=search.trim().toLocaleLowerCase(),entries=Object.values(DELIVERED_NAVIGATION[role]).filter(entry=>entry.directory);
+  return [...PRIMARY_NAVIGATION[role].map(item=>item.title),PUBLIC_GROUP].map(title=>({title,pages:entries.filter(entry=>entry.group===title&&(!filter||[entry.id,entry.title,entry.group,entry.variantLabel??"",entry.stateLabel].some(value=>value.toLocaleLowerCase().includes(filter))))})).filter(group=>group.pages.length>0);
 }

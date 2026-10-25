@@ -92,6 +92,7 @@ def copy_overlay() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
+        ("BossMenuNavigation.tsx", "BossMenuNavigation.tsx"),
         ("BossLogin.tsx", "BossLogin.tsx"),
         ("BossToday.tsx", "BossToday.tsx"),
         ("BossOwnerPlans.tsx", "BossOwnerPlans.tsx"),
