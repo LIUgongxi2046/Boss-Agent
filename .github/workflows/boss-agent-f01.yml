@@ -34,6 +34,18 @@ jobs:
         run: mkdir -p .work/ci-pytest .work/ci-tmp
       - name: F01 sorting and original-receipt behavior regression
         run: node --test app/tests/f01_today_order.test.mjs
+      - name: F01 native morning agent and fixed-source permission regression
+        env:
+          FC03_NATIVE_DOMAIN_ROOT: ${{ github.workspace }}
+          PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/validation/fc03_agent:${{ github.workspace }}/app/tests:${{ github.workspace }}/app/tests/fc03_agent
+          TMPDIR: ${{ github.workspace }}/.work/ci-tmp
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --project validation --no-sync python -m pytest -q
+          --basetemp .work/ci-pytest/f01-agent
+          app/tests/fc03_agent/test_formal.py
+          app/tests/fc03_agent/test_menu.py
+          app/tests/fc03_agent/test_native.py
       - name: Exercise F01 classifications, source versions, CAS and public endpoints
         env:
           PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
