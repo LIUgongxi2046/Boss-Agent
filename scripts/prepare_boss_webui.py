@@ -134,6 +134,15 @@ def copy_overlay() -> None:
         ("boss-login.css", "boss-login.css"),
     ]:
         shutil.copy2(ROOT / "app" / "webui" / source_name, BOSS_DIR / target_name)
+    # The baseline list predates N02/N03 and the shared navigation components.
+    # Carry every checked-in first-party module into the pinned upstream build;
+    # .patch files are instructions, not importable runtime modules.
+    source_modules = sorted(
+        module for module in (ROOT / "app" / "webui").iterdir()
+        if module.is_file() and module.suffix in {".tsx", ".ts", ".css", ".json"}
+    )
+    for module in source_modules:
+        shutil.copy2(module, BOSS_DIR / module.name)
     (BOSS_DIR / "page-meta.json").write_text(
         json.dumps(catalogue, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
@@ -187,7 +196,8 @@ def copy_overlay() -> None:
         "source_commit": UPSTREAM_REV,
         "design_page_count": 72,
         "design_state_links": 561,
-        "overlay": ["app/webui/BossDesktop.tsx", "app/webui/boss-v6.css"],
+        "overlay": [f"app/webui/{module.name}" for module in source_modules],
+        "overlay_sha256": {module.name: hashlib.sha256(module.read_bytes()).hexdigest() for module in source_modules},
         "design_meta_sha256": hashlib.sha256(meta_file.read_bytes()).hexdigest(),
         "source_modified": "webui/src/App.tsx (working tree only)",
     }
