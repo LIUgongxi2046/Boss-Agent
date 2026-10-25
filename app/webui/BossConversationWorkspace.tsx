@@ -55,7 +55,15 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
     if(scope.current?.client!==client||scope.current?.token!==token||scope.current?.chatId!==chatId||scope.current?.role!==role){
       scope.current={client,token,chatId,role};setView(null);setAttachments([]);setReceipts([]);setError("");setSelectedRunId("");
     }
-    if(role!=="BOSS"||!visible||!chatId||connectionStatus!=="open")return;
+    if(!isActiveN02Scope(latestScope.current)){
+      // Existing rows are historical, not a currently authorized projection.
+      // Do not leave the previous run, attachments or original receipts
+      // actionable during an identity switch or a dropped native connection.
+      setView(null);setAttachments([]);setReceipts([]);
+      setError(role==="BOSS"&&visible&&chatId
+        ?"原生会话连接尚未就绪或已中断；连接恢复后将重新读取当前运行、附件和原请求记录。":"");
+      return;
+    }
     let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,attachmentRevision:string|null=null;
     const read=async()=>{
       try{
