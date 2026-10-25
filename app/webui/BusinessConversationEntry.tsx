@@ -4,7 +4,7 @@ import type {Overview,OverviewScope,OverviewSelection} from "./business-overview
 
 type TopicReference={page_id:string;use:OverviewSelection["use"]}|null;
 export type BusinessEntry={source_type:"RUNTIME_RECORD";store_reference:string;preparation_id:string;client_request_id:string;preparation_sha256:string;prepared_at:string;bound_at:string|null;binding_state:"PREPARED"|"BOUND";context:{session_id:string;chat_id:string;native_session_created_at:string}|null;applied_scope:OverviewScope;scope_sha256:string;topic_reference:TopicReference;topic_sha256:string|null;snapshot_sha256:string;source_references:{kind:"document";id:string;version:string|null;content_sha256:string|null;status:string}[];business_at:string;return_reference:{page_id:"N03";applied_scope:OverviewScope;topic_reference:TopicReference;snapshot_sha256:string};current_use_verified:boolean;business_authorization_granted:false;business_mutation_performed:false};
-export type BusinessContext={source_type:"RUNTIME_RECORD";session_id:string;chat_id:string;binding_state:"BOUND"|"UNBOUND";entry:BusinessEntry|null;overview:Overview|null;references:{kind:"document";id:string;version:string}[];current_use_verified:boolean;business_authorization_granted:false;business_mutation_performed:false};
+export type BusinessContext={source_type:"RUNTIME_RECORD";session_id:string;chat_id:string;binding_state:"BOUND"|"UNBOUND";entry:BusinessEntry|null;overview:Overview|null;references:{kind:"document";id:string;version:string}[];current_use_verified:boolean;current_selection_active?:boolean;business_authorization_granted:false;business_mutation_performed:false};
 type Receipt={source_type:"RUNTIME_RECORD";client_request_id:string;outcome:"RECORDED"|"NOT_FOUND_IN_CURRENT_STORE";entry:BusinessEntry|null;business_authorization_granted:false;business_mutation_performed:false};
 type Pointer={requestId:string;chatId:string|null};
 type Props={role:"BOSS"|"MAINTAINER"|null;getToken:()=>string;onCreateChat:()=>Promise<string>;onOpenChat:(chatId:string)=>void;onBeforeStart:(start:()=>void)=>void};
@@ -55,7 +55,7 @@ export function useBusinessConversationEntry({role,getToken,onCreateChat,onOpenC
     }
     if(!chatId)throw new Error("经营会话原记录缺少实际会话编号");
     client.attach(chatId);
-    const context=await client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:chatId});
+    const context=await client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:chatId,adopt_selection:true});
     if(!current())return;verifyBusinessContext(context,chatId);
     if(context.entry?.preparation_id!==original.preparation_id||context.entry.preparation_sha256!==original.preparation_sha256)throw new Error("当前经营会话与原准备记录不符");
     preserve(null);setEntry(null);setLookedUp(false);latest.current.onOpenChat(chatId);

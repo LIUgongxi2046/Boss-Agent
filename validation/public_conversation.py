@@ -17,7 +17,7 @@ CONVERSATION_TASK_ACTIONS = frozenset({
     "boss.conversation.task.prepare", "boss.conversation.task.bind", "boss.conversation.task.read", "boss.conversation.task.receipt",
 })
 CONVERSATION_BUSINESS_ACTIONS = frozenset({
-    "boss.conversation.business.prepare", "boss.conversation.business.bind", "boss.conversation.business.read", "boss.conversation.business.receipt",
+    "boss.conversation.business.prepare", "boss.conversation.business.bind", "boss.conversation.business.read", "boss.conversation.business.receipt", "boss.conversation.business.clear",
 })
 REQUESTS_SCHEMA=json.loads((Path(__file__).resolve().parents[1]/"specs/conversation-requests.schema.json").read_text())
 
@@ -76,7 +76,11 @@ class PublicConversation:
         require(active(), "当前本人认证已经失效", web.HTTPUnauthorized)
         require(action in CONVERSATION_BUSINESS_ACTIONS and isinstance(payload, dict), "经营会话动作或字段无效", web.HTTPBadRequest)
         chat_id = None
-        if action == "boss.conversation.business.prepare":
+        if action == "boss.conversation.business.clear":
+            require(not payload, "清理当前经营选择不接受额外字段", web.HTTPBadRequest)
+            result = {"source_type": "RUNTIME_RECORD", "current_selection_cleared": True,
+                      "business_authorization_granted": False, "business_mutation_performed": False}
+        elif action == "boss.conversation.business.prepare":
             result = self.business_entry.prepare(role, payload)
         elif action == "boss.conversation.business.receipt":
             result = self.business_entry.receipt(role, payload)
@@ -84,7 +88,9 @@ class PublicConversation:
             if action == "boss.conversation.business.bind":
                 validate_business_entry("EntryBind", payload)
             else:
-                require(set(payload) == {"chat_id"}, "经营会话读取字段无效", web.HTTPBadRequest)
+                require(set(payload) in ({"chat_id"}, {"chat_id", "adopt_selection"})
+                        and ("adopt_selection" not in payload or type(payload["adopt_selection"]) is bool),
+                        "经营会话读取字段无效", web.HTTPBadRequest)
             chat_id = payload.get("chat_id")
             require(is_valid_webui_chat_id(chat_id) and attached(chat_id), "当前连接尚未订阅所选经营会话", web.HTTPForbidden)
             session_id = webui_session_key(chat_id)

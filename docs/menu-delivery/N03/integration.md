@@ -1,50 +1,66 @@
 # MENU-N03 经营关注
 
-task_id=MENU-N03-N3；CURRENT；last_verified=2026-10-25；状态来源为原始项目specs/feature-delivery.json。当前IN_PROGRESS，完整MENU-N03.C01—C26开发覆盖0/26，用户分子null，视觉NOT_RUN。工单为原始项目docs/menu-delivery/N03.md。准确输入基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57，F01必要设计事项已关闭，旧用户体验保持保护。
+task_id=MENU-N03-N3；CURRENT；last_verified=2026-10-25。完整工单为原始项目docs/menu-delivery/N03.md；正式状态唯一来源为原始项目specs/feature-delivery.json。MENU-N03.C01—C26开发覆盖0/26，用户分子null，视觉NOT_RUN。前置F01必要设计事项已经关闭，准确基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57。当前任务保持完整菜单范围，完成后接续F02。
 
-## 检索与采用依据
+## 需求、原稿与职责
 
-已检索开发索引、F01/N02及FC02/FC04公共记录、BossDesktop、delivered-navigation、BossBIView、BossSectorView、BossSectorAPI、BossPageAPI和现有会话范围。原始N03 HTML、页面配置及提示词、design-v6-panels.js的topics和TOPIC已读取。原稿实际加载区域为主列“经营关注范围”“十个经营专题”、右列“经营提醒与来源”；完整产品PRD FR-02/03/14—23、BR-C01—C07和E01—E06共同限制汇总与后续路径。
+采用完整PRD FR-02/03/14—23、BR-C01—C07、E01—E06及交互规范。原稿依据为N03 HTML、页面配置与提示词、实际加载的design-v6-panels.js topics/TOPIC、design-v6.js、CSS和Token。独立界面保留主列“经营关注范围”“十个经营专题”、右列“经营提醒与来源”，以及完整指标、提醒、关联、来源和合法共享操作。十专题按F14—F23固定顺序；F19四用途独立，未知专业资料保持具体缺口。
 
-当前N03通过BossDesktop转到BossBIView，与F03共享完整查询页面；delivered-navigation也保留FC02别名。当前BossSectorAPI只提供各专题的字段定义、缺少专题资料及有限关联来源，不能直接充当当前N03正式范围总览。已有BI、提醒、任务和原生会话继续按准确依赖采用；需要N1提供本菜单正式总览与范围语义，N2核查现有工具的实际采用边界。
+N3负责原稿设计、公共身份/注册/读取、范围草稿与应用、对象选择、当前来源、真实会话/准备接收、D06、连续返回、独立构建及唯一正式状态。N1负责领域/Schema，N2负责原生Agent/受限工具/Runtime，N4负责必要的只读差距核查。没有新聊天或子代理；仅在现有角色自然完成且idle复查后发送准确依赖任务。
 
-## 当前责任与设计
+## 当前实现
 
-N3负责独立N03原稿布局、公共认证/导航/读取注册、范围草稿与应用、选择/返回及D06、当前来源与合法共享操作、实际会话和准备流程的公共采用。N1负责领域/Schema与当前来源，N2负责受限上下文/工具及实际SDK；N4负责完整期望与差距矩阵。原稿、现有正式接口和各角色准确提交共同构成实施依据，未接收字段保持待确认。
-
-| 区域 | 当前必要行为 |
+| 范围 | 当前行为 |
 |---|---|
-| 经营关注范围 | 正式法人、区域、期间与关注条件；草稿与应用分别呈现；无效/未支持条件明确拒绝 |
-| 十个经营专题 | F14—F23完整顺序、用途、当前资料截至/缺口/可读状态、稳定对象及关联；F19四用途独立 |
-| 经营提醒与来源 | 当前指标入口、本人参与提醒、关联事项、当前来源和时间；专业状态、通知和任务分别呈现 |
-| 连续操作 | 范围/专题进入F03、F02、来源、讨论及适用会议/交办准备，返回恢复选择、滚动与焦点；较早响应不能覆盖当前对象 |
+| 独立入口 | BossDesktop和delivered-navigation以经营关注MENU-N03提供独立容器、六类导航与原稿Hero；独立草稿状态、D06和关闭保护 |
+| 范围 | 正式法人、区域、期间、IANA时区及三项关注条件；明确应用后读取，同步核查范围/来源摘要；身份失效清理当前受保护内容 |
+| 专题 | 十项完整目录、真实状态/截至/缺口/对象/来源；F19用途保留；详情与原文均以当前固定版本复核 |
+| 指标及共享查询 | 正式query_handoff传入F03表单，重新核查原总览摘要；不自动采用其他历史查询，补充条件影响本次查询 |
+| 提醒与任务 | 明确事件/任务稳定ID及版本，进入既有合法共享页面；保留原经营范围和返回入口 |
+| 原生会话 | PublicConversation接收prepare/bind/read/receipt；实际new_chat/attach/bind/read之后打开同一SDK会话，没有自动提交问题 |
+| 选择证明 | 当前连接只采用服务端已经重新核查的preparation_id/preparation_sha256；明确应用范围清理旧选择；历史回执不恢复执行证明 |
+| 受限Agent | admit_business位于晨间候选之前；经营轮次仅三项正式工具，N02原七项保持；Runtime Schema 1.14.0固定安全范围引用 |
+| 共享入口 | 应用创建实际SessionManager后注入morning.native.bind_sessions；新增晨间绑定在同一写入事务内拒绝已有经营/任务/意图占用 |
+| 交办准备 | 正式Scope/专题/对象/来源审查生成准确准备输入；实际SDK执行前后复核context_sha256，结果匹配任务版本和review_sha256；同编号不重复运行 |
+| 原请求 | 未知准备保留原编号及安全技术引用；回执只读，取消只停止界面等待；保存、邀请、发送和完成分别处理 |
+| 返回 | 安全URL保存应用范围、专题/用途、位置与控件引用；返回重新读取当前服务，迟到响应不能覆盖当前选择 |
 
-公共框架、宽度、比例、层级、尺寸、间距、字体、图标和响应阈值按原N03加载页面核查。动态资料数量与自然高度单独记录。没有截图、图像或未经执行的视觉评分。所有业务值来自获准正式服务；讨论、查询及总览读取不授予业务权限。
+BusinessOverviewPreparation的会议关系和材料状态已经接收；完整范围限定的会议准备消费者仍在N1继续处理。该能力、公共交互及当前制品检查完成前，不能登记完整C17通过。新交办需要明确本人输入和合法来源关系，当前界面没有默认生成负责人、期限或授权。
 
-## 运行及验证条件
+## 准确依赖
 
-独立构建目标menu-n03-n3-dist，资料采用menu-n03-*专用目录，端口10811/10812/20811使用前核查归属。原F01、新F01、N02、UI02、MVP的制品、桌面、用户资料和端口均受保护；不退出、重启、热替换或用于业务检查。外部SIMULATED_FIRST，STT/F27/FC28暂停；凭据仅沿用明确授权受控填充，不自动登录。
-
-| 验收范围 | 当前动作与结果 |
+| 输入 | 当前接收 |
 |---|---|
-| C01—C26 | 完整需求/设计已建立独立工单；业务组件和正式接口采用待完成，产品业务验证NOT_RUN |
-| C02/C05/C25参考依据 | check-menu-n03-reference.cjs实际测量原加载页面18组窗口/缩放/阈值，三个区域、四字段、十专题顺序符合原脚本；evidence/menu-delivery/N03/reference-dom.json为REFERENCE_MEASURED，产品和视觉未验证 |
-| F01前置 | 3d04f28准确候选18/18开发覆盖、D01—D12限定关闭；684份源码及制品/报告/配置摘要最终核验PASS，用户与视觉待确认 |
+| N1总览 | a38bf9b/4b48ccb → 67be86d/a8cc244；BusinessOverviewAPI与正式Scope/View/Detail |
+| N1原生入口 | d57de121/97e3b3cf → 804c064/72f0a7f；business-overview Schema 1.1.0 |
+| N2经营消费者 | 6d9eacf、68d9b269 → a71c8dd/a7a3992；businessOverviewRead、结构化指标、Runtime Schema 1.14.0 |
+| N2共享晨间 | e3c28e01 → 5b334fd；bind_sessions与原子互斥 |
+| N1准备接口 | 463704e2/d95532b1 → 03af5a8/5a899ef；BusinessOverviewPreparation与preparation Schema 1.0.0 |
+| N4期望 | qa.md，摘要60b6bc4f263529489125338693ed6a8de73f03adf23c0702fea91f14e3f75a01；完整26项、D01—D12、G01—G07 |
 
-前端结构、Token、组件、状态、异步/流式及返回设计见design.md。参考测量与产品断言分别记录；正式API与TypeScript字段等待N1准确交付。后续实施采用S008 Given–When–Then及实际正式服务验证。新行为需要有效失败证据和对应通过证据，纯布局采用原HTML/DOM/计算样式/位置尺寸核查。所有26项及后续菜单承诺保留，不以记录完成代替功能完成。
+公共总览读取使用当前已认证WebUI结构化动作与GET范围选项；没有第二套认证或新增HTTP POST服务。公共准备提供严格read/verify及实际交办prepare与原编号读取。RoleChannel仅记录动作和状态。nanobot-menu-n03.patch记录当前SDK客户端对经营准备/绑定/选择接收的中断处理，连接重建不自动重发这些动作。
 
-当前已提供纯呈现BossBusinessOverviewLayout与独立N03样式，三个区域的业务内容由正式容器传入，没有占位业务结果；组件尚未接入路由。menu-n03-n3-dist已由当前基准完成严格TypeScript和Vite构建，仅供专用入口检查准备，不能作为N03开发完成制品。check-menu-n03-entry.cjs的执行在启动前被自动审批审查拒绝，原因是脚本自动完成认证被认为与产品“不自动登录”约束冲突；没有取得有效Red或业务通过证据。专用自动化测试认证的明确授权正在等待用户回答，产品受控账号填充仍保持手动登录。接口、组件实施和无认证的参考测量继续进行。
+## 限定检查与剩余验证
 
-新纯呈现组件已通过准备工程的严格TypeScript编译；这项结果只证明当前组件和类型能够编译，不代表当前业务已采用。N4已提供准确基准下的完整26项期望、N03-D01—D12及G01—G07，qa.md摘要60b6bc4f263529489125338693ed6a8de73f03adf23c0702fea91f14e3f75a01；没有N4产品运行或视觉结果。N2设计提交6d9eacf2725f82a103daabc778453ee5aea07b52已读取，明确七工具的已有范围、结构化N03输入尚未进入Grant、任务绑定不能承载经营范围。后续新增绑定和工具等待N1精确接口；N2当前设计不登记实际SDK通过。
+| 当前证据 | 结果与适用范围 |
+|---|---|
+| reference-dom.json | REFERENCE_MEASURED；原加载页面18组窗口/缩放/阈值，三个区域、四字段、十专题顺序及27项DOM/计算样式/位置尺寸；产品未测量 |
+| domain-receiver.xml | 11通过，7.34秒；正式总览、范围/来源/关系和只读状态 |
+| public-receiver.xml | 14通过，5.25秒；公共总览及领域组合，含严格输入、角色和旧快照拒绝 |
+| native-entry-receiver.xml | 36通过，9.92秒；原生Session、准备/绑定/回执、并发与任务互斥 |
+| agent-receiver.xml | 29通过，21.80秒；实际SDK经营消费者与Runtime Schema准确基准；禁止socket.connect |
+| public-entry-receiver.xml | 6通过，2.36秒；实际PublicConversation/SQLite/SessionManager，角色/附着/额外字段/来源变化拒绝 |
+| morning-receiver.xml | 10通过，4.89秒；共享原子互斥、实际生命周期及晨间优先 |
+| scoped-preparation-receiver.xml | 15通过，8.27秒；范围固定的公共适配、实际交办SDK、相同编号零重复、异内容拒绝及领域准备回归 |
+| protected-frontends.json | PASS；既有五套体验制品摘要保持；没有读取业务资料 |
+| TypeScript/Vite | 当前独立N03容器、查询、会话与准备Dialog严格编译通过；独立menu-n03-n3-dist构建通过，Vite用时16.72秒；没有产品UI或完整交付声明 |
 
-N1总览实施a38bf9b与记录4b48ccb分别接收为67be86d/a8cc244，BusinessOverviewAPI和Schema1.0.0已进入当前PRODUCT。准确领域接收检查11项通过，用时7.34秒，domain-receiver.xml。公共读取在接入前实际返回404，三项必要断言失败；接入GET范围选项及三项结构化WebUI只读动作后，public-green.xml的三项通过，最终公共/领域消费者组合14项通过、5.25秒，public-receiver.xml。分别验证正式Scope、十专题、来源快照、非法/越权拒绝、同库重读和读取前后业务表不变；这些结果不能代替认证UI或真实Agent采用。
+以上组合存在范围交集，数量不相加。各领域/SDK结果不能替代认证UI、当前产品的成对DOM、连续业务行为、启动器、制品清单及完整26项映射。N2自有25项当前定向和77项受影响组合、N1自有24项准备组合分别见各自准确主记录，不登记为N3完整菜单通过。
 
-BossBusinessOverview与business-overview-types.ts已经采用正式范围/专题/来源类型，提供范围草稿与明确应用、静态原稿目录和正式专题结果的不同读取状态、当前专题Dialog、来源原文及固定快照复核、迟到响应隔离和返回坐标。组件和类型已通过严格TypeScript，路由、会话入口及准备流程仍待接入和实际验证。纯目录名称来自批准设计，不代表已经存在专题资料；正式结果只在读取成功后显示。原生Scope入口的持久绑定已在N1自然完成且idle复查后具体接续，marker=MENU-N03-N1-NATIVE-ENTRY-20261025，N2后续采用等待准确接口。
+check-menu-n03-entry.cjs在执行前被自动审批审查拒绝，理由是自动完成认证被认为与“产品不自动登录”约束冲突。没有启动该检查、没有创建其测试数据、没有有效UI Red或产品通过结果。专用测试认证授权已提出并等待明确回复；不重试、委派或通过间接登录执行被拒绝动作。产品受控凭据填充仍仅按用户明确授权，保持本人点击登录。
 
-N03独立基准构建后的五套既有体验制品摘要核验PASS，protected-frontends.json仅证明这些制品保持原摘要，没有读取业务资料、没有产品或视觉验收声明。
+## 制品、资料与环境
 
-N1原生入口实施d57de121和记录97e3b3cf已接收为804c064/72f0a7f；Schema为1.1.0。native-entry-receiver.xml记录36项通过、9.92秒，验证实际Session与同库准备/绑定/历史回执、来源变化、重复编号和任务入口互斥。当前PublicConversation已提供boss.conversation.business.prepare/bind/read/receipt，RoleChannel注册同名结构化动作与只读原编号入口；公共适配尚待实际消费者检查。BusinessConversationEntry通过真实new_chat、attach、正式bind/read建立会话，不自动提交问题；未知结果保留原编号。原生客户端对prepare/bind连接中断停止自动重发，对应nanobot-menu-n03.patch。严格TypeScript通过。
+N03目标为独立menu-n03-n3-dist及menu-n03-*专用资料，正式端口10811/10812/20811；当前没有最终候选、完整制品清单或已认证产品验收。原F01、新F01、N02、UI02和MVP的制品、桌面、用户资料及端口全部保护。外部SIMULATED_FIRST，STT/F27/FC28和视觉暂停。没有截图或图像评分。
 
-BusinessOverviewQuery提供当前总览摘要复核和F03完整条件传入；BossBIView在显式initialScope下保持原法人、地区、期间和来源，不自动采用其他历史查询。N03容器增加F19四用途、身份失效清理和返回焦点核查。桌面路由、当前服务端选择证明、Agent公共入口及会议/交办准备尚在接收，认证UI未执行。全部26项开发覆盖保持0/26，以上局部结果不登记完整检查点通过。
-
-N1于idle复查后收到MENU-N03-N1-PREPARATION-BRIDGE-20261025，限定处理正式Scope、专题、对象及来源版本的准备上下文。N2的68d9b269与agent.md已完整读取，25项当前定向及77项受影响组合为其模块证据；准确公共接收仍待执行。N2于idle复查后收到MENU-N03-N2-MORNING-MUTUAL-EXCLUSION-20261025，限定负责共享晨间绑定事务互斥及必要检查。没有向运行中的聊天追加消息，没有新聊天或子代理。
+磁盘生成门槛保持200MiB。清理仅针对确认结束且通过活动进程、路径及objects表检查的专用测试SQLite或缓存，保留账号、报告、源码和用户体验。N02先前32轮检查曾因空间不足被自动审批审查拒绝；限定清理与生成门槛检查后已完成必要检查。N03当前认证检查的批准状态独立保留，不由该历史处理推断授权。

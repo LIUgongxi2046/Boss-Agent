@@ -60,6 +60,7 @@ def native(tmp_path):
     recorder = FeatureRecorder(store, registry, lambda: snapshot, ProductBI(store), service)
     loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry,
         hook_factories=[recorder.hook_factory, adapter.hook_factory])
+    adapter.bind_sessions(loop.sessions)
     for name in list(registry.tool_names):
         registry.unregister(name)
     for name in sorted(FORMAL_TOOLS):

@@ -4,6 +4,7 @@ import {ArrowLeft,FileText,History,MessageCircle,Plus,RefreshCw,Search,X} from "
 import {useClient} from "@/providers/ClientProvider";
 import {verifyTaskContext,type TaskConversationContext} from "./BossTaskConversationEntry";
 import {useConversationReturn} from "./BossConversationPosition";
+import {verifyBusinessContext,type BusinessContext} from "./BusinessConversationEntry";
 import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
 import "./boss-n02.css";
 
@@ -29,6 +30,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const [view,setView]=useState<View|null>(null),[attachments,setAttachments]=useState<Attachment[]>([]),[error,setError]=useState(""),[revision,setRevision]=useState(0);
   const [receipts,setReceipts]=useState<RequestReceipt[]>([]);
   const [taskContext,setTaskContext]=useState<TaskConversationContext|null>(null),[taskContextError,setTaskContextError]=useState(""),[taskContextChecking,setTaskContextChecking]=useState(false);
+  const [businessContext,setBusinessContext]=useState<BusinessContext|null>(null),[businessContextError,setBusinessContextError]=useState("");
   const [artifact,setArtifact]=useState<Artifact|null>(null),[artifactOpen,setArtifactOpen]=useState(false),[artifactError,setArtifactError]=useState(""),[artifactLoading,setArtifactLoading]=useState(false);
   const [historyOpen,setHistoryOpen]=useState(false),[selectedRunId,setSelectedRunId]=useState("");
   const scope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
@@ -37,6 +39,14 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const generation=useRef(0),artifactGeneration=useRef(0),progress=useRef<HTMLDivElement|null>(null),artifactFocus=useRef<HTMLElement|null>(null);
   useEffect(()=>client.onStatus(setConnectionStatus),[client]);
   useEffect(()=>{if(role==="BOSS"&&visible&&chatId&&connectionStatus==="open")client.attach(chatId);},[client,role,visible,chatId,connectionStatus]);
+  useEffect(()=>{
+    let active=true;setBusinessContext(null);setBusinessContextError("");
+    if(role!=="BOSS"||!visible||!chatId||connectionStatus!=="open")return;
+    void client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:chatId}).then(result=>{
+      if(!active)return;verifyBusinessContext(result,chatId);setBusinessContext(result);
+    }).catch(reason=>{if(active)setBusinessContextError(reason instanceof Error?reason.message:String(reason));});
+    return()=>{active=false;};
+  },[client,token,chatId,role,visible,connectionStatus,revision]);
   useEffect(()=>{
     const current=++generation.current;++artifactGeneration.current;setArtifact(null);setArtifactOpen(false);setArtifactError("");
     if(scope.current?.client!==client||scope.current?.token!==token||scope.current?.chatId!==chatId||scope.current?.role!==role){
@@ -109,6 +119,11 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
         {returnPosition.restoring&&<p role="status">正在读取原会话并恢复原消息位置<button className="boss-btn" onClick={returnPosition.clear}>结束位置恢复</button></p>}
         {taskEntry&&<div className="boss-n02-source" aria-label="固定任务上下文"><strong>{taskEntry.task_reference.id} · 原任务版本 {taskEntry.task_reference.version}</strong><span>{taskContextError?"当前有效性核查失败，原选择仅供核查":taskContextChecking?"正在核查原任务与来源的当前有效性":"当前任务与来源版本已经核查"}</span><button className="boss-btn" data-conversation-return={"task:"+taskEntry.return_reference.task_id} onClick={()=>openBusiness(()=>actions.onOpenTask(taskEntry.return_reference.task_id))}>返回关联任务</button></div>}
         {taskContextError&&<div className="boss-n02-note error" role="alert">{taskContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查任务上下文</button></div>}
+        {businessContext?.entry&&<div className="boss-n02-source" aria-label="固定经营上下文"><strong>经营范围 {businessContext.entry.applied_scope.legal_entity_id} · {businessContext.entry.applied_scope.period_start} 至 {businessContext.entry.applied_scope.period_end}</strong><span>专题 {businessContext.entry.topic_reference?.page_id??"经营总览"} · 用途 {businessContext.entry.topic_reference?.use??"当前范围"} · 当前正式版本已经核查</span><span>原请求编号 {businessContext.entry.client_request_id}</span>{!businessContext.current_selection_active&&<><p>当前连接尚未采用此会话的原范围，请明确核查后继续。</p><button className="boss-btn" onClick={()=>{
+          if(!chatId)throw new Error("经营会话缺少当前编号");const selectedChat=chatId;
+          void client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:selectedChat,adopt_selection:true}).then(result=>{if(scope.current?.chatId!==selectedChat)return;verifyBusinessContext(result,selectedChat);setBusinessContext(result);setBusinessContextError("");}).catch(reason=>{if(scope.current?.chatId===selectedChat)setBusinessContextError(reason instanceof Error?reason.message:String(reason));});
+        }}>核查并采用此会话原范围</button></>}</div>}
+        {businessContextError&&<div className="boss-n02-note error" role="alert">{businessContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查经营上下文</button></div>}
         <Row name="关联事项" value={taskEntry?.task_reference.id??selected?.object_id??(contextRefs.length?contextRefs.map(ref=>ref.id).join("、"):origin?.date?"晨间事项 · "+String(origin.date):"尚未关联")}/>
         <Row name="资料版本" value={taskEntry?taskEntry.source_references.map(ref=>ref.id+" · 原版本 "+ref.version).join("；"):selected?.version??(documentRefs.length?documentRefs.map(ref=>ref.id+" · 原版本 "+(ref.recorded_version??"未知")+" / 当前 "+(ref.current_version??"未知")).join("；"):origin?.snapshot_sha256?"已保存当前清单快照":"待读取")}/>
         <Row name="任务对象" value={[...new Set([...(taskEntry?[taskEntry.task_reference.id]:[]),...taskRefs.map(ref=>ref.id),...latest?.artifacts.filter(value=>value.kind==="task").map(value=>value.id)??[]])].join("、")||"尚未关联交办"}/>

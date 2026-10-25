@@ -6,7 +6,7 @@ import {BossBusinessOverviewLayout} from "./BossBusinessOverviewLayout";
 import type {Overview,OverviewScope,OverviewDimensions,OverviewDetail,OverviewSelection,OverviewAssociation} from "./business-overview-types";
 import type {BusinessAlert} from "./BossBusinessAlerts";
 
-type Props={visible:boolean;refreshVersion:number;discardVersion:number;onDirtyChange:(dirty:boolean)=>void;onQuery:(view:Overview)=>void;onReminder:(alert:BusinessAlert)=>void;onTask:(task:OverviewAssociation)=>void;onDiscuss:(selection:OverviewSelection)=>Promise<void>;onPrepare:(detail:OverviewDetail)=>void;conversationStatus:ReactNode};
+type Props={visible:boolean;refreshVersion:number;discardVersion:number;onDirtyChange:(dirty:boolean)=>void;onQuery:(view:Overview)=>void;onReminder:(alert:BusinessAlert)=>void;onTask:(task:OverviewAssociation)=>void;onDiscuss:(selection:OverviewSelection)=>Promise<void>;onPrepare:(detail:OverviewDetail,use:OverviewSelection["use"])=>void;conversationStatus:ReactNode};
 type SourceText={source_id:string;version:string;source_type:string;content:string;author_contact_id?:string;author_display_name?:string;published_at?:string;read_at:string};
 const scopeKeys=["legal_entity_id","region_id","period_start","period_end","timezone","attention"] as const;
 const sameScope=(first:OverviewScope,second:OverviewScope)=>scopeKeys.every(key=>first[key]===second[key]);
@@ -40,10 +40,11 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
     if(status===401||status===403){++epoch.current;++generation.current;++detailGeneration.current;setDenied(true);setDimensions(null);setDraft(null);setDirty(false);setSelected("");setSelectedUse(null);setView(null);viewRef.current=null;initial.current=null;returnPoint.current=null;setDetail(null);setSource(null);setDialogOpen(false);if(status===401)window.dispatchEvent(new Event("boss-auth-expired"));}
     setError(status===409?"当前范围、对象或来源已经变化，请重新查询专题范围。":status===400?"当前法人、区域、期间、时区或关注条件不受支持，请核查后重新查询。":status===401||status===403?"当前身份无法读取经营关注资料。":"当前读取未完成，请保留原范围并核查连接后重新读取。");
   },[]);
-  const apply=useCallback((scope:OverviewScope)=>{
+  const apply=useCallback((scope:OverviewScope,explicit=false)=>{
     const current=epoch.current,sequence=++generation.current;++detailGeneration.current;
     setLoading(true);setError("");setDetail(null);setSource(null);setDialogOpen(false);
-    void client.requestMutation<Overview>("boss.business_overview.read",scope).then(result=>{
+    const cleared=explicit?client.requestMutation("boss.conversation.business.clear",{}):Promise.resolve();
+    void cleared.then(()=>client.requestMutation<Overview>("boss.business_overview.read",scope)).then(result=>{
       if(epoch.current!==current||generation.current!==sequence)return;
       if(result.projection!=="business-overview"||!sameScope(result.applied_scope,scope)||result.business_mutation_performed!==false||result.business_authorization_granted!==false||result.topics.length!==10||result.topics.some((row,index)=>row.page_id!=="F"+(index+14)))throw new Error("经营总览没有采用当前正式范围和完整专题");
       setView(result);viewRef.current=result;setDraft(result.applied_scope);setDirty(false);setStale(false);setLoading(false);saveScope(result.applied_scope);
@@ -122,7 +123,7 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
     <BossBusinessOverviewLayout scope={<>
       {error&&<p role="alert" className="boss-n03-note">{error}</p>}
       {loading&&<p role="status">正在读取当前经营范围。</p>}
-      {dimensions&&draft&&<form onSubmit={event=>{event.preventDefault();apply(draft);}}>
+      {dimensions&&draft&&<form onSubmit={event=>{event.preventDefault();apply(draft,true);}}>
         <div className="boss-n03-fields">
           <label className="boss-n03-field"><span>法人范围</span><select id="overview-entity" value={draft.legal_entity_id} disabled={denied} onChange={event=>edit({legal_entity_id:event.target.value})}>{dimensions.legal_entity_ids.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
           <label className="boss-n03-field"><span>区域</span><select id="overview-region" value={draft.region_id??"ALL"} disabled={denied} onChange={event=>edit({region_id:event.target.value==="ALL"?null:event.target.value})}><option value="ALL">全部获准区域</option>{dimensions.region_ids.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
@@ -160,7 +161,7 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
           {detail.topic.uses.length>0&&<><div className="boss-n03-actions" aria-label="禽类与反刍用途">{detail.topic.uses.map(value=><button type="button" className="boss-btn" key={value} aria-pressed={selectedUse===value} onClick={()=>{setSelectedUse(value);remember({overviewUse:value});}}>{useLabels[value]}</button>)}</div><p>当前用途：{selectedUse?useLabels[selectedUse]:"尚未选择"}。当前缺少完整专业资料，切换用途不会合并不相容指标。</p></>}
           {detail.topic.records.length===0?<p>当前没有符合范围及关注条件的本专题正式对象。</p>:detail.topic.records.map(record=><article key={record.kind+":"+record.id}><p>{record.kind} · {record.id} · v{record.version??"未知"} · {state(record.adoption_state)}</p><p>当前状态 {record.state??"未知"}</p>{record.facts&&<dl className="boss-n03-kv">{Object.entries(record.facts).map(([key,value])=><div key={key}><dt>{factLabels[key]??key}</dt><dd>{value===null?"未知":String(value)}</dd></div>)}</dl>}</article>)}
           {detail.sources.filter(row=>detailSourceIds.has(row.source_id)).map(row=><article key={row.source_id}><p>{row.source_id} · v{row.version??"未知"} · {state(row.status)} · {row.metadata?.author_display_name??row.metadata?.author_contact_id??"当前作者不可采用"}</p><button className="boss-btn" disabled={stale||row.status!=="VALID"||detailLoading} onClick={()=>openSource(row.source_id)}>来源原文</button></article>)}
-          <div className="boss-n03-actions"><button className="boss-btn" disabled={disabled||detailLoading} onClick={()=>{capture(trigger.current);void onDiscuss({scope:detail.applied_scope,page_id:detail.topic.page_id,use:detail.topic.page_id==="F19"?selectedUse:null,snapshot_sha256:detail.snapshot_sha256});}}>继续讨论</button><button className="boss-btn" disabled={disabled||detailLoading||!detail.topic.records.some(row=>row.adoption_state==="CURRENT")} onClick={()=>{capture(trigger.current);onPrepare(detail);}}>准备会议或交办</button></div>
+          <div className="boss-n03-actions"><button className="boss-btn" disabled={disabled||detailLoading} onClick={()=>{capture(trigger.current);setDialogOpen(false);void onDiscuss({scope:detail.applied_scope,page_id:detail.topic.page_id,use:detail.topic.page_id==="F19"?selectedUse:null,snapshot_sha256:detail.snapshot_sha256});}}>继续讨论</button><button className="boss-btn" disabled={disabled||detailLoading} onClick={()=>{capture(trigger.current);setDialogOpen(false);requestAnimationFrame(()=>onPrepare(detail,detail.topic.page_id==="F19"?selectedUse:null));}}>准备会议或交办</button></div>
           {!detail.topic.records.some(row=>row.adoption_state==="CURRENT")&&<p>准备会议或交办需要当前有效对象及来源；现有资料尚不足。</p>}
         </>}
       </DialogContent>

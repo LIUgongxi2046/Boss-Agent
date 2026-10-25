@@ -166,6 +166,8 @@ async def serve():
     audit.registry = registry
     bus = MessageBus()
     sessions = SessionManager(config.workspace_path)
+    if morning is not None:
+        morning.native.bind_sessions(sessions)
     conversation = ProductConversation(store, registry, lambda: runtime_control.snapshot(), ConversationAttachments(sessions, get_media_dir("websocket"))) if product_mode else None
     if conversation is not None:
         registry.conversation = conversation
@@ -207,6 +209,8 @@ async def serve():
             registry.unregister(name)
             registry.register(AssignmentReadTool(ordinary, assignment))
         registry.register(next(tool for tool in conversation.delegates if tool.name == "conversationRead"))
+        for tool in conversation.business_tools():
+            registry.register(tool)
     else:
         registry.register(BossResearchSourcesTool(store, "BOSS", observation_sink=research_read_observed))
     runtime_control = None

@@ -16,7 +16,7 @@ export const DELIVERED_NAVIGATION:Record<Role,Record<string,Entry>>={
     N06:{title:"通知中心",feature:"FC04",directory:true},
     N08:{title:"本人通知设置",feature:"FC04",directory:true},
     N09:{title:"本人计划",feature:"FC04",directory:true},
-    N03:{title:"经营查询与追问",feature:"FC02",directory:false},
+    N03:{title:"经营关注",feature:"MENU-N03",directory:true},
     D01:{title:"来源原文",feature:"SHARED_DELIVERED",directory:false},
     D04:{title:"选择负责人",feature:"FC07",directory:false},
     D05:{title:"选择时间",feature:"FC07",directory:false},

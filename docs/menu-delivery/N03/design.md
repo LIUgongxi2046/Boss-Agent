@@ -72,7 +72,7 @@ flowchart TD
 
 public_business_overview.py提供精确只读映射，BossCommandAPI限定BOSS并使用现有WebUI传输；BossPageAPI提供无参数范围选项读取。RoleChannel仅记录操作与状态，不记录payload。当前没有新增HTTP POST服务或第二套认证。程序错误继续抛出，正式HTTP业务拒绝由现有边界返回对应状态。
 
-TrustedContext等待N1持久入口及N2准确采用。当前F03、F02、D01、F06和原生会话的既有能力按各自准确范围复用，不由入口存在推断完整菜单通过。Scope→applied_scope→query_handoff/Topic/Source字段由当前容器及后续共享页面分别采用，公开接收14项消费者检查已有结果；实际页面与Agent传播仍待验证。
+TrustedContext采用N1持久入口和N2经营消费者。当前连接必须通过正式Entry.read核查并明确采用preparation_id/preparation_sha256；重新应用范围清理旧选择，历史回执不恢复执行资格。RoleChannel在晨间候选之前接收admit_business，实际SDK采用同一范围与三项受限工具。Scope→applied_scope→query_handoff/Topic/Source进入独立容器、F03、专题、会话和交办准备。实际公共传输与页面传播仍待认证UI验证。
 
 ## 6. 异步、流式与恢复
 
@@ -87,10 +87,10 @@ TrustedContext等待N1持久入口及N2准确采用。当前F03、F02、D01、F0
 | 范围 | 当前证据及必要后续 |
 |---|---|
 | 原稿 | 18组REFERENCE_MEASURED；完整区域/字段/十专题顺序与源码摘要已保存 |
-| 产品结构及状态 | 当前基准仍为BI别名；独立N03实施、同环境成对DOM/样式/位置和交互验证待完成 |
-| 字段/身份/业务 | 等待准确N1/N2接口，接收时核查请求/响应/类型/权限/版本/当前采用及正式终态 |
+| 产品结构及状态 | 独立N03容器与桌面路由、三个业务区域、详情/准备Dialog及D06已经实现；当前制品的成对DOM/样式/位置和交互验证待完成 |
+| 字段/身份/业务 | N1/N2准确接口已经接收；领域、PublicConversation和实际SDK限定检查通过；完整认证UI和会议准备消费者待完成 |
 | 连续返回 | 专题、F03/F02、来源、讨论、会议/交办准备及刷新路径待实际检查，不能仅靠组件状态推断 |
 | 响应与可访问性 | 三尺寸/200%、原阈值、长内容、键盘、44px目标、2px焦点、整页溢出与Dialog关闭/返回待当前制品检查 |
-| 工程与交付 | 严格TypeScript、Vite、独立入口/资料/端口、实际SDK和保护制品摘要待准确候选完成 |
+| 工程与交付 | 严格TypeScript与当前独立N03 Vite构建通过；独立启动器/资料/端口、完整清单和最终候选待完成 |
 
 业务BDD采用当前正式获准资料与实际服务、SQLite及SDK；不使用mock、虚假业务数据或替代成功。必要失败证据、准确通过报告和完整26项映射共同完成当前菜单。视觉与用户验收保持NOT_RUN，不建立无依据的全菜单独立检查门槛。

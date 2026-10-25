@@ -9,6 +9,7 @@ from nanobot.providers.base import LLMResponse, ToolCallRequest
 
 from business import checksum, now, require
 from boss_assignment_sources import AssignmentSourcesAPI
+from boss_business_overview import BusinessOverviewAPI
 from boss_runtime_records import ATTRIBUTE
 from boss_simulation_api import _context
 from fc07_agent import Fc07Context, Fc07ReadTool, TOOLS
@@ -38,6 +39,77 @@ class ProductAssignment:
         self.bot = self.runtime = None
         self.provider = Fc07SimulatedProvider(self.events)
         self.outputs = {}
+
+    def _overview_record(self, db, key):
+        context = _context(db)
+        row = self.store.get(db, "ui-check", "overview_assignment_preparation", key)
+        require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")),
+                "经营准备原请求不属于当前本人资料", web.HTTPForbidden)
+        return row
+
+    async def prepare_overview(self, role, payload, active):
+        require(role == "BOSS" and active(), "经营交办准备需要当前本人认证", web.HTTPForbidden)
+        require(isinstance(payload, dict) and set(payload) == {"client_request_id", "input", "context_sha256"},
+                "经营交办准备字段无效", web.HTTPBadRequest)
+        key = payload["client_request_id"]
+        validate_request("Status", {"client_request_id": key})
+        bridge = BusinessOverviewAPI(self.store).preparation()
+        view = bridge.verify(role, payload["input"], payload["context_sha256"])
+        require(view["handoff"] is not None and view["handoff"]["operation"] == "boss.assignment.prepare",
+                "当前经营准备没有正式交办审查入口", web.HTTPConflict)
+        digest = checksum(payload)
+        with self.store.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            checked = bridge.project_in_transaction(role, db, payload["input"])
+            require(checked["context_sha256"] == payload["context_sha256"] and checked["current_use_verified"],
+                    "经营准备范围或来源已经变化", web.HTTPConflict)
+            previous = db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='overview_assignment_preparation' AND id=?", (key,)).fetchone()
+            if previous:
+                require(self._overview_record(db, key)["input_sha256"] == digest,
+                        "经营准备原编号内容不符", web.HTTPConflict)
+            else:
+                require(db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='assignment_public_request' AND id=?", (key,)).fetchone() is None,
+                        "当前编号已经用于其他交办准备，请读取原请求", web.HTTPConflict)
+                context = _context(db)
+                self.store.put(db, "ui-check", "overview_assignment_preparation", key, {"client_request_id": key,
+                    **{field: context[field] for field in ("owner_id", "dataset_id", "dataset_version")},
+                    "input_sha256": digest, "input": payload["input"], "context_sha256": payload["context_sha256"],
+                    "created_at": now()})
+        if previous:
+            return self.overview_receipt(role, key, active)
+        def current():
+            if not active():
+                return False
+            bridge.verify(role, payload["input"], payload["context_sha256"])
+            return True
+        result = await self.prepare(role, {"client_request_id": key, **view["handoff"]["parameters"]}, current)
+        bridge.verify(role, payload["input"], payload["context_sha256"])
+        self._verify_overview_result(view, result)
+        return self.overview_receipt(role, key, active)
+
+    @staticmethod
+    def _verify_overview_result(view, receipt):
+        prepared, expected = receipt["preparation"], view["assignment_context"]
+        require(prepared is not None and expected is not None and receipt["request_state"] == "SUCCEEDED"
+                and prepared["task"]["task_id"] == expected["task_reference"]["id"]
+                and prepared["task"]["version"] == expected["task_reference"]["version"]
+                and prepared["source_review"]["review_sha256"] == expected["review_sha256"],
+                "经营准备实际结果与原范围、对象或来源审查不符", web.HTTPConflict)
+
+    def overview_receipt(self, role, key, active):
+        require(role == "BOSS" and active(), "经营准备原请求需要当前本人认证", web.HTTPForbidden)
+        validate_request("Status", {"client_request_id": key})
+        with self.store.connect() as db:
+            db.execute("BEGIN")
+            row = self._overview_record(db, key)
+            recorded = db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='assignment_public_request' AND id=?", (key,)).fetchone()
+        result = self.receipt(role, key, active) if recorded else None
+        require(active(), "经营准备读取期间本人身份已变化", web.HTTPUnauthorized)
+        return {"source_type": "RUNTIME_RECORD", "client_request_id": key, "input": row["input"],
+            "context_sha256": row["context_sha256"], "assignment_receipt": result,
+            "outcome": "RECORDED" if recorded else "ASSIGNMENT_REQUEST_NOT_FOUND_IN_CURRENT_STORE",
+            "current_use_verified": False, "write_performed_by_lookup": False,
+            "business_authorization_granted": False, "business_mutation_performed": False}
 
     @staticmethod
     def handles(request):

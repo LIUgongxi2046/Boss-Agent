@@ -37,6 +37,7 @@ class RoleChannel(WebSocketChannel):
         self.assignment = None
         self.reminders = None
         self.native_conversation = None
+        self.business_selections = {}
         self.morning_admission = ContextVar("morning_native_admission", default=None)
         self.conversation_admission = ContextVar("conversation_native_admission", default=None)
         self.conversation_upload = ContextVar("conversation_native_upload", default=None)
@@ -148,14 +149,15 @@ class RoleChannel(WebSocketChannel):
                         status, body = failure.status, {"error": failure.text}
                     self.record(role, address.path, status)
                     return connection.respond(status, json.dumps(body, ensure_ascii=False))
-                if address.path == "/api/boss/ui/assignment-preparation":
+                if address.path in {"/api/boss/ui/assignment-preparation", "/api/boss/ui/business-overview/assignment-preparation"}:
                     try:
                         if self.assignment is None:
                             raise web.HTTPServiceUnavailable(text="当前交办读取服务尚未就绪")
                         values = parse_qs(address.query, keep_blank_values=True)
                         if set(values) != {"client_request_id"} or len(values["client_request_id"]) != 1 or not values["client_request_id"][0]:
                             raise web.HTTPBadRequest(text="交办原请求字段无效")
-                        body = self.assignment.receipt(role, values["client_request_id"][0], lambda: True)
+                        lookup = self.assignment.overview_receipt if address.path.startswith("/api/boss/ui/business-overview/") else self.assignment.receipt
+                        body = lookup(role, values["client_request_id"][0], lambda: True)
                         status = 200
                     except web.HTTPException as failure:
                         status, body = failure.status, {"error": failure.text}
@@ -232,7 +234,7 @@ class RoleChannel(WebSocketChannel):
             self.bi_responses.add(task)
             task.add_done_callback(self.bi_responses.discard)
             return
-        if kind == "webui_request" and action == "boss.assignment.prepare":
+        if kind == "webui_request" and action in {"boss.assignment.prepare", "boss.business_overview.assignment.prepare"}:
             task = asyncio.create_task(self._assignment_response(connection, role, envelope))
             self.bi_responses.add(task)
             task.add_done_callback(self.bi_responses.discard)
@@ -315,6 +317,7 @@ class RoleChannel(WebSocketChannel):
             peers = [peer for peer, identity in self.connection_roles.items() if identity == role]
             for peer in peers:
                 self.connection_roles.pop(peer, None)
+                self.business_selections.pop(peer, None)
             self.record(role, action, 200)
             await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": True, "result": {"signed_out": True}}))
             for peer in peers:
@@ -355,21 +358,31 @@ class RoleChannel(WebSocketChannel):
             await connection.send(json.dumps(event, ensure_ascii=False))
             return
         admitted = None
+        general_admitted = None
         control_message = kind == "message" and isinstance(envelope.get("content"), str) and not builtin_command_starts_agent_turn(envelope["content"])
-        if kind == "message" and self.morning is not None and not control_message:
+        if kind == "message" and (self.morning is not None or self.native_conversation is not None) and not control_message:
             try:
-                admitted = self.morning.native.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
-                    attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
-                    active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
+                if self.native_conversation is not None:
+                    general_admitted = self.native_conversation.admit_business(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
+                        media_sha256=checksum(envelope.get("media") or []),
+                        attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
+                        active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0),
+                        selection_current=lambda: self.business_selections.get(connection))
+                if general_admitted is not None and not general_admitted["enqueue"]:
+                    await connection.send(json.dumps({"event":"error","detail":"conversation_turn_already_recorded","reason":"本轮已经接收，请读取原编号记录。","chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id"),"receipt":general_admitted}, ensure_ascii=False))
+                    return
+                if general_admitted is None and self.morning is not None:
+                    admitted = self.morning.native.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
+                        attached=lambda chat_id: chat_id in self.webui_connection_chats(connection),
+                        active=lambda: self.connection_roles.get(connection) == "BOSS" and self.token_roles.get(self.connection_tokens.get(connection)) == "BOSS" and connection.close_code is None and time.monotonic() < self.connection_expirations.get(connection, 0))
                 if admitted is not None and not admitted["enqueue"]:
                     await connection.send(json.dumps({"event":"error","detail":"morning_turn_already_recorded","reason":"本轮已经接收，请读取原会话记录。","chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}))
                     return
             except web.HTTPException as failure:
-                self.record(role, "boss.morning.native.message", failure.status)
-                await connection.send(json.dumps({"event":"error","detail":"morning_scope_rejected","reason":failure.text,"chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}, ensure_ascii=False))
+                self.record(role, "boss.native.message", failure.status)
+                await connection.send(json.dumps({"event":"error","detail":"native_scope_rejected","reason":failure.text,"chat_id":envelope.get("chat_id"),"turn_id":envelope.get("turn_id")}, ensure_ascii=False))
                 return
-        general_admitted = None
-        if kind == "message" and admitted is None and self.native_conversation is not None and not control_message:
+        if kind == "message" and admitted is None and general_admitted is None and self.native_conversation is not None and not control_message:
             try:
                 general_admitted = self.native_conversation.admit(role, envelope.get("chat_id"), envelope.get("turn_id"), envelope.get("content"),
                     media_sha256=checksum(envelope.get("media") or []),
@@ -468,6 +481,17 @@ class RoleChannel(WebSocketChannel):
             operation = self.conversation.business if envelope["action"] in CONVERSATION_BUSINESS_ACTIONS else self.conversation.task if envelope["action"] in CONVERSATION_TASK_ACTIONS else self.conversation.read
             result = operation(role, envelope["action"], envelope.get("payload"),
                 attached=lambda chat_id: chat_id in self.webui_connection_chats(connection), active=active)
+            if envelope["action"] in {"boss.conversation.business.prepare", "boss.conversation.business.clear"}:
+                self.business_selections.pop(connection, None)
+            elif envelope["action"] == "boss.conversation.business.read":
+                if result["binding_state"] == "UNBOUND":
+                    self.business_selections.pop(connection, None)
+                elif envelope["payload"].get("adopt_selection") is True:
+                    entry = result["entry"]
+                    self.business_selections[connection] = (entry["preparation_id"], entry["preparation_sha256"])
+                entry = result["entry"]
+                result = {**result, "current_selection_active": entry is not None
+                          and self.business_selections.get(connection) == (entry["preparation_id"], entry["preparation_sha256"])}
             status, response = 200, {"result": result}
         except web.HTTPException as failure:
             status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
@@ -501,11 +525,12 @@ class RoleChannel(WebSocketChannel):
         try:
             if self.assignment is None:
                 raise web.HTTPServiceUnavailable(text="当前交办读取服务尚未就绪")
-            result = await self.assignment.prepare(role, envelope.get("payload"), active)
+            prepare = self.assignment.prepare_overview if envelope["action"] == "boss.business_overview.assignment.prepare" else self.assignment.prepare
+            result = await prepare(role, envelope.get("payload"), active)
             status, response = 200, {"result": result}
         except web.HTTPException as failure:
             status, response = failure.status, {"error": {"status": failure.status, "message": failure.text}}
-        self.record(role, "boss.assignment.prepare", status)
+        self.record(role, envelope["action"], status)
         if connection.close_code is None:
             await connection.send(json.dumps({"event": "webui_response", "request_id": request_id, "ok": status == 200, **response}, ensure_ascii=False))
 
@@ -595,6 +620,7 @@ class RoleChannel(WebSocketChannel):
                 await super()._connection_loop(connection)
             finally:
                 self.connection_roles.pop(connection, None)
+                self.business_selections.pop(connection, None)
             return
         await connection.send(json.dumps({"event": "ready", "chat_id": str(uuid.uuid4()), "client_id": "maintainer-1"}))
         try:
@@ -606,3 +632,4 @@ class RoleChannel(WebSocketChannel):
         finally:
             await self._cleanup_connection(connection)
             self.connection_roles.pop(connection, None)
+            self.business_selections.pop(connection, None)
