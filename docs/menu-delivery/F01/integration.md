@@ -1,5 +1,18 @@
 # MENU-F01 今日工作
 
+### 2026-10-25 从首菜单重新核验：v7 准入（新一轮，尚未通过）
+
+用户在完成新一轮项目接手和逐菜单讨论后明确要求“建议从头确认下”。本项由当前接手负责人按最新指令重新从 F01 核对，不推倒重做，不删原始证据。原 `MENU-F01.C01—C18` 共18项及 `docs/menu-delivery/F01/delivery-rework.json` 的 `DEVELOPED_PENDING_USER_ACCEPTANCE` 仍是 **Desktop v6、准确旧候选和旧独立环境** 的历史开发覆盖记录，不等于本次 v7 已验证。原 18/18 保留并单列，新一轮 v7 逐项重核从 0/18 起，用户/视觉验收继续 NOT_RUN/PENDING。单活动菜单约束继续有效；N03 已有模块和26项进度冻结保留，不能借此删除。
+
+**本次静态核对来源**：本轮开始时的 GitHub `main` 为 `83e3e303de2e31e61c89ddf8bede517be7d200cc`；已重新完整读取 `docs/开发接手与执行规范.md`、`AGENTS.md`、`specs/feature-delivery.json`、`specs/menu-plan.json`、F01 工单/既有开发与设计记录、`docs/PRD完整产品后续需求.md` 的 FR-01/BR-01/AC-01-S/E 与共同规则、当前 `BossMorningView.tsx`/`BossToday.tsx`、F01 Shell 样式及 `specs/page-service-map.json`。原 F01 源为 `Boss-Agent-Desktop-Complete-v6/pages/F01-今日工作.html` 及加载 CSS/JS、Token。上一聊天的 v7 `Boss-Agent-Desktop-v7-72-Full-Length-UI.zip` 长页审查记录为72个主页面HTML/PNG对应、F01 2880×2862、N02 2880×5256，不能凭图片高度宣告业务内容完整；该 v7 ZIP 未进入当前 GitHub 树，当前无法取得同版本完整HTML/CSS/素材字节进行自动成对比较。旧 v6 测量不继承为 v7 通过证据，既有图像/截图禁令继续有效。
+
+**静态代码实情**：当前 F01 实际保留日期/IANA时区、本人待决定/待协调/需要知晓分类、正式事项详情、同版本来源、排序及 CAS、自然语言交接和明确本人授权流程；应优先复用。现有 `specs/page-service-map.json#F01` 仍标为 `PARTIAL_TODAY_CLASSIFICATION_AND_OWNER_ORDER` 且写有 `conversation.start` 未实现，但这份字段滞后于 `BossMorningView` 当前交接代码和 F01 准确候选记录，不能直接当成当前缺陷或当前通过。该映射需按实际消费者/源码版本重新核定，不删旧历史。最新主线的干净 CI 构建仍失败（见运行 `40161702949`）：原生 `App.tsx` 尚未完成 `BossDesktop` render-prop 整合以及 `ThreadViewport` 的真实阅读控制器补丁接收；本项为 F01/N02 公共可重建阻碍，不能靠仅复制文件、静态页面或类型空实现宣布解除。旧 F01 私有独立候选有构建与行为证据，但它不是最新 `main` 或 v7 的可启动交付。
+
+**本轮 F01 确认门槛**：保留18个稳定检查点，从头对照最新正式 FR-01 和 v7 当前HTML/长页中的真实区域与状态；逐项补当前源码功能、前后端真实消费及同库保存/重读/权限/撤销/幂等/失败与返回证据；复用 v6 已验证的同版本正确域能力。高保真核查覆盖公共Shell、左列分类/事项/自然语言、右侧选中详情/来源/会议承诺、尺寸/时区/滚动/键盘及所有适用异常；先形成有原值和实测值的差异表再修复。独立干净构建需包含纳入的原生 nanobot 必要补丁，编译、启动器、认证后真实完整使用与制品/源码版本一致；用户原体验和资料不切换。不获得授权时不执行截图/图像查看或自动认证，未完成的外部模拟状态、语音暂停和私人资料保护全部保留。
+
+**当前结论**：`F01_V7_REVALIDATION_IN_PROGRESS`，当前新一轮逐项有效验证 0/18（尚未执行 v7 逐项完整证据），旧 18/18 保留为有边界的历史开发结果，不能计作最新版本已通过。核验并修好 F01 后，依次重新确认 N02（历史26项保留）和 N03（已有业务继续复用），再继续其他菜单。不得重做已经满足且依赖未变的业务实现，也不得绕过用户验收门槛。
+
+
 task_id=MENU-F01-N3；CURRENT；2026-10-25；DEVELOPED_PENDING_USER_ACCEPTANCE。唯一正式状态来源为原始目录specs/feature-delivery.json。完整范围为MENU-F01.C01—C18，开发覆盖18/18；用户验收分子null，视觉NOT_RUN。必要设计事项F01-D01—D12均已在指定范围关闭。
 
 ## 需求与设计依据
