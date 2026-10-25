@@ -5,7 +5,7 @@ import {useClient} from "@/providers/ClientProvider";
 import {verifyTaskContext,type TaskConversationContext} from "./BossTaskConversationEntry";
 import {useConversationReturn} from "./BossConversationPosition";
 import {verifyBusinessContext,type BusinessContext} from "./BusinessConversationEntry";
-import {isActiveN02Scope,mayDisplayCurrentTaskReference,sameActiveN02Scope,type N02Scope} from "./n02-context-guard";
+import {isActiveN02Scope,mayDisplayCurrentTaskReference,sameActiveN02Scope,shouldCancelN02PositionOnInteraction,type N02Scope} from "./n02-context-guard";
 import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
 import "./boss-n02.css";
 
@@ -120,11 +120,17 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const currentBusinessContext=isActiveN02Scope(latestScope.current)&&!businessContextError?businessContext:null;
   return <div className="boss-n02" aria-label="聊天交办工作区" ref={workspace}
     onPointerDownCapture={event=>{if(!(event.target instanceof Element&&event.target.closest("button,a,input,select,textarea")))cancelForInteraction();}}
-    onClickCapture={cancelForInteraction} onWheelCapture={cancelForInteraction} onKeyDownCapture={cancelForInteraction}>
+    onClickCapture={event=>{
+      const retry=event.target instanceof Element&&Boolean(event.target.closest("[data-n02-position-retry]"));
+      if(shouldCancelN02PositionOnInteraction("click",null,retry))cancelForInteraction();
+    }} onWheelCapture={cancelForInteraction} onKeyDownCapture={event=>{
+      const retry=event.target instanceof Element&&Boolean(event.target.closest("[data-n02-position-retry]"));
+      if(shouldCancelN02PositionOnInteraction("keydown",event.key,retry))cancelForInteraction();
+    }}>
     <div className="boss-n02-main">
       <section className="boss-n02-panel boss-n02-context" aria-labelledby="boss-n02-context-title">
         <header className="boss-n02-heading"><h2 id="boss-n02-context-title">当前会话与关联事项</h2></header>
-        {returnPosition.error&&<div className="boss-n02-note error" role="alert">{returnPosition.error}<button className="boss-btn" onClick={returnPosition.retry}>重新定位原消息</button><button className="boss-btn" onClick={returnPosition.clear}>结束位置恢复</button></div>}
+        {returnPosition.error&&<div className="boss-n02-note error" role="alert">{returnPosition.error}<button className="boss-btn" type="button" data-n02-position-retry onClick={returnPosition.retry}>重新定位原消息</button><button className="boss-btn" onClick={returnPosition.clear}>结束位置恢复</button></div>}
         {returnPosition.restoring&&<p role="status">正在读取原会话并恢复原消息位置<button className="boss-btn" onClick={returnPosition.clear}>结束位置恢复</button></p>}
         {taskEntry&&<div className="boss-n02-source" aria-label="固定任务上下文"><strong>{taskEntry.task_reference.id} · 原任务版本 {taskEntry.task_reference.version}</strong><span>{taskContextError?"当前有效性核查失败，原选择仅供核查":taskContextChecking?"正在核查原任务与来源的当前有效性":"当前任务与来源版本已经核查"}</span><button className="boss-btn" data-conversation-return={"task:"+taskEntry.return_reference.task_id} onClick={()=>openBusiness(()=>actions.onOpenTask(taskEntry.return_reference.task_id))}>返回关联任务</button></div>}
         {taskContextError&&<div className="boss-n02-note error" role="alert">{taskContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查任务上下文</button></div>}
