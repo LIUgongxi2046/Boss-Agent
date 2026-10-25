@@ -93,8 +93,8 @@ function validate(text:string,label:string,max=2400) {
 
 const MESSAGE_ACTIONS=["boss.message.draft.save","boss.message.send"] as const;
 function messageRequest(){const values=new URLSearchParams(window.location.search),action=values.get("messageOperationAction"),id=values.get("messageOperationRequest");return action&&id&&MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number])?{action,id}:null;}
-function retainMessageRequest(action:string,id:string){if(!MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number]))return;const current=messageRequest();if(current&&(current.action!==action||current.id!==id))throw new Error("当前消息存在待核查原请求");const url=new URL(window.location.href);url.searchParams.set("messageOperationAction",action);url.searchParams.set("messageOperationRequest",id);window.history.replaceState(null,"",url);}
-function clearMessageRequest(action:string,id:string){const current=messageRequest();if(current?.action===action&&current.id===id){const url=new URL(window.location.href);url.searchParams.delete("messageOperationAction");url.searchParams.delete("messageOperationRequest");window.history.replaceState(null,"",url);}}
+function retainMessageRequest(action:string,id:string){if(!MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number]))return;const current=messageRequest();if(current&&(current.action!==action||current.id!==id))throw new Error("当前消息存在待核查原请求");const url=new URL(window.location.href);url.searchParams.set("messageOperationAction",action);url.searchParams.set("messageOperationRequest",id);window.history.replaceState(window.history.state,"",url);}
+function clearMessageRequest(action:string,id:string){const current=messageRequest();if(current?.action===action&&current.id===id){const url=new URL(window.location.href);url.searchParams.delete("messageOperationAction");url.searchParams.delete("messageOperationRequest");window.history.replaceState(window.history.state,"",url);}}
 
 function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
   const {client,getToken}=useClient();

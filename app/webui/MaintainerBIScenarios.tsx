@@ -39,7 +39,7 @@ export function MaintainerBIScenarios(){
   async function load(){
     if(!catalog||busy||uncertain||!selected)return;
     const current=epoch.current,requestId=crypto.randomUUID();setKey(requestId);setBusy(true);setError("");setResult(null);setReceipt(null);setUncertain(true);
-    const address=new URL(window.location.href);address.searchParams.set("biLoadRequest",requestId);window.history.replaceState(null,"",address);
+    const address=new URL(window.location.href);address.searchParams.set("biLoadRequest",requestId);window.history.replaceState(window.history.state,"",address);
     const payload={client_request_id:requestId,mode:"SIMULATED",scenario_id:selected,generator_version:catalog.generator_version,seed:catalog.seed,
       expected_version:catalog.loaded_scenarios.find(row=>row.scenario_id===selected)?.version??"0"};
     await client.requestMutation<LoadResult>("boss.simulation.bi_scenario.load",payload).then(async value=>{

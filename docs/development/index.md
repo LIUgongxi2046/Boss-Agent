@@ -9,7 +9,7 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
-| SHOW-ALL-MENUS | [全部菜单显示](SHOW-ALL-MENUS.md) | 本人六组、维护四组及72项设计页面按角色显示；目录、搜索、直接入口和实现状态统一；5项导航与实际React输出检查、严格TypeScript通过，完整菜单验收独立登记 |
+| SHOW-ALL-MENUS | [全部菜单显示](SHOW-ALL-MENUS.md) | 本人六组、维护四组及72项设计页面按角色显示；侧栏全部页面、目录、搜索、直接入口及History；10项检查含实际React点击与Chromium前进后退、严格TypeScript通过，产品认证UI与独立启动尚未验证 |
 | MENU-N03-N3 | [经营关注完整菜单](../menu-delivery/N03/integration.md) | FR-02/03/14—23、原始v6 N03、MENU-N03.C01—C26；范围/十专题/指标/提醒/关联/来源、实际会话及连续返回；正式状态读取原始feature-delivery.json |
 | MENU-N03-N1 | [经营关注领域](../menu-delivery/N03/backend.md) | BusinessOverviewAPI、BusinessOverviewEntry、BusinessOverviewPreparation、经营范围/专题/来源绑定、原编号历史、C17交办源审查、meeting范围限定材料与businessMeetingPreparationRead；正式状态读取N3的feature-delivery.json |
 | MENU-N03-N2 | [经营会话消费者](../menu-delivery/N03/agent.md) | 正式经营绑定、结构化指标条件、受限工具、Runtime Schema及晨间共享占用检查；公共接收与完整菜单状态由N3维护 |

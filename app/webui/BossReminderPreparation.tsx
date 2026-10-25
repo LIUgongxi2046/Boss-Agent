@@ -24,7 +24,7 @@ export function BossReminderPreparation({revision}:{revision:number}){
   useEffect(()=>{const current=++epoch.current,abort=new AbortController();setReceipt(null);setBusy(false);setUnknown(Boolean(key));setError("");if(key)void read(key,abort.signal).catch(failure=>{if(current===epoch.current&&!abort.signal.aborted)setError(failure.message);});return()=>{epoch.current++;sequence.current++;abort.abort();};},[token,revision,read]);
   async function prepare(){
     if(busy||unknown)return;const current=epoch.current,original="fc04-read-"+crypto.randomUUID();sequence.current++;setKey(original);setReceipt(null);setBusy(true);setUnknown(true);setError("");
-    const url=new URL(window.location.href);url.searchParams.set("reminderPreparation",original);window.history.replaceState(null,"",url);
+    const url=new URL(window.location.href);url.searchParams.set("reminderPreparation",original);window.history.replaceState(window.history.state,"",url);
     await client.requestMutation("boss.reminder.prepare",{client_request_id:original}).then(async()=>{if(current===epoch.current)await read(original);}).catch(failure=>{if(current===epoch.current){setError(failure.message+"；请核查原请求编号。");if([400,401,403,404,409,410,413,422].includes(failure.status))setUnknown(false);}});
     if(current===epoch.current)setBusy(false);
   }

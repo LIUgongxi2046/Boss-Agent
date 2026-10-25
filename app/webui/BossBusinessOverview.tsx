@@ -21,7 +21,7 @@ const topicDirectory=[
   ["F19","禽类与反刍"],["F20","公司水产养殖"],["F21","食品与品质"],["F22","海外业务"],["F23","研发应用"],
 ] as const;
 const state=(value:string)=>stateLabels[value]??value;
-function remember(values:Record<string,string|null>){const address=new URL(window.location.href);for(const [key,value] of Object.entries(values)){if(value===null)address.searchParams.delete(key);else address.searchParams.set(key,value);}window.history.replaceState(null,"",address);}
+function remember(values:Record<string,string|null>){const address=new URL(window.location.href);for(const [key,value] of Object.entries(values)){if(value===null)address.searchParams.delete(key);else address.searchParams.set(key,value);}window.history.replaceState(window.history.state,"",address);}
 function saveScope(scope:OverviewScope){remember({overviewEntity:scope.legal_entity_id,overviewRegion:scope.region_id??"ALL",overviewStart:scope.period_start,overviewEnd:scope.period_end,overviewTimezone:scope.timezone,overviewAttention:scope.attention});}
 export function savedOverviewScope():OverviewScope|null{const query=new URLSearchParams(window.location.search),values=["overviewEntity","overviewRegion","overviewStart","overviewEnd","overviewTimezone","overviewAttention"].map(key=>query.get(key));if(values.every(value=>value===null))return null;if(values.some(value=>!value))throw new Error("保存的经营范围引用不完整");return {legal_entity_id:values[0]!,region_id:values[1]==="ALL"?null:values[1]!,period_start:values[2]!,period_end:values[3]!,timezone:values[4]!,attention:values[5] as OverviewScope["attention"]};}
 

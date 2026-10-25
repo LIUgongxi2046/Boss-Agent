@@ -16,7 +16,7 @@ type Props={data:AssignmentSourceReviewProjection|null;loading:boolean;error:str
   onReceipt:(action:string,clientRequestId:string)=>Promise<Receipt>;onOpenSource:(sourceId:string)=>void;onDirtyChange:(dirty:boolean)=>void};
 const ACTION="boss.assignment.sources.confirm";
 function original():Payload|null{const values=new URLSearchParams(window.location.search),key=values.get("sourceReviewRequest"),task=values.get("sourceReviewTask");return key&&task?{client_request_id:key,task_id:task,task_version:"",review_sha256:"",reason:""}:null;}
-function remember(value:Payload|null){const url=new URL(window.location.href);if(value){url.searchParams.set("sourceReviewRequest",value.client_request_id);url.searchParams.set("sourceReviewTask",value.task_id);}else{url.searchParams.delete("sourceReviewRequest");url.searchParams.delete("sourceReviewTask");}window.history.replaceState(null,"",url);}
+function remember(value:Payload|null){const url=new URL(window.location.href);if(value){url.searchParams.set("sourceReviewRequest",value.client_request_id);url.searchParams.set("sourceReviewTask",value.task_id);}else{url.searchParams.delete("sourceReviewRequest");url.searchParams.delete("sourceReviewTask");}window.history.replaceState(window.history.state,"",url);}
 const SOURCE_LABELS:Record<SourceStatus,string>={VALID:"当前可用",RECEIVED:"尚未生效",INCOMPLETE:"资料不完整",CONFLICTED:"存在冲突",
   SUPERSEDED:"已经换版",WITHDRAWN:"已经撤销",EXPIRED:"已经到期",MISSING:"没有找到资料",FORBIDDEN:"当前没有权限"};
 

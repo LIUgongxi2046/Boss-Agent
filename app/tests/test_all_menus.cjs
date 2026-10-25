@@ -83,6 +83,7 @@ test('实际React菜单输出完整角色目录、状态与独立专题，一级
     const buttons=[...primary.querySelectorAll('button[data-menu-group]')];
     assert.deepEqual(buttons.map(button=>button.dataset.menuGroup),navigation.primaryNavigation(role).map(group=>group.id));
     assert.ok(buttons.every(button=>!button.disabled));assert.equal(primary.querySelectorAll('[aria-current="page"]').length,1);
+    assert.deepEqual([...primary.querySelectorAll('button[data-menu-page]')].map(button=>button.dataset.menuPage),navigation.navigationGroups(role).flatMap(group=>group.pages.map(entry=>entry.id)));
     const catalogue=documentFor(React.createElement(BossMenuDirectory,{role,page,search:'',onNavigate}));
     const entries=[...catalogue.querySelectorAll('button[data-menu-page]')];
     assert.deepEqual(entries.map(button=>button.dataset.menuPage),navigation.navigationGroups(role).flatMap(group=>group.pages.map(entry=>entry.id)));

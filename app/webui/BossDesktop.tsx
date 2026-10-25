@@ -13,6 +13,8 @@ import {
 import pageMeta from "./page-meta.json";
 import {deliveredPage} from "./delivered-navigation";
 import {BossPrimaryNavigation,BossMenuDirectory} from "./BossMenuNavigation";
+import {bindBossHistory,pushBossHistory,replaceBossHistory} from "./boss-history";
+import {bossPageId,menuPageUrl,readBossLocation} from "./boss-route";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import {BossNotificationReturn} from "./BossDesktopNotifications";
@@ -158,9 +160,8 @@ function allowed(page: string, role: Role, mvp=false, _priority=false) {
   return deliveredPage(page,role,mvp)!==undefined;
 }
 function initialPage(role: Role, mvp=false, priority=false): string {
-  const original = new URLSearchParams(window.location.search).get("bossPage") || "";
-  const selected = role==="BOSS"&&original==="NATIVE"?"N02":original;
-  return selected ? allowed(selected,role,mvp,priority)?selected:"UNAVAILABLE" : role === "BOSS" ? "F01" : "A08";
+  void mvp;void priority;
+  return readBossLocation(new URL(window.location.href),role).page;
 }
 async function jsonRequest<T>(path: string, getToken: () => string, signal?: AbortSignal): Promise<T> {
   const token = getToken();
@@ -262,7 +263,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const importEditor=currentSupply?.import??EMPTY_IMPORT_EDITOR;
   const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
   const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
-  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string}|null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string;menu?:boolean}|null>(null);
   const [pendingLeaveAction,setPendingLeaveAction]=useState<(()=>void)|null>(null);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
@@ -307,7 +308,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [requestVersion, setRequestVersion] = useState(0);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const navigationFocus = useRef<HTMLElement | null>(null);
-  const currentLocation = useRef(window.location.href);
   const openDirectory = useCallback(() => {
     navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
     setDirectoryOpen(true);
@@ -321,7 +321,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     window.addEventListener("keydown",shortcut,true);
     return () => window.removeEventListener("keydown",shortcut,true);
   }, [role,openDirectory]);
-  useEffect(() => {currentLocation.current=window.location.href;});
   useEffect(() => {
     if (!(assignmentDirty || sourceReviewDirty || settingsDirty || workDirty || overviewDirty || queryDirty || supplyDirty || importDirty)) return;
     const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
@@ -346,11 +345,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     return () => abort.abort();
   }, [getToken, authAttempt]);
 
-  const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string, sopId?: string) => {
-    if(role==="BOSS"&&id==="NATIVE")id="N02";
+  const navigate = useCallback((id: string, focus = "", bypassDirty = false, taskId?: string, sopId?: string,menu=false) => {
+    if(role)id=bossPageId(id,role);
     if (!role || !allowed(id, role,mvpScope,priorityScope)) return;
     if (["NATIVE","N02"].includes(page) && id !== page && !bypassDirty) {
-      onBeforeLeaveNative(() => navigate(id, focus, true, taskId, sopId));
+      onBeforeLeaveNative(() => navigate(id, focus, true, taskId, sopId,menu));
       return;
     }
     const changingTask = taskId !== undefined && taskId !== selectedTaskId;
@@ -365,7 +364,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
         navigationFocus.current=trigger;
       }
       setDirectoryOpen(false);
-      setPendingNavigation({id,focus,taskId,sopId});
+      setPendingNavigation({id,focus,taskId,sopId,menu});
       return;
     }
     if (id !== page) setPreviousPage(page);
@@ -378,23 +377,27 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
     if (id !== page && ["F01","MVP01","F02","N06","F04","N05","N09","F08","A08","A13"].includes(page)) setWorkDirty(false);
     if (focus) setOriginFocus(focus);
-    const url = new URL(window.location.href);
+    const url = menu?menuPageUrl(window.location.href,id,role):new URL(window.location.href);
     url.searchParams.set("bossPage", id);
+    if(menu)conversationReturn.current=false;
     if(conversationReturn.current)url.searchParams.set("bossConversationReturn","N02");
     if (["NATIVE","N02"].includes(id)) url.searchParams.set("bossReturn", page);
-    if (taskId ?? selectedTaskId) url.searchParams.set("bossTask", taskId ?? selectedTaskId);
+    if(!menu&&(taskId ?? selectedTaskId))url.searchParams.set("bossTask",taskId ?? selectedTaskId);
+    if(taskId==="")url.searchParams.delete("bossTask");
     if(id==="D01")url.searchParams.set("bossReturn",page);
     const sopReference = id === "A06" ? selectedSop : id === "A15" ? sopId ?? "" : "";
     if (sopReference) url.searchParams.set("bossSop", sopReference);
     else url.searchParams.delete("bossSop");
     setRuntimeSopReference(id === "A15" ? sopReference : "");
-    window.history.pushState({}, "", url);
+    pushBossHistory(url);
     if (taskId !== undefined) setSelectedTaskId(taskId);
     if (id !== page || changingTask) setSourceReviewDirty(false);
     setPage(id);
     setError("");
     setDirectoryOpen(false);
   }, [page, role, assignmentDirty, sourceReviewDirty, selectedTaskId, selectedSop, settingsDirty, workDirty,overviewDirty,queryDirty,supplyDirty,importDirty,directoryOpen,mvpScope,priorityScope,onOpenNative,onBeforeLeaveNative]);
+
+  const openMenu=(id:string)=>navigate(id,"",false,id==="F06"?"":undefined,undefined,true);
 
   const guardLeave=useCallback((leave:()=>void)=>{
     if(["NATIVE","N02"].includes(page)){onBeforeLeaveNative(leave);return;}
@@ -406,6 +409,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const businessConversation=useBusinessConversationEntry({role,getToken,onCreateChat:onCreateTaskConversation,
     onOpenChat:chatId=>{onOpenTaskConversation(chatId);navigate("N02","N03",true);},onBeforeStart:guardLeave});
   const requestLogout=useCallback(()=>guardLeave(onLogout),[guardLeave,onLogout]);
+  const historyCallbacks=useRef({guardLeave,page});
+  historyCallbacks.current={guardLeave,page};
   useEffect(()=>{
     onRegisterCloseGuard(guardLeave);
     return()=>onRegisterCloseGuard(null);
@@ -415,31 +420,26 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     setSelectedSop(sopId);
     if (page === "A06") {
       const url = new URL(window.location.href); url.searchParams.set("bossSop", sopId);
-      window.history.replaceState({}, "", url);
+      replaceBossHistory(url);
     }
   }, [page]);
 
   useEffect(() => {
-    const onBack = () => {
-      if (!role) return;
-      const selected = initialPage(role,mvpScope,priorityScope);
-      if (selected !== page && selected !== "UNAVAILABLE" &&
-          (["NATIVE","N02"].includes(page) || assignmentDirty || sourceReviewDirty || settingsDirty || workDirty || overviewDirty || queryDirty || supplyDirty || importDirty)) {
-        const targetTask = new URLSearchParams(window.location.search).get("bossTask")??"";
-        window.history.replaceState(null,"",currentLocation.current);
-        navigate(selected,"",false,targetTask);
-        return;
-      }
-      setSelectedTaskId(new URLSearchParams(window.location.search).get("bossTask")??"");
-      setSourceId(new URLSearchParams(window.location.search).get("bossSource")??"finance-note");
-      const reference = new URLSearchParams(window.location.search).get("bossSop") ?? "";
-      if (selected === "A06" && /^SOP(?:0[1-9]|1[0-3])$/.test(reference)) setSelectedSop(reference);
-      setRuntimeSopReference(selected === "A15" ? reference : "");
-      setPage(selected);
-    };
-    window.addEventListener("popstate", onBack);
-    return () => window.removeEventListener("popstate", onBack);
-  }, [role,mvpScope,priorityScope,page,navigate,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,overviewDirty,queryDirty,supplyDirty,importDirty]);
+    if(!role)return;
+    return bindBossHistory(window,(url,proceed)=>{
+      const current=historyCallbacks.current;
+      if(readBossLocation(url,role).page!==current.page)current.guardLeave(proceed);else proceed();
+    },url=>{
+      const location=readBossLocation(url,role);
+      setSelectedTaskId(location.taskId);setSourceId(location.sourceId);setSourceAnchor(null);
+      setPreviousPage(location.returnPage);
+      conversationReturn.current=url.searchParams.get("bossConversationReturn")==="N02";
+      if(["NATIVE","N02"].includes(location.page))businessPage.current=location.returnPage;
+      if(location.page==="A06"&&/^SOP(?:0[1-9]|1[0-3])$/.test(location.sopId))setSelectedSop(location.sopId);
+      setRuntimeSopReference(location.page==="A15"?location.sopId:"");
+      setOverviewPreparation(null);setPage(location.page);setError("");
+    });
+  },[role]);
 
   useEffect(() => {
     if (!role || ["NATIVE","N02"].includes(page)) return;
@@ -528,13 +528,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     version:string;start:number;end:number;
   }) => {
     setSourceId(id);
-    const url=new URL(window.location.href);url.searchParams.set("bossSource",id);window.history.replaceState(null,"",url);
+    const url=new URL(window.location.href);url.searchParams.set("bossSource",id);replaceBossHistory(url);
     setSourceAnchor(anchor?{source_id:id,...anchor}:null);
     navigate("D01", page);
   };
   const selectTask = (id: string,bypassDirty=false) => navigate("F06", page, bypassDirty, id);
-  const markOverviewReturn=()=>{const address=new URL(window.location.href);address.searchParams.set("overviewReturn","N03");window.history.replaceState(null,"",address);};
-  const returnOverview=()=>guardLeave(()=>{const address=new URL(window.location.href);address.searchParams.delete("overviewReturn");window.history.replaceState(null,"",address);navigate("N03","",true);});
+  const markOverviewReturn=()=>{const address=new URL(window.location.href);address.searchParams.set("overviewReturn","N03");replaceBossHistory(address);};
+  const returnOverview=()=>guardLeave(()=>{const address=new URL(window.location.href);address.searchParams.delete("overviewReturn");replaceBossHistory(address);navigate("N03","",true);});
 
   if (!role) return <div className="boss-gate">
     <img src="/boss-brand/dapeng-front.png" alt="" />
@@ -548,7 +548,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
 
   if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前身份无法打开此页面</h1><p>页面编号未知或不属于当前身份的菜单范围。请返回相应工作区。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回工作区</button><button className="boss-btn" onClick={requestLogout}>退出当前身份</button></div></section></div>;
   return <div className="boss-v6" data-role={role} data-page={page} ref={shellRef}>
-    <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);window.history.replaceState(null,"",url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
+    <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);replaceBossHistory(url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
       <div className={"boss-layout " + (!sidebarOpen ? "boss-layout-slim" : "")}>
         <aside className="boss-sidebar" aria-label={role === "BOSS" ? "老板工作区" : "技术维护工作区"}>
@@ -558,7 +558,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           </div>
           {sidebarOpen && <p className="boss-brand-caption">让重要的事，推进得更确定</p>}
           <div className="boss-sidebar-label">{sidebarOpen ? (role === "BOSS" ? "老板工作区" : "技术维护工作区") : "◈"}</div>
-          <BossPrimaryNavigation role={role} page={page} expanded={sidebarOpen} onNavigate={id=>navigate(id)} referenceIcon={referenceMenu?id=><ReferenceNavigationIcon id={id}/>:undefined}/>
+          <BossPrimaryNavigation role={role} page={page} expanded={sidebarOpen} onNavigate={openMenu} referenceIcon={referenceMenu?id=><ReferenceNavigationIcon id={id}/>:undefined}/>
           <div className="boss-sidebar-bottom">
             <button type="button" onClick={openDirectory} title="全部菜单目录">
               {page==="F01"&&!mvpScope?<Settings size={17} aria-hidden="true"/>:<FolderOpen size={17} aria-hidden="true" />}{sidebarOpen && "全部菜单"}
@@ -610,8 +610,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </div>}
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-overview-content" hidden={page!=="N03"}>
               <BossBusinessOverview visible={page==="N03"} refreshVersion={requestVersion} discardVersion={overviewDiscardVersion} onDirtyChange={setOverviewDirty}
-                onQuery={view=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("overviewQuerySnapshot",view.snapshot_sha256);address.searchParams.delete("biRequest");address.searchParams.delete("biScenario");window.history.replaceState(null,"",address);navigate("F03");}}
-                onReminder={alert=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("bossEvent",alert.event_id);address.searchParams.set("bossEventVersion",alert.event_version);window.history.replaceState(null,"",address);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}
+                onQuery={view=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("overviewQuerySnapshot",view.snapshot_sha256);address.searchParams.delete("biRequest");address.searchParams.delete("biScenario");replaceBossHistory(address);navigate("F03");}}
+                onReminder={alert=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("bossEvent",alert.event_id);address.searchParams.set("bossEventVersion",alert.event_version);replaceBossHistory(address);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}
                 onTask={task=>{markOverviewReturn();selectTask(task.id);}} onDiscuss={businessConversation.start} conversationStatus={<>{businessConversation.status}{savedOverviewPreparation()&&<button className="boss-btn" onClick={()=>setOverviewPreparation(savedOverviewPreparation())}>核查原经营准备</button>}</>} onPrepare={(detail,use)=>setOverviewPreparation({scope:detail.applied_scope,page_id:detail.topic.page_id,use,snapshot_sha256:detail.snapshot_sha256})}/>
               {page==="N03"&&overviewPreparation&&<BusinessOverviewPreparation selection={overviewPreparation} onClose={()=>setOverviewPreparation(null)} onOpenTask={id=>{markOverviewReturn();selectTask(id);}}/>}
             </div>}
@@ -690,7 +690,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 </div> :
                 page === "N05" ? <BossTaskCenter
                   data={tasks} selectedTaskId={selectedTaskId}
-                  onSelectTask={id=>{setSelectedTaskId(id);const url=new URL(window.location.href);url.searchParams.set("bossTask",id);window.history.replaceState(null,"",url);}}
+                  onSelectTask={id=>{setSelectedTaskId(id);const url=new URL(window.location.href);url.searchParams.set("bossTask",id);replaceBossHistory(url);}}
                   onOpenTask={selectTask}
                   onNavigate={id=>navigate(id)} onReload={refresh} onDirtyChange={setWorkDirty}
                 /> :
@@ -1039,7 +1039,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             if(page==="A03"&&!importEditor.pending)updateImportEditor({...EMPTY_IMPORT_EDITOR});
             setPendingNavigation(null);
             setPendingLeaveAction(null);
-            if(action)action();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId);
+            if(action)action();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId,destination.menu);
           }}>放弃草稿并离开</button>
         </div>
         </DialogPrimitive.Content>
@@ -1052,7 +1052,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <button type="button" onClick={() => setDirectoryOpen(false)} aria-label="关闭目录"><X size={19}/></button></header>
         <label className="boss-directory-search"><Search size={17}/><input autoFocus value={pageFilter}
           onChange={(e) => setPageFilter(e.target.value)} placeholder="搜索页面编号或名称"/></label>
-        <BossMenuDirectory role={role} page={page} search={pageFilter} onNavigate={id=>navigate(id)}/>
+        <BossMenuDirectory role={role} page={page} search={pageFilter} onNavigate={openMenu}/>
         {allowed("NATIVE",role,mvpScope,priorityScope)&&<footer><button type="button" onClick={() => navigate("NATIVE")}>
           <MessageCircle size={16}/>{role === "BOSS" ? "大鹏会话" : "应用设置"}
         </button></footer>}

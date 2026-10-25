@@ -116,7 +116,7 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
   const [uncertain,setUncertain]=useState(Boolean(pending?.restored));
   const epoch=useRef(0),identity=useRef(token);
   useEffect(()=>{epoch.current++;if(identity.current!==token){identity.current=token;setPending(null);setApproved(false);setNotice("");setError("");setUncertain(false);setBusy(false);setLookupBusy(false);}return()=>{epoch.current++;};},[token]);
-  const remember=useCallback((value:Pending|null)=>{const url=new URL(window.location.href);for(const key of ["Request","Action","Target"]){if(value){const content=key==="Request"?value.id:key==="Action"?value.action:value.target??"";url.searchParams.set(scope+key,content);}else url.searchParams.delete(scope+key);}window.history.replaceState(null,"",url);},[scope]);
+  const remember=useCallback((value:Pending|null)=>{const url=new URL(window.location.href);for(const key of ["Request","Action","Target"]){if(value){const content=key==="Request"?value.id:key==="Action"?value.action:value.target??"";url.searchParams.set(scope+key,content);}else url.searchParams.delete(scope+key);}window.history.replaceState(window.history.state,"",url);},[scope]);
   const [approved, setApproved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
