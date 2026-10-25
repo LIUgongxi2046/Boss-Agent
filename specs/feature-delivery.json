@@ -29,8 +29,8 @@
     },
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
-    "independent_current_main_build": "REACT_TYPESCRIPT_VITE_PASS_N03_LEGACY_PYTHON_CONTRACT_FAILURE",
-    "latest_clean_build_run_id": 40186113227,
+    "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_N03_FAILURE",
+    "latest_clean_build_run_id": 40195931205,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -40,9 +40,9 @@
       ],
       "desktop_build": {
         "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121147133442,
-        "run_id": 40186113227,
-        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ASSET_MANIFEST_SOURCE_CHECK_REPEAT_AND_MANUAL_LAUNCH_SYNTAX"
+        "job_id": 121176692836,
+        "run_id": 40195931205,
+        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_NATIVE_PATCHES_ASSET_SHA_ELECTRON_SYNTAX"
       },
       "repeat_preparation": {
         "result": "PASS",
@@ -51,9 +51,9 @@
         "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
       },
       "f01_business": {
-        "result": "52_PASSED_0_FAILED",
-        "run_id": 40186113255,
-        "scope": "44_SQLITE_DOMAIN_PUBLIC_API_PLUS_8_BUILD_INTEGRITY_TESTS"
+        "result": "53_PASSED_0_FAILED",
+        "run_id": 40195948810,
+        "scope": "SQLITE_DOMAIN_PUBLIC_API_AND_BUNDLE_INTEGRITY_INCLUDING_READONLY_MISSING_SORT_RECEIPT"
       },
       "current_full_f01_e2e": "NOT_RUN",
       "design_v7_dom_and_visual": "NOT_RUN",
@@ -79,14 +79,14 @@
         ]
       },
       "f01_order_and_return": {
-        "result": "20_PASSED_0_FAILED",
-        "run_id": 40186113255,
-        "scope": "CURRENT_NODE_CATEGORY_ORDER_RETURN_PREVIEW_CONTEXT_AND_ASSIGNMENT_BINDING"
+        "result": "27_PASSED_0_FAILED",
+        "run_id": 40195948810,
+        "scope": "NODE_CATEGORY_ORDER_RETURN_PREVIEW_CONTEXT_ASSIGNMENT_AND_NATIVE_BINDING_RECOVERY"
       },
       "f01_native_agent": {
         "result": "39_PASSED_0_FAILED",
-        "run_id": 40186113255,
-        "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
+        "run_id": 40195948810,
+        "scope": "SIMULATED_NATIVE_NANOBOT_SDK_TOOLS_SOURCE_AUTHORIZATION_AND_ORIGINAL_BINDING"
       },
       "f01_preview_and_source": {
         "result": "SOURCE_FIXES_WITH_SCOPED_TEST_AND_BUILD_ONLY",
@@ -125,15 +125,43 @@
         "source_design_v7": "NOT_AVAILABLE_AS_VERIFIABLE_RAW_BYTES"
       },
       "f01_exact_version_artifact": {
-        "source_commit": "69b19070aeb1b96f1c4e282ef0ba22a9a8f4896f",
-        "workflow_run_id": 40186113227,
-        "artifact_id": 12595563757,
-        "artifact_name": "boss-f01-frontend-69b19070aeb1b96f1c4e282ef0ba22a9a8f4896f",
-        "zip_sha256": "33ca4593ae8e52397d2a85e21f0d726595f9c126574c4c3ea3ce8ca1001a2122",
+        "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+        "workflow_run_id": 40195931205,
+        "artifact_id": 12599921374,
+        "artifact_name": "boss-f01-frontend-5ac660330fce99c925163f06a62951563a24d383",
+        "zip_sha256": "ca3860e98b0547c8bb9384e65bad5726a05b4719d2393dbf9a96700ea5f7eea3",
         "artifact_limit": "FRONTEND_BUILD_ONLY_NOT_MAC_GUI_OR_V7_ACCEPTED",
         "manual_launch": "scripts/run_f01_manual_review.command",
         "preflight": "scripts/verify_f01_candidate.py",
         "instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md"
+      },
+      "f01_original_request_recovery": {
+        "result": "SCOPED_TESTED_NOT_FULL_UI_E2E",
+        "relevant_checkpoints": [
+          "MENU-F01.C08",
+          "MENU-F01.C11",
+          "MENU-F01.C15",
+          "MENU-F01.C17"
+        ],
+        "source_commits": [
+          "309cd1981b1c2931df0f5f4cc9189a41a5950ba9",
+          "5e8f1860f7fa5c7f8d48a003a15836be7cade556",
+          "00fda92e4099c5f1f29d080bb795202ca92e46a0",
+          "dc3dc7cfbdab6165d424c9553ef42e3d8b0f93c0",
+          "ae72eff43c87d2886cceb15036f338d17e4801d1"
+        ],
+        "guarantees": [
+          "RECORD_WITH_REAL_AUTHORIZATION_BEFORE_SUCCESS",
+          "RECORDED_ORDER_URL_ID_CLEARED_ONLY_EXACT_MATCH",
+          "MISSING_RECEIPT_REQUIRES_EXPLICIT_OWNER_ACKNOWLEDGEMENT",
+          "NEVER_REPLAY_ON_NETWORK_ERROR",
+          "BINDING_MISSING_REQUIRES_STRICT_READONLY_RECEIPT",
+          "NO_AUTOMATIC_NATIVE_MESSAGE_SUBMISSION"
+        ],
+        "frontend_node": 27,
+        "agent_sdk": 39,
+        "domain_and_asset": 53,
+        "full_native_desktop_recovery": "NOT_RUN"
       }
     },
     "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度"
