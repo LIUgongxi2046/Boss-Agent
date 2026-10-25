@@ -186,11 +186,11 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   function cancelHandoff(){handoff.current?.abort();setHandoffCanceled(true);setError("会话交接取消已请求；等待原绑定结果，当前问题不会自动发送。");}
   const current=list?.adoption_state==="CURRENT",order=list?.current_order;
   useEffect(()=>{
-    if(!visible||!returnPending.current||loading||Boolean(selected)&&!detail)return;
+    if(!visible||!returnPending.current||loading||(Boolean(selected)&&!detail&&!detailError))return;
     const point=returnPoint.current;if(!point)return;
     const frame=requestAnimationFrame(()=>{const target=window.document.getElementById(point.focus);if(!target||target.matches(":disabled"))return;surface.current?.closest(".boss-content")?.scrollTo({top:point.scroll});target.focus({preventScroll:true});returnPending.current=false;});
     return()=>cancelAnimationFrame(frame);
-  },[visible,detail,current,loading,selected]);
+  },[visible,detail,detailError,current,loading,selected]);
   useEffect(()=>{
     let frame=0;
     const restoreFocus=()=>{if(!visibility.current||!returnPoint.current)return;frame=requestAnimationFrame(()=>{
