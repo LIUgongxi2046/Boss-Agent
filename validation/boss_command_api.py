@@ -497,7 +497,8 @@ class BossCommandAPI:
             "envelope": _data_envelope(data, key),
         }
         validate("assignment_input", tool_input)
-        result = self.store.create_assignment(db, NAMESPACE, data, tool_input)
+        result = self.store.create_assignment(db, NAMESPACE, data, tool_input,
+            verified_morning_selection=morning_reference is not None)
         validate("assignment_output", result)
         pinned_versions = {
             source_id: self._require_current_source(db, data, source_id)["version"]
