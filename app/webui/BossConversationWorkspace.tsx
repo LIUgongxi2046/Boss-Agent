@@ -5,6 +5,7 @@ import {useClient} from "@/providers/ClientProvider";
 import {verifyTaskContext,type TaskConversationContext} from "./BossTaskConversationEntry";
 import {useConversationReturn} from "./BossConversationPosition";
 import {verifyBusinessContext,type BusinessContext} from "./BusinessConversationEntry";
+import {isActiveN02Scope,mayDisplayCurrentTaskReference,sameActiveN02Scope,type N02Scope} from "./n02-context-guard";
 import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
 import "./boss-n02.css";
 
@@ -27,6 +28,8 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const {client,token}=useClient();
   const [connectionStatus,setConnectionStatus]=useState(client.status);
   const session=sessions.find(value=>value.key===activeKey),chatId=session?.chatId??(activeKey?.startsWith("websocket:")?activeKey.slice(10):null);
+  const latestScope=useRef<N02Scope>({client,token,chatId,role,visible,connectionStatus});
+  latestScope.current={client,token,chatId,role,visible,connectionStatus};
   const [view,setView]=useState<View|null>(null),[attachments,setAttachments]=useState<Attachment[]>([]),[error,setError]=useState(""),[revision,setRevision]=useState(0);
   const [receipts,setReceipts]=useState<RequestReceipt[]>([]);
   const [taskContext,setTaskContext]=useState<TaskConversationContext|null>(null),[taskContextError,setTaskContextError]=useState(""),[taskContextChecking,setTaskContextChecking]=useState(false);
@@ -77,14 +80,18 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
     if(taskScope.current?.client!==client||taskScope.current?.token!==token||taskScope.current?.chatId!==chatId||taskScope.current?.role!==role){
       taskScope.current={client,token,chatId,role};setTaskContext(null);setTaskContextError("");
     }
-    setTaskContextChecking(true);
-    if(role!=="BOSS"||!visible||!chatId||connectionStatus!=="open")return;
+    const ready=role==="BOSS"&&visible&&Boolean(chatId)&&connectionStatus==="open";
+    setTaskContextChecking(ready);
+    if(!ready){setTaskContext(null);setTaskContextError("");return;}
+    // Do not leave the previously adopted task actionable while re-checking
+    // this exact chat, including refresh, re-connect and explicit retry.
+    setTaskContext(null);setTaskContextError("");
     const read=async()=>{
       try{
         const result=await client.requestMutation<TaskConversationContext>("boss.conversation.task.read",{chat_id:chatId});
         if(disposed)return;
         verifyTaskContext(result,chatId);setTaskContext(result);setTaskContextError("");setTaskContextChecking(false);timer=setTimeout(()=>void read(),2000);
-      }catch(failure){if(!disposed){setTaskContextError(failure instanceof Error?failure.message:String(failure));setTaskContextChecking(false);}}
+      }catch(failure){if(!disposed){setTaskContext(null);setTaskContextError(failure instanceof Error?failure.message:String(failure));setTaskContextChecking(false);}}
     };
     void read();return()=>{disposed=true;if(timer)clearTimeout(timer);};
   },[client,token,chatId,role,visible,revision,connectionStatus]);
@@ -108,7 +115,9 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   if(role!=="BOSS")return <>{children}</>;
   const latest=view?.runs.find(run=>run.run_id===selectedRunId)??view?.runs.at(-1),origin=latest?.origin_references.morning_context,selected=origin?.selected_item_ref as {object_id?:string;version?:string;source_refs?:{kind:string;id:string;version:string|null}[]}|undefined;
   const contextRefs=latest?.context_references??[],taskRefs=contextRefs.filter(ref=>ref.kind==="task"),documentRefs=contextRefs.filter(ref=>ref.kind==="document");
-  const taskEntry=taskContext?.entry;
+  const taskEntry=mayDisplayCurrentTaskReference(taskContext,latestScope.current,taskContextChecking,taskContextError)
+    ?taskContext?.entry:null;
+  const currentBusinessContext=isActiveN02Scope(latestScope.current)&&!businessContextError?businessContext:null;
   return <div className="boss-n02" aria-label="聊天交办工作区" ref={workspace}
     onPointerDownCapture={event=>{if(!(event.target instanceof Element&&event.target.closest("button,a,input,select,textarea")))cancelForInteraction();}}
     onClickCapture={cancelForInteraction} onWheelCapture={cancelForInteraction} onKeyDownCapture={cancelForInteraction}>
@@ -119,9 +128,18 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
         {returnPosition.restoring&&<p role="status">正在读取原会话并恢复原消息位置<button className="boss-btn" onClick={returnPosition.clear}>结束位置恢复</button></p>}
         {taskEntry&&<div className="boss-n02-source" aria-label="固定任务上下文"><strong>{taskEntry.task_reference.id} · 原任务版本 {taskEntry.task_reference.version}</strong><span>{taskContextError?"当前有效性核查失败，原选择仅供核查":taskContextChecking?"正在核查原任务与来源的当前有效性":"当前任务与来源版本已经核查"}</span><button className="boss-btn" data-conversation-return={"task:"+taskEntry.return_reference.task_id} onClick={()=>openBusiness(()=>actions.onOpenTask(taskEntry.return_reference.task_id))}>返回关联任务</button></div>}
         {taskContextError&&<div className="boss-n02-note error" role="alert">{taskContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查任务上下文</button></div>}
-        {businessContext?.entry&&<div className="boss-n02-source" aria-label="固定经营上下文"><strong>经营范围 {businessContext.entry.applied_scope.legal_entity_id} · {businessContext.entry.applied_scope.period_start} 至 {businessContext.entry.applied_scope.period_end}</strong><span>专题 {businessContext.entry.topic_reference?.page_id??"经营总览"} · 用途 {businessContext.entry.topic_reference?.use??"当前范围"} · 当前正式版本已经核查</span><span>原请求编号 {businessContext.entry.client_request_id}</span>{!businessContext.current_selection_active&&<><p>当前连接尚未采用此会话的原范围，请明确核查后继续。</p><button className="boss-btn" onClick={()=>{
-          if(!chatId)throw new Error("经营会话缺少当前编号");const selectedChat=chatId;
-          void client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:selectedChat,adopt_selection:true}).then(result=>{if(scope.current?.chatId!==selectedChat)return;verifyBusinessContext(result,selectedChat);setBusinessContext(result);setBusinessContextError("");}).catch(reason=>{if(scope.current?.chatId===selectedChat)setBusinessContextError(reason instanceof Error?reason.message:String(reason));});
+        {currentBusinessContext?.entry&&<div className="boss-n02-source" aria-label="固定经营上下文"><strong>经营范围 {currentBusinessContext.entry.applied_scope.legal_entity_id} · {currentBusinessContext.entry.applied_scope.period_start} 至 {currentBusinessContext.entry.applied_scope.period_end}</strong><span>专题 {currentBusinessContext.entry.topic_reference?.page_id??"经营总览"} · 用途 {currentBusinessContext.entry.topic_reference?.use??"当前范围"} · 当前正式版本已经核查</span><span>原请求编号 {currentBusinessContext.entry.client_request_id}</span>{!currentBusinessContext.current_selection_active&&<><p>当前连接尚未采用此会话的原范围，请明确核查后继续。</p><button className="boss-btn" onClick={()=>{
+          if(!chatId)throw new Error("经营会话缺少当前编号");
+          const selectedChat=chatId,originalScope={...latestScope.current};
+          void client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:selectedChat,adopt_selection:true}).then(result=>{
+            if(!sameActiveN02Scope(originalScope,latestScope.current))return;
+            verifyBusinessContext(result,selectedChat);setBusinessContext(result);setBusinessContextError("");
+          }).catch(reason=>{
+            if(sameActiveN02Scope(originalScope,latestScope.current)){
+              setBusinessContext(null);
+              setBusinessContextError(reason instanceof Error?reason.message:String(reason));
+            }
+          });
         }}>核查并采用此会话原范围</button></>}</div>}
         {businessContextError&&<div className="boss-n02-note error" role="alert">{businessContextError}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新核查经营上下文</button></div>}
         <Row name="关联事项" value={taskEntry?.task_reference.id??selected?.object_id??(contextRefs.length?contextRefs.map(ref=>ref.id).join("、"):origin?.date?"晨间事项 · "+String(origin.date):"尚未关联")}/>
