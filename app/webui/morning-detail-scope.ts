@@ -12,7 +12,7 @@ export type MorningProjectionScope = {list_id: string | null} | null;
 export function currentMorningDetailScope(
   list: MorningListScope,
   view: MorningProjectionScope,
-): boolean {
+): view is {list_id: string} {
   const listId = list?.result?.list_id;
   return list?.adoption_state === "CURRENT"
     && typeof listId === "string"
