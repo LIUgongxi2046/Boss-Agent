@@ -29,8 +29,8 @@
     },
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
-    "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_UNRELATED_FAILURES",
-    "latest_clean_build_run_id": 40165910623,
+    "independent_current_main_build": "REACT_TYPESCRIPT_VITE_PASS_N03_LEGACY_PYTHON_CONTRACT_FAILURE",
+    "latest_clean_build_run_id": 40183732779,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -40,8 +40,8 @@
       ],
       "desktop_build": {
         "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121086785406,
-        "run_id": 40165910623,
+        "job_id": 121140008786,
+        "run_id": 40183732779,
         "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX_AND_REPEAT"
       },
       "repeat_preparation": {
@@ -51,9 +51,9 @@
         "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
       },
       "f01_business": {
-        "result": "41_PASSED_0_FAILED",
-        "run_id": 40165910636,
-        "scope": "CURRENT_CODE_TESTS_SIMULATED_DOMAIN_PUBLIC_API"
+        "result": "44_PASSED_0_FAILED",
+        "run_id": 40183732776,
+        "scope": "CURRENT_CODE_TESTS_SQLITE_DOMAIN_PUBLIC_API_AND_ASSIGNMENT_SOURCE"
       },
       "current_full_f01_e2e": "NOT_RUN",
       "design_v7_dom_and_visual": "NOT_RUN",
@@ -75,13 +75,13 @@
         ]
       },
       "f01_order_and_return": {
-        "result": "12_PASSED_0_FAILED",
-        "run_id": 40165910636,
-        "scope": "NODE_CLIENTSIDE_ORDER_RETURN_POSITION_AND_PREVIEW_DETAIL_SCOPE"
+        "result": "19_PASSED_0_FAILED",
+        "run_id": 40183732776,
+        "scope": "NODE_CATEGORY_ORDER_RETURN_PREVIEW_AND_MORNING_ASSIGNMENT_BINDING"
       },
       "f01_native_agent": {
         "result": "39_PASSED_0_FAILED",
-        "run_id": 40165910636,
+        "run_id": 40183732776,
         "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
       },
       "f01_preview_and_source": {
@@ -100,6 +100,25 @@
           "strict_current_list_id_type_guard"
         ],
         "validation_scope": "NO_AUTHENTICATED_UI_OR_V7_DOM_CHECK"
+      },
+      "f01_morning_to_assignment": {
+        "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
+        "commit_shas": [
+          "7e44072f2911513eceb7fe9c787dafdffe51e006",
+          "418a2551a4680d70f355f953f0e3698166b24adc",
+          "bd5d2e4d8b057aadc0824da64763cd2ebe95d98d",
+          "a7010f5e573d436eeb0abd84e3501c77e9ff57a4",
+          "0875b79dd0fbb1e36b8db8a76ae6e3fd15244a74"
+        ],
+        "verified_scope": [
+          "exact_current_list_item_source_and_version",
+          "allowed_non_finance_source_to_open_assignment",
+          "unbound_legacy_source_policy_unchanged",
+          "unrelated_current_source_denied_with_zero_business_write"
+        ],
+        "f01_ci_run_id": 40183732776,
+        "current_main_product_gui": "NOT_RUN",
+        "source_design_v7": "NOT_AVAILABLE_AS_VERIFIABLE_RAW_BYTES"
       }
     }
   },
