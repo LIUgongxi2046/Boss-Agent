@@ -210,7 +210,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const disabled=busy||uncertain||orderDirty||denied;
   const actualCounts={DECIDE:0,COORDINATE:0,INFORM:0};for(const item of view?.items??[])actualCounts[item.category]++;
   const counts=view?.category_counts??actualCounts;
-  const chooseItem=(item:TodayItem)=>{if(selected===item.item_id&&!detail)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(currentMorningDetailScope(list,view));setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
+  const chooseItem=(item:TodayItem)=>{if(selected===item.item_id)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(currentMorningDetailScope(list,view));setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
   const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setError("");setSourceError("");setSourceId(id);setDocument(null);remember({morningSource:id});};
   const readOrder=useCallback((key:string,signal?:AbortSignal)=>read<TodayOrderReceipt>("/api/boss/ui/morning/receipt?"+new URLSearchParams({action:"boss.today.reorder",client_request_id:key}),signal),[read]);
   const categories=[{id:"DECIDE" as const,title:"待决定",Icon:ClipboardList},{id:"COORDINATE" as const,title:"待协调",Icon:CheckCircle2},{id:"INFORM" as const,title:"需要知晓",Icon:Info}];
