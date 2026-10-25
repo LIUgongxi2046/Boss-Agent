@@ -30,7 +30,7 @@
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
     "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_UNRELATED_FAILURES",
-    "latest_clean_build_run_id": 40164989025,
+    "latest_clean_build_run_id": 40165910623,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -40,8 +40,8 @@
       ],
       "desktop_build": {
         "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121084100584,
-        "run_id": 40164989025,
+        "job_id": 121086785406,
+        "run_id": 40165910623,
         "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX_AND_REPEAT"
       },
       "repeat_preparation": {
@@ -52,7 +52,7 @@
       },
       "f01_business": {
         "result": "41_PASSED_0_FAILED",
-        "run_id": 40164989007,
+        "run_id": 40165910636,
         "scope": "CURRENT_CODE_TESTS_SIMULATED_DOMAIN_PUBLIC_API"
       },
       "current_full_f01_e2e": "NOT_RUN",
@@ -75,14 +75,31 @@
         ]
       },
       "f01_order_and_return": {
-        "result": "8_PASSED_0_FAILED",
-        "run_id": 40164989007,
-        "scope": "NODE_CLIENTSIDE_ORDER_AND_RETURN_POSITION"
+        "result": "12_PASSED_0_FAILED",
+        "run_id": 40165910636,
+        "scope": "NODE_CLIENTSIDE_ORDER_RETURN_POSITION_AND_PREVIEW_DETAIL_SCOPE"
       },
       "f01_native_agent": {
         "result": "39_PASSED_0_FAILED",
-        "run_id": 40164989007,
+        "run_id": 40165910636,
         "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
+      },
+      "f01_preview_and_source": {
+        "result": "SOURCE_FIXES_WITH_SCOPED_TEST_AND_BUILD_ONLY",
+        "commits": [
+          "56b7e57a5a651055ffbc1ac309d6ab11dfbdbf26",
+          "e2021d95f5d8cb5367c352e05106bff5486ae453",
+          "00431ece9f8f31d3b2032e5a174dde52ce411b4f",
+          "559ab1a6972823eb427ecf0ec6289f49839e36d9",
+          "2bb3e901789336006438115eba31f8d0053f0617"
+        ],
+        "changes": [
+          "date_preview_does_not_fake_current_detail_loading",
+          "invalidated_list_cannot_adopt_old_details_or_sources",
+          "current_source_read_error_has_explicit_retry",
+          "strict_current_list_id_type_guard"
+        ],
+        "validation_scope": "NO_AUTHENTICATED_UI_OR_V7_DOM_CHECK"
       }
     }
   },
