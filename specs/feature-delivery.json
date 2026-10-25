@@ -10,7 +10,7 @@
     "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
     "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
     "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip",
-    "source_access": "V7_LIBRARY_ARCHIVE_FOUND_BUT_RAW_BYTES_NOT_MATERIALIZABLE__GITHUB_SOURCE_UNAVAILABLE",
+    "source_access": "V7_LIBRARY_ZIP_METADATA_AVAILABLE_181_MB_RAW_DESIGN_BYTES_NOT_AUTHORIZED_IN_THIS_SESSION",
     "current_completed_checkpoints": 0,
     "total_checkpoints": 18,
     "previous_development": {
@@ -30,7 +30,7 @@
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
     "independent_current_main_build": "REACT_TYPESCRIPT_VITE_PASS_N03_LEGACY_PYTHON_CONTRACT_FAILURE",
-    "latest_clean_build_run_id": 40183732779,
+    "latest_clean_build_run_id": 40186113227,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -40,9 +40,9 @@
       ],
       "desktop_build": {
         "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121140008786,
-        "run_id": 40183732779,
-        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX_AND_REPEAT"
+        "job_id": 121147133442,
+        "run_id": 40186113227,
+        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ASSET_MANIFEST_SOURCE_CHECK_REPEAT_AND_MANUAL_LAUNCH_SYNTAX"
       },
       "repeat_preparation": {
         "result": "PASS",
@@ -51,9 +51,9 @@
         "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
       },
       "f01_business": {
-        "result": "44_PASSED_0_FAILED",
-        "run_id": 40183732776,
-        "scope": "CURRENT_CODE_TESTS_SQLITE_DOMAIN_PUBLIC_API_AND_ASSIGNMENT_SOURCE"
+        "result": "52_PASSED_0_FAILED",
+        "run_id": 40186113255,
+        "scope": "44_SQLITE_DOMAIN_PUBLIC_API_PLUS_8_BUILD_INTEGRITY_TESTS"
       },
       "current_full_f01_e2e": "NOT_RUN",
       "design_v7_dom_and_visual": "NOT_RUN",
@@ -64,24 +64,28 @@
         "commit_sha": [
           "ab24197c5e195a2b9ae47a3a0ddc4eed4381e62e",
           "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212",
-          "e7f466dfc5d3dc0eb1a5ea3f1ab79c529b77f9d0"
+          "e7f466dfc5d3dc0eb1a5ea3f1ab79c529b77f9d0",
+          "5092880d98c4c5d7015520c83e930d7c286767f5",
+          "1effb0f03f345c31fa878f711664a9bb3caebe41"
         ],
         "changes": [
           "filtered_category_reorder",
           "original_request_validation_and_error_recovery",
           "technical_colon_id_return_focus",
           "retryable_selected_detail_errors",
-          "failure_does_not_block_saved_task_focus_restore"
+          "failure_does_not_block_saved_task_focus_restore",
+          "reselect_existing_current_item_restarts_real_detail_read",
+          "filter_change_removes_offscreen_selected_item_and_source_context"
         ]
       },
       "f01_order_and_return": {
-        "result": "19_PASSED_0_FAILED",
-        "run_id": 40183732776,
-        "scope": "NODE_CATEGORY_ORDER_RETURN_PREVIEW_AND_MORNING_ASSIGNMENT_BINDING"
+        "result": "20_PASSED_0_FAILED",
+        "run_id": 40186113255,
+        "scope": "CURRENT_NODE_CATEGORY_ORDER_RETURN_PREVIEW_CONTEXT_AND_ASSIGNMENT_BINDING"
       },
       "f01_native_agent": {
         "result": "39_PASSED_0_FAILED",
-        "run_id": 40183732776,
+        "run_id": 40186113255,
         "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
       },
       "f01_preview_and_source": {
@@ -119,8 +123,20 @@
         "f01_ci_run_id": 40183732776,
         "current_main_product_gui": "NOT_RUN",
         "source_design_v7": "NOT_AVAILABLE_AS_VERIFIABLE_RAW_BYTES"
+      },
+      "f01_exact_version_artifact": {
+        "source_commit": "69b19070aeb1b96f1c4e282ef0ba22a9a8f4896f",
+        "workflow_run_id": 40186113227,
+        "artifact_id": 12595563757,
+        "artifact_name": "boss-f01-frontend-69b19070aeb1b96f1c4e282ef0ba22a9a8f4896f",
+        "zip_sha256": "33ca4593ae8e52397d2a85e21f0d726595f9c126574c4c3ea3ce8ca1001a2122",
+        "artifact_limit": "FRONTEND_BUILD_ONLY_NOT_MAC_GUI_OR_V7_ACCEPTED",
+        "manual_launch": "scripts/run_f01_manual_review.command",
+        "preflight": "scripts/verify_f01_candidate.py",
+        "instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md"
       }
-    }
+    },
+    "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度"
   },
   "suspended_current_menu": {
     "active_feature_id": "MENU-N03",
