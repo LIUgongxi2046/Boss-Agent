@@ -213,7 +213,6 @@ def test_meeting_requires_explicit_relationship_and_scoped_materials(preparation
     result = bridge.read("BOSS", selection(api, ref, action="MEETING_PREPARATION"))
     assert result["state"] == "WAITING_INPUT" and result["handoff"] is None
     assert result["meeting_context"]["meeting_reference"] == {"kind": "meeting", "id": "meeting-1", "version": "1"}
-    assert "SCOPED_MEETING_PREPARATION_REQUIRED" in result["missing_conditions"]
     assert "MEETING_MATERIALS_OUTSIDE_SELECTED_SCOPE" in result["missing_conditions"]
     assert snapshot(store) == before
     service, _ = imported(store)

@@ -64,7 +64,7 @@ class BusinessOverviewPreparation:
         result = {"source_type": "SIMULATED", **{field: payload[field] for field in
             ("applied_scope", "topic_reference", "snapshot_sha256", "object_reference", "action")},
             "state": "WAITING_INPUT", "candidates": candidates, "task_candidates": [], "source_references": [],
-            "assignment_context": None, "meeting_context": None, "handoff": None, "missing_conditions": [], "required_inputs": [],
+            "assignment_context": None, "meeting_context": None, "meeting_preparation": None, "handoff": None, "missing_conditions": [], "required_inputs": [],
             "business_at": view["business_at"], "read_at": now(), "current_use_verified": False,
             "owner_decision_required": True, "business_authorization_granted": False, "business_mutation_performed": False,
             "message_sent": False, "task_completed": False}
@@ -88,7 +88,7 @@ class BusinessOverviewPreparation:
             if current["adoption_state"] != required_state or not result["source_references"] or any(ref["status"] != "VALID" for ref in result["source_references"]):
                 result["missing_conditions"].append("CURRENT_OBJECT_SOURCES_REQUIRED")
             elif selected["kind"] == "task":
-                self._assignment(db, identity, payload, current, topic_sources if topic is not None else set(sources), result)
+                self._assignment(db, identity, payload, current, topic_sources if topic is not None else set(sources), view, result)
             else:
                 # 仅正式协调记录证明专题对象与任务的关系，不按名称或相同来源推断。
                 for row, in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='supply_quality_coordination' ORDER BY id", (identity["namespace"],)):
@@ -104,7 +104,7 @@ class BusinessOverviewPreparation:
         result["context_sha256"] = checksum({"identity": identity, "result": {key: value for key, value in result.items() if key != "read_at"}})
         return validate("View", result)
 
-    def _assignment(self, db, identity, payload, current, allowed_sources, result):
+    def _assignment(self, db, identity, payload, current, allowed_sources, overview, result):
         review = self.assignments.project_in_transaction("BOSS", db, current["id"])
         require(review["task"]["version"] == current["version"], "交办来源核查与当前对象版本不符", web.HTTPConflict)
         result["assignment_context"] = {"task_reference": reference(current), "review_sha256": review["review_sha256"],
@@ -123,7 +123,6 @@ class BusinessOverviewPreparation:
                 "operation": "boss.assignment.prepare", "parameters": {"task_id": current["id"], "task_version": current["version"]},
                 "required_inputs": ["client_request_id"]})
             return
-        result["missing_conditions"].append("SCOPED_MEETING_PREPARATION_REQUIRED")
         if task["related_meeting_id"] is None:
             result["missing_conditions"].append("RELATED_MEETING_REFERENCE_REQUIRED")
             return
@@ -140,12 +139,26 @@ class BusinessOverviewPreparation:
             result["missing_conditions"].append("MEETING_MATERIALS_OUTSIDE_SELECTED_SCOPE")
         else:
             documents = self.store.assignment_sources(db, identity["namespace"], initial, sorted(document_ids))
-            result["meeting_context"]["source_scope_current"] = all(any(ref["id"] == identifier and ref["version"] == document["version"]
-                and ref["content_sha256"] == checksum(document) for ref in result["source_references"]) for identifier, document in documents.items())
+            declared = meeting.get("source_refs", [])
+            if not declared or len({ref["source_id"] for ref in declared}) != len(declared) or {ref["source_id"] for ref in declared} != document_ids:
+                result["missing_conditions"].append("MEETING_SOURCE_VERSIONS_REQUIRED")
+            pins = {ref["source_id"]: ref["version"] for ref in declared}
+            result["meeting_context"]["source_scope_current"] = all(pins.get(identifier) == document["version"] and any(
+                ref["id"] == identifier and ref["version"] == document["version"] and ref["content_sha256"] == checksum(document)
+                for ref in result["source_references"]) for identifier, document in documents.items())
             if not result["meeting_context"]["source_scope_current"]:
                 result["missing_conditions"].append("CURRENT_MEETING_SOURCES_REQUIRED")
         if meeting.get("state", "DRAFT") in {"CANCELED", "HELD"}:
             result["missing_conditions"].append("CURRENT_MEETING_STATE_REQUIRED")
+        if result["missing_conditions"]:
+            return
+        from boss_business_meeting_preparation import compile_preparation
+        prepared, missing = compile_preparation(identity, payload, overview, task, meeting, documents, initial["contacts"])
+        result["missing_conditions"].extend(missing)
+        if prepared is not None:
+            result.update(state="READY_FOR_REVIEW", current_use_verified=True, meeting_preparation=prepared,
+                handoff={"page_id": "F04", "operation": "boss.business.meeting.prepare", "parameters": {"selection": payload},
+                    "required_inputs": ["context_sha256"]})
 
     def verify(self, role, payload, context_sha256):
         owner(role)
@@ -153,3 +166,12 @@ class BusinessOverviewPreparation:
         result = self.read(role, payload)
         require(result["context_sha256"] == context_sha256 and result["current_use_verified"], "经营准备上下文已经变化或必要条件不足", web.HTTPConflict)
         return result
+
+    def meeting(self, role, payload):
+        owner(role)
+        validate("MeetingInput", payload)
+        result = self.verify(role, payload["selection"], payload["context_sha256"])
+        require(result["meeting_preparation"] is not None, "当前选择没有会议准备结果", web.HTTPConflict)
+        return validate("MeetingResult", {"source_type": "SIMULATED", "context_sha256": result["context_sha256"],
+            "preparation_sha256": result["meeting_preparation"]["preparation_sha256"], "preparation": result["meeting_preparation"],
+            "read_at": result["read_at"], "business_authorization_granted": False, "business_mutation_performed": False})

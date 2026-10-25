@@ -5,7 +5,7 @@
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
 | MENU-N03-N3 | [经营关注完整菜单](../menu-delivery/N03/integration.md) | FR-02/03/14—23、原始v6 N03、MENU-N03.C01—C26；范围/十专题/指标/提醒/关联/来源、实际会话及连续返回；正式状态读取原始feature-delivery.json |
-| MENU-N03-N1 | [经营关注领域](../menu-delivery/N03/backend.md) | BusinessOverviewAPI、BusinessOverviewEntry、BusinessOverviewPreparation、经营范围/专题/来源绑定、原编号历史、C17准备上下文与实际交办源审查；正式状态读取N3的feature-delivery.json |
+| MENU-N03-N1 | [经营关注领域](../menu-delivery/N03/backend.md) | BusinessOverviewAPI、BusinessOverviewEntry、BusinessOverviewPreparation、经营范围/专题/来源绑定、原编号历史、C17交办源审查、meeting范围限定材料与businessMeetingPreparationRead；正式状态读取N3的feature-delivery.json |
 | MENU-N03-N2 | [经营会话消费者](../menu-delivery/N03/agent.md) | 正式经营绑定、结构化指标条件、受限工具、Runtime Schema及晨间共享占用检查；公共接收与完整菜单状态由N3维护 |
 | MENU-N02-N1 | [聊天交办领域](../menu-delivery/N02/backend.md) | 当前会话/运行/产物、消息/回复/来源、原生附件元数据及真实权限；正式状态读取N3的feature-delivery.json |
 | MENU-N02-N3 | [聊天交办完整菜单](../menu-delivery/N02/integration.md) | FR-08/24/29、原始 v6 N02、MENU-N02.C01—C26；连续会话/附件、任务与来源、实际运行、消息授权及异常；FR-27暂停，正式状态引用原始 feature-delivery.json |
