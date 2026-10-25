@@ -33,7 +33,7 @@ jobs:
       - name: Create project-local isolated test directories
         run: mkdir -p .work/ci-pytest .work/ci-tmp
       - name: N02 selected-context and async-scope security regressions
-        run: node --test app/tests/n02-context-guard.test.mjs
+        run: node --test app/tests/n02-context-guard.test.mjs app/tests/n02-attachments.test.mjs
       - name: N02 real domain, attachment, history, and task-reference boundaries
         env:
           PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
