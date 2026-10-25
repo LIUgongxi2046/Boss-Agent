@@ -55,6 +55,10 @@ class ConversationAPI:
         from boss_conversation_task_entry import ConversationTaskEntry
         return ConversationTaskEntry(self, native_sessions)
 
+    def business_entry(self, native_sessions):
+        from boss_business_overview_entry import BusinessOverviewEntry
+        return BusinessOverviewEntry(self, native_sessions)
+
     def task_in_transaction(self, db, context, identifier, version=None):
         ns = context["namespace"]
         initial = self.store.get(db, ns, "initial", "snapshot")

@@ -1,8 +1,49 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:boss-agent:business-overview:1.0.0",
+  "$id": "urn:boss-agent:business-overview:1.1.0",
   "$defs": {
     "Id": {"type":"string","minLength":1,"maxLength":200},
+    "Sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "EntryRequestId":{"type":"string","minLength":8,"maxLength":128,"pattern":"^[A-Za-z0-9_.-]+$"},
+    "EntryTopic":{"type":["object","null"],"additionalProperties":false,"required":["page_id","use"],"properties":{
+      "page_id":{"enum":["F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"]},
+      "use":{"enum":[null,"BROILER","EGG","MILK","BEEF"]}}},
+    "EntryNativeContext":{"type":"object","additionalProperties":false,"required":["session_id","chat_id"],"properties":{
+      "session_id":{"$ref":"#/$defs/Id"},"chat_id":{"$ref":"#/$defs/Id"}}},
+    "EntryBoundContext":{"type":["object","null"],"additionalProperties":false,"required":["session_id","chat_id","native_session_created_at"],"properties":{
+      "session_id":{"$ref":"#/$defs/Id"},"chat_id":{"$ref":"#/$defs/Id"},"native_session_created_at":{"$ref":"#/$defs/Id"}}},
+    "EntryPrepare":{"type":"object","additionalProperties":false,"required":["client_request_id","applied_scope","snapshot_sha256","topic_reference"],"properties":{
+      "client_request_id":{"$ref":"#/$defs/EntryRequestId"},"applied_scope":{"$ref":"#/$defs/Scope"},
+      "snapshot_sha256":{"$ref":"#/$defs/Sha256"},"topic_reference":{"$ref":"#/$defs/EntryTopic"}}},
+    "EntryBind":{"type":"object","additionalProperties":false,"required":["client_request_id","preparation_id","preparation_sha256","chat_id"],"properties":{
+      "client_request_id":{"$ref":"#/$defs/EntryRequestId"},"preparation_id":{"$ref":"#/$defs/Id"},
+      "preparation_sha256":{"$ref":"#/$defs/Sha256"},"chat_id":{"$ref":"#/$defs/Id"}}},
+    "EntrySource":{"type":"object","additionalProperties":false,"required":["kind","id","version","content_sha256","status"],"properties":{
+      "kind":{"const":"document"},"id":{"$ref":"#/$defs/Id"},"version":{"type":["string","null"]},
+      "content_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},"status":{"$ref":"#/$defs/Id"}}},
+    "EntryReference":{"type":"object","additionalProperties":false,"required":["kind","id","version"],"properties":{
+      "kind":{"const":"document"},"id":{"$ref":"#/$defs/Id"},"version":{"$ref":"#/$defs/Id"}}},
+    "EntryReturn":{"type":"object","additionalProperties":false,"required":["page_id","applied_scope","topic_reference","snapshot_sha256"],"properties":{
+      "page_id":{"const":"N03"},"applied_scope":{"$ref":"#/$defs/Scope"},"topic_reference":{"$ref":"#/$defs/EntryTopic"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"}}},
+    "EntryPreparation":{"type":"object","additionalProperties":false,"required":["source_type","store_reference","preparation_id","client_request_id","preparation_sha256","prepared_at","bound_at","binding_state","context","applied_scope","scope_sha256","topic_reference","topic_sha256","snapshot_sha256","source_references","business_at","return_reference","current_use_verified","business_authorization_granted","business_mutation_performed"],"properties":{
+      "source_type":{"const":"RUNTIME_RECORD"},"store_reference":{"type":"string","format":"uuid"},
+      "preparation_id":{"$ref":"#/$defs/Id"},"client_request_id":{"$ref":"#/$defs/EntryRequestId"},"preparation_sha256":{"$ref":"#/$defs/Sha256"},
+      "prepared_at":{"type":"string","format":"date-time"},"bound_at":{"type":["string","null"],"format":"date-time"},
+      "binding_state":{"enum":["PREPARED","BOUND"]},"context":{"$ref":"#/$defs/EntryBoundContext"},
+      "applied_scope":{"$ref":"#/$defs/Scope"},"scope_sha256":{"$ref":"#/$defs/Sha256"},"topic_reference":{"$ref":"#/$defs/EntryTopic"},
+      "topic_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},"snapshot_sha256":{"$ref":"#/$defs/Sha256"},
+      "source_references":{"type":"array","items":{"$ref":"#/$defs/EntrySource"}},"business_at":{"type":"string"},
+      "return_reference":{"$ref":"#/$defs/EntryReturn"},"current_use_verified":{"type":"boolean"},
+      "business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false}}},
+    "EntryContext":{"type":"object","additionalProperties":false,"required":["source_type","session_id","chat_id","binding_state","entry","overview","references","current_use_verified","business_authorization_granted","business_mutation_performed"],"properties":{
+      "source_type":{"const":"RUNTIME_RECORD"},"session_id":{"$ref":"#/$defs/Id"},"chat_id":{"$ref":"#/$defs/Id"},"binding_state":{"enum":["BOUND","UNBOUND"]},
+      "entry":{"anyOf":[{"$ref":"#/$defs/EntryPreparation"},{"type":"null"}]},"overview":{"anyOf":[{"$ref":"#/$defs/View"},{"type":"null"}]},
+      "references":{"type":"array","items":{"$ref":"#/$defs/EntryReference"}},"current_use_verified":{"type":"boolean"},
+      "business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false}}},
+    "EntryReceiptInput":{"type":"object","additionalProperties":false,"required":["client_request_id"],"properties":{"client_request_id":{"$ref":"#/$defs/EntryRequestId"}}},
+    "EntryReceipt":{"type":"object","additionalProperties":false,"required":["source_type","client_request_id","outcome","entry","business_authorization_granted","business_mutation_performed"],"properties":{
+      "source_type":{"const":"RUNTIME_RECORD"},"client_request_id":{"$ref":"#/$defs/EntryRequestId"},"outcome":{"enum":["RECORDED","NOT_FOUND_IN_CURRENT_STORE"]},
+      "entry":{"anyOf":[{"$ref":"#/$defs/EntryPreparation"},{"type":"null"}]},"business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false}}},
     "Scope": {"type":"object","additionalProperties":false,"required":["legal_entity_id","region_id","period_start","period_end","timezone","attention"],"properties":{
       "legal_entity_id":{"$ref":"#/$defs/Id"},"region_id":{"type":["string","null"],"minLength":1},
       "period_start":{"type":"string","format":"date"},"period_end":{"type":"string","format":"date"},"timezone":{"$ref":"#/$defs/Id"},

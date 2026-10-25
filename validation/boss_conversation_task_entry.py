@@ -102,7 +102,7 @@ class ConversationTaskEntry:
         require(not session.messages, "任务入口需要尚未使用的原生会话", web.HTTPConflict)
         # 同一原生会话只承接一个明确入口，其他资料空间的既有绑定也不能被接管。
         occupied = db.execute("SELECT 1 FROM objects WHERE kind IN ('runtime_run','conversation_intent',"
-            "'morning_native_binding','conversation_task_binding') AND (json_extract(body,'$.session_id')=? "
+            "'morning_native_binding','conversation_task_binding','conversation_business_binding') AND (json_extract(body,'$.session_id')=? "
             "OR json_extract(body,'$.chat_id')=?) LIMIT 1", (query["session_id"], query["chat_id"])).fetchone()
         require(occupied is None, "原生会话已经承接其他事项或原意图", web.HTTPConflict)
         return session.created_at.isoformat()
