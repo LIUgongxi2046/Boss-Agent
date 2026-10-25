@@ -5,30 +5,303 @@
   "decision_id": "D-MENU-DELIVERY-20261024",
   "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
   "design_fidelity_requirements": "docs/menu-delivery/高保真还原执行要求.md",
-  "source": "依据PRD和原始v6设计逐个菜单完整开发交付；现有四窗口协作当前菜单，用户验收独立登记",
+  "source": "根据最新用户明确指令，从F01按PRD/完整功能/最新v7逐个菜单重新确认，保留v6已交付证据和N03在途成果",
+  "revalidation": {
+    "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
+    "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
+    "target_design": "Boss-Agent-Desktop-v7-72-Full-Length-UI.zip",
+    "source_access": "DESIGN_ARCHIVE_NOT_IN_GITHUB_SOURCE_TREE",
+    "current_completed_checkpoints": 0,
+    "total_checkpoints": 18,
+    "previous_development": {
+      "F01": {
+        "count": 18,
+        "total": 18,
+        "source": "docs/menu-delivery/F01/delivery-rework.json",
+        "design": "Desktop v6"
+      },
+      "N02": {
+        "count": 26,
+        "total": 26,
+        "source": "docs/menu-delivery/N02/delivery.json",
+        "design": "Desktop v6"
+      }
+    },
+    "visual": "NOT_RUN",
+    "user_acceptance": "PENDING_USER_ACCEPTANCE",
+    "independent_current_main_build": "FAILED_SOURCE_INTEGRATION",
+    "latest_clean_build_run_id": 40161702949,
+    "paused_menu": "MENU-N03"
+  },
+  "suspended_current_menu": {
+    "active_feature_id": "MENU-N03",
+    "active_ticket": "docs/menu-delivery/N03.md",
+    "current_stage": "MENU_N03_BUILD_AND_PUBLIC_VALIDATION",
+    "candidate_commit": null,
+    "implementation_commit": null,
+    "baseline_commit": "3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57",
+    "development_record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/menu-delivery/N03/integration.md",
+    "delivery_record": null,
+    "experience_instructions": null,
+    "experience_launcher": null,
+    "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n03-n3-dist",
+    "manifest_sha256": null,
+    "index_sha256": null,
+    "inventory": null,
+    "directed_review": {
+      "status": "SOURCE_SCOPE_REVIEWED_UI_NOT_RUN",
+      "reviewed_commit": "3fc7446801a15b91b2c56e6a3066bc06c823c9fa",
+      "reviewed_ids": [
+        "MENU-N03.C17",
+        "N03-G05"
+      ],
+      "verdict": "SOURCE_REVIEW_COMPLETE_NO_NEW_CONFIRMED_DEFECTS",
+      "record": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N03/qa.md",
+      "record_sha256": "22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da",
+      "scope": "SCOPED_MEETING_PREPARATION_PUBLIC_DTO_DIALOG_AND_EXACT_ALERT_VERSION_CONSUMERS",
+      "evidence_status": "SOURCE_AND_RECEIVER_EVIDENCE_PRESENT_NEEDS_AUTHENTICATED_UI",
+      "checkpoint_closed": false,
+      "retained_review": {
+        "reviewed_commit": "7db7dbacdaa02445e4ff0fcc1c677835b150426f",
+        "reviewed_ids": [
+          "N03-G01",
+          "N03-G03",
+          "N03-G04",
+          "N03-G05"
+        ],
+        "scope": "ORIGINAL_GENERAL_ENTRY_AND_ASSIGNMENT_PREPARATION_SOURCE_SCOPE"
+      },
+      "remaining_ids": null,
+      "independent_product_run": false,
+      "full_menu_independent_pass_required": false
+    },
+    "candidate_scope": "MENU-N03完整26项：经营范围、十专题、指标/提醒/关联、来源及合法共享流程、实际Agent采用和原稿结构；独立制品/资料/端口，保护既有五套体验；FR-27暂停",
+    "feature_status": "IN_PROGRESS",
+    "development_covered_checkpoints": 0,
+    "verified_checkpoints": null,
+    "total_checkpoints": 26,
+    "acceptance_baseline_id": "boss-menu-n03-coverage-20261025-v1",
+    "development_status": "IN_PROGRESS",
+    "acceptance_status": "PENDING_USER_ACCEPTANCE",
+    "required_input_checkpoints": [
+      "MENU-N03_AUTHENTICATED_AUTOMATION_APPROVAL",
+      "MENU-N03_INITIALIZATION_AUTHENTICATION_APPROVAL"
+    ],
+    "authenticated_automation_approval": {
+      "status": "PENDING_USER_REPLY",
+      "scope": "N03_NEW_PRIVATE_TEST_DIRECTORIES_AND_PORTS_ONLY",
+      "product_account_fill_auto_login": false,
+      "review_reason": "自动审批审查拒绝入口测试中的自动认证，需要明确专用测试认证授权；产品账号填充继续手动登录",
+      "affected_work": "AUTHENTICATED_UI_CHECKS_ONLY",
+      "unaffected_work": "DOMAIN_AND_FRONTEND_IMPLEMENTATION_REFERENCE_DOM"
+    },
+    "initialization_authentication_approval": {
+      "status": "PENDING_USER_REPLY",
+      "scope": "N03_NEW_PRIVATE_INITIALIZATION_DIRECTORY_GENERATED_MAINTAINER_ACCOUNT_ONLY",
+      "rejected_action": "CREATE_N03_INITIALIZATION_AND_LAUNCHER_SCRIPTS_WITH_HTTP_WEBSOCKET_MAINTAINER_AUTHENTICATION",
+      "review_reason": "自动审批审查认为读取新目录credentials.json并自动维护认证及配置超出仅受控Electron填表授权",
+      "scripts_created": false,
+      "scripts_executed": false,
+      "product_account_fill_auto_login": false,
+      "affected_work": "INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY"
+    },
+    "checkpoint_evidence_policy": "MENU-N03按完整26项登记准确候选和必要限定行为；业务、设计结构与样式、交互状态、可启动交付分别核查；视觉及用户验收独立。F01新版18项、N02的26项及全部历史范围保留，不换算当前菜单分数",
+    "post_current_work_item": "MENU-F02",
+    "post_current_ticket": "docs/menu-delivery/F02.md",
+    "roles": {
+      "N1": {
+        "responsibility": "业务数据与领域服务",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
+        "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c",
+        "task_id": "MENU-N03-N1",
+        "development_record": "docs/menu-delivery/N03/backend.md",
+        "activation_condition": "CURRENT_MENU_DOMAIN_AND_SCHEMA"
+      },
+      "N2": {
+        "responsibility": "Agent工具与运行采用",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent",
+        "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a",
+        "task_id": "MENU-N03-N2",
+        "development_record": "docs/menu-delivery/N03/agent.md",
+        "activation_condition": "CURRENT_MENU_AGENT_AND_RUNTIME"
+      },
+      "N3": {
+        "responsibility": "高保真界面、公共集成与功能推进",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
+        "thread_id": "01a16926-a48c-7b83-9811-f1905cf0f1ab",
+        "task_id": "MENU-N03-N3",
+        "development_record": "docs/menu-delivery/N03/integration.md"
+      },
+      "N4": {
+        "responsibility": "当前菜单PRD、原设计与实现差距矩阵及必要定向验证，用户验收单独登记",
+        "directory": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent",
+        "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe",
+        "task_id": "MENU-N03-N4",
+        "development_record": "docs/menu-delivery/N03/qa.md",
+        "activation_condition": "CURRENT_MENU_GAP_MATRIX_AND_NECESSARY_CHECKS"
+      }
+    },
+    "checkpoints": [
+      {
+        "id": "MENU-N03.C01",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C02",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C03",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C04",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C05",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C06",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C07",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C08",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C09",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C10",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C11",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C12",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C13",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C14",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C15",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C16",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C17",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C18",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C19",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C20",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C21",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C22",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C23",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C24",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C25",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      },
+      {
+        "id": "MENU-N03.C26",
+        "status": "NOT_RUN",
+        "development_status": "NOT_RUN"
+      }
+    ],
+    "pause_reason": "LATEST_USER_REQUEST_REVALIDATE_FROM_F01",
+    "pause_date": "2026-10-25",
+    "status": "PAUSED_WITH_SOURCE_AND_EVIDENCE_PRESERVED"
+  },
   "plan": "docs/菜单开发总计划.md",
-  "active_feature_id": "MENU-N03",
-  "active_ticket": "docs/menu-delivery/N03.md",
-  "current_stage": "MENU_N03_BUILD_AND_PUBLIC_VALIDATION",
+  "active_feature_id": "MENU-F01",
+  "active_ticket": "docs/menu-delivery/F01.md",
+  "current_stage": "MENU_F01_V7_REVALIDATION",
   "candidate_commit": null,
   "implementation_commit": null,
-  "baseline_commit": "3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57",
-  "development_record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/menu-delivery/N03/integration.md",
+  "baseline_commit": "7527537830f6c011c328dc3bb6b7567ff262c20b",
+  "development_record": "docs/menu-delivery/F01/integration.md",
   "delivery_record": null,
   "experience_instructions": null,
   "experience_launcher": null,
   "experience_origin": null,
-  "frontend_directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/menu-n03-n3-dist",
+  "frontend_directory": null,
   "credential_file": null,
   "manifest_sha256": null,
   "index_sha256": null,
   "inventory": null,
   "inventory_sha256": null,
-  "directed_review": {"status":"SOURCE_SCOPE_REVIEWED_UI_NOT_RUN","reviewed_commit":"3fc7446801a15b91b2c56e6a3066bc06c823c9fa","reviewed_ids":["MENU-N03.C17","N03-G05"],"verdict":"SOURCE_REVIEW_COMPLETE_NO_NEW_CONFIRMED_DEFECTS","record":"/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent/docs/menu-delivery/N03/qa.md","record_sha256":"22d3c51df92c71a5d2768708e7c3bccf1e3faffbe6a44ab118441b54c81e99da","scope":"SCOPED_MEETING_PREPARATION_PUBLIC_DTO_DIALOG_AND_EXACT_ALERT_VERSION_CONSUMERS","evidence_status":"SOURCE_AND_RECEIVER_EVIDENCE_PRESENT_NEEDS_AUTHENTICATED_UI","checkpoint_closed":false,"retained_review":{"reviewed_commit":"7db7dbacdaa02445e4ff0fcc1c677835b150426f","reviewed_ids":["N03-G01","N03-G03","N03-G04","N03-G05"],"scope":"ORIGINAL_GENERAL_ENTRY_AND_ASSIGNMENT_PREPARATION_SOURCE_SCOPE"},"remaining_ids":null,"independent_product_run":false,"full_menu_independent_pass_required":false},
-  "candidate_scope": "MENU-N03完整26项：经营范围、十专题、指标/提醒/关联、来源及合法共享流程、实际Agent采用和原稿结构；独立制品/资料/端口，保护既有五套体验；FR-27暂停",
+  "directed_review": {"status":"PENDING_CURRENT_V7_REFERENCE_AND_BUILD","feature_id":"MENU-F01","record":"docs/menu-delivery/F01/integration.md","independent_product_run":false,"visual":"NOT_RUN"},
+  "candidate_scope": "F01原18项按最新v7源重新核验：真实今日事项/三类分类/日期/来源/排序/会话/会议与交办；复用v6能力，验证干净构建与独立运行，保护旧体验",
   "menu_completed_development_ids": ["MENU-F01", "MENU-N02"],
+  "menu_completed_development_evidence_basis": "DESKTOP_V6_HISTORICAL_ONLY_REVALIDATION_REQUIRED",
+  "menu_revalidation_required_ids": ["MENU-F01", "MENU-N02"],
   "menu_user_accepted_ids": [],
-  "required_menu_rework": {"feature_id": "MENU-F01", "ticket": "docs/menu-delivery/F01.md", "decision_id": "D-UI-FIDELITY-20261024", "status": "COMPLETE", "before_feature_id": "MENU-N03", "checkpoint_ids": ["MENU-F01.C01", "MENU-F01.C02", "MENU-F01.C18"], "business_evidence": "RETAINED_FOR_UNCHANGED_DEPENDENCIES", "parallel_menu_implementation": false},
+  "required_menu_rework": {"feature_id":"MENU-F01","ticket":"docs/menu-delivery/F01.md","decision_id":"D-UI-FIDELITY-20261024","status":"COMPLETE","before_feature_id":"MENU-N03","checkpoint_ids":["MENU-F01.C01","MENU-F01.C02","MENU-F01.C18"],"business_evidence":"RETAINED_FOR_UNCHANGED_DEPENDENCIES","parallel_menu_implementation":false,"latest_v7_revalidation":"PENDING","historical_v6_rework_complete":true},
   "historical_menu_n02_handoff": {
     "marker": "MENU-N02-START-20261024",
     "initiator": "N3",
@@ -273,8 +546,8 @@
   "feature_status": "IN_PROGRESS",
   "development_covered_checkpoints": 0,
   "verified_checkpoints": null,
-  "total_checkpoints": 26,
-  "acceptance_baseline_id": "boss-menu-n03-coverage-20261025-v1",
+  "total_checkpoints": 18,
+  "acceptance_baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
   "development_status": "IN_PROGRESS",
   "acceptance_owner": "USER_AND_SUPERVISOR",
   "acceptance_status": "PENDING_USER_ACCEPTANCE",
@@ -290,10 +563,10 @@
     "total_checkpoints": 20,
     "record": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent/docs/feature-delivery/FC02/acceptance.json"
   },
-  "required_input_checkpoints": ["MENU-N03_AUTHENTICATED_AUTOMATION_APPROVAL", "MENU-N03_INITIALIZATION_AUTHENTICATION_APPROVAL"],
-  "authenticated_automation_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_TEST_DIRECTORIES_AND_PORTS_ONLY","product_account_fill_auto_login":false,"review_reason":"自动审批审查拒绝入口测试中的自动认证，需要明确专用测试认证授权；产品账号填充继续手动登录","affected_work":"AUTHENTICATED_UI_CHECKS_ONLY","unaffected_work":"DOMAIN_AND_FRONTEND_IMPLEMENTATION_REFERENCE_DOM"},
-  "initialization_authentication_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_INITIALIZATION_DIRECTORY_GENERATED_MAINTAINER_ACCOUNT_ONLY","rejected_action":"CREATE_N03_INITIALIZATION_AND_LAUNCHER_SCRIPTS_WITH_HTTP_WEBSOCKET_MAINTAINER_AUTHENTICATION","review_reason":"自动审批审查认为读取新目录credentials.json并自动维护认证及配置超出仅受控Electron填表授权","scripts_created":false,"scripts_executed":false,"product_account_fill_auto_login":false,"affected_work":"INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY"},
-  "checkpoint_evidence_policy": "MENU-N03按完整26项登记准确候选和必要限定行为；业务、设计结构与样式、交互状态、可启动交付分别核查；视觉及用户验收独立。F01新版18项、N02的26项及全部历史范围保留，不换算当前菜单分数",
+  "required_input_checkpoints": [],
+  "authenticated_automation_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_TEST_DIRECTORIES_AND_PORTS_ONLY","product_account_fill_auto_login":false,"review_reason":"自动审批审查拒绝入口测试中的自动认证，需要明确专用测试认证授权；产品账号填充继续手动登录","affected_work":"AUTHENTICATED_UI_CHECKS_ONLY","unaffected_work":"DOMAIN_AND_FRONTEND_IMPLEMENTATION_REFERENCE_DOM","applicability":"SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"},
+  "initialization_authentication_approval": {"status":"PENDING_USER_REPLY","scope":"N03_NEW_PRIVATE_INITIALIZATION_DIRECTORY_GENERATED_MAINTAINER_ACCOUNT_ONLY","rejected_action":"CREATE_N03_INITIALIZATION_AND_LAUNCHER_SCRIPTS_WITH_HTTP_WEBSOCKET_MAINTAINER_AUTHENTICATION","review_reason":"自动审批审查认为读取新目录credentials.json并自动维护认证及配置超出仅受控Electron填表授权","scripts_created":false,"scripts_executed":false,"product_account_fill_auto_login":false,"affected_work":"INITIALIZATION_SCRIPT_CREATION_AND_EXECUTION_ONLY","applicability":"SUSPENDED_MENU_N03_ONLY_NOT_AUTHORIZATION_FOR_F01"},
+  "checkpoint_evidence_policy": "本轮F01稳定18项检查点，当前v7逐项重核0/18；历史v6 F01 18/18和N02 26/26完整保留不转为当前已验收；业务、视觉、交互、可重建版本和用户验收分开登记",
   "completed_features": [
     {
       "feature_id": "FC01",
@@ -334,9 +607,9 @@
   "queue": [],
   "planning_queue_source": "specs/menu-plan.json",
   "remaining_feature_status": "CONTINUE_MENU_QUEUE_AFTER_CURRENT_COMPLETE",
-  "post_current_work_item": "MENU-F02",
-  "post_current_ticket": "docs/menu-delivery/F02.md",
-  "post_ui_action": "CONTINUE_AUTHORIZED_MENU_QUEUE",
+  "post_current_work_item": "MENU-N02",
+  "post_current_ticket": "docs/menu-delivery/N02.md",
+  "post_ui_action": "CONTINUE_F01_THEN_N02_THEN_RESUME_N03",
   "paused_feature_ids": ["FC28"],
   "historical_mvp_deferred_status": "DEFERRED",
   "historical_mvp_deferred_feature_ids": ["FC04", "FC05", "FC06", "FC07", "FC08", "FC09", "FC10", "FC11", "FC12", "FC13", "FC14", "FC15", "FC16", "FC17", "FC18", "FC19", "FC20", "FC21", "FC22", "FC23", "FC24", "FC25", "FC26", "FC27", "FC28", "FC29", "FC30", "FC31"],
@@ -374,7 +647,7 @@
     "FC31"
   ],
   "policy": {
-    "next_feature": "MENU-F01必要设计事项已关闭，完整18项开发交付；MENU-N02开发26项交付保留。按队列接续N03；用户验收独立，已有正确领域/Agent依赖保留，FR-27暂停",
+    "next_feature": "用户要求从头确认，当前仅F01 v7重新核验；随后N02重新核验；N03原在途成果保存并暂停，完成前两项后按原有单菜单队列恢复",
     "external_api": "SIMULATED_FIRST",
     "visual": "PROHIBITED_UNLESS_USER_AUTHORIZES",
     "paused_scope": "STT保持用户暂停，其他依赖满足内容继续",
@@ -384,62 +657,149 @@
     "N1": {
       "responsibility": "业务数据与领域服务",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-business/Boss-Agent",
-      "thread_id": "01a16925-a11e-70e3-9b45-6f27d4753d9c",
-      "task_id": "MENU-N03-N1",
-      "development_record": "docs/menu-delivery/N03/backend.md",
-      "activation_condition": "CURRENT_MENU_DOMAIN_AND_SCHEMA"
+      "thread_id": null,
+      "task_id": "MENU-F01-N1",
+      "development_record": "docs/menu-delivery/F01/backend.md",
+      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N2": {
       "responsibility": "Agent工具与运行采用",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-sop-writes/Boss-Agent",
-      "thread_id": "01a16925-c11b-7593-aaea-4704cac0d78a",
-      "task_id": "MENU-N03-N2",
-      "development_record": "docs/menu-delivery/N03/agent.md",
-      "activation_condition": "CURRENT_MENU_AGENT_AND_RUNTIME"
+      "thread_id": null,
+      "task_id": "MENU-F01-N2",
+      "development_record": "docs/menu-delivery/F01/agent.md",
+      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N3": {
       "responsibility": "高保真界面、公共集成与功能推进",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent",
-      "thread_id": "01a16926-a48c-7b83-9811-f1905cf0f1ab",
-      "task_id": "MENU-N03-N3",
-      "development_record": "docs/menu-delivery/N03/integration.md"
+      "thread_id": null,
+      "task_id": "MENU-F01-N3",
+      "development_record": "docs/menu-delivery/F01/integration.md",
+      "activation_condition": "CURRENT_REVALIDATION_OWNER_NOT_DISPATCHED",
+      "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     },
     "N4": {
       "responsibility": "当前菜单PRD、原设计与实现差距矩阵及必要定向验证，用户验收单独登记",
       "directory": "/Users/liuhaoxian/.codex/worktrees/boss-agent-admin/Boss-Agent",
-      "thread_id": "01a16925-dec5-7202-8e3e-9605d9e073fe",
-      "task_id": "MENU-N03-N4",
-      "development_record": "docs/menu-delivery/N03/qa.md",
-      "activation_condition": "CURRENT_MENU_GAP_MATRIX_AND_NECESSARY_CHECKS"
+      "thread_id": null,
+      "task_id": "MENU-F01-N4",
+      "development_record": "docs/menu-delivery/F01/design-rework.md",
+      "activation_condition": "ONLY_IF_CURRENT_F01_REVALIDATION_REVEALS_NECESSARY_DEPENDENCY",
+      "dispatch_status": "NOT_STARTED_NO_AUTOMATED_CHATS"
     }
   },
   "checkpoints": [
-    {"id":"MENU-N03.C01","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C02","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C03","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C04","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C05","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C06","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C07","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C08","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C09","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C10","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C11","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C12","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C13","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C14","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C15","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C16","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C17","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C18","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C19","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C20","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C21","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C22","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C23","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C24","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C25","status":"NOT_RUN","development_status":"NOT_RUN"},
-    {"id":"MENU-N03.C26","status":"NOT_RUN","development_status":"NOT_RUN"}
+    {
+      "id": "MENU-F01.C01",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C01"
+    },
+    {
+      "id": "MENU-F01.C02",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C02"
+    },
+    {
+      "id": "MENU-F01.C03",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C03"
+    },
+    {
+      "id": "MENU-F01.C04",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C04"
+    },
+    {
+      "id": "MENU-F01.C05",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C05"
+    },
+    {
+      "id": "MENU-F01.C06",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C06"
+    },
+    {
+      "id": "MENU-F01.C07",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C07"
+    },
+    {
+      "id": "MENU-F01.C08",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C08"
+    },
+    {
+      "id": "MENU-F01.C09",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C09"
+    },
+    {
+      "id": "MENU-F01.C10",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C10"
+    },
+    {
+      "id": "MENU-F01.C11",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C11"
+    },
+    {
+      "id": "MENU-F01.C12",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C12"
+    },
+    {
+      "id": "MENU-F01.C13",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C13"
+    },
+    {
+      "id": "MENU-F01.C14",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C14"
+    },
+    {
+      "id": "MENU-F01.C15",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C15"
+    },
+    {
+      "id": "MENU-F01.C16",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C16"
+    },
+    {
+      "id": "MENU-F01.C17",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C17"
+    },
+    {
+      "id": "MENU-F01.C18",
+      "status": "NOT_RUN",
+      "development_status": "NOT_RUN",
+      "historical_evidence": "docs/menu-delivery/F01/delivery-rework.json#/checkpoint_development_evidence/MENU-F01.C18"
+    }
   ],
   "historical_menu_f01_checkpoints": [
     {"id": "MENU-F01.C01", "status": "PENDING_USER_ACCEPTANCE", "development_status": "REQUIRES_DESIGN_REWORK", "development_evidence": "historical_menu_f01.delivery_record#/checkpoint_development_evidence/MENU-F01.C01"},
