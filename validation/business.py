@@ -284,7 +284,7 @@ class Store:
                 + [{"record_id": document["source_id"], "version": document["version"], "content": document}],
                 "definition_version": "1", "conflicts": [], "missing_fields": ["原因贡献明细"]}
 
-    def create_assignment(self, db, ns, data, p):
+    def create_assignment(self, db, ns, data, p, *, verified_morning_selection=False):
         from boss_supply_quality import DEFINITION
         require(p["coordinator_id"] == "coordinator-1", "负责人不属于当前业务范围", web.HTTPBadRequest)
         if p["related_meeting_id"] is not None:
@@ -298,8 +298,14 @@ class Store:
             # 正式维护事件从当前namespace继承本人；显式归属仍必须一致。
             require(event["event_id"] == identifier and event.get("owner_id", data["owner_id"]) == data["owner_id"], "关联事件不属于当前本人范围", web.HTTPForbidden)
         documents = self.assignment_sources(db, ns, data, p["source_refs"])
-        require(all(identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1") for identifier, document in documents.items()),
-                "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
+        # Existing unbound/MVP assignments retain their original dataset
+        # whitelist. The only exception is a F01 selection already verified
+        # against an authenticated CURRENT morning list, exact item, snapshot,
+        # owner and document refs by BossCommandAPI._create.
+        require(verified_morning_selection or all(
+            identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1")
+            for identifier, document in documents.items()),
+            "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
         self.require_current_coordinator(db, ns, data, p["coordinator_id"])
         due = datetime.fromisoformat(p["due_at"])
         from zoneinfo import available_timezones
