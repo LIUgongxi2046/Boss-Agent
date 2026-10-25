@@ -56,6 +56,40 @@ def native_document(tmp_path):
     return reopened, context, receipt, data, selected, paths
 
 
+def test_saved_attachment_changes_without_creating_any_new_runtime_run(tmp_path):
+    """N02 file freshness must never depend on runtime run_id or status."""
+    from nanobot.session.manager import SessionManager
+
+    media_root, data, selected, paths = accepted_file(tmp_path)
+    sessions = SessionManager(tmp_path / "native-workspace",
+                              sessions_root=tmp_path / "native-sessions")
+    api = ConversationAttachments(sessions, media_root)
+    context = {"session_id": "websocket:n02-upload-without-run",
+               "chat_id": "n02-upload-without-run"}
+    receipt = api.record_upload("BOSS", context, selected, paths)
+    saved = api.read("BOSS", context)
+    assert saved["session_state"] == "SAVED"
+    assert saved["source_type"] == "RUNTIME_RECORD"
+    assert saved["business_authorization_granted"] is False
+    assert len(saved["attachments"]) == 1
+    assert saved["attachments"][0]["processing_state"] == "STORED"
+    assert saved["attachments"][0]["attachment_id"] == receipt["attachment_ids"][0]
+    assert not sessions.read_session_snapshot(context["session_id"]).messages
+
+    another = (ROOT / "specs/conversation.schema.json").read_bytes()
+    Path(paths[0]).write_bytes(another)
+    changed = api.read("BOSS", context)
+    assert changed["attachments"][0]["processing_state"] == "CHANGED"
+    assert changed["attachments"][0]["content_sha256"] == hashlib.sha256(another).hexdigest()
+    assert changed["attachments"][0]["recorded_content_sha256"] == hashlib.sha256(data).hexdigest()
+    Path(paths[0]).unlink()
+    missing = api.read("BOSS", context)
+    assert missing["attachments"][0]["processing_state"] == "MISSING"
+    assert missing["attachments"][0]["size_bytes"] is None
+    assert missing["attachments"][0]["attachment_id"] == receipt["attachment_ids"][0]
+    assert not sessions.read_session_snapshot(context["session_id"]).messages
+
+
 def test_uploaded_document_survives_actual_sdk_session_save(native_document, tmp_path):
     reopened, context, receipt, data, selected, paths = native_document
     view = reopened.read("BOSS", context)
