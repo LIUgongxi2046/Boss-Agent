@@ -30,7 +30,7 @@
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
     "independent_current_main_build": "SCOPED_REACT_TYPESCRIPT_VITE_PASS__COMPLETE_INTEGRATION_RUN_HAS_UNRELATED_FAILURES",
-    "latest_clean_build_run_id": 40164765972,
+    "latest_clean_build_run_id": 40164989025,
     "paused_menu": "MENU-N03",
     "scoped_engineering_evidence": {
       "native_integration_commits": [
@@ -40,8 +40,8 @@
       ],
       "desktop_build": {
         "result": "PASS_REACT_JOB_ONLY",
-        "job_id": 121083458430,
-        "run_id": 40164765972,
+        "job_id": 121084100584,
+        "run_id": 40164989025,
         "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX_AND_REPEAT"
       },
       "repeat_preparation": {
@@ -52,7 +52,7 @@
       },
       "f01_business": {
         "result": "41_PASSED_0_FAILED",
-        "run_id": 40164777236,
+        "run_id": 40164989007,
         "scope": "CURRENT_CODE_TESTS_SIMULATED_DOMAIN_PUBLIC_API"
       },
       "current_full_f01_e2e": "NOT_RUN",
@@ -63,23 +63,25 @@
         "result": "SCOPED_CURRENT_SOURCE_TESTS_PASSED",
         "commit_sha": [
           "ab24197c5e195a2b9ae47a3a0ddc4eed4381e62e",
-          "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212"
+          "ffa247e4aedabbe6d8cf43ff10ba291b7cfdf212",
+          "e7f466dfc5d3dc0eb1a5ea3f1ab79c529b77f9d0"
         ],
         "changes": [
           "filtered_category_reorder",
           "original_request_validation_and_error_recovery",
           "technical_colon_id_return_focus",
-          "retryable_selected_detail_errors"
+          "retryable_selected_detail_errors",
+          "failure_does_not_block_saved_task_focus_restore"
         ]
       },
       "f01_order_and_return": {
         "result": "8_PASSED_0_FAILED",
-        "run_id": 40164777236,
+        "run_id": 40164989007,
         "scope": "NODE_CLIENTSIDE_ORDER_AND_RETURN_POSITION"
       },
       "f01_native_agent": {
         "result": "39_PASSED_0_FAILED",
-        "run_id": 40164777236,
+        "run_id": 40164989007,
         "scope": "SIMULATED_NATIVE_NANOBOT_TOOLS_SOURCES_SELECTION_AND_PERMISSION"
       }
     }
