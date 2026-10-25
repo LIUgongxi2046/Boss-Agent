@@ -5,13 +5,13 @@ import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogClose} from "@/
 import {CheckCircle2,ClipboardList,Info,Send,X} from "lucide-react";
 import {isSafeMorningFocusId,readMorningReturnPoint} from "./morning-return";
 import {currentMorningDetailScope,shouldClearMorningSelectionOnFilter} from "./morning-detail-scope";
+import {validateMorningBindingReceipt,canAcknowledgeMissingMorningBinding,type MorningBinding,type MorningBindingReceipt} from "./morning-binding-recovery";
+export type {MorningBinding,MorningBindingReceipt} from "./morning-binding-recovery";
 import "./boss-morning.css";
 import "./boss-f01-shell.css";
 
 type Day={date:string;timezone:string};
 export type MorningConversationRequest=Day&{client_request_id:string;question:string;list_id?:string;item_id?:string;binding_id?:string};
-export type MorningBinding={binding_id:string;chat_id:string;session_id:string;date:string;timezone:string;snapshot_sha256:string;order_version:string;list_id:string|null;item_id:string|null;last_request_id:string|null};
-export type MorningBindingReceipt={client_request_id:string;outcome:"RECORDED"|"NOT_FOUND_IN_CURRENT_STORE";result:MorningBinding|null;write_performed_by_lookup:false};
 export type MorningReference={list_id:string;list_version:string;item_id:string;snapshot_sha256:string};
 type Document={source_id:string;version:string;content?:string;published_at?:string;observed_at?:string;valid_from?:string;valid_until?:string;author_contact_id?:string;author_display_name?:string;author_kind?:string;allowed_use?:string;original_locator?:unknown};
 type Source={source_id:string;version:string|null;status:string;author_contact_id:string|null;published_at:string|null;observed_at:string|null;data_as_of?:string|null;locator:unknown};
@@ -42,7 +42,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const [question,setQuestion]=useState(""),[questionDirty,setQuestionDirty]=useState(false),[receipt,setReceipt]=useState<Receipt|null>(null),[history,setHistory]=useState<History>({requests:[]});
   const [dayDraft,setDayDraft]=useState<Day|null>(null),[category,setCategory]=useState<TodayItem["category"]|"ALL">("ALL"),[meetingOpen,setMeetingOpen]=useState(false);
   const [requestId,setRequestId]=useState(""),[selected,setSelected]=useState(""),[sourceId,setSourceId]=useState("");
-  const [bindingId,setBindingId]=useState(""),[nativeBinding,setNativeBinding]=useState<MorningBinding|null>(null);
+  const [bindingId,setBindingId]=useState(""),[nativeBinding,setNativeBinding]=useState<MorningBinding|null>(null),[missingBindingReceipt,setMissingBindingReceipt]=useState<MorningBindingReceipt|null>(null);
   const handoff=useRef<AbortController|null>(null),[handoffCanceled,setHandoffCanceled]=useState(false);
   const [detail,setDetail]=useState<Detail|null>(null),[document,setDocument]=useState<Document|null>(null);
   const [detailLoading,setDetailLoading]=useState(false),[detailError,setDetailError]=useState(""),[detailRevision,setDetailRevision]=useState(0);
@@ -56,7 +56,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     setDetail(null);setDetailLoading(false);setDetailError("");
   },[]);
   bound.current=list;
-  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");setDetailLoading(false);setDetailError("");setSourceError("");},[]);
+  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");setDetailLoading(false);setDetailError("");setSourceError("");setMissingBindingReceipt(null);},[]);
   const read=useCallback(async<T,>(path:string,signal?:AbortSignal):Promise<T>=>{
     const response=await fetch(path,{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal});
     if(response.status===401||response.status===403){deniedRef.current=true;setDenied(true);generation.current++;clear();if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));throw new Error("当前身份无法读取晨间资料");}
@@ -83,10 +83,14 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   },[read]);
   const restoreBinding=useCallback(async(key:string,signal?:AbortSignal)=>{
     const current=epoch.current,version=generation.current;
-    const value=await read<MorningBindingReceipt>("/api/boss/ui/morning/binding?"+new URLSearchParams({client_request_id:key}),signal);
+    const value=validateMorningBindingReceipt(await read<unknown>("/api/boss/ui/morning/binding?"+new URLSearchParams({client_request_id:key}),signal),key);
     if(current!==epoch.current||version!==generation.current||signal?.aborted)return;
-    if(value.client_request_id!==key||value.write_performed_by_lookup!==false)throw new Error("原生晨间绑定与原编号不符");
     setBindingId(key);setNativeBinding(value.result);setUncertain(value.outcome!=="RECORDED");
+    setMissingBindingReceipt(value.outcome==="NOT_FOUND_IN_CURRENT_STORE"?value:null);
+    if(value.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
+      setError("当前库没有原会话绑定记录，未知网络状态已通过原编号核查。不会自动重发问题；可以再次读取原编号或由本人明确结束核查。");
+      return;
+    }
     if(value.result?.last_request_id){remember({morningRequest:value.result.last_request_id});await restore(value.result.last_request_id,signal,true);}
     else if(value.result)setError("会话范围已绑定，问题尚未进入晨间运行。保留当前文字，可明确提交或打开该会话。");
   },[read,restore]);
@@ -162,14 +166,14 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   function changeDay(next:Day){
     generation.current++;receiptSequence.current++;setView(null);setList(null);bound.current=null;setReceipt(null);setRequestId("");setSelected("");setSourceId("");setDetail(null);setDocument(null);setUncertain(false);setDay(next);setDayDraft(next);setCategory("ALL");
     returnPoint.current=null;returnPending.current=false;
-    setBindingId("");setNativeBinding(null);remember({morningDate:next.date,morningTimezone:next.timezone,morningRequest:null,morningItem:null,morningSource:null,morningBinding:null,morningChat:null,todayOrderRequest:null,morningCategory:null,morningScroll:null,morningFocus:null});
+    setBindingId("");setNativeBinding(null);setMissingBindingReceipt(null);remember({morningDate:next.date,morningTimezone:next.timezone,morningRequest:null,morningItem:null,morningSource:null,morningBinding:null,morningChat:null,todayOrderRequest:null,morningCategory:null,morningScroll:null,morningFocus:null});
   }
   async function submit(discuss=false){
     if(!day||busy||orderDirty||uncertain||!view||deniedRef.current||!question.trim())return;
     if(discuss&&!detail)return;
     const current=epoch.current,version=++generation.current,key="morning-bind-"+crypto.randomUUID(),listId=detail?.list_id,itemId=detail?.item.item_id;
     const reusable=nativeBinding&&nativeBinding.date===day.date&&nativeBinding.timezone===day.timezone&&nativeBinding.item_id===(itemId??null)&&nativeBinding.snapshot_sha256===view.snapshot_sha256&&nativeBinding.order_version===(list?.current_order?.version??view.order_version)?nativeBinding:null;
-    const controller=new AbortController();handoff.current=controller;setHandoffCanceled(false);
+    const controller=new AbortController();handoff.current=controller;setHandoffCanceled(false);setMissingBindingReceipt(null);
     captureReturn();receiptSequence.current++;setBusy(true);setUncertain(true);setError("");setDocument(null);setSourceId("");
     setBindingId(reusable?.binding_id??key);remember({morningBinding:reusable?.binding_id??key,morningDate:day.date,morningTimezone:day.timezone,morningItem:selected||null,morningSource:null,todayOrderRequest:null});
     await onStartConversation({client_request_id:key,...day,question,...(listId&&itemId?{list_id:listId,item_id:itemId}:{}),...(reusable?{binding_id:reusable.binding_id}:{})},controller.signal).then(saved=>{
@@ -189,6 +193,12 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   }
   async function recover(key=requestId,adoptDay=false){if(!key||orderDirty||deniedRef.current)return;const current=epoch.current;generation.current++;setError("");setDetail(null);setDocument(null);setSelected("");setSourceId("");remember({morningRequest:key,morningItem:null,morningSource:null});await restore(key,undefined,adoptDay).then(()=>{if(current===epoch.current&&!deniedRef.current)setRevision(value=>value+1);},failure=>{if(current===epoch.current)setError(failure.message);});}
   function cancelHandoff(){handoff.current?.abort();setHandoffCanceled(true);setError("会话交接取消已请求；等待原绑定结果，当前问题不会自动发送。");}
+  function acknowledgeMissingBinding(){
+    if(busy||deniedRef.current||!canAcknowledgeMissingMorningBinding(missingBindingReceipt,bindingId))return;
+    setBindingId("");setNativeBinding(null);setMissingBindingReceipt(null);setUncertain(false);
+    remember({morningBinding:null,morningChat:null});
+    setError("已由本人结束当前库中未记录的原会话绑定核查；问题不会自动重发。请重新确认本次需求后再明确提交。");
+  }
   const current=currentMorningDetailScope(list,view),order=current?list?.current_order:null;
   useEffect(()=>{
     if(!visible||!returnPending.current||loading||(Boolean(selected)&&!detail&&!detailError))return;
@@ -266,7 +276,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
       <details><summary>查看资料与业务记录</summary>
       <details><summary>当前进展与查询记录</summary><p>{list?label(list.adoption_state):"当前日期预览"} · 清单版本 {view?.list_version??"尚未生成"}</p><p>业务日 {view?.day_start??"等待读取"} 至 {view?.day_end??"等待读取"}</p>
         <p>当前本人次序设置：{label(order?.state??view?.order_state??"NOT_SET")} · 当前次序版本 {order?.version??view?.order_version??"等待读取"}。事项排序理由保留清单查询时的依据。</p>
-        {bindingId&&<><p>原生会话绑定 {bindingId}</p><button className="boss-btn" disabled={busy||orderDirty||denied} onClick={()=>void restoreBinding(bindingId).catch(failure=>setError(failure.message))}>读取原会话绑定与结果</button></>}
+        {bindingId&&<><p>原生会话绑定 {bindingId}</p><button className="boss-btn" disabled={busy||orderDirty||denied} onClick={()=>void restoreBinding(bindingId).catch(failure=>setError(failure.message))}>读取原会话绑定与结果</button>
+          {canAcknowledgeMissingMorningBinding(missingBindingReceipt,bindingId)&&<button className="boss-btn" type="button" disabled={busy||orderDirty||denied} onClick={acknowledgeMissingBinding}>确认原绑定未记录，结束核查</button>}</>}
         {nativeBinding&&<button className="boss-btn" disabled={busy||orderDirty||denied} onClick={()=>{captureReturn();onOpenConversation(nativeBinding.chat_id);}}>打开当前晨间会话</button>}
         {nativeBinding&&receipt&&["PREPARED","RUNNING"].includes(receipt.request_state)&&<p>可打开当前晨间会话，使用原生停止操作取消尚未执行的步骤。</p>}
         <p>原晨间请求 {requestId||"尚未提交"}</p><p>晨间运行状态 {receipt?.request_state??(busy?"运行中":uncertain?"结果尚未确认":"尚未提交")} · 回执 {receipt?.receipt.outcome??"未知"}</p>{receipt?.run_id&&<p>运行 {receipt.run_id}</p>}
