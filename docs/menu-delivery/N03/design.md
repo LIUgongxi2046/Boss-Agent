@@ -4,7 +4,7 @@
 
 ## 1. 上游与实际使用方
 
-PRD FR-02/03/14—23、BR-C01—C07、E01—E06限定范围、专业职责、来源和后续授权。原N03 HTML与加载topics定义主列范围/十专题、右列提醒/来源。现有HLD、ClientProvider、RoleChannel和SQLite领域继续使用；公共组件由N3维护。领域N1的a38bf9b已接收为67be86d，记录4b48ccb已接收为a8cc244；BusinessOverviewAPI与Schema1.0.0已提供准确只读范围。原生经营入口持久绑定仍由N1补充，N2实际采用等待该准确接口。
+PRD FR-02/03/14—23、BR-C01—C07、E01—E06限定范围、专业职责、来源和后续授权。原N03 HTML与加载topics定义主列范围/十专题、右列提醒/来源。现有HLD、ClientProvider、RoleChannel和SQLite领域继续使用；公共组件由N3维护。BusinessOverviewAPI、经营入口持久绑定与N2实际消费者已经接收，business-overview Schema为1.1.0，准备Schema为1.1.0；来源与当前状态均由正式领域重新核查。
 
 | 使用方 | 当前接入或责任 |
 |---|---|
@@ -88,7 +88,7 @@ TrustedContext采用N1持久入口和N2经营消费者。当前连接必须通�
 |---|---|
 | 原稿 | 18组REFERENCE_MEASURED；完整区域/字段/十专题顺序与源码摘要已保存 |
 | 产品结构及状态 | 独立N03容器与桌面路由、三个业务区域、详情/准备Dialog及D06已经实现；当前制品的成对DOM/样式/位置和交互验证待完成 |
-| 字段/身份/业务 | N1/N2准确接口已经接收；领域、PublicConversation和实际SDK限定检查通过；完整认证UI和会议准备消费者待完成 |
+| 字段/身份/业务 | N1/N2准确接口已经接收；领域、PublicConversation、会议准备和实际SDK限定检查通过；完整认证UI待完成 |
 | 连续返回 | 专题、F03/F02、来源、讨论、会议/交办准备及刷新路径待实际检查，不能仅靠组件状态推断 |
 | 响应与可访问性 | 三尺寸/200%、原阈值、长内容、键盘、44px目标、2px焦点、整页溢出与Dialog关闭/返回待当前制品检查 |
 | 工程与交付 | 严格TypeScript与当前独立N03 Vite构建通过；独立启动器/资料/端口、完整清单和最终候选待完成 |

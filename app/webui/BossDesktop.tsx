@@ -52,6 +52,7 @@ import { BossBIView } from "./BossBIView";
 import {BossBusinessOverview} from "./BossBusinessOverview";
 import {useBusinessConversationEntry} from "./BusinessConversationEntry";
 import {BusinessOverviewQuery} from "./BusinessOverviewQuery";
+import {BusinessOverviewAlert} from "./BusinessOverviewAlert";
 import {BusinessOverviewPreparation,savedOverviewPreparation} from "./BusinessOverviewPreparation";
 import type {OverviewSelection} from "./business-overview-types";
 import { MaintainerBIScenarios } from "./MaintainerBIScenarios";
@@ -891,6 +892,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 /> :
                 page === "N09" ? <BossOwnerPlans data={ownerPlans} loading={loading} error={error}
                   onReload={refresh} onDirtyChange={setWorkDirty} onCommand={scopedCommand}/> :
+                page==="F02"&&fromOverview?<BusinessOverviewAlert onNavigate={id=>navigate(id)} onOpenTask={selectTask} onDirtyChange={setWorkDirty}/>:
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                   key={page} role={role} pageId={page}
                 onOpenTask={selectTask} onDirtyChange={setWorkDirty}
