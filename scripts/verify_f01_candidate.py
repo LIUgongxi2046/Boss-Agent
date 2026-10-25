@@ -82,6 +82,23 @@ def verify(bundle: Path, *, require_head: bool = False) -> dict:
         ).strip()
         if head != record["repo_commit"]:
             raise ValueError("当前源代码提交与编译制品不一致：应使用隔离工作树核验准确版本，禁止重置现有工作树")
+        changed = subprocess.check_output(
+            ["git", "status", "--porcelain=v1", "--untracked-files=no", "--",
+             "app", "validation", "scripts", "specs",
+             "Boss-Agent-Desktop-Complete-v6"], cwd=ROOT, text=True
+        ).strip()
+        if changed:
+            raise ValueError("当前功能或设计源码存在未提交修改；不能冒充准确仓库版本，原文件不会被覆盖")
+        module_hashes = build.get("overlay_sha256")
+        if not isinstance(module_hashes, dict) or not module_hashes:
+            raise ValueError("F01 编译清单没有第一方模块内容摘要")
+        for name, expected in module_hashes.items():
+            if (not isinstance(name, str) or "/" in name or name.startswith(".")
+                    or not _sha(expected)):
+                raise ValueError("第一方模块来源映射非法")
+            file = ROOT / "app/webui" / name
+            if not file.is_file() or file.is_symlink() or digest(file) != expected:
+                raise ValueError("F01 当前第一方模块与制品声明不一致：" + name)
     return {
         "result": "VERIFIED_BUILD_NOT_GUI_ACCEPTANCE",
         "repo_commit": record["repo_commit"],
