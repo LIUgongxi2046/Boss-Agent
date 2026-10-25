@@ -70,5 +70,11 @@ jobs:
         run: python scripts/prepare_boss_webui.py --build
       - name: Check compiled bundle
         run: test -f .work/product/nanobot/nanobot/web/dist/index.html
+      - name: Verify native patch rebuild is idempotent and sources remain complete
+        run: |
+          test -f .work/product/boss-native-patches.json
+          cp .work/product/boss-native-patches.json .work/product/boss-native-patches-first.json
+          python scripts/prepare_boss_webui.py
+          cmp .work/product/boss-native-patches.json .work/product/boss-native-patches-first.json
       - name: Syntax check Electron host
         run: node --check validation/desktop/main.cjs
