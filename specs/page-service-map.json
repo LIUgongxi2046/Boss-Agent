@@ -75,27 +75,58 @@
       "logical_architecture_route": "/app/boss/F01",
       "actual_webui_navigation": "?bossPage=F01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_TODAY_CLASSIFICATION_AND_OWNER_ORDER",
+      "render_status": "CURRENT_CODE_COMPILES_V6_FUNCTIONS_PRESENT_V7_ACCEPTANCE_PENDING",
       "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "component_name": "BossDesktop + BossMorningView + BossToday + native ThreadShell",
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
-        "GET /api/boss/ui/today"
+        "GET /api/boss/ui/today",
+        "GET /api/boss/ui/morning/preview",
+        "GET /api/boss/ui/morning/list",
+        "GET /api/boss/ui/morning/detail",
+        "GET /api/boss/ui/morning/source",
+        "GET /api/boss/ui/morning/request",
+        "GET /api/boss/ui/morning/history",
+        "GET /api/boss/ui/morning/binding"
       ],
-      "code_wired_write_actions": ["boss.today.reorder"],
-      "other_integration_points": ["app/webui/BossToday.tsx"],
+      "code_wired_write_actions": [
+        "boss.today.reorder",
+        "boss.morning.bind"
+      ],
+      "other_integration_points": [
+        "app/webui/BossMorningView.tsx",
+        "app/webui/BossToday.tsx",
+        "scripts/boss_native_overlay.py",
+        "nanobot native ThreadShell / SessionManager"
+      ],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [
-        "conversation.start"
-      ],
+      "operations_not_yet_implemented": [],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_boss_today.py",
+        "app/tests/test_fc03_morning.py",
+        "app/tests/test_menu_f01_domain.py",
+        "app/tests/test_public_morning.py",
+        ".github/workflows/boss-agent-f01.yml"
       ],
       "source_task_ids": [
         "T18",
         "T24"
-      ]
+      ],
+      "operations_not_yet_current_e2e_verified": [
+        "F01 full authenticated desktop continuation",
+        "v7 long-page and responsive structure comparison",
+        "native morning chat and cross-page round-trip on current clean-built binary"
+      ],
+      "reverification": {
+        "scope": "CURRENT_SOURCE_AND_ISOLATED_CI_ONLY",
+        "code_build": "PASSED_ON_CI_JOB_121079563848",
+        "repeated_pinned_overlay_build": "PASSED_ON_CI_JOB_121080102274",
+        "f01_domain": "41 PASSED_ON_CI_RUN_40163532726",
+        "visual_v7": "NOT_RUN",
+        "product_e2e": "NOT_RUN",
+        "user_acceptance": "PENDING"
+      }
     },
     {
       "page_id": "F02",
