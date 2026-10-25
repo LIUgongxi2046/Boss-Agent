@@ -42,3 +42,9 @@ N1总览实施a38bf9b与记录4b48ccb分别接收为67be86d/a8cc244，BusinessOv
 BossBusinessOverview与business-overview-types.ts已经采用正式范围/专题/来源类型，提供范围草稿与明确应用、静态原稿目录和正式专题结果的不同读取状态、当前专题Dialog、来源原文及固定快照复核、迟到响应隔离和返回坐标。组件和类型已通过严格TypeScript，路由、会话入口及准备流程仍待接入和实际验证。纯目录名称来自批准设计，不代表已经存在专题资料；正式结果只在读取成功后显示。原生Scope入口的持久绑定已在N1自然完成且idle复查后具体接续，marker=MENU-N03-N1-NATIVE-ENTRY-20261025，N2后续采用等待准确接口。
 
 N03独立基准构建后的五套既有体验制品摘要核验PASS，protected-frontends.json仅证明这些制品保持原摘要，没有读取业务资料、没有产品或视觉验收声明。
+
+N1原生入口实施d57de121和记录97e3b3cf已接收为804c064/72f0a7f；Schema为1.1.0。native-entry-receiver.xml记录36项通过、9.92秒，验证实际Session与同库准备/绑定/历史回执、来源变化、重复编号和任务入口互斥。当前PublicConversation已提供boss.conversation.business.prepare/bind/read/receipt，RoleChannel注册同名结构化动作与只读原编号入口；公共适配尚待实际消费者检查。BusinessConversationEntry通过真实new_chat、attach、正式bind/read建立会话，不自动提交问题；未知结果保留原编号。原生客户端对prepare/bind连接中断停止自动重发，对应nanobot-menu-n03.patch。严格TypeScript通过。
+
+BusinessOverviewQuery提供当前总览摘要复核和F03完整条件传入；BossBIView在显式initialScope下保持原法人、地区、期间和来源，不自动采用其他历史查询。N03容器增加F19四用途、身份失效清理和返回焦点核查。桌面路由、当前服务端选择证明、Agent公共入口及会议/交办准备尚在接收，认证UI未执行。全部26项开发覆盖保持0/26，以上局部结果不登记完整检查点通过。
+
+N1于idle复查后收到MENU-N03-N1-PREPARATION-BRIDGE-20261025，限定处理正式Scope、专题、对象及来源版本的准备上下文。N2的68d9b269与agent.md已完整读取，25项当前定向及77项受影响组合为其模块证据；准确公共接收仍待执行。N2于idle复查后收到MENU-N03-N2-MORNING-MUTUAL-EXCLUSION-20261025，限定负责共享晨间绑定事务互斥及必要检查。没有向运行中的聊天追加消息，没有新聊天或子代理。

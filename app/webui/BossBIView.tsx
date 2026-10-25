@@ -33,7 +33,7 @@ class BIReadError extends Error {
   constructor(readonly status:number,message:string){super(message);this.name="BIReadError";}
 }
 
-export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id:string)=>void}){
+export function BossBIView({getToken,onSource,initialScope,onDirtyChange}:{getToken:()=>string;onSource:(id:string)=>void;initialScope?:Scope;onDirtyChange?:(dirty:boolean)=>void}){
   const {client}=useClient();
   const [dimensions,setDimensions]=useState<Dimensions|null>(null),[scope,setScope]=useState<Scope>({});
   const [question,setQuestion]=useState("查询当前经营指标及变化"),[mode,setMode]=useState<"NEW"|"FOLLOW_UP">("NEW");
@@ -49,6 +49,7 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   const generation=useRef(0),activeRequest=useRef(""),readId=useRef<string|null>(null),mounted=useRef(true);
   const identityEpoch=useRef(0),denied=useRef(false),restoredScope=useRef(false),receiptSequence=useRef(0),historySequence=useRef(0),dimensionSequence=useRef(0);
   readId.current=read?.result.query_id??null;
+  useEffect(()=>{onDirtyChange?.(dirty||busy);return()=>onDirtyChange?.(false);},[dirty,busy,onDirtyChange]);
   const clearProtected=useCallback(()=>{
     setDimensions(null);setScope({});setRead(null);setReceipt(null);setHistory({requests:[]});setEvidence(null);
     setRequestKey("");activeRequest.current="";readId.current=null;restoredScope.current=false;
@@ -98,7 +99,10 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
   useEffect(()=>{
     const abort=new AbortController(),epoch=++identityEpoch.current;
     mounted.current=true;denied.current=false;setAccessDenied(false);clearProtected();setError("");setHistoryLoading(true);
-    setScenarioId(new URLSearchParams(window.location.search).get("biScenario")??"");
+    if(initialScope){
+      restoredScope.current=true;setScope(structuredClone(initialScope));setScenarioId(typeof initialScope.scenario_id==="string"?initialScope.scenario_id:"");
+      setDimensionSources(Array.isArray(initialScope.source_ids)?initialScope.source_ids:null);
+    }else setScenarioId(new URLSearchParams(window.location.search).get("biScenario")??"");
     const initialGeneration=generation.current;
     const current=()=>mounted.current&&!denied.current&&epoch===identityEpoch.current&&!abort.signal.aborted;
     const historyRequest=++historySequence.current;
@@ -107,11 +111,11 @@ export function BossBIView({getToken,onSource}:{getToken:()=>string;onSource:(id
     void fetchJSON<History>("/api/boss/ui/bi/history",abort.signal).then(saved=>{
       if(!current()||historyRequest!==historySequence.current)return;setHistory(saved);setHistoryLoading(false);
       const latest=saved.requests[0]?.client_request_id;
-      if(!requested&&!activeRequest.current&&latest&&generation.current===initialGeneration)void loadReceipt(latest,abort.signal);
+      if(!initialScope&&!requested&&!activeRequest.current&&latest&&generation.current===initialGeneration)void loadReceipt(latest,abort.signal);
     },failure=>{if(current()&&historyRequest===historySequence.current){setHistoryError(failure.message);setHistoryLoading(false);}});
     if(requested)void loadReceipt(requested,abort.signal);
     return()=>{mounted.current=false;identityEpoch.current++;generation.current++;receiptSequence.current++;abort.abort();};
-  },[fetchJSON,loadReceipt,clearProtected]);
+  },[fetchJSON,loadReceipt,clearProtected,initialScope]);
   const dimensionSourceKey=JSON.stringify(dimensionSources);
   useEffect(()=>{
     if(denied.current)return;

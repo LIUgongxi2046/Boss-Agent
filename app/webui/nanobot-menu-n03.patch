@@ -1,0 +1,13 @@
+*** Begin Patch
+*** Update File: webui/src/lib/nanobot-client.ts
+@@
+-      // 晨间请求与本人排序在连接中断后只读取原请求结果。
++      // 经营范围准备与绑定在连接中断后仅查询原编号。
++      if (["boss.conversation.business.prepare", "boss.conversation.business.bind"].includes(pending.action)) {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "经营会话连接已中断，请读取原请求回执"));
++        continue;
++      }
++      // 晨间请求与本人排序在连接中断后只读取原请求结果。
+*** End Patch

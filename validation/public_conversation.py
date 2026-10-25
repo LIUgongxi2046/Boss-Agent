@@ -8,12 +8,16 @@ from nanobot.webui.session_identity import is_valid_webui_chat_id, webui_session
 from business import require
 from boss_conversation import ConversationAPI, owner_role, validate
 from boss_conversation_attachments import ConversationAttachments
+from boss_business_overview_entry import validate as validate_business_entry
 
 CONVERSATION_READ_ACTIONS = frozenset({
     "boss.conversation.read", "boss.conversation.artifact", "boss.conversation.messages", "boss.conversation.attachments",
 })
 CONVERSATION_TASK_ACTIONS = frozenset({
     "boss.conversation.task.prepare", "boss.conversation.task.bind", "boss.conversation.task.read", "boss.conversation.task.receipt",
+})
+CONVERSATION_BUSINESS_ACTIONS = frozenset({
+    "boss.conversation.business.prepare", "boss.conversation.business.bind", "boss.conversation.business.read", "boss.conversation.business.receipt",
 })
 REQUESTS_SCHEMA=json.loads((Path(__file__).resolve().parents[1]/"specs/conversation-requests.schema.json").read_text())
 
@@ -29,6 +33,7 @@ class PublicConversation:
         self.api = ConversationAPI(store)
         self.attachments = ConversationAttachments(sessions, media_root)
         self.task_entry = self.api.task_entry(sessions)
+        self.business_entry = self.api.business_entry(sessions)
         self.sessions, self.workspaces = sessions, workspaces
 
     def task(self, role, action, payload, *, attached, active):
@@ -64,6 +69,38 @@ class PublicConversation:
             else:
                 result = self.task_entry.read(role, {"session_id": session_id, "chat_id": chat_id})
         require(active() and (chat_id is None or attached(chat_id)), "任务会话处理期间身份或附着已经变化", web.HTTPForbidden)
+        return result
+
+    def business(self, role, action, payload, *, attached, active):
+        owner_role(role)
+        require(active(), "当前本人认证已经失效", web.HTTPUnauthorized)
+        require(action in CONVERSATION_BUSINESS_ACTIONS and isinstance(payload, dict), "经营会话动作或字段无效", web.HTTPBadRequest)
+        chat_id = None
+        if action == "boss.conversation.business.prepare":
+            result = self.business_entry.prepare(role, payload)
+        elif action == "boss.conversation.business.receipt":
+            result = self.business_entry.receipt(role, payload)
+        else:
+            if action == "boss.conversation.business.bind":
+                validate_business_entry("EntryBind", payload)
+            else:
+                require(set(payload) == {"chat_id"}, "经营会话读取字段无效", web.HTTPBadRequest)
+            chat_id = payload.get("chat_id")
+            require(is_valid_webui_chat_id(chat_id) and attached(chat_id), "当前连接尚未订阅所选经营会话", web.HTTPForbidden)
+            session_id = webui_session_key(chat_id)
+            if action == "boss.conversation.business.bind":
+                original = self.business_entry.receipt(role, {"client_request_id": payload["client_request_id"]})["entry"]
+                require(original is not None, "当前原请求没有经营会话准备记录", web.HTTPNotFound)
+                require(original["preparation_id"] == payload["preparation_id"] and original["preparation_sha256"] == payload["preparation_sha256"], "本次绑定与原经营范围准备不符", web.HTTPConflict)
+                self.business_entry.prepare(role, {field: original[field] for field in ("client_request_id", "applied_scope", "snapshot_sha256", "topic_reference")})
+                if self.sessions.read_session_snapshot(session_id) is None:
+                    require(self.workspaces is not None, "原生工作空间服务尚未就绪", web.HTTPServiceUnavailable)
+                    require(active() and attached(chat_id), "准备经营会话期间身份或附着已经变化", web.HTTPForbidden)
+                    self.workspaces.persist_scope(chat_id, self.workspaces.scope_for_session_key(session_id))
+                result = self.business_entry.bind(role, payload)
+            else:
+                result = self.business_entry.read(role, {"session_id": session_id, "chat_id": chat_id})
+        require(active() and (chat_id is None or attached(chat_id)), "经营会话处理期间身份或附着已经变化", web.HTTPForbidden)
         return result
 
     def record_upload(self, role, chat_id, accepted_media, accepted_paths, *, attached, active):
