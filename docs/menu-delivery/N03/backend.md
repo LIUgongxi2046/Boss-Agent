@@ -14,6 +14,8 @@ C17实施提交463704e2f758acde393af56d8f1a3df4ba87a44f，准确七份文件，�
 
 范围限定会议准备marker=MENU-N03-N1-SCOPED-MEETING-PREPARATION-20261025，领域检查MODULE_CHECKS_PASSED；PRODUCT准确输入5a899ef87bb1d516a9633441705bffd5f2198e15。核查现有MeetingAPI当前确认材料、Runtime会议读取及实际会议编制范围，N1提供C17必要只读准备结果和当前重读方法，公共注册/UI/role_channel/application保持N3负责。完整26项仍由N3维护，不增加开发覆盖数量。
 
+范围限定会议准备实施提交504d0b0e8ddd6cfa8dbd091a12f4fe81102d96c2，准确八份文件；本记录提供1.1.0 Schema、meeting可调用方法、当前结果及工具采用条件。原五项未提交内容保持。
+
 ## 当前依据与边界
 
 完整读取当前工单和适用AGENTS，沿用S008任务记录、实施与接口检查规范。核查准确PRODUCT基准3d04f28d6d3b7d53b58a1a69b085a54ca1cc6f57的BossSectorAPI、正式BI计算、SimulationAPI、供应品质、经营提醒、任务和来源规则；验证时PRODUCT HEAD为ba59c33bc3cc6b914bdd0b0792aeedc49b3f2220，相关领域文件与基准相同。PRODUCT目录为/Users/liuhaoxian/.codex/worktrees/boss-integration/Boss-Agent，仅作只读依赖。记忆索引没有本任务相关证据。
