@@ -4,7 +4,7 @@ import {BossToday,morningReason,morningState,type TodayItem,type TodayOrderRecei
 import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogClose} from "@/components/ui/dialog";
 import {CheckCircle2,ClipboardList,Info,Send,X} from "lucide-react";
 import {isSafeMorningFocusId,readMorningReturnPoint} from "./morning-return";
-import {currentMorningDetailScope} from "./morning-detail-scope";
+import {currentMorningDetailScope,shouldClearMorningSelectionOnFilter} from "./morning-detail-scope";
 import "./boss-morning.css";
 import "./boss-f01-shell.css";
 
@@ -231,7 +231,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
       <BossToday key={view?.list_id??day?.date??""} data={ordered} loading={loading} error="" onReload={()=>setRevision(value=>value+1)} onNavigate={onNavigate}
         presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={chooseItem} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
         orderScope={current&&view?.list_id?{list_id:view.list_id,date:view.date,timezone:view.timezone}:undefined} onReadOrder={readOrder} onReorder={payload=>client.requestMutation("boss.today.reorder",payload).then(()=>undefined)}>
-        <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
+        <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);if(shouldClearMorningSelectionOnFilter(next,selected,view?.items??[])){setSelected("");setDetail(null);setDetailLoading(false);setDetailError("");setSourceId("");setDocument(null);setSourceError("");remember({morningCategory:next,morningItem:null,morningSource:null});}else remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
       </BossToday>
       <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>交给 Boss Agent</h2></div></header>
         <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-f01-entry-label" htmlFor="morning-question">本次需求</label>
