@@ -46,6 +46,18 @@ def test_current_meeting_source_can_be_pinned_without_old_finance_fixture(store)
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0] == 0
 
 
+def test_unbound_legacy_assignment_keeps_original_source_allowlist(store):
+    """F01 verified selection does not broaden the ordinary assignment route."""
+    commands = BossCommandAPI(store)
+    status, result = commands.execute("BOSS", "boss.assignment.create", create_input(
+        "unbound-source-whitelist-still-enforced", source_refs=["meeting-minutes"]))
+    assert status == 400, result
+    with store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind IN ('task','authorization','outbox')"
+        ).fetchone()[0] == 0
+
+
 def test_public_morning_day_preview_is_actual_and_strict(store):
     pages = BossPageAPI(store)
     days = [{"date": "2026-10-23", "timezone": "Asia/Shanghai"}, DAY]
