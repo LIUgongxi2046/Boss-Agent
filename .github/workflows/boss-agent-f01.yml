@@ -58,3 +58,4 @@ jobs:
           app/tests/test_fc03_morning.py
           app/tests/test_menu_f01_domain.py
           app/tests/test_public_morning.py
+          app/tests/test_f01_compiled_bundle.py
