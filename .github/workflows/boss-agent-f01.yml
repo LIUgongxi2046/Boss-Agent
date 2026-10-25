@@ -24,11 +24,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
       - uses: astral-sh/setup-uv@v6
       - name: Install locked product and nanobot dependencies
         run: uv sync --project validation --locked
       - name: Create private project-local test directories
         run: mkdir -p .work/ci-pytest .work/ci-tmp
+      - name: F01 sorting and original-receipt behavior regression
+        run: node --test app/tests/f01_today_order.test.mjs
       - name: Exercise F01 classifications, source versions, CAS and public endpoints
         env:
           PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
