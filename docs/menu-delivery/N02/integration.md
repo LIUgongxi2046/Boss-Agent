@@ -1,4 +1,22 @@
 # MENU-N02 聊天交办
+## 2026-10-25 N02 附件状态独立核验与异常隔离
+
+**活动任务** `MENU-N02`、`MENU-N02-N3`；需求按现行 `docs/menu-delivery/N02.md` 的 C06/C09/C15/C20/C21/C22 与 FR-08/24/29 的 E01/E02/E03/E05/E06。执行前重新完整读取 `docs/开发接手与执行规范.md` 与 `AGENTS.md`，确认最新 `main=4f2f060ea440f5ad324509e45ababe1341a51f2e`、唯一状态 N02 0/26、旧 v6 26/26 只能历史复用、F01 工程冻结与 N03 暂停；只修改 N02 前端消费者、独立回归和当前记录。
+
+**实际确认缺陷**：正式 `ConversationAttachments.read` 按原生 SessionManager 保存记录与**当前磁盘附件字节摘要**计算 `STORED/MISSING/CHANGED/REFERENCE_UNAVAILABLE`，附件可在没有新 `runtime_run` 及其状态不变时上传/失效/变化。先前 `BossConversationWorkspace` 只在上次运行 `run_id/status/finished_at` 标记变化时请求 `boss.conversation.attachments`，即稳定运行/从未运行的会话会长期保留旧文件状态。更重要的是原组件对响应仅取 `attachments`，未验证服务返回的准确 chat/session/owner-only/no-auth 权限和正式保存范围；附件读取失败也会同时清空已经分别读成功的运行和原请求记录，错误发生的位置无法判断。
+
+**修复和使用方**：
+
+- `c055e40`：新增 `app/webui/n02-attachments.ts`，独立于运行状态按时间间隔及新运行标记决定重新读取当前附件（正常间隔 5s、最新运行变化时立即读）；严格验证 `source_type=RUNTIME_RECORD`、同一 chat ID、`session_id=websocket:<chatId>`、原生 `session_state`、`business_authorization_granted=false` 和附件唯一 ID、类型、大小、录入/当前 SHA、原始文件名与四种合法状态。跨会话、伪造权限或字段不合规时不展示其附件，避免把未知结果当“无文件”。
+- `79b496b`：当前 `BossConversationWorkspace` 在相同本人认证/会话连接范围内，先分别核实并展示 `boss.conversation.read` 的运行/工具记录和 `boss.conversation.requests` 的原请求历史；附件单独发起既有合法只读操作 `boss.conversation.attachments`。附件失败时只清除不可信附件并显示“不能判定当前附件为空”的实际错误及“重新读取当前附件”重试按钮，原已核实的 Runtime/原回执继续可读，不新增业务写入。异步前后对比当前 client/token/chat/role/可见性/连接状态，不采用旧身份迟到响应。连接关闭或切换会话仍清理当前可操作状态。
+- `26aad33`：新增 Node 纯消费者回归：稳定 `NO_RUN` 不变时的定期检查、从 `STORED` 转 `CHANGED/MISSING`、返回错误归属/同一ID重复/伪造授权/目录式文件名拒绝等。
+- `12a5a44`：在原 `app/tests/test_menu_n02_native_files.py` 增加**真实原生 SessionManager 业务测试**：实际 WebUI media gateway 接受 JSON 文件并在独立 sessions_root 中保存上传；不创建任何 Runtime/message，读出 `SAVED/STORED`，再直接改变原已保存文件内容/移除文件，原 read 返回 `CHANGED/MISSING`、原版本和附件 ID 不变。测试不访问用户账号/业务文件或外部网络。
+- `a7e1369`：纳入 N02 唯一定向 workflow，而不是创建另一套状态或排除旧测试。
+
+**本批经 GitHub 实际执行的精确证据**：独立 N02 workflow `40206135834`（代码 `a7e13692ff6aa4daa431daee7ffdca21585dae7d`）中 Node **8/8**、正式领域/附件/任务 **38/38**、真实 nanobot SDK **59/59**，合计 **105/105**，0失败；`40206118068` 的 `react-webui-build` job `121207357249` PASS，锁定 nanobot、TS/Vite、原生补丁重构、重复准备、制品摘要、Electron 与 N02 手工启动入口语法均通过。构建精确源提交 `12a5a44277435e279a50a4215ca5ffd1b21d5b41`，归档名称 `boss-agent-frontend-12a5a44277435e279a50a4215ca5ffd1b21d5b41`、artifact ID `12603823060`、GitHub ZIP digest `sha256:57d8ed0bce3824334978000f5ba8a9fa53d21705a5f625ae4940307573dae2bc`，约 10.8MB、2026-11-08 到期。对比 `12a5a44` 至 `a7e1369` 仅修改 N02 CI 的测试命令，没有任何产品代码差异；当需要从 ZIP 在 Mac 实际核对，必须使用归档 manifest 记载的 `12a5a44` **准确源码工作树**，不能拿较新 main 直接冒称该文件制品。整体 desktop workflow 仍因为**暂停中的 N03 旧 Python 测试失败**呈 FAILURE，绝不视为全绿。
+
+**限制和准入**：该 105项定向通过证明上述代码/域/SDK适用范围，**不证明 Desktop v7 N02 全长原设计匹配、Mac 用户登录运行或26项完整收口**。最新 v7 仍只有历史 Library ZIP 文件记录，完整原 HTML/CSS/JS/素材原字节本会话无法取得；用户未授权截图或自动认证，原有 Mac 实例/SQLite/凭据保持未接触。因此正式 `MENU-N02` v7 **0/26 完整验收**、视觉 NOT_RUN、用户 PENDING；v6 26/26 历史独立保留。下阶段仅修真实必要缺陷，不将追加的小函数测试代替整页验收。
+
 ## 2026-10-25 从F01工程冻结切换至N02：当前v7第一批集成接收
 
 根据用户最新明确指令 `D-NEXT-MENU-N02-20261025`，先完整阅读 `docs/开发接手与执行规范.md`、`AGENTS.md`、正式 `specs/feature-delivery.json`、队列、N02原26项、FR-08/24/29 与共享 E01—E06、现有v6 HTML/加载CSS和全部 N02 正式记录，再核对 `main`。**从这批起本文件下方“DEVELOPED_PENDING_USER_ACCEPTANCE，26/26”属于之前 Desktop v6 限定交付历史**，绝不代替当前 Desktop v7 严格版验收。当前唯一活动 `MENU-N02`、v7 完整0/26、视觉未执行、用户待确认。F01 冻结源码 `5ac660330fce99c925163f06a62951563a24d383`，完整v7/目标Mac验收后置但未获批准降级；N03 源码与26项状态原样暂停保存，没有多菜单并行、自动认证、任何工作聊天的自动调度。
