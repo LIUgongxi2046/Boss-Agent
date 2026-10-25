@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 import yaml
 from boss_auth_overlay import apply_auth_overlay
+from boss_native_overlay import apply_native_overlay
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_REV = "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
@@ -195,13 +196,8 @@ def copy_overlay() -> None:
         '      </div>\n      </BossDesktop>\n    </ThemeProvider>\n  );\n}\n',
         "closing Shell boundary",
     )
-    previous_overlay = patched
     patched = apply_auth_overlay(patched, one_replace)
-    app_file = SRC / "App.tsx"
-    existing = app_file.read_text(encoding="utf-8")
-    if existing not in (original, previous_overlay, patched):
-        raise RuntimeError("上游 App.tsx 存在非本工具改动；已拒绝覆盖。")
-    app_file.write_text(patched, encoding="utf-8")
+    native_manifest = apply_native_overlay(ROOT, SOURCE, patched, original)
 
     manifest = {
         "upstream": "HKUDS/nanobot",
@@ -211,7 +207,11 @@ def copy_overlay() -> None:
         "overlay": [f"app/webui/{module.name}" for module in source_modules],
         "overlay_sha256": {module.name: hashlib.sha256(module.read_bytes()).hexdigest() for module in source_modules},
         "design_meta_sha256": hashlib.sha256(meta_file.read_bytes()).hexdigest(),
-        "source_modified": "webui/src/App.tsx (working tree only)",
+        "source_modified": "pinned native WebUI overlay (working tree only)",
+        "native_patches_manifest_sha256": hashlib.sha256(
+            (ROOT / ".work" / "product" / "boss-native-patches.json").read_bytes()
+        ).hexdigest(),
+        "native_hunks_applied": native_manifest["hunks_applied"],
     }
     manifest_path = ROOT / ".work" / "product" / "boss-build-manifest.json"
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
