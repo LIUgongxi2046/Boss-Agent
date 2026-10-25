@@ -59,3 +59,31 @@ export function validateTodayOrderReceipt(value: unknown, requestId: string): To
   }
   return receipt as TodayOrderReceipt;
 }
+
+/**
+ * Clear an acknowledged original request only if this window still points
+ * to that exact identifier. Keep date, selected item and other navigation
+ * coordinates unchanged. Unknown responses retain their original URL.
+ */
+export function withoutTodayOrderRequest(href: string, requestId: string): string | null {
+  if (!requestId) return null;
+  const address = new URL(href);
+  if (address.searchParams.get("todayOrderRequest") !== requestId) return null;
+  address.searchParams.delete("todayOrderRequest");
+  return address.href;
+}
+
+/**
+ * The original request can be dismissed only after a server-side read has
+ * confirmed it is absent in the current store. Network failure or an invalid
+ * response must NEVER unlock a new write silently.
+ */
+export function isConfirmedMissingTodayOrderReceipt(
+  receipt: TodayOrderReceipt | null,
+  requestId: string,
+): boolean {
+  return Boolean(requestId && receipt?.action === "boss.today.reorder"
+    && receipt?.client_request_id === requestId
+    && receipt?.write_performed_by_lookup === false
+    && receipt?.outcome === "NOT_FOUND_IN_CURRENT_STORE");
+}
