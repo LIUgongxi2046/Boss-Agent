@@ -6,6 +6,7 @@ import {verifyTaskContext,type TaskConversationContext} from "./BossTaskConversa
 import {useConversationReturn} from "./BossConversationPosition";
 import {verifyBusinessContext,type BusinessContext} from "./BusinessConversationEntry";
 import {isActiveN02Scope,mayDisplayCurrentTaskReference,sameActiveN02Scope,shouldCancelN02PositionOnInteraction,type N02Scope} from "./n02-context-guard";
+import {shouldRefreshN02Attachments,validateN02AttachmentRead,type N02Attachment,type N02AttachmentReadMarker} from "./n02-attachments";
 import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
 import "./boss-n02.css";
 
@@ -16,7 +17,7 @@ type ContextReference={kind:string;id:string;recorded_version:string|null;curren
 type Run={run_id:string;status:string;stop_reason:string|null;started_at:string;finished_at:string|null;configuration_id:string;configuration_version:string;tool_steps:{tool_id:string;tool_call_id:string;status:string;version?:string;task_version?:string}[];tool_errors:{tool_id:string;error_type:string}[];artifacts:Reference[];context_references:ContextReference[];origin_references:Record<string,Record<string,unknown>>};
 type View={session_id:string;chat_id:string;runs:Run[];business_authorization_granted:false;business_mutation_performed:false};
 type RequestReceipt={client_request_id:string;outcome:"RECORDED";request_state:string;run_id:string|null;chat_id:string;session_id:string;turn_id:string;write_performed_by_lookup:false;business_authority_granted:false};
-type Attachment={attachment_id:string;stored_name:string|null;original_name:string|null;mime_type:string|null;size_bytes:number|null;content_sha256:string|null;recorded_size_bytes:number|null;recorded_content_sha256:string|null;user_message_index:number|null;processing_state:"STORED"|"MISSING"|"CHANGED"|"REFERENCE_UNAVAILABLE"};
+type Attachment=N02Attachment;
 type Artifact={run_id:string;kind:Reference["kind"];id:string;data:Record<string,unknown>;evidence:{sources:{source_id:string;version:string;published_at?:string;author_contact_id?:string}[]}|null};
 type Props=ThreadReadingController&{role:"BOSS"|"MAINTAINER";visible:boolean;activeKey:string|null;sessions:Session[];onNewChat:()=>void;onSelectChat:(key:string)=>void;onSearch:()=>void;actions:ConversationActions;children:ReactNode};
 const stateLabel:Record<string,string>={RUNNING:"正在执行",QUEUED:"正在排队",SUCCEEDED:"运行完成",WAITING_INPUT:"等待补充条件",FAILED:"运行失败",CANCELED:"已经取消",TIMED_OUT:"执行超时",UNKNOWN:"结果待核查",INTERRUPTED:"执行中断",CURRENT:"当前可以读取",NEEDS_REVIEW:"需要重新核查",UNAVAILABLE:"当前无法采用",VERSION_CHANGED:"当前版本已经变化",VERSION_UNRECORDED:"原版本未记录",INACTIVE:"当前已经停用",MISSING_OR_FORBIDDEN:"当前无法访问",UNSUPPORTED_KIND:"当前种类无法读取"};
@@ -30,7 +31,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const session=sessions.find(value=>value.key===activeKey),chatId=session?.chatId??(activeKey?.startsWith("websocket:")?activeKey.slice(10):null);
   const latestScope=useRef<N02Scope>({client,token,chatId,role,visible,connectionStatus});
   latestScope.current={client,token,chatId,role,visible,connectionStatus};
-  const [view,setView]=useState<View|null>(null),[attachments,setAttachments]=useState<Attachment[]>([]),[error,setError]=useState(""),[revision,setRevision]=useState(0);
+  const [view,setView]=useState<View|null>(null),[attachments,setAttachments]=useState<Attachment[]>([]),[attachmentError,setAttachmentError]=useState(""),[attachmentLoading,setAttachmentLoading]=useState(false),[error,setError]=useState(""),[revision,setRevision]=useState(0);
   const [receipts,setReceipts]=useState<RequestReceipt[]>([]);
   const [taskContext,setTaskContext]=useState<TaskConversationContext|null>(null),[taskContextError,setTaskContextError]=useState(""),[taskContextChecking,setTaskContextChecking]=useState(false);
   const [businessContext,setBusinessContext]=useState<BusinessContext|null>(null),[businessContextError,setBusinessContextError]=useState("");
@@ -53,32 +54,56 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   useEffect(()=>{
     const current=++generation.current;++artifactGeneration.current;setArtifact(null);setArtifactOpen(false);setArtifactError("");
     if(scope.current?.client!==client||scope.current?.token!==token||scope.current?.chatId!==chatId||scope.current?.role!==role){
-      scope.current={client,token,chatId,role};setView(null);setAttachments([]);setReceipts([]);setError("");setSelectedRunId("");
+      scope.current={client,token,chatId,role};setView(null);setAttachments([]);setAttachmentError("");setAttachmentLoading(false);setReceipts([]);setError("");setSelectedRunId("");
     }
     if(!isActiveN02Scope(latestScope.current)){
       // Existing rows are historical, not a currently authorized projection.
       // Do not leave the previous run, attachments or original receipts
       // actionable during an identity switch or a dropped native connection.
-      setView(null);setAttachments([]);setReceipts([]);
+      setView(null);setAttachments([]);setAttachmentError("");setAttachmentLoading(false);setReceipts([]);
       setError(role==="BOSS"&&visible&&chatId
         ?"原生会话连接尚未就绪或已中断；连接恢复后将重新读取当前运行、附件和原请求记录。":"");
       return;
     }
-    let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,attachmentRevision:string|null=null;
+    let disposed=false,timer:ReturnType<typeof setTimeout>|undefined;
+    let lastAttachmentRead:N02AttachmentReadMarker|null=null;
+    const originalScope={...latestScope.current};
+    const active=()=>!disposed&&generation.current===current
+      &&sameActiveN02Scope(originalScope,latestScope.current);
     const read=async()=>{
       try{
         const [result,requests]=await Promise.all([client.requestMutation<View>("boss.conversation.read",{chat_id:chatId}),client.requestMutation<RequestReceipt[]>("boss.conversation.requests",{chat_id:chatId})]);
-        if(disposed||generation.current!==current)return;
-        if(result.chat_id!==chatId||result.session_id!=="websocket:"+chatId||result.business_authorization_granted!==false||result.business_mutation_performed!==false)throw new Error("当前会话读取范围不符");
-        if(requests.some(row=>row.chat_id!==chatId||row.session_id!=="websocket:"+chatId||row.write_performed_by_lookup!==false||row.business_authority_granted!==false))throw new Error("原请求记录与当前会话范围不符");
-        const last=result.runs.at(-1),nextAttachmentRevision=last?last.run_id+":"+last.status+":"+last.finished_at:"NO_RUN";
-        if(nextAttachmentRevision!==attachmentRevision){
-          const files=await client.requestMutation<{attachments:Attachment[]}>("boss.conversation.attachments",{chat_id:chatId});
-          if(disposed||generation.current!==current)return;
-          setAttachments(files.attachments);attachmentRevision=nextAttachmentRevision;
+        if(!active())return;
+        if(result.chat_id!==chatId||result.session_id!=="websocket:"+chatId||result.business_authorization_granted!==false||result.business_mutation_performed!==false||!Array.isArray(result.runs))throw new Error("当前会话读取范围不符");
+        if(!Array.isArray(requests)||requests.some(row=>row.chat_id!==chatId||row.session_id!=="websocket:"+chatId||row.write_performed_by_lookup!==false||row.business_authority_granted!==false))throw new Error("原请求记录与当前会话范围不符");
+        // Independently verified runtime/receipt rows must not disappear just
+        // because the native file-metadata endpoint has a partial failure.
+        setView(result);setReceipts(requests);setError("");
+        const last=result.runs.at(-1),runMarker=last?last.run_id+":"+last.status+":"+last.finished_at:"NO_RUN";
+        if(shouldRefreshN02Attachments(lastAttachmentRead,runMarker,Date.now())){
+          setAttachmentLoading(true);
+          try{
+            const envelope=await client.requestMutation<unknown>("boss.conversation.attachments",{chat_id:chatId});
+            if(!active())return;
+            setAttachments(validateN02AttachmentRead(envelope,chatId));
+            setAttachmentError("");
+          }catch(failure){
+            if(!active())return;
+            // Do not keep the old file list marked as current if its latest
+            // read or ownership proof could not be confirmed.
+            setAttachments([]);
+            setAttachmentError(failure instanceof Error?failure.message:String(failure));
+          }finally{
+            if(active()){setAttachmentLoading(false);lastAttachmentRead={runMarker,checkedAt:Date.now()};}
+          }
         }
-        setView(result);setReceipts(requests);setError("");timer=setTimeout(()=>void read(),2000);
-      }catch(failure){if(!disposed&&generation.current===current){setView(null);setAttachments([]);setReceipts([]);setError(failure instanceof Error?failure.message:String(failure));}}
+        if(active())timer=setTimeout(()=>void read(),2000);
+      }catch(failure){
+        if(active()){
+          setView(null);setAttachments([]);setAttachmentError("");setAttachmentLoading(false);
+          setReceipts([]);setError(failure instanceof Error?failure.message:String(failure));
+        }
+      }
     };
     void read();return()=>{disposed=true;if(timer)clearTimeout(timer);};
   },[role,visible,chatId,client,token,revision,connectionStatus]);
@@ -190,7 +215,10 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
         <div className="boss-n02-actions"><button className="boss-btn" data-conversation-return="messages" onClick={()=>openBusiness(actions.onOpenMessages)}>查看消息草稿与回复</button><button className="boss-btn" data-conversation-return="task:new" onClick={()=>openBusiness(()=>actions.onOpenTask(""))}>准备交办</button></div>
       </section>
       <section className="boss-n02-panel" aria-label="来源与依据"><h2>来源与依据</h2>{taskEntry?.source_references.map(source=><div className="boss-n02-source" key={"task-entry-"+source.id} data-task-entry-source={source.id}><strong>{source.id}</strong><span>任务入口原来源版本 {source.version} · {taskContextError||taskContextChecking?"当前有效性待核查":"当前固定来源已经核查"}</span><button className="boss-btn" data-conversation-return={"entry-source:"+source.id} onClick={()=>openBusiness(()=>actions.onOpenSource(source.id))}>核查任务来源原文</button></div>)}{contextRefs.length?contextRefs.map(reference=><ContextReferenceDetails key={reference.kind+reference.id+reference.recorded_version} reference={reference} onOpenSource={id=>openBusiness(()=>actions.onOpenSource(id))} onOpenTask={id=>openBusiness(()=>actions.onOpenTask(id))}/>):selected?.source_refs?.length?selected.source_refs.map(source=><div className="boss-n02-source" key={source.kind+source.id}><strong>{source.id}</strong><span>版本 {source.version??"未知"}</span>{source.kind==="document"&&<button className="boss-btn" data-conversation-return={"morning-source:"+source.id} onClick={()=>openBusiness(()=>actions.onOpenSource(source.id))}>核查来源</button>}</div>):<p>当前运行没有已记录的来源或对象引用。</p>}<p className="boss-n02-note">上下文关联及工具读取分别记录，附件保存状态和业务来源采用分别核查。</p>
-        <details aria-label="当前已保存附件"><summary>当前已保存附件（{attachments.length}）</summary>{attachments.length?attachments.map(file=><div className="boss-n02-source" key={file.attachment_id}><strong>{file.original_name??file.stored_name??"附件名称未知"}</strong><span>{file.mime_type??"类型未知"} · {file.size_bytes===null?"当前大小未知":file.size_bytes+" bytes"} · {fileState[file.processing_state]}</span>{file.processing_state!=="STORED"&&<p className="boss-n02-note warn">上传记录大小：{file.recorded_size_bytes===null?"未知":file.recorded_size_bytes+" bytes"}。当前附件不能作为已核查的业务依据。</p>}</div>):<p>尚无已保存附件。当前选择及未发送附件保留在输入区域。</p>}</details>
+        <details aria-label="当前已保存附件"><summary>当前已保存附件（{attachmentError?"待核查":attachments.length}）</summary>
+          {attachmentLoading&&<p role="status">正在重新核查此会话保存的附件及原始文件状态。</p>}
+          {attachmentError&&<div role="alert" className="boss-n02-note error">附件读取失败，不能判定当前附件为空：{attachmentError}<button className="boss-btn" type="button" onClick={()=>setRevision(value=>value+1)}>重新读取当前附件</button></div>}
+          {!attachmentError&&(attachments.length?attachments.map(file=><div className="boss-n02-source" key={file.attachment_id}><strong>{file.original_name??file.stored_name??"附件名称未知"}</strong><span>{file.mime_type??"类型未知"} · {file.size_bytes===null?"当前大小未知":file.size_bytes+" bytes"} · {fileState[file.processing_state]}</span>{file.processing_state!=="STORED"&&<p className="boss-n02-note warn">上传记录大小：{file.recorded_size_bytes===null?"未知":file.recorded_size_bytes+" bytes"}。当前附件不能作为已核查的业务依据。</p>}</div>):!attachmentLoading&&<p>本次读取确认暂无已保存附件。当前选择及未发送附件保留在输入区域。</p>)}</details>
       </section>
     </aside>
     <Dialog.Root open={artifactOpen&&visible} onOpenChange={open=>{setArtifactOpen(open);if(!open)++artifactGeneration.current;}}><Dialog.Portal><Dialog.Overlay className="boss-n02-dialog-overlay"/><Dialog.Content className="boss-n02-dialog" onCloseAutoFocus={event=>{event.preventDefault();if(visible&&artifactFocus.current?.isConnected)artifactFocus.current.focus({preventScroll:true});}}><Dialog.Title>当前产物与依据</Dialog.Title><Dialog.Description>根据当前会话的原运行引用，重新核查实际对象与来源。</Dialog.Description><Dialog.Close className="boss-icon-button" aria-label="关闭产物详情"><X size={18}/></Dialog.Close>
