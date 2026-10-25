@@ -58,6 +58,38 @@ def test_unbound_legacy_assignment_keeps_original_source_allowlist(store):
         ).fetchone()[0] == 0
 
 
+def test_valid_unrelated_source_cannot_be_pinned_to_selected_morning_item(store):
+    """Even a current BOSS-readable document cannot escape its selected item."""
+    commands = BossCommandAPI(store)
+    status, _ = commands.execute("MAINTAINER", "boss.knowledge.source.create", {
+        "client_request_id": "f01-unrelated-current-document",
+        "source_id": "sim-doc-f01-unrelated",
+        "title": "另一个事项的独立模拟依据",
+        "author_contact_id": "finance-1",
+        "published_at": "2026-10-22",
+        "content": "这份当前有效的模拟原文仅验证来源绑定，不能被未关联的晨间事项用作交办依据。",
+    })
+    assert status == 200
+    morning = MorningAPI(store)
+    view = query(morning, key="f01-isolated-source-query", date="2026-10-23")
+    item = next(row for row in view["items"] if row["kind"] == "meeting")
+    assert "sim-doc-f01-unrelated" not in {
+        ref["id"] for ref in item["source_refs"] if ref["kind"] == "document"
+    }
+    reference = {field: view[field] for field in ("list_id", "list_version", "snapshot_sha256")}
+    reference["item_id"] = item["item_id"]
+    status, result = commands.execute("BOSS", "boss.assignment.create", create_input(
+        "f01-cross-item-source-denied",
+        morning_reference=reference, source_refs=["sim-doc-f01-unrelated"],
+        related_meeting_id=None, related_event_ids=[],
+    ))
+    assert status == 409, result
+    with store.connect() as db:
+        assert db.execute(
+            "SELECT COUNT(*) FROM objects WHERE kind IN ('task','authorization','outbox')"
+        ).fetchone()[0] == 0
+
+
 def test_public_morning_day_preview_is_actual_and_strict(store):
     pages = BossPageAPI(store)
     days = [{"date": "2026-10-23", "timezone": "Asia/Shanghai"}, DAY]
