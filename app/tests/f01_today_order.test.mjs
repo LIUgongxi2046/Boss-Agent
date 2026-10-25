@@ -4,6 +4,8 @@ import {
   moveTodayOrderWithinCategory,
   todayOrderPosition,
   validateTodayOrderReceipt,
+  withoutTodayOrderRequest,
+  isConfirmedMissingTodayOrderReceipt,
 } from "../webui/today-order.ts";
 
 const rows = [
@@ -59,4 +61,29 @@ test("original sorting receipt accepts only exact matching non-writing lookup",(
   ]){
     assert.throws(()=>validateTodayOrderReceipt(bad,"r-1"),/回执/);
   }
+});
+
+test("confirmed saved sort removes only its own URL identifier",()=>{
+  const location="http://localhost:11322/?bossPage=F01&morningItem=task%3A123&todayOrderRequest=today-001&morningDate=2026-10-24";
+  const normalized=withoutTodayOrderRequest(location,"today-001");
+  const next=new URL(normalized);
+  assert.equal(next.searchParams.get("todayOrderRequest"),null);
+  assert.equal(next.searchParams.get("morningItem"),"task:123");
+  assert.equal(next.searchParams.get("bossPage"),"F01");
+  assert.equal(next.searchParams.get("morningDate"),"2026-10-24");
+  assert.equal(withoutTodayOrderRequest(location,"today-002"),null,
+    "a delayed request may not remove another original request");
+  assert.equal(withoutTodayOrderRequest(location,""),null);
+});
+
+test("a server-confirmed missing request alone unlocks explicit review dismissal",()=>{
+  const missing={action:"boss.today.reorder",client_request_id:"today-001",
+    outcome:"NOT_FOUND_IN_CURRENT_STORE",write_performed_by_lookup:false};
+  assert.equal(isConfirmedMissingTodayOrderReceipt(missing,"today-001"),true);
+  assert.equal(isConfirmedMissingTodayOrderReceipt(null,"today-001"),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt(missing,"today-002"),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,outcome:"RECORDED"},"today-001"),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,write_performed_by_lookup:true},"today-001"),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,action:"boss.assignment.send"},"today-001"),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt(missing,""),false);
 });
