@@ -147,6 +147,18 @@ def copy_overlay() -> None:
         json.dumps(catalogue, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
     )
+    # The source module lives in app/webui, while the installed module lives
+    # in the isolated nanobot/boss-agent directory. Rebase only this known
+    # design-metadata import onto the exact 72-page generated JSON.
+    navigation = BOSS_DIR / "delivered-navigation.ts"
+    navigation_source = navigation.read_text(encoding="utf-8")
+    original_meta_import = "../../Boss-Agent-Desktop-Complete-v6/meta/页面配置.json"
+    if navigation_source.count(original_meta_import) != 1:
+        raise RuntimeError("经营导航源码与已审核的72页设计引用不匹配，拒绝自动改写")
+    navigation.write_text(
+        navigation_source.replace(original_meta_import, "./page-meta.json", 1),
+        encoding="utf-8",
+    )
     shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")
     (BOSS_DIR / "supply-quality-v1.json").write_text(
         json.dumps(yaml.safe_load((ROOT / "data/simulation/supply-quality-v1.yaml").read_text()), ensure_ascii=False) + "\n", encoding="utf-8",
