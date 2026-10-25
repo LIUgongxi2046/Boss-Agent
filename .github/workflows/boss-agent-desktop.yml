@@ -78,10 +78,10 @@ jobs:
           cmp .work/product/boss-native-patches.json .work/product/boss-native-patches-first.json
       - name: Verify distributable matches recorded source and content hashes
         run: python scripts/verify_f01_candidate.py --bundle .work/product --require-head
-      - name: Archive immutable F01 integration candidate for manual Mac review
+      - name: Archive immutable authenticated desktop frontend candidate for current menu
         uses: actions/upload-artifact@v4
         with:
-          name: boss-f01-frontend-${{ github.sha }}
+          name: boss-agent-frontend-${{ github.sha }}
           path: |
             .work/product/nanobot/nanobot/web/dist/
             .work/product/boss-compiled-build.json
