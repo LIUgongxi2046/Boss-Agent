@@ -93,6 +93,8 @@ def copy_overlay() -> None:
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
         ("BossMenuNavigation.tsx", "BossMenuNavigation.tsx"),
+        ("boss-history.ts", "boss-history.ts"),
+        ("boss-route.ts", "boss-route.ts"),
         ("BossLogin.tsx", "BossLogin.tsx"),
         ("BossToday.tsx", "BossToday.tsx"),
         ("BossOwnerPlans.tsx", "BossOwnerPlans.tsx"),

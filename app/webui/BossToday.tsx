@@ -91,12 +91,12 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
     const payload={...orderScope,client_request_id:key,
       expected_version:data.order_version,snapshot_sha256:data.snapshot_sha256,item_ids:order};
     setOriginal(key);setPending(key);setReceipt(null);setBusy(true);setFailure("");
-    const address=new URL(window.location.href);address.searchParams.set("todayOrderRequest",key);window.history.replaceState(null,"",address);
+    const address=new URL(window.location.href);address.searchParams.set("todayOrderRequest",key);window.history.replaceState(window.history.state,"",address);
     await onReorder(payload).then(async()=>{if(version===epoch.current)await recover(key,undefined,version);},(reason:unknown)=>{
       if(version!==epoch.current)return;
       const status=typeof reason==="object"&&reason!==null&&"status" in reason?Number(reason.status):null;
       if(status!==null&&[400,401,403,404,409,410,413].includes(status)){
-        setPending("");const current=new URL(window.location.href);if(current.searchParams.get("todayOrderRequest")===key){current.searchParams.delete("todayOrderRequest");window.history.replaceState(null,"",current);}
+        setPending("");const current=new URL(window.location.href);if(current.searchParams.get("todayOrderRequest")===key){current.searchParams.delete("todayOrderRequest");window.history.replaceState(window.history.state,"",current);}
       }
       setFailure((status===409?"事项版本或本人次序已经变化；未保存编辑已保留，请核查当前资料。":reason instanceof Error?reason.message:String(reason))+"；原排序请求 "+key);
     });

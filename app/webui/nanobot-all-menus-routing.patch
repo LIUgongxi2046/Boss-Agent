@@ -1,0 +1,33 @@
+*** Begin Patch
+*** Update File: webui/src/App.tsx
+@@
+ import { BossDesktop } from "./boss-agent/BossDesktop";
++import {bossHistorySuppressed,pushBossHistory,replaceBossHistory} from "./boss-agent/boss-history";
+@@
+   if (replace) {
+-    window.history.replaceState(
+-      null,
+-      "",
+-      `${window.location.pathname}${window.location.search}${nextHash}`,
+-    );
++    replaceBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+     return;
+   }
+-  window.history.pushState(
+-    null,
+-    "",
+-    `${window.location.pathname}${window.location.search}${nextHash}`,
+-  );
++  pushBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+@@
+     const applyRoute = () => {
++      if(bossHistorySuppressed())return;
+       const route = readShellRoute();
+@@
+         onOpenNative={role => {
+-          if (role === "BOSS" && view !== "chat") onBackToChat();
+-          if (role === "MAINTAINER" && view === "chat") onOpenSettings(settingsInitialSection);
++          if(role === "BOSS" && view !== "chat")navigate({view:"chat",activeKey,settingsSection:"overview"},{replace:true});
++          if(role === "MAINTAINER" && view === "chat")navigate({view:shellViewForSettingsSection(settingsInitialSection),activeKey,settingsSection:settingsInitialSection},{replace:true});
+         }}
+*** End Patch

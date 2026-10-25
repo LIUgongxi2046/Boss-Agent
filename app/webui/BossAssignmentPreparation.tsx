@@ -29,7 +29,7 @@ export function BossAssignmentPreparation({taskId,taskVersion}:{taskId:string;ta
   async function prepare(){
     if(busy||unknown)return;
     const current=epoch.current,original="fc07-read-"+crypto.randomUUID();setKey(original);setReceipt(null);setBusy(true);setUnknown(true);setError("");
-    const url=new URL(window.location.href);url.searchParams.set("assignmentPreparation",original);url.searchParams.set("assignmentPreparationTask",taskId);window.history.replaceState(null,"",url);
+    const url=new URL(window.location.href);url.searchParams.set("assignmentPreparation",original);url.searchParams.set("assignmentPreparationTask",taskId);window.history.replaceState(window.history.state,"",url);
     await client.requestMutation("boss.assignment.prepare",{client_request_id:original,task_id:taskId,task_version:taskVersion}).then(async()=>{
       if(current===epoch.current)await read(original);
     }).catch(failure=>{if(current===epoch.current){setError(failure.message+"；请读取原请求编号。");if([400,401,403,404,409,410,413,422].includes(failure.status))setUnknown(false);if([401,403].includes(failure.status))setReceipt(null);}});

@@ -82,7 +82,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
   const submitted=[...chosenFeedback].reverse().find(f=>f.kind==="RESULT_SUBMITTED");
 
   function apply(){setApplied({coordinator,before,status,meeting});setPage(0);}
-  function changeTab(value:Tab){setTab(value);setPage(0);const url=new URL(window.location.href);url.searchParams.set("taskTab",value);window.history.replaceState(null,"",url);}
+  function changeTab(value:Tab){setTab(value);setPage(0);const url=new URL(window.location.href);url.searchParams.set("taskTab",value);window.history.replaceState(window.history.state,"",url);}
   return <div className="boss-task-center-view">
     <section className="boss-panel boss-task-center">
       <div className="boss-minutes-tabs" role="tablist" aria-label="任务与承诺分类">

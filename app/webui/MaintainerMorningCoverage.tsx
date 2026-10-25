@@ -28,7 +28,7 @@ export function MaintainerMorningCoverage(){
   async function load(){
     if(!catalog||busy||uncertain||!date||!timezone)return;
     const current=epoch.current,original="morning-coverage-"+crypto.randomUUID();setKey(original);setReceipt(null);setError("");setBusy(true);setUncertain(true);
-    const address=new URL(window.location.href);address.searchParams.set("morningCoverageRequest",original);window.history.replaceState(null,"",address);
+    const address=new URL(window.location.href);address.searchParams.set("morningCoverageRequest",original);window.history.replaceState(window.history.state,"",address);
     await client.requestMutation<NonNullable<Receipt["result"]>>("boss.simulation.morning_coverage.load",{client_request_id:original,date,timezone,mode:"SIMULATED",generator_version:catalog.definition.generator_version,seed:catalog.definition.seed,
       expected_version:catalog.loaded.find(value=>value.date===date&&value.timezone===timezone)?.version??"0"}).then(async result=>{
       if(current===epoch.current){setReceipt({client_request_id:original,outcome:"RECORDED",result});setUncertain(false);await refresh();}

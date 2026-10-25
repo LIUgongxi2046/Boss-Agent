@@ -275,7 +275,7 @@ export function BossLogin({ mode = "auth", failed = false, expired: expiredProp 
         <div className="boss-login-footer">
         <button type="button" className="boss-login-secondary boss-login-maintenance" disabled={busy} onClick={() => {
           const nextRole=role==="BOSS"?"MAINTAINER":"BOSS";setRole(nextRole);requestedRole=null;
-          const url=new URL(window.location.href),selected=url.searchParams.get("bossPage");if(selected&&deliveredPage(selected,role)&&!deliveredPage(selected,nextRole)){url.searchParams.delete("bossPage");window.history.replaceState(null,"",url);}
+          const url=new URL(window.location.href),selected=url.searchParams.get("bossPage");if(selected&&deliveredPage(selected,role)&&!deliveredPage(selected,nextRole)){url.searchParams.delete("bossPage");window.history.replaceState(window.history.state,"",url);}
           setValue(""); setUsername(""); setValidation(""); setVisible(false); input.current?.focus();
         }}>{role === "BOSS" ? "技术维护" : "返回本人登录"}</button>
         <button type="button" className="boss-login-secondary" disabled={busy} aria-expanded={helpOpen} aria-controls="boss-login-assistance" onClick={()=>setHelpOpen(current=>!current)}>认证帮助</button>

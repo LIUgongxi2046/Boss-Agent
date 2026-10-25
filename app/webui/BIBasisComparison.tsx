@@ -28,7 +28,7 @@ export function BIBasisComparison({current,request,onSource,reviewKey}:{current:
   },[key,request,refresh,reviewKey]);
   function choose(next:string[]){
     const address=new URL(window.location.href);address.searchParams.delete("biCompare");for(const identifier of next)address.searchParams.append("biCompare",identifier);
-    window.history.replaceState(null,"",address);setIds(next);
+    window.history.replaceState(window.history.state,"",address);setIds(next);
   }
   const actual=entries.flatMap(entry=>entry.read?[entry.read]:[]);
   const sameScope=actual.length===2&&comparable(actual[0].result.context_snapshot)===comparable(actual[1].result.context_snapshot);

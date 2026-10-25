@@ -77,6 +77,13 @@
 .boss-brand-caption{font-size:11px;line-height:1.55;color:#6682a0;margin:1px 7px 22px;white-space:nowrap}
 .boss-sidebar-label{font-size:11px;color:#7692ae;font-weight:750;letter-spacing:.08em;margin:12px 8px 8px}
 .boss-sidebar-nav{display:flex;flex-direction:column;gap:5px}
+.boss-nav-group>.boss-nav-item{width:100%}
+.boss-nav-group>h3{font-size:12px;color:#58748f;margin:12px 9px 6px}
+.boss-nav-pages{display:grid;gap:3px;padding:4px 0 10px 12px}
+.boss-nav-page{display:grid;gap:3px;min-height:44px;width:100%;padding:7px 9px;border:1px solid transparent;border-radius:8px;background:transparent;text-align:left;color:#375a7d}
+.boss-nav-page>span{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.boss-nav-page>small{font-size:10px;line-height:1.5;color:#6682a0}
+.boss-nav-page:hover,.boss-nav-page.selected{background:#eaf4ff;border-color:#cde3f8;color:#0753a1}
 .boss-nav-item{
   border:1px solid transparent;display:flex;align-items:center;gap:11px;
   min-height:46px;border-radius:11px;padding:11px 12px;

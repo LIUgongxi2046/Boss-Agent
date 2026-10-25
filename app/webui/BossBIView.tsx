@@ -143,9 +143,9 @@ export function BossBIView({getToken,onSource,initialScope,onDirtyChange}:{getTo
   function chooseScenario(identifier:string){
     generation.current++;receiptSequence.current++;restoredScope.current=false;setScenarioId(identifier);setDimensionSources(null);setScope({});setRead(null);setReceipt(null);setReceiptLoading(false);
     setRequestKey("");activeRequest.current="";setEvidence(null);setChanged(new Set());setDirty(false);setMode("NEW");setError("");setReceiptError("");
-    const address=new URL(window.location.href);address.searchParams.delete("biRequest");if(identifier)address.searchParams.set("biScenario",identifier);else address.searchParams.delete("biScenario");window.history.replaceState(null,"",address);
+    const address=new URL(window.location.href);address.searchParams.delete("biRequest");if(identifier)address.searchParams.set("biScenario",identifier);else address.searchParams.delete("biScenario");window.history.replaceState(window.history.state,"",address);
   }
-  function remember(key:string){const address=new URL(window.location.href);address.searchParams.set("biRequest",key);window.history.replaceState(null,"",address);}
+  function remember(key:string){const address=new URL(window.location.href);address.searchParams.set("biRequest",key);window.history.replaceState(window.history.state,"",address);}
   async function submit(){
     if(busy||!dimensions||denied.current)return;
     const key=crypto.randomUUID(),version=++generation.current,epoch=identityEpoch.current;activeRequest.current=key;setRequestKey(key);remember(key);

@@ -20,7 +20,7 @@ export function BossPersonalCommitments({items,businessClock,onReload,onDirtyCha
   const sourceRequest=useRef<AbortController|null>(null),epoch=useRef(0);
   const active=currentId?items.find(item=>item.commitment_id===currentId):items.find(item=>item.status==="ACTIVE")??items[0];
   function saved(){setPurpose("");setDue("");setRequiredProof("");setSourceId("");setSourceVersion("");setProofId("");setProofVersion("");setNewDue("");setReason("");setDocument(null);onReload();}
-  function select(id:string){setCurrentId(id);const url=new URL(window.location.href);url.searchParams.set("bossCommitment",id);window.history.replaceState(null,"",url);}
+  function select(id:string){setCurrentId(id);const url=new URL(window.location.href);url.searchParams.set("bossCommitment",id);window.history.replaceState(window.history.state,"",url);}
   const {propose,dialog,recovery,notice,busy}=useTransaction(saved,select,undefined,"commitment");
   useEffect(()=>{epoch.current++;sourceRequest.current?.abort();setDocument(null);return()=>{epoch.current++;sourceRequest.current?.abort();};},[token,active?.commitment_id,sourceId,sourceVersion,proofId,proofVersion]);
   useEffect(()=>{onDirtyChange(Boolean(purpose||due||requiredProof||sourceId||sourceVersion||proofId||proofVersion||newDue||reason||busy));},[purpose,due,requiredProof,sourceId,sourceVersion,proofId,proofVersion,newDue,reason,busy,onDirtyChange]);

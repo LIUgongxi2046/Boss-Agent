@@ -19,7 +19,7 @@ export function BossOriginalReceipt({scope,actions,onRecorded}:{scope:string;act
       if(receipt.outcome!=="RECORDED"||!receipt.result)throw new Error("原请求结果仍未确定，请继续查询同一编号。");
       const object=action.startsWith("boss.alert.")?receipt.result.event_id:receipt.result.task_id??receipt.result.task?.task_id??receipt.result.commitment_id??receipt.result.event_id??receipt.result.plan_id;
       if(target&&object!==target)throw new Error("原回执不属于当前记录的对象");
-      const url=new URL(window.location.href);if(url.searchParams.get(scope+"Request")!==id||url.searchParams.get(scope+"Action")!==action)throw new Error("当前原请求编号已经变化，请重新核查。");for(const suffix of ["Request","Action","Target"])url.searchParams.delete(scope+suffix);window.history.replaceState(null,"",url);onRecorded();
+      const url=new URL(window.location.href);if(url.searchParams.get(scope+"Request")!==id||url.searchParams.get(scope+"Action")!==action)throw new Error("当前原请求编号已经变化，请重新核查。");for(const suffix of ["Request","Action","Target"])url.searchParams.delete(scope+suffix);window.history.replaceState(window.history.state,"",url);onRecorded();
     }).catch(failure=>{if(current===epoch.current)setError(failure.message);});
     if(current===epoch.current)setBusy(false);
   }

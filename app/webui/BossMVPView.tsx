@@ -12,7 +12,7 @@ type Saved={action:string;client_request_id:string;outcome:string;result:{task_i
 type Document={source_id:string;version:string;content:string;author_contact_id?:string;author_display_name?:string;published_at?:string;observed_at?:string;original_locator?:unknown};
 const titles:Record<string,string>={INBOUND_RECEIPT:"入库报告成本",ACTUAL_CONSUMPTION:"实际领用报告成本"};
 const shown=(value:string|null)=>value??"未知";
-function remember(values:Record<string,string|null>){const url=new URL(window.location.href);for(const [key,value] of Object.entries(values)){if(value===null)url.searchParams.delete(key);else url.searchParams.set(key,value);}window.history.replaceState(null,"",url);}
+function remember(values:Record<string,string|null>){const url=new URL(window.location.href);for(const [key,value] of Object.entries(values)){if(value===null)url.searchParams.delete(key);else url.searchParams.set(key,value);}window.history.replaceState(window.history.state,"",url);}
 
 export function BossMVPView({contacts,onDirtyChange,refreshVersion,onOpenTask}:{contacts:{contact_id:string;name:string}[];onDirtyChange:(value:boolean)=>void;refreshVersion:number;onOpenTask?:(id:string)=>void}){
   const {client,getToken,token}=useClient();
