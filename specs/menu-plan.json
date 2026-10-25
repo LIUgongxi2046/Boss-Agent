@@ -206,7 +206,7 @@
     "A16",
     "F27"
   ],
-  "queue_basis": "INFERRED_WITHIN_AUTHORIZATION：今日入口、会话和经营操作优先，随后会议/任务/设置及维护；每项完整菜单交付，分组仅组织页面。真实必要依赖可有据调整，不能删除未完成需求",
+  "queue_basis": "INFERRED_WITHIN_AUTHORIZATION：今日入口、会话和经营操作优先，随后会议/任务/设置及维护；每项完整菜单交付，分组仅组织页面。真实必要依赖可有据调整，不能删除未完成需求；2026-10-25最新明确指令调整当前唯一执行优先级为N02，F01 v7保留待验收，原完整排队目录不变",
   "shared_pages": [
     "N01",
     "D01",
@@ -247,13 +247,34 @@
   "handoff_marker": "MENU-F01-START-20261024",
   "monitor_interval_minutes": 30,
   "scope_change_adds_completed_items": false,
-  "revalidation_decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
+  "revalidation_decision_id": "D-NEXT-MENU-N02-20261025",
   "revalidation_queue": [
-    "F01",
     "N02",
     "N03"
   ],
-  "revalidation_requirement": "先对已有F01、N02的v6限定开发证据重新核验最新main与Desktop v7，满足当前完整PRD和真实前后端/独立构建证据再进N03；N03既有源码和进度冻结复用。原菜单后续顺序及暂停F27保持不变。",
+  "revalidation_requirement": "用户最新指令批准F01工程冻结但v7/用户验收后置，当前从N02重新核验v7完整26项并继续实际开发；旧N02 v6 26/26历史证据保留。N03现有代码仍冻结，不并行实施；进入N03及何时回补F01根据用户最新优先级与正式准入决定，不视F01验收已通过。",
   "revalidation_visual_boundary": "v7长页包不在GitHub可重建源码内；现有源尺寸审查可用，但HTML/CSS/交互逐页成对实测尚未完成；原禁止主动视觉/截图继续适用",
-  "revalidation_preserve": "已有F01 18/18和N02 26/26作为v6历史开发覆盖保存；新轮逐项复核从0计，不撤销历史证明、不重置数据库或已实现能力"
+  "revalidation_preserve": "已有F01 18/18和N02 26/26作为v6历史开发覆盖保存；新轮逐项复核从0计，不撤销历史证明、不重置数据库或已实现能力",
+  "previous_revalidation_decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
+  "current_execution_override": {
+    "decision_id": "D-NEXT-MENU-N02-20261025",
+    "active_menu": "N02",
+    "full_current_checkpoints": 26,
+    "last_menu": "F01",
+    "last_menu_state": "F01_ENGINEERING_FROZEN_V7_AND_USER_ACCEPTANCE_PENDING",
+    "last_menu_evidence": "docs/menu-delivery/F01/closeout.md",
+    "deferred_revalidation": [
+      "F01"
+    ],
+    "suspended_parallel_menu": [
+      "N03"
+    ],
+    "restriction": "ONE_ACTIVE_MENU_ONLY_EXPLICIT_USER_PRIORITY_NO_ACCEPTANCE_WAIVER",
+    "preserve_original_queue": true,
+    "automatic_conversation_dispatch": false,
+    "automatic_supervision": false
+  },
+  "deferred_revalidation_ids": [
+    "F01"
+  ]
 }
