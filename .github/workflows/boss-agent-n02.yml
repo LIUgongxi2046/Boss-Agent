@@ -1,0 +1,64 @@
+name: Boss-Agent N02 scoped validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "validation/**"
+      - "scripts/**"
+      - "specs/**"
+      - ".github/workflows/boss-agent-n02.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  n02-current-contracts:
+    name: N02 domain, task entry, and actual native business contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked product and native nanobot dependencies
+        run: uv sync --project validation --locked
+      - name: Create project-local isolated test directories
+        run: mkdir -p .work/ci-pytest .work/ci-tmp
+      - name: N02 selected-context and async-scope security regressions
+        run: node --test app/tests/n02-context-guard.test.mjs
+      - name: N02 real domain, attachment, history, and task-reference boundaries
+        env:
+          PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests
+          MENU_N02_PRODUCT_ROOT: ${{ github.workspace }}
+          MENU_N02_CONVERSATION_ROOT: ${{ github.workspace }}
+          TMPDIR: ${{ github.workspace }}/.work/ci-tmp
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --project validation --no-sync python -m pytest -q
+          --basetemp .work/ci-pytest/n02-domain
+          app/tests/test_menu_n02_domain.py
+          app/tests/test_menu_n02_native_files.py
+          app/tests/test_menu_n02_context_references.py
+          app/tests/test_menu_n02_task_entry.py
+          app/tests/test_menu_n02_task_references.py
+      - name: N02 actual SessionManager and AgentLoop adapters (no external calls)
+        env:
+          PYTHONPATH: ${{ github.workspace }}/validation:${{ github.workspace }}/app/tests:${{ github.workspace }}/app/tests/conversation_agent
+          CONVERSATION_DOMAIN_ROOT: ${{ github.workspace }}
+          TMPDIR: ${{ github.workspace }}/.work/ci-tmp
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --project validation --no-sync python -m pytest -q
+          --basetemp .work/ci-pytest/n02-native
+          app/tests/conversation_agent/test_requests.py
+          app/tests/conversation_agent/test_task_entry_consumer.py
+          app/tests/conversation_agent/test_current_references.py
+          app/tests/conversation_agent/test_business_consumer.py
