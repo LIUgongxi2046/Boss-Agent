@@ -1,4 +1,28 @@
 # MENU-N02 聊天交办
+## 2026-10-25 从F01工程冻结切换至N02：当前v7第一批集成接收
+
+根据用户最新明确指令 `D-NEXT-MENU-N02-20261025`，先完整阅读 `docs/开发接手与执行规范.md`、`AGENTS.md`、正式 `specs/feature-delivery.json`、队列、N02原26项、FR-08/24/29 与共享 E01—E06、现有v6 HTML/加载CSS和全部 N02 正式记录，再核对 `main`。**从这批起本文件下方“DEVELOPED_PENDING_USER_ACCEPTANCE，26/26”属于之前 Desktop v6 限定交付历史**，绝不代替当前 Desktop v7 严格版验收。当前唯一活动 `MENU-N02`、v7 完整0/26、视觉未执行、用户待确认。F01 冻结源码 `5ac660330fce99c925163f06a62951563a24d383`，完整v7/目标Mac验收后置但未获批准降级；N03 源码与26项状态原样暂停保存，没有多菜单并行、自动认证、任何工作聊天的自动调度。
+
+### N02 已修复真实问题、准确源及消费者
+
+| 缺陷/对应要求 | 真实修改、实际消费者与恢复规则 |
+|---|---|
+| **当前任务上下文可能过期**；C07/C20/C21 | `50759cb`新增 `app/webui/n02-context-guard.ts`，`f672af7`/`1124446` 修改正式 `BossConversationWorkspace.tsx`：在连接断开、会话/身份变化、重新校验期间及 `boss.conversation.task.read` 失败后，不再将上一次 BOUND 任务及来源显示为当前有效的可操作对象。只展示同一 BOSS 当前连接并由正规接口成功核查的记录；原历史审计仍可读，不自动改业务结果 |
+| **较早经营绑定响应覆盖当前会话**；C20/C21 | `sameActiveN02Scope` 对客户端实例、token、聊天ID、角色、可见页面和连接状态逐一匹配；旧响应与失败不能回写新身份/新会话。采用 `boss.conversation.business.read` 现有接口，不另造服务或越过后端 |
+| **阅读位置重试误取消自身**；C23/C25 | `481707a`/`ba9b2f2`：恢复失败后的“重新定位原消息”按钮保留原 `conversationPosition` 技术坐标，不再在 click-capture/Enter/Space 阶段触发取消；Tab/Shift+Tab导航保留可达。用户主动在其它页面位置点选或其他键盘交互仍可中断旧恢复请求。保留 `BossConversationPosition` 与原生 `ThreadViewport` 阅读控制器的同一实现 |
+| **断线/离开时运行资料仍显示上次当前值**；C09/C15/C18/C21 | `d1436ab`：`BossConversationWorkspace` 在非当前 BOSS/关闭连接/隐藏页面时，清除当前已采用的运行、附件及原请求列表，在原位置明确说明需连接后重读。既有的原生消息记录与用户输入由 SessionManager 和原草稿保护机制独立保存，**未删除实际会话或发件箱** |
+
+**实测范围：**`40202750401` 的 N02 独立 GitHub Actions workflow 为 **Node 4/4、正式 SQLite/业务/任务/附件/来源 37/37、真实 nanobot AgentLoop/SessionManager/Registry 回归 59/59，合计100项 PASS/0 FAIL**。领域用例原有一个早期夹具未接入真实原生 SessionManager（对应晨间/任务入口互斥）导致首次 CI 失败；`903d9af` 调整为原 `ProductMorning.native.bind_sessions(sessions)` 正式注入，保持互斥和权限拒绝断言，没有跳过测试或伪造SDK。
+
+固定上游产品构建 `40202750383` 中 `react-webui-build` 为 **PASS**，包含 nanobot锁定源码、签入原生补丁、真实TypeScript/Vite、再准备 manifest一致、真实dist/资源哈希与 Electron主进程语法；整个 workflow 的另一个 `python-domain-contract` 因之前 N03 代码/环境失败仍显示**FAILURE**，本次没有修改/屏蔽N03。该构建的**产品源码提交** `d1436abc614dbfeb842421b5b1bdefe53d9d5df9`；GitHub Actions `boss-agent-frontend-d1436abc614dbfeb842421b5b1bdefe53d9d5df9`，artifact ID **12603035088**，约10.8MB，GitHub报告 ZIP SHA256 `d436ac9bc8684d0a26a2c1b4f0e03a5b622a3d90d86b330e0cf782f37a019f3a`，**2026-11-08到期**；内容只有完整静态前端与编译来源摘要，不包含Mac安装包/账号/个人SQLite。复用 `scripts/verify_f01_candidate.py` 中的**通用只读产品哈希验证**（旧文件名不表示这是F01版本），后续人工运行应使用对应原始 `repo_commit` 的隔离工作树而非旧N02 v6体验目录。
+
+### 当前必需的未验证项与继续实施顺序
+
+既有N02旧版`docs/menu-delivery/N02/delivery.json` 的26/26和旧UI/布局/启动器证据保留为同版本历史，不作为新版分子。新版仍缺 Desktop v7 N02（历史摘要2880×5256）的完整原HTML、加载CSS/JS与引用素材原字节，目前仅可读取 Library ZIP 名称/尺寸而无法用于本任务成对 DOM/计算样式对照；当前目标Mac手动登录、原生连续操作、真实Dialog/焦点/滚动、断连及同库持久化的**本候选实际 GUI**也尚未进行。不要沿用旧 `scripts/run_menu_n02.command` 的v6制品宣称当前main体验完成。
+
+进入下轮时只推进 N02 真实已证实的阻断级缺陷、当前FR/BR/AC必要行为和独立验证。不得重新启动 F01 普通开发、并行 N03、打开视觉/截图或自动账号初始化；保持 SIMULATED_FIRST、STT 暂停。正式26项里，已有功能与模拟/源码集成证据在本节准确列明，但当前所有必需视觉结构/真实整页状态/准确GUI尚未成对确认，所以 **新版完整0/26** 与用户待验收在唯一状态中保留，避免走之前F01无限叠加局部测试的循环。
+
+
 
 task_id=MENU-N02-N3；CURRENT；2026-10-25；DEVELOPED_PENDING_USER_ACCEPTANCE。唯一正式状态来源为原始specs/feature-delivery.json。完整稳定范围MENU-N02.C01—C26，baseline_id=boss-menu-n02-coverage-20261024-v1；当前开发覆盖26/26，用户通过分子null，视觉及用户验收独立待确认。完整逐项证据为本目录delivery.json，连续操作为experience.md。
 
