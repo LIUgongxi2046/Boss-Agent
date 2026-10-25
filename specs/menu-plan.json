@@ -25,30 +25,235 @@
   "task_id_rule": "MENU-<page_id>",
   "ticket_rule": "当前激活前在docs/menu-delivery/<page_id>.md提取完整FR/BR/AC及设计状态，保留稳定需求检查点，不能按现有代码缩减",
   "menu_groups": [
-    {"id": "today", "title": "今日工作", "pages": ["F01", "F11"]},
-    {"id": "chat", "title": "聊天交办", "pages": ["N02", "F08", "F24", "F29", "F27"]},
-    {"id": "business", "title": "经营关注", "pages": ["N03", "F02", "F03", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23"]},
-    {"id": "meetings", "title": "会议与资料", "pages": ["N04", "F04", "F05", "F07", "F09", "F10"]},
-    {"id": "tasks", "title": "任务与承诺", "pages": ["N05", "F06"]},
-    {"id": "preferences", "title": "通知与设置", "pages": ["N06", "N07", "N08", "N09", "N10", "F28", "N11", "F12", "F13", "F26"]},
-    {"id": "simulation", "title": "模拟中心", "pages": ["F25", "A02", "A03", "A04", "A11"]},
-    {"id": "access", "title": "档案与访问", "pages": ["A01", "A12", "A14"]},
-    {"id": "agent", "title": "Agent配置", "pages": ["A05", "A06", "A07", "A08", "A09", "A10", "A13"]},
-    {"id": "operations", "title": "运行与评测", "pages": ["N12", "F30", "F31", "F32", "A15", "A16"]}
+    {
+      "id": "today",
+      "title": "今日工作",
+      "pages": [
+        "F01",
+        "F11"
+      ]
+    },
+    {
+      "id": "chat",
+      "title": "聊天交办",
+      "pages": [
+        "N02",
+        "F08",
+        "F24",
+        "F29",
+        "F27"
+      ]
+    },
+    {
+      "id": "business",
+      "title": "经营关注",
+      "pages": [
+        "N03",
+        "F02",
+        "F03",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23"
+      ]
+    },
+    {
+      "id": "meetings",
+      "title": "会议与资料",
+      "pages": [
+        "N04",
+        "F04",
+        "F05",
+        "F07",
+        "F09",
+        "F10"
+      ]
+    },
+    {
+      "id": "tasks",
+      "title": "任务与承诺",
+      "pages": [
+        "N05",
+        "F06"
+      ]
+    },
+    {
+      "id": "preferences",
+      "title": "通知与设置",
+      "pages": [
+        "N06",
+        "N07",
+        "N08",
+        "N09",
+        "N10",
+        "F28",
+        "N11",
+        "F12",
+        "F13",
+        "F26"
+      ]
+    },
+    {
+      "id": "simulation",
+      "title": "模拟中心",
+      "pages": [
+        "F25",
+        "A02",
+        "A03",
+        "A04",
+        "A11"
+      ]
+    },
+    {
+      "id": "access",
+      "title": "档案与访问",
+      "pages": [
+        "A01",
+        "A12",
+        "A14"
+      ]
+    },
+    {
+      "id": "agent",
+      "title": "Agent配置",
+      "pages": [
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A10",
+        "A13"
+      ]
+    },
+    {
+      "id": "operations",
+      "title": "运行与评测",
+      "pages": [
+        "N12",
+        "F30",
+        "F31",
+        "F32",
+        "A15",
+        "A16"
+      ]
+    }
   ],
-  "queue": ["F01", "N02", "N03", "F02", "F03", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "N04", "F04", "F05", "F07", "F09", "F10", "F11", "N05", "F06", "F08", "F24", "F29", "N06", "N07", "N08", "N09", "N10", "F28", "N11", "F12", "F13", "F26", "N12", "F30", "F31", "F32", "F25", "A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "F27"],
+  "queue": [
+    "F01",
+    "N02",
+    "N03",
+    "F02",
+    "F03",
+    "F14",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F21",
+    "F22",
+    "F23",
+    "N04",
+    "F04",
+    "F05",
+    "F07",
+    "F09",
+    "F10",
+    "F11",
+    "N05",
+    "F06",
+    "F08",
+    "F24",
+    "F29",
+    "N06",
+    "N07",
+    "N08",
+    "N09",
+    "N10",
+    "F28",
+    "N11",
+    "F12",
+    "F13",
+    "F26",
+    "N12",
+    "F30",
+    "F31",
+    "F32",
+    "F25",
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "F27"
+  ],
   "queue_basis": "INFERRED_WITHIN_AUTHORIZATION：今日入口、会话和经营操作优先，随后会议/任务/设置及维护；每项完整菜单交付，分组仅组织页面。真实必要依赖可有据调整，不能删除未完成需求",
-  "shared_pages": ["N01", "D01", "D02", "D03", "D04", "D05", "D06", "D07", "D08", "D09"],
-  "variants": {"F19": ["V19-EGG", "V19-MILK", "V19-BEEF"]},
-  "paused_pages": ["F27"],
+  "shared_pages": [
+    "N01",
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09"
+  ],
+  "variants": {
+    "F19": [
+      "V19-EGG",
+      "V19-MILK",
+      "V19-BEEF"
+    ]
+  },
+  "paused_pages": [
+    "F27"
+  ],
   "paused_scope": "STT/FC28保持用户暂停；菜单分母保留，暂停不计完成，其他菜单继续",
-  "completion_dimensions": ["BUSINESS", "DESIGN_STRUCTURE_AND_STYLE", "INTERACTION_AND_STATES", "RUNNABLE_DELIVERY"],
-  "separate_acceptance_dimensions": ["VISUAL_USER_REVIEW", "USER_ACCEPTANCE"],
+  "completion_dimensions": [
+    "BUSINESS",
+    "DESIGN_STRUCTURE_AND_STYLE",
+    "INTERACTION_AND_STATES",
+    "RUNNABLE_DELIVERY"
+  ],
+  "separate_acceptance_dimensions": [
+    "VISUAL_USER_REVIEW",
+    "USER_ACCEPTANCE"
+  ],
   "visual_tools": "PROHIBITED_UNLESS_USER_AUTHORIZES",
   "allowed_design_checks": "原设计HTML/规范与实际页面的DOM、计算样式、位置尺寸、区域顺序、层级、动作及响应式行为对照；不得据此伪造视觉相似度",
   "external_api_mode": "SIMULATED_FIRST",
   "new_real_external_requests": false,
   "handoff_marker": "MENU-F01-START-20261024",
   "monitor_interval_minutes": 30,
-  "scope_change_adds_completed_items": false
+  "scope_change_adds_completed_items": false,
+  "revalidation_decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
+  "revalidation_queue": [
+    "F01",
+    "N02",
+    "N03"
+  ],
+  "revalidation_requirement": "先对已有F01、N02的v6限定开发证据重新核验最新main与Desktop v7，满足当前完整PRD和真实前后端/独立构建证据再进N03；N03既有源码和进度冻结复用。原菜单后续顺序及暂停F27保持不变。",
+  "revalidation_visual_boundary": "v7长页包不在GitHub可重建源码内；现有源尺寸审查可用，但HTML/CSS/交互逐页成对实测尚未完成；原禁止主动视觉/截图继续适用",
+  "revalidation_preserve": "已有F01 18/18和N02 26/26作为v6历史开发覆盖保存；新轮逐项复核从0计，不撤销历史证明、不重置数据库或已实现能力"
 }
