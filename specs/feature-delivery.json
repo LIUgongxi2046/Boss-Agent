@@ -31,7 +31,35 @@
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
     "independent_current_main_build": "FAILED_SOURCE_INTEGRATION",
     "latest_clean_build_run_id": 40161702949,
-    "paused_menu": "MENU-N03"
+    "paused_menu": "MENU-N03",
+    "scoped_engineering_evidence": {
+      "native_integration_commits": [
+        "855edf4af6ca681dc23dff04abed06445c90e213",
+        "df940f7db3df2c4b80712727ad8248396ea45f61",
+        "0d320b5c92d6749f5dab1e6a4567f32f47542547"
+      ],
+      "desktop_build": {
+        "result": "PASS",
+        "job_id": 121079563848,
+        "run_id": 40163435064,
+        "scope": "PINNED_SOURCE_TYPESCRIPT_VITE_ELECTRON_SYNTAX"
+      },
+      "repeat_preparation": {
+        "result": "PASS",
+        "job_id": 121080102274,
+        "run_id": 40163625105,
+        "scope": "SECOND_APPLY_AND_MANIFEST_IDEMPOTENCE"
+      },
+      "f01_business": {
+        "result": "41_PASSED_0_FAILED",
+        "run_id": 40163532726,
+        "scope": "CURRENT_CODE_TESTS_SIMULATED_DOMAIN_PUBLIC_API"
+      },
+      "current_full_f01_e2e": "NOT_RUN",
+      "design_v7_dom_and_visual": "NOT_RUN",
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "main_legacy_comprehensive_suite": "FAILS_OUTSIDE_CURRENT_F01_SCOPE"
+    }
   },
   "suspended_current_menu": {
     "active_feature_id": "MENU-N03",
