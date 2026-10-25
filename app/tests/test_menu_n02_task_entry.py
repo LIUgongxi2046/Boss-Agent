@@ -245,6 +245,10 @@ def test_existing_morning_entry_cannot_be_taken_over_by_task_entry(task_entry):
     from product_morning import ProductMorning
     store, commands, task, sessions, entry, request = task_entry
     morning = ProductMorning(store)
+    # ProductMorning is only a service factory. In the actual runtime the
+    # pinned Nanobot AgentLoop injects its live SessionManager before binding.
+    # Reuse this test's real session manager, not a fake SDK or skipped check.
+    morning.native.bind_sessions(sessions)
     morning.native.bind("BOSS", "n02-entry-morning-original", {"chat_id": CHAT, "date": "2026-10-24", "timezone": "Asia/Shanghai"},
         attached=lambda chat: chat == CHAT, active=lambda: True)
     prepared = entry.prepare("BOSS", request)
