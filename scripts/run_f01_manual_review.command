@@ -7,7 +7,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUNDLE="${BOSS_F01_REVIEW_BUNDLE:-$ROOT/.work/product}"
 REVIEW_WORK="${BOSS_F01_REVIEW_WORK_DIR:-$ROOT/validation/.work/menu-f01-v7-review-local}"
-PORTS='${BOSS_F01_REVIEW_PORTS:-{"business":11321,"webui":11322,"gateway":21321}}'
+PORTS="${BOSS_F01_REVIEW_PORTS:-}"
+if [[ -z "$PORTS" ]]; then
+  PORTS='{"business":11321,"webui":11322,"gateway":21321}'
+fi
 PYTHON="$ROOT/validation/.venv/bin/python"
 ELECTRON="$ROOT/validation/desktop/node_modules/.bin/electron"
 
