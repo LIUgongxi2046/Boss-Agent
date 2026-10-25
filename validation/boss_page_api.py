@@ -166,7 +166,8 @@ class BossPageAPI:
                 "task_id": row["task_id"],
                 "type": "ASSIGNMENT_NUDGE",
                 "recipient_id": row["recipient_id"],
-                "body": row["body"],
+                # Keep the authored nudge in its protected record; public task
+                # summaries expose only delivery/status metadata, never text.
                 "authorization_id": row.get("authorization_id"),
                 "sent_at": row["sent_at"],
                 "business_at": row["business_at"],
