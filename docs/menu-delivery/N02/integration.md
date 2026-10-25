@@ -16,6 +16,12 @@
 
 固定上游产品构建 `40202750383` 中 `react-webui-build` 为 **PASS**，包含 nanobot锁定源码、签入原生补丁、真实TypeScript/Vite、再准备 manifest一致、真实dist/资源哈希与 Electron主进程语法；整个 workflow 的另一个 `python-domain-contract` 因之前 N03 代码/环境失败仍显示**FAILURE**，本次没有修改/屏蔽N03。该构建的**产品源码提交** `d1436abc614dbfeb842421b5b1bdefe53d9d5df9`；GitHub Actions `boss-agent-frontend-d1436abc614dbfeb842421b5b1bdefe53d9d5df9`，artifact ID **12603035088**，约10.8MB，GitHub报告 ZIP SHA256 `d436ac9bc8684d0a26a2c1b4f0e03a5b622a3d90d86b330e0cf782f37a019f3a`，**2026-11-08到期**；内容只有完整静态前端与编译来源摘要，不包含Mac安装包/账号/个人SQLite。复用 `scripts/verify_f01_candidate.py` 中的**通用只读产品哈希验证**（旧文件名不表示这是F01版本），后续人工运行应使用对应原始 `repo_commit` 的隔离工作树而非旧N02 v6体验目录。
 
+### 新版N02人工验收启动器与准确制品
+
+`2a8a4f5` 在 N02 唯一当前菜单内新增 `scripts/run_n02_manual_review.command`，该入口只做编译来源/本地 HEAD/哈希一致性、手工预置的独立账号目录/端口及前端目录安全检查，**不会自行登录、自动初始化、读取凭据正文、修改现有用户 N02/F01/UI02/MVP 或触发真实外部调用**。新默认独立端口 `11421/11422/21421`，新资料目录必须单独命名为 `menu-n02-v7-review-*`；若缺少用户准备则安全失败退出，不将此视为运行成功。CI `b5b05d2` 还校验该 Shell 语法。
+
+**能够同时提供新启动器与实际对应编译制品的准确仓库提交为 `b5b05d2da40299045cae36842006edf87c211ef9`**；经 GitHub compare 从产品源码 `d1436abc614dbfeb842421b5b1bdefe53d9d5df9` 到 `b5b05d2` 仅 CI/N02交接/正式状态/新增启动器变化，前端功能代码未变化。新提交的 `40203082570` 中 `react-webui-build` PASS、整个 workflow 因 N03 旧 Python job 仍 FAILURE；准确产物 `boss-agent-frontend-b5b05d2da40299045cae36842006edf87c211ef9`、artifact ID `12603230096`、GitHub ZIP SHA256 `f71ef50d4a2af43c76047bd7f4beb8b086e5ebc84142c8377bfa5ba31915afd4`，约10.8 MB，2026-11-08 到期。后来的文档更新不改变该编译产物。实际手动体验步骤和必需阻碍见 `docs/menu-delivery/N02/experience-v7-revalidation.md`。这个 ZIP 仅静态前端，不等于完整 Mac 安装包、用户已登录或v7高保真通过。
+
 ### 当前必需的未验证项与继续实施顺序
 
 既有N02旧版`docs/menu-delivery/N02/delivery.json` 的26/26和旧UI/布局/启动器证据保留为同版本历史，不作为新版分子。新版仍缺 Desktop v7 N02（历史摘要2880×5256）的完整原HTML、加载CSS/JS与引用素材原字节，目前仅可读取 Library ZIP 名称/尺寸而无法用于本任务成对 DOM/计算样式对照；当前目标Mac手动登录、原生连续操作、真实Dialog/焦点/滚动、断连及同库持久化的**本候选实际 GUI**也尚未进行。不要沿用旧 `scripts/run_menu_n02.command` 的v6制品宣称当前main体验完成。
