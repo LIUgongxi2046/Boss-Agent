@@ -49,7 +49,7 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
       if(epoch.current!==current||generation.current!==sequence)return;
       if(result.projection!=="business-overview"||!sameScope(result.applied_scope,scope)||result.business_mutation_performed!==false||result.business_authorization_granted!==false||result.topics.length!==10||result.topics.some((row,index)=>row.page_id!=="F"+(index+14)))throw new Error("经营总览没有采用当前正式范围和完整专题");
       setView(result);viewRef.current=result;setDraft(result.applied_scope);setDirty(false);setStale(false);setLoading(false);saveScope(result.applied_scope);
-    },reason=>{if(epoch.current===current&&generation.current===sequence){setLoading(false);failure(reason);}});
+    }).catch(reason=>{if(epoch.current===current&&generation.current===sequence){setLoading(false);failure(reason);}});
   },[client,failure]);
   useEffect(()=>{
     const current=++epoch.current,abort=new AbortController();++generation.current;++detailGeneration.current;
@@ -95,13 +95,13 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
   },[visible,loading,view]);
   function capture(active:HTMLElement|null=window.document.activeElement instanceof HTMLElement?window.document.activeElement:null){const area=root.current?.closest<HTMLElement>(".boss-content");if(!area||!active?.id||!root.current?.contains(active))throw new Error("经营关注返回需要明确控件与滚动区域");returnPoint.current={scroll:area.scrollTop,focus:active.id};remember({overviewScroll:String(area.scrollTop),overviewFocus:active.id});}
   function edit(changes:Partial<OverviewScope>){++generation.current;setLoading(false);setDraft(current=>current?{...current,...changes}:current);setDirty(true);setError("");}
-  function currentAction(action:(current:Overview)=>void){const before=viewRef.current;if(!before||dirty||loading||denied||stale)return;capture();const current=epoch.current,sequence=++generation.current;setLoading(true);setError("");void client.requestMutation<Overview>("boss.business_overview.read",before.applied_scope).then(result=>{if(current!==epoch.current||sequence!==generation.current)return;setLoading(false);if(result.snapshot_sha256!==before.snapshot_sha256){setView(result);setDetail(null);setSource(null);setDialogOpen(false);setError("资料已经变化，当前内容已重新核查；请核对后再次选择操作。");return;}action(result);},reason=>{if(current===epoch.current&&sequence===generation.current){setLoading(false);failure(reason);}});}
+  function currentAction(action:(current:Overview)=>void){const before=viewRef.current;if(!before||dirty||loading||denied||stale)return;capture();const current=epoch.current,sequence=++generation.current;setLoading(true);setError("");void client.requestMutation<Overview>("boss.business_overview.read",before.applied_scope).then(result=>{if(current!==epoch.current||sequence!==generation.current)return;setLoading(false);if(result.snapshot_sha256!==before.snapshot_sha256){setView(result);setDetail(null);setSource(null);setDialogOpen(false);setError("资料已经变化，当前内容已重新核查；请核对后再次选择操作。");return;}action(result);}).catch(reason=>{if(current===epoch.current&&sequence===generation.current){setLoading(false);failure(reason);}});}
   function openTopic(pageId:string){
     if(!view||dirty||denied||stale)return;
     const current=epoch.current,sequence=++detailGeneration.current;setSelected(pageId);remember({overviewTopic:pageId});trigger.current=window.document.activeElement instanceof HTMLElement?window.document.activeElement:null;
     if(pageId!=="F19"){setSelectedUse(null);remember({overviewUse:null});}
     setDetail(null);setSource(null);setDetailLoading(true);setDialogOpen(true);setError("");
-    void client.requestMutation<OverviewDetail>("boss.business_overview.detail",{scope:view.applied_scope,page_id:pageId,snapshot_sha256:view.snapshot_sha256}).then(result=>{if(current!==epoch.current||sequence!==detailGeneration.current)return;if(result.topic.page_id!==pageId)throw new Error("经营专题详情与当前选择不符");setDetail(result);setDetailLoading(false);},reason=>{if(current===epoch.current&&sequence===detailGeneration.current){setDetailLoading(false);failure(reason);}});
+    void client.requestMutation<OverviewDetail>("boss.business_overview.detail",{scope:view.applied_scope,page_id:pageId,snapshot_sha256:view.snapshot_sha256}).then(result=>{if(current!==epoch.current||sequence!==detailGeneration.current)return;if(result.topic.page_id!==pageId)throw new Error("经营专题详情与当前选择不符");setDetail(result);setDetailLoading(false);}).catch(reason=>{if(current===epoch.current&&sequence===detailGeneration.current){setDetailLoading(false);failure(reason);}});
   }
   function openSource(sourceId:string){
     if(!view||!detail||stale)return;
@@ -114,7 +114,7 @@ export function BossBusinessOverview({visible,refreshVersion,discardVersion,onDi
       if(current!==epoch.current||sequence!==detailGeneration.current)return;
       if(result.source_id!==expected.source_id||result.version!==expected.version||checked.snapshot_sha256!==payload.snapshot_sha256)throw new Error("来源原文与当前固定版本不符");
       setSource(result);setDetailLoading(false);
-    },reject),reject);
+    })).catch(reject);
   }
   const selectedTopic=view?.topics.find(row=>row.page_id===selected),disabled=!view||dirty||loading||denied||stale;
   const period=dimensions?.periods.find(row=>row.period_start===draft?.period_start&&row.period_end===draft?.period_end);
