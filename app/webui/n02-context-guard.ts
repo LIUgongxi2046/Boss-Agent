@@ -37,3 +37,16 @@ export function mayDisplayCurrentTaskReference(
     && context.current_use_verified===true
     && context.entry?.current_use_verified===true;
 }
+
+/**
+ * The "retry original message" control must never discard the URL
+ * position before its handler can read that same saved original position.
+ * Tab navigation alone is not an explicit decision to abandon recovery.
+ */
+export function shouldCancelN02PositionOnInteraction(
+  type:"click"|"keydown",
+  key:string|null,
+  targetIsRetry:boolean,
+):boolean {
+  return !targetIsRetry && !(type==="keydown"&&key==="Tab");
+}
