@@ -48,10 +48,18 @@ test("global list moves across categories only when ALL is selected",()=>{
   assert.equal(moveTodayOrderWithinCategory(order,rows,"ALL","unrecognized",1),null);
 });
 
-test("original sorting receipt accepts only exact matching non-writing lookup",()=>{
-  const valid={action:"boss.today.reorder",client_request_id:"r-1",outcome:"RECORDED",write_performed_by_lookup:false};
+const savedOrder={
+  source_type:"SIMULATED",list_id:"list-r-1",list_version:"1",
+  date:"2026-10-25",timezone:"Asia/Shanghai",version:"2",
+  snapshot_sha256:"a".repeat(64),item_ids:["task:one","meeting:two"],
+  authorization_id:"owner-authorization-1",
+};
+
+test("original sorting receipt accepts only exactly matched non-writing recorded evidence",()=>{
+  const valid={action:"boss.today.reorder",client_request_id:"r-1",outcome:"RECORDED",result:savedOrder,write_performed_by_lookup:false};
   assert.equal(validateTodayOrderReceipt(valid,"r-1"),valid);
-  assert.equal(validateTodayOrderReceipt({...valid,outcome:"NOT_FOUND_IN_CURRENT_STORE"},"r-1").outcome,"NOT_FOUND_IN_CURRENT_STORE");
+  const missing={...valid,outcome:"NOT_FOUND_IN_CURRENT_STORE",result:null};
+  assert.equal(validateTodayOrderReceipt(missing,"r-1"),missing);
   for(const bad of [
     null, [], {action:"boss.today.reorder",client_request_id:"r-1"},
     {...valid,client_request_id:"r-2"},
@@ -60,6 +68,21 @@ test("original sorting receipt accepts only exact matching non-writing lookup",(
     {...valid,outcome:"SUCCEEDED"},
   ]){
     assert.throws(()=>validateTodayOrderReceipt(bad,"r-1"),/回执/);
+  }
+});
+
+test("recorded outcome without the actual bound order and authorization is never accepted",()=>{
+  const valid={action:"boss.today.reorder",client_request_id:"r-1",outcome:"RECORDED",result:savedOrder,write_performed_by_lookup:false};
+  for(const bad of [
+    {...valid,result:null},
+    {...valid,result:undefined},
+    {...valid,result:{...savedOrder,authorization_id:""}},
+    {...valid,result:{...savedOrder,source_type:"PUBLIC_SOURCE"}},
+    {...valid,result:{...savedOrder,item_ids:["task:one","task:one"]}},
+    {...valid,result:{...savedOrder,snapshot_sha256:"invalid"}},
+    {...valid,outcome:"NOT_FOUND_IN_CURRENT_STORE"},
+  ]){
+    assert.throws(()=>validateTodayOrderReceipt(bad,"r-1"),/排序原请求|当前库/);
   }
 });
 
@@ -78,7 +101,7 @@ test("confirmed saved sort removes only its own URL identifier",()=>{
 
 test("a server-confirmed missing request alone unlocks explicit review dismissal",()=>{
   const missing={action:"boss.today.reorder",client_request_id:"today-001",
-    outcome:"NOT_FOUND_IN_CURRENT_STORE",write_performed_by_lookup:false};
+    outcome:"NOT_FOUND_IN_CURRENT_STORE",result:null,write_performed_by_lookup:false};
   assert.equal(isConfirmedMissingTodayOrderReceipt(missing,"today-001"),true);
   assert.equal(isConfirmedMissingTodayOrderReceipt(null,"today-001"),false);
   assert.equal(isConfirmedMissingTodayOrderReceipt(missing,"today-002"),false);
@@ -86,4 +109,5 @@ test("a server-confirmed missing request alone unlocks explicit review dismissal
   assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,write_performed_by_lookup:true},"today-001"),false);
   assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,action:"boss.assignment.send"},"today-001"),false);
   assert.equal(isConfirmedMissingTodayOrderReceipt(missing,""),false);
+  assert.equal(isConfirmedMissingTodayOrderReceipt({...missing,result:savedOrder},"today-001"),false);
 });
