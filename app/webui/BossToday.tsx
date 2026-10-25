@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState, type ReactNode} from "react";
 import {useClient} from "@/providers/ClientProvider";
-import {moveTodayOrderWithinCategory, todayOrderPosition, validateTodayOrderReceipt, type TodayOrderReceipt} from "./today-order";
+import {moveTodayOrderWithinCategory, todayOrderPosition, validateTodayOrderReceipt, withoutTodayOrderRequest, isConfirmedMissingTodayOrderReceipt, type TodayOrderReceipt} from "./today-order";
 export type {TodayOrderReceipt} from "./today-order";
 
 export type TodayItem = {
@@ -75,6 +75,18 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
     if(!changed)return;
     setOrder(changed);setDirty(true);onDirtyChange(true);
   }
+  function clearTrackedRequest(key:string){
+    const revised=withoutTodayOrderRequest(window.location.href,key);
+    if(revised!==null)window.history.replaceState(window.history.state,"",revised);
+  }
+  function acknowledgeMissing(){
+    if(busy||!pending||!isConfirmedMissingTodayOrderReceipt(receipt,pending))return;
+    clearTrackedRequest(pending);setPending("");
+    onDirtyChange(dirty);
+    setFailure(dirty
+      ?"原排序请求在当前库未找到；已由本人结束原编号核查，未保存次序仍保留。请核对后再决定是否明确提交。"
+      :"原排序请求在当前库未找到；已由本人结束核查。刷新前未保存次序无法恢复，请重新核对当前清单后再调整。");
+  }
   async function recover(key=original,signal?:AbortSignal,version=epoch.current){
     if(!key)return;
     const request=++sequence.current;setBusy(true);setFailure("");
@@ -83,7 +95,11 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
       const value=validateTodayOrderReceipt(await onReadOrder(key,signal),key);
       if(!current())return;
       setReceipt(value);
-      if(value.outcome==="RECORDED"){setPending("");setDirty(false);onDirtyChange(false);onReload();}
+      if(value.outcome==="RECORDED"){
+        clearTrackedRequest(key);setPending("");setDirty(false);onDirtyChange(false);onReload();
+      }else{
+        setFailure("原排序请求在当前库未找到记录；不会自动重发。可以再次读取原编号，或明确结束核查。");
+      }
     }catch(reason){
       if(current())setFailure(reason instanceof Error?reason.message:String(reason));
     }finally{
@@ -101,7 +117,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
       if(version!==epoch.current)return;
       const status=typeof reason==="object"&&reason!==null&&"status" in reason?Number(reason.status):null;
       if(status!==null&&[400,401,403,404,409,410,413].includes(status)){
-        setPending("");const current=new URL(window.location.href);if(current.searchParams.get("todayOrderRequest")===key){current.searchParams.delete("todayOrderRequest");window.history.replaceState(window.history.state,"",current);}
+        setPending("");clearTrackedRequest(key);
       }
       setFailure((status===409?"事项版本或本人次序已经变化；未保存编辑已保留，请核查当前资料。":reason instanceof Error?reason.message:String(reason))+"；原排序请求 "+key);
     });
@@ -136,7 +152,8 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
         <button type="button" className="boss-btn" disabled={!orderEnabled||!dirty||busy||loading||Boolean(pending)} onClick={()=>void save()}>{busy?"正在保存当前次序":"本人确认保存当前次序"}</button>
         {onDiscuss&&<button id="morning-discuss" type="button" className="boss-btn boss-btn-primary" disabled={!discussEnabled||busy||Boolean(pending)} onClick={onDiscuss}>继续讨论</button>}</div>
       {dirty&&<p role="status">当前次序尚未保存。选中事项支持 Alt+方向键调整。</p>}
-      {pending&&<div role="status"><p>排序结果尚未确认，原请求 {original} · 回执 {receipt?.outcome??"尚未取得"}</p><button type="button" className="boss-btn" disabled={busy} onClick={()=>void recover()}>读取排序原请求结果</button></div>}
+      {pending&&<div role="status"><p>排序结果尚未确认，原请求 {original} · 回执 {receipt?.outcome??"尚未取得"}</p><button type="button" className="boss-btn" disabled={busy} onClick={()=>void recover()}>读取排序原请求结果</button>
+        {isConfirmedMissingTodayOrderReceipt(receipt,pending)&&<button type="button" className="boss-btn" disabled={busy} onClick={acknowledgeMissing}>结束原编号核查，保留当前编辑</button>}</div>}
       <details className="boss-f01-order-record"><summary>查看排序依据与保存结果</summary><button type="button" className="boss-btn" disabled={loading||busy||dirty||Boolean(pending)} onClick={onReload}>重新读取今日资料</button><p>{data?.ordering_reason??"排序依据等待读取"} · 版本 {data?.order_version??"未知"}</p>
         <button type="button" className="boss-btn" disabled={!dirty||busy||Boolean(pending)} onClick={()=>{setDirty(false);onDirtyChange(false);onReload();}}>放弃未保存次序</button>
         {original&&<p>排序原请求 {original}</p>}{receipt&&<p>排序回执 {receipt.outcome}</p>}{pending&&<p role="status">排序结果尚未确认，请读取同一原请求结果。</p>}
@@ -174,6 +191,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
           <button type="button" className="boss-btn" disabled={!dirty||busy||Boolean(pending)} onClick={()=>{setDirty(false);onDirtyChange(false);onReload();}}>放弃未保存次序</button></div>
         {dirty&&<p role="status">当前次序尚未保存。事项标题支持 Alt+方向键调整，也可以使用上移、下移按钮。</p>}
         {original&&<p>排序原请求 {original}</p>}{receipt&&<p>排序回执 {receipt.outcome}</p>}{pending&&<p role="status">排序结果尚未确认，请读取同一原请求结果。</p>}
+        {isConfirmedMissingTodayOrderReceipt(receipt,pending)&&<button type="button" className="boss-btn" disabled={busy} onClick={acknowledgeMissing}>结束原编号核查，保留当前编辑</button>}
         {original&&<button type="button" className="boss-btn" disabled={busy} onClick={()=>void recover()}>读取排序原请求结果</button>}
       </div>
     </section>;
@@ -188,6 +206,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
     {original&&<p>排序原请求 {original}</p>}
     {receipt&&<p>排序回执 {receipt.outcome}</p>}
     {pending&&<p role="status">排序结果尚未确认，请读取同一原请求结果。</p>}
+    {isConfirmedMissingTodayOrderReceipt(receipt,pending)&&<button type="button" className="boss-btn" disabled={busy} onClick={acknowledgeMissing}>结束原编号核查，保留当前编辑</button>}
     <div className="boss-actions"><button type="button" className="boss-btn" disabled={!original||busy} onClick={()=>void recover()}>读取排序原请求结果</button></div>
     {loading&&<p role="status">正在读取本人事项</p>}
     <div className="boss-columns"><div className="boss-column">
