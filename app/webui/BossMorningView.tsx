@@ -46,6 +46,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const handoff=useRef<AbortController|null>(null),[handoffCanceled,setHandoffCanceled]=useState(false);
   const [detail,setDetail]=useState<Detail|null>(null),[document,setDocument]=useState<Document|null>(null);
   const [detailLoading,setDetailLoading]=useState(false),[detailError,setDetailError]=useState(""),[detailRevision,setDetailRevision]=useState(0);
+  const [sourceError,setSourceError]=useState(""),[sourceRevision,setSourceRevision]=useState(0);
   const [error,setError]=useState(""),[loading,setLoading]=useState(false),[busy,setBusy]=useState(false),[uncertain,setUncertain]=useState(false),[orderDirty,setOrderDirty]=useState(false),[denied,setDenied]=useState(false),[revision,setRevision]=useState(0);
   const epoch=useRef(0),generation=useRef(0),receiptSequence=useRef(0),deniedRef=useRef(false),bound=useRef<Read|null>(null);
   const surface=useRef<HTMLDivElement>(null),returnPoint=useRef<{scroll:number;focus:string}|null>(null),returnPending=useRef(false),overlayFocus=useRef<HTMLElement|null>(null),visibility=useRef(visible);
@@ -55,7 +56,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     setDetail(null);setDetailLoading(false);setDetailError("");
   },[]);
   bound.current=list;
-  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");setDetailLoading(false);setDetailError("");},[]);
+  const clear=useCallback(()=>{setView(null);setList(null);bound.current=null;setDetail(null);setDocument(null);setHistory({requests:[]});setReceipt(null);setSelected("");setSourceId("");setDetailLoading(false);setDetailError("");setSourceError("");},[]);
   const read=useCallback(async<T,>(path:string,signal?:AbortSignal):Promise<T>=>{
     const response=await fetch(path,{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal});
     if(response.status===401||response.status===403){deniedRef.current=true;setDenied(true);generation.current++;clear();if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));throw new Error("当前身份无法读取晨间资料");}
@@ -147,17 +148,17 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     return()=>abort.abort();
   },[selected,list,view?.list_id,read,clearDetailForRead,detailRevision]);
   useEffect(()=>{
-    if(!sourceId||!currentMorningDetailScope(list,view)){setDocument(null);return;}
+    if(!sourceId||!currentMorningDetailScope(list,view)){setDocument(null);setSourceError("");return;}
     const abort=new AbortController(),current=epoch.current,version=generation.current;
-    setDocument(null);
+    setDocument(null);setSourceError("");
     void read<{list_id:string;list_version:string;document:Document}>("/api/boss/ui/morning/source?"+new URLSearchParams({list_id:view.list_id,source_id:sourceId}),abort.signal).then(value=>{
       if(current===epoch.current&&version===generation.current&&!abort.signal.aborted){
         if(value.list_id!==bound.current?.result.list_id||value.list_version!==bound.current.result.list_version||value.document.source_id!==sourceId)throw new Error("当前来源与清单引用不符");
-        setDocument(value.document);
+        setDocument(value.document);setSourceError("");
       }
-    }).catch(failure=>{if(current===epoch.current&&!abort.signal.aborted)setError(failure.message);});
+    }).catch(failure=>{if(current===epoch.current&&!abort.signal.aborted)setSourceError(failure instanceof Error?failure.message:String(failure));});
     return()=>abort.abort();
-  },[sourceId,list,view?.list_id,read]);
+  },[sourceId,list,view?.list_id,read,sourceRevision]);
   function changeDay(next:Day){
     generation.current++;receiptSequence.current++;setView(null);setList(null);bound.current=null;setReceipt(null);setRequestId("");setSelected("");setSourceId("");setDetail(null);setDocument(null);setUncertain(false);setDay(next);setDayDraft(next);setCategory("ALL");
     returnPoint.current=null;returnPending.current=false;
@@ -210,7 +211,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const actualCounts={DECIDE:0,COORDINATE:0,INFORM:0};for(const item of view?.items??[])actualCounts[item.category]++;
   const counts=view?.category_counts??actualCounts;
   const chooseItem=(item:TodayItem)=>{if(selected===item.item_id&&!detail)setDetailRevision(value=>value+1);setSelected(item.item_id);setDetail(null);setDetailError("");setDetailLoading(currentMorningDetailScope(list,view));setSourceId("");setDocument(null);remember({morningItem:item.item_id,morningSource:null});};
-  const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setError("");setSourceId(id);setDocument(null);remember({morningSource:id});};
+  const chooseSource=(id:string)=>{overlayFocus.current=window.document.activeElement as HTMLElement;setError("");setSourceError("");setSourceId(id);setDocument(null);remember({morningSource:id});};
   const readOrder=useCallback((key:string,signal?:AbortSignal)=>read<TodayOrderReceipt>("/api/boss/ui/morning/receipt?"+new URLSearchParams({action:"boss.today.reorder",client_request_id:key}),signal),[read]);
   const categories=[{id:"DECIDE" as const,title:"待决定",Icon:ClipboardList},{id:"COORDINATE" as const,title:"待协调",Icon:CheckCircle2},{id:"INFORM" as const,title:"需要知晓",Icon:Info}];
   const meetings=detail?.objects.filter(object=>object.reference.kind==="meeting"&&detail.item.related_meetings?.some(ref=>ref.id===object.reference.id&&ref.version===object.reference.version))??[];
@@ -288,9 +289,9 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         <details><summary>查看未纳入的对象与原因</summary>{view?.excluded_items.map(value=><p key={value.kind+value.id}>{value.kind} / {value.id} / v{value.version} · {morningReason(value.reason)}</p>)}</details></details>
       <details><summary>本人目标与阅读要求</summary><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></details></details></Panel>
     </aside></div>
-    <Dialog open={Boolean(sourceId)&&visible} onOpenChange={open=>{if(!open){setSourceId("");setDocument(null);remember({morningSource:null});}}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-source-description"><DialogTitle>当前来源原文</DialogTitle><DialogDescription id="morning-source-description">当前清单与来源版本经服务端重新核查。关闭后返回当前事项。</DialogDescription>
+    <Dialog open={Boolean(sourceId)&&visible} onOpenChange={open=>{if(!open){setSourceId("");setDocument(null);setSourceError("");remember({morningSource:null});}}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-source-description"><DialogTitle>当前来源原文</DialogTitle><DialogDescription id="morning-source-description">当前清单与来源版本经服务端重新核查。关闭后返回当前事项。</DialogDescription>
       <DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>
-      {document&&current?<article id="morning-source"><h3>{document.source_id} · v{document.version}</h3><p>作者 {document.author_display_name??document.author_contact_id??document.author_kind??"尚未提供"} · 用途 {document.allowed_use??"以当前资料权限为准"}</p><p>发布 {document.published_at??"未知"} · 更新 {document.observed_at??"未知"}</p><p>有效时间 {document.valid_from??"未知"} 至 {document.valid_until??"未知"}</p><p>引用位置 {document.original_locator===undefined?"尚未提供":JSON.stringify(document.original_locator)}</p><blockquote>{document.content??"原文未提供"}</blockquote></article>:<p role="status">{!current?"当前清单为预览或已失效，暂不能读取原文，请重新查询正式清单。":error||"正在读取当前来源"}</p>}
+      {document&&current?<article id="morning-source"><h3>{document.source_id} · v{document.version}</h3><p>作者 {document.author_display_name??document.author_contact_id??document.author_kind??"尚未提供"} · 用途 {document.allowed_use??"以当前资料权限为准"}</p><p>发布 {document.published_at??"未知"} · 更新 {document.observed_at??"未知"}</p><p>有效时间 {document.valid_from??"未知"} 至 {document.valid_until??"未知"}</p><p>引用位置 {document.original_locator===undefined?"尚未提供":JSON.stringify(document.original_locator)}</p><blockquote>{document.content??"原文未提供"}</blockquote></article>:<div><p role={sourceError&&current?"alert":"status"}>{!current?"当前清单为预览或已失效，暂不能读取原文，请重新查询正式清单。":sourceError||"正在读取当前来源"}</p>{current&&sourceError&&<button id="morning-source-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setSourceRevision(value=>value+1)}>重新核查当前来源</button>}</div>}
     </DialogContent></Dialog>
     <Dialog open={meetingOpen&&visible} onOpenChange={setMeetingOpen}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-meeting-description"><DialogTitle>关联会议与准备材料</DialogTitle><DialogDescription id="morning-meeting-description">当前事项所引用的会议，只读展示当前清单绑定的版本。</DialogDescription><DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>
       {current&&detail?meetings.map(object=><article key={object.reference.id}><h3>{String(object.data.title??"会议与会前材料")}</h3><p>会议 {object.reference.id} · v{object.reference.version}</p><p>{String(object.data.starts_at??"开始时间尚未提供")} 至 {String(object.data.ends_at??"结束时间尚未提供")} · {String(object.data.timezone??view?.timezone??"时区尚未提供")}</p><p>地点 {String(object.data.location??"尚未提供")}</p><p>材料 {Array.isArray(object.data.material_ids)?object.data.material_ids.join("、"):"尚未提供"}</p></article>):<p>当前依据需要重新核查。</p>}
