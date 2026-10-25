@@ -19,3 +19,17 @@ export function currentMorningDetailScope(
     && listId.length > 0
     && view?.list_id === listId;
 }
+
+export type MorningItemCategory = "DECIDE" | "COORDINATE" | "INFORM";
+export type MorningCategoryFilter = MorningItemCategory | "ALL";
+
+/** A hidden or removed item must not remain the source of a visible action. */
+export function shouldClearMorningSelectionOnFilter(
+  nextCategory: MorningCategoryFilter,
+  selectedId: string,
+  items: readonly {item_id: string; category: MorningItemCategory}[],
+): boolean {
+  if (!selectedId) return false;
+  const selected = items.find(item => item.item_id === selectedId);
+  return !selected || (nextCategory !== "ALL" && selected.category !== nextCategory);
+}
