@@ -1,5 +1,17 @@
 # MENU-F01 今日工作
 
+### 2026-10-25 F01 第一批真实工程接收结果
+
+- **固定上游与复用**：仍采用 HKUDS/nanobot v0.3.5 固定提交 `1bb712d`、原有 BossMorningView/BossToday、SessionManager、原生 ThreadShell/Composer/Viewport 与全部现存领域组件；没有另建会话平台或降级删减 UI。之前通用 `prepare_boss_webui.py` 仅初始 BossDesktop JSX 包裹，遗漏后续 F01/N02/UI02 原生扩展，致最新主分支干净构建失败。
+- **本轮代码**：`855edf4` 新增 `scripts/boss_native_overlay.py` 按已签入的十组历史补丁重建受控上游源码，匹配失败即拒绝覆盖；`df940f7` 接入构建，`dcb696e`/`0d320b5` 修正同名 JSX 属性歧义，保证两种真实 ThreadShell 及 ThreadComposer 分别绑定当前会话/历史阅读与输入保护。原生晨间 `onStartMorningChat`、`boss.morning.bind`、输入丢弃确认、会话恢复和动作中断原编号路径被实际编译，而非空实现。
+- **构建与复验**：GitHub Actions `40163435064` 中 `react-webui-build` 成功；固定上游源码+第一方 React+TypeScript+Vite 成功，制品 `.work/product/nanobot/nanobot/web/dist/index.html` 存在，Electron 宿主语法检查成功。新增 `8fd0caf` 的第二次独立准备与 manifest 字节比较，在 `40163625105` 的 `react-webui-build` 全部成功，证明在同一隔离 GitHub Runner 中重复准备不会遗漏补丁/改写其它文件。此证据不是目标 Mac GUI 运行。
+- **F01 真实领域**：独立 `.github/workflows/boss-agent-f01.yml` 于 `40163532726` 执行当前 `main` 已签入领域和接口共 **41 passed/0 failed**，包括 `test_boss_today.py`、`test_fc03_morning.py`、`test_menu_f01_domain.py`、`test_public_morning.py`。涉及分类、时间、来源、CAS/幂等、持久化、服务访问和异常；测试在项目 `.work/ci-pytest/f01` 下创建独立模拟 SQLite，没有登录用户程序或读取密钥。该结果仍属于受限模拟领域/公开接口，不能代表模型质量或全部 UI 行为。
+- **逐页映射修订**：`specs/page-service-map.json#F01` 只纠正当前源码已存在的 `BossMorningView`/原生绑定、真实只读接口与 `boss.today.reorder`/`boss.morning.bind`，仍保留 `actual_e2e_verified=false`、`visual_pixel_verified=false` 与需复验的三项完整桌面行为；不提前登记 UI 或用户通过。
+- **剩余阻碍与责任**：Desktop v7 完整 ZIP/HTML 未在可核查的 GitHub 源码树；现有 v7 2880×2862 长图尺寸记录不能替代正式 DOM/样式及用户视觉验收。已通过的原 v6 开发18项历史保持，当前 v7 新轮完整检查点仍为 **0/18**；须在保留的运行实例之外提供独立验证与准确来源一致的制品、真实受控手动登录、F01 全路径、动态状态、尺寸/长页、焦点/滚动、授权恢复和验收证据。已有 N03 业务/待确认任务不受本轮构建改动推进。
+- **CI范围分离**：旧综合流水线的 `python-domain-contract` 仍会因为暂停中的 N03 SDK 检查依赖未提供的本地 `validation/connection.json` 和既有失败而显示总体红色；不伪造密钥、不关闭失败检查，也不据此否认已单独通过的 React 构建和 F01 41项领域测试。
+
+当前结论为 `SOURCE_BUILD_AND_SCOPED_DOMAIN_CHECKS_PASSED__DESKTOP_V7_E2E_PENDING`；正式完成数量及用户验收状态仍以唯一 `specs/feature-delivery.json` 为准，当前不能由某个成功 CI 提升为18/18。
+
 ### 2026-10-25 从首菜单重新核验：v7 准入（新一轮，尚未通过）
 
 用户在完成新一轮项目接手和逐菜单讨论后明确要求“建议从头确认下”。本项由当前接手负责人按最新指令重新从 F01 核对，不推倒重做，不删原始证据。原 `MENU-F01.C01—C18` 共18项及 `docs/menu-delivery/F01/delivery-rework.json` 的 `DEVELOPED_PENDING_USER_ACCEPTANCE` 仍是 **Desktop v6、准确旧候选和旧独立环境** 的历史开发覆盖记录，不等于本次 v7 已验证。原 18/18 保留并单列，新一轮 v7 逐项重核从 0/18 起，用户/视觉验收继续 NOT_RUN/PENDING。单活动菜单约束继续有效；N03 已有模块和26项进度冻结保留，不能借此删除。
