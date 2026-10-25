@@ -30,7 +30,7 @@
     "visual": "NOT_RUN",
     "user_acceptance": "PENDING_USER_ACCEPTANCE",
     "independent_current_main_build": "N02_SCOPED_NATIVE_REACT_BUILD_PASSED__COMPREHENSIVE_LEGACY_N03_PYTHON_FAILED",
-    "latest_clean_build_run_id": 40202750383,
+    "latest_clean_build_run_id": 40203082570,
     "paused_menu": "MENU-N03",
     "f01_deferral": {
       "status": "ENGINEERING_FROZEN_AND_V7_GUI_ACCEPTANCE_DEFERRED_BY_EXPLICIT_NEXT_MENU_INSTRUCTION",
@@ -72,7 +72,7 @@
         ]
       },
       "n02_current_scoped_tests": {
-        "run_id": 40202750401,
+        "run_id": 40203066706,
         "node": "4_PASSED",
         "sqlite_domain_task_source": "37_PASSED",
         "nanobot_agentloop_native": "59_PASSED",
@@ -80,18 +80,19 @@
         "result": "PASS_CURRENT_SOURCE_GITHUB_CI_SIMULATED_NO_GUI"
       },
       "n02_current_build": {
-        "run_id": 40202750383,
-        "job_id": 121197182866,
+        "run_id": 40203082570,
+        "job_id": 121198254303,
         "result": "PASS_REACT_JOB_ONLY",
-        "scope": "PINNED_NANOBOT_PATCHES_TYPESCRIPT_VITE_SHA_MANIFEST_REPEAT_ELECTRON_SYNTAX"
+        "scope": "PINNED_NANOBOT_PATCHES_TYPESCRIPT_VITE_SHA_MANIFEST_REPEAT_ELECTRON_AND_N02_MANUAL_LAUNCH_SYNTAX"
       },
       "n02_build_artifact": {
-        "artifact_id": 12603035088,
-        "name": "boss-agent-frontend-d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
-        "source_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
-        "archive_sha256": "d436ac9bc8684d0a26a2c1b4f0e03a5b622a3d90d86b330e0cf782f37a019f3a",
+        "artifact_id": 12603230096,
+        "name": "boss-agent-frontend-b5b05d2da40299045cae36842006edf87c211ef9",
+        "source_commit": "b5b05d2da40299045cae36842006edf87c211ef9",
+        "functional_source_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
+        "archive_sha256": "f71ef50d4a2af43c76047bd7f4beb8b086e5ebc84142c8377bfa5ba31915afd4",
         "size_bytes": 10786200,
-        "expires_at": "2026-11-08T14:33:45Z",
+        "expires_at": "2026-11-08T14:38:29Z",
         "scope": "FRONTEND_STATIC_BUNDLE_ONLY_NOT_MAC_INSTALLATION"
       },
       "n02_current_gui": "NOT_RUN",
@@ -99,7 +100,15 @@
       "n02_current_all_26": "NOT_RUN",
       "n03_legacy_comprehensive_pytest": "FAIL_RETAINED_NOT_SUPPRESSED",
       "visual": "NOT_RUN",
-      "user_acceptance": "PENDING_USER_ACCEPTANCE"
+      "user_acceptance": "PENDING_USER_ACCEPTANCE",
+      "n02_manual_review": {
+        "launcher": "scripts/run_n02_manual_review.command",
+        "instructions": "docs/menu-delivery/N02/experience-v7-revalidation.md",
+        "preflight": "scripts/verify_f01_candidate.py",
+        "status": "MANUAL_ONLY_NOT_EXECUTED_ON_USER_MAC",
+        "protected_previous_experiences": true,
+        "automatic_authentication": false
+      }
     },
     "full_checklist_record": "docs/menu-delivery/N02/integration.md"
   },
