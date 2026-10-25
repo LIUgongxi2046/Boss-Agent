@@ -231,7 +231,33 @@ def main() -> None:
         dist = SOURCE / "nanobot" / "web" / "dist" / "index.html"
         if not dist.exists():
             raise RuntimeError("上游构建成功但未发现正式 dist/index.html")
+        # The previous overlay manifest identifies the first-party source, but
+        # not the resulting deployed bundle. Record an explicit content digest
+        # only after a clean real Vite build, never during prepare-only calls.
+        dist_root = dist.parent
+        files = sorted(path for path in dist_root.rglob("*") if path.is_file())
+        if not files:
+            raise RuntimeError("正式前端编译结果为空，拒绝建立可交付指针")
+        source_manifest = ROOT / ".work" / "product" / "boss-build-manifest.json"
+        product = {
+            "format": "BOSS_AGENT_DIST_SHA256_V1",
+            "repo_commit": run("git", "rev-parse", "HEAD", cwd=ROOT),
+            "nanobot_commit": UPSTREAM_REV,
+            "index_html_sha256": hashlib.sha256(dist.read_bytes()).hexdigest(),
+            "overlay_manifest_sha256": hashlib.sha256(source_manifest.read_bytes()).hexdigest(),
+            "assets": {
+                str(path.relative_to(dist_root)): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in files
+            },
+            "result": "BUILT_NOT_MAC_GUI_ACCEPTED",
+            "desktop_v7_verified": False,
+        }
+        record = ROOT / ".work" / "product" / "boss-compiled-build.json"
+        record.write_text(
+            json.dumps(product, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8"
+        )
         print("构建完成：" + str(dist))
+        print("制品校验：" + str(record))
 
 
 if __name__ == "__main__":
