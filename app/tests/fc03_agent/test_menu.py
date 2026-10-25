@@ -92,8 +92,27 @@ def test_selected_source_matches_current_document(sourced):
 
 
 def test_selected_item_rejects_unrelated_source(selected):
+    from boss_command_api import BossCommandAPI
+    from boss_page_api import BossPageAPI
+
     formal, view, item = selected
+    # Create an independently readable, current simulated source through the
+    # same approved MAINTAINER path used by the product. The fixture's existing
+    # sources can all belong to the selected item; never rely on an accidental
+    # second document or silently skip this authorization check.
+    unrelated_id = "sim-doc-f01-unrelated"
+    status, created = BossCommandAPI(formal[0]).execute("MAINTAINER", "boss.knowledge.source.create", {
+        "client_request_id": "f01-unrelated-source-creation",
+        "source_id": unrelated_id,
+        "title": "用于晨间来源授权检查的独立模拟资料",
+        "author_contact_id": "finance-1",
+        "published_at": "2026-10-22",
+        "content": "仅用于隔离测试的模拟运营参考资料，不对应当前选中事项，不得由绑定该事项的Agent读取。",
+    })
+    assert status == 200, created
+    assert created["index_state"] == "INDEXED_CURRENT"
+    assert BossPageAPI(formal[0]).serve("BOSS", "/api/boss/ui/evidence", "source=" + unrelated_id)[0] == 200
     permitted = {reference["id"] for reference in item["source_refs"] if reference["kind"] == "document"}
-    unrelated = next(reference for reference in view["source_statuses"] if reference["status"] == "VALID" and reference["source_id"] not in permitted)
+    assert unrelated_id not in permitted
     with pytest.raises(web.HTTPForbidden):
-        call(formal, "morningSourceRead", {"list_id": view["list_id"], "source_id": unrelated["source_id"]})
+        call(formal, "morningSourceRead", {"list_id": view["list_id"], "source_id": unrelated_id})
