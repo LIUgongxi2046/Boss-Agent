@@ -1,5 +1,22 @@
 # MENU-F01 今日工作
 
+### 2026-10-25 F01 第四批：当前晨间事项到交办的来源闭环
+
+本次重新完整读取 `docs/开发接手与执行规范.md`、`AGENTS.md`、正式 `specs/feature-delivery.json`、`specs/menu-plan.json`、F01 原18项工单、对应 FR-01/BR-01/AC 与旧实现；只推进 F01，N02 原26项、N03 现有源码与正式暂停状态及全部用户目录保持。开始时 `main` 为 `20feea6e0e0e7acaf13ca5ba17194539d0467513`。
+
+**确认的具体功能缺陷**：在 `BossMorningView` 的已固定列表选择会议、事项后点击“准备交办”进入 F06，`BossMorningPreparation.tsx` 仅识别 `finance-note`、`si09-si10-business-v1`、`FC04-ALERT-1` 预设来源。实际上 `MorningAPI.detail` 已从同一 CURRENT 清单返回该选中事项下带版本的其他有效模拟来源；服务端 `BossCommandAPI._create` 对正式 `morning_reference` 已执行当前清单、当前事项、snapshot、source_refs、会议和事件范围验证，但 `Store.create_assignment` 继承旧 MVP 全局白名单，导致例如 `meeting-minutes` 在实际请求中 HTTP 400。这是跨前端、领域数据的真缺口，旧 v6 F01 已有测试并不覆盖该路径。
+
+**本轮复用/修复（不新增第二套交办或放宽普通业务权限）**：
+
+- `7e44072`：新增 `app/webui/morning-assignment-context.ts`，按返回的真实选中事项 `source_refs` 与当前 `documents` 的 ID、版本、来源属性、清单 ID、事项 ID、snapshot 精确绑定，保留其已有会议和事件引用；不再根据演示资料名称静默漏选，版本不一致、跨事项、重复、不完整、非 SIMULATED 文档均报错。缺少文档时不拼造来源、不允许创建；只计算本人待确认的交办准备上下文。
+- `418a255`：`BossMorningPreparation` 接受上述现有领域读取并接入 `BossAssignmentFlow`；保留原页面信息、本人确认弹窗、当前负责人及任务创建/发送/完成分离，不改变现有权限或模拟模式。
+- `bd5d2e4`、`a7010f5`：在已有 `BossCommandAPI._create` 的 **当前 `morning_reference` 完整验证之后**，仅通过内部 `verified_morning_selection` 参数让 `Store.create_assignment` 接受当前选中事项的有效来源；普通未绑定晨间清单的交办仍保留其既定来源白名单和完整授权/时钟/负责人/CAS/幂等规则。无需数据迁移或新的模拟数据集。
+- `f285606`、`d33c0b6`、`4e811fb`、`0875b79`：新增纯前端引用范围、版本及误用拒绝测试和正式 SQLite 业务 API 正反向测试，覆盖会议纪要等旧白名单以外来源创建 `OPEN` 任务、普通入口继续拒绝、另一个有效来源不能冒用当前事项、失败无任务/授权/outbox 写入。已在定向检查中真实触发旧 HTTP 400，修复后方通过；没有删用例或修改预期以绕过功能缺陷。
+
+**准确测试版本与范围**：`40183732776` （`main` 的 `0875b79` 候选）定向 F01 CI：Node 前端 **19/19**、nanobot 原生晨间 Agent **39/39**、实际 SQLite 领域与公共 API **44/44**，分别通过，共102项不同层面的限定断言；`40183732779` 的 `react-webui-build` 为 PASS（TypeScript/Vite、固定原生补丁、重复准备一致性、Electron 宿主语法）。综合 workflow 的 `python-domain-contract` 仍包含暂停 N03 旧失败，记录为 FAILURE，不得写成全套 CI 通过。无真实外部发件、没有实际用户 Mac 的 GUI 自动认证或个人资料访问。
+
+**用户结果与继续验收**：F01 当前可以在源码及领域测试范围内把非财务但获准的晨间文档纳入真实待本人确认交办，同时阻止错误来源和越权动作。新 F01 v7 稳定18项在唯一状态中继续 **0/18完整验收**；独立启动器、当前准确 Mac 认证 UI、长页结构/滚动/键盘、全部状态和用户视觉仍需核验，且最新 v7 HTML/CSS 原始 ZIP 尚不能获得获准字节副本。不可用旧 v6 制品或旧 CI 报告替代最终验收。N02/N03 不切换，不申请账号自动登录或外部真实调用授权。
+
 ### 2026-10-25 F01 第三批：预览、历史清单及来源读取恢复
 
 按用户“继续推进，需要另外开一个新窗口吗？”的指令在**原对话中继续**，没有新建开发聊天、自动任务或第二活动菜单。已重新完整阅读 `docs/开发接手与执行规范.md` 和原 F01 工单，核对 `main`、正式活动状态及 v7 设计资料可访问边界。仅修改本菜单的 `app/webui` 与定向测试；已完成的 v6 F01/N02 证据和 N03 代码、独立制品、原运行资料全部保留。
