@@ -256,6 +256,13 @@
       ]
     },
     {
+      "id": "C27",
+      "source_ref": "用户2026-10-23新增第四窗口及六项登录和桌面改进；项目计划第13.12节",
+      "outcome": "登录文案、桌面品牌、吉祥物动画、内测标识、身份入口与真实账号密码登录符合用户要求",
+      "disposition": "IN_SCOPE",
+      "acceptance_ids": ["A27"]
+    },
+    {
       "id": "X01",
       "source_ref": "用户本次范围决定；docs/项目决策记录.md D11",
       "outcome": "其他职能部门 Agent、部门专属 SOP、部门个人记忆及独立智能体编排",
@@ -1043,6 +1050,18 @@
         "required": false,
         "description": "本项审查交付范围和证据，业务采用由前置验收记录证明"
       }
+    },
+    {
+      "id": "A27",
+      "commitment_id": "C27",
+      "scenario": "在当前集成桌面应用核查六项登录和桌面改进，并使用真实配置的账号完成登录、退出及重新认证",
+      "expected_result": "文案、内测标识、隐藏默认老板入口、底部维护及帮助入口符合第13.12节；窗口名称和项目图标生效；吉祥物动画可播放；真实账号密码经服务端核验及身份隔离，错误凭据被拒绝，退出与过期后认证有效；用户取得已验证账号密码，凭据不进入源码和公共记录",
+      "outcome_type": "QUALITY",
+      "capability": "REAL",
+      "required_checks": [{"id":"K27","kind":"INTEGRATION"}],
+      "status": "NOT_RUN",
+      "evidence_ids": [],
+      "consumer": {"required":true,"check_id":"K27","description":"用户通过桌面登录页使用真实账号密码进入对应获准工作区"}
     }
   ],
   "tasks": [
@@ -1661,6 +1680,14 @@
         "delivery-ledger.json"
       ],
       "blockers": []
+    },
+    {
+      "id": "T27",
+      "acceptance_ids": ["A27"],
+      "depends_on": ["T11"],
+      "state": "TODO",
+      "allowed_paths": ["app/webui/BossLogin.tsx","app/webui/boss-login.css","validation/boss_account_auth.py","validation/desktop/branding.cjs","validation/desktop/branding/","scripts/provision_boss_accounts.py","app/tests/test_boss_account_auth.py","validation/desktop/check-login-polish.cjs","design/T27/","docs/development/T27.md","evidence/T27/"],
+      "blockers": []
     }
   ],
   "evidence": [
@@ -1754,7 +1781,8 @@
       "T23",
       "T24",
       "T25",
-      "T26"
+      "T26",
+      "T27"
     ],
     "next_task_id": "T05",
     "constraints": [
