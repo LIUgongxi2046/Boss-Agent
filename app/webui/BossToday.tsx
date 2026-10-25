@@ -1,5 +1,7 @@
 import {useEffect, useRef, useState, type ReactNode} from "react";
 import {useClient} from "@/providers/ClientProvider";
+import {moveTodayOrderWithinCategory, todayOrderPosition, validateTodayOrderReceipt, type TodayOrderReceipt} from "./today-order";
+export type {TodayOrderReceipt} from "./today-order";
 
 export type TodayItem = {
   item_id:string;object_id:string;version:string|null;title:string;
@@ -28,7 +30,6 @@ type Props = {
   category?:TodayItem["category"]|"ALL";
   selectedItemId?:string;
 };
-export type TodayOrderReceipt={action:string;client_request_id:string;outcome:"RECORDED"|"NOT_FOUND_IN_CURRENT_STORE";write_performed_by_lookup:false};
 export function morningState(state:string){const labels:Record<string,string>={OPEN:"待处理",DRAFT:"草稿",ACTIVE:"当前启用",IN_PROGRESS:"处理中",RESULT_SUBMITTED:"结果已提交",PENDING_DECISION:"等待本人决定",WAITING_MATERIAL:"等待材料",CONFIRMED:"已经确认",CANCELED:"已经取消",HELD:"已经举行",CLOSED:"已经关闭",APPROVED:"已经批准",REJECTED:"已经拒绝",COMPLETED_CONFIRMED:"本人已确认完成"};return labels[state]??state;}
 export function morningReason(reason:string){
   const labels:Record<string,string>={"CATEGORY:DECIDE":"按照待本人决定事项分类","CATEGORY:COORDINATE":"按照待本人协调事项分类","CATEGORY:INFORM":"按照需要知晓事项分类",
@@ -68,22 +69,26 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
   useEffect(()=>{
     if(data&&!dirty&&!pending)setOrder(data.items.map(i=>i.item_id));
   },[data,dirty,pending]);
-  function move(index:number,offset:number){
-    if(!orderEnabled||busy||pending||index<0||index+offset<0||index+offset>=order.length)return;
-    const changed=[...order];
-    [changed[index],changed[index+offset]]=[changed[index+offset],changed[index]];
+  function move(index:number,offset:-1|1){
+    if(!orderEnabled||busy||pending||index<0||index>=order.length)return;
+    const changed=moveTodayOrderWithinCategory(order,data?.items??[],category,order[index],offset);
+    if(!changed)return;
     setOrder(changed);setDirty(true);onDirtyChange(true);
   }
   async function recover(key=original,signal?:AbortSignal,version=epoch.current){
     if(!key)return;
     const request=++sequence.current;setBusy(true);setFailure("");
-    await onReadOrder(key,signal).then(value=>{
-      if(signal?.aborted||version!==epoch.current||request!==sequence.current)return;
-      if(value.action!=="boss.today.reorder"||value.client_request_id!==key||value.write_performed_by_lookup!==false)throw new Error("排序原请求回执与当前编号不符");
+    const current=()=>!signal?.aborted&&version===epoch.current&&request===sequence.current;
+    try{
+      const value=validateTodayOrderReceipt(await onReadOrder(key,signal),key);
+      if(!current())return;
       setReceipt(value);
       if(value.outcome==="RECORDED"){setPending("");setDirty(false);onDirtyChange(false);onReload();}
-    },failure=>{if(!signal?.aborted&&version===epoch.current&&request===sequence.current)setFailure(failure instanceof Error?failure.message:String(failure));});
-    if(!signal?.aborted&&version===epoch.current&&request===sequence.current)setBusy(false);
+    }catch(reason){
+      if(current())setFailure(reason instanceof Error?reason.message:String(reason));
+    }finally{
+      if(current())setBusy(false);
+    }
   }
   async function save(){
     if(!data||!orderEnabled||busy||pending)return;
@@ -108,6 +113,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
   if(presentation==="compact"){
     const filtered=items.filter(item=>category==="ALL"||item.category===category),pages=Math.max(1,Math.ceil(filtered.length/10)),currentPage=Math.min(page,pages);
     const selectedIndex=items.findIndex(item=>item.item_id===selectedItemId);
+    const selectedPosition=todayOrderPosition(order,data?.items??[],category,selectedItemId??"");
     return <section className="boss-panel boss-f01-list" aria-label="我的当前事项" aria-busy={loading}>
       <header className="boss-panel-head"><h2>今天需要我参与的事</h2></header>
       {children}
@@ -125,8 +131,8 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
       {!loading&&filtered.length===0&&<p className="boss-f01-empty">{data?"当前资料在此分类没有可展示事项；来源及覆盖缺口见右侧。":"资料尚待读取，事项数量尚未确定。"}</p>}
       <div className="boss-f01-table-foot"><span>{data?"当前分类 "+filtered.length+" 项 / 全部 "+items.length+" 项":"数量等待读取"} · 每页10项</span>
         {pages>1&&<div className="boss-actions"><button className="boss-btn" type="button" disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>上一页</button><span>{currentPage} / {pages}</span><button className="boss-btn" type="button" disabled={currentPage===pages} onClick={()=>setPage(currentPage+1)}>下一页</button></div>}</div>
-      <div className="boss-actions boss-f01-sort-actions"><button type="button" className="boss-btn" disabled={!orderEnabled||selectedIndex<=0||busy||Boolean(pending)} onClick={()=>move(selectedIndex,-1)}>上移 ↑</button>
-        <button type="button" className="boss-btn" disabled={!orderEnabled||selectedIndex<0||selectedIndex===items.length-1||busy||Boolean(pending)} onClick={()=>move(selectedIndex,1)}>下移 ↓</button>
+      <div className="boss-actions boss-f01-sort-actions"><button type="button" className="boss-btn" disabled={!orderEnabled||selectedPosition.index<=0||busy||Boolean(pending)} onClick={()=>move(selectedIndex,-1)}>上移 ↑</button>
+        <button type="button" className="boss-btn" disabled={!orderEnabled||selectedPosition.index<0||selectedPosition.index===selectedPosition.total-1||busy||Boolean(pending)} onClick={()=>move(selectedIndex,1)}>下移 ↓</button>
         <button type="button" className="boss-btn" disabled={!orderEnabled||!dirty||busy||loading||Boolean(pending)} onClick={()=>void save()}>{busy?"正在保存当前次序":"本人确认保存当前次序"}</button>
         {onDiscuss&&<button id="morning-discuss" type="button" className="boss-btn boss-btn-primary" disabled={!discussEnabled||busy||Boolean(pending)} onClick={onDiscuss}>继续讨论</button>}</div>
       {dirty&&<p role="status">当前次序尚未保存。选中事项支持 Alt+方向键调整。</p>}
@@ -149,14 +155,15 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
         <th scope="col">事项标题</th><th scope="col">处理人</th><th scope="col">期限</th><th scope="col">状态</th><th scope="col">参与原因与排序理由</th><th scope="col">调整次序</th>
       </tr></thead><tbody>{filtered.slice((currentPage-1)*10,currentPage*10).map(item=>{
         const index=items.findIndex(value=>value.item_id===item.item_id);
+        const position=todayOrderPosition(order,data?.items??[],category,item.item_id);
         return <tr key={item.item_id} data-item-id={item.item_id} aria-selected={selectedItemId===item.item_id}>
           <td><button id={"morning-item-"+item.item_id} className="boss-f01-item-link" type="button" onClick={()=>onSelectItem?onSelectItem(item):onNavigate(item.page_id,item.target_id||item.object_id)}
             onKeyDown={event=>{if(event.altKey&&["ArrowUp","ArrowDown"].includes(event.key)){event.preventDefault();move(index,event.key==="ArrowUp"?-1:1);}}}>{item.title}</button>
             <span className="boss-f01-cell-note">{labels[item.category]}{item.important?" · 重要事项":""} · v{item.version??"未知"}</span></td>
           <td>{item.coordinator_id??"尚未提供"}</td><td>{item.due_at??"期限尚未提供"}</td><td>{morningState(item.state??"状态尚未提供")}</td>
           <td><p>{item.reason}</p><ul>{item.sorting_reasons?.map(reason=><li key={reason}>{morningReason(reason)}</li>)}</ul></td>
-          <td><div className="boss-f01-order-buttons"><button type="button" className="boss-btn" disabled={!orderEnabled||index===0||busy||Boolean(pending)} onClick={()=>move(index,-1)} aria-label={"提高事项次序："+item.title}>上移</button>
-            <button type="button" className="boss-btn" disabled={!orderEnabled||index===items.length-1||busy||Boolean(pending)} onClick={()=>move(index,1)} aria-label={"降低事项次序："+item.title}>下移</button></div></td>
+          <td><div className="boss-f01-order-buttons"><button type="button" className="boss-btn" disabled={!orderEnabled||position.index<=0||busy||Boolean(pending)} onClick={()=>move(index,-1)} aria-label={"提高事项次序："+item.title}>上移</button>
+            <button type="button" className="boss-btn" disabled={!orderEnabled||position.index<0||position.index===position.total-1||busy||Boolean(pending)} onClick={()=>move(index,1)} aria-label={"降低事项次序："+item.title}>下移</button></div></td>
         </tr>;
       })}</tbody></table></div>
       {!loading&&filtered.length===0&&<p className="boss-f01-empty">{data?"当前资料在此分类没有可展示事项；来源及覆盖缺口见右侧。":"资料尚待读取，事项数量尚未确定。"}</p>}
