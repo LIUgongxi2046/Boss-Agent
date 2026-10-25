@@ -5,7 +5,7 @@
   "decision_id": "D-MENU-DELIVERY-20261024",
   "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
   "design_fidelity_requirements": "docs/menu-delivery/高保真还原执行要求.md",
-  "source": "根据最新用户明确指令，从F01按PRD/完整功能/最新v7逐个菜单重新确认，保留v6已交付证据和N03在途成果",
+  "source": "用户2026-10-25明确要求F01工程收口，固定源码、聚焦证据与人工验收入口；保留完整PRD及未完成的v7和Mac验收，不继续零散开发",
   "revalidation": {
     "decision_id": "D-MENU-REVALIDATION-FROM-F01-20261025",
     "baseline_id": "boss-menu-f01-revalidation-v7-20261025-v1",
@@ -164,7 +164,80 @@
         "full_native_desktop_recovery": "NOT_RUN"
       }
     },
-    "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度"
+    "full_checklist_matrix": "docs/menu-delivery/F01/integration.md#2026-10-25-f01-18项新版验收逐条缺口表同一正式工单非第二套进度",
+    "closeout": {
+      "decision_id": "D-MENU-F01-SCOPE-FREEZE-20261025",
+      "status": "ENGINEERING_SCOPE_FROZEN__REQUIRED_V7_AND_MAC_EVIDENCE_PENDING",
+      "active_menu": "MENU-F01",
+      "record": "docs/menu-delivery/F01/closeout.md",
+      "user_intent": "F01收口吧",
+      "freeze_source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+      "code_compare": {
+        "base": "5ac660330fce99c925163f06a62951563a24d383",
+        "head": "fa2a4ac36989332e52168c2f5fff7830b63d519d",
+        "conclusion": "PRODUCT_SOURCE_UNCHANGED_AFTER_FROZEN_ARTIFACT",
+        "changed_files": [
+          ".github/workflows/boss-agent-f01.yml",
+          "docs/menu-delivery/F01/integration.md",
+          "specs/feature-delivery.json"
+        ]
+      },
+      "verified_scoped_tests": {
+        "node": 27,
+        "native_agent": 39,
+        "sqlite_api_and_artifact": 53,
+        "run_id": 40195948810
+      },
+      "build": {
+        "result": "REACT_WEBUI_BUILD_PASSED__COMPREHENSIVE_PYTHON_WORKFLOW_FAILED_OTHER_N03",
+        "run_id": 40195931205,
+        "artifact_id": 12599921374,
+        "source_commit": "5ac660330fce99c925163f06a62951563a24d383",
+        "artifact_expires_at": "2026-11-08T13:05:21Z"
+      },
+      "not_yet_verified": {
+        "f01_v7_html_css_js_assets": "UNAVAILABLE_AS_AUTHORIZED_RAW_BYTES",
+        "v7_dom_style_responsive_comparison": "NOT_RUN",
+        "target_mac_isolated_manual_login_and_business_e2e": "NOT_RUN",
+        "visual_feedback": "NOT_RUN",
+        "user_acceptance": "PENDING_USER_ACCEPTANCE"
+      },
+      "unclosed_current_v7_checkpoints": [
+        "MENU-F01.C01",
+        "MENU-F01.C02",
+        "MENU-F01.C03",
+        "MENU-F01.C04",
+        "MENU-F01.C05",
+        "MENU-F01.C06",
+        "MENU-F01.C07",
+        "MENU-F01.C08",
+        "MENU-F01.C09",
+        "MENU-F01.C10",
+        "MENU-F01.C11",
+        "MENU-F01.C12",
+        "MENU-F01.C13",
+        "MENU-F01.C14",
+        "MENU-F01.C15",
+        "MENU-F01.C16",
+        "MENU-F01.C17",
+        "MENU-F01.C18"
+      ],
+      "historical_v6_covered_checkpoint_count": 18,
+      "exact_version_manual_instructions": "docs/menu-delivery/F01/experience-v7-revalidation.md",
+      "permitted_reopen_causes": [
+        "V7_RAW_REFERENCE_AVAILABLE_FOR_SINGLE_SCOPED_COMPARISON",
+        "USER_AUTHORIZED_MAC_ISOLATED_MANUAL_REVIEW",
+        "CONFIRMED_BLOCKING_REGRESSION"
+      ],
+      "other_work": "DO_NOT_START_N02_OR_RESUME_N03_UNTIL_FORMAL_GATE_OR_NEW_EXPLICIT_USER_PRIORITY_DECISION",
+      "policies": [
+        "NO_AUTOMATIC_AUTHENTICATION",
+        "NO_VISUAL_SCREENSHOT",
+        "NO_UNAPPROVED_EXTERNAL_MODEL_API",
+        "NO_USER_PROCESS_OR_DATA_SWITCH",
+        "NO_AUTOMATION_RESTART"
+      ]
+    }
   },
   "suspended_current_menu": {
     "active_feature_id": "MENU-N03",
@@ -413,7 +486,7 @@
   "plan": "docs/菜单开发总计划.md",
   "active_feature_id": "MENU-F01",
   "active_ticket": "docs/menu-delivery/F01.md",
-  "current_stage": "MENU_F01_V7_REVALIDATION",
+  "current_stage": "MENU_F01_ENGINEERING_FROZEN_AWAITING_V7_AND_MAC_EVIDENCE",
   "candidate_commit": null,
   "implementation_commit": null,
   "baseline_commit": "7527537830f6c011c328dc3bb6b7567ff262c20b",
@@ -429,13 +502,13 @@
   "inventory": null,
   "inventory_sha256": null,
   "directed_review": {
-    "status": "PENDING_CURRENT_V7_REFERENCE_AND_BUILD",
+    "status": "PENDING_RAW_V7_DESIGN_AND_AUTHORIZED_MAC_GUI",
     "feature_id": "MENU-F01",
     "record": "docs/menu-delivery/F01/integration.md",
     "independent_product_run": false,
     "visual": "NOT_RUN"
   },
-  "candidate_scope": "F01原18项按最新v7源重新核验：真实今日事项/三类分类/日期/来源/排序/会话/会议与交办；复用v6能力，验证干净构建与独立运行，保护旧体验",
+  "candidate_scope": "F01工程冻结：保留已实现的日期/分类/来源/排序/原生晨间会话/交办与状态修复；新v7完整18项检查及Mac受控人工登录/交互仍须同版本证据，不降级设计和权限",
   "menu_completed_development_ids": [
     "MENU-F01",
     "MENU-N02"
@@ -459,7 +532,7 @@
     ],
     "business_evidence": "RETAINED_FOR_UNCHANGED_DEPENDENCIES",
     "parallel_menu_implementation": false,
-    "latest_v7_revalidation": "PENDING",
+    "latest_v7_revalidation": "BLOCKED_RAW_V7_DOM_AND_TARGET_MAC_GUI_REQUIRED",
     "historical_v6_rework_complete": true
   },
   "historical_menu_n02_handoff": {
