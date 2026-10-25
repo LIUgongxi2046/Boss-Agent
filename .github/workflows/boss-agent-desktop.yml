@@ -91,5 +91,7 @@ jobs:
           if-no-files-found: error
       - name: Syntax check manual-only F01 review launcher
         run: bash -n scripts/run_f01_manual_review.command
+      - name: Syntax check N02 isolated manual review launcher
+        run: bash -n scripts/run_n02_manual_review.command
       - name: Syntax check Electron host
         run: node --check validation/desktop/main.cjs
