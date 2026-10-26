@@ -921,3 +921,9 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
   .boss-v6[data-design="v7"] .boss-user{padding-left:4px}
   .boss-v6[data-design="v7"] .boss-kv{grid-template-columns:minmax(80px,35%) minmax(0,1fr)}
 }
+.boss-v6[data-design="v7"] .boss-stage input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.boss-v6[data-design="v7"] .boss-stage select,
+.boss-v6[data-design="v7"] .boss-stage textarea{min-height:40px;padding:7px 10px;border:1px solid #dce4ed;border-radius:8px;background:#fff;color:#172b4d;font:inherit;line-height:22px}
+.boss-v6[data-design="v7"] .boss-stage input[type="date"],
+.boss-v6[data-design="v7"] .boss-stage input[type="datetime-local"]{min-height:40px}
+.boss-v6[data-design="v7"] .boss-helper{overflow-wrap:anywhere;word-break:break-word}
