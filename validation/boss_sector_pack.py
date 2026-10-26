@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from business import now
 from boss_sector_api import CATALOGUE, SECTORS
 
-PACK_VERSION = "3"
+PACK_VERSION = "4"
 DEFINITION = "SECTOR-PACK-1"
 UNIT_MAP = {
     "F14": ["CNY/吨", "CNY/吨", "CNY/吨", "CNY/吨"],
@@ -61,6 +61,10 @@ def _rows(page):
     design = CATALOGUE.get(page) or {}
     filters = design.get("filters") or []
     fields = design.get("fields") or []
+    _, _, kpis = SECTORS[page]
+    kpi_units = UNIT_MAP.get(page, [""] * len(kpis))
+    unit_by_label = {label: kpi_units[index] if index < len(kpi_units) else ""
+                     for index, label in enumerate(kpis)}
     rows = []
     for index in range(6):
         values, dims = {}, {}
@@ -75,7 +79,7 @@ def _rows(page):
             elif label in dims:
                 values[label] = dims[label]
             else:
-                values[label] = _number(page, label, PERIODS[-1], "")
+                values[label] = _number(page, label, PERIODS[-1], unit_by_label.get(label, ""))
         rows.append({"id": page.lower() + "-row-" + str(index + 1), "values": values,
                      "dims": dims, "version": "1", "state": "SIMULATED"})
     return rows

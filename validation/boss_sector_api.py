@@ -182,6 +182,39 @@ class BossSectorAPI:
                          for row in facts.get("relations", [])]
             workflow = [{**row, "source_ids": row.get("source_ids") or pack_source_ids}
                         for row in facts.get("workflow", [])]
+        metric_values = {}
+        for metric in (facts or {}).get("metrics", []):
+            numbers = []
+            for record in records:
+                try:
+                    numbers.append(float(record["values"].get(metric["label"])))
+                except (TypeError, ValueError):
+                    continue
+            if numbers and metric.get("unit"):
+                total = sum(numbers)
+                value = total / len(numbers) if metric["unit"] == "%" else total
+                text = str(round(value, 2)).rstrip("0").rstrip(".")
+                metric_values[metric["label"]] = text if text else "0"
+        metrics = []
+        for index, metric in enumerate((facts or {}).get("metrics", [])):
+            metrics.append({"id": f"{page}-kpi-{index}", "label": metric["label"],
+                            "value": metric_values.get(metric["label"], metric["points"][-1]["value"]),
+                            "unit": metric["unit"], "period": (facts or {}).get("period"),
+                            "source_ids": [pack["source_id"]] if pack else [], "state": "SIMULATED",
+                            "definition_version": "1", "comparability": "同一模拟资料包与指标定义版本"})
+        if not facts:
+            metrics = [{"id": f"{page}-kpi-{index}", "label": label, "value": None, "unit": None,
+                        "period": None, "source_ids": [], "state": "SOURCE_NOT_AVAILABLE",
+                        "definition_version": "1", "comparability": "当前没有可比较的正式明细"}
+                       for index, label in enumerate(kpis)]
+        trend = None
+        if facts and facts["metrics"]:
+            first = facts["metrics"][0]
+            points = [{"period": point["period"], "value": point["value"],
+                       "source_ids": [pack["source_id"]]} for point in first["points"]]
+            if first["label"] in metric_values:
+                points[-1]["value"] = metric_values[first["label"]]
+            trend = {"metric_id": first["label"], "unit": first["unit"], "points": points}
         return 200, {
             "projection": "sector-workspace", "page_id": page, "title": title,
             "source_type": "SIMULATED", "namespace": self.namespace,
@@ -191,21 +224,8 @@ class BossSectorAPI:
             "design_filters": design_filters,
             "filter_options": (facts or {}).get("filter_options", {}),
             "applied_filters": applied,
-            "metrics": ([{"id": f"{page}-kpi-{index}", "label": metric["label"],
-                          "value": metric["points"][-1]["value"], "unit": metric["unit"],
-                          "period": facts["period"], "source_ids": [pack["source_id"]],
-                          "state": "SIMULATED", "definition_version": "1",
-                          "comparability": "同一模拟资料包与指标定义版本"}
-                         for index, metric in enumerate(facts["metrics"])] if facts else
-                        [{"id": f"{page}-kpi-{index}", "label": label, "value": None, "unit": None,
-                          "period": None, "source_ids": [], "state": "SOURCE_NOT_AVAILABLE",
-                          "definition_version": "1", "comparability": "当前没有可比较的正式明细"}
-                         for index, label in enumerate(kpis)]),
-            "trend": ({"metric_id": facts["metrics"][0]["label"], "unit": facts["metrics"][0]["unit"],
-                       "points": [{"period": point["period"], "value": point["value"],
-                                   "source_ids": [pack["source_id"]]}
-                                  for point in facts["metrics"][0]["points"]]}
-                      if facts and facts["metrics"] else None),
+            "metrics": metrics,
+            "trend": trend,
             "records": records, "sections": sections, "relations": relations, "workflow": workflow,
             "sources": sources, "coverage": coverage, "missing_fields": missing,
             "availability": "SIMULATED_METRICS_ONLY" if facts else "SOURCE_NOT_AVAILABLE", "contacts": contacts,

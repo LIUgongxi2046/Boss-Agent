@@ -60,6 +60,8 @@ def test_pack_provides_metrics_trend_and_source(store):
     assert first["period"] == "2026-10"
     assert first["source_ids"] == ["sector-f15-a"]
     assert first["state"] == "SIMULATED"
+    expected_total = round(sum(float(row["values"]["订单"]) for row in body["records"]), 2)
+    assert abs(float(first["value"]) - expected_total) < 0.01
     assert body["trend"]["metric_id"] == first["label"]
     assert [point["period"] for point in body["trend"]["points"]] == ["2026-08", "2026-09", "2026-10"]
     assert body["sources"][0]["source_id"] == "sector-f15-a"
@@ -89,6 +91,10 @@ def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
     assert second["query_id"] != first["query_id"]
     assert 0 < len(second["records"]) < len(first["records"])
     assert all(row["values"]["区域"] == "华东" for row in second["records"])
+    expected_total = round(sum(float(row["values"]["订单"]) for row in second["records"]), 2)
+    metric = next(row for row in second["metrics"] if row["label"] == "订单")
+    assert abs(float(metric["value"]) - expected_total) < 0.01
+    assert metric["value"] != next(row for row in first["metrics"] if row["label"] == "订单")["value"]
 
 
 def test_owner_decision_is_saved_and_listed_for_current_query(store):
