@@ -6,6 +6,8 @@
 
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| V7-FRONTEND | [全部电脑端界面](V7-FRONTEND.md) | 全部72个Desktop v7主视图、公共框架、页面交互与适用状态；前端完成后接续后端和Agent；状态采用feature-delivery.json |
+| V7-BACKEND | [后端与页面服务](V7-BACKEND.md) | 全部新增页面读写、权限、版本、持久化、原请求查询与实际消费者；状态采用feature-delivery.json |
 | SHOW-ALL-MENUS | [全部菜单显示](SHOW-ALL-MENUS.md) | 本人六组、维护四组及72项设计页面按角色显示；侧栏全部页面、目录、搜索、直接入口及History；10项检查含实际React点击与Chromium前进后退、严格TypeScript通过，产品认证UI与独立启动尚未验证 |
 | MENU-N03-N3 | [经营关注完整菜单](../menu-delivery/N03/integration.md) | FR-02/03/14—23、原始v6 N03、MENU-N03.C01—C26；范围/十专题/指标/提醒/关联/来源、实际会话及连续返回；正式状态读取原始feature-delivery.json |
 | MENU-N03-N1 | [经营关注领域](../menu-delivery/N03/backend.md) | BusinessOverviewAPI、BusinessOverviewEntry、BusinessOverviewPreparation、经营范围/专题/来源绑定、原编号历史、C17交办源审查、meeting范围限定材料与businessMeetingPreparationRead；正式状态读取N3的feature-delivery.json |

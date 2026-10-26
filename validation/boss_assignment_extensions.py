@@ -5,6 +5,7 @@ from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 
 from business import require
+from boss_execution_scope import NAMESPACE
 from boss_command_api import BossCommandAPI
 from boss_simulation_api import _context
 from boss_task_reminders import current, synchronize_task_due
@@ -31,7 +32,7 @@ class AssignmentExtensionAPI:
 
     def _context(self, db):
         context = _context(db)
-        require(context["namespace"] == "ui-check" and context["owner_id"] == "boss-1", "延期决定不属于当前本人范围", web.HTTPForbidden)
+        require(context["namespace"] == NAMESPACE and context["owner_id"] == "boss-1", "延期决定不属于当前本人范围", web.HTTPForbidden)
         return context
 
     def execute(self, role, payload):

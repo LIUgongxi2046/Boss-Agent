@@ -1,13 +1,29 @@
 import json
+from datetime import datetime
 
 from aiohttp import web
 
 from business import require
 
 
+def current_memory(db, namespace):
+    row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='memory' AND id='current'", (namespace,)).fetchone()
+    return json.loads(row[0]) if row is not None else None
+
+
 def confirmed_memory(db, namespace, memory, owner_id):
+    if memory is None:
+        return None
     if memory["confirmation_state"] != "CONFIRMED":
         return None
+    if memory.get("valid_until") is not None:
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='clock' AND id='current'", (namespace,)).fetchone()
+        require(row is not None, "记忆有效期缺少业务时钟")
+        expiry = datetime.fromisoformat(memory["valid_until"])
+        reference = datetime.fromisoformat(json.loads(row[0])["at"])
+        require(expiry.tzinfo is not None and reference.tzinfo is not None, "记忆有效期需要包含时区")
+        if reference >= expiry:
+            return None
     matches = []
     for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='authorization'", (namespace,)).fetchall():
         authorization = json.loads(row[0])

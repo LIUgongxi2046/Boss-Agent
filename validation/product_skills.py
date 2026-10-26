@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator
 from boss_native_skills import BossSkillCatalog
 from boss_skill_drafts import BossSkillDrafts
 from business import checksum, encode, require
+from boss_execution_scope import NAMESPACE
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,7 +100,7 @@ class ProductSkills:
         require(self._without_skills(before) == self._without_skills(self.runtime.native_configuration),
                 "其他原生运行配置尚未被当前Runtime采用")
         with self.runtime.store.connect() as db:
-            current = self.runtime.store.get(db, "ui-check", "configuration", "current")
+            current = self.runtime.store.get(db, NAMESPACE, "configuration", "current")
         result = operation()
         config = self.runtime._native()
         require(self._without_skills(config.model_dump(mode="json")) == self._without_skills(before),

@@ -4,15 +4,17 @@ from decimal import Decimal, localcontext
 from aiohttp import web
 
 from business import checksum, encode, now, require
+from boss_execution_scope import NAMESPACE
 from boss_alert_policy import DEFINITION, GENERATOR, MANIFEST, get, validate
 from boss_metrics import aggregate_metrics
 from boss_simulation_api import _context
 from boss_source_access import require_current_business_source
+from boss_v7_metrics import apply_configurations, calculate, effective_configuration, policy_fingerprint, record_adoption, selected_rows
 
 
 def scope(db):
     context = _context(db)
-    require(context["namespace"] == "ui-check" and context["owner_id"] == "boss-1", "当前经营提醒执行范围不符", web.HTTPForbidden)
+    require(context["namespace"] == NAMESPACE and context["owner_id"] == "boss-1", "当前经营提醒执行范围不符", web.HTTPForbidden)
     return context
 
 
@@ -145,13 +147,19 @@ class BusinessAlertInputAPI:
             base_rows, current_rows = ([row for row in data["details"] if row["period"] == period] for period in ("BASE", "CURRENT"))
             base_metrics = aggregate_metrics(base_rows)["metrics"]
             current_metrics = aggregate_metrics(current_rows)["metrics"]
+            base_metrics, base_adoption = apply_configurations(db, ns, base_rows, base_metrics, cache=True)
+            current_metrics, current_adoption = apply_configurations(db, ns, current_rows, current_metrics, cache=True)
             base, current = base_metrics["gross_margin"][0], current_metrics["gross_margin"][0]
             frame = payload["frame"]
             with localcontext() as numeric:
                 numeric.prec = 80
                 recovery_cost = None
                 if frame == "RECOVERY":
-                    base_revenue, base_cost, current_revenue = base_metrics["revenue"][0], base_metrics["cost"][0], current_metrics["revenue"][0]
+                    policy = effective_configuration(db, ns, "gross_margin")
+                    selected_base = selected_rows(base_rows, policy["values"]) if policy else base_rows
+                    selected_current = selected_rows(current_rows, policy["values"]) if policy else current_rows
+                    base_revenue, base_cost = calculate(selected_base, "revenue"), calculate(selected_base, "cost")
+                    current_revenue = calculate(selected_current, "revenue")
                     recovery_cost = current_revenue * base_cost / base_revenue if base_revenue and base_cost is not None and current_revenue is not None else None
                     current = (current_revenue - recovery_cost) / current_revenue * 100 if current_revenue and recovery_cost is not None else None
                 change = current - base if current is not None and base is not None else None
@@ -172,6 +180,7 @@ class BusinessAlertInputAPI:
                 self.store.put(db, ns, "document_history", sid + ":" + old_document["version"], old_document)
             provenance = {field: MANIFEST[field] for field in ("definition_version", "seed", "source_type", "author_kind", "allowed_use", "real_enterprise_data", "third_party_authorization")}
             document = {**provenance, "source_id": sid, "version": version, "access_scope": data["owner_id"], "owner_id": data["owner_id"],
+                "metric_policy_sha256": policy_fingerprint(db, ns), "metric_calculations": {"BASE": base_adoption, "CURRENT": current_adoption},
                 "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"], "execution_namespace": ns,
                 "input_source_refs": [{"source_id": finance["source_id"], "version": finance["version"]}],
                 "input_source_fingerprints": {finance["source_id"]: checksum(finance)}, "initial_snapshot_sha256": checksum(data),
@@ -185,12 +194,14 @@ class BusinessAlertInputAPI:
             event = {"event_id": event_id, "version": version, "state": "CANCELED" if frame == "CANCELED" else "RECOVERED" if frame == "RECOVERY" else "OPEN",
                 "generated_by": GENERATOR, "source_type": "SIMULATED", "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"], "execution_namespace": ns,
                 "due_at": clock, "observed_at": clock, "data_as_of": data_as_of, "impact": facts["impact"], "facts": facts,
-                "basis_sha256": checksum({"snapshot": checksum(data), "periods": data["periods"], "finance": checksum(finance), "scope": facts["scope"]}),
+                "basis_sha256": checksum({"snapshot": checksum(data), "periods": data["periods"], "finance": checksum(finance), "scope": facts["scope"],
+                                          "metric_policy_sha256": policy_fingerprint(db, ns)}),
                 "source_refs": [{"source_id": row["source_id"], "version": row["version"]} for row in (finance, document)],
                 "source_fingerprints": {row["source_id"]: checksum(row) for row in (finance, document)},
                 **({"owner_plan_id": original["owner_plan_id"]} if original and original.get("owner_plan_id") else {})}
             self.store.put(db, ns, "event", event_id, event)
             self.store.put(db, ns, "business_alert_observation", event_id + ":v" + version, event)
+            record_adoption(self.store, db, ns, event_id + ":v" + version, {"BASE": base_adoption, "CURRENT": current_adoption})
             db.execute("DELETE FROM knowledge WHERE namespace=? AND source_id=?", (ns, sid))
             db.execute("INSERT INTO knowledge VALUES(?,?,?)", (ns, sid, document["content"]))
             result = {"source_type": "SIMULATED", "event_id": event_id, "event_version": version, "source_id": sid, "source_version": version,

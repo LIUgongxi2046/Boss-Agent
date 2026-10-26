@@ -3,6 +3,8 @@ from zoneinfo import ZoneInfo
 
 from business import checksum, now
 from boss_alert_policy import GENERATOR, get, items, material, record_dispatch
+from boss_scheduler_config import event_in_scope
+from boss_notification_snapshot import notification_snapshot
 
 
 def quiet(clock, configuration):
@@ -21,6 +23,8 @@ def dispatch(store, db, ns, only_event_id=None):
     results = []
     for event in items(db, ns, "event"):
         if event.get("generated_by") != GENERATOR or only_event_id is not None and event["event_id"] != only_event_id:
+            continue
+        if not event_in_scope(schedule, event):
             continue
         view = material(store, db, ns, data, event)
         evaluation, rule, reminder = view["evaluation"], view["business_rule"], view["reminder"]
@@ -91,6 +95,7 @@ def dispatch(store, db, ns, only_event_id=None):
                 store.put(db, ns, "notification_revision", notification_id + ":" + old_notice["version"], old_notice)
             notification = {**result, "notification_id": notification_id, "version": str(int(old_notice["version"]) + 1) if old_notice else "1",
                 "delivered_at": clock.isoformat(), "notification_center_state": "SAVED", "system_notification_state": "NOT_REQUESTED"}
+            notification = notification_snapshot(db, ns, event, notification)
             store.put(db, ns, "notification", notification_id, notification)
             store.put(db, ns, "delivery", event["event_id"], notification)
             store.put(db, ns, "business_alert_delivery", checksum(result), notification)
@@ -103,8 +108,9 @@ def dispatch(store, db, ns, only_event_id=None):
                 tracking["last_snooze_until"] = token
         elif reason == "SAME_INCIDENT_MERGED" and old_notice and old_notice["event_version"] != event["version"]:
             store.put(db, ns, "notification_revision", notification_id + ":" + old_notice["version"], old_notice)
-            store.put(db, ns, "notification", notification_id, {**old_notice, "version": str(int(old_notice["version"]) + 1),
-                "event_version": event["version"], "source_refs": event["source_refs"], "merged_at": clock.isoformat(), "merge_reason": reason})
+            store.put(db, ns, "notification", notification_id, notification_snapshot(db, ns, event, {
+                **old_notice, "version": str(int(old_notice["version"]) + 1), "event_version": event["version"],
+                "source_refs": event["source_refs"], "merged_at": clock.isoformat(), "merge_reason": reason}))
         store.put(db, ns, "business_alert_tracking", event["event_id"], tracking)
         results.append(record_dispatch(store, db, ns, result))
     return results

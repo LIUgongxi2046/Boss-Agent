@@ -1,0 +1,17 @@
+core_order,prompt_id,name,purpose,desktop,mobile
+01,F01,今日工作,老板任务入口与当前进展,desktop/F01.txt,mobile/F01.txt
+02,N02,连续对话工作页,追问、补充、查看执行及产物,desktop/N02.txt,mobile/N02.txt
+03,F03,BI 查询与连续追问,查看经营范围、指标与明细,desktop/F03.txt,mobile/F03.txt
+04,D01,来源原文与支持关系,查看依据、版本及支持范围,desktop/D01.txt,mobile/D01.txt
+05,F04,会前准备,议题、历史承诺及材料缺口,desktop/F04.txt,mobile/F04.txt
+06,F05,会后纪要核查,区分意见、决定与交办草稿,desktop/F05.txt,mobile/F05.txt
+07,F06,交办与承诺详情,期限、反馈、证据及本人完成确认,desktop/F06.txt,mobile/F06.txt
+08,D02,当前动作必要决定,展示对象、内容、授权及后果,desktop/D02.txt,mobile/D02.txt
+09,N06,通知中心,返回事项、知晓、暂缓及关闭提醒,desktop/N06.txt,mobile/N06.txt
+10,F27,语音输入与文本核查,录音、转写核查及共同交办入口,desktop/F27.txt,mobile/F27.txt
+11,F25,模拟中心总览,数据、接口、事件及执行空间,desktop/F25.txt,mobile/F25.txt
+12,A08,模型与 Provider,模型连接、验证及启用,desktop/A08.txt,mobile/A08.txt
+13,A05,Prompt 版本,职责要求、版本及实际采用,desktop/A05.txt,mobile/A05.txt
+14,A09,Tools 与连接,参数、工具权限及接口映射,desktop/A09.txt,mobile/A09.txt
+15,A13,调度计划,时间事件、暂停、取消及重复抑制,desktop/A13.txt,mobile/A13.txt
+16,A15,运行记录与用量,模型工具、状态、错误及费用,desktop/A15.txt,mobile/A15.txt

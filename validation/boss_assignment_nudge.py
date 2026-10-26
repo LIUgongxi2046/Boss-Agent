@@ -12,7 +12,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 
 
 def nudge(api, db, data, payload, key):

@@ -15,11 +15,12 @@ from boss_travel import meeting_impacts
 from boss_people import meeting_impacts as people_meeting_impacts
 from boss_owner_preferences import owner_goal_reference
 from boss_metrics import aggregate_metrics
+from boss_v7_metrics import apply_configurations, record_adoption
 from boss_meetings import meeting_materials
 from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 
-NS="ui-check"
+from boss_execution_scope import NAMESPACE as NS
 
 
 def _get(db, kind, key):
@@ -56,7 +57,7 @@ def _documents(db, data):
     return results
 
 
-def _metrics(data, approved):
+def _metrics(db, data, approved):
     if not approved:
         return {"available":False,"reason":"finance-note CURRENT source not available",
                 "values":[],"unexplained_causes":["缺少已核验的财务来源"]}
@@ -66,6 +67,7 @@ def _metrics(data, approved):
         group=[r for r in details if r["period"]==period and
                r["region_id"]=="region-1" and r["trade_type"]=="EXTERNAL_SALES"]
         computed=aggregate_metrics(group)
+        computed["metrics"], adopted = apply_configurations(db, NS, group, computed["metrics"])
         result.append({
             "period_scope":period,"date_range":data["periods"][period],
             "source_id":"finance-note","source_version":approved["version"],
@@ -74,6 +76,8 @@ def _metrics(data, approved):
                                "unit":computed["metrics"][metric][1]}
                        for metric in ("sales_quantity","revenue","gross_profit","gross_margin")},
             "detail_refs":[r["record_id"] for r in group],
+            **({"metric_configurations": {identifier: {key: value for key, value in calculation.items() if key not in {"calculated_at", "next_refresh_at"}}
+                                           for identifier, calculation in adopted.items()}} if adopted else {}),
         })
     return {"available":True,"values":result,
             "unexplained_causes":["贡献明细与经营变化原因未提供，不能推断"]}
@@ -123,7 +127,7 @@ def compile_brief(db,data):
             })
     finance=next((d for d in current_docs if d["source_id"]=="finance-note" and
                   d["status"]=="CURRENT"),None)
-    calculation=_metrics(data,finance)
+    calculation=_metrics(db,data,finance)
     if not calculation["available"]:missing.append("metric:finance-note")
     meeting_event=_get(db,"event",data["event"]["event_id"])
     return {
@@ -183,6 +187,8 @@ def prepare(api,db,data,payload):
         "source_type":"SIMULATED",
     }
     api.store.put(db,NS,"meeting_brief",meeting["meeting_id"],record)
+    record_adoption(api.store, db, NS, record["brief_id"] + ":v" + new_version,
+                    {item["period_scope"]: item.get("metric_configurations", {}) for item in compiled["metrics"]["values"]})
     return {
         "source_type":"SIMULATED","brief_id":record["brief_id"],
         "meeting_id":meeting["meeting_id"],"version":new_version,

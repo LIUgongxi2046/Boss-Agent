@@ -1,507 +1,115 @@
-import {
-  useEffect, useRef, useState, type ReactNode,
-} from "react";
-import {
-  AlertCircle, BellRing, CheckCircle2, FileClock,
-  History, Loader2, RefreshCw, ShieldCheck, SlidersHorizontal,
-} from "lucide-react";
-import { useClient } from "@/providers/ClientProvider";
+import {useEffect,useRef,useState} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import {useClient} from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
-import {deliveredPage} from "./delivered-navigation";
+import {V7Empty,V7Fact,V7Panel,V7ReadState} from "./BossV7UI";
+import {BossNotificationPermissions} from "./BossDesktopNotifications";
 
-type GoalSettings = {
-  goals: string[]; topics: string[]; reading_requirement: string;
-  scope: "OWNER_WORKSPACE"|"DAILY_BRIEF"|"MEETING_PREP";
-  valid_until: string|null; source: string;
-};
-type NoticeSettings = {
-  timezone: string; quiet_start: number; quiet_end: number;
-  notifications_enabled: boolean; important_during_quiet: boolean;
-  reading_format: "ACTIONS_FIRST"|"SUMMARY"|"DETAIL";
-  visibility: "BOSS_ONLY"; calendar_share_limit:"BUSY_ONLY";
-  valid_until: string|null; source: string;
-};
-type Settings = GoalSettings|NoticeSettings;
-type RecordState = {
-  id:string;version:string;state:string;content:Settings;
-  content_sha256:string;source_draft_version?:string;
-  confirmed_at?:string; saved_at?:string;
-};
-type Projection = {
-  source_type:"SIMULATED";projection:"owner-goals"|"owner-notice";
-  draft:RecordState|null;active:RecordState|null;active_is_effective:boolean;
-  current_owner_profile?:{owner_confirmation:string;active_version:string|null};
-  runtime_context_observation?:{context_load_count:number;
-    observation:string;actual_model_compliance_verified:boolean};
-  technical_rules?:Record<string,unknown>;
-  technical_schedule?:Record<string,unknown>;
-  history:{version:string;state:string;confirmed_at?:string}[];
-  fixture_goals_are_owner_confirmed?:boolean;
-  calendar_share_per_contact_requires_F12?:boolean;
-};
-type Result={
-  version:string;state:string;content_sha256?:string;
-  authorization_id?:string;source_draft_version?:string;
-};
-type Pending={
-  action:string;key:string;payload:Record<string,unknown>;
-  title:string;details:string[];
-};
-type Props={
-  pageId:"N07"|"N08";onNavigate:(page:string)=>void;
-  onDirtyChange:(dirty:boolean)=>void;
-};
+type GoalSettings={goals:string[];topics:string[];reading_requirement:string;scope:"OWNER_WORKSPACE"|"DAILY_BRIEF"|"MEETING_PREP";valid_until:string|null;source:string};
+type NoticeSettings={timezone:string;quiet_start:number;quiet_end:number;notifications_enabled:boolean;important_during_quiet:boolean;reading_format:"ACTIONS_FIRST"|"SUMMARY"|"DETAIL";visibility:"BOSS_ONLY";calendar_share_limit:"BUSY_ONLY";valid_until:string|null;source:string};
+type RecordState={id:string;version:string;state:string;content:GoalSettings|NoticeSettings;content_sha256:string;confirmed_at?:string;saved_at?:string};
+type Projection={source_type:"SIMULATED";projection:"owner-goals"|"owner-notice";draft:RecordState|null;active:RecordState|null;active_is_effective:boolean;
+  runtime_context_observation?:{active_version?:string;context_load_count:number;last_loaded_at?:string;observation:string;actual_model_compliance_verified:boolean};
+  technical_rules?:{version?:string;timezone?:string;quiet_start?:number;quiet_end?:number};technical_schedule?:{version?:string;enabled?:boolean;canceled?:boolean};
+  history:{version:string;state:string;confirmed_at?:string}[]};
+type Props={pageId:"N07"|"N08";onNavigate:(page:string)=>void;onDirtyChange:(dirty:boolean)=>void};
+type Editor={goals:string;topics:string;reading:string;scope:GoalSettings["scope"]|"";until:string;timezone:string;quietStart:string;quietEnd:string;enabled:""|"true"|"false";important:""|"true"|"false";format:NoticeSettings["reading_format"]|""};
+const EMPTY:Editor={goals:"",topics:"",reading:"",scope:"",until:"",timezone:"",quietStart:"",quietEnd:"",enabled:"",important:"",format:""};
+const SCOPES={OWNER_WORKSPACE:"本人全部工作区",DAILY_BRIEF:"晨间简报",MEETING_PREP:"会议准备"};
+const FORMATS={ACTIONS_FIRST:"待行动事项优先",SUMMARY:"简要汇总",DETAIL:"详细模式"};
+function localTime(value:string|null){return value?new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(value)).replace(" ","T"):"";}
+function isGoals(value:GoalSettings|NoticeSettings):value is GoalSettings{return "goals" in value;}
+function rows(value:string){return value.split("\n").map(row=>row.trim()).filter(Boolean);}
 
-function Panel({title,note,children}:{
-  title:string;note?:string;children:ReactNode;
-}) {
-  return <section className="boss-panel">
-    <div className="boss-panel-head"><h2>{title}</h2>{note&&<small>{note}</small>}</div>
-    {children}
-  </section>;
-}
-function Value({label,children}:{label:string;children:ReactNode}){
-  return <div className="boss-kv"><span>{label}</span><strong>{children}</strong></div>;
-}
-function validUntil(local:string){
-  if(!local)return null;
-  if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(local))
-    throw new Error("截止时间缺少日期或分钟");
-  return local+":00+08:00";
-}
-function asLocal(input:string|null|undefined){
-  return input?input.slice(0,16):"";
-}
-function lines(raw:string){
-  return raw.split("\n").map(x=>x.trim()).filter(Boolean);
-}
-function isGoals(value:Settings):value is GoalSettings{
-  return "goals" in value;
+export function BossOwnerPreferences(props:Props){
+  const {token}=useClient();
+  const identity=useRef({token,sequence:0});
+  if(identity.current.token!==token)identity.current={token,sequence:identity.current.sequence+1};
+  return <OwnerPreferences key={props.pageId+identity.current.sequence} {...props}/>;
 }
 
-export function BossOwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
-  const {client,getToken}=useClient();
-  const isGoal=pageId==="N07";
-  const route=isGoal?"owner-goals":"owner-notice";
-  const [data,setData]=useState<Projection|null>(null);
-  const [revision,setRevision]=useState(0);
-  const [loading,setLoading]=useState(false);
-  const [dirty,setDirty]=useState(false);
-  const [error,setError]=useState("");
-  const [notice,setNotice]=useState("");
-  const [goals,setGoals]=useState("");
-  const [topics,setTopics]=useState("");
-  const [reading,setReading]=useState("");
-  const [scope,setScope]=useState<GoalSettings["scope"]>("OWNER_WORKSPACE");
-  const [validUntilLocal,setValidUntilLocal]=useState("");
-  const [timezone,setTimezone]=useState("Asia/Shanghai");
-  const [quietStart,setQuietStart]=useState(22);
-  const [quietEnd,setQuietEnd]=useState(7);
-  const [enabled,setEnabled]=useState(true);
-  const [important,setImportant]=useState(false);
-  const [format,setFormat]=useState<NoticeSettings["reading_format"]>("ACTIONS_FIRST");
-  const [pending,setPending]=useState<Pending|null>(null);
-  const [approved,setApproved]=useState(false);
-  const [busy,setBusy]=useState(false);
-  const [checking,setChecking]=useState(false);
-  const modalRef=useRef<HTMLElement|null>(null);
-  const reload=()=>setRevision(x=>x+1);
-  const noticeTx=useTransaction(()=>{setDirty(false);onDirtyChange(false);reload();},undefined,undefined,isGoal?"ownerGoalsReadonly":"ownerNotice");
-
-  useEffect(()=>{onDirtyChange(dirty||(!isGoal&&noticeTx.busy));},[dirty,isGoal,noticeTx.busy,onDirtyChange]);
+function OwnerPreferences({pageId,onNavigate,onDirtyChange}:Props){
+  const {getToken}=useClient();
+  const isGoal=pageId==="N07",route=isGoal?"owner-goals":"owner-notice";
+  const [data,setData]=useState<Projection|null>(null),[revision,setRevision]=useState(0);
+  const [loading,setLoading]=useState(true),[readError,setReadError]=useState(""),[formError,setFormError]=useState("");
+  const [editor,setEditor]=useState<Editor>(EMPTY),[basis,setBasis]=useState({draft:"0",active:"0"});
+  const [dirty,setDirty]=useState(false),dirtyRef=useRef(false);
+  const [recordView,setRecordView]=useState<"history"|"usage"|null>(null);
+  const reload=()=>setRevision(value=>value+1);
+  const transaction=useTransaction(recorded=>{if(recorded){dirtyRef.current=false;setDirty(false);onDirtyChange(false);}reload();},undefined,undefined,isGoal?"ownerGoals":"ownerNotice");
+  const stale=Boolean(data&&(basis.draft!==(data.draft?.version??"0")||basis.active!==(data.active?.version??"0")));
+  const disabled=loading||transaction.busy||!data||Boolean(readError)||stale;
+  const active=data?.active,selected=data?.draft??active;
+  const usage=data?.runtime_context_observation;
+  const actualUsage=usage&&usage.active_version===active?.version?usage:null;
+  const effectiveState=data?data.active_is_effective?"已确认且在有效期内":"当前未生效":"尚未读取";
+  useEffect(()=>{onDirtyChange(dirty||transaction.busy);},[dirty,transaction.busy,onDirtyChange]);
+  useEffect(()=>{const prevent=(event:BeforeUnloadEvent)=>{if(dirtyRef.current||transaction.busy){event.preventDefault();event.returnValue="";}};window.addEventListener("beforeunload",prevent);return()=>window.removeEventListener("beforeunload",prevent);},[transaction.busy]);
+  function hydrate(value:Projection){
+    const content=(value.draft??value.active)?.content;
+    setBasis({draft:value.draft?.version??"0",active:value.active?.version??"0"});
+    setEditor(!content?EMPTY:isGoals(content)?{...EMPTY,goals:content.goals.join("\n"),topics:content.topics.join("\n"),reading:content.reading_requirement,scope:content.scope,until:localTime(content.valid_until)}:{...EMPTY,timezone:content.timezone,quietStart:String(content.quiet_start),quietEnd:String(content.quiet_end),enabled:content.notifications_enabled?"true":"false",important:content.important_during_quiet?"true":"false",format:content.reading_format,until:localTime(content.valid_until)});
+    dirtyRef.current=false;setDirty(false);setFormError("");onDirtyChange(false);
+  }
   useEffect(()=>{
-    const onBeforeUnload=(event:BeforeUnloadEvent)=>{
-      if(dirty||pending||(!isGoal&&noticeTx.busy)){event.preventDefault();event.returnValue="";}
-    };
-    window.addEventListener("beforeunload",onBeforeUnload);
-    return ()=>window.removeEventListener("beforeunload",onBeforeUnload);
-  },[dirty,pending,isGoal,noticeTx.busy]);
-
-  function hydrate(record:RecordState|null){
-    if(!record)return;
-    const c=record.content;
-    setValidUntilLocal(asLocal(c.valid_until));
-    if(isGoals(c)){
-      setGoals(c.goals.join("\n"));setTopics(c.topics.join("\n"));
-      setReading(c.reading_requirement);setScope(c.scope);
+    const controller=new AbortController();setLoading(true);setReadError("");
+    void fetch("/api/boss/ui/workspace/"+route,{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal:controller.signal}).then(async response=>{
+      if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
+      if(!response.ok)throw new Error("读取本人设置失败，HTTP "+response.status);
+      const result=await response.json() as Projection;
+      if(result.source_type!=="SIMULATED"||result.projection!==route)throw new Error("设置来源或页面范围不匹配");
+      for(const record of [result.draft,result.active])if(record&&isGoals(record.content)!==isGoal)throw new Error("本人设置内容与当前页面不匹配");
+      if(controller.signal.aborted)return;
+      setData(result);setLoading(false);if(!dirtyRef.current)hydrate(result);
+    }).catch(error=>{if(controller.signal.aborted)return;setReadError(error.message);setLoading(false);});
+    return()=>controller.abort();
+  },[route,revision,getToken]);
+  function change<K extends keyof Editor>(key:K,value:Editor[K]){setEditor(current=>({...current,[key]:value}));dirtyRef.current=true;setDirty(true);setFormError("");}
+  function save(){
+    if(disabled||!data)return;
+    if(editor.until&&!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(editor.until)){setFormError("请填写完整有效期日期与时间。");return;}
+    const common={expected_version:basis.draft,valid_until:editor.until?editor.until+":00+08:00":null};
+    if(isGoal){
+      const goals=rows(editor.goals),topics=rows(editor.topics);
+      if(!goals.length||goals.length>8||goals.some(value=>value.length>160)||new Set(goals).size!==goals.length){setFormError("请填写1—8项不同目标，每项不超过160字。");return;}
+      if(topics.length>10||topics.some(value=>value.length>120)||new Set(topics).size!==topics.length){setFormError("关注主题最多10项，每项不超过120字且不能重复。");return;}
+      if(!editor.scope||!editor.reading.trim()||editor.reading.trim().length>800){setFormError("请选择适用范围，并填写1—800字的阅读要求。");return;}
+      transaction.propose("boss.owner.goals.save",{...common,goals,topics,reading_requirement:editor.reading.trim(),scope:editor.scope},"保存本人目标与关注要求",["原草稿版本："+basis.draft,"适用范围："+SCOPES[editor.scope],"目标："+goals.join("；"),"关注主题："+(topics.join("；")||"未指定"),"阅读要求："+editor.reading.trim(),"有效期："+(common.valid_until??"未设置期限"),"保存后为草稿，本人确认后才能在有效范围内采用。"]);
     }else{
-      setTimezone(c.timezone);setQuietStart(c.quiet_start);
-      setQuietEnd(c.quiet_end);setEnabled(c.notifications_enabled);
-      setImportant(c.important_during_quiet);setFormat(c.reading_format);
+      if(!editor.timezone.trim()||editor.quietStart===""||editor.quietEnd===""||editor.enabled===""||editor.important===""||editor.format===""){setFormError("请完整选择通知要求、时区、免打扰时段、事件升级及阅读格式。");return;}
+      transaction.propose("boss.owner.notice.save",{...common,timezone:editor.timezone.trim(),quiet_start:Number(editor.quietStart),quiet_end:Number(editor.quietEnd),notifications_enabled:editor.enabled==="true",important_during_quiet:editor.important==="true",reading_format:editor.format,visibility:"BOSS_ONLY",calendar_share_limit:"BUSY_ONLY"},"保存本人通知要求",["原草稿版本："+basis.draft,"通知时区："+editor.timezone.trim(),"免打扰："+editor.quietStart+":00 — "+editor.quietEnd+":00","本人通知："+(editor.enabled==="true"?"允许按有效规则提醒":"暂停"),"重要事件在免打扰期间提醒："+(editor.important==="true"?"允许，仍受技术规则限制":"不允许"),"阅读格式："+FORMATS[editor.format],"有效期："+(common.valid_until??"未设置期限"),"私人正文仅本人可见；占用时间分享继续逐对象授权。"]);
     }
   }
-
-  useEffect(()=>{
-    const controller=new AbortController();
-    const token=getToken();
-    if(!token){setError("当前身份已经失效，请重新认证");return;}
-    setLoading(true);
-    void fetch("/api/boss/ui/workspace/"+route,{
-      headers:{Authorization:"Bearer "+token},cache:"no-store",
-      signal:controller.signal,
-    }).then(async r=>{
-      if(!r.ok)throw new Error("读取本人设置失败，HTTP "+r.status);
-      const result=await r.json() as Projection;
-      if(result.source_type!=="SIMULATED"||result.projection!==route)
-        throw new Error("设置来源或页面范围不匹配");
-      return result;
-    }).then(result=>{
-      if(controller.signal.aborted)return;
-      setData(result);setLoading(false);
-      if(!dirty){
-        hydrate(result.draft||result.active);
-      }
-    }).catch(e=>{
-      if(controller.signal.aborted)return;
-      setError(e instanceof Error?e.message:String(e));setLoading(false);
-    });
-    return ()=>controller.abort();
-  },[route,revision,getToken]);
-
-  useEffect(()=>{
-    if(!pending)return;
-    const previous=document.activeElement instanceof HTMLElement?document.activeElement:null;
-    modalRef.current?.focus();
-    const handler=(event:KeyboardEvent)=>{
-      if(event.key==="Escape"&&!busy&&!checking){
-        setPending(null);setApproved(false);return;
-      }
-      if(event.key!=="Tab"||!modalRef.current)return;
-      const nodes=Array.from(modalRef.current.querySelectorAll<HTMLElement>(
-        "input:not([disabled]),button:not([disabled])"
-      )).filter(n=>n.getClientRects().length>0);
-      if(nodes.length===0)return;
-      if(event.shiftKey&&document.activeElement===nodes[0]){
-        event.preventDefault();nodes[nodes.length-1].focus();
-      }else if(!event.shiftKey&&document.activeElement===nodes[nodes.length-1]){
-        event.preventDefault();nodes[0].focus();
-      }
-    };
-    document.addEventListener("keydown",handler);
-    return ()=>{document.removeEventListener("keydown",handler);previous?.focus();};
-  },[pending?.key,busy,checking]);
-
-  function changed(update:()=>void){
-    update();setDirty(true);setNotice("");
+  function confirm(){
+    if(disabled||dirty||!data?.draft)return;
+    transaction.propose(isGoal?"boss.owner.goals.confirm":"boss.owner.notice.confirm",{expected_draft_version:data.draft.version,expected_active_version:data.active?.version??"0",content_sha256:data.draft.content_sha256},isGoal?"确认当前本人要求":"确认当前通知要求",["待确认草稿：v"+data.draft.version,"当前有效版本："+(data.active?.version??"尚未确认"),"内容摘要："+data.draft.content_sha256,"有效期："+(data.draft.content.valid_until??"未设置期限"),"确认后仅在有效期和本人授权范围内采用当前内容。"]);
   }
-  function propose(action:string,payload:Record<string,unknown>,
-                   title:string,details:string[]){
-    if(!isGoal){if(noticeTx.busy)return;if(action!=="boss.owner.notice.save"&&action!=="boss.owner.notice.confirm")throw new Error("当前通知设置动作无效");noticeTx.propose(action,payload,title,details);return;}
-    setPending({action,payload,title,details,key:"boss-"+crypto.randomUUID()});
-    setApproved(false);setError("");setNotice("");
-  }
-  function saveDraft(){
-    if(loading||busy)return;
-    try{
-      const expiry=validUntil(validUntilLocal);
-      const common={
-        expected_version:data?.draft?.version||"0",
-        valid_until:expiry,
-      };
-      if(isGoal){
-        const gs=lines(goals);const ts=lines(topics);
-        if(!gs.length||gs.some(x=>x.length>160)||gs.length>8)
-          throw new Error("请填写 1—8 项目标，每项最多160字");
-        if(ts.length>10||ts.some(x=>x.length>120))
-          throw new Error("关注主题最多10项，每项最多120字");
-        if(!reading.trim()||reading.length>800)
-          throw new Error("阅读要求须填写 1—800 字");
-        propose("boss.owner.goals.save",{
-          ...common,goals:gs,topics:ts,
-          reading_requirement:reading.trim(),scope,
-        },"保存目标与关注要求草稿",[
-          "适用范围："+scope,"目标："+gs.join("；"),
-          "关注主题："+(ts.join("；")||"未指定"),
-          "阅读要求："+reading.trim(),
-          "保存后为 DRAFT，不会修改当前生效版本，也不会被新模型任务采用。",
-        ]);
-      }else{
-        propose("boss.owner.notice.save",{
-          ...common,timezone:timezone.trim(),
-          quiet_start:quietStart,quiet_end:quietEnd,
-          notifications_enabled:enabled,
-          important_during_quiet:important,reading_format:format,
-          visibility:"BOSS_ONLY",calendar_share_limit:"BUSY_ONLY",
-        },"保存通知要求草稿",[
-          "IANA 时区："+timezone,
-          "免打扰："+quietStart+":00 — "+quietEnd+":00",
-          "通知状态："+(enabled?"允许按技术规则提醒":"本人暂停通知"),
-          "重要事件允许穿透本人免打扰："+(important?"是（技术规则仍可限制）":"否"),
-          "分享范围：仅 BUSY_ONLY；F12 单独按收件人授权。",
-          "保存仅为草稿，不会影响当前后台调度。",
-        ]);
-      }
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-  }
-  function confirmDraft(){
-    if(!data?.draft||dirty){setError("请先保存并重读本次草稿");return;}
-    propose(isGoal?"boss.owner.goals.confirm":"boss.owner.notice.confirm",{
-      expected_draft_version:data.draft.version,
-      expected_active_version:data.active?.version||"0",
-      content_sha256:data.draft.content_sha256,
-    },isGoal?"本人确认长期目标与阅读要求":"本人确认通知与可见范围",[
-      "待确认草稿 v"+data.draft.version,
-      "当前有效版本 "+(data.active?.version||"无"),
-      "目标摘要哈希："+data.draft.content_sha256.slice(0,16),
-      isGoal?
-        "此后仅在有效期及适用范围内采用于 F01、F04 及新任务上下文。模型是否遵守需独立验证。":
-        "确认后下次模拟调度读取该版本；只能增加老板侧的暂停/静默限制，不能解除技术限制。",
-      "本人确认与保存草稿是两个独立动作。",
-    ]);
-  }
-  function applied(result:Result){
-    setPending(null);setApproved(false);setDirty(false);
-    onDirtyChange(false);
-    setNotice("当前模拟 SQLite 回执："+result.state+" · v"+result.version+
-      "。请重新读取有效版本和实际采用/抑制记录。");
-    reload();
-  }
-  async function submit(){
-    if(!pending||!approved||busy||checking)return;
-    setBusy(true);setError("");
-    try{
-      const result=await client.requestMutation<Result>(pending.action,{
-        ...pending.payload,client_request_id:pending.key,
-      });
-      applied(result);
-    }catch(e){
-      setError((e instanceof Error?e.message:String(e))+
-        "。执行结果可能未知，请优先查询同一幂等请求回执，不更换编号盲目重复提交。");
-    }finally{setBusy(false);}
-  }
-  async function reconcile(){
-    if(!pending||busy||checking)return;
-    const token=getToken();
-    if(!token){setError("身份已失效，无法查询原请求");return;}
-    setChecking(true);setError("");
-    try{
-      const params=new URLSearchParams({
-        action:pending.action,client_request_id:pending.key,
-      });
-      const response=await fetch("/api/boss/ui/operation-status?"+params,{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
-      });
-      if(!response.ok)throw new Error("查询失败 HTTP "+response.status);
-      const record=await response.json() as {
-        action:string;client_request_id:string;outcome:string;result?:Result;
-      };
-      if(record.action!==pending.action||record.client_request_id!==pending.key)
-        throw new Error("请求回执的动作或标识不一致");
-      if(record.outcome==="RECORDED"&&record.result)applied(record.result);
-      else if(record.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
-        setError("当前执行空间尚无原请求回执，不代表原操作未执行。请核对正式业务对象，必要时沿用原请求编号重试。");
-        reload();
-      }else throw new Error("未知回执状态，禁止自动提交第二次");
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setChecking(false);}
-  }
-
-  return <div className={!isGoal?"boss-fc04-reminders":undefined}>
-    <div className="boss-workspace-toolbar">
-      <span className="boss-workspace-note">
-        <span className="boss-tag boss-tag-amber">SIMULATED · BOSS ONLY</span>
-        {pageId} · {isGoal?"本人目标与关注要求":"通知要求与可见范围"}
-      </span>
-      <button type="button" className="boss-btn" disabled={loading}
-        onClick={reload}>
-        {loading?<Loader2 size={15} className="boss-spin"/>:
-          <RefreshCw size={15}/>} 重新读取当前版本
-      </button>
-    </div>
-    {error&&<div className="boss-status boss-status-error" role="alert">
-      <AlertCircle size={16}/>{error}
-    </div>}
-    {notice&&<div className="boss-status boss-status-ok" role="status">
-      <CheckCircle2 size={16}/>{notice}
-    </div>}
-    {dirty&&<div className="boss-status boss-status-warn" role="status">
-      <AlertCircle size={16}/> 当前编辑有未保存内容。离开本页需要明确放弃草稿；仅点击保存还不会正式启用。
-    </div>}
-    <div className="boss-columns">
-      <div className="boss-column">
-        <Panel title={isGoal?"目标、关注主题及长期阅读要求":"通知时间、升级与阅读格式"}
-          note="Desktop v6 原版编辑表单 · 保存 / 本人确认分离">
-          <fieldset className="boss-owner-setting-fields" disabled={busy||(!isGoal&&noticeTx.busy)}>
-          {isGoal?<>
-            <label className="boss-field">
-              <span>目标内容（每行一项，最多8项）</span>
-              <textarea rows={5} value={goals} maxLength={1600}
-                onChange={e=>changed(()=>setGoals(e.target.value))}
-                placeholder="请输入本人明确确认的工作目标；不自动采用演示建议。"/>
-            </label>
-            <div className="boss-form-grid">
-              <label>适用范围<select value={scope}
-                onChange={e=>changed(()=>setScope(e.target.value as GoalSettings["scope"]))}>
-                <option value="OWNER_WORKSPACE">本人全部工作区</option>
-                <option value="DAILY_BRIEF">晨间简报</option>
-                <option value="MEETING_PREP">会议准备</option>
-              </select></label>
-              <label>关注主题（每行一项，最多10项）
-                <textarea rows={3} value={topics} onChange={e=>changed(()=>setTopics(e.target.value))}
-                  placeholder="明确的本人关注事项，当前为空则不推断"/>
-              </label>
-            </div>
-            <label className="boss-field">
-              <span>阅读与表达要求</span>
-              <textarea rows={4} value={reading} maxLength={800}
-                onChange={e=>changed(()=>setReading(e.target.value))}
-                placeholder="例如：先写待本人决定的事项，再列证据缺口。"/>
-            </label>
-          </>:<>
-            <div className="boss-form-grid">
-              <label>IANA 通知时区<input value={timezone}
-                onChange={e=>changed(()=>setTimezone(e.target.value))}
-                placeholder="Asia/Shanghai" maxLength={80}/></label>
-              <label>本人阅读格式<select value={format}
-                onChange={e=>changed(()=>setFormat(e.target.value as NoticeSettings["reading_format"]))}>
-                <option value="ACTIONS_FIRST">待行动事项优先</option>
-                <option value="SUMMARY">简要汇总</option>
-                <option value="DETAIL">详细模式</option>
-              </select></label>
-              <label>免打扰开始（整点）<select value={quietStart}
-                onChange={e=>changed(()=>setQuietStart(Number(e.target.value)))}>
-                {Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}
-              </select></label>
-              <label>免打扰结束（整点）<select value={quietEnd}
-                onChange={e=>changed(()=>setQuietEnd(Number(e.target.value)))}>
-                {Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}
-              </select></label>
-            </div>
-            <div className="boss-workspace-item">
-              <label className="boss-confirm-check"><input type="checkbox"
-                checked={enabled} onChange={e=>changed(()=>setEnabled(e.target.checked))}/>
-                <span>允许本人通知（取消后对本机模拟事件增加暂停限制）</span>
-              </label>
-              <label className="boss-confirm-check"><input type="checkbox"
-                checked={important} onChange={e=>changed(()=>setImportant(e.target.checked))}/>
-                <span>重要事件可跳过本人免打扰（技术规则仍必须独立允许）</span>
-              </label>
-            </div>
-            <Value label="资料可见范围">仅本人 BOSS_ONLY</Value>
-            <Value label="分享字段范围">仅 F12 已明确授权的 BUSY_ONLY</Value>
-            <p className="boss-helper">这页不会创建接收者共享授权。
-              收件人、用途和有效期仍须在 F12 逐项核对；暂停本人通知不会暂停技术 CronService。</p>
+  const saveControls=<div className="boss-actions"><button className="boss-btn boss-btn-primary" disabled={disabled} onClick={save}>{isGoal?"保存":"保存本人通知要求"}</button><button className="boss-btn" disabled={disabled||dirty||!data?.draft} onClick={confirm}>确认当前要求</button><button className="boss-btn" disabled={loading||transaction.busy||!data} onClick={()=>{if(data)hydrate(data);}}>恢复最近保存内容</button>{!isGoal&&<button className="boss-btn" onClick={()=>onNavigate("N06")}>应用内通知中心</button>}</div>;
+  const versionState=<><V7Fact label="草稿版本">{data?data.draft?.version??"尚未保存":"尚未读取"}</V7Fact><V7Fact label="草稿状态">{data?data.draft?.state??"未设置":"尚未读取"}</V7Fact><V7Fact label="本人已确认版本">{data?active?.version??"尚未确认":"尚未读取"}</V7Fact><V7Fact label="有效状态">{effectiveState}</V7Fact><V7Fact label="确认时间">{data?active?.confirmed_at??"尚未确认":"尚未读取"}</V7Fact><V7Fact label="有效期限">{active?active.content.valid_until??"未设置期限":"尚未取得有效内容"}</V7Fact></>;
+  return <div className={"boss-owner-preferences "+(isGoal?"boss-goals-view":"boss-notice-view")}>
+    <V7ReadState loading={loading} error={readError} onReload={reload}/>
+    {formError&&<p className="boss-status boss-status-error" role="alert">{formError}</p>}
+    {dirty&&<p className="boss-status boss-status-warn" role="status">当前内容尚未保存。</p>}
+    {stale&&<p className="boss-status boss-status-warn" role="status">已保存版本发生变化。当前编辑保留，采用最新保存内容后才能继续操作。</p>}
+    <div className="boss-workspace-toolbar"><span>{data?.source_type??"本人设置待读取"}</span><button className="boss-btn" disabled={loading||transaction.busy} onClick={reload}>重新读取当前版本</button></div>
+    <div className="boss-preference-columns"><div className="boss-column">
+      <V7Panel title={isGoal?"内容与配置":"应用内与系统通知"}>
+        <fieldset className="boss-preference-fields" disabled={disabled}>
+          {isGoal?<><div className="boss-form-grid"><label>目标内容（每行一项）<textarea rows={5} value={editor.goals} maxLength={1600} onChange={event=>change("goals",event.target.value)} placeholder="填写本人明确的工作目标"/></label><label>关注主题（每行一项）<textarea rows={5} value={editor.topics} maxLength={1300} onChange={event=>change("topics",event.target.value)} placeholder="填写本人关注的主题"/></label><label>适用范围<select value={editor.scope} onChange={event=>change("scope",event.target.value as Editor["scope"])}><option value="">请选择范围</option>{Object.entries(SCOPES).map(([value,title])=><option key={value} value={value}>{title}</option>)}</select></label><label>目标期限（Asia/Shanghai，可留空）<input type="datetime-local" value={editor.until} onChange={event=>change("until",event.target.value)}/></label></div><h3>编辑内容与说明</h3><label className="boss-field">阅读与表达要求<textarea rows={5} value={editor.reading} maxLength={800} onChange={event=>change("reading",event.target.value)} placeholder="填写希望持续采用的阅读与表达要求"/></label></>:<>
+            <div className="boss-form-grid"><label>应用内通知要求<select value={editor.enabled} onChange={event=>change("enabled",event.target.value as Editor["enabled"])}><option value="">待设置</option><option value="true">按有效规则提醒</option><option value="false">暂停本人通知</option></select></label><label>系统通知许可<input readOnly value="由系统提供，尚未取得全局许可结果"/></label><label>IANA 通知时区<input value={editor.timezone} maxLength={80} onChange={event=>change("timezone",event.target.value)} placeholder="请选择实际采用的时区"/></label><label>可见范围<input readOnly value="私人正文仅本人可见；系统预览采用最少信息"/></label><label>免打扰开始（整点）<select value={editor.quietStart} onChange={event=>change("quietStart",event.target.value)}><option value="">待设置</option>{Array.from({length:24},(_,index)=><option key={index} value={String(index)}>{index}:00</option>)}</select></label><label>免打扰结束（整点）<select value={editor.quietEnd} onChange={event=>change("quietEnd",event.target.value)}><option value="">待设置</option>{Array.from({length:24},(_,index)=><option key={index} value={String(index)}>{index}:00</option>)}</select></label><label>重要事件升级<select value={editor.important} onChange={event=>change("important",event.target.value as Editor["important"])}><option value="">待设置</option><option value="false">遵守本人免打扰</option><option value="true">技术规则允许时可在免打扰期间提醒</option></select></label><label>阅读格式<select value={editor.format} onChange={event=>change("format",event.target.value as Editor["format"])}><option value="">待设置</option>{Object.entries(FORMATS).map(([value,title])=><option key={value} value={value}>{title}</option>)}</select></label><label>要求有效期（Asia/Shanghai，可留空）<input type="datetime-local" value={editor.until} onChange={event=>change("until",event.target.value)}/></label></div>
           </>}
-          <label className="boss-field">
-            <span>本人设置有效期（北京时间，可留空）</span>
-            <input type="datetime-local" value={validUntilLocal}
-              onChange={e=>changed(()=>setValidUntilLocal(e.target.value))}/>
-          </label>
-          <p className="boss-helper">截止时间基于获准模拟业务时钟 Asia/Shanghai，
-            到期自动停止本次本人设置的后续采用，不删除历史审计记录。</p>
-          <div className="boss-actions">
-            <button type="button" className="boss-btn" disabled={loading||busy}
-              onClick={()=>{hydrate(data?.draft||data?.active||null);setDirty(false);onDirtyChange(false);}}>
-              <History size={15}/> 恢复最近保存内容
-            </button>
-            <button type="button" className="boss-btn boss-btn-primary"
-              disabled={loading||busy||!data} onClick={saveDraft}>
-              <SlidersHorizontal size={15}/> 保存配置草稿
-            </button>
-            <button type="button" className="boss-btn boss-btn-primary"
-              disabled={!data?.draft||dirty||busy||loading}
-              onClick={confirmDraft}>
-              <ShieldCheck size={15}/> 本人确认启用当前草稿
-            </button>
-          </div>
-          </fieldset>
-        </Panel>
-        <Panel title={isGoal?"当前要求与版本状态":"通知策略当前版本"}
-          note="草稿、有效版本、实际采用分别记录">
-          <Value label="草稿版本">{data?.draft?.version||"尚未保存"}</Value>
-          <Value label="草稿状态">{data?.draft?.state||"未设置"}</Value>
-          <Value label="本人已确认版本">{data?.active?.version||"尚未确认"}</Value>
-          <Value label="有效状态">{data?.active_is_effective?"已确认且在有效期内":"不采用"}</Value>
-          <Value label="确认记录时间">{data?.active?.confirmed_at||"尚未确认"}</Value>
-          {isGoal?<>
-            <Value label="后续上下文加载次数">{data?.runtime_context_observation?.context_load_count??0}</Value>
-            <Value label="采用观测">{data?.runtime_context_observation?.observation||"NOT_OBSERVED"}</Value>
-            <p className="boss-helper">仅确认运行时上下文提供器确实被调用；
-              不代表模型已经正确遵守阅读要求，也不是 DeepSeek 质量验收。</p>
-          </>:<>
-            <Value label="技术调度状态">{data?.technical_schedule?.enabled?"启用":"停用或待核查"}</Value>
-            <Value label="技术静默规则版本">{String(data?.technical_rules?.version||"尚未设置")}</Value>
-            <p className="boss-helper">本人配置与技术调度规则取交集；
-              后台原始业务事件和任务不因本人通知暂停而被删除。</p>
-          </>}
-        </Panel>
-      </div>
-      <div className="boss-column">
-        <Panel title="保存结果与实际采用" note={isGoal?"N07 → F01 / F04 / Agent":"N08 → F02 / N06 / Cron"}>
-          {data?.active_is_effective&&data.active&&<>
-            <Value label="生效版本">{data.active.version}</Value>
-            {isGoal&&isGoals(data.active.content)?<>
-              {(data.active.content.goals||[]).map((x,i)=>
-                <div className="boss-workspace-item" key={i}><strong>目标 {i+1}</strong><p>{x}</p></div>)}
-              <Value label="范围">{data.active.content.scope}</Value>
-            </>:!isGoals(data.active.content)&&<>
-              <Value label="免打扰">
-                {data.active.content.quiet_start}:00 — {data.active.content.quiet_end}:00
-              </Value>
-              <Value label="老板通知">{data.active.content.notifications_enabled?"按技术规则允许":"本人暂停"}</Value>
-            </>}
-          </>}
-          {!data?.active_is_effective&&
-            <p className="boss-helper">当前没有在有效期内、由本人亲自确认的配置。
-              即使演示数据存在也不会把它标为新的本人授权。</p>}
-          <div className="boss-actions">
-            {isGoal?<>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>
-                <FileClock size={15}/> 查看晨间工作
-              </button>
-              {deliveredPage("F04","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
-                查看会前材料</button>}
-              {deliveredPage("F13","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F13")}>
-                个人记忆</button>}
-            </>:<>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("N06")}>
-                <BellRing size={15}/> 查看通知记录</button>
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("N09")}>
-                查看本人计划</button>
-              {deliveredPage("F12","BOSS")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
-                查看私人日程授权</button>}
-            </>}
-          </div>
-        </Panel>
-        <Panel title="历史已确认版本" note="历史只读；不能冒充当前生效设置">
-          {(data?.history||[]).length?data?.history.map(x=>
-            <div className="boss-workspace-item" key={x.version}>
-              <strong>v{x.version} · {x.state}</strong>
-              <small>{x.confirmed_at||"历史确认时间未保存"}</small>
-            </div>):<p className="boss-helper">尚无被新版本替代的有效配置。</p>}
-          <p className="boss-helper">当前设置只由 BOSS 身份保存与确认；
-            技术维护端无权读取本人具体目标或替老板启用通知。</p>
-        </Panel>
-      </div>
-    </div>
-    {!isGoal&&noticeTx.notice&&<p className="boss-status boss-status-ok" role="status">{noticeTx.notice}</p>}
-    {!isGoal&&noticeTx.dialog}
-    {!isGoal&&noticeTx.recovery}
-    {pending&&<div className="boss-confirm-backdrop">
-      <section ref={modalRef} role="dialog" aria-modal="true" tabIndex={-1}
-        className="boss-confirm" aria-labelledby="boss-owner-setting-title">
-        <h3 id="boss-owner-setting-title"><ShieldCheck size={18}/>{pending.title}</h3>
-        <p>此处的保存与启用是两个独立动作。系统验证角色、当前内容、版本与原请求幂等编号。</p>
-        <dl>{pending.details.map((line,i)=><div key={i}><dd>{line}</dd></div>)}</dl>
-        <label className="boss-confirm-check">
-          <input type="checkbox" checked={approved} disabled={busy}
-            onChange={e=>setApproved(e.target.checked)}/>
-          <span>我已核对本次内容、适用范围及执行后果。</span>
-        </label>
-        {error&&<p className="boss-validation-error" role="alert">{error}</p>}
-        <footer className="boss-actions">
-          <button type="button" className="boss-btn" disabled={busy||checking}
-            onClick={()=>{setPending(null);setApproved(false);}}>取消</button>
-          <button type="button" className="boss-btn" disabled={busy||checking}
-            onClick={()=>void reconcile()}>
-            {checking&&<Loader2 size={14} className="boss-spin"/>} 查询原请求回执
-          </button>
-          <button type="button" className="boss-btn boss-btn-primary"
-            disabled={!approved||busy||checking} onClick={()=>void submit()}>
-            {busy&&<Loader2 size={14} className="boss-spin"/>} 确认并执行
-          </button>
-        </footer>
-      </section>
-    </div>}
+        </fieldset>{!isGoal&&saveControls}
+      </V7Panel>
+      {isGoal?<V7Panel title="关联内容与处理边界"><div className="boss-preference-facts"><V7Fact label="当前要求">{active&&isGoals(active.content)?active.content.goals.join("；"):"尚未取得本人确认的目标"}</V7Fact><V7Fact label="本人确认">{effectiveState}</V7Fact><V7Fact label="适用范围">{active&&isGoals(active.content)?SCOPES[active.content.scope]:"尚未确认"}</V7Fact></div><p className="boss-v7-note">保存的候选要求尚未生效。实际采用需要对应任务记录和有效版本。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>onNavigate("F01")}>查看今日工作</button><button className="boss-btn" onClick={()=>onNavigate("F04")}>查看会前材料</button><button className="boss-btn" onClick={()=>onNavigate("F13")}>个人记忆</button></div></V7Panel>:<V7Panel title="隐私预览"><V7Fact label="系统预览应用名">Boss-Agent</V7Fact><V7Fact label="事项类别">经营提醒</V7Fact><V7Fact label="显示内容">请打开应用核查当前事项。</V7Fact><V7Fact label="返回入口">打开后核查当前授权与原通知对象</V7Fact><V7Fact label="私人标题与正文">不展示</V7Fact><V7Fact label="附件或摘要">不展示</V7Fact><p className="boss-v7-note">系统许可被拒绝时，可通过应用内通知中心读取获准内容。</p><details><summary>分享字段与私人安排</summary><V7Fact label="默认许可字段">仅占用时间 BUSY_ONLY</V7Fact><p>接收对象、用途、到期时间及撤销状态在私人安排中逐项核查。这里保存通知要求不创建分享授权。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>onNavigate("F12")}>进入私人安排</button><button className="boss-btn" onClick={()=>onNavigate("N10")}>查看授权</button><button className="boss-btn" onClick={()=>onNavigate("F13")}>个人记忆</button></div></details></V7Panel>}
+    </div><aside className="boss-column">
+      {isGoal?<><V7Panel title="来源与依据"><V7Fact label="内容来源">{selected?.content.source??"尚未填写"}</V7Fact><V7Fact label="对象标识">{selected?.id??"尚未保存"}</V7Fact><V7Fact label="编辑依据版本">{basis.draft==="0"?"尚无保存草稿":basis.draft}</V7Fact><V7Fact label="最近保存时间">{data?.draft?.saved_at??"尚未保存"}</V7Fact><p className="boss-v7-note">本人目标与阅读要求仅由本人保存和确认。</p></V7Panel><V7Panel title="状态与核查">{versionState}<V7Fact label="当前版本采用">{actualUsage?.observation??(data?"尚无当前版本采用记录":"尚未读取")}</V7Fact></V7Panel></>:<V7Panel title="权限与返回"><BossNotificationPermissions/><V7Fact label="系统许可拒绝或撤销">在系统设置中管理当前应用的通知许可</V7Fact><V7Fact label="会话过期">重新认证后核查当前通知对象</V7Fact><div className="boss-actions"><button className="boss-btn" onClick={()=>onNavigate("D09")}>历史通知详情</button><button className="boss-btn" onClick={()=>onNavigate("N09")}>查看或暂停本人计划</button></div><h3>当前有效要求</h3>{versionState}<div className="boss-actions"><button className="boss-btn" onClick={()=>setRecordView("history")}>查看历史版本</button><button className="boss-btn" onClick={()=>setRecordView("usage")}>查看实际采用</button></div></V7Panel>}
+    </aside></div>
+    {isGoal&&<footer className="boss-owner-actions">{saveControls}<button className="boss-btn" onClick={()=>setRecordView("history")}>查看历史</button><button className="boss-btn" onClick={()=>setRecordView("usage")}>查看实际采用</button></footer>}
+    {transaction.notice&&<p className="boss-status boss-status-ok" role="status">{transaction.notice}</p>}{transaction.dialog}{transaction.recovery}
+    <Dialog.Root open={recordView!==null} onOpenChange={open=>{if(!open)setRecordView(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>{recordView==="history"?"历史已确认版本":"实际采用与当前要求"}</Dialog.Title><Dialog.Description>记录来自当前本人获准范围，保存、确认和后续采用分别核查。</Dialog.Description>
+      {recordView==="history"?<><div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>历史版本</th><th>状态</th><th>本人确认时间</th></tr></thead><tbody>{data?.history.map(row=><tr key={row.version}><td>{row.version}</td><td>{row.state}</td><td>{row.confirmed_at??"尚未提供"}</td></tr>)}</tbody></table></div>{!data?.history.length&&<V7Empty title={data?"没有已读取的历史版本":"历史版本待读取"}/>}</>:<>{versionState}{isGoal?<><V7Fact label="当前采用版本">{actualUsage?.active_version??"尚未记录"}</V7Fact><V7Fact label="上下文加载次数">{actualUsage?.context_load_count??"尚无当前版本记录"}</V7Fact><V7Fact label="最近加载时间">{actualUsage?.last_loaded_at??"尚未记录"}</V7Fact><V7Fact label="采用观测">{actualUsage?.observation??"尚未取得"}</V7Fact><p>上下文加载记录仅证明要求已经提供给相应任务，模型执行质量仍需独立核查。</p></>:<><V7Fact label="技术规则版本">{data?.technical_rules?.version??"尚未读取"}</V7Fact><V7Fact label="技术调度版本">{data?.technical_schedule?.version??"尚未读取"}</V7Fact><V7Fact label="技术调度状态">{data?.technical_schedule?.canceled?"已取消":data?.technical_schedule?.enabled===true?"启用":data?.technical_schedule?.enabled===false?"暂停":"尚未读取"}</V7Fact><p>查看通知记录中的实际采用规则、抑制原因和送达结果。</p><button className="boss-btn" onClick={()=>onNavigate("N06")}>打开通知中心</button></>}</>}
+      <div className="boss-actions"><Dialog.Close asChild><button className="boss-btn">关闭</button></Dialog.Close></div>
+    </Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
 }

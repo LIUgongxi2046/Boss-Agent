@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from "react";
 import type {Read,Evidence,Scope} from "./BossBIView";
+import {BIRecordContent} from "./BIRecordContent";
 
 type Request=<T>(path:string,signal?:AbortSignal)=>Promise<T>;
 type Entry={id:string;read:Read|null;evidence:Evidence|null;error:string};
@@ -20,7 +21,9 @@ export function BIBasisComparison({current,request,onSource,reviewKey}:{current:
       let read:Read|null=null;
       try{
         read=await request<Read>("/api/boss/ui/bi/query?"+new URLSearchParams({query_id:id,historical:"true"}),abort.signal);
+        if(read.result.query_id!==id)throw new Error("并列查询结果与当前选择不匹配");
         const evidence=read.adoption_state==="HISTORICAL_REQUIRES_REQUERY"?null:await request<Evidence>("/api/boss/ui/metrics-evidence?"+new URLSearchParams({query_id:id}),abort.signal);
+        if(evidence&&evidence.query_id!==id)throw new Error("并列依据与当前查询不匹配");
         return {id,read,evidence,error:""};
       }catch(failure){return {id,read,evidence:null,error:failure instanceof Error?failure.message:String(failure)};}
     })).then(values=>{if(!abort.signal.aborted&&version===epoch.current){setEntries(values);setLoading(false);}});
@@ -56,7 +59,7 @@ export function BIBasisComparison({current,request,onSource,reviewKey}:{current:
             <p>作者 {String(body?.author_display_name??body?.author_contact_id??"未知")} · {String(body?.author_kind??"未知")}</p>
             <p>业务口径 {String(body?.business_basis??"未知")} · 用途 {String(body?.allowed_use??"未知")}</p>
             <p>有效期 {String(body?.valid_from??"未知")} 至 {String(body?.valid_until??"未知")} · 位置 {String(body?.original_locator??"未知")}</p>
-            <pre>{typeof body?.content==="string"?body.content:JSON.stringify(record.content,null,2)}</pre></details>;
+            <BIRecordContent value={body?.content??record.content}/></details>;
         })}</>}
     </article>)}</div>
     {ids.length===0&&<p>查询一种口径后保留该项，再查询另一种口径并保留。</p>}

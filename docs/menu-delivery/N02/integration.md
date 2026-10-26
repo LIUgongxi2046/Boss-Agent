@@ -1,4 +1,13 @@
 # MENU-N02 聊天交办
+
+## 2026-10-25 本机最新代码启动
+
+用户要求从 GitHub 获取最新代码并启动项目。任务归属 MENU-N02，采用 main 提交 `4f2f060ea440f5ad324509e45ababe1341a51f2e`，页面入口 N02。允许范围为本机依赖、项目忽略目录内的构建与独立账号资料，以及本记录；完成条件为准确版本构建、制品核验及桌面登录窗口加载成功。
+
+`scripts/prepare_boss_webui.py --build` 的 TypeScript 与 Vite 构建通过。启动前通用制品校验核对当前 HEAD 和450个资源文件通过，index SHA256 为 `9e387709376620d0fdfee69e24cdfc92611f10d41dac03e77f666f37e264c0eb`；前端目录为 `.work/product/nanobot/nanobot/web/dist`。
+
+启动入口为 `scripts/run_n02_manual_review.command`，`BOSS_N02_REVIEW_WORK_DIR` 指向当前项目内 `validation/.work/menu-n02-v7-review-20261025-local`，采用独立端口11421、11422、21421。账号通过正式 `scripts/provision_boss_accounts.py` 创建，凭据只保存在该目录受保护的 accounts 文件中。Electron 45.0.0 x64 生命周期确认 `service_started` 与 `window_loaded`，HTTP 页面返回200；记录位于 `validation/.work/desktop-menu-n02-v7-review-20261025-local/diagnostics/desktop-lifecycle.jsonl`。登录由用户操作，外部采用 SIMULATED_FIRST；完整业务、v7设计及用户验收状态保持待确认。
+
 ## 2026-10-25 N02 附件状态独立核验与异常隔离
 
 **活动任务** `MENU-N02`、`MENU-N02-N3`；需求按现行 `docs/menu-delivery/N02.md` 的 C06/C09/C15/C20/C21/C22 与 FR-08/24/29 的 E01/E02/E03/E05/E06。执行前重新完整读取 `docs/开发接手与执行规范.md` 与 `AGENTS.md`，确认最新 `main=4f2f060ea440f5ad324509e45ababe1341a51f2e`、唯一状态 N02 0/26、旧 v6 26/26 只能历史复用、F01 工程冻结与 N03 暂停；只修改 N02 前端消费者、独立回归和当前记录。

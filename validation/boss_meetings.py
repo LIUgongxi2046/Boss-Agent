@@ -7,7 +7,8 @@ from business import checksum, now, require
 from boss_source_access import require_current_business_source
 from boss_supply_quality import DEFINITION, external_adoption
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
+from boss_calendar_state import current_calendar
 
 
 def _object(db, kind, identifier):
@@ -49,12 +50,10 @@ class MeetingAPI:
         return meeting_materials(db, self.store.get(db, NS, "initial", "snapshot"))
 
     def _preview(self, db, data, details):
-        private = _object(db, "private_calendar", data["private_calendar"]["calendar_id"])
-        if private is None:
-            private = {**data["private_calendar"], "version": "1", "status": "ACTIVE"}
+        private = current_calendar(db, NS, data)
         start, end = datetime.fromisoformat(details["starts_at"]), datetime.fromisoformat(details["ends_at"])
-        private_context = {key: private[key] for key in ("calendar_id", "version", "status", "starts_at", "ends_at")}
-        private_conflict = private["status"] == "ACTIVE" and start < datetime.fromisoformat(private["ends_at"]) and end > datetime.fromisoformat(private["starts_at"])
+        private_context = {key: private[key] for key in ("calendar_id", "version", "status", "starts_at", "ends_at")} if private else None
+        private_conflict = private is not None and private["status"] == "ACTIVE" and start < datetime.fromisoformat(private["ends_at"]) and end > datetime.fromisoformat(private["starts_at"])
         trips = [{"travel_id": row["travel_id"], "version": row["version"], "current": row["current"]}
                  for row in _rows(db, "travel_plan") if row["status"] == "CONFIRMED"]
         overlapping = [row["travel_id"] for row in trips
@@ -69,7 +68,7 @@ class MeetingAPI:
             if document is not None and document.get("simulation_definition") == DEFINITION:
                 current["adoption"] = external_adoption(db, NS, data, self.store.get(db, NS, "clock", "current")["at"], document)
             sources.append(current)
-        impact = {"private_calendar": {"version": private["version"], "conflict": private_conflict, "private_body_exposed": False},
+        impact = {"private_calendar": {"version": private["version"] if private else None, "conflict": private_conflict, "private_body_exposed": False},
                   "overlapping_travel_ids": overlapping, "preparation_deadline_known": details["preparation_due_at"] is not None,
                   "requires_owner_acknowledgement": private_conflict or bool(overlapping), "external_attendance_verified": False}
         context = {"meeting": data["meeting"], "contacts": data["contacts"], "sources": sources,

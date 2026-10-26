@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, FileSearch, History, Loader2, RefreshCw, Save, ShieldCheck, Square } from "lucide-react";
+import {V7Empty,V7Fact,V7Panel} from "./BossV7UI";
 
 type HistoryVersion={history_id:string;method_version:string;content_sha256:string;recorded_at:string;origin:string};
 type Draft={draft_version:string;method_version:string;description:string;body:string;content_sha256:string;
@@ -162,7 +163,9 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
     finally{if(alive.current&&current===identity.current&&!controller.signal.aborted)setLoading(false);}
   }
   const disabled=loading||busy||pending!==null;
-  return <>
+  const sectionText=(label:string)=>data?.sections.filter(section=>section.heading.includes(label)).map(section=>section.body).join("\n\n")||"当前方法尚未提供此字段";
+  const actions=<><button type="button" className="boss-btn" disabled={!data||disabled} onClick={save}><Save size={15}/>保存方法草稿</button><button type="button" className="boss-btn" disabled={!data?.draft||dirty||disabled} onClick={()=>savedAction("validate")}>校验</button><button type="button" className="boss-btn boss-btn-primary" disabled={!data?.draft||dirty||disabled||data.draft.state==="ACTIVE"||data.draft.validation_status!=="VALIDATED_STATIC_ONLY"||(data.draft.missing_tools?.length??0)>0} onClick={()=>savedAction("activate")}>启用草稿</button><button type="button" className="boss-btn" disabled={!data||data.active.enabled||dirty||disabled||data.active_assessment.missing_tools.length>0} onClick={()=>prepare("enable",{expected_active_sha256:data!.active.content_sha256},"启用当前原生方法")}>启用当前方法</button><button type="button" className="boss-btn" disabled={!data?.active.enabled||dirty||disabled} onClick={()=>prepare("disable",{expected_active_sha256:data!.active.content_sha256},"停用当前方法")}>停用</button></>;
+  return <div className="boss-maintainer-records boss-sop-workspace">
     <div className="boss-workspace-toolbar"><div className="boss-workspace-note"><span className="boss-tag">MAINTAINER · A06</span>
       <span>SOP 与 Skills · 技术配置不授予本人业务权限</span></div>
       <div className="boss-actions"><button className="boss-btn" type="button" disabled={disabled} onClick={()=>select(sop,true)}><RefreshCw size={15}/>读取当前方法</button>
@@ -170,14 +173,11 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
     {error&&!pending&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error}</div>}
     {notice&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={16}/>{notice}</div>}
     {loading&&<div className="boss-status" role="status"><Loader2 size={16} className="boss-spin"/>正在读取当前配置</div>}
-    <div className="boss-columns"><div className="boss-column"><section className="boss-panel">
-      <div className="boss-panel-head"><h2>SOP 与 Skills</h2><small>秘书任务方法</small></div>
-      <label className="boss-label" htmlFor="sop-method-select">选择方法</label>
+    <div className="boss-v7-filter-bar boss-maintainer-filters"><label htmlFor="sop-method-select">任务方法
       <select id="sop-method-select" className="boss-single-input" value={sop} disabled={disabled} onChange={event=>select(event.target.value)}>
-        {METHODS.map((label,index)=>{const id="SOP"+String(index+1).padStart(2,"0");return <option key={id} value={id}>{id} · {label}</option>;})}</select>
-      {!data&&<div className="boss-status">尚未读取当前方法。农业资料方法等待获准方法定义。</div>}
-      {data&&<div style={{overflowX:"auto"}}><table aria-label="已保存方法步骤表"><thead><tr><th>方法字段</th><th>已保存正文</th></tr></thead>
-        <tbody>{data.sections.map((section,index)=><tr key={index}><th scope="row">{section.heading}</th><td style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{section.body}</td></tr>)}</tbody></table></div>}
+        {METHODS.map((label,index)=>{const id="SOP"+String(index+1).padStart(2,"0");return <option key={id} value={id}>{id} · {label}</option>;})}</select></label><label>农业资料方法<select disabled value=""><option value="">等待获准方法定义</option></select></label><label>当前生效版本<input readOnly value={data?.active.version??"尚未读取"}/></label><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={()=>select(sop,true)}>查询 / 应用</button></div>
+    <div className="boss-maintainer-columns"><div className="boss-column"><V7Panel title="流程步骤与执行条件"><div className="boss-sop-checks"><V7Fact label="方法步骤">{data?"当前保存正文已读取":"尚未读取"}</V7Fact><V7Fact label="方法依赖">{data?data.current_dependencies.missing_tools.length||data.current_dependencies.missing_projections.length?"存在缺少引用":"引用已经注册":"尚未读取"}</V7Fact><V7Fact label="版本采用">{data?data.current_dependencies.context_eligible?"符合下一上下文条件":"当前不能采用":"尚未读取"}</V7Fact><V7Fact label="引用核查">{data?.draft?.validation_status??"尚无草稿校验记录"}</V7Fact></div><div className="boss-v7-table-scroll"><table className="boss-v7-table" aria-label="已保存方法步骤与条件"><thead><tr><th>步骤</th><th>触发与输入</th><th>工具引用</th><th>授权条件</th><th>输出与结束条件</th></tr></thead><tbody>{data&&<tr><td><strong>{sop} · 当前保存方法</strong><p>{sectionText("步骤")}</p></td><td>{sectionText("触发")}</td><td>{[...data.read_operations,...data.command_operations].join("\n")||"当前没有工具引用"}</td><td>{sectionText("授权")}</td><td>{sectionText("输出")}</td></tr>}</tbody></table></div>{!data&&<V7Empty title="尚未读取当前方法与执行条件"/>}<p className="boss-v7-note">表格使用服务端解析的完整方法正文和已注册工具引用；当前编辑内容需保存后重新核查。</p></V7Panel><section className="boss-panel">
+      <div className="boss-panel-head"><h2>责任与质量约束</h2><small>方法正文与版本</small></div>
       <div className="boss-form-grid"><label>新方法版本<input aria-label="新方法版本" value={methodVersion} disabled={!data||disabled}
         placeholder="填写高于当前生效版本的新版本" onChange={event=>{setMethodVersion(event.target.value);setDirty(true);}}/></label>
         <label>方法说明<input aria-label="方法说明" value={description} disabled={!data||disabled} onChange={event=>{setDescription(event.target.value);setDirty(true);}}/></label></div>
@@ -194,7 +194,7 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
         <button type="button" className="boss-btn" disabled={!data?.active.enabled||dirty||disabled}
           onClick={()=>prepare("disable",{expected_active_sha256:data!.active.content_sha256},"停用当前方法")}><Square size={15}/>停用当前方法</button></div>
       {dirty&&<p role="status">当前存在未保存修改。</p>}
-    </section><section className="boss-panel"><div className="boss-panel-head"><h2>方法历史</h2><History size={17}/></div>
+    </section><details className="boss-sop-history"><summary>方法历史与完整字段</summary><V7Panel title="已保存方法字段">{data?.sections.map((section,index)=><article key={index}><h3>{section.heading}</h3><pre>{section.body}</pre></article>)}{!data&&<V7Empty title="尚未读取方法"/>}</V7Panel><section className="boss-panel"><div className="boss-panel-head"><h2>方法历史</h2><History size={17}/></div>
       <label className="boss-label" htmlFor="sop-history-select">选择历史版本</label>
       <select id="sop-history-select" className="boss-single-input" value={historyId} disabled={disabled} onChange={event=>{setHistoryId(event.target.value);setHistory(null);}}>
         <option value="">请选择当前方法的历史版本</option>{data?.history.map(item=><option key={item.history_id} value={item.history_id}>{item.method_version} · {item.origin} · {item.recorded_at}</option>)}</select>
@@ -203,7 +203,7 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
           onClick={()=>prepare("restore",{history_id:historyId,expected_draft_version:data!.draft?.draft_version??"0",expected_active_sha256:data!.active.content_sha256,
             method_version:methodVersion.trim(),change_note:note},"恢复历史为新草稿")}>恢复历史为新草稿</button></div>
       {history&&<article aria-label="历史方法正文"><p>历史版本：{history.method_version}</p><p>内容摘要：{history.content_sha256}</p><pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{history.body}</pre></article>}
-    </section></div><div className="boss-column"><section className="boss-panel"><div className="boss-panel-head"><h2>配置与采用状态</h2><small>{data?"RUNTIME_RECORD · 外部依赖 SIMULATED":"尚未读取"}</small></div>
+    </section></details></div><aside className="boss-column"><V7Panel title="来源与依据"><V7Fact label="依赖关系">{data?data.current_dependencies.missing_tools.join("、")||"工具引用已经注册":"尚未读取"}</V7Fact><V7Fact label="工作投影">{data?data.current_dependencies.missing_projections.join("、")||"当前投影引用完整":"尚未读取"}</V7Fact><V7Fact label="授权范围">每项业务动作检查本人有效授权</V7Fact><V7Fact label="关联评测">当前方法读取没有执行模型评测</V7Fact><V7Fact label="生效内容摘要">{data?.active.content_sha256??"尚未读取"}</V7Fact><V7Fact label="草稿内容摘要">{data?.draft?.content_sha256??"尚未取得保存草稿"}</V7Fact></V7Panel><section className="boss-panel"><div className="boss-panel-head"><h2>状态与核查</h2><small>{data?"RUNTIME_RECORD":"尚未读取"}</small></div>
       <div className="boss-kv"><span>当前生效方法版本</span><strong>{data?.active.version??"尚未读取"}</strong></div>
       <div className="boss-kv"><span>当前启用状态</span><strong>{data?(data.active.enabled?"已启用":"已停用"):"尚未读取"}</strong></div>
       <div className="boss-kv"><span>草稿保存版本</span><strong>{data?.draft?.draft_version??"尚无已读取草稿"}</strong></div>
@@ -228,7 +228,8 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
       {!data?<p>尚未读取</p>:data.pending_activations.length===0?<p>当前没有待恢复操作。</p>:data.pending_activations.map(item=><article key={item.client_request_id}>
         <p>原操作编号：{item.client_request_id}</p><p>草稿版本：{item.draft_version} · {item.state}</p>
         <div className="boss-actions"><button className="boss-btn" type="button" disabled={disabled} onClick={()=>prepare("recover",{activation_request_id:item.client_request_id},"继续原启用操作")}>继续原启用操作</button>
-          <button className="boss-btn" type="button" disabled={disabled} onClick={()=>prepare("cancel",{activation_request_id:item.client_request_id},"取消原启用并恢复此前方法")}>取消原启用</button></div></article>)}</section></div></div>
+          <button className="boss-btn" type="button" disabled={disabled} onClick={()=>prepare("cancel",{activation_request_id:item.client_request_id},"取消原启用并恢复此前方法")}>取消原启用</button></div></article>)}</section></aside></div>
+    <footer className="boss-maintainer-actions"><span>{dirty?"当前方法包含未保存修改":sop+" · 技术方法配置"}</span>{actions}{onNavigate&&<button className="boss-btn" onClick={()=>onNavigate("A15",{sop_id:sop})}>查看实际步骤</button>}</footer>
     {(pending||discard)&&<div className="boss-confirm-backdrop"><section ref={modalRef} className="boss-confirm" role="dialog" aria-modal="true" aria-labelledby="sop-modal-title" tabIndex={-1}>
       <h3 id="sop-modal-title">{pending?.label??"取消未保存修改"}</h3>
       {discard?<><p>当前未保存修改将被清理，数据库与当前生效方法保持现有状态。</p><div className="boss-actions">
@@ -245,5 +246,5 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
         {pending.submitted&&<p>本次请求已经提交。关闭等待不会撤销已执行步骤，结果需要查询原操作回执。</p>}
       </>}
     </section></div>}
-  </>;
+  </div>;
 }

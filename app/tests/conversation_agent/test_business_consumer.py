@@ -18,6 +18,7 @@ from boss_supply_quality import SupplyQualityAPI, IMPORT_ACTION
 from test_task_entry_schema import current_validator
 from test_native import native, read
 from test_cancel_deadline import arguments, run_for
+from test_sources import selection
 
 
 CHAT = "n03-bound-consumer"
@@ -96,6 +97,24 @@ def test_native_business_binding_drives_exact_query_parameters_and_followup(nati
         assert run["conversation_context"]["business_entry"]["preparation_sha256"] == bound["preparation_sha256"]
         assert run["tool_results"][0]["tool_id"] == "businessOverviewRead"
     assert entry.read("BOSS", {"session_id": "websocket:" + CHAT, "chat_id": CHAT})["entry"] == bound
+    assert not read(native, "task") and not read(native, "authorization")
+
+
+def test_business_query_reads_selected_knowledge_with_original_business_scope(native):
+    _, bound = bind_business(native)
+    enable_business(native)
+    request = selection(native, "meeting-minutes", chat=CHAT)
+    assert native[1].source_selection.bind("BOSS", request, active=lambda: True)["outcome"] == "RECORDED"
+    async def check():
+        async with session(native) as (bot, _):
+            return await bot.run("查询收入", **arguments(CHAT))
+    result = asyncio.run(check())
+    assert "查询编号" in result.content and "meeting-minutes" in result.content
+    run = read(native, "runtime_run")[0]
+    assert run["conversation_context"]["business_entry"]["preparation_sha256"] == bound["preparation_sha256"]
+    assert run["conversation_context"]["source_selection"]["source_refs"] == request["source_refs"]
+    assert any(step["tool_id"] == "bossEvidenceRead" and step["source_id"] == "meeting-minutes" for step in run["tool_results"])
+    assert read(native, "query")[0]["context_snapshot"]["metric_ids"] == ["revenue"]
     assert not read(native, "task") and not read(native, "authorization")
 
 

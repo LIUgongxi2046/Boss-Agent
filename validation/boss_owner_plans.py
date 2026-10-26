@@ -8,7 +8,7 @@ from aiohttp import web
 from business import now, require
 from boss_command_api import BossCommandAPI
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 
 
 def _items(db, kind):

@@ -1,0 +1,24 @@
+{
+  "palette_id": "HAID-BOSS-UI-PROPOSAL-01",
+  "evidence": "公开披露材料标志的蓝绿方向；未取得官方 VI 标准数值",
+  "source_url": "https://static.cninfo.com.cn/finalpage/2022-08-04/1214218100.PDF",
+  "source_year": 2022,
+  "checked_on": "2026-10-21",
+  "hex_status": "UI_PROPOSAL_NOT_OFFICIAL_VI",
+  "colors": [
+    "#005BAC",
+    "#073B70",
+    "#5CA63B",
+    "#EEF5FC",
+    "#F0F7EB",
+    "#F5F7FA",
+    "#FFFFFF",
+    "#172B4D",
+    "#52647A",
+    "#DCE4ED",
+    "#237443",
+    "#A45A00",
+    "#B42318"
+  ],
+  "image_generation_executed": false
+}

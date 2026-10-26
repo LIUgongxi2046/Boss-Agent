@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:conversation-sources:1.0.0",
+  "$defs": {
+    "Id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "RequestId": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9_.-]+$"},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Reference": {"type": "object", "additionalProperties": false, "required": ["source_id", "version"], "properties": {"source_id": {"$ref": "#/$defs/Id"}, "version": {"$ref": "#/$defs/Id"}}},
+    "ListInput": {"type": "object", "additionalProperties": false, "required": ["chat_id", "query"], "properties": {"chat_id": {"$ref": "#/$defs/Id"}, "query": {"type": "string", "maxLength": 500}}},
+    "BindInput": {"type": "object", "additionalProperties": false,
+      "required": ["chat_id", "client_request_id", "execution_namespace", "dataset_version", "expected_context_version", "expected_catalogue_version", "source_refs"],
+      "properties": {"chat_id": {"$ref": "#/$defs/Id"}, "client_request_id": {"$ref": "#/$defs/RequestId"}, "execution_namespace": {"$ref": "#/$defs/Id"}, "dataset_version": {"$ref": "#/$defs/Id"}, "expected_context_version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"}, "expected_catalogue_version": {"$ref": "#/$defs/Digest"}, "source_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/Reference"}}}},
+    "ReceiptInput": {"type": "object", "additionalProperties": false, "required": ["chat_id", "client_request_id"], "properties": {"chat_id": {"$ref": "#/$defs/Id"}, "client_request_id": {"$ref": "#/$defs/RequestId"}}},
+    "Source": {"type": "object", "additionalProperties": false,
+      "required": ["source_id", "version", "title", "source_type", "author", "published_at", "validity_state", "allowed", "reason"],
+      "properties": {"source_id": {"$ref": "#/$defs/Id"}, "version": {"$ref": "#/$defs/Id"}, "title": {"$ref": "#/$defs/Id"}, "source_type": {"enum": ["SIMULATED", "PUBLIC_SOURCE", "RUNTIME_RECORD"]}, "author": {"type": ["string", "null"]}, "published_at": {"type": ["string", "null"]}, "validity_state": {"$ref": "#/$defs/Id"}, "allowed": {"type": "boolean"}, "reason": {"type": ["string", "null"]}}},
+    "Catalogue": {"type": "object", "additionalProperties": false,
+      "required": ["projection", "chat_id", "session_id", "execution_namespace", "dataset_version", "context_version", "catalogue_version", "query", "sources", "selected_sources", "coverage", "can_bind", "unavailable_reason", "business_authorization_granted", "business_mutation_performed"],
+      "properties": {"projection": {"const": "conversation-sources"}, "chat_id": {"$ref": "#/$defs/Id"}, "session_id": {"$ref": "#/$defs/Id"}, "execution_namespace": {"$ref": "#/$defs/Id"}, "dataset_version": {"$ref": "#/$defs/Id"}, "context_version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"}, "catalogue_version": {"$ref": "#/$defs/Digest"}, "query": {"type": "string"}, "sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}, "selected_sources": {"type": "array", "items": {"$ref": "#/$defs/Reference"}}, "coverage": {"enum": ["COMPLETE", "PARTIAL"]}, "can_bind": {"type": "boolean"}, "unavailable_reason": {"type": ["string", "null"]}, "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}}},
+    "Receipt": {"type": "object", "additionalProperties": false,
+      "required": ["client_request_id", "chat_id", "session_id", "outcome", "business_authorization_granted", "business_mutation_performed"],
+      "properties": {"client_request_id": {"$ref": "#/$defs/RequestId"}, "chat_id": {"$ref": "#/$defs/Id"}, "session_id": {"$ref": "#/$defs/Id"}, "outcome": {"enum": ["RECORDED", "REJECTED", "UNKNOWN"]}, "binding_id": {"$ref": "#/$defs/Id"}, "context_version": {"$ref": "#/$defs/Id"}, "source_refs": {"type": "array", "items": {"$ref": "#/$defs/Reference"}}, "reason": {"type": "string"}, "business_authorization_granted": {"const": false}, "business_mutation_performed": {"const": false}, "write_performed_by_lookup": {"const": false}},
+      "allOf": [{"if": {"properties": {"outcome": {"const": "RECORDED"}}}, "then": {"required": ["binding_id", "context_version", "source_refs"]}}, {"if": {"properties": {"outcome": {"const": "REJECTED"}}}, "then": {"required": ["reason"]}}]}
+  }
+}

@@ -10,7 +10,7 @@ from boss_message_calendar import _calendar
 from boss_owner_preferences import owner_profile
 from boss_meetings import meeting_materials
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 FINAL = {"CANCELED", "COMPLETED_CONFIRMED"}
 
 
@@ -85,7 +85,7 @@ class TodayAPI:
                 append("event", event["event_id"], event["version"], "经营事件", "INFORM",
                        "查看当前事件及处理依据", "F02", event["due_at"], event["impact"] == "IMPORTANT")
         private = _calendar(db, data)
-        if private.get("status", "ACTIVE") == "ACTIVE":
+        if private is not None and private.get("status", "ACTIVE") == "ACTIVE":
             append("private_calendar", private["calendar_id"], private.get("version", "1"), "本人私人安排", "INFORM",
                    "本人需要协调工作与私人占用时间", "F12", private["starts_at"])
         priority = {"DECIDE": 0, "COORDINATE": 1, "INFORM": 2}

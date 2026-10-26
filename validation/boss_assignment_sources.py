@@ -8,7 +8,7 @@ from boss_source_access import require_current_simulated_source
 from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 ACTION = "boss.assignment.sources.confirm"
 REVIEW_STATES = {"OPEN", "WAITING_FEEDBACK", "IN_PROGRESS", "WAITING_MATERIAL", "RESULT_SUBMITTED"}
 SCHEMA = json.loads((ROOT.parent / "specs/assignment-source-review.schema.json").read_text())

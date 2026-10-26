@@ -15,7 +15,7 @@ from business import now, require
 from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 
-NS="ui-check"
+from boss_execution_scope import NAMESPACE as NS
 REPORT_ID="research-current"
 
 

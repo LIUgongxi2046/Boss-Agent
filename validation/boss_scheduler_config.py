@@ -7,13 +7,32 @@ not BOSS business authorization, external messaging, or personal preferences.
 from __future__ import annotations
 
 import json
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from zoneinfo import ZoneInfo
+from croniter import croniter
 
 from aiohttp import web
 from business import now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 TRIGGER = "EVENT_OR_TIME"
+PLAN_DEFAULTS = {"name": "本人获准事件检查", "executor_component": "CronService", "expression": "* * * * *",
+                 "authorized_scope": ["SIMULATED_EVENTS", "OWNER_TASKS", "OWNER_COMMITMENTS", "OWNER_PLANS", "BUSINESS_ALERTS"],
+                 "restart_policy": "CHECK_DUE_ON_RESTART"}
+SCOPES = {"SIMULATED_EVENTS": "获准模拟事件", "OWNER_TASKS": "本人授权任务", "OWNER_COMMITMENTS": "本人承诺",
+          "OWNER_PLANS": "本人计划", "BUSINESS_ALERTS": "经营提醒"}
+RESTART_POLICIES = {"CHECK_DUE_ON_RESTART": "重启后核查当前到期事项", "PAUSE_ON_RESTART": "重启后暂停等待手动恢复"}
+
+
+def plan_fields(body):
+    return {key: body.get(key, value) for key, value in PLAN_DEFAULTS.items()}
+
+
+def event_in_scope(schedule, event):
+    scope = "OWNER_PLANS" if event.get("owner_plan_id") else {
+        "BOSS_AUTHORIZED_TASK": "OWNER_TASKS", "BOSS_OWN_COMMITMENT": "OWNER_COMMITMENTS",
+        "BUSINESS_ALERT_INPUT": "BUSINESS_ALERTS",
+    }.get(event.get("generated_by"), "SIMULATED_EVENTS")
+    return scope in plan_fields(schedule)["authorized_scope"]
 
 
 def _get(db, kind, key):
@@ -31,11 +50,20 @@ def _as_version(value):
 
 
 def _config(body):
-    require(body.get("trigger") == TRIGGER, "当前仅支持经过验证的事件或时间组合触发",
+    require(body.get("trigger") in {TRIGGER, "CRON", "EVENT"}, "调度触发类型无效",
             web.HTTPBadRequest)
     timezone = body.get("timezone")
-    require(timezone == "Asia/Shanghai", "当前模拟时钟仅支持已校验的 Asia/Shanghai",
-            web.HTTPBadRequest)
+    require(isinstance(timezone, str), "调度时区无效", web.HTTPBadRequest)
+    ZoneInfo(timezone)
+    plan = plan_fields(body)
+    require(isinstance(plan["name"], str) and 0 < len(plan["name"].strip()) <= 120, "计划名称无效", web.HTTPBadRequest)
+    require(plan["executor_component"] == "CronService", "执行责任组件必须为CronService", web.HTTPBadRequest)
+    require(isinstance(plan["expression"], str) and (body["trigger"] == "EVENT" or croniter.is_valid(plan["expression"])),
+            "调度表达式无效", web.HTTPBadRequest)
+    require(isinstance(plan["authorized_scope"], list) and bool(plan["authorized_scope"])
+            and all(isinstance(item, str) and item in SCOPES for item in plan["authorized_scope"])
+            and len(set(plan["authorized_scope"])) == len(plan["authorized_scope"]), "获准任务范围无效", web.HTTPBadRequest)
+    require(plan["restart_policy"] in RESTART_POLICIES, "重启恢复策略无效", web.HTTPBadRequest)
     for name in ("quiet_start", "quiet_end"):
         value = body.get(name)
         require(type(value) is int and 0 <= value <= 23,
@@ -46,7 +74,8 @@ def _config(body):
     require(type(body.get("important_escalation")) is bool,
             "重要提醒升级开关必须明确为布尔值", web.HTTPBadRequest)
     return {
-        "trigger": TRIGGER,
+        **plan,
+        "trigger": body["trigger"],
         "timezone": timezone,
         "quiet_start": body["quiet_start"],
         "quiet_end": body["quiet_end"],
@@ -56,11 +85,12 @@ def _config(body):
 
 
 def save(api, db, data, payload):
-    api._exact(payload, {
+    fields = {
         "client_request_id", "expected_version", "trigger", "timezone",
         "quiet_start", "quiet_end", "cooldown_seconds",
         "important_escalation",
-    })
+    }
+    require(set(payload) in (fields, fields | set(PLAN_DEFAULTS)), "调度字段缺少或包含未知字段", web.HTTPBadRequest)
     proposed = _config(payload)
     existing = _get(db, "scheduler_draft", "current")
     original = existing["version"] if existing else "0"
@@ -140,6 +170,7 @@ def activate(api, db, data, payload):
         **schedule, "version": str(int(schedule["version"]) + 1),
         "schedule_version": str(int(schedule["schedule_version"]) + 1),
         "timezone": cfg["timezone"], "trigger": cfg["trigger"],
+        **plan_fields(cfg),
         "enabled": True, "canceled": False,
         "active_draft_version": draft["version"],
         "last_configured_at": now(),
@@ -229,6 +260,7 @@ def manual_run(api, db, data, payload):
     )
     require(allowed and event.get("source_type") == "SIMULATED",
             "事件并非获准模拟数据或已授权业务范围", web.HTTPForbidden)
+    require(event_in_scope(schedule, event), "事件不在当前计划的获准范围", web.HTTPForbidden)
     result = api.store.dispatch_due_in_transaction(
         db, NS, only_event_id=identifier,
     )

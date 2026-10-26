@@ -14,7 +14,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 GOAL_SCOPES = ("OWNER_WORKSPACE", "DAILY_BRIEF", "MEETING_PREP")
 READING_FORMATS = ("ACTIONS_FIRST", "SUMMARY", "DETAIL")
 READING_LIMIT = 800

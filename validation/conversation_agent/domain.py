@@ -6,6 +6,7 @@ from aiohttp import web
 from jsonschema import Draft202012Validator
 
 from business import checksum, encode, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_conversation import ConversationAPI, SCHEMA, validate
 from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
@@ -123,8 +124,8 @@ class ConversationPlanner:
             add("conversationRead", {"projection": "messages"})
             required.append("消息写入请采用当前本人消息编辑入口中的正式草稿、收件人、内容版本及有效授权")
         with self.store.connect() as db:
-            initial = self.store.get(db, "ui-check", "initial", "snapshot")
-            documents = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='document' AND json_extract(body,'$.access_scope')=? AND json_extract(body,'$.source_type')='SIMULATED'", (initial["owner_id"],))]
+            initial = self.store.get(db, NS, "initial", "snapshot")
+            documents = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='document' AND json_extract(body,'$.access_scope')=? AND json_extract(body,'$.source_type')='SIMULATED'", (NS, initial["owner_id"]))]
         selected = [document for document in documents if mentioned(text, document["source_id"])
                     or document.get("title") and document["title"].casefold() in lowered]
         selected_source_ids = []

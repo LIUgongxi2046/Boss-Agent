@@ -19,7 +19,8 @@ from boss_message_calendar import work_meeting_conflict
 from boss_meetings import meeting_materials
 from business import now
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
+from boss_calendar_state import current_calendar
 SAFE_RECEIPT_FIELDS = {
     "source_type", "draft_id", "draft_version", "message_id",
     "recipient_id", "send_state", "delivery_state", "reply_state",
@@ -32,7 +33,7 @@ SAFE_RECEIPT_FIELDS = {
     "independent_send_required", "message_sent",
     "application_id", "decision_id",
     "commitment_id", "external_message_sent", "due_at", "event_id", "event_version", "until",
-    "authorization_id",
+    "authorization_id", "run_id", "memory_id", "object_id", "index_state", "withdrawn",
     "plan_id", "date", "item_ids",
     "meeting_version", "review_sha256", "meeting_changed", "invitation_sent", "independent_tasks_unchanged",
     "historical_only",
@@ -44,6 +45,8 @@ SAFE_RECEIPT_FIELDS = {
 def calendar_share_state(share, calendar, clock):
     if share.get("revoked") is True:
         return "REVOKED"
+    if calendar is None:
+        return "OUTDATED"
     if calendar.get("status", "ACTIVE") != "ACTIVE" or (
         share.get("calendar_version") != calendar.get("version")
     ):
@@ -146,6 +149,8 @@ class BossRecoveryAPI:
                         "read_at": now(),
                     }
                 result = json.loads(found[0])
+                if action.startswith(("boss.technical.", "boss.owner_workspace.")):
+                    result = result["result"]
                 safe = {
                     field: val for field, val in result.items()
                     if field in SAFE_RECEIPT_FIELDS
@@ -176,14 +181,8 @@ class BossRecoveryAPI:
                 if row is None:
                     return 404, {"error": "SHARE_NOT_FOUND"}
                 share = json.loads(row[0])
-                saved = db.execute(
-                    "SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id='private-1'",
-                    (self.namespace,),
-                ).fetchone()
                 data = self.store.get(db, self.namespace, "initial", "snapshot")
-                calendar = json.loads(saved[0]) if saved else {
-                    **data["private_calendar"], "version": "1", "status": "ACTIVE",
-                }
+                calendar = current_calendar(db, self.namespace, data)
                 clock = self.store.get(db, self.namespace, "clock", "current")
                 authorization = self.store.get(db, self.namespace, "authorization", share["authorization_id"])
                 if authorization["revoked"]:

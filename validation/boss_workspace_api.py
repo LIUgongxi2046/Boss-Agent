@@ -23,12 +23,13 @@ from boss_people import projection as people_projection
 from boss_owner_preferences import goals_projection, notice_projection, effective_owner_notice
 from boss_recovery_api import calendar_share_state
 from boss_meetings import meeting_materials
-from boss_memory import confirmed_memory
+from boss_memory import confirmed_memory, current_memory
+from boss_calendar_state import current_calendar
 from boss_owner_authorizations import authorization_can_revoke
 from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 BOSS_PAGES = {
     "memory", "calendar", "notifications", "authorizations", "decisions",
     "outbox", "sources", "knowledge", "organization", "plans", "voice",
@@ -277,27 +278,20 @@ class BossWorkspaceAPI:
                 "actual_funds_transfer_supported": False,
             }
         if key == "memory":
-            current = self.store.get(db, self.namespace, "memory", "current")
+            current = current_memory(db, self.namespace)
             return {
                 "memory": {
                     "memory_id": current.get("memory_id"),
                     "version": current["version"],
                     "confirmation_state": current["confirmation_state"],
                     "text": current.get("text", "") if current["confirmation_state"] == "CONFIRMED" else "",
-                },
+                } if current else None,
                 "effective": confirmed_memory(db, self.namespace, current, data["owner_id"]) is not None,
                 "future_turn_policy": "CURRENT_NON_REVOKED_CONFIRMATION_ONLY",
                 "physical_secure_erasure_verified": False,
             }
         if key == "calendar":
-            row = db.execute(
-                "SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id='private-1'",
-                (self.namespace,),
-            ).fetchone()
-            calendar = json.loads(row[0]) if row else {
-                **data["private_calendar"], "version": "1", "status": "ACTIVE",
-                "title": "", "location": "", "attachment_refs": [],
-            }
+            calendar = current_calendar(db, self.namespace, data)
             shares = _object_list(db, self.namespace, "calendar_share")
             clock = self.store.get(db, self.namespace, "clock", "current")
             return {
@@ -323,7 +317,7 @@ class BossWorkspaceAPI:
                 },
                 "visibility": "BOSS_PRIVATE",
                 "external_share_created": False,
-                "can_edit": calendar["status"] != "DELETED",
+                "can_edit": calendar is None or calendar["status"] != "DELETED",
                 "physical_secure_erasure_verified": False,
             }
         if key == "sources" or key == "source-index":
@@ -385,7 +379,7 @@ class BossWorkspaceAPI:
         if key == "notifications":
             from boss_business_alerts import BusinessAlertsAPI
 
-            if self.namespace != "ui-check":
+            if self.namespace != NS:
                 raise web.HTTPConflict(text="当前经营提醒执行空间不匹配")
             events = _object_list(db, self.namespace, "event")
             operating_ids = {event["event_id"] for event in events if event.get("generated_by") == "BUSINESS_ALERT_INPUT"}
@@ -621,6 +615,7 @@ class BossWorkspaceAPI:
             "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
             "owner_body_access": False}
         if key == "scheduler":
+            from boss_scheduler_config import SCOPES, RESTART_POLICIES, plan_fields
             schedule = self.store.get(db, self.namespace, "schedule", "current")
             clock = self.store.get(db, self.namespace, "clock", "current")
             draft_row = db.execute(
@@ -632,13 +627,26 @@ class BossWorkspaceAPI:
                 (self.namespace,),
             ).fetchone()
             draft = json.loads(draft_row[0]) if draft_row else None
+            if draft is not None:
+                draft = {**draft, "configuration": {**draft["configuration"], **plan_fields(draft["configuration"])}}
             rules = json.loads(rules_row[0]) if rules_row else None
             dispatches = _object_list(db, self.namespace, "dispatch")
+            executor = getattr(self.store, "scheduler_runtime", None)
+            runtime = executor.snapshot() if executor is not None else {
+                "state": "NOT_ATTACHED", "active_run_count": 0, "resume_checked_at": None,
+                "quit_behavior": "当前接口未连接应用调度责任组件", "next_run_time": None,
+            }
+            if executor is not None and runtime["schedule_version"] != schedule["version"]:
+                runtime = {**runtime, "state": "CONFIGURATION_PENDING", "next_run_time": None}
             return {
-                "schedule": {k: schedule.get(k) for k in (
+                "schedule": {**{k: schedule.get(k) for k in (
                     "schedule_id", "version", "schedule_version", "timezone",
                     "trigger", "enabled", "canceled", "active_draft_version",
-                )},
+                )}, **plan_fields(schedule)},
+                "executors": [{"id": "CronService", "label": "nanobot CronService"}],
+                "authorized_scopes": [{"id": key, "label": label} for key, label in SCOPES.items()],
+                "restart_policies": [{"id": key, "label": label} for key, label in RESTART_POLICIES.items()],
+                "runtime": runtime,
                 "draft": draft,
                 "rules": rules,
                 "simulated_business_time": clock["at"],
@@ -656,7 +664,7 @@ class BossWorkspaceAPI:
                        or event.get("generated_by") in (
                            "BOSS_AUTHORIZED_TASK", "BOSS_OWN_COMMITMENT"
                        ))],
-                "next_run_time": None,
+                "next_run_time": runtime["next_run_time"],
                 "recent_dispatches": [{
                     k: row[k] for k in (
                         "event_id", "event_version", "state", "reason",

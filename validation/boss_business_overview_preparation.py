@@ -6,6 +6,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 
 from business import checksum, now, require
+from boss_execution_scope import NAMESPACE
 from boss_assignment_sources import AssignmentSourcesAPI
 from boss_conversation import ConversationAPI
 from boss_business_overview import owner
@@ -47,7 +48,7 @@ class BusinessOverviewPreparation:
         owner(role)
         validate("Input", payload)
         identity = _context(db)
-        require(identity["namespace"] == "ui-check", "当前准备流程仅支持获准执行空间", web.HTTPForbidden)
+        require(identity["namespace"] == NAMESPACE, "当前准备流程需要绑定服务执行空间", web.HTTPForbidden)
         view = self.overview.project_in_transaction(role, db, payload["applied_scope"])
         require(view["snapshot_sha256"] == payload["snapshot_sha256"], "经营范围、对象或来源已经变化", web.HTTPConflict)
         topic = None

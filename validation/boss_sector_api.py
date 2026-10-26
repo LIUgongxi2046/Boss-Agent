@@ -11,6 +11,7 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import now
+from boss_execution_scope import NAMESPACE
 
 SECTORS = {
     "F14": ("原料与饲料", ["原料", "产品", "法人", "期间"],
@@ -46,7 +47,7 @@ SECTORS = {
 
 
 class BossSectorAPI:
-    def __init__(self, store, namespace="ui-check"):
+    def __init__(self, store, namespace=NAMESPACE):
         self.store, self.namespace = store, namespace
 
     def serve(self, role, query_string):

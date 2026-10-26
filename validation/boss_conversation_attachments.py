@@ -1,5 +1,7 @@
 import hashlib
 import mimetypes
+import os
+import stat
 from pathlib import Path
 
 from aiohttp import web
@@ -74,36 +76,46 @@ class ConversationAttachments:
         validate("Context", query)
         require(isinstance(query["chat_id"], str) and query["session_id"] == "websocket:" + query["chat_id"], "原生附件会话归属不符", web.HTTPForbidden)
         session = self.sessions.read_session_snapshot(query["session_id"])
+        return self.read_snapshot(role, query, session)
+
+    def _locations(self, session):
+        metadata = self._metadata(session)
+        paths, positions = {}, {}
+        for index, message in enumerate(session.messages):
+            if message["role"] != "user":
+                continue
+            for filename in message.get("media", []):
+                path = self._approved_path(filename)
+                identifier = self._identifier(session.key, path)
+                paths[identifier] = path
+                positions.setdefault(identifier, set()).add(index)
+        unresolved = set()
+        for identifier, value in metadata.items():
+            if "relative_path" in value:
+                path = self._approved_path(self.media_root / value["relative_path"])
+                require(self._identifier(session.key, path) == identifier, "附件保存引用与编号不符", web.HTTPForbidden)
+                paths[identifier] = path
+            elif identifier not in paths:
+                unresolved.add(identifier)
+        # 历史记录按既有完整编号匹配获准目录内的文件，不解析正文或推断消息位置。
+        if unresolved:
+            for candidate in self.media_root.rglob("*"):
+                path = candidate.resolve()
+                if path.is_relative_to(self.media_root):
+                    identifier = self._identifier(session.key, path)
+                    if identifier in unresolved and path.is_file():
+                        paths[identifier] = path
+        return metadata, paths, positions
+
+    def read_snapshot(self, role, query, session):
+        owner_role(role)
+        validate("Context", query)
+        require(isinstance(query["chat_id"], str) and query["session_id"] == "websocket:" + query["chat_id"],
+                "原生附件会话归属不符", web.HTTPForbidden)
         attachments = []
         if session is not None:
             require(session.key == query["session_id"], "原生会话标识不符", web.HTTPForbidden)
-            metadata = self._metadata(session)
-            paths = {}
-            positions = {}
-            for index, message in enumerate(session.messages):
-                if message["role"] != "user":
-                    continue
-                for filename in message.get("media", []):
-                    path = self._approved_path(filename)
-                    identifier = self._identifier(session.key, path)
-                    paths[identifier] = path
-                    positions.setdefault(identifier, set()).add(index)
-            unresolved = set()
-            for identifier, value in metadata.items():
-                if "relative_path" in value:
-                    path = self._approved_path(self.media_root / value["relative_path"])
-                    require(self._identifier(session.key, path) == identifier, "附件保存引用与编号不符", web.HTTPForbidden)
-                    paths[identifier] = path
-                elif identifier not in paths:
-                    unresolved.add(identifier)
-            # 历史记录仅按既有完整编号匹配获准目录内的文件，不解析正文或推断消息位置。
-            if unresolved:
-                for candidate in self.media_root.rglob("*"):
-                    path = candidate.resolve()
-                    if path.is_relative_to(self.media_root):
-                        identifier = self._identifier(session.key, path)
-                        if identifier in unresolved and path.is_file():
-                            paths[identifier] = path
+            metadata, paths, positions = self._locations(session)
             for identifier in dict.fromkeys([*metadata, *paths]):
                 path = paths.get(identifier)
                 value = metadata.get(identifier)
@@ -121,3 +133,29 @@ class ConversationAttachments:
                     "processing_state": state, "user_message_index": next(iter(indices)) if len(indices) == 1 else None})
         return validate("Attachments", {"source_type": "RUNTIME_RECORD", **query, "session_state": "SAVED" if session else "NO_SAVED_SESSION",
             "attachments": attachments, "business_authorization_granted": False})
+
+    def read_content(self, role, query, session, identifier):
+        view = self.read_snapshot(role, query, session)
+        matches = [item for item in view["attachments"] if item["attachment_id"] == identifier]
+        require(len(matches) == 1, "原附件不存在或没有读取权限", web.HTTPNotFound)
+        item = matches[0]
+        require(item["processing_state"] == "STORED" and item["recorded_content_sha256"] is not None,
+                "原附件缺少、已经变化或没有保存内容摘要", web.HTTPConflict)
+        metadata, paths, _ = self._locations(session)
+        value, path = metadata[identifier], paths.get(identifier)
+        require(path is not None, "原附件没有可核查的文件引用", web.HTTPConflict)
+        require(self._identifier(session.key, path) == identifier and not path.is_symlink(),
+                "原附件引用与编号不符", web.HTTPForbidden)
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(descriptor, "rb") as source:
+            before = os.fstat(source.fileno())
+            require(stat.S_ISREG(before.st_mode) and before.st_size == value["size_bytes"],
+                    "原附件类型或大小发生变化", web.HTTPConflict)
+            content = source.read(value["size_bytes"] + 1)
+            after = os.fstat(source.fileno())
+            require((before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
+                    == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns),
+                    "读取期间原附件发生变化", web.HTTPConflict)
+        require(len(content) == value["size_bytes"] and hashlib.sha256(content).hexdigest() == value["content_sha256"],
+                "原附件内容与上传时摘要不符", web.HTTPConflict)
+        return item, content

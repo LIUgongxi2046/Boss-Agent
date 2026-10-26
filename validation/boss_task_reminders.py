@@ -12,7 +12,7 @@ import json
 
 from business import now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 TERMINAL = frozenset({"CANCELED", "COMPLETED_CONFIRMED"})
 
 

@@ -122,7 +122,7 @@ if (!app.requestSingleInstanceLock()) {
       return { role: request.role, username: matches[0].username, password: matches[0].password };
     }
     if ('role' in request) throw new Error('当前能力不接受入口身份字段');
-    if (action === 'status') return { versions: process.versions, service_pid: child.pid, service_startup_ms: serviceStartupElapsedMs, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported(), demo_account_injection_supported: demoAccountInjection };
+    if (action === 'status') return { versions: process.versions, service_pid: child.pid, service_startup_ms: serviceStartupElapsedMs, platform: process.platform, architecture: process.arch, microphone: systemPreferences.getMediaAccessStatus('microphone'), notifications_supported: Notification.isSupported(), demo_account_injection_supported: demoAccountInjection, auto_start: ['darwin', 'win32'].includes(process.platform) ? app.getLoginItemSettings().openAtLogin : null, auto_update: false, background_mode: 'QUIT_WITH_LAST_WINDOW' };
     await authorize(event, request.token);
     record('ipc_authorized', { action });
     if (action === 'notify_event' || action === 'retry_notification' || action === 'notification_status') {
@@ -132,8 +132,8 @@ if (!app.requestSingleInstanceLock()) {
       const response = await fetch(origin + '/api/boss/ui/notification-target?' + query, { headers: { Authorization: 'Bearer ' + request.token } });
       if (!response.ok) throw new Error('当前通知对象不能采用，HTTP ' + response.status);
       const target = await response.json();
-      if (target.event_id !== request.event_id || target.event_version !== request.event_version || target.page_id !== 'F02' || target.notification_saved !== true) throw new Error('通知目标与当前对象不符');
-      const key = JSON.stringify([target.event_id, target.event_version]);
+      if (target.event_id !== request.event_id || target.event_version !== request.event_version || typeof target.execution_namespace !== 'string' || !target.execution_namespace || target.page_id !== 'F02' || target.notification_saved !== true) throw new Error('通知目标与当前对象不符');
+      const key = JSON.stringify([target.execution_namespace, target.event_id, target.event_version]);
       const supported = Notification.isSupported();
       if (action === 'notification_status') return { supported, permission: eventNotifications.get(key)?.permission ?? 'NOT_REPORTED_BY_SYSTEM', state: eventNotifications.get(key)?.state ?? 'NOT_REQUESTED', failure_reason: eventNotifications.get(key)?.failure_reason ?? null, external_delivery_verified: false };
       if (!supported) throw new Error('当前系统不支持桌面通知，请查看应用内通知记录');
@@ -151,7 +151,7 @@ if (!app.requestSingleInstanceLock()) {
         if (!window || window.isDestroyed()) return;
         window.show();
         window.focus();
-        window.webContents.send('boss-desktop:notification-open', { event_id: target.event_id, event_version: target.event_version });
+        window.webContents.send('boss-desktop:notification-open', { execution_namespace: target.execution_namespace, event_id: target.event_id, event_version: target.event_version });
       });
       notification.show();
       return { supported, permission: 'NOT_REPORTED_BY_SYSTEM', state: observed.state, original_request_reused: false, external_delivery_verified: false };

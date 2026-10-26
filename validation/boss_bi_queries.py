@@ -1,12 +1,13 @@
 import json
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone
 from decimal import Decimal, localcontext
 
 from aiohttp import web
 
 from business import checksum, encode, now, require, validate
 from boss_source_policy import source_validity
+from boss_v7_metrics import apply_configurations, display_rounding, policy_fingerprint, record_adoption
 
 SCOPE_FIELDS = ("legal_entity_id", "currency", "quantity_unit", "trade_scope", "definition_version", "target_version", "business_basis", "settlement_state", "ownership_type", "asset_owner_id", "cost_owner_id", "customer_id")
 
@@ -74,6 +75,7 @@ def _binding(store, db, ns, data, query):
 
 def require_current(store, db, ns, data, query):
     binding = _binding(store, db, ns, data, query)
+    require(binding.get("metric_policy_sha256", checksum({})) == policy_fingerprint(db, ns), "指标配置已经变化，需要重新查询")
     if "scenario_id" in binding:
         from boss_bi_scenarios import binding_current
         binding_current(store, db, ns, data, binding)
@@ -89,6 +91,8 @@ def require_current(store, db, ns, data, query):
 def query_metrics(store, db, ns, data, payload):
     from boss_bi_scenarios import query_inputs
     env = payload["envelope"]
+    policy_at = datetime.now(timezone.utc)
+    calculations = {}
     digest = checksum(payload)
     receipt_id = checksum({"session_id": env["session_id"], "request_id": env["request_id"]})
     previous = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='bi_query_receipt' AND id=?", (ns, receipt_id)).fetchone()
@@ -142,11 +146,14 @@ def query_metrics(store, db, ns, data, payload):
         context.prec = max(80, sum(len(value) for row in all_rows.values() for value in row.values() if isinstance(value, str)))
         for name, rows, scope in (("BASE", baseline_rows, baseline_scope), ("CURRENT", current_rows, payload)):
             metrics, gaps = _aggregate(rows, scope)
+            source_metrics = metrics
+            metrics, calculations[name] = apply_configurations(db, ns, rows, metrics, cache=True, at=policy_at)
             period_values[name] = metrics
             missing.extend(name + ":" + field for field in gaps)
-            if metrics["revenue"][0] == 0:
+            missing.extend(name + ":" + identifier + ":" + field for identifier, calculation in calculations[name].items() for field in calculation["missing_fields"])
+            if "gross_margin" not in calculations[name] and source_metrics["revenue"][0] == 0:
                 missing.append(name + ":gross_margin:ZERO_DENOMINATOR_UNDEFINED")
-            if metrics["sales_quantity"][0] == 0:
+            if "gross_profit_per_tonne" not in calculations[name] and source_metrics["sales_quantity"][0] == 0:
                 missing.append(name + ":gross_profit_per_tonne:ZERO_DENOMINATOR_UNDEFINED")
             coverage[name] = {"record_count": len(rows), "region_ids": sorted({row["region_id"] for row in rows}),
                               "period_start": payload["comparison_start"] if name == "BASE" else payload["period_start"],
@@ -156,9 +163,12 @@ def query_metrics(store, db, ns, data, payload):
                 if definitions[metric]["definition_version"] != scope["definition_version"]:
                     formula = "DEFINITION_NOT_PROVIDED"
                     missing.append(name + ":definition_version:UNKNOWN")
-                values.append({"metric_id": metric, "period_scope": name, "scope_description": encode({key: value for key, value in scope.items() if key not in ("envelope", "question")}),
+                metric_scope = {key: value for key, value in scope.items() if key not in ("envelope", "question")}
+                if metric in calculations[name]:
+                    metric_scope["metric_configuration"] = {key: calculations[name][metric][key] for key in ("configuration_version", "scope", "breakdown")}
+                values.append({"metric_id": metric, "period_scope": name, "scope_description": encode(metric_scope),
                                "value": format(value, "f") if value is not None else None, "unit": unit, "formula": formula,
-                               "definition_version": scope["definition_version"], "display_rounding": "原始Decimal字符串；展示四舍五入不得覆盖原值"})
+                               "definition_version": scope["definition_version"], "display_rounding": display_rounding(calculations[name][metric]) if metric in calculations[name] else "原始Decimal字符串；展示四舍五入不得覆盖原值"})
         missing_regions = sorted(set(_regions(payload)) - {row["region_id"] for row in current_rows})
         delayed = sorted({row["region_id"] for row in current_rows if row.get("sync_state") == "DELAYED"})
         unsynchronized = sorted({row["region_id"] for row in current_rows if row.get("sync_state") == "UNSYNCHRONIZED"})
@@ -195,9 +205,11 @@ def query_metrics(store, db, ns, data, payload):
         "query_id": result["query_id"], "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
         "source_id": document["source_id"], "source_version": document["version"], "source_sha256": checksum(document),
         "definitions_sha256": checksum(data["metric_definitions"]), "detail_fingerprints": {identifier: checksum(row) for identifier, row in all_rows.items()},
+        "metric_policy_sha256": policy_fingerprint(db, ns, policy_at), "metric_calculations": calculations,
         "original_records": list(all_rows.values()), "document_snapshot": document,
         **({"scenario_id": payload["scenario_id"], "document_snapshots": documents} if payload.get("scenario_id") else {})})
     store.put(db, ns, "bi_query_receipt", receipt_id, {"digest": digest, "query_id": result["query_id"], "session_id": env["session_id"], "request_id": env["request_id"]})
+    record_adoption(store, db, ns, result["query_id"], calculations)
     return result
 
 
@@ -279,7 +291,7 @@ class BIQueryAPI:
                 return result
             if "scenario_id" in binding:
                 from boss_bi_scenarios import binding_current
-                valid = binding_current(self.store, db, ns, data, binding, enforce=False)
+                valid = binding_current(self.store, db, ns, data, binding, enforce=False) and binding.get("metric_policy_sha256", checksum({})) == policy_fingerprint(db, ns)
                 result = {"adoption_state": "HISTORICAL_CURRENT" if valid else "HISTORICAL_REQUIRES_REQUERY", "result": query}
                 validate("bi_read", result)
                 return result
@@ -289,6 +301,7 @@ class BIQueryAPI:
             valid = source_validity(document, clock) == "VALID" and checksum(document) == binding["source_sha256"]
             current = {row["record_id"]: checksum(row) for row in data["details"]}
             valid = valid and binding["definitions_sha256"] == checksum(data["metric_definitions"]) and all(current.get(key) == value for key, value in binding["detail_fingerprints"].items())
+            valid = valid and binding.get("metric_policy_sha256", checksum({})) == policy_fingerprint(db, ns)
             result = {"adoption_state": "HISTORICAL_CURRENT" if valid else "HISTORICAL_REQUIRES_REQUERY", "result": query}
             validate("bi_read", result)
             return result

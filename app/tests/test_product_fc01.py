@@ -10,7 +10,7 @@ from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.schema import Config
-from nanobot.config.loader import save_config
+from nanobot.config.loader import load_config, save_config
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "validation"))
@@ -36,6 +36,7 @@ def test_public_runtime_preparation_and_owner_adoption_preserve_same_task(store,
     config = Config.model_validate({"agents":{"defaults":{"workspace":str(tmp_path / "workspace"),"provider":"deepseek","model":"deepseek-flash","maxToolIterations":12,"maxTokens":4096,"maxToolResultChars":200000,"dream":{"enabled":False}}},"providers":{"deepseek":{"apiKey":"${DEEPSEEK_API_KEY}","apiBase":"https://api.deepseek.com"}}})
     filename = tmp_path / "config.json"
     save_config(config, filename)
+    config = load_config(filename)
     registry = ToolRegistry()
     recorder = Fc01RuntimeRecorder(store, "ui-check", registry, lambda: runtime.snapshot())
     loop = AgentLoop.from_config(config, provider=service.provider, tool_registry=registry, hook_factories=[recorder.hook_factory])

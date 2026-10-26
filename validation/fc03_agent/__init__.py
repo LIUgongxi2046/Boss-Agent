@@ -6,6 +6,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, require
+from boss_execution_scope import NAMESPACE
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_owner_read_tools import BossTodayReadTool
 
@@ -32,6 +33,7 @@ class Fc03Context:
     allowed_list_ids: frozenset[str] = frozenset()
     selected_list_id: str | None = None
     selected_item_id: str | None = None
+    source_selection_json: str | None = None
 
 
 def register_fc03_tools(registry, store, context_provider, *, formal=False):
@@ -68,7 +70,7 @@ class Fc03TodayTool(Tool):
         context = self.context_provider()
         require(isinstance(context, Fc03Context) and context.role == "BOSS" and context.active is True,
                 "晨间本人认证请求无效", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and bool(context.request_id) and bool(context.session_id),
+        require(context.namespace == NAMESPACE and bool(context.request_id) and bool(context.session_id),
                 "晨间执行范围无效", web.HTTPForbidden)
         request = current_request_context()
         if require_runtime and request is not None:

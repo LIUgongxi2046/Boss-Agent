@@ -151,9 +151,40 @@ def test_minutes_confirm_produces_separate_authorization_and_snapshots(services)
     saved=view(reads,"BOSS","minutes")[1]
     assert saved["minute"]["confirmation_authorization_id"]==out["authorization_id"]
     assert any(row["version"]=="1" for row in saved["revisions"])
+    status, history = reads.serve("BOSS", "/api/boss/ui/owner/decisions")
+    assert status == 200, history
+    record = next(row for row in history["records"] if row["authorization_id"] == out["authorization_id"])
+    assert record["original_records"][0]["version"] == "1"
+    assert record["original_records"][0]["content"] == "\n".join(row["text"] for row in minutes_input()["entries"])
+    assert record["sources"][0]["source_id"] == "meeting-minutes" and record["sources"][0]["version"] == "1"
+    assert "历史会议纪要" in record["sources"][0]["content"]
     with api.store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='task'").fetchone()[0]==0
         assert db.execute("SELECT COUNT(*) FROM objects WHERE kind='outbox'").fetchone()[0]==0
+
+
+def test_owner_decision_retains_original_attachment_after_revision(services):
+    api, pages = services
+    original = seed_input()
+    assert api.execute("MAINTAINER", "boss.simulation.application.seed", original)[0] == 200
+    status, decision = api.execute("BOSS", "boss.approval.decide", decide_input(decision="REQUEST_MORE"))
+    assert status == 200, decision
+    revised = {**seed_input("revise-history-source"), "expected_version": "2",
+               "attachment_text": "SIMULATED：申请人补充当前报价说明，保留此前附件与本人决定供历史查询。"}
+    status, result = api.execute("MAINTAINER", "boss.simulation.application.revise", revised)
+    assert status == 200, result
+    before = api.store.path.read_bytes()
+    status, history = pages.serve("BOSS", "/api/boss/ui/owner/decisions")
+    assert status == 200, history
+    record = next(row for row in history["records"] if row["authorization_id"] == decision["authorization_id"])
+    assert record["original_records"][0]["decision"] == "REQUEST_MORE"
+    assert record["original_records"][0]["content"] == decide_input()["comment"]
+    source = record["sources"][0]
+    assert source["version"] == "1" and source["state"] == "HISTORICAL_VERSION"
+    assert source["content"] == original["attachment_text"]
+    assert source["current_evidence_eligible"] is False
+    assert api.store.path.read_bytes() == before
+    assert pages.serve("MAINTAINER", "/api/boss/ui/owner/decisions")[0] == 403
 
 
 def test_application_does_not_exist_before_maintenance_simulation(services):

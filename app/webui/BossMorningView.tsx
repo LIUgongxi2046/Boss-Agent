@@ -37,7 +37,7 @@ const inputLabels:Record<string,string>={owner_goals:"本人目标",task:"交办
 const coverageLabels:Record<string,string>={CONFIRMED:"已经确认",NOT_SET:"尚未设置",NO_RECORDS_IN_PROVIDED_SCOPE:"所提供范围没有记录",NEEDS_REVIEW:"需要复核",PARTIAL:"部分覆盖"};
 
 export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConversation,onOpenConversation,refreshVersion,visible=true}:{onNavigate:(page:string,id:string)=>void;onDirtyChange:(value:boolean)=>void;onPrepare:(item:TodayItem,reference:MorningReference)=>void;onStartConversation:(value:MorningConversationRequest,signal:AbortSignal)=>Promise<MorningBindingReceipt>;onOpenConversation:(chatId:string)=>void;refreshVersion:number;visible?:boolean}){
-  const {client,getToken}=useClient();
+  const {client,getToken,token}=useClient();
   const [day,setDay]=useState<Day|null>(null),[view,setView]=useState<View|null>(null),[list,setList]=useState<Read|null>(null);
   const [question,setQuestion]=useState(""),[questionDirty,setQuestionDirty]=useState(false),[receipt,setReceipt]=useState<Receipt|null>(null),[history,setHistory]=useState<History>({requests:[]});
   const [dayDraft,setDayDraft]=useState<Day|null>(null),[category,setCategory]=useState<TodayItem["category"]|"ALL">("ALL"),[meetingOpen,setMeetingOpen]=useState(false);
@@ -112,7 +112,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     }).catch(failure=>{if(active())setError(failure.message);}).finally(()=>{if(active())setLoading(false);});
     void read<History>("/api/boss/ui/morning/history",abort.signal).then(value=>{if(active())setHistory(value);},failure=>{if(active())setError(failure.message);});
     return()=>{epoch.current++;generation.current++;receiptSequence.current++;abort.abort();handoff.current?.abort();};
-  },[client,read,restore,restoreBinding,clear]);
+  },[client,token,read,restore,restoreBinding,clear]);
   const dateDirty=Boolean(day&&dayDraft&&(day.date!==dayDraft.date||day.timezone!==dayDraft.timezone));
   useEffect(()=>{if(visible)onDirtyChange(orderDirty||busy||uncertain||questionDirty||dateDirty);},[onDirtyChange,orderDirty,busy,uncertain,questionDirty,dateDirty,visible]);
   useEffect(()=>{

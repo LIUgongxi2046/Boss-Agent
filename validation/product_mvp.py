@@ -6,6 +6,7 @@ from aiohttp import web
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, now, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_page_api import BossPageAPI
 from boss_simulation_api import _context
 from boss_supply_quality import SupplyQualityAPI, bound_source_references
@@ -51,7 +52,7 @@ class ProductMVP(ProductFc01):
                     for reference in bound_source_references(db, context, "material_cost_report", record):
                         references[reference["source_id"]] = reference
                 result["source_refs"] = list(references.values())
-                self.store.put(db, "ui-check", "mvp_query", grant.key, {"owner_id": context["owner_id"], "dataset_id": grant.dataset_id,
+                self.store.put(db, NS, "mvp_query", grant.key, {"owner_id": context["owner_id"], "dataset_id": grant.dataset_id,
                     "dataset_version": grant.dataset_version, "input_sha256": checksum(grant.params), "result": result})
         return response
 
@@ -81,7 +82,7 @@ class ProductMVP(ProductFc01):
         with self.store.connect() as db:
             db.execute("BEGIN")
             context = _context(db)
-            stored = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='mvp_query' AND id=?", (key,)).fetchone()
+            stored = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='mvp_query' AND id=?", (NS, key)).fetchone()
             snapshot = json.loads(stored[0]) if stored else None
             if snapshot:
                 require(all(snapshot[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")), "原查询不属于当前本人资料范围", web.HTTPForbidden)
@@ -94,7 +95,7 @@ class ProductMVP(ProductFc01):
                 with self.store.connect() as db:
                     db.execute("BEGIN")
                     for reference in snapshot["result"]["source_refs"]:
-                        document = require_current_business_source(self.store, db, "ui-check", context["owner_id"], reference["source_id"])
+                        document = require_current_business_source(self.store, db, NS, context["owner_id"], reference["source_id"])
                         require(document["version"] == reference["version"] and checksum(document) == reference["source_sha256"], "原查询来源已经变化", web.HTTPConflict)
         return {"client_request_id": key, "request_state": state, "run_id": prepared.get("run_id"),
             "adoption_state": "CURRENT" if current else "HISTORICAL_REQUIRES_REQUERY" if snapshot else "NOT_OBSERVED",
@@ -111,7 +112,7 @@ class ProductMVP(ProductFc01):
             with self.store.connect() as db:
                 db.execute("BEGIN")
                 context = _context(db)
-                rows = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='mvp_query' ORDER BY json_extract(body,'$.result.read_at') DESC")]
+                rows = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='mvp_query' ORDER BY json_extract(body,'$.result.read_at') DESC", (NS,))]
             return {"requests": [{"client_request_id": row["result"]["query_id"], "read_at": row["result"]["read_at"], "cost_type": row["result"]["cost_report"]["cost_type"]}
                 for row in rows if all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version"))]}
         require(path in {"/api/boss/ui/mvp/query", "/api/boss/ui/mvp/source"}, "采购读取入口不存在", web.HTTPNotFound)

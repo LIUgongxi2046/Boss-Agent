@@ -1,694 +1,114 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  AlertCircle, ArrowLeft, CheckCircle2, Clock3, FileSearch,
-  FolderOpen, Loader2, MessageSquareText, RefreshCw, Send, ShieldCheck, X,
-} from "lucide-react";
-import { useClient } from "@/providers/ClientProvider";
-import {BossOriginalReceipt} from "./BossOriginalReceipt";
-import "./boss-v6.css";
+import {useEffect,useRef,useState,type ReactNode} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import {AlertCircle,FileSearch,Inbox,Loader2,Plus,RefreshCw,Send,ShieldCheck,Trash2} from "lucide-react";
+import {useClient} from "@/providers/ClientProvider";
+import {useTransaction} from "./BossAssignmentFlow";
+import type {DraftLeaveRegistration} from "./draft-leave";
 
-type Contact = {
-  contact_id:string;name:string;organization:string;responsibility:string;
-};
-type Reference = {source_id:string;version:string};
-type Draft = {
-  draft_id:string;version:string;status:"DRAFT"|"SENT_SIMULATED";
-  recipient_id:string;recipient_name_at_save:string;organization_at_save:string;
-  related_task_id:string|null;body:string;attachment_refs:Reference[];
-  content_sha256:string;message_id:string|null;
-};
-type Sent = {
-  message_id:string;draft_id:string;recipient_id:string;
-  send_state:"SENT_SIMULATED";delivery_state:string;reply_state:string;
-  sent_at:string;related_task_id:string|null;external_channel_invoked:boolean;
-};
-type Reply = {
-  reply_id:string;reply_to:string;text:string;author_contact_id:string;received_at:string;
-};
-type Outbox = {
-  source_type:"SIMULATED";projection:"outbox";data_version:string;
-  drafts:Draft[];sent_messages:Sent[];replies:Reply[];
-  contacts:Contact[];task_ids:string[];messages:Record<string,unknown>[];
-};
-type Calendar = {
-  calendar_id:string;version:string;status:"ACTIVE"|"DELETED";
-  starts_at:string;ends_at:string;timezone:string;title?:string;
-  location?:string;private_body:string;attachment_refs:Reference[];
-};
-type BusyShare = {
-  share_id:string;calendar_version:string;recipient_id:string;
-  busy:boolean;starts_at:string;ends_at:string;timezone:string;
-  expires_at:string;revoked:boolean;
-  effective_state:"ACTIVE_SIMULATED"|"EXPIRED"|"REVOKED"|"OUTDATED"|"INVALID";
-};
-type ConflictCheck = {
-  source_type:"SIMULATED";meeting_id:string;meeting_version:string;
-  proposed_starts_at:string;proposed_ends_at:string;
-  status:string;meeting_starts_at:string;meeting_ends_at:null;
-  meeting_end_known:false;requires_owner_acknowledgement:boolean;
-  conflict_proven_absent:false;coverage:string;read_only:true;
-};
-type BusyPreview = {
-  share_id:string;share_status:"ACTIVE_SIMULATED";recipient_id:string;
-  busy:true;starts_at:string;ends_at:string;timezone:string;
-  fields:string[];preview_only_not_external_access:true;
-};
-type CalendarData = {
-  source_type:"SIMULATED";projection:"calendar";data_version:string;
-  calendar:Calendar;shares:BusyShare[];contacts:Contact[];
-  meeting:{meeting_id:string;starts_at:string;ends_at:null;end_is_known:false};
-  can_edit:boolean;physical_secure_erasure_verified:false;
-};
-type MutationResult = {
-  draft_id?:string;version?:string;status?:string;message_id?:string;
-  send_state?:string;delivery_state?:string;share_status?:string;
-};
-type Pending = {
-  action:string;payload:Record<string,unknown>;key:string;
-  title:string;lines:string[];
-};
-type Props = {pageId:"F08"|"F12";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;focusDraftId?:string;onFocusDraftConsumed?:()=>void;onDirtyChange?:(dirty:boolean)=>void};
-
-function Block({title,note,children}: {title:string;note?:string;children:ReactNode}) {
-  return <section className="boss-panel">
-    <div className="boss-panel-head"><h2>{title}</h2>{note&&<small>{note}</small>}</div>{children}
-  </section>;
-}
-function LabelValue({name,value,children}:{name:string;value?:string|number|boolean|null;children?:string|number|boolean|null}) {
-  const shown=value??children;
-  return <div className="boss-kv"><span>{name}</span><strong>{shown===undefined||shown===null?"待核查":String(shown)}</strong></div>;
-}
-function Empty({children}:{children:ReactNode}) {
-  return <div className="boss-empty"><FolderOpen size={20}/><div><strong>暂无已保存记录</strong><p>{children}</p></div></div>;
-}
-function splitDate(raw:string) {return raw.slice(0,16);}
-function isoShanghai(raw:string) {
-  if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(raw)) throw Error("必须填写完整日期与时间");
-  return raw+":00+08:00";
-}
-function validate(text:string,label:string,max=2400) {
-  if(!text.trim()||text.length>max)throw Error(label+"必须填写且不超过"+max+"字");
-  return text.trim();
-}
-
-const MESSAGE_ACTIONS=["boss.message.draft.save","boss.message.send"] as const;
-function messageRequest(){const values=new URLSearchParams(window.location.search),action=values.get("messageOperationAction"),id=values.get("messageOperationRequest");return action&&id&&MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number])?{action,id}:null;}
-function retainMessageRequest(action:string,id:string){if(!MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number]))return;const current=messageRequest();if(current&&(current.action!==action||current.id!==id))throw new Error("当前消息存在待核查原请求");const url=new URL(window.location.href);url.searchParams.set("messageOperationAction",action);url.searchParams.set("messageOperationRequest",id);window.history.replaceState(window.history.state,"",url);}
-function clearMessageRequest(action:string,id:string){const current=messageRequest();if(current?.action===action&&current.id===id){const url=new URL(window.location.href);url.searchParams.delete("messageOperationAction");url.searchParams.delete("messageOperationRequest");window.history.replaceState(window.history.state,"",url);}}
-
-function useMutation(refresh:()=>void, success?:(result:MutationResult)=>void) {
-  const {client,getToken}=useClient();
-  const [lookupBusy,setLookupBusy]=useState(false);
-  const [pending,setPending]=useState<Pending|null>(null);
-  const [checked,setChecked]=useState(false);
-  const [uncertain,setUncertain]=useState(false);
-  const [busy,setBusy]=useState(false);
-  const [error,setError]=useState("");
-  const [status,setStatus]=useState("");
-  const modal=useRef<HTMLElement|null>(null);
-  const busyRef=useRef(false);busyRef.current=busy;
-  useEffect(()=>{
-    if(!pending)return;
-    const previous=document.activeElement instanceof HTMLElement?document.activeElement:null;
-    modal.current?.focus();
-    const key=(event:KeyboardEvent)=>{
-      if(event.key==="Escape"&&!busyRef.current){setPending(null);setChecked(false);return;}
-      if(event.key!=="Tab"||!modal.current)return;
-      const nodes=Array.from(modal.current.querySelectorAll<HTMLElement>(
-        'input:not([disabled]),button:not([disabled])')).filter(x=>x.getClientRects().length>0);
-      if(nodes.length&&event.shiftKey&&document.activeElement===nodes[0]){
-        event.preventDefault();nodes[nodes.length-1].focus();
-      }else if(nodes.length&&!event.shiftKey&&document.activeElement===nodes[nodes.length-1]){
-        event.preventDefault();nodes[0].focus();
-      }
-    };
-    document.addEventListener("keydown",key);
-    return ()=>{document.removeEventListener("keydown",key);previous?.focus();};
-  },[pending?.key]);
-  const propose=useCallback((action:string,payload:Record<string,unknown>,
-                            title:string,lines:string[])=>{
-    if(MESSAGE_ACTIONS.includes(action as typeof MESSAGE_ACTIONS[number])&&messageRequest()){setError("当前消息存在待核查原请求，请先读取原编号。");return;}
-    setPending({action,payload,key:"boss-"+crypto.randomUUID(),title,lines});
-    setChecked(false);setUncertain(false);setStatus("");setError("");
-  },[]);
-  const submit=async()=>{
-    if(!pending||!checked||busy||uncertain)return;
-    retainMessageRequest(pending.action,pending.key);
-    setBusy(true);setError("");
-    try{
-      const result=await client.requestMutation<MutationResult>(pending.action,{
-        ...pending.payload,client_request_id:pending.key,
-      });
-      clearMessageRequest(pending.action,pending.key);
-      setStatus("模拟业务事务已保存："+(result.status||result.send_state||result.share_status||"已记录")+
-                "。请以重新读取的状态为准。");
-      success?.(result);
-      setPending(null);setChecked(false);refresh();
-    }catch(e){
-      const message=MESSAGE_ACTIONS.includes(pending.action as typeof MESSAGE_ACTIONS[number]);
-      const rejected=e instanceof Error&&"status" in e&&typeof e.status==="number"&&[400,401,403,404,409,410,413,422].includes(e.status);
-      setUncertain(message&&!rejected);
-      if(message){setChecked(false);if(rejected)clearMessageRequest(pending.action,pending.key);}
-      setError((e instanceof Error?e.message:String(e))+(message&&!rejected?"。结果需要核查，请读取原编号；当前不会重新提交。":""));
-    }finally{setBusy(false);}
-  };
-  const reconcile=async()=>{
-    if(!pending||busy||lookupBusy)return;
-    const token=getToken();
-    if(!token){setError("身份已过期，不能核对原请求回执");return;}
-    setLookupBusy(true);setError("");
-    try{
-      const params=new URLSearchParams({
-        action:pending.action,client_request_id:pending.key,
-      });
-      const response=await fetch("/api/boss/ui/operation-status?"+params.toString(),{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
-      });
-      if(!response.ok)throw new Error("原请求回执读取失败（HTTP "+response.status+"）");
-      const data=await response.json() as {
-        action:string;client_request_id:string;outcome:string;write_performed_by_lookup:boolean;
-        result?:MutationResult;
-      };
-      if(data.action!==pending.action||data.client_request_id!==pending.key||data.write_performed_by_lookup!==false)
-        throw new Error("回执请求标识或动作不一致");
-      if(data.outcome==="RECORDED"&&data.result){
-        clearMessageRequest(pending.action,pending.key);setUncertain(false);
-        success?.(data.result);
-        setStatus("已从服务端 SQLite 幂等回执证实本次动作已保存，已重新读取正式状态。");
-        setPending(null);setChecked(false);refresh();
-      }else if(data.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
-        setUncertain(MESSAGE_ACTIONS.includes(pending.action as typeof MESSAGE_ACTIONS[number]));setError("当前数据库没有找到原回执，结果仍待核查。请继续读取原编号和正式业务对象。");
-        refresh();
-      }else throw new Error("未识别的回执状态，不进行再次提交");
-    }catch(e){
-      setError(e instanceof Error?e.message:String(e));
-    }finally{setLookupBusy(false);}
-  };
-  const dialog=pending?<div className="boss-confirm-backdrop">
-    <section ref={modal} tabIndex={-1} className="boss-confirm" role="dialog"
-      aria-modal="true" aria-labelledby="boss-private-action-title">
-      <h3 id="boss-private-action-title"><ShieldCheck size={18}/>{pending.title}</h3>
-      <p>仅当前 BOSS 身份可执行该动作。收件人、内容、版本或日程分享字段发生变化时，需要重新授权。</p>
-      <dl>{pending.lines.map((line,i)=><div key={i}><dd>{line}</dd></div>)}</dl>
-      <label className="boss-confirm-check">
-        <input type="checkbox" checked={checked} disabled={busy}
-          onChange={e=>setChecked(e.target.checked)}/>
-        <span>我已核实本次具体内容、对象、范围与结果，并同意执行。</span>
-      </label>
-      {error&&<p className="boss-validation-error" role="alert">{error}</p>}
-      <footer className="boss-actions">
-        <button className="boss-btn" type="button" disabled={busy||lookupBusy} onClick={()=>setPending(null)}>取消</button>
-        <button className="boss-btn" type="button" disabled={busy||lookupBusy}
-          onClick={()=>void reconcile()}>
-          {lookupBusy&&<Loader2 size={16} className="boss-spin"/>} 查询本次回执
-        </button>
-        <button className="boss-btn boss-btn-primary" type="button"
-          disabled={!checked||busy||lookupBusy||uncertain} onClick={()=>void submit()}>
-          {busy&&<Loader2 size={16} className="boss-spin"/>} 确认并提交
-        </button>
-      </footer>
-    </section>
-  </div>:null;
-  const finishRecovery=()=>{setError("");setUncertain(false);setPending(null);setChecked(false);};
-  return {propose,dialog,status,error,busy,finishRecovery};
-}
-
-export function BossCommunicationCalendar({pageId,onNavigate,onViewSource,focusDraftId,onFocusDraftConsumed,onDirtyChange}:Props) {
+type Contact={contact_id:string;name:string;organization:string;responsibility:string;valid_from?:string;valid_until?:string};
+type SourceRef={source_id:string;version:string};
+type Draft={draft_id:string;version:string;status:"DRAFT"|"SENT_SIMULATED";recipient_id:string;recipient_name_at_save:string;organization_at_save:string;related_task_id:string|null;body:string;attachment_refs:SourceRef[];content_sha256:string;message_id:string|null;updated_at?:string;visibility?:string;send_eligibility?:{allowed:boolean;reason:string};origin?:{kind:string;object_id:string;version:string};authorization?:{authorization_id:string;status:string;recipient_id:string;content_sha256:string;expires_at:string|null}};
+type Sent={message_id:string;draft_id:string;draft_version:string;recipient_id:string;related_task_id:string|null;body:string;attachment_refs:SourceRef[];send_state:string;delivery_state:string;reply_state:string;sent_at:string;external_channel_invoked:boolean};
+type Reply={reply_id:string;reply_to:string;text:string;author_contact_id:string;received_at:string;related_task_id:string|null;task_completion_confirmed:boolean};
+type TaskMessage={message_id:string;task_id:string;message_status:string;task_status?:string;task_version?:string;recipient_id:string;sent_at:string;source_type:string};
+type Incoming={message_id:string;author_contact_id:string;body:string;received_at:string;reply_required:boolean;reply_status:string;related_task_id:string|null;attachment_refs:SourceRef[]};
+type Projection={source_type:"SIMULATED";projection:"outbox";data_version:string;execution_namespace?:string;drafts:Draft[];sent_messages:Sent[];replies:Reply[];contacts:Contact[];task_ids:string[];messages:TaskMessage[];incoming_messages?:Incoming[];tasks?:{task_id:string;version:string;title:string;status:string;coordinator_id:string}[];sources?:{source_id:string;version:string;status:string;author?:string;published_at?:string;valid_until?:string}[];expression_requirements?:{version:string;status:string;content:string};business_clock?:string};
+type Form={recipient_id:string;related_task_id:string;body:string;attachment_refs:SourceRef[];basis:string};
+type Props={pageId:"F08";onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;onOpenTask?:(id:string)=>void;focusDraftId?:string;onFocusDraftConsumed?:()=>void;onDirtyChange?:(dirty:boolean)=>void;refreshVersion?:number;onDraftLeaveChange?:DraftLeaveRegistration};
+type PendingChoice={id:string;restore:boolean};
+const EMPTY:Form={recipient_id:"",related_task_id:"",body:"",attachment_refs:[],basis:""};
+function Panel({title,children}:{title:string;children:ReactNode}){return <section className="boss-panel"><div className="boss-panel-head"><h2>{title}</h2></div>{children}</section>;}
+function Fact({label,value}:{label:string;value?:string|number|null}){return <div className="boss-kv"><span>{label}</span><strong>{value??"尚未提供"}</strong></div>;}
+function signature(data:Projection,id:string){return JSON.stringify([data.execution_namespace,id,data.drafts.find(value=>value.draft_id===id),data.contacts,data.task_ids,data.tasks,data.sources,data.expression_requirements]);}
+function saved(data:Projection,id:string):Form{const draft=data.drafts.find(value=>value.draft_id===id);return draft?{recipient_id:draft.recipient_id,related_task_id:draft.related_task_id??"",body:draft.body,attachment_refs:draft.attachment_refs.map(ref=>({...ref})),basis:signature(data,id)}:{...EMPTY,basis:signature(data,id)};}
+function person(data:Projection|null,id:string){const contact=data?.contacts.find(value=>value.contact_id===id);return contact?contact.name+" · "+contact.organization+" · "+contact.responsibility+" ["+contact.contact_id+"]":id;}
+export function BossCommunicationCalendar(props:Props){const {token}=useClient(),identity=useRef({token,version:0});if(identity.current.token!==token)identity.current={token,version:identity.current.version+1};return <MessageEditor key={identity.current.version} {...props}/>;}
+function MessageEditor({onNavigate,onViewSource,onOpenTask,focusDraftId,onFocusDraftConsumed,onDirtyChange,refreshVersion,onDraftLeaveChange}:Props){
   const {getToken}=useClient();
-  const isMessage=pageId==="F08";
-  const [state,setState]=useState<Outbox|CalendarData|null>(null);
-  const [revision,setRevision]=useState(0);
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-  const [selectedDraft,setSelectedDraft]=useState("");
-  const [selectedRecipient,setSelectedRecipient]=useState("");
-  const [relatedTask,setRelatedTask]=useState("");
-  const [messageBody,setMessageBody]=useState("");
-  const [attachmentId,setAttachmentId]=useState("");
-  const [attachmentVersion,setAttachmentVersion]=useState("1");
-  const [dirty,setDirty]=useState(false);
-  useEffect(()=>{onDirtyChange?.(dirty);},[dirty,onDirtyChange]);
-  useEffect(()=>()=>onDirtyChange?.(false),[onDirtyChange]);
-  const [start,setStart]=useState("");
-  const [end,setEnd]=useState("");
-  const [title,setTitle]=useState("");
-  const [privateBody,setPrivateBody]=useState("");
-  const [location,setLocation]=useState("");
-  const [conflictCheck,setConflictCheck]=useState<ConflictCheck|null>(null);
-  const [conflictBusy,setConflictBusy]=useState(false);
-  const [privateAttachmentId,setPrivateAttachmentId]=useState("");
-  const [privateAttachmentVersion,setPrivateAttachmentVersion]=useState("1");
-  const [busyPreview,setBusyPreview]=useState<BusyPreview|null>(null);
-  const [previewBusy,setPreviewBusy]=useState(false);
-  const [conflictAcknowledged,setConflictAcknowledged]=useState(false);
-  const [shareRecipient,setShareRecipient]=useState("");
-  const [sharePurpose,setSharePurpose]=useState("");
-  const [shareExpires,setShareExpires]=useState("");
-  const reload=()=>setRevision(x=>x+1);
-  const {propose,dialog,status,busy,error:mutationError,finishRecovery}=useMutation(reload,result=>{
-    if(result.draft_id){setSelectedDraft(result.draft_id);setDirty(false);}
-    if(result.version&&!isMessage)setDirty(false);
-  });
-
+  const [data,setData]=useState<Projection|null>(null),[loading,setLoading]=useState(true),[revision,setRevision]=useState(0),[loadError,setLoadError]=useState(""),[error,setError]=useState("");
+  const [selectedId,setSelectedId]=useState(""),selectedRef=useRef("");
+  const [form,setForm]=useState<Form>(EMPTY),[dirty,setDirty]=useState(false),dirtyRef=useRef(false);
+  const [nextChoice,setNextChoice]=useState<PendingChoice|null>(null),[filterRecipient,setFilterRecipient]=useState(""),[filterTask,setFilterTask]=useState(""),[historyMode,setHistoryMode]=useState("all");
+  const historyRef=useRef<HTMLElement|null>(null),entryRef=useRef("");dirtyRef.current=dirty;
+  const reload=()=>setRevision(value=>value+1);
+  const savedLeave=useRef<(()=>void)|null>(null);
+  const transaction=useTransaction((recorded,action)=>{if(recorded){setDirty(false);dirtyRef.current=false;setForm(EMPTY);}reload();if(recorded&&action==="boss.message.draft.save"){const finish=savedLeave.current;savedLeave.current=null;finish?.();}},undefined,id=>{selectedRef.current=id;setSelectedId(id);},"messageOperation");
+  useEffect(()=>{if(!transaction.dialog&&!transaction.busy)savedLeave.current=null;},[transaction.dialog,transaction.busy]);
+  const locked=transaction.busy||Boolean(transaction.dialog),current=!loading&&!loadError?data:null;
+  const draft=current?.drafts.find(value=>value.draft_id===selectedId),missing=Boolean(current&&selectedId&&!draft),stale=Boolean(current&&form.basis&&form.basis!==signature(current,selectedId));
+  const disabled=!current||locked||missing||stale||Boolean(draft&&draft.status!=="DRAFT");
+  const recipient=current?.contacts.find(value=>value.contact_id===form.recipient_id),task=current?.tasks?.find(value=>value.task_id===form.related_task_id);
+  const sent=current?.sent_messages.find(value=>value.draft_id===selectedId&&value.message_id===draft?.message_id);
+  useEffect(()=>{onDirtyChange?.(dirty||locked);return()=>onDirtyChange?.(false);},[dirty,locked,onDirtyChange]);
+  useEffect(()=>{if(!dirty&&!locked)return;const guard=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};window.addEventListener("beforeunload",guard);return()=>window.removeEventListener("beforeunload",guard);},[dirty,locked]);
   useEffect(()=>{
-    const abort=new AbortController();
-    const token=getToken();
-    if(!token){setError("当前登录已失效");return;}
-    setLoading(true);setError("");setState(null);setBusyPreview(null);setConflictCheck(null);
-    const key=isMessage?"outbox":"calendar";
-    void fetch("/api/boss/ui/workspace/"+key,{
-      headers:{"Authorization":"Bearer "+token},cache:"no-store",signal:abort.signal,
-    }).then(async response=>{
-      if(!response.ok)throw Error("无法读取有权业务资料（HTTP "+response.status+"）");
-      const data=await response.json() as Outbox|CalendarData;
-      if(data.source_type!=="SIMULATED"||data.projection!==key)
-        throw Error("当前业务来源与预期不符");
-      return data;
-    }).then(data=>{
-      if(abort.signal.aborted)return;
-      setState(data);setLoading(false);
-      if(isMessage&&focusDraftId){
-        const matched=(data as Outbox).drafts.find(d=>d.draft_id===focusDraftId);
-        if(matched){
-          setSelectedDraft(matched.draft_id);setSelectedRecipient(matched.recipient_id);
-          setRelatedTask(matched.related_task_id||"");setMessageBody(matched.body);
-          setAttachmentId(matched.attachment_refs[0]?.source_id||"");
-          setAttachmentVersion(matched.attachment_refs[0]?.version||"1");
-          setDirty(false);onFocusDraftConsumed?.();
-        }else setError("原跨页面草稿已不在当前有权范围，请重新核查发件箱。");
-      }
-      if(!isMessage&&!dirty){
-        const c=(data as CalendarData).calendar;
-        setStart(splitDate(c.starts_at));setEnd(splitDate(c.ends_at));
-        setTitle(c.title||"");setPrivateBody(c.private_body||"");
-        setLocation(c.location||"");
-        setPrivateAttachmentId(c.attachment_refs?.[0]?.source_id||"");
-        setPrivateAttachmentVersion(c.attachment_refs?.[0]?.version||"1");
-      }
-    }).catch(e=>{
-      if(abort.signal.aborted)return;
-      setError(e instanceof Error?e.message:String(e));setLoading(false);
-    });
-    return ()=>abort.abort();
-  },[pageId,revision,getToken]);
-
-  const messages=isMessage?state as Outbox|null:null;
-  const calendars=!isMessage?state as CalendarData|null:null;
-  const draft=messages?.drafts.find(x=>x.draft_id===selectedDraft)||null;
-
-  function chooseDraft(row:Draft) {
-    setSelectedDraft(row.draft_id);setSelectedRecipient(row.recipient_id);
-    setRelatedTask(row.related_task_id||"");setMessageBody(row.body);
-    setAttachmentId(row.attachment_refs[0]?.source_id||"");
-    setAttachmentVersion(row.attachment_refs[0]?.version||"1");
-    setDirty(false);setError("");
+    const controller=new AbortController();setLoading(true);setLoadError("");setError("");setData(null);const token=getToken();
+    if(!token){setForm(EMPTY);setDirty(false);dirtyRef.current=false;setLoadError("当前身份已失效");setLoading(false);return;}
+    void fetch("/api/boss/ui/workspace/outbox",{headers:{Authorization:"Bearer "+token},cache:"no-store",signal:controller.signal}).then(async response=>{
+      if(controller.signal.aborted)return null;if(response.status===401||response.status===403){setForm(EMPTY);setDirty(false);dirtyRef.current=false;setNextChoice(null);if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));}
+      if(!response.ok)throw new Error("消息资料读取失败（HTTP "+response.status+"）");const value=await response.json() as Projection;if(value.source_type!=="SIMULATED"||value.projection!=="outbox")throw new Error("消息资料类型不符");return value;
+    }).then(value=>{if(controller.signal.aborted||!value)return;setData(value);if(!dirtyRef.current)setForm(saved(value,selectedRef.current));setLoading(false);}).catch(reason=>{if(controller.signal.aborted)return;setLoadError(reason instanceof Error?reason.message:String(reason));setLoading(false);});return()=>controller.abort();
+  },[revision,refreshVersion,getToken]);
+  useEffect(()=>{
+    if(!current||!focusDraftId||entryRef.current===focusDraftId||locked)return;entryRef.current=focusDraftId;
+    if(!current.drafts.some(value=>value.draft_id===focusDraftId)){setError("请求打开的草稿不在当前有权目录中，请重新核查来源事项");onFocusDraftConsumed?.();return;}
+    if(dirty)setNextChoice({id:focusDraftId,restore:false});else{selectedRef.current=focusDraftId;setSelectedId(focusDraftId);setForm(saved(current,focusDraftId));setError("");}
+    onFocusDraftConsumed?.();
+  },[current,focusDraftId,locked,dirty,onFocusDraftConsumed]);
+  function select(id:string){if(!current||locked)return;if(id&&!current.drafts.some(value=>value.draft_id===id)){setError("当前草稿无法读取，请重新核查目录");return;}selectedRef.current=id;setSelectedId(id);setForm(saved(current,id));setDirty(false);dirtyRef.current=false;setError("");setNextChoice(null);}
+  function choose(id:string){if(!current||locked||id===selectedId)return;if(dirty)setNextChoice({id,restore:false});else select(id);}
+  function edit(patch:Partial<Form>){setForm(value=>({...value,...patch}));setDirty(true);dirtyRef.current=true;setError("");}
+  function save(){
+    if(disabled||!current)return false;setError("");if(!recipient){setError("请选择稳定联系人，核查姓名、组织与职责");return false;}
+    if(!form.body.trim()||form.body.length>2400){setError("消息正文必须填写，最多2400字");return false;}
+    if(form.related_task_id&&!current.task_ids.includes(form.related_task_id)){setError("当前关联任务不在可编辑范围");return false;}
+    if(task&&task.coordinator_id!==recipient.contact_id){setError("关联任务负责人和收件人不一致，请核查具体对象");return false;}
+    if(form.attachment_refs.length>5||form.attachment_refs.some(ref=>!ref.source_id.trim()||!ref.version.trim())||new Set(form.attachment_refs.map(ref=>ref.source_id.trim())).size!==form.attachment_refs.length){setError("最多添加5份附件，每份均需唯一来源编号及明确版本");return false;}
+    return transaction.propose("boss.message.draft.save",{draft_id:draft?.draft_id??null,expected_version:draft?.version??"0",recipient_id:recipient.contact_id,related_task_id:form.related_task_id||null,body:form.body.trim(),attachment_refs:form.attachment_refs.map(ref=>({source_id:ref.source_id.trim(),version:ref.version.trim()})),visibility:"RECIPIENT_ONLY"},"保存当前消息草稿",["草稿："+(draft?draft.draft_id+" / v"+draft.version:"新建草稿"),"收件人："+person(current,recipient.contact_id),"关联事项："+(form.related_task_id||"未关联"),"正文："+form.body.trim(),"附件："+(form.attachment_refs.map(ref=>ref.source_id+" / v"+ref.version).join("、")||"未添加"),"可见范围：本人及获准收件人。保存草稿后仍需独立执行发送。"]);
   }
-  function draftPayload(){
-    return {
-      draft_id:draft?.draft_id||null,
-      expected_version:draft?.version||"0",
-      recipient_id:selectedRecipient,related_task_id:relatedTask||null,
-      body:validate(messageBody,"消息内容"),
-      attachment_refs:attachmentId.trim()?[{
-        source_id:attachmentId.trim(),version:attachmentVersion.trim(),
-      }]:[],
-      visibility:"RECIPIENT_ONLY",
-    };
+  useEffect(()=>{
+    const canSave=dirty&&!disabled;
+    onDraftLeaveChange?.({object:draft?.draft_id??"新建消息草稿",version:draft?.version??"尚未保存",changedFields:dirty?["消息正文、收件人、关联事项或附件"]:[],canSave,unavailableReason:locked?"原请求正在确认或结果尚未确定，请保留当前页面核查。":"草稿资料或来源版本需要重新核查。",beginSave:finish=>{if(!canSave)return false;savedLeave.current=finish;const started=save();if(!started)savedLeave.current=null;return started;}});
+    return()=>onDraftLeaveChange?.(null);
+  });
+  function send(){
+    if(disabled||!draft||dirty||!current)return;setError("");if(!recipient||recipient.contact_id!==draft.recipient_id){setError("草稿收件人需要重新核查");return;}
+    if(draft.send_eligibility?.allowed===false){setError(draft.send_eligibility.reason);return;}
+    if(task&&(!["WAITING_FEEDBACK","IN_PROGRESS"].includes(task.status)||task.coordinator_id!==draft.recipient_id)){setError("关联任务需要先独立发送，且当前负责人必须与消息收件人一致");return;}
+    transaction.propose("boss.message.send",{draft_id:draft.draft_id,expected_version:draft.version,recipient_id:draft.recipient_id,expected_content_sha256:draft.content_sha256},"确认按当前内容发送模拟消息",["当前联系人："+person(current,draft.recipient_id),"草稿保存时的姓名与组织："+draft.recipient_name_at_save+" · "+draft.organization_at_save,"草稿与版本："+draft.draft_id+" / v"+draft.version,"正文："+draft.body,"附件："+(draft.attachment_refs.map(ref=>ref.source_id+" / v"+ref.version).join("、")||"未添加"),"关联事项："+(draft.related_task_id||"未关联"),"可见范围：RECIPIENT_ONLY。实际记录模拟发件箱后显示SENT_SIMULATED，送达及回复分别核查。","回复可以更新符合条件的任务进展，任务完成仍需本人独立确认。"]);
   }
-  function saveDraft(){
-    setError("");
-    try{
-      if(!messages?.contacts.some(c=>c.contact_id===selectedRecipient))
-        throw Error("请选择稳定联系人 ID。不能仅凭显示姓名匹配");
-      if(draft?.status==="SENT_SIMULATED")throw Error("已发草稿不能编辑；请新建草稿");
-      const body=draftPayload();
-      propose("boss.message.draft.save",body,"保存本人消息草稿",[
-        "收件人："+selectedRecipient,
-        "任务："+(body.related_task_id||"未绑定"),
-        "附件："+(attachmentId?attachmentId+" v"+attachmentVersion:"无"),
-        "正文："+body.body,
-        "保存草稿不发送、不创建送达回执。",
-      ]);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-  }
-  function sendDraft(){
-    setError("");
-    if(!draft){setError("请先保存并重读本条消息草稿");return;}
-    if(dirty){setError("输入内容已变化，必须先保存新版本，再发送");return;}
-    if(draft.status!=="DRAFT"){setError("已发出或不可发送的草稿不能重复提交");return;}
-    propose("boss.message.send",{
-      draft_id:draft.draft_id,expected_version:draft.version,
-      recipient_id:draft.recipient_id,expected_content_sha256:draft.content_sha256,
-    },"确认发送当前版本的模拟消息",[
-      "唯一收件人："+draft.recipient_id+" · "+draft.organization_at_save,
-      "草稿："+draft.draft_id+" / v"+draft.version,
-      "正文："+draft.body,
-      "附件："+draft.attachment_refs.map(x=>x.source_id+" v"+x.version).join("、"),
-      "成功时仅写入模拟发件箱 SENT_SIMULATED；送达/回复各自独立核查。",
-    ]);
-  }
-  async function checkCalendarConflict(){
-    setError("");
-    const token=getToken();
-    if(!token){setError("身份已过期，不能查询工作会议");return;}
-    let starts_at="",ends_at="";
-    try{
-      starts_at=isoShanghai(start);ends_at=isoShanghai(end);
-    }catch(e){setError(e instanceof Error?e.message:String(e));return;}
-    setConflictBusy(true);setConflictCheck(null);
-    try{
-      const qs=new URLSearchParams({starts_at,ends_at,timezone:"Asia/Shanghai"});
-      const response=await fetch("/api/boss/ui/calendar-conflict?"+qs.toString(),{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
-      });
-      if(!response.ok)throw Error("会议信息检查未完成（HTTP "+response.status+"）");
-      const result=await response.json() as ConflictCheck;
-      if(result.source_type!=="SIMULATED"||!result.read_only||
-         result.proposed_starts_at!==starts_at||result.proposed_ends_at!==ends_at||
-         result.meeting_end_known!==false||result.conflict_proven_absent!==false)
-        throw Error("当前会议信息的校验结果与申请窗口不符");
-      setConflictCheck(result);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setConflictBusy(false);}
-  }
-  function saveCalendar(){
-    setError("");
-    if(!calendars?.calendar){setError("当前私人日程未加载");return;}
-    try{
-      if(!conflictCheck||
-         conflictCheck.proposed_starts_at!==isoShanghai(start)||
-         conflictCheck.proposed_ends_at!==isoShanghai(end)){
-        setError("先按当前起止时间执行工作会议冲突检查，核对结果后再保存。");
-        return;
-      }
-      const c=calendars.calendar;
-      propose("boss.calendar.save",{
-        expected_version:c.version,starts_at:isoShanghai(start),ends_at:isoShanghai(end),
-        timezone:"Asia/Shanghai",title,private_body:validate(privateBody,"私人日程正文",2000),
-        location,attachment_refs:privateAttachmentId.trim()?[{
-          source_id:privateAttachmentId.trim(),version:validate(privateAttachmentVersion,"附件来源版本",40),
-        }]:[],acknowledge_conflict:conflictAcknowledged,
-      },"保存本人私人安排",[
-        "私人安排："+start+" — "+end,
-        "标题和地点将仅由老板读取："+(title||"未填写")+" / "+(location||"未填写"),
-        "私人正文："+privateBody,
-        "获准附件："+(privateAttachmentId.trim()?privateAttachmentId+" v"+privateAttachmentVersion:"无"),
-        "与工作会议的结束时间无法完全核实；邻近时段须由本人确认。",
-        "原有效 busy 分享会因版本变化全部失效。",
-      ]);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-  }
-  function shareCalendar(){
-    setError("");
-    const c=calendars?.calendar;
-    if(!c||c.status!=="ACTIVE"){setError("没有可分享的有效私人日程");return;}
-    try{
-      propose("boss.calendar.share",{
-        expected_version:c.version,recipient_id:shareRecipient,
-        purpose:validate(sharePurpose,"分享用途",240),
-        expires_at:isoShanghai(shareExpires),
-        fields:["busy","starts_at","ends_at","timezone"],
-      },"仅分享忙碌状态与时间",[
-        "收件人稳定 ID："+shareRecipient,
-        "用途："+sharePurpose,
-        "有效期至："+shareExpires,
-        "允许字段：busy、starts_at、ends_at、timezone",
-        "禁止分享标题、地点、私人正文及附件。无外部实际送达。",
-      ]);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-  }
-  async function inspectShare(item:BusyShare){
-    if(item.effective_state!=="ACTIVE_SIMULATED"){
-      setError("当前分享已失效，不能继续展示获准时段");return;
-    }
-    const token=getToken();
-    if(!token){setError("身份已过期，请重新认证");return;}
-    setPreviewBusy(true);setError("");setBusyPreview(null);
-    try{
-      const response=await fetch(
-        "/api/boss/ui/calendar-share-preview?share_id="+encodeURIComponent(item.share_id),{
-          headers:{Authorization:"Bearer "+token},cache:"no-store",
-        }
-      );
-      if(response.status===410){
-        setError("该 busy 分享已经过期、撤销或版本失效；已重新读取正式状态。");
-        reload();return;
-      }
-      if(!response.ok)throw Error("读取分享范围失败（HTTP "+response.status+"）");
-      const result=await response.json() as BusyPreview;
-      const allowed=["busy","starts_at","ends_at","timezone"];
-      if(result.share_id!==item.share_id || result.share_status!=="ACTIVE_SIMULATED" ||
-         JSON.stringify(result.fields)!==JSON.stringify(allowed) ||
-         result.preview_only_not_external_access!==true)
-        throw Error("预览字段超出允许范围或分享身份不匹配");
-      setBusyPreview(result);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setPreviewBusy(false);}
-  }
-  function revokeShare(item:BusyShare){
-    propose("boss.calendar.share.revoke",{
-      share_id:item.share_id,expected_version:item.calendar_version,
-    },"撤销忙碌分享授权",[
-      "授权："+item.share_id,"接收联系人："+item.recipient_id,
-      "撤销后停止当前查询与新分享采用；不宣称回收已传出的内容。",
-    ]);
-  }
-  function deleteCalendar(){
-    const c=calendars?.calendar;
-    if(!c)return;
-    propose("boss.calendar.delete",{expected_version:c.version},
-      "删除本人的当前私人安排",[
-        "对象："+c.calendar_id+" / v"+c.version,
-        "正文停止未来读取，仍保留必要历史记录供追溯。",
-        "同步撤销当前忙碌分享。不能宣称已擦除所有磁盘备份。",
-      ]);
-  }
-
-  return <>
-    <div className="boss-workspace-toolbar">
-      <span className="boss-workspace-note"><span className="boss-tag boss-tag-amber">SIMULATED · BOSS ONLY</span>
-        {isMessage?"F08 消息编辑与模拟发件箱":"F12 本人私人安排与忙碌分享"}
-      </span>
-      <button type="button" className="boss-btn" onClick={reload} disabled={loading}>
-        {loading?<Loader2 className="boss-spin" size={15}/>:<RefreshCw size={15}/>} 重新读取
-      </button>
-    </div>
-    {loading&&<div className="boss-status"><Loader2 size={16} className="boss-spin"/>正在读取有权版本…</div>}
-    {(error||(isMessage&&mutationError))&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error||mutationError}</div>}
-    {isMessage&&<BossOriginalReceipt scope="messageOperation" actions={MESSAGE_ACTIONS} onRecorded={()=>{finishRecovery();setDirty(false);reload();}}/>}
-    {status&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={16}/>{status}</div>}
-    <div className="boss-columns">
-      <div className="boss-column">
-        {isMessage?<>
-          <Block title="消息编辑" note="收件人、正文、附件和版本逐项核对">
-            <div className="boss-form-grid">
-              <label>选择唯一联系人
-                <select value={selectedRecipient} onChange={e=>{setSelectedRecipient(e.target.value);setDirty(true);}}>
-                  <option value="">请选择</option>
-                  {(messages?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
-                    {c.name} · {c.organization} · {c.responsibility} [{c.contact_id}]
-                  </option>)}
-                </select>
-              </label>
-              <label>关联任务
-                <select value={relatedTask} onChange={e=>{setRelatedTask(e.target.value);setDirty(true);}}>
-                  <option value="">不关联任务</option>
-                  {(messages?.task_ids||[]).map(id=><option key={id} value={id}>{id}</option>)}
-                </select>
-              </label>
-              <label>有权附件来源标识<input value={attachmentId}
-                onChange={e=>{setAttachmentId(e.target.value);setDirty(true);}}
-                placeholder="无附件请留空"/></label>
-              <label>附件当前版本<input value={attachmentVersion}
-                onChange={e=>{setAttachmentVersion(e.target.value);setDirty(true);}}/></label>
-            </div>
-            <label className="boss-label" htmlFor="boss-msg-text">消息正文</label>
-            <textarea id="boss-msg-text" rows={5} value={messageBody}
-              onChange={e=>{setMessageBody(e.target.value);setDirty(true);}}
-              placeholder="明确的模拟收件人、用途及正文；不会默认向同名联系人发送。"/>
-            <div className="boss-actions">
-              <button type="button" className="boss-btn" disabled={busy} onClick={()=>{
-                setSelectedDraft("");setSelectedRecipient("");setRelatedTask("");setMessageBody("");
-                setAttachmentId("");setDirty(false);
-              }}>新建草稿</button>
-              <button type="button" className="boss-btn" onClick={saveDraft} disabled={busy||Boolean(messageRequest())}>
-                <ShieldCheck size={15}/> 保存当前草稿</button>
-              <button type="button" className="boss-btn boss-btn-primary"
-                disabled={!draft||dirty||busy||Boolean(messageRequest())||draft.status!=="DRAFT"} onClick={sendDraft}>
-                <Send size={15}/> 审核并模拟发送</button>
-            </div>
-            <div className="boss-status boss-status-warn"><AlertCircle size={16}/>
-              已保存并回读的 DRAFT 才能模拟发送。修改收件人、附件或正文后，旧确认一律无效。
-            </div>
-          </Block>
-          <Block title="已保存草稿与消息时间线" note="草稿 / SENT / 送达核查 / 回复分开">
-            {(messages?.drafts||[]).length?(messages?.drafts||[]).map(d=><button
-              type="button" className={"boss-task-row "+(selectedDraft===d.draft_id?"selected":"")}
-              key={d.draft_id} onClick={()=>chooseDraft(d)}>
-              <span className="boss-task-icon"><MessageSquareText size={18}/></span>
-              <span><strong>{d.recipient_name_at_save} · {d.organization_at_save}</strong>
-                <small>{d.draft_id} · v{d.version} · {d.status}</small>
-                <small>收件人 ID：{d.recipient_id}</small>
-              </span><ArrowLeft size={15}/>
-            </button>):<Empty>请先保存有权消息草稿。</Empty>}
-            {(messages?.sent_messages||[]).map(row=><div className="boss-workspace-item" key={row.message_id}>
-              <strong>{row.message_id}</strong>
-              <LabelValue name="实际模拟发送">{row.send_state}</LabelValue>
-              <LabelValue name="送达状态">{row.delivery_state}</LabelValue>
-              <LabelValue name="回复状态">{row.reply_state}</LabelValue>
-              <LabelValue name="联系人">{row.recipient_id}</LabelValue>
-              {(messages?.replies||[]).filter(reply=>reply.reply_to===row.message_id).map(reply=>
-                <div className="boss-msg-reply" key={reply.reply_id}>
-                  <span>模拟回复 · {reply.author_contact_id}</span><p>{reply.text}</p>
-                </div>)}
-            </div>)}
-            <div className="boss-actions">
-              <button type="button" className="boss-btn" onClick={()=>onNavigate("F06")}>
-                查看交办状态 <ArrowLeft size={15}/></button>
-            </div>
-          </Block>
-        </>:<>
-          <Block title="私人安排编辑" note="FR12 · 标题、地点、正文默认仅本人可见">
-            {calendars?.calendar?<div className="boss-form-grid">
-              <label>开始（北京时间）<input type="datetime-local" value={start} disabled={!calendars.can_edit}
-                onChange={e=>{setStart(e.target.value);setDirty(true);setConflictCheck(null);setConflictAcknowledged(false);}}/></label>
-              <label>结束（北京时间）<input type="datetime-local" value={end} disabled={!calendars.can_edit}
-                onChange={e=>{setEnd(e.target.value);setDirty(true);setConflictCheck(null);setConflictAcknowledged(false);}}/></label>
-              <label>私人标题<input value={title} disabled={!calendars.can_edit}
-                onChange={e=>{setTitle(e.target.value);setDirty(true);}}/></label>
-              <label>地点<input value={location} disabled={!calendars.can_edit}
-                onChange={e=>{setLocation(e.target.value);setDirty(true);}}/></label>
-            </div>:<Empty>正在等待本人私有日程。</Empty>}
-            <div className="boss-form-grid">
-              <label>私人附件来源 ID<input value={privateAttachmentId}
-                disabled={!calendars?.can_edit}
-                onChange={e=>{setPrivateAttachmentId(e.target.value);setDirty(true);}}
-                placeholder="无附件可留空"/></label>
-              <label>附件当前版本<input value={privateAttachmentVersion}
-                disabled={!calendars?.can_edit}
-                onChange={e=>{setPrivateAttachmentVersion(e.target.value);setDirty(true);}}/></label>
-            </div>
-            <label className="boss-label" htmlFor="boss-private-body">私人正文（禁止向维护者显示）</label>
-            <textarea id="boss-private-body" rows={4} value={privateBody}
-              disabled={!calendars?.can_edit}
-              onChange={e=>{setPrivateBody(e.target.value);setDirty(true);}}/>
-            <div className="boss-actions">
-              <button type="button" className="boss-btn" disabled={!calendars?.can_edit||conflictBusy}
-                onClick={()=>void checkCalendarConflict()}>
-                {conflictBusy&&<Loader2 size={15} className="boss-spin"/>}
-                <Clock3 size={15}/> 检查工作会议冲突
-              </button>
-            </div>
-            {conflictCheck&&<div className="boss-status boss-status-warn" role="status">
-              <Clock3 size={16}/>
-              <span>服务端核查：{conflictCheck.status}。参照会议 {conflictCheck.meeting_id}
-                （开始 {conflictCheck.meeting_starts_at.replace("T"," ")}，
-                结束时间未知）。{conflictCheck.requires_owner_acknowledgement?
-                "该范围需要本人明确确认风险。":
-                "仅当前获准会议资料未发现必须确认的重叠，不代表全部日程无冲突。"}
-              </span>
-            </div>}
-            <label className="boss-confirm-check">
-              <input type="checkbox" checked={conflictAcknowledged}
-                onChange={e=>setConflictAcknowledged(e.target.checked)}/>
-              <span>会议缺少结束时间时，我已核查临近时间的冲突风险。</span>
-            </label>
-            <div className="boss-actions">
-              <button type="button" className="boss-btn boss-btn-primary"
-                disabled={!calendars?.can_edit||busy} onClick={saveCalendar}>
-                <ShieldCheck size={15}/> 保存本人私人安排</button>
-              <button type="button" className="boss-btn"
-                disabled={!calendars?.can_edit||busy} onClick={deleteCalendar}>删除私人安排</button>
-            </div>
-            <div className="boss-status boss-status-warn"><Clock3 size={16}/>
-              只能核对已知会议开始时间；会议缺少结束时间，无法推断精确冲突。保存后原 busy 分享将失效。
-            </div>
-          </Block>
-          <Block title="仅分享忙碌时段" note="不暴露标题、地点或正文">
-            <div className="boss-form-grid">
-              <label>分享给稳定联系人
-                <select value={shareRecipient} onChange={e=>setShareRecipient(e.target.value)}>
-                  <option value="">请选择联系人 ID</option>
-                  {(calendars?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
-                    {c.name} · {c.organization} · {c.responsibility} [{c.contact_id}]
-                  </option>)}
-                </select>
-              </label>
-              <label>授权有效期（北京时间）<input type="datetime-local"
-                value={shareExpires} onChange={e=>setShareExpires(e.target.value)}/></label>
-            </div>
-            <label className="boss-label">用途</label>
-            <textarea rows={2} value={sharePurpose} onChange={e=>setSharePurpose(e.target.value)}
-              placeholder="例如：只告知当前时段已被占用。"/>
-            <div className="boss-actions">
-              <button type="button" className="boss-btn boss-btn-primary"
-                disabled={!calendars?.can_edit||busy||dirty||!shareRecipient} onClick={shareCalendar}>
-                <ShieldCheck size={15}/> 确认分享 busy 字段</button>
-            </div>
-            <div className="boss-status"><ShieldCheck size={16}/>
-              有效共享字段固定为 busy、starts_at、ends_at、timezone。当前为本地模拟授权，没有真实外部投递。
-            </div>
-          </Block>
-          <Block title="已有分享和撤销记录" note="逐项核查版本及撤销时间">
-            {(calendars?.shares||[]).length?(calendars?.shares||[]).map(share=>
-              <div key={share.share_id} className="boss-workspace-item">
-                <strong>{share.share_id}</strong>
-                <LabelValue name="接收人 ID">{share.recipient_id}</LabelValue>
-                <LabelValue name="时段">{share.starts_at.replace("T"," ")+" — "+share.ends_at.replace("T"," ")}</LabelValue>
-                <LabelValue name="授权版本">{share.calendar_version}</LabelValue>
-                <LabelValue name="状态">{share.effective_state}</LabelValue>
-                <div className="boss-actions">
-                  {share.effective_state==="ACTIVE_SIMULATED"&&
-                    <button type="button" className="boss-btn" disabled={previewBusy}
-                      onClick={()=>void inspectShare(share)}>
-                      <ShieldCheck size={15}/> 模拟接收方允许字段预览</button>}
-                  {!share.revoked&&<button type="button" className="boss-btn" disabled={busy}
-                    onClick={()=>revokeShare(share)}>
-                    <X size={15}/> 明确撤销分享</button>}
-                </div>
-                {busyPreview?.share_id===share.share_id&&
-                  <div className="boss-workspace-item" role="status">
-                    <strong>模拟接收范围（仅预览，不是对外访问）</strong>
-                    <LabelValue name="接收方">{busyPreview.recipient_id}</LabelValue>
-                    <LabelValue name="busy">{busyPreview.busy}</LabelValue>
-                    <LabelValue name="开始">{busyPreview.starts_at}</LabelValue>
-                    <LabelValue name="结束">{busyPreview.ends_at}</LabelValue>
-                    <LabelValue name="时区">{busyPreview.timezone}</LabelValue>
-                  </div>}
-              </div>):<Empty>没有已生效的忙碌分享记录。</Empty>}
-          </Block>
-        </>}
-      </div>
-      <div className="boss-column">
-        <Block title="当前业务与权限范围">
-          <LabelValue name="工作台">{pageId}</LabelValue>
-          <LabelValue name="资料版本">{state?.data_version}</LabelValue>
-          <LabelValue name="数据属性">{state?.source_type}</LabelValue>
-          {isMessage?<>
-            <LabelValue name="已选择草稿版本">{draft?.version}</LabelValue>
-            <LabelValue name="已保存草稿数">{messages?.drafts.length}</LabelValue>
-            <LabelValue name="模拟发送数">{messages?.sent_messages.length}</LabelValue>
-            <LabelValue name="已有模拟回复">{messages?.replies.length}</LabelValue>
-            <LabelValue name="真实投递渠道">未接入</LabelValue>
-            <div className="boss-actions">
-              <button type="button" className="boss-btn" onClick={()=>onViewSource("finance-note")}>
-                <FileSearch size={15}/> 打开已授权来源</button>
-            </div>
-          </>:<>
-            <LabelValue name="日程版本">{calendars?.calendar.version}</LabelValue>
-            <LabelValue name="私人正文可见性">BOSS ONLY</LabelValue>
-            <LabelValue name="当前生效分享数">{calendars?.shares.filter(x=>x.effective_state==="ACTIVE_SIMULATED").length}</LabelValue>
-            <LabelValue name="私人资料物理擦除">未独立验证</LabelValue>
-            <LabelValue name="会议原定开始">{calendars?.meeting.starts_at.replace("T"," ")}</LabelValue>
-            <LabelValue name="会议结束时间">未知</LabelValue>
-          </>}
-          <div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>
-              <ArrowLeft size={15}/> 返回今日工作</button>
-          </div>
-        </Block>
-      </div>
-    </div>
-    {dialog}
-  </>;
+  function showOutbox(){setHistoryMode("outbox");historyRef.current?.scrollIntoView({block:"start",behavior:"smooth"});historyRef.current?.focus();}
+  const visible=(recipientId:string,taskId:string|null|undefined)=>(!filterRecipient||filterRecipient===recipientId)&&(!filterTask||filterTask===taskId);
+  const drafts=current?.drafts.filter(value=>visible(value.recipient_id,value.related_task_id))??[];
+  const outbox=current?.sent_messages.filter(value=>visible(value.recipient_id,value.related_task_id))??[];
+  const taskMessages=current?.messages.filter(value=>visible(value.recipient_id,value.task_id))??[];
+  const incoming=current?.incoming_messages?.filter(value=>visible(value.author_contact_id,value.related_task_id))??[];
+  return <div className="boss-message-editor">
+    <div className="boss-workspace-toolbar"><span className="boss-tag boss-tag-amber">SIMULATED · 本人消息</span><span className="boss-workspace-note">消息正文和附件按收件人、当前版本与可见范围审核</span><button type="button" className="boss-btn" onClick={reload} disabled={loading||locked}><RefreshCw size={15}/>重新读取</button></div>
+    {loading&&<p className="boss-status"><Loader2 className="boss-spin" size={16}/>正在读取草稿、发件箱与回复</p>}{(loadError||error)&&<p className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{loadError||error}</p>}{transaction.notice&&<p className="boss-status" role="status">{transaction.notice}</p>}
+    {(stale||missing)&&<p className="boss-status boss-status-warn" role="alert">{missing?"原草稿不在当前有权目录，当前输入不能作为新草稿提交。":"草稿、联系人、任务或来源依据发生变化，当前输入需要重新核查。"}<button type="button" className="boss-btn" disabled={!current||locked} onClick={()=>setNextChoice({id:missing?"":selectedId,restore:true})}>重新采用当前内容</button></p>}
+    <div className="boss-message-scope"><label>当前草稿<select value={selectedId} disabled={!current||locked} onChange={event=>choose(event.target.value)}><option value="">新建草稿</option>{missing&&<option value={selectedId}>{selectedId} · 当前不可读取</option>}{current?.drafts.map(value=><option key={value.draft_id} value={value.draft_id}>{value.recipient_name_at_save} · v{value.version} · {value.status} [{value.draft_id}]</option>)}</select></label><Fact label="内容版本" value={draft?.version??(current&&!selectedId?"尚未保存":null)}/><Fact label="关联事项" value={form.related_task_id||"未关联"}/></div>
+    <div className="boss-message-columns"><main className="boss-column"><Panel title="内容与配置">
+      <fieldset disabled={disabled} className="boss-message-form"><label>稳定联系人<select value={form.recipient_id} onChange={event=>edit({recipient_id:event.target.value})}><option value="">请选择唯一联系人</option>{form.recipient_id&&!recipient&&<option value={form.recipient_id}>{form.recipient_id} · 当前不可读取</option>}{current?.contacts.map(value=><option key={value.contact_id} value={value.contact_id}>{person(current,value.contact_id)}</option>)}</select></label><label>关联事项<select value={form.related_task_id} onChange={event=>edit({related_task_id:event.target.value})}><option value="">不关联任务</option>{form.related_task_id&&!current?.task_ids.includes(form.related_task_id)&&<option value={form.related_task_id}>{form.related_task_id} · 当前不可编辑</option>}{current?.task_ids.map(id=><option key={id} value={id}>{current.tasks?.find(value=>value.task_id===id)?.title??id} [{id}]</option>)}</select></label>
+      <div className="boss-message-wide boss-message-person"><Fact label="姓名" value={recipient?.name}/><Fact label="组织" value={recipient?.organization}/><Fact label="职责" value={recipient?.responsibility}/><Fact label="联系人ID" value={recipient?.contact_id}/><Fact label="职责有效起始" value={recipient?.valid_from}/><Fact label="职责有效截至" value={recipient?.valid_until}/></div>
+      <label className="boss-message-wide">编辑内容与说明<textarea rows={6} maxLength={2400} value={form.body} onChange={event=>edit({body:event.target.value})} placeholder="填写当前收件人获准接收的消息正文"/></label><div className="boss-message-wide"><h3>附件与来源版本</h3>{form.attachment_refs.map((ref,index)=><div className="boss-message-attachment" key={index}><label>来源编号<input value={ref.source_id} onChange={event=>edit({attachment_refs:form.attachment_refs.map((value,i)=>i===index?{...value,source_id:event.target.value}:value)})}/></label><label>来源版本<input value={ref.version} onChange={event=>edit({attachment_refs:form.attachment_refs.map((value,i)=>i===index?{...value,version:event.target.value}:value)})}/></label><button type="button" className="boss-btn" aria-label={"移除附件"+(index+1)} onClick={()=>edit({attachment_refs:form.attachment_refs.filter((_,i)=>i!==index)})}><Trash2 size={15}/></button></div>)}{!form.attachment_refs.length&&<p className="boss-helper">尚未添加附件。</p>}<button type="button" className="boss-btn" disabled={disabled||form.attachment_refs.length>=5} onClick={()=>edit({attachment_refs:[...form.attachment_refs,{source_id:"",version:""}]})}><Plus size={15}/>添加附件</button></div>
+      <label>可见范围<input readOnly value="RECIPIENT_ONLY · 获准收件人"/></label><Fact label="正文字符数" value={form.body.length}/></fieldset>
+      <div className="boss-actions"><button type="button" className="boss-btn" disabled={!current||locked||(!selectedId&&!dirty)} onClick={()=>{if(dirty)setNextChoice({id:"",restore:false});else select("");}}><Plus size={15}/>新建草稿</button><button type="button" className="boss-btn" disabled={!current||locked||!dirty} onClick={()=>setNextChoice({id:selectedId,restore:true})}>放弃未提交编辑</button></div>
+      {draft?.status==="SENT_SIMULATED"&&<p className="boss-helper">当前内容已经模拟发送，保留发送时版本。后续消息使用新草稿。</p>}
+    </Panel><section ref={historyRef} tabIndex={-1} className="boss-panel boss-message-history" aria-labelledby="boss-message-history-title"><div className="boss-panel-head"><h2 id="boss-message-history-title">关联内容与处理边界</h2></div>
+      <div className="boss-message-history-filters"><label>联系人<select value={filterRecipient} onChange={event=>setFilterRecipient(event.target.value)}><option value="">全部联系人</option>{current?.contacts.map(value=><option key={value.contact_id} value={value.contact_id}>{value.name} [{value.contact_id}]</option>)}</select></label><label>关联任务<input value={filterTask} onChange={event=>setFilterTask(event.target.value)} placeholder="完整任务编号"/></label><label>记录范围<select value={historyMode} onChange={event=>setHistoryMode(event.target.value)}><option value="all">全部沟通记录</option><option value="drafts">已保存草稿</option><option value="outbox">发件箱与回复</option><option value="incoming">待本人回复</option></select></label></div>
+      {(historyMode==="all"||historyMode==="incoming")&&<div className="boss-message-history-group"><h3>待本人回复</h3>{current?.incoming_messages===undefined?<p className="boss-helper">完整收件箱与待回复状态尚未提供。</p>:incoming.filter(value=>value.reply_required).map(value=><article className="boss-workspace-item" key={value.message_id}><strong>{person(current,value.author_contact_id)}</strong><Fact label="消息编号" value={value.message_id}/><Fact label="收到时间" value={value.received_at}/><Fact label="回复状态" value={value.reply_status}/><p className="boss-message-body">{value.body}</p>{value.attachment_refs.map(ref=><div key={ref.source_id} className="boss-message-source"><span>{ref.source_id} · v{ref.version}</span><button type="button" className="boss-btn" onClick={()=>onViewSource(ref.source_id)}>核查当前来源</button></div>)}<p className="boss-helper">回复关联需要正式消息引用，当前未提供回复发送入口。</p></article>)}{current?.incoming_messages!==undefined&&!incoming.some(value=>value.reply_required)&&<p className="boss-helper">当前筛选范围没有待本人回复的记录。</p>}</div>}
+      {(historyMode==="all"||historyMode==="drafts")&&<div className="boss-message-history-group"><h3>已保存草稿</h3>{drafts.map(value=><button type="button" disabled={locked} className={"boss-task-row "+(value.draft_id===selectedId?"selected":"")} key={value.draft_id} onClick={()=>choose(value.draft_id)}><span><strong>{value.recipient_name_at_save} · {value.organization_at_save}</strong><small>{value.draft_id} · v{value.version} · {value.status}</small><small>联系人：{value.recipient_id} · 更新：{value.updated_at??"尚未提供"}</small></span></button>)}{current&&!drafts.length&&<p className="boss-helper">当前筛选范围没有草稿。</p>}</div>}
+      {(historyMode==="all"||historyMode==="outbox")&&<div className="boss-message-history-group"><h3>发件箱与回复</h3>{outbox.map(value=><article className="boss-workspace-item" key={value.message_id}><strong>{person(current,value.recipient_id)}</strong><Fact label="消息编号" value={value.message_id}/><Fact label="草稿版本" value={value.draft_id+" / v"+value.draft_version}/><Fact label="发送时间" value={value.sent_at}/><div className="boss-message-states"><Fact label="发送" value={value.send_state}/><Fact label="送达" value={value.delivery_state}/><Fact label="回复" value={value.reply_state}/></div><p className="boss-message-body">{value.body}</p>{value.attachment_refs.map(ref=><div className="boss-message-source" key={ref.source_id}><span>{ref.source_id} · v{ref.version}</span><button type="button" className="boss-btn" onClick={()=>onViewSource(ref.source_id)}>核查当前原文</button></div>)}<Fact label="外部渠道调用" value={value.external_channel_invoked?"已执行":"未执行"}/><div className="boss-actions"><button type="button" className="boss-btn" disabled={locked||!current?.drafts.some(row=>row.draft_id===value.draft_id)} onClick={()=>choose(value.draft_id)}>查看发送时草稿</button>{value.related_task_id&&<button type="button" className="boss-btn" disabled={!onOpenTask||!current?.task_ids.includes(value.related_task_id)} onClick={()=>onOpenTask?.(value.related_task_id!)}>查看关联任务</button>}</div>{current?.replies.filter(reply=>reply.reply_to===value.message_id).map(reply=><div className="boss-message-reply" key={reply.reply_id}><strong>{person(current,reply.author_contact_id)}</strong><Fact label="回复编号" value={reply.reply_id}/><Fact label="收到时间" value={reply.received_at}/><p className="boss-message-body">{reply.text}</p><Fact label="任务完成确认" value={reply.task_completion_confirmed?"已经确认":"尚未确认"}/></div>)}</article>)}{current&&!outbox.length&&<p className="boss-helper">当前筛选范围没有发件记录。</p>}
+      <h3>关联交办沟通</h3>{taskMessages.map(value=><article className="boss-workspace-item" key={value.message_id}><strong>{value.message_id}</strong><Fact label="联系人" value={person(current,value.recipient_id)}/><Fact label="消息状态" value={value.message_status}/><Fact label="发送时间" value={value.sent_at}/><Fact label="任务编号" value={value.task_id}/><Fact label="发送时任务版本" value={value.task_version}/><Fact label="记录中的任务状态" value={value.task_status}/><button type="button" className="boss-btn" disabled={!onOpenTask||!current?.task_ids.includes(value.task_id)} onClick={()=>onOpenTask?.(value.task_id)}>核查当前任务</button></article>)}{current&&!taskMessages.length&&<p className="boss-helper">当前筛选范围没有交办沟通记录。</p>}</div>}
+      <p className="boss-helper">草稿、模拟发送、送达和回复分别采用正式记录。消息回复与任务完成确认分别处理。</p>
+    </section></main><aside className="boss-column"><Panel title="来源与依据"><Fact label="资料版本" value={current?.data_version}/><Fact label="执行空间" value={current?.execution_namespace}/><Fact label="草稿保存时姓名" value={draft?.recipient_name_at_save}/><Fact label="草稿保存时组织" value={draft?.organization_at_save}/><Fact label="原事项" value={draft?.origin?.object_id}/><Fact label="原事项版本" value={draft?.origin?.version}/><Fact label="内容摘要" value={draft?.content_sha256}/>
+      <h3>本人表达要求</h3><Fact label="要求版本" value={current?.expression_requirements?.version}/><Fact label="要求状态" value={current?.expression_requirements?.status}/>{current?.expression_requirements?.status==="CONFIRMED"?<p className="boss-message-body">{current.expression_requirements.content}</p>:<p className="boss-helper">当前有效表达要求尚未提供。</p>}
+      <h3>附件依据</h3>{draft?.attachment_refs.map(ref=>{const source=current?.sources?.find(value=>value.source_id===ref.source_id&&value.version===ref.version);return <article className="boss-workspace-item" key={ref.source_id}><strong>{ref.source_id} · v{ref.version}</strong><Fact label="有效性" value={source?.status}/><Fact label="作者" value={source?.author}/><Fact label="发布日期" value={source?.published_at}/><Fact label="有效截至" value={source?.valid_until}/><button type="button" className="boss-btn" onClick={()=>onViewSource(ref.source_id)}><FileSearch size={15}/>核查当前原文</button></article>;})}{current&&!draft?.attachment_refs.length&&<p className="boss-helper">当前草稿没有已保存附件。</p>}
+    </Panel><Panel title="状态与核查"><Fact label="草稿状态" value={draft?.status??(current&&!selectedId?"尚未保存":null)}/><Fact label="编辑状态" value={stale?"依据已变化":dirty?"存在未保存内容":"尚无未保存修改"}/><Fact label="模拟发送" value={sent?.send_state??(draft?.status==="DRAFT"?"尚未发送":null)}/><Fact label="送达状态" value={sent?.delivery_state}/><Fact label="回复状态" value={sent?.reply_state}/><Fact label="发送可用性" value={draft?.send_eligibility?draft.send_eligibility.allowed?"当前允许核查发送":draft.send_eligibility.reason:"发送时由正式服务核查"}/>
+      <h3>授权来源与发送后果</h3><Fact label="授权编号" value={draft?.authorization?.authorization_id}/><Fact label="授权状态" value={draft?.authorization?.status}/><Fact label="授权收件人" value={draft?.authorization?.recipient_id}/><Fact label="授权到期" value={draft?.authorization?.expires_at}/><p className="boss-helper">当前发送确认固定草稿版本、收件人、正文和附件。保存后的修改需要重新审核；结果未知时只查询原请求与发件箱。实际外部投递未接入。</p><Fact label="关联任务状态" value={task?.status}/><Fact label="任务负责人" value={task?.coordinator_id}/><div className="boss-actions"><button type="button" className="boss-btn" disabled={!onOpenTask||!form.related_task_id||!current?.task_ids.includes(form.related_task_id)} onClick={()=>onOpenTask?.(form.related_task_id)}>核查关联任务</button><button type="button" className="boss-btn" onClick={()=>onNavigate("N10")}>查看本人授权</button><button type="button" className="boss-btn" onClick={()=>onNavigate("N05")}>查看任务与承诺</button></div>{transaction.recovery}
+    </Panel></aside></div>
+    <footer className="boss-message-footer boss-actions"><button type="button" className="boss-btn" disabled={disabled} onClick={save}><ShieldCheck size={15}/>保存草稿</button><button type="button" className="boss-btn boss-btn-primary" disabled={disabled||dirty||!draft||draft.send_eligibility?.allowed===false} onClick={send}><Send size={15}/>按有效授权发送</button><button type="button" className="boss-btn" onClick={showOutbox}><Inbox size={15}/>查看发件箱</button></footer>
+    {transaction.dialog}<Dialog.Root open={nextChoice!==null} onOpenChange={open=>{if(!open)setNextChoice(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>{nextChoice?.restore?"重新采用当前草稿":"切换消息草稿"}</Dialog.Title><Dialog.Description>未提交的收件人、正文、关联任务和附件将被清除。可以继续编辑，或者读取选定草稿的当前保存内容。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button type="button" className="boss-btn">继续编辑</button></Dialog.Close><button type="button" className="boss-btn" disabled={!current||locked} onClick={()=>{if(nextChoice)select(nextChoice.id);}}>放弃编辑并继续</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
+  </div>;
 }

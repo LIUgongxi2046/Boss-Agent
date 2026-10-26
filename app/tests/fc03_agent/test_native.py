@@ -10,10 +10,12 @@ import pytest
 from aiohttp import web
 from loguru import logger
 from nanobot import Nanobot
+from nanobot.agent.hook import AgentHook
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.context import RequestContext
 from nanobot.config.schema import Config
 from nanobot.providers.base import LLMResponse
+from nanobot.session.manager import SessionManager
 
 ROOT = Path(__file__).resolve().parents[3]
 DOMAIN = Path(os.environ["FC03_NATIVE_DOMAIN_ROOT"])
@@ -22,6 +24,7 @@ sys.path.insert(0, str(ROOT / "validation/fc03_agent"))
 
 from native import NativeMorningAdapter
 from business import checksum
+from boss_conversation import ConversationAPI
 from controls import ControlStore
 from fc03_agent.formal import FormalMorningTool, FORMAL_TOOLS
 from fc03_agent.runtime import Fc03SimulatedProvider
@@ -58,7 +61,8 @@ def native(tmp_path):
     provider = FeatureProvider(ProductFc01(store), ProductBI(store), service)
     provider.generation = config.resolve_preset().to_generation_settings()
     recorder = FeatureRecorder(store, registry, lambda: snapshot, ProductBI(store), service)
-    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry,
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry, session_manager=sessions,
         hook_factories=[recorder.hook_factory, adapter.hook_factory])
     adapter.bind_sessions(loop.sessions)
     for name in list(registry.tool_names):
@@ -87,7 +91,7 @@ def rows(native, kind):
         return [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE kind=?", (kind,))]
 
 
-def run_turns(native, questions, *, before_context=None):
+def run_turns(native, questions, *, before_context=None, hooks=None):
     store, service, adapter, loop, config, recorder = native
     admitted = []
     async def execute():
@@ -103,7 +107,7 @@ def run_turns(native, questions, *, before_context=None):
             for context in (transport, adapter.native_context, recorder.context):
                 bot.runtime.add_context_provider(context)
             return [await bot.run(question, session_key="websocket:" + CHAT, channel="websocket", chat_id=CHAT,
-                sender_id="boss-1") for question in questions]
+                sender_id="boss-1", hooks=hooks) for question in questions]
     return asyncio.run(execute()), admitted
 
 
@@ -131,6 +135,66 @@ def test_actual_native_sdk_keeps_two_inputs_one_session_and_one_list(native):
     with pytest.raises(web.HTTPConflict):
         native[2].admit("BOSS", CHAT, original["turn_id"], "修改原问题", attached=lambda chat: True, active=lambda: True)
     assert len(rows(native, "runtime_run")) == 2
+
+
+def select_knowledge(native):
+    sessions = native[3].sessions
+    sessions.save(sessions.get_or_create("websocket:" + CHAT))
+    service = native[2].source_selection
+    catalogue = service.listing("BOSS", {"chat_id": CHAT, "query": ""})
+    source_refs = [{"source_id": source["source_id"], "version": source["version"]} for source in catalogue["sources"]
+        if source["source_id"] in {"finance-note", "meeting-minutes"}]
+    assert len(source_refs) == 2
+    result = service.bind("BOSS", {"chat_id": CHAT, "client_request_id": "morning-knowledge-selection",
+        "execution_namespace": catalogue["execution_namespace"], "dataset_version": catalogue["dataset_version"],
+        "expected_context_version": catalogue["context_version"], "expected_catalogue_version": catalogue["catalogue_version"],
+        "source_refs": source_refs}, active=lambda: True)
+    assert result["outcome"] == "RECORDED"
+    return source_refs
+
+
+def test_native_morning_reads_selected_knowledge_and_records_versions(native):
+    bind(native)
+    refs = select_knowledge(native)
+    results, _ = run_turns(native, ["结合选择的知识资料讨论今天的事项"])
+    assert all(ref["source_id"] in results[0].content for ref in refs)
+    row = rows(native, "runtime_run")[0]
+    assert row["status"] == "SUCCEEDED" and row["morning_context"]["source_selection"]["source_refs"] == refs
+    documents = [step["document_ref"] for step in row["tool_results"] if "document_ref" in step]
+    assert all(ref in documents for ref in refs)
+    projected = ConversationAPI(native[0]).read("BOSS", {"chat_id": CHAT, "session_id": "websocket:" + CHAT})["runs"][0]
+    for source in refs:
+        reference = next(ref for ref in projected["context_references"] if ref["id"] == source["source_id"])
+        assert reference["recorded_version"] == source["version"] and reference["adoption_state"] == "CURRENT"
+        assert {support["origin"] for support in reference["support"]} == {"SOURCE_SELECTION", "TOOL_RESULT"}
+    assert not rows(native, "authorization") and not rows(native, "outbox")
+
+
+@pytest.mark.parametrize("stage", ["TOOL", "ANSWER"])
+def test_native_morning_stops_when_selected_knowledge_is_withdrawn(native, stage):
+    bind(native)
+    select_knowledge(native)
+    class WithdrawKnowledge(AgentHook):
+        def __init__(self):
+            super().__init__(reraise=True)
+            self.executed = False
+
+        async def after_execute_tool(self, context, tool_call, tool, params, result):
+            if self.executed or stage != "TOOL":
+                return
+            self.executed = True
+            assert not native[2].source_selection.listing("BOSS", {"chat_id": CHAT, "query": ""})["can_bind"]
+            native[0].control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+
+        async def after_iteration(self, context):
+            if stage == "ANSWER" and not context.tool_calls and context.response is not None and context.response.content:
+                self.executed = True
+                native[0].control("ui-check", "withdraw", {"source_id": "finance-note", "version": "1"})
+    hook = WithdrawKnowledge()
+    with pytest.raises(web.HTTPException):
+        run_turns(native, ["结合选择的知识资料讨论今天的事项"], hooks=[hook])
+    assert hook.executed and rows(native, "runtime_run")[0]["status"] == "FAILED"
+    assert len(rows(native, "runtime_run")[0]["tool_results"]) == (1 if stage == "TOOL" else 5)
 
 
 def test_selected_native_sdk_consumes_exact_item(native):

@@ -47,7 +47,7 @@ def read_runtime_task_reference(store, role, namespace, run_id, task_id):
         }
 
 
-def read_runtime_records(store, role, namespace, run_id=None, query=None):
+def read_runtime_records(store, role, namespace, run_id=None, query=None, *, historical=False):
     require(role is not None, "需要认证身份", web.HTTPUnauthorized)
     require(role in {"BOSS", "MAINTAINER"}, "运行记录访问被拒绝", web.HTTPForbidden)
     parameters = {} if query is None else query
@@ -63,7 +63,15 @@ def read_runtime_records(store, role, namespace, run_id=None, query=None):
     limit = int(parameters.get("limit", "50"))
     with store.connect() as db:
         db.execute("BEGIN")
-        store.active(db, namespace)
+        if historical:
+            from boss_execution_scope import NAMESPACE, validate_namespace
+            validate_namespace(namespace)
+            store.active(db, NAMESPACE)
+            archive = store.get(db, "dataset-catalog", "execution_archive", namespace)
+            require(archive["state"] == "READ_ONLY" and db.execute("SELECT active FROM spaces WHERE namespace=?", (namespace,)).fetchone() == (0,),
+                    "当前空间不属于已归档历史")
+        else:
+            store.active(db, namespace)
         if run_id is not None:
             rows = [store.get(db, namespace, "runtime_run", run_id)]
             total = 1
@@ -95,4 +103,5 @@ def read_runtime_records(store, role, namespace, run_id=None, query=None):
             "projection": "runtime-records", "source_type": "RUNTIME_RECORD", "namespace": namespace,
             "read_at": now(), "runs": rows, "matched_count": total, "limit": limit, "next_cursor": cursor,
             "private_body_available_here": False, "business_mutation_performed": False,
+            **({"historical": True, "current_evidence_eligible": False} if historical else {}),
         }

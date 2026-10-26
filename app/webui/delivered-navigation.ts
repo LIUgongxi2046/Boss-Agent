@@ -1,4 +1,4 @@
-import designPages from "../../Boss-Agent-Desktop-Complete-v6/meta/页面配置.json";
+import designPages from "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json";
 
 export type Role="BOSS"|"MAINTAINER";
 type FeatureReference={title:string;feature:string;directory:boolean};
@@ -56,7 +56,7 @@ for(const role of ["BOSS","MAINTAINER"] as const){
     DELIVERED_NAVIGATION[role][id]={id,title:metadata.title,group,feature:FEATURE_REFERENCES[role][id]?.feature??"PARTIAL_PAGE_BINDING",directory:true,state,stateLabel:STATE_LABELS[state],accepted:false,variantLabel:VARIANTS[id]??null};
   }
 }
-DELIVERED_NAVIGATION.BOSS.MVP01={id:"MVP01",title:"采购成本协调",group:"今日工作",feature:"MVP01",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
+DELIVERED_NAVIGATION.BOSS.MVP01={id:"MVP01",title:"采购成本协调",group:"今日工作",feature:"MVP01",directory:false,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 DELIVERED_NAVIGATION.BOSS.NATIVE={...DELIVERED_NAVIGATION.BOSS.N02,id:"NATIVE",directory:false};
 DELIVERED_NAVIGATION.MAINTAINER.NATIVE={id:"NATIVE",title:"应用设置",group:"Agent配置",feature:"UI02",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 

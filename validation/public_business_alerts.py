@@ -4,13 +4,14 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import require
+from boss_execution_scope import NAMESPACE
 
 
 def read_alerts(store, role, namespace, query_string):
     from boss_business_alerts import BusinessAlertsAPI
 
     require(role == "BOSS", "经营提醒仅限本人读取", web.HTTPForbidden)
-    require(namespace == "ui-check", "经营提醒执行范围无效", web.HTTPConflict)
+    require(namespace == NAMESPACE, "经营提醒执行范围无效", web.HTTPConflict)
     values = parse_qs(query_string, keep_blank_values=True)
     require(not values or set(values) == {"event_id"} and len(values["event_id"]) == 1
             and 0 < len(values["event_id"][0]) <= 200, "经营提醒查询参数无效", web.HTTPBadRequest)
@@ -20,7 +21,7 @@ def read_alerts(store, role, namespace, query_string):
 def read_rules(store, role, namespace, query_string):
     from boss_alert_rules import BusinessAlertRulesAPI
 
-    require(namespace == "ui-check", "经营规则执行范围无效", web.HTTPConflict)
+    require(namespace == NAMESPACE, "经营规则执行范围无效", web.HTTPConflict)
     require(query_string == "", "经营规则不接受额外查询参数", web.HTTPBadRequest)
     return BusinessAlertRulesAPI(store).read(role)
 
@@ -29,7 +30,7 @@ def input_catalog(store, role, namespace, query_string):
     from boss_alert_policy import MANIFEST, GENERATOR
 
     require(role == "MAINTAINER", "演示输入仅限技术维护", web.HTTPForbidden)
-    require(namespace == "ui-check" and query_string == "", "演示输入查询范围无效", web.HTTPBadRequest)
+    require(namespace == NAMESPACE and query_string == "", "演示输入查询范围无效", web.HTTPBadRequest)
     with store.connect() as db:
         db.execute("BEGIN")
         store.active(db, namespace)

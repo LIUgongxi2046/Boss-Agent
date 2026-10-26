@@ -9,6 +9,7 @@ from nanobot.agent.tools.context import current_request_context
 from nanobot.providers.base import LLMResponse, ToolCallRequest
 
 from business import checksum, now, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_morning import MorningAPI, SCHEMA, QUERY_ACTION
 from boss_runtime_records import ATTRIBUTE
 from boss_simulation_api import _context
@@ -41,6 +42,7 @@ class MorningRequest:
     list_id: str | None
     item_id: str | None
     active: object
+    source_selection_json: str | None = None
 
 
 class ProductMorning:
@@ -65,11 +67,11 @@ class ProductMorning:
     def context_provider(self):
         request, grant = self._grant()
         runtime = request.attributes.get(ATTRIBUTE)
-        return Fc03Context("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
+        return Fc03Context("BOSS", grant.owner_id, NS, grant.dataset_id, grant.dataset_version,
             runtime.request_id if runtime is not None else grant.key, runtime.session_id if runtime is not None else grant.session_id,
             True, json.dumps({"date": grant.date, "timezone": grant.timezone}), grant.date, grant.timezone,
             grant.snapshot_sha256, grant.order_version, grant.key, frozenset({grant.list_id}) if grant.list_id else frozenset(),
-            grant.list_id if grant.item_id else None, grant.item_id)
+            grant.list_id if grant.item_id else None, grant.item_id, grant.source_selection_json)
 
     async def scope_context(self, request):
         if not self.handles(request):
@@ -100,10 +102,10 @@ class ProductMorning:
         binding = request.attributes[ATTRIBUTE]
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "morning_public_request", grant.key)
+            row = self.store.get(db, NS, "morning_public_request", grant.key)
             require(row["status"] == "PREPARED", "原晨间请求已经进入运行", web.HTTPConflict)
             row.update(status="RUNNING", runtime_request_id=binding.request_id, run_id=binding.run_id, session_id=binding.session_id)
-            self.store.put(db, "ui-check", "morning_public_request", grant.key, row)
+            self.store.put(db, NS, "morning_public_request", grant.key, row)
 
     async def events(self, messages, tools):
         await asyncio.sleep(0)
@@ -125,6 +127,12 @@ class ProductMorning:
         sources = [source for source in view["source_statuses"] if source["status"] == "VALID" and (source_ids is None or source["source_id"] in source_ids)]
         if sources and not any("document" in output for output in outputs):
             return call("morningSourceRead", {"list_id": view["list_id"], "source_id": sources[0]["source_id"]})
+        if grant.source_selection_json is not None:
+            selected_sources = json.loads(grant.source_selection_json)["source_refs"]
+            documents_read = {(output["document"]["source_id"], output["document"]["version"]) for output in outputs if "document" in output}
+            for source in selected_sources:
+                if (source["source_id"], source["version"]) not in documents_read:
+                    return call("morningSourceRead", {"list_id": view["list_id"], "source_id": source["source_id"]})
         content = "SIMULATED · 晨间清单 " + view["list_id"] + " · 版本 " + view["list_version"]
         discussed = [detail["item"]] if grant.item_id and detail else view["items"]
         content += "\n" + "\n".join(item["title"] + "：" + item["reason"] for item in discussed)
@@ -140,7 +148,7 @@ class ProductMorning:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             context = _context(db)
-            existing = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='morning_public_request' AND id=?", (key,)).fetchone()
+            existing = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='morning_public_request' AND id=?", (NS, key)).fetchone()
             if existing:
                 row = json.loads(existing[0])
                 require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")), "原晨间请求不属于当前范围", web.HTTPForbidden)
@@ -156,15 +164,15 @@ class ProductMorning:
             if payload.get("item_id") is not None:
                 self.api.detail(role, selected, payload["item_id"])
             with self.store.connect() as db:
-                stored = self.store.get(db, "ui-check", "morning_list", selected)
+                stored = self.store.get(db, NS, "morning_list", selected)
                 domain_key = stored["client_request_id"]
         session_id = "sdk:morning-" + str(uuid4())
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             current = _context(db)
             require(all(current[field] == context[field] for field in ("owner_id", "namespace", "dataset_id", "dataset_version")), "晨间范围在准备期间已变化", web.HTTPConflict)
-            require(db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='morning_public_request' AND id=?", (key,)).fetchone() is None, "原晨间请求正在准备，请查询原编号", web.HTTPConflict)
-            self.store.put(db, "ui-check", "morning_public_request", key, {"request_id": key, "payload_sha256": checksum(payload),
+            require(db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='morning_public_request' AND id=?", (NS, key)).fetchone() is None, "原晨间请求正在准备，请查询原编号", web.HTTPConflict)
+            self.store.put(db, NS, "morning_public_request", key, {"request_id": key, "payload_sha256": checksum(payload),
                 "owner_id": context["owner_id"], "dataset_id": context["dataset_id"], "dataset_version": context["dataset_version"],
                 **day, "session_id": session_id, "domain_client_request_id": domain_key, "selected_list_id": selected, "selected_item_id": payload.get("item_id"), "status": "PREPARED", "created_at": now()})
         return MorningRequest(key, context["owner_id"], context["dataset_id"], context["dataset_version"], session_id,
@@ -177,7 +185,7 @@ class ProductMorning:
         grant = self._request(role, payload, active)
         if grant is None:
             return self.receipt(role, payload["client_request_id"])
-        task = asyncio.create_task(self.bot.run(payload["question"], session_key=grant.session_id, sender_id=grant.owner_id,
+        task = asyncio.create_task(self.runtime.run_bot(self.bot, payload["question"], session_key=grant.session_id, sender_id=grant.owner_id,
             ephemeral=True, attributes={MORNING_REQUEST: grant}))
         self.active_runs[grant.key] = task
         try:
@@ -186,10 +194,10 @@ class ProductMorning:
             self.active_runs.pop(grant.key, None)
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
-                row = self.store.get(db, "ui-check", "morning_public_request", grant.key)
+                row = self.store.get(db, NS, "morning_public_request", grant.key)
                 if "run_id" not in row:
                     row.update(status="CANCELED" if task.cancelled() else "FAILED", finished_at=now())
-                    self.store.put(db, "ui-check", "morning_public_request", grant.key, row)
+                    self.store.put(db, NS, "morning_public_request", grant.key, row)
         require(not result.error, "晨间运行未成功，请查询原编号", web.HTTPConflict)
         require(active(), "晨间认证已失效，请重新认证后读取原编号", web.HTTPUnauthorized)
         return self.receipt(role, grant.key)
@@ -198,9 +206,9 @@ class ProductMorning:
         self.api._role(role)
         with self.store.connect() as db:
             context = _context(db)
-            row = self.store.get(db, "ui-check", "morning_public_request", key)
+            row = self.store.get(db, NS, "morning_public_request", key)
             require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")), "原晨间请求不属于当前范围", web.HTTPForbidden)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if "run_id" in row else None
+            run = self.store.get(db, NS, "runtime_run", row["run_id"]) if "run_id" in row else None
         return {"client_request_id": key, "request_state": run["status"] if run else row["status"], "run_id": row.get("run_id"),
                 "receipt": self.api.receipt(role, QUERY_ACTION, row["domain_client_request_id"]), "write_performed_by_lookup": False}
 
@@ -208,7 +216,7 @@ class ProductMorning:
         self.api._role(role)
         with self.store.connect() as db:
             context = _context(db)
-            rows = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='morning_public_request' ORDER BY json_extract(body,'$.created_at') DESC")]
+            rows = [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='morning_public_request' ORDER BY json_extract(body,'$.created_at') DESC", (NS,))]
         return {"source_type": "SIMULATED", "requests": [{key: row.get(key) for key in ("request_id", "date", "timezone", "created_at", "run_id", "selected_list_id")}
             for row in rows if all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version"))]}
 
@@ -223,7 +231,7 @@ class ProductMorning:
 
 class PublicMorningRecorder(Fc03RuntimeRecorder):
     def __init__(self, service, registry, snapshot):
-        super().__init__(service.store, "ui-check", registry, snapshot, service.context_provider)
+        super().__init__(service.store, NS, registry, snapshot, service.context_provider)
         self.service = service
 
     async def context(self, request):

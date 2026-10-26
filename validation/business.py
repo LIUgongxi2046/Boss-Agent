@@ -2,6 +2,7 @@ import hashlib
 import json
 import sqlite3
 import uuid
+from time import monotonic
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -50,6 +51,7 @@ def initial_materials():
     return {
         "source_type": "SIMULATED", "generator_version": "T02-3", "seed": 20261022,
         "owner_id": "boss-1", "dataset_id": "selection", "dataset_version": "1",
+        "business_clock": "2026-10-22T09:00:00+08:00",
         "boss_profile": {"owner_id": "boss-1", "goals": ["增长质量", "现金", "本人承诺"], "timezone": "Asia/Shanghai", "confirmed_reading_requirement": "简报优先展示现金与本人承诺。", "version": "1"},
         "metric_definitions": [{"metric_id": metric, "formula": formula, "unit": unit, "precision": "Decimal", "definition_version": "1", "scope": "region-1 EXTERNAL_SALES CNY", "settlement_state": "SETTLED"} for metric, formula, unit in [("sales_quantity", "SUM(quantity_tonnes)", "吨"), ("revenue", "SUM(revenue_cny)", "CNY"), ("cost", "SUM(cost_cny)", "CNY"), ("gross_profit", "revenue-cost", "CNY"), ("gross_margin", "gross_profit/revenue*100", "%"), ("gross_profit_per_tonne", "gross_profit/sales_quantity", "CNY/吨")]],
         "periods": {"BASE": ["2026-09-01", "2026-09-10"], "CURRENT": ["2026-10-01", "2026-10-10"]},
@@ -75,6 +77,22 @@ class Store:
                 CREATE TABLE IF NOT EXISTS idempotency(namespace TEXT, operation TEXT, key TEXT, digest TEXT, result TEXT, PRIMARY KEY(namespace, operation, key));
                 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, namespace TEXT, operation TEXT, input TEXT, output TEXT, created_at TEXT);
             """)
+            indexed = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='knowledge_text'").fetchone()
+            db.executescript("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_text USING fts5(namespace UNINDEXED,source_id UNINDEXED,content,tokenize='trigram');
+                CREATE TRIGGER IF NOT EXISTS document_text_insert AFTER INSERT ON objects WHEN new.kind='document' BEGIN
+                    INSERT INTO knowledge_text(namespace,source_id,content) SELECT new.namespace,new.id,json_extract(new.body,'$.content') WHERE coalesce(json_extract(new.body,'$.withdrawn'),0)=0;
+                END;
+                CREATE TRIGGER IF NOT EXISTS document_text_update AFTER UPDATE ON objects WHEN new.kind='document' BEGIN
+                    DELETE FROM knowledge_text WHERE namespace=old.namespace AND source_id=old.id;
+                    INSERT INTO knowledge_text(namespace,source_id,content) SELECT new.namespace,new.id,json_extract(new.body,'$.content') WHERE coalesce(json_extract(new.body,'$.withdrawn'),0)=0;
+                END;
+                CREATE TRIGGER IF NOT EXISTS document_text_delete AFTER DELETE ON objects WHEN old.kind='document' BEGIN
+                    DELETE FROM knowledge_text WHERE namespace=old.namespace AND source_id=old.id;
+                END;
+            """)
+            if indexed is None:
+                db.execute("INSERT INTO knowledge_text(namespace,source_id,content) SELECT namespace,id,json_extract(body,'$.content') FROM objects WHERE kind='document' AND coalesce(json_extract(body,'$.withdrawn'),0)=0")
 
     def connect(self):
         db = sqlite3.connect(self.path, timeout=10)
@@ -99,10 +117,11 @@ class Store:
     def initialize_in_transaction(self, db, ns, data):
         db.execute("INSERT INTO spaces VALUES(?,1,?)", (ns, checksum(data)))
         self.put(db, ns, "initial", "snapshot", data)
-        self.put(db, ns, "memory", "current", data["memory"])
+        if data["memory"] is not None:
+            self.put(db, ns, "memory", "current", data["memory"])
         self.put(db, ns, "configuration", "current", {"config_id": "runtime-1", "version": "1", "provider": "deepseek", "api_type": "chat_completions", "model_id": "deepseek-flash", "credential_ref": "connection.json:credential_file", "tool_scope": list(OPERATIONS), "max_tool_rounds": 12, "timeout": 120, "enabled": True})
         self.put(db, ns, "schedule", "current", {"schedule_id": "schedule-1", "schedule_version": "1", "version": "1", "trigger": "EVENT_OR_TIME", "timezone": "Asia/Shanghai", "enabled": True, "canceled": False})
-        self.put(db, ns, "clock", "current", {"at": "2026-10-22T09:00:00+08:00", "version": "1"})
+        self.put(db, ns, "clock", "current", {"at": data["business_clock"], "version": "1"})
         db.execute("CREATE VIRTUAL TABLE IF NOT EXISTS knowledge USING fts5(namespace UNINDEXED, source_id UNINDEXED, content)")
         for document in data["documents"]:
             self.put(db, ns, "document", document["source_id"], document)
@@ -128,15 +147,22 @@ class Store:
         return auth_id
 
     def invoke(self, operation, payload):
+        from boss_v7_configuration import record_use, tool_policy, validate_tool_value
+        started = monotonic()
         require(operation in OPERATIONS, "未知业务操作", web.HTTPNotFound)
         validate(OPERATIONS[operation]["input_schema"].rsplit("/", 1)[1], payload)
         env = payload["envelope"]
         ns = env["execution_namespace"]
-        require(env["owner_id"] == "boss-1" and env["dataset_id"] == "selection" and env["dataset_version"] == "1", "本人或数据版本不符", web.HTTPForbidden)
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             self.active(db, ns)
             data = self.get(db, ns, "initial", "snapshot")
+            from boss_execution_scope import require_dataset_scope
+            require_dataset_scope(db, ns, data)
+            require(all(env[field] == data[field] for field in ("owner_id", "dataset_id", "dataset_version")),
+                    "本人或数据版本不符", web.HTTPForbidden)
+            policy = tool_policy(db, operation, ns)
+            validate_tool_value(policy, "input", payload)
             if operation in ("create_assignment", "send_assignment"):
                 content = {k: v for k, v in payload.items() if k not in ("envelope", "authorization_id", "idempotency_key")}
                 digest = checksum(content)
@@ -153,6 +179,10 @@ class Store:
                 require(used is None, "当前授权已经产生业务结果，请查询原请求回执")
             result = getattr(self, operation)(db, ns, data, payload)
             validate(OPERATIONS[operation]["output_schema"].rsplit("/", 1)[1], result)
+            validate_tool_value(policy, "output", result)
+            if policy is not None:
+                require(monotonic() - started <= policy["values"]["timeout_seconds"], "工具执行超过已启用的时间限制", web.HTTPRequestTimeout)
+                record_use(self, db, "tools", operation, policy["version"], env["request_id"], ns)
             if operation in ("create_assignment", "send_assignment"):
                 db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (ns, operation, payload["idempotency_key"], digest, encode(result)))
             audit_input = {"request_id": env["request_id"], "session_id": env["session_id"],
@@ -233,6 +263,7 @@ class Store:
             from boss_bi_queries import query_metrics
             return query_metrics(self, db, ns, data, p)
         from boss_metrics import aggregate_metrics, compare_metrics
+        from boss_v7_metrics import apply_configurations, display_rounding, policy_fingerprint, record_adoption
         document = self._metric_source(db, ns, data)
         require(p["region_id"] == "region-1" and p["definition_version"] == "1", "范围或口径不可用", web.HTTPBadRequest)
         require([p["period_start"], p["period_end"]] == data["periods"]["CURRENT"] and [p["comparison_start"], p["comparison_end"]] == data["periods"]["BASE"], "期间不可比", web.HTTPBadRequest)
@@ -241,15 +272,20 @@ class Store:
         values = []
         missing = []
         period_metrics = {}
+        calculations = {}
+        policy_at = datetime.now(timezone.utc)
         for period in ("BASE", "CURRENT"):
             group = [r for r in records if r["period"] == period]
             computed = aggregate_metrics(group)
-            metrics = computed["metrics"]
+            metrics, calculations[period] = apply_configurations(db, ns, group, computed["metrics"], cache=True, at=policy_at)
             period_metrics[period] = metrics
             missing.extend(period + ":" + field for field in computed["missing_fields"])
+            missing.extend(period + ":" + identifier + ":" + field for identifier, calculation in calculations[period].items() for field in calculation["missing_fields"])
             for metric in p["metric_ids"]:
                 value, unit, formula = metrics[metric]
-                values.append({"metric_id": metric, "period_scope": period, "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
+                metric_scope = encode({"region_id": p["region_id"], "product_ids": p["product_ids"],
+                                      "metric_configuration": {key: calculations[period][metric][key] for key in ("configuration_version", "scope", "breakdown")}}) if metric in calculations[period] else f"region-1 {p['product_ids']}"
+                values.append({"metric_id": metric, "period_scope": period, "scope_description": metric_scope, "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": display_rounding(calculations[period][metric]) if metric in calculations[period] else "原始 Decimal 精度"})
         for metric, (value, unit, formula) in compare_metrics(period_metrics["BASE"], period_metrics["CURRENT"]).items():
             if metric in p["metric_ids"]:
                 values.append({"metric_id": metric, "period_scope": "CHANGE", "scope_description": f"region-1 {p['product_ids']}", "value": str(value) if value is not None else None, "unit": unit, "formula": formula, "definition_version": "1", "display_rounding": "原始 Decimal 精度"})
@@ -259,7 +295,9 @@ class Store:
             "query_id": result["query_id"], "owner_id": data["owner_id"], "dataset_id": data["dataset_id"], "dataset_version": data["dataset_version"],
             "source_id": document["source_id"], "source_version": document["version"], "source_sha256": checksum(document),
             "detail_fingerprints": {row["record_id"]: checksum(row) for row in records},
+            "metric_policy_sha256": policy_fingerprint(db, ns, policy_at), "metric_calculations": calculations,
         })
+        record_adoption(self, db, ns, result["query_id"], calculations)
         return result
 
     def read_evidence(self, db, ns, data, p):
@@ -272,6 +310,8 @@ class Store:
         row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='query_source_binding' AND id=?", (ns, p["query_id"])).fetchone()
         require(row is not None, "查询缺少完整来源绑定，需要重新查询")
         binding = json.loads(row[0])
+        from boss_v7_metrics import policy_fingerprint
+        require(binding.get("metric_policy_sha256", checksum({})) == policy_fingerprint(db, ns), "指标配置已经变化，需要重新查询")
         require(binding["owner_id"] == data["owner_id"] and binding["dataset_id"] == data["dataset_id"]
                 and binding["dataset_version"] == data["dataset_version"], "查询绑定不属于当前范围", web.HTTPForbidden)
         require(binding["source_id"] == document["source_id"] and binding["source_version"] == document["version"]
@@ -344,13 +384,13 @@ class Store:
         return {field: task[field] for field in fields if field in task}
 
     def context(self, ns):
-        from boss_memory import confirmed_memory
+        from boss_memory import confirmed_memory, current_memory
         with self.connect() as db:
             db.execute("BEGIN")
             self.active(db, ns)
-            memory = self.get(db, ns, "memory", "current")
+            memory = current_memory(db, ns)
             data = self.get(db, ns, "initial", "snapshot")
-            return {"memory": confirmed_memory(db, ns, memory, data["owner_id"]), "memory_version": memory["version"], "configuration": self.get(db, ns, "configuration", "current")}
+            return {"memory": confirmed_memory(db, ns, memory, data["owner_id"]), "memory_version": memory["version"] if memory else None, "configuration": self.get(db, ns, "configuration", "current")}
 
     def notify(self, ns, event_id):
         with self.connect() as db:

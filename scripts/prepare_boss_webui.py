@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-"""Reproducibly overlay Boss-Agent Desktop v6 React onto fixed nanobot WebUI.
-
-This modifies *only* a private .work/product checkout, never upstream GitHub,
-and never embeds the original static 72 HTML pages as if they were a product.
-A local network connection is required for first-time upstream checkout/npm ci.
-"""
 from __future__ import annotations
 
 import argparse
@@ -21,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_REV = "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9"
 UPSTREAM_URL = "https://github.com/HKUDS/nanobot.git"
 SOURCE = ROOT / ".work" / "product" / "nanobot"
-DESIGN = ROOT / "Boss-Agent-Desktop-Complete-v6"
+DESIGN = ROOT / "Boss-Agent-Desktop-Complete-v7"
 SOURCE_WEBUI = SOURCE / "webui"
 SRC = SOURCE_WEBUI / "src"
 BOSS_DIR = SRC / "boss-agent"
@@ -76,7 +69,7 @@ def copy_overlay() -> None:
         raise RuntimeError(f"设计源缺页：{missing}")
     states = json.loads((DESIGN / "meta" / "v6-状态关联.json").read_text(encoding="utf-8"))
     if len(states) != 561:
-        raise RuntimeError("561 个 v6 状态索引缺失，拒绝构建。")
+        raise RuntimeError("561 个设计状态索引缺失，拒绝构建。")
     mapping = json.loads((ROOT / "specs" / "hld-72-page-map.json").read_text(encoding="utf-8"))
     mapped = {row["page_id"]: row for row in mapping["pages"]}
     if set(mapped) != set(catalogue):
@@ -91,6 +84,8 @@ def copy_overlay() -> None:
 
     BOSS_DIR.mkdir(parents=True, exist_ok=True)
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
+    for dependency_file in ("package.json", "package-lock.json"):
+        shutil.copy2(ROOT / "app" / "frontend" / dependency_file, SOURCE_WEBUI / dependency_file)
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
         ("BossMenuNavigation.tsx", "BossMenuNavigation.tsx"),
@@ -153,7 +148,7 @@ def copy_overlay() -> None:
     # design-metadata import onto the exact 72-page generated JSON.
     navigation = BOSS_DIR / "delivered-navigation.ts"
     navigation_source = navigation.read_text(encoding="utf-8")
-    original_meta_import = "../../Boss-Agent-Desktop-Complete-v6/meta/页面配置.json"
+    original_meta_import = "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json"
     if navigation_source.count(original_meta_import) != 1:
         raise RuntimeError("经营导航源码与已审核的72页设计引用不匹配，拒绝自动改写")
     navigation.write_text(
@@ -207,6 +202,10 @@ def copy_overlay() -> None:
         "overlay": [f"app/webui/{module.name}" for module in source_modules],
         "overlay_sha256": {module.name: hashlib.sha256(module.read_bytes()).hexdigest() for module in source_modules},
         "design_meta_sha256": hashlib.sha256(meta_file.read_bytes()).hexdigest(),
+        "frontend_dependencies_sha256": {
+            name: hashlib.sha256((ROOT / "app" / "frontend" / name).read_bytes()).hexdigest()
+            for name in ("package.json", "package-lock.json")
+        },
         "source_modified": "pinned native WebUI overlay (working tree only)",
         "native_patches_manifest_sha256": hashlib.sha256(
             (ROOT / ".work" / "product" / "boss-native-patches.json").read_bytes()
@@ -226,7 +225,7 @@ def main() -> None:
     copy_overlay()
     if args.build:
         print("准备上游锁定前端依赖并编译…")
-        subprocess.run(["npm", "ci"], cwd=SOURCE_WEBUI, check=True)
+        subprocess.run(["npm", "ci", "--no-audit", "--no-fund", "--cache", str(ROOT / ".work" / "npm-cache")], cwd=SOURCE_WEBUI, check=True)
         subprocess.run(["npm", "run", "build"], cwd=SOURCE_WEBUI, check=True)
         dist = SOURCE / "nanobot" / "web" / "dist" / "index.html"
         if not dist.exists():

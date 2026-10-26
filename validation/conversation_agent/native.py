@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 from uuid import uuid4
 
@@ -10,10 +10,12 @@ from nanobot.webui.session_identity import is_valid_webui_chat_id, webui_session
 from nanobot.webui.transcript import normalize_webui_turn_id
 
 from business import checksum, encode, now, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
 from boss_simulation_api import _context
 from boss_source_access import require_current_business_source
+from boss_conversation_sources import ConversationSources
 from runtime_page_read_tools import BossDashboardReadTool, BossEvidenceReadTool, BossMeetingsReadTool
 from runtime_sop_read_tools import BossTasksReadTool, BossWorkspaceReadTool
 from conversation_agent import CONVERSATION_REQUEST, CONVERSATION_TOOLS, READ_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
@@ -39,6 +41,7 @@ class ConversationGrant:
     dataset_version: str
     task_entry_json: str | None = None
     business_entry_json: str | None = None
+    source_selection_json: str | None = None
 
 
 class NativeConversationAgent:
@@ -49,6 +52,7 @@ class NativeConversationAgent:
         self.planner = ConversationPlanner(store)
         self.task_entry = self.planner.api.task_entry(attachments.sessions)
         self.business_entry = self.planner.api.business_entry(attachments.sessions)
+        self.source_selection = ConversationSources(store, attachments.sessions)
         self.scope = ConversationScope(store, self.context_provider, self.validate_context)
         api = BossPageAPI(store)
         self.delegates = [BossDashboardReadTool(api, "BOSS"), BossTasksReadTool(api, "BOSS"),
@@ -74,7 +78,7 @@ class NativeConversationAgent:
         require(role == "BOSS" and callable(active) and active(), "一般会话需要当前本人认证", web.HTTPUnauthorized)
 
     def _identity(self, db):
-        self.store.active(db, "ui-check")
+        self.store.active(db, NS)
         return _context(db)
 
     @staticmethod
@@ -86,7 +90,7 @@ class NativeConversationAgent:
         if self.business_claimed(chat_id):
             return False
         with self.store.connect() as db:
-            return db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='morning_native_binding' AND json_extract(body,'$.chat_id')=?", (chat_id,)).fetchone() is not None
+            return db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='morning_native_binding' AND json_extract(body,'$.chat_id')=?", (NS, chat_id)).fetchone() is not None
 
     def tools(self):
         return [ConversationReadTool(delegate, self.scope) for delegate in self.delegates if delegate.name in READ_TOOLS] + [
@@ -142,19 +146,19 @@ class NativeConversationAgent:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             identity = self._identity(db)
-            found = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND id=?", (key,)).fetchone()
+            found = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='conversation_intent' AND id=?", (NS, key)).fetchone()
             if found:
                 row = json.loads(found[0])
                 self._owner(row, identity)
                 require(row["input_sha256"] == digest, "相同原生轮次携带不同文字或媒体", web.HTTPConflict)
                 return {"enqueue": False, **self.receipt(role, key, active=active)}
-            running = db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND json_extract(body,'$.finished_at') IS NULL", (webui_session_key(chat_id),)).fetchone()
+            running = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND json_extract(body,'$.finished_at') IS NULL", (NS, webui_session_key(chat_id))).fetchone()
             require(running is None, "当前会话仍有未终止原意图，请读取原编号", web.HTTPConflict)
             row = {"client_request_id": key, "chat_id": chat_id, "session_id": webui_session_key(chat_id), "turn_id": turn_id,
                 **{field: identity[field] for field in ("owner_id", "dataset_id", "dataset_version")},
                 "input_sha256": digest, "text_sha256": checksum(content), "media_sha256": media_sha256,
                 "status": "ADMITTED", "created_at": now(), "finished_at": None, "run_id": None}
-            self.store.put(db, "ui-check", "conversation_intent", key, row)
+            self.store.put(db, NS, "conversation_intent", key, row)
         self.proofs[key] = (lambda: bool(active() and attached(chat_id)), digest)
         return {"enqueue": True, **self.receipt(role, key, active=active)}
 
@@ -166,11 +170,11 @@ class NativeConversationAgent:
         return result
 
     def _receipt(self, db, identity, key):
-        found = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND id=?", (key,)).fetchone()
+        found = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='conversation_intent' AND id=?", (NS, key)).fetchone()
         row = json.loads(found[0]) if found else None
         if row is not None:
             self._owner(row, identity)
-        run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row and row["run_id"] else None
+        run = self.store.get(db, NS, "runtime_run", row["run_id"]) if row and row["run_id"] else None
         return {"source_type": "RUNTIME_RECORD", "client_request_id": key,
             "outcome": "RECORDED" if row else "NOT_FOUND_IN_CURRENT_STORE", "request_state": run["status"] if run else row["status"] if row else "UNKNOWN",
             "run_id": row["run_id"] if row else None, "chat_id": row["chat_id"] if row else None,
@@ -185,8 +189,8 @@ class NativeConversationAgent:
             db.execute("PRAGMA query_only=ON")
             db.execute("BEGIN")
             identity = self._identity(db)
-            identifiers = db.execute("SELECT id FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' "
-                "AND json_extract(body,'$.chat_id')=? ORDER BY json_extract(body,'$.created_at'),id", (chat_id,)).fetchall()
+            identifiers = db.execute("SELECT id FROM objects WHERE namespace=? AND kind='conversation_intent' "
+                "AND json_extract(body,'$.chat_id')=? ORDER BY json_extract(body,'$.created_at'),id", (NS, chat_id)).fetchall()
             results = [self._receipt(db, identity, identifier) for identifier, in identifiers]
             for result in results:
                 require(result["outcome"] == "RECORDED" and result["chat_id"] == chat_id
@@ -225,7 +229,7 @@ class NativeConversationAgent:
         require(key in self.proofs, "实际上传缺少当前会话接收证明", web.HTTPForbidden)
         self._authorize(role, self.proofs[key][0])
         with self.store.connect() as db:
-            row = self.store.get(db, "ui-check", "conversation_intent", key)
+            row = self.store.get(db, NS, "conversation_intent", key)
             self._owner(row, self._identity(db))
             require(row["status"] == "ADMITTED", "当前原意图已经开始运行", web.HTTPConflict)
             require(checksum(accepted_media) == row["media_sha256"], "成功上传内容与本轮原生媒体摘要不符", web.HTTPConflict)
@@ -249,11 +253,11 @@ class NativeConversationAgent:
             self._authorize("BOSS", proof[0])
             with self.store.connect() as db:
                 identity = self._identity(db)
-                row = self.store.get(db, "ui-check", "conversation_intent", key)
+                row = self.store.get(db, NS, "conversation_intent", key)
                 self._owner(row, identity)
                 require(row["status"] == "ADMITTED" and row["text_sha256"] == checksum(request.original_user_text)
                         and row["input_sha256"] == proof[1], "会话输入或原编号已变化", web.HTTPConflict)
-                previous = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND id<>? ORDER BY json_extract(body,'$.created_at')", (request.session_key, key))]
+                previous = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='conversation_intent' AND json_extract(body,'$.session_id')=? AND id<>? ORDER BY json_extract(body,'$.created_at')", (NS, request.session_key, key))]
             artifacts, last_source_id, last_source_ref, pending_query_scope = [], None, None, None
             for old in previous:
                 self._owner(old, identity)
@@ -261,7 +265,7 @@ class NativeConversationAgent:
                     last_source_ref = tuple(old["last_source_ref"]) if old["last_source_ref"] is not None else None
                 elif old["run_id"] is not None:
                     with self.store.connect() as db:
-                        recorded = self.store.get(db, "ui-check", "runtime_run", old["run_id"])
+                        recorded = self.store.get(db, NS, "runtime_run", old["run_id"])
                     selected = [step for step in recorded["tool_results"] if step["tool_id"] == "bossEvidenceRead"
                         and step.get("source_id") == old.get("last_source_id")]
                     if selected:
@@ -288,6 +292,10 @@ class NativeConversationAgent:
                     require((encode(old["task_entry"]) if old["task_entry"] is not None else None) == task_entry_json,
                             "本会话任务入口与原固定选择不符", web.HTTPConflict)
             task_entry = json.loads(task_entry_json) if task_entry_json is not None else None
+            source_selection = self.source_selection.pin(request.chat_id)
+            source_selection_json = encode(source_selection) if source_selection is not None else None
+            if previous and previous[-1].get("source_selection") != source_selection:
+                last_source_id, last_source_ref = None, None
             media = self._media_refs(self.attachments.read("BOSS", query))
             require(all(state == "STORED" for _, _, state in media), "当前附件已变化或无法读取，请核查原附件", web.HTTPConflict)
             require(row["media_sha256"] == checksum([]) or key in self.pending_media,
@@ -304,25 +312,38 @@ class NativeConversationAgent:
             else:
                 plan = self.planner.plan(request.original_user_text, query, (last_source_ref,) if last_source_ref else (), tuple(artifacts), last_source_id,
                     has_media=bool(self.pending_media.get(key)), pending_query_scope=pending_query_scope, task_entry=task_entry)
+            if source_selection is not None:
+                calls, references = list(plan.calls), list(plan.references)
+                for source in source_selection["source_refs"]:
+                    reference = ("document", source["source_id"], source["version"])
+                    require(all(ref[2] == source["version"] for ref in references if ref[:2] == reference[:2]), "所选知识资料与原事项依据版本不符", web.HTTPConflict)
+                    call = ("bossEvidenceRead", encode({"source": source["source_id"]}))
+                    if call not in calls:
+                        calls.append(call)
+                    if reference not in references:
+                        references.append(reference)
+                required = tuple(item for item in plan.required_inputs if not source_selection["source_refs"] or item != "请明确当前来源ID或已有正式来源名称")
+                plan = replace(plan, calls=tuple(calls), references=tuple(references), required_inputs=required)
             self.validate_artifacts(plan, query)
             grant = ConversationGrant(key, request.chat_id, row["turn_id"], row["text_sha256"], proof[0], plan, media,
-                row["owner_id"], row["dataset_id"], row["dataset_version"], task_entry_json, business_entry_json)
+                row["owner_id"], row["dataset_id"], row["dataset_version"], task_entry_json, business_entry_json, source_selection_json)
             require(CONVERSATION_REQUEST not in request.attributes, "请求已经包含会话采用上下文", web.HTTPForbidden)
             request.attributes[CONVERSATION_REQUEST] = grant
             self.scope.current(request, require_runtime=False)
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
-                row = self.store.get(db, "ui-check", "conversation_intent", key)
+                row = self.store.get(db, NS, "conversation_intent", key)
                 current_sources = [json.loads(parameters)["source"] for name, parameters in plan.calls if name == "bossEvidenceRead"]
                 if current_sources:
                     last_source_ref = next(ref for ref in reversed(plan.references) if ref[0] == "document" and ref[1] == current_sources[-1])
                 row.update(references=plan.references, attachment_refs=media, artifact_checks=plan.artifact_checks,
                            pending_query_scope=plan.pending_query_scope, task_entry=task_entry,
+                           source_selection=source_selection,
                            business_entry=json.loads(business_entry_json) if business_entry_json is not None else None,
                            last_source_id=current_sources[-1] if current_sources else last_source_id,
                            last_source_ref=last_source_ref,
                            plan_sha256=checksum({"calls": plan.calls, "required_inputs": plan.required_inputs}))
-                self.store.put(db, "ui-check", "conversation_intent", key, row)
+                self.store.put(db, NS, "conversation_intent", key, row)
             ready = True
         finally:
             if not ready:
@@ -338,8 +359,11 @@ class NativeConversationAgent:
                 "任务入口与本轮固定准备摘要不符", web.HTTPConflict)
         require(entry_pin(self.business_entry.read("BOSS", {"session_id": request.session_key, "chat_id": request.chat_id})) == grant.business_entry_json,
                 "经营入口与本轮原始选择不符", web.HTTPConflict)
+        selection = self.source_selection.pin(request.chat_id)
+        require((encode(selection) if selection is not None else None) == grant.source_selection_json,
+                "本轮知识资料选择已经变化，请核查原执行结果", web.HTTPConflict)
         binding = request.attributes.get(ATTRIBUTE)
-        return ConversationContext("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
+        return ConversationContext("BOSS", grant.owner_id, NS, grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else request.message_id or request.turn_id, request.session_key,
             request.chat_id, request.turn_id, bool(grant.key in self.proofs and grant.active()), grant.text_sha256,
             BUSINESS_TOOLS if grant.business_entry_json is not None else CONVERSATION_TOOLS,
@@ -352,7 +376,7 @@ class NativeConversationAgent:
                     self.planner.api.task_in_transaction(db, _context(db), identifier, version)
                 else:
                     require(kind == "document", "会话历史包含未验证来源种类", web.HTTPForbidden)
-                    document = require_current_business_source(self.store, db, "ui-check", context.owner_id, identifier)
+                    document = require_current_business_source(self.store, db, NS, context.owner_id, identifier)
                     require(document["version"] == version, "会话历史来源版本已经变化", web.HTTPConflict)
         request = current_request_context()
         if request is not None and self.handles(request) and ATTRIBUTE in request.attributes:
@@ -363,7 +387,7 @@ class NativeConversationAgent:
             self.validate_artifacts(grant.plan, {"session_id": context.session_id, "chat_id": context.chat_id})
             binding = request.attributes[ATTRIBUTE]
             with self.store.connect() as db:
-                run = self.store.get(db, "ui-check", "runtime_run", binding.run_id)
+                run = self.store.get(db, NS, "runtime_run", binding.run_id)
             for step in run["tool_results"]:
                 if step["tool_id"] == "query_metrics":
                     actual = self.planner.api.artifact("BOSS", {"session_id": context.session_id, "chat_id": context.chat_id,
@@ -407,7 +431,7 @@ class NativeConversationAgent:
     def runtime_reference(self, request):
         grant = request.attributes[CONVERSATION_REQUEST]
         with self.store.connect() as db:
-            row = self.store.get(db, "ui-check", "conversation_intent", grant.key)
+            row = self.store.get(db, NS, "conversation_intent", grant.key)
         result = {"client_request_id": grant.key, "media_sha256": row["media_sha256"],
                 "attachment_refs": [{"attachment_id": key, "content_sha256": digest, "processing_state": state}
                                     for key, digest, state in grant.attachment_refs],
@@ -416,19 +440,21 @@ class NativeConversationAgent:
             result["task_entry"] = json.loads(grant.task_entry_json)
         if grant.business_entry_json is not None:
             result["business_entry"] = json.loads(grant.business_entry_json)
+        if grant.source_selection_json is not None:
+            result["source_selection"] = json.loads(grant.source_selection_json)
         return result
 
     def bind_runtime(self, request, binding):
         grant = request.attributes[CONVERSATION_REQUEST]
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "conversation_intent", grant.key)
+            row = self.store.get(db, NS, "conversation_intent", grant.key)
             require(row["run_id"] in {None, binding.run_id}, "原意图已经关联其他运行", web.HTTPConflict)
             if row["run_id"] == binding.run_id:
                 return
             require(row["status"] == "ADMITTED" and row["finished_at"] is None, "原意图已经终止，禁止重新进入Runtime", web.HTTPConflict)
             row.update(run_id=binding.run_id, runtime_request_id=binding.request_id, status="RUNNING")
-            self.store.put(db, "ui-check", "conversation_intent", grant.key, row)
+            self.store.put(db, NS, "conversation_intent", grant.key, row)
 
     def guard_context(self, provider):
         async def guarded(request):
@@ -448,10 +474,10 @@ class NativeConversationAgent:
         self.pending_media.pop(key, None)
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "conversation_intent", key)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row["run_id"] else None
+            row = self.store.get(db, NS, "conversation_intent", key)
+            run = self.store.get(db, NS, "runtime_run", row["run_id"]) if row["run_id"] else None
             if run and run["status"] == "QUEUED" and run["finished_at"] is None:
                 run.update(status=status, stop_reason="context_preparation_failed", finished_at=now())
-                self.store.put(db, "ui-check", "runtime_run", run["run_id"], run)
+                self.store.put(db, NS, "runtime_run", run["run_id"], run)
             row.update(status=run["status"] if run else status, finished_at=run["finished_at"] if run else now())
-            self.store.put(db, "ui-check", "conversation_intent", key, row)
+            self.store.put(db, NS, "conversation_intent", key, row)

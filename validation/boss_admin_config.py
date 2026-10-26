@@ -1,12 +1,15 @@
+import json
+
 from aiohttp import web
 
 from business import now, require
+from boss_execution_scope import NAMESPACE
 from boss_prompt_config import KINDS, _select_runtime_prompts, obj
 from boss_source_policy import source_validity
-from boss_memory import confirmed_memory
+from boss_memory import confirmed_memory, current_memory
 
 
-def prompt_technical_status(store, role, namespace="ui-check"):
+def prompt_technical_status(store, role, namespace=NAMESPACE):
     require(role is not None, "需要认证身份", web.HTTPUnauthorized)
     require(role == "MAINTAINER", "需要技术维护身份", web.HTTPForbidden)
     with store.connect() as db:
@@ -63,19 +66,19 @@ def prompt_technical_status(store, role, namespace="ui-check"):
         }
 
 
-def memory_technical_status(store, role, namespace="ui-check"):
+def memory_technical_status(store, role, namespace=NAMESPACE):
     require(role is not None, "需要认证身份", web.HTTPUnauthorized)
     require(role == "MAINTAINER", "需要技术维护身份", web.HTTPForbidden)
     with store.connect() as db:
         db.execute("BEGIN")
         store.active(db, namespace)
-        current = store.get(db, namespace, "memory", "current")
+        current = current_memory(db, namespace)
         snapshot = store.get(db, namespace, "initial", "snapshot")
         owner = snapshot["owner_id"]
         eligible = confirmed_memory(db, namespace, current, owner) is not None
-        state = current["confirmation_state"]
+        state = current["confirmation_state"] if current else "ABSENT"
         condition = "namespace=? AND kind='runtime_run' AND json_extract(body,'$.memory_reference.memory_id')=? AND json_extract(body,'$.memory_reference.confirmation_authority_checked')=1"
-        parameters = (namespace, current["memory_id"])
+        parameters = (namespace, current["memory_id"] if current else None)
         selection_count = db.execute("SELECT COUNT(*) FROM objects WHERE " + condition, parameters).fetchone()[0]
         latest = db.execute(
             "SELECT id,json_extract(body,'$.memory_reference.version'),json_extract(body,'$.memory_reference.eligible'),"
@@ -89,11 +92,14 @@ def memory_technical_status(store, role, namespace="ui-check"):
             selection = {
                 "run_id": latest[0], "memory_version": latest[1], "eligible": bool(latest[2]),
                 "selected_at": latest[3], "run_status": latest[4], "model_completion_observed": bool(latest[5]),
-                "matches_current_memory_version": latest[1] == current["version"],
+                "matches_current_memory_version": current is not None and latest[1] == current["version"],
                 "observation": "CONTEXT_SELECTION_RECORDED",
             }
         # 字段白名单只包含技术元信息，正文不进入接口结果。
         deleted = state == "DELETED"
+        deletion_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='memory_deletion' AND id=?",
+                                  (namespace, current["memory_id"] if current else None)).fetchone()
+        propagation = json.loads(deletion_row[0]) if deletion_row else {}
         return {
             "projection": "memory-technical-status",
             "source_type": "RUNTIME_RECORD",
@@ -102,10 +108,10 @@ def memory_technical_status(store, role, namespace="ui-check"):
             "owner_scope": {key: snapshot[key] for key in ("owner_id", "dataset_id", "dataset_version")},
             "memory_source_type": snapshot["source_type"],
             "memory": {
-                "memory_id": current["memory_id"],
-                "version": current["version"],
+                "memory_id": current["memory_id"] if current else None,
+                "version": current["version"] if current else None,
                 "confirmation_state": state,
-                "valid_until": current.get("valid_until"),
+                "valid_until": current.get("valid_until") if current else None,
             },
             "future_context_eligible": eligible,
             "confirmation_authority_checked": True,
@@ -121,8 +127,9 @@ def memory_technical_status(store, role, namespace="ui-check"):
             "derived_memory_index": "NOT_USED",
             "deletion_scopes": {
                 "current_memory_content": "CLEARED" if deleted and not current.get("text") else "RETAINED" if deleted else "NOT_REQUESTED",
-                "initial_approved_source": "RETAINED" if snapshot.get("memory", {}).get("text") else "NOT_PRESENT",
-                "loaded_sessions": "NOT_VERIFIED", "backups": "NOT_VERIFIED", "physical_erasure": "NOT_VERIFIED",
+                "initial_approved_source": "RETAINED" if snapshot["memory"] is not None and snapshot["memory"].get("text") else "NOT_PRESENT",
+                "loaded_sessions": propagation.get("loaded_sessions", "NOT_VERIFIED"),
+                "backups": propagation.get("backups", "NOT_VERIFIED"), "physical_erasure": "NOT_VERIFIED",
             },
             "model_adoption_verified": False,
             "physical_secure_erasure_verified": False,

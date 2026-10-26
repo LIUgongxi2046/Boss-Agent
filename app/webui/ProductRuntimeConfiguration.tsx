@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import {V7Fact, V7Panel, V7Steps} from "./BossV7UI";
 
-type Values = {max_tool_rounds: number; max_output_tokens: number; tool_scope: string[]};
+type Values = {max_tool_rounds: number; max_output_tokens: number; tool_scope: string[];workspace_read_mode:"SOURCE_EXCERPTS"|"WORKSPACE_PROJECTIONS";workspace_projections:string[]};
 type Draft = {version: string; values: Values; content_sha256: string; validation_status: string};
 type Projection = {
   projection: "runtime-configuration";
-  current: {version: string; enabled: boolean; provider: string; model_id: string; tool_scope: string[]; max_tool_rounds: number};
+  current: {version: string; enabled: boolean; provider: string; model_id: string;api_type:string;timeout:number; tool_scope: string[]; max_tool_rounds: number;workspace_read_mode:Values["workspace_read_mode"];workspace_projections:string[]};
   draft: Draft | null; effective: Values & {config_sha256: string};
   available_tools: string[]; admission_ready: boolean; active_run_count: number;
   native_config_sha256: string; private_body_available_here: false; business_authority_granted: false;
+  available_workspace_projections:string[];workspace_access:{mode:Values["workspace_read_mode"];enabled:boolean;allowed_projections:string[]};
 };
 type Props = {getToken: () => string; onCommand: (action: string, payload: Record<string, unknown>) => Promise<void>;
   onDirtyChange: (dirty: boolean) => void; onReload: () => void};
@@ -35,7 +37,8 @@ export function ProductRuntimeConfiguration({getToken, onCommand, onDirtyChange,
     if (abort.signal.aborted) return;
     setData(next);
     setValues(next.draft?.values ?? {max_tool_rounds: next.current.max_tool_rounds,
-      max_output_tokens: next.effective.max_output_tokens, tool_scope: next.current.tool_scope});
+      max_output_tokens: next.effective.max_output_tokens, tool_scope: next.current.tool_scope,
+      workspace_read_mode:next.current.workspace_read_mode,workspace_projections:next.current.workspace_projections});
     setDirty(false);
     onDirtyChange(false);
   }, [getToken, onDirtyChange]);
@@ -61,12 +64,12 @@ export function ProductRuntimeConfiguration({getToken, onCommand, onDirtyChange,
     } catch (reason: unknown) {setError(String(reason instanceof Error ? reason.message : reason));}
     finally {locked.current = false; setBusy(false);}
   }
-  return <section className="boss-panel" aria-label="公共模型运行配置">
+  return <><section className="boss-panel" aria-label="公共模型运行配置">
     <header className="boss-panel-head"><h3>公共模型运行配置</h3></header>
     {error && <div className="boss-error" role="alert">{error}</div>}
     {notice && <p role="status">{notice}</p>}
     {!data || !values ? <p role="status">正在读取当前运行配置…</p> : <>
-      <p>DeepSeek · deepseek-flash · 当前版本 {data.current.version} · {data.current.enabled ? "已启用" : "已停用"}</p>
+      <div className="boss-form-grid"><V7Fact label="Provider">{data.current.provider}</V7Fact><V7Fact label="Model ID">{data.current.model_id}</V7Fact><V7Fact label="API 类型">{data.current.api_type}</V7Fact><V7Fact label="请求超时">{data.current.timeout} 秒</V7Fact><V7Fact label="服务端凭据引用">DEEPSEEK_API_KEY</V7Fact><V7Fact label="启用版本">{data.current.version} · {data.current.enabled?"已启用":"已停用"}</V7Fact></div>
       <p role="status">{data.admission_ready ? "当前Runtime可以接收新任务" : "当前Runtime需要校验并启用配置"} · 进行中 {data.active_run_count} 项</p>
       <form onSubmit={event => {event.preventDefault(); void mutate("boss.runtime.save", {expected_version: data.draft?.version ?? "0", values});}}>
         <fieldset disabled={busy} className="boss-runtime-fields">
@@ -78,6 +81,8 @@ export function ProductRuntimeConfiguration({getToken, onCommand, onDirtyChange,
           <fieldset><legend>允许的工具范围</legend>{data.available_tools.map(name => <label key={name}>
             <input type="checkbox" checked={values.tool_scope.includes(name)} onChange={event => edit({...values,
               tool_scope: event.currentTarget.checked ? [...values.tool_scope, name].sort() : values.tool_scope.filter(item => item !== name)})}/>{name}</label>)}</fieldset>
+          <label>工作资料读取范围<select value={values.workspace_read_mode} onChange={event=>edit({...values,workspace_read_mode:event.target.value as Values["workspace_read_mode"],workspace_projections:[]})}><option value="SOURCE_EXCERPTS">当前授权原文片段</option><option value="WORKSPACE_PROJECTIONS">限定工作页面资料</option></select></label>
+          {values.workspace_read_mode==="WORKSPACE_PROJECTIONS"&&<fieldset><legend>允许读取的工作页面资料</legend>{data.available_workspace_projections.map(name=><label key={name}><input type="checkbox" checked={values.workspace_projections.includes(name)} onChange={event=>edit({...values,workspace_projections:event.target.checked?[...values.workspace_projections,name].sort():values.workspace_projections.filter(item=>item!==name)})}/>{name}</label>)}</fieldset>}
           <p>工具启用不授予老板业务权限。交办和发送继续核查本人的当前授权。配置启用需要等待进行中的任务结束。</p>
           <div className="boss-actions">
             <button className="boss-btn" type="submit" disabled={!dirty}>保存配置草稿</button>
@@ -96,5 +101,11 @@ export function ProductRuntimeConfiguration({getToken, onCommand, onDirtyChange,
         setError(""); void read().catch((reason: unknown) => setError(String(reason)));
       }}>重新读取运行配置</button>
     </>}
-  </section>;
+  </section>
+    <V7Panel title="配置与运行采用"><V7Steps steps={[
+      {title:"配置草稿",description:data?.draft?"v"+data.draft.version:dirty?"存在未保存编辑":"尚无草稿",state:data?.draft?"complete":dirty?"current":"waiting"},
+      {title:"静态校验",description:data?.draft?.validation_status??"尚未校验",state:data?.draft?.validation_status==="VALIDATED_STATIC_ONLY"?"complete":"waiting"},
+      {title:"下一任务配置",description:data?.admission_ready?"可以接收新任务":"等待启用并核查采用条件",state:data?.admission_ready?"complete":"waiting"},
+    ]}/><V7Fact label="原生配置摘要">{data?.native_config_sha256??"尚未读取"}</V7Fact><V7Fact label="Runtime 采用摘要">{data?.effective.config_sha256??"尚未读取"}</V7Fact><V7Fact label="当前资料范围">{data?.workspace_access.allowed_projections.join("、")||"仅原文片段"}</V7Fact></V7Panel>
+  </>;
 }

@@ -13,6 +13,7 @@ from boss_simulation_api import SimulationAPI, _context
 from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 from boss_business_alerts import BusinessAlertsAPI
+from boss_v7_metrics import apply_configurations, display_rounding
 
 
 SCHEMA = json.loads((Path(__file__).resolve().parents[1] / "specs/business-overview.schema.json").read_text())
@@ -121,13 +122,16 @@ class BusinessOverviewAPI:
         selected = _period_rows(data, metric_scope, scope["period_start"], scope["period_end"]) if finance["status"] == "VALID" else []
         missing_regions = sorted(set(metric_scope["region_ids"]) - {row["region_id"] for row in selected})
         values, missing = _aggregate(selected, metric_scope)
+        values, metric_configurations = apply_configurations(db, ns, selected, values)
         if finance["status"] != "VALID":
             missing.append("FINANCE_SOURCE_" + finance["status"])
         elif not selected:
             missing.append("NO_EXTERNAL_SALES_ROWS_FOR_SELECTED_SCOPE")
         as_of = datetime.combine(date.fromisoformat(scope["period_end"]), time(23, 59, 59), ZoneInfo(scope["timezone"])).isoformat()
         metrics = [{"metric_id": key, "value": str(value) if value is not None else None, "unit": unit, "formula": formula,
-            "definition_version": "1", "precision": "DECIMAL_UNROUNDED", "business_as_of": as_of, "source_refs": [{"source_id": "finance-note", "version": finance["version"]}] if selected else []}
+            "definition_version": "1", "precision": display_rounding(metric_configurations[key]) if key in metric_configurations else "DECIMAL_UNROUNDED",
+            **({"metric_configuration": {field: item for field, item in metric_configurations[key].items() if field not in {"calculated_at", "next_refresh_at"}}} if key in metric_configurations else {}),
+            "business_as_of": as_of, "source_refs": [{"source_id": "finance-note", "version": finance["version"]}] if selected else []}
             for key, (value, unit, formula) in values.items()]
         raw = {(row["entity_type"], row["object_id"]): row["data"]["data"] for row in records}
         def entities(kind, body):

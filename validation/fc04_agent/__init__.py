@@ -6,6 +6,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, require
+from boss_execution_scope import NAMESPACE
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from boss_workspace_api import BossWorkspaceAPI
 from runtime_sop_read_tools import BossWorkspaceReadTool
@@ -58,7 +59,7 @@ class Fc04ReadTool(Tool):
         context = self.context_provider()
         require(isinstance(context, Fc04Context) and context.role == "BOSS" and context.active is True,
                 "提醒本人认证请求无效", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and context.request_id and context.session_id,
+        require(context.namespace == NAMESPACE and context.request_id and context.session_id,
                 "提醒当前执行空间无效", web.HTTPForbidden)
         request = current_request_context()
         if runtime and request is not None:

@@ -1,5 +1,13 @@
 # MENU-F01 今日工作
 
+### 2026-10-25 本机最新代码启动
+
+本次范围为用户要求从 GitHub 获取最新代码并启动项目。任务归属 MENU-F01，采用 main 提交 `9d6076b76aab1285c3398e0cb5a726ea242cdd58`；目标为打开当前源码对应的桌面登录窗口。允许范围为本机依赖、项目忽略目录中的前端构建与独立账号资料，以及本记录。页面入口 F01，完整需求、设计与用户验收状态继续采用唯一正式状态。
+
+正式入口 `scripts/prepare_boss_webui.py --build` 的 TypeScript 与 Vite 构建通过。启动前 `scripts/verify_f01_candidate.py --require-head` 核验当前提交与450个制品文件通过，index SHA256 为 `913e270882b6a8788283a42c7614c3e385540976e0eee6f355a9f07c576c9631`。前端目录为 `.work/product/nanobot/nanobot/web/dist`。
+
+启动入口为 `scripts/run_f01_manual_review.command`，设置 `BOSS_F01_REVIEW_WORK_DIR` 指向当前工程内 `validation/.work/menu-f01-v7-review-20261025-latest`，采用独立端口11321、11322、21321。新账号通过正式 `scripts/provision_boss_accounts.py` 创建于该目录的 accounts 子目录，密码仅保存在本机受保护文件。Electron 45.0.0 x64 生命周期记录确认业务服务启动及 `window_loaded`，HTTP 页面返回200。记录位于 `validation/.work/desktop-menu-f01-v7-review-20261025-latest/diagnostics/desktop-lifecycle.jsonl`。登录由用户操作，外部采用 SIMULATED_FIRST，完整菜单、v7设计和用户验收状态保持待确认。
+
 ### 2026-10-25 F01 第六批：排序原编号和原生晨间绑定的异常恢复
 
 用户最新指令“继续推进开发”，继续 `MENU-F01` 且重新完整阅读 `docs/开发接手与执行规范.md`、活动工单与正式状态。起点 `main=504461a905f036883410f4c44e75b6a0e6dcf6b9`，本批仅处理 F01 本人排序、原生晨间会话的原编号读取与恢复，不开发下个菜单，不动任何原有用户 GUI、账号文件、业务 SQLite 或本地端口。当前的 v7 ZIP 仍无获准 HTML/CSS/JS 字节可读，不能作成对设计验收。

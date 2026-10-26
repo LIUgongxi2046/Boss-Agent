@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { AlertCircle, FileSearch, Loader2, Square } from "lucide-react";
+import {V7Empty,V7Panel,V7Tabs} from "./BossV7UI";
 
 type Usage = {
   prompt_tokens?: number | null; completion_tokens?: number | null; total_tokens?: number | null;
@@ -40,7 +41,7 @@ type Projection = {
   runs: RuntimeRecord[]; matched_count: number; limit: number; next_cursor: Cursor | null;
   private_body_available_here: false; business_mutation_performed: false;
 };
-type Props = {getToken: () => string; onOpenTask?: (taskId: string, runId: string) => void; initialRunId?: string};
+type Props = {getToken: () => string; identityKey:string; pageId?:"A15"|"F30"; onOpenTask?: (taskId: string, runId: string) => void; initialRunId?: string};
 type TaskReference = {
   projection: "runtime-task-reference"; source_type: "RUNTIME_RECORD"; task_source_type: "SIMULATED";
   namespace: string; run_id: string; dataset_id: string; dataset_version: string;
@@ -50,7 +51,7 @@ type TaskReference = {
 type Filters = {provider: string; run_id: string; dataset_id: string; status: string;
   stop_reason: string; started_from: string; started_until: string; limit: string};
 const INITIAL: Filters = {provider: "", run_id: "", dataset_id: "", status: "", stop_reason: "",
-  started_from: "", started_until: "", limit: "50"};
+  started_from: "", started_until: "", limit: "10"};
 const STATUSES = ["QUEUED", "RUNNING", "WAITING_INPUT", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"];
 const value = (item: ReactNode) => item === null || item === undefined || item === "" ? "未知" : item;
 function Detail({label, children}: {label: string; children?: ReactNode}) {
@@ -66,7 +67,9 @@ function UsageFields({usage}: {usage?: Usage | null}) {
   </>;
 }
 
-export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: Props) {
+export function MaintainerRuntimeRecords({getToken, identityKey,pageId="A15",onOpenTask, initialRunId}: Props) {
+  const formId=useId();
+  const [tab,setTab]=useState<"model"|"tools"|"business"|"configuration">("model");
   const [filters, setFilters] = useState<Filters>({...INITIAL, run_id: initialRunId ?? ""});
   const [data, setData] = useState<Projection | null>(null);
   const [selected, setSelected] = useState<RuntimeRecord | null>(null);
@@ -79,9 +82,10 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
   const applied = useRef<URLSearchParams | null>(null);
   useEffect(() => {
     setData(null); setSelected(null); setTask(null); setDetails(false); setError(""); setNotice(""); setLoading(false);
+    setFilters({...INITIAL,run_id:initialRunId??""});setTab("model");
     applied.current = null;
     return () => active.current?.abort();
-  }, [getToken]);
+  }, [getToken,identityKey,initialRunId]);
 
   function read(parameters: URLSearchParams, append = false, detail = false) {
     active.current?.abort();
@@ -101,6 +105,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
       return result;
     }).then(result => {
       if (abort.signal.aborted) return;
+      if (append&&data&&result.namespace!==data.namespace) throw Error("当前执行空间已经变化，请重新查询运行记录");
       if (detail) {
         if (result.runs.length !== 1 || result.runs[0].run_id !== parameters.get("run_id"))
           throw Error("运行记录编号与详情响应不一致");
@@ -146,7 +151,7 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
     const parameters = new URLSearchParams();
     for (const [key, input] of Object.entries(filters)) {
       if (!input.trim()) continue;
-      parameters.set(key, key.startsWith("started_") ? new Date(input).toISOString() : input.trim());
+      parameters.set(key, key.startsWith("started_") ? new Date(input+"+08:00").toISOString() : input.trim());
     }
     if (parameters.has("started_from") && parameters.has("started_until") &&
       parameters.get("started_from")! > parameters.get("started_until")!) {
@@ -164,11 +169,10 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
     active.current?.abort(); setLoading(false); setNotice("已取消本次读取，业务任务继续保持原有状态");
   }
   const taskIds = [...new Set([...(selected?.tool_results.flatMap(result => result.task_id ? [result.task_id] : []) ?? []),...(selected?.owner_task_links?.map(link=>link.task_id) ?? [])])];
-  return <>
-    <section className="boss-panel" aria-label="运行记录查询">
-      <div className="boss-panel-head"><h2>运行记录</h2><small>RUNTIME_RECORD · 获准技术元信息</small></div>
-      <form onSubmit={query}>
-        <div className="boss-form-grid">
+  const show=(section:typeof tab)=>pageId!=="F30"||tab===section;
+  const inspect=()=>{if(selected)read(new URLSearchParams({run_id:selected.run_id}),false,true);};
+  return <div className="boss-maintainer-records boss-runtime-records">
+      <form id={formId} onSubmit={query} className="boss-v7-filter-bar boss-maintainer-filters" aria-label="运行记录查询">
           {([ ["provider", "Provider"], ["run_id", "run_id"], ["dataset_id", "数据集"],
             ["stop_reason", "错误类型或终止原因"] ] as const).map(([key, label]) =>
             <label key={key}>{label}<input value={filters[key]} maxLength={128}
@@ -177,28 +181,24 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
             <option value="">全部状态</option>{STATUSES.map(status => <option key={status}>{status}</option>)}
           </select></label>
           <label>每页数量<select value={filters.limit} onChange={event => setFilters(previous => ({...previous, limit: event.target.value}))}>
-            {[1, 20, 50, 100].map(limit => <option key={limit}>{limit}</option>)}
+            {[10, 20, 50, 100].map(limit => <option key={limit}>{limit}</option>)}
           </select></label>
-          <label>真实开始时间从<input type="datetime-local" step="0.001" value={filters.started_from}
+          <label>开始时间从（Asia/Shanghai）<input type="datetime-local" step="0.001" value={filters.started_from}
             onChange={event => setFilters(previous => ({...previous, started_from: event.target.value}))}/></label>
-          <label>真实开始时间至<input type="datetime-local" step="0.001" value={filters.started_until}
+          <label>开始时间至（Asia/Shanghai）<input type="datetime-local" step="0.001" value={filters.started_until}
             onChange={event => setFilters(previous => ({...previous, started_until: event.target.value}))}/></label>
-        </div>
-        <div className="boss-actions">
-          <button className="boss-btn boss-btn-primary" type="submit" disabled={loading}><FileSearch size={16}/>查询记录</button>
-          <button className="boss-btn" type="button" disabled={!loading} onClick={cancel}><Square size={16}/>取消读取</button>
-        </div>
+          <button className="boss-btn boss-btn-primary" type="submit" disabled={loading}><FileSearch size={16}/>查询 / 应用</button>
       </form>
-    </section>
     {loading && <div role="status" className="boss-status"><Loader2 size={16} className="boss-spin"/>正在读取运行记录</div>}
     {error && <div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
     {notice && <div role="status" className="boss-status">{notice}</div>}
-    <div className="boss-columns">
+    <div className="boss-maintainer-columns"><div className="boss-column">
+      <V7Panel title="执行概览"><div className="boss-runtime-summary"><Detail label="模型请求">{selected?.model_requests.length}</Detail><Detail label="工具结果">{selected?.tool_results.length}</Detail><Detail label="配置版本">{selected?.configuration_version}</Detail><Detail label="业务结果">{selected?"按关联对象核查":"尚未选择运行"}</Detail><Detail label="终止原因">{selected?.stop_reason}</Detail><Detail label="授权状态">{selected?"按原动作授权记录核查":"尚未选择运行"}</Detail></div></V7Panel>
       <section className="boss-panel" aria-label="运行记录列表">
         <div className="boss-panel-head"><h2>已记录的运行</h2><small>{data ? `已读取 ${data.runs.length} / 匹配 ${data.matched_count}` : "记录待查询"}</small></div>
         {data && <><Detail label="当前执行空间">{data.namespace}</Detail><Detail label="实际读取时间">{data.read_at}</Detail></>}
-        {data?.runs.length === 0 && <p role="status">没有符合当前条件的运行记录</p>}
-        {!!data?.runs.length && <div className="boss-table-scroll"><table className="boss-table">
+        {!data?.runs.length && <V7Empty title={data?"没有符合当前条件的运行记录":"运行记录待查询"}/>}
+        {!!data?.runs.length && <div className="boss-v7-table-scroll"><table className="boss-v7-table">
           <thead><tr><th scope="col">运行编号 / 真实时间</th><th scope="col">Provider / 配置版本</th>
             <th scope="col">请求 / 工具返回</th><th scope="col">运行状态 / 终止原因</th><th scope="col">操作</th></tr></thead>
           <tbody>{data.runs.map(record => <tr key={record.run_id} aria-selected={record.run_id === selected?.run_id}>
@@ -210,10 +210,11 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
         </table></div>}
         {data?.next_cursor && <button type="button" className="boss-btn" disabled={loading} onClick={more}>读取更多记录</button>}
       </section>
-      <aside className="boss-column" aria-label="运行记录详情">
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>获准记录详情</h2><small>私人正文、凭据和内部推理不在读取范围</small></div>
-          {!selected ? <p>选择已有运行记录查看详情</p> : <>
+          <div className="boss-panel-head"><h2>运行步骤与工具结果</h2><small>获准技术记录</small></div>
+          {pageId==="F30"&&<V7Tabs label="运行详情分类" value={tab} onChange={setTab} items={[{id:"model",title:"模型请求"},{id:"tools",title:"工具输入结果"},{id:"business",title:"授权与业务状态"},{id:"configuration",title:"配置版本"}]}/>}
+          {!selected ? <V7Empty title="尚未选择实际运行记录">选择已读取记录查看请求、工具结果及终止原因。</V7Empty> : <>
+            <details className="boss-runtime-metadata"><summary>运行标识与时间</summary>
             <Detail label="run_id">{selected.run_id}</Detail><Detail label="request_id">{selected.request_id}</Detail>
             <Detail label="请求编号来源">{selected.request_id_source}</Detail><Detail label="session_id">{selected.session_id}</Detail>
             <Detail label="数据集及版本">{selected.dataset_id ? `${selected.dataset_id} · v${value(selected.dataset_version)}` : null}</Detail>
@@ -223,35 +224,42 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
             <Detail label="终止来源">{selected.termination_source}</Detail>
             <Detail label="模型完成已观察">{selected.model_completion_observed ? "已经观察" : "尚未观察"}</Detail>
             <Detail label="业务完成">未通过本投影判定</Detail>
+            </details>
+            {show("configuration")&&<>
+            <h3>本次采用配置</h3>
             <Detail label="配置编号及版本">{selected.configuration_id} · v{selected.configuration_version}</Detail>
             <Detail label="Provider / 模型">{selected.runtime.provider} / {selected.runtime.model_id}</Detail>
             <Detail label="实际工具轮数限制">{selected.runtime.max_tool_rounds}</Detail>
             {selected.prompt_versions.map(prompt => <Detail key={prompt.prompt_id} label={prompt.kind}>
               {prompt.prompt_id} · 内容v{prompt.prompt_version} · 启用v{prompt.active_version}</Detail>)}
+            <Detail label="配置摘要">{selected.runtime.config_sha256}</Detail><Detail label="全部工具配置摘要">{selected.tool_config_sha256}</Detail>
+            {selected.tool_configuration.map(tool=><div key={tool.tool_id} className="boss-workspace-item"><Detail label="工具编号及实现">{tool.tool_id} · {tool.implementation}</Detail><Detail label="Schema 摘要">{tool.schema_sha256}</Detail><Detail label="实现源码摘要">{tool.implementation_sha256}</Detail></div>)}
+            </>}
             <div className="boss-actions"><button type="button" className="boss-btn" disabled={loading}
-              onClick={() => read(new URLSearchParams({run_id: selected.run_id}), false, true)}>核查明细</button></div>
-            <h3>业务结果关联</h3>
-            {!selected.tool_results.length && <p>本次运行没有已观察的工具返回或关联任务</p>}
+              onClick={inspect}>{details?"重新核查明细":"核查明细"}</button></div>
+            {show("tools")&&<><h3>工具返回与结果对象</h3>
+            <p className="boss-v7-note">当前投影提供工具调用编号与结果元信息，工具输入正文需要独立访问授权。</p>
+            {!selected.tool_results.length && <p>本次运行没有已观察的工具返回</p>}
             {selected.tool_results.map(result => <div key={result.tool_call_id} className="boss-workspace-item">
               <Detail label="工具及调用编号">{result.tool_id} · {result.tool_call_id}</Detail>
               <Detail label="结果对象">{result.query_id ?? result.task_id ?? result.message_id}</Detail>
               <Detail label="业务状态及版本">{value(result.task_status ?? result.status)} · {value(result.task_version ?? result.version)}</Detail>
             </div>)}
+            </>}
+            {show("business")&&<><h3>授权与业务状态</h3><p>运行状态与业务完成分别核查。当前投影没有提供完整授权判定，关联任务入口读取正式任务状态。</p>
+            {selected.owner_task_links?.map(link=><div key={link.task_id+link.request_id} className="boss-workspace-item"><Detail label="任务与版本">{link.task_id} · v{link.task_version}</Detail><Detail label="动作与请求">{link.action} · {link.request_id}</Detail><Detail label="准备记录摘要">{link.preparation_sha256}</Detail></div>)}
             {taskIds.map(taskId => <button key={taskId} type="button" className="boss-btn" disabled={loading}
               onClick={() => openTask(taskId, selected)}>查看关联任务 {taskId}</button>)}
             {!taskIds.length && <button type="button" className="boss-btn" disabled>查看关联任务（没有关联任务）</button>}
-            {details && <>
-              <h3>实际请求与工具配置</h3><Detail label="配置摘要">{selected.runtime.config_sha256}</Detail>
-              <Detail label="全部工具配置摘要">{selected.tool_config_sha256}</Detail>
+            </>}
+            {show("model")&&<>
+              <h3>已记录模型请求</h3><p>记录来源：{selected.source_type??"原记录未提供来源类型"}；请求覆盖：{selected.model_attempts_coverage??"未知"}。</p>
+              {!selected.model_requests.length&&<V7Empty title="本次运行没有已记录的 HTTP 模型请求"/>}
               {selected.model_requests.map(request => <div key={request.model_request_id} className="boss-workspace-item">
                 <Detail label="模型请求编号">{request.model_request_id}</Detail><Detail label="HTTP 状态">{request.http_status}</Detail>
                 <Detail label="服务响应编号">{request.response_ids.join("、")}</Detail><Detail label="模型结束原因">{request.finish_reasons.join("、")}</Detail>
                 <Detail label="请求摘要">{request.request_sha256}</Detail><Detail label="实际传输工具摘要">{request.tool_config_sha256}</Detail>
                 <UsageFields usage={request.usage}/>
-              </div>)}
-              {selected.tool_configuration.map(tool => <div key={tool.tool_id} className="boss-workspace-item">
-                <Detail label="工具编号及实现">{tool.tool_id} · {tool.implementation}</Detail>
-                <Detail label="Schema 摘要">{tool.schema_sha256}</Detail><Detail label="实现源码摘要">{tool.implementation_sha256}</Detail>
               </div>)}
             </>}
           </>}
@@ -264,16 +272,12 @@ export function MaintainerRuntimeRecords({getToken, onOpenTask, initialRunId}: P
           <Detail label="数据集及版本">{task.dataset_id} · v{task.dataset_version}</Detail>
           <Detail label="读取时间">{task.read_at}</Detail>
         </section>}
-        {selected && <section className="boss-panel" aria-label="费用与覆盖范围">
-          <div className="boss-panel-head"><h2>用量与费用</h2><small>缺少用量保持未知</small></div>
-          <UsageFields usage={selected.usage}/>
-          <Detail label="语音用量">未知</Detail><Detail label="检索用量">未知</Detail>
-          <Detail label="计价日期或版本">{selected.price_version}</Detail><Detail label="币种">未知</Detail>
-          <Detail label="费用覆盖范围">{selected.usage_coverage}</Detail>
-          <Detail label="请求覆盖范围">{selected.model_attempts_coverage}</Detail>
-          <Detail label="已知费用小计">未知</Detail><Detail label="完整总额">{selected.cost_total === null ? "null（未核算）" : selected.cost_total}</Detail>
-        </section>}
+        <V7Panel title="用量与分项计费" description="未知用量及缺少计价依据分别显示"><div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>资源类型</th><th>用量</th><th>缓存</th><th>计价日期或版本</th><th>费用</th></tr></thead><tbody>{selected&&<><tr><td>模型 Token<small>本次已记录请求合计</small></td><td>输入 {value(selected.usage?.prompt_tokens)}<br/>输出 {value(selected.usage?.completion_tokens)}<br/>总计 {value(selected.usage?.total_tokens)}</td><td>命中 {value(selected.usage?.prompt_cache_hit_tokens)}<br/>未命中 {value(selected.usage?.prompt_cache_miss_tokens)}</td><td>{value(selected.price_version)}</td><td>未知</td></tr>{selected.model_requests.map(request=><tr key={request.model_request_id}><td>请求 {request.model_request_id}<small>HTTP {value(request.http_status)}</small></td><td>输入 {value(request.usage?.prompt_tokens)}<br/>输出 {value(request.usage?.completion_tokens)}<br/>总计 {value(request.usage?.total_tokens)}</td><td>命中 {value(request.usage?.prompt_cache_hit_tokens)}<br/>未命中 {value(request.usage?.prompt_cache_miss_tokens)}</td><td>{value(selected.price_version)}</td><td>未知</td></tr>)}<tr><td>检索</td><td>未知</td><td>未知</td><td>未知</td><td>未知</td></tr><tr><td>语音</td><td>未知</td><td>未知</td><td>未知</td><td>未知</td></tr></>}</tbody></table></div>{!selected&&<V7Empty title="尚未选择可核算用量的运行"/>}{selected&&<><div className="boss-runtime-summary"><Detail label="费用覆盖范围">{selected.usage_coverage}</Detail><Detail label="已知费用小计">未知</Detail><Detail label="完整总额">{selected.cost_total===null?"null（未核算）":selected.cost_total}</Detail><Detail label="币种">未知</Detail></div><p className="boss-v7-note">请求行用于解释合计来源，不能与合计再次相加。缓存命中和未命中均属于输入 Token；缺少请求回执或价格时保持未知。</p></>}</V7Panel>
+      </div><aside className="boss-column" aria-label="运行依据与状态">
+        <V7Panel title="来源与依据"><Detail label="记录来源">{data?.source_type}</Detail><Detail label="当前执行空间">{data?.namespace}</Detail><Detail label="查询读取时间">{data?.read_at}</Detail><Detail label="数据集及版本">{selected?`${selected.dataset_id??"未知"} · v${selected.dataset_version??"未知"}`:null}</Detail><Detail label="Token 与缓存">{selected?.usage_coverage}</Detail><Detail label="语音与检索费用">未知</Detail><Detail label="计价日期或版本">{selected?.price_version}</Detail><Detail label="币种">未知</Detail><p>私人正文、凭据和内部推理不在当前读取范围。</p></V7Panel>
+        <V7Panel title="状态与核查"><Detail label="查询状态">{loading?"正在读取":error?"读取失败":data?"已读取获准记录":"记录待查询"}</Detail><Detail label="当前运行">{selected?.run_id}</Detail><Detail label="运行状态">{selected?.status}</Detail><Detail label="终止原因">{selected?.stop_reason}</Detail><Detail label="明细核查">{selected?details?"已重新读取当前记录":"使用列表读取版本":"尚未选择运行"}</Detail><Detail label="模型完成观察">{selected?selected.model_completion_observed?"已经观察":"尚未观察":null}</Detail><Detail label="业务状态">{task?.task_status??"需要核查关联对象"}</Detail><Detail label="模型行为评测">{selected?selected.model_behavior_evaluation_passed?"记录标记已通过":"尚未验证通过":null}</Detail></V7Panel>
       </aside>
     </div>
-  </>;
+    <footer className="boss-maintainer-actions"><span>{selected?.run_id??"请选择已读取运行"}</span><button className="boss-btn boss-btn-primary" type="submit" form={formId} disabled={loading}>查询记录</button><button className="boss-btn" type="button" disabled={!selected||loading} onClick={inspect}>核查明细与费用</button><button className="boss-btn" type="button" disabled={!loading} onClick={cancel}><Square size={16}/>取消读取</button></footer>
+  </div>;
 }

@@ -24,9 +24,9 @@ after(async()=>{if(browser)await browser.close();if(server)await new Promise(res
 
 test('完整角色目录逐项生成实际目的URL，直接读取与刷新保持页面、原生别名及权限',()=>{
   for(const role of ['BOSS','MAINTAINER'])for(const entry of navigation.navigationGroups(role).flatMap(group=>group.pages)){
-    const url=routes.menuPageUrl('http://127.0.0.1:10822/?overviewReturn=N03&bossConversationReturn=N02&bossTask=previous&bossSource=previous#/',entry.id,role);
+    const url=routes.menuPageUrl('http://127.0.0.1:10822/?overviewReturn=N03&bossConversationReturn=N02&bossTask=previous&bossSource=previous&bossOwnerRecord=previous-authorization&bossHistoryRecord=previous-notification&bossSimulationSection=reset&bossLibraryContext=previous&bossLibraryAction=prepare&libraryTab=meeting&libraryQuery=previous&libraryDate=2026-10-26&libraryState=READY&librarySelected=previous&taskTab=previous&taskCoordinator=previous&taskBefore=2026-10-26&taskState=ACTIVE&taskMeeting=previous&bossCommitment=previous&bossRun=previous&bossIssue=previous&bossRecoveryRequest=previous&bossRecoveryAction=previous#/',entry.id,role);
     assert.equal(routes.readBossLocation(url,role).page,entry.id);
-    for(const key of ['overviewReturn','bossConversationReturn','bossTask','bossSource'])assert.equal(url.searchParams.has(key),false);
+    for(const key of ['overviewReturn','bossConversationReturn','bossTask','bossSource','bossOwnerRecord','bossHistoryRecord','bossSimulationSection','bossLibraryContext','bossLibraryAction','libraryTab','libraryQuery','libraryDate','libraryState','librarySelected','taskTab','taskCoordinator','taskBefore','taskState','taskMeeting','bossCommitment','bossRun','bossIssue','bossRecoveryRequest','bossRecoveryAction'])assert.equal(url.searchParams.has(key),false);
     assert.equal(navigation.deliveredPage(routes.readBossLocation(new URL(url.href),role).page,role).title,entry.title);
   }
   assert.equal(routes.readBossLocation(new URL('http://127.0.0.1/?bossPage=NATIVE'),'BOSS').page,'N02');
@@ -37,11 +37,13 @@ test('完整角色目录逐项生成实际目的URL，直接读取与刷新保�
 });
 
 test('共享任务与来源读取原返回页面，普通菜单进入独立页面',()=>{
-  const shared=new URL('http://127.0.0.1/?bossPage=D01&bossReturn=F19&bossSource=finance-note&bossTask=retained');
+  const shared=new URL('http://127.0.0.1/?bossPage=D01&bossReturn=F19&bossSource=finance-note&bossTask=retained&bossSourceReferenceVersion=1');
   const actual=routes.readBossLocation(shared,'BOSS');
   assert.deepEqual(actual,{page:'D01',returnPage:'F19',sourceId:'finance-note',taskId:'retained',sopId:''});
   assert.equal(routes.readBossLocation(routes.menuPageUrl(shared.href,'F03','BOSS'),'BOSS').taskId,'');
   assert.equal(routes.menuPageUrl(shared.href,'F03','BOSS').searchParams.has('bossReturn'),false);
+  assert.equal(new URL(shared.href).searchParams.get('bossSourceReferenceVersion'),'1');
+  assert.equal(routes.menuPageUrl(shared.href,'F03','BOSS').searchParams.has('bossSourceReferenceVersion'),false);
 });
 
 test('实际Chromium History后退与前进不增加条目，刷新与F19变体保持目的页面',async()=>{
@@ -65,10 +67,15 @@ test('历史移动等待当前离开确认，取消保持来源及前进条目�
 test('实际React侧栏和目录按钮点击后采用同一页面读取与History函数',async()=>{
   const page=await browser.newPage();await page.goto(origin+'/?bossPage=F01');
   for(const role of ['BOSS','MAINTAINER']){
-    const expected=navigation.navigationGroups(role).flatMap(group=>group.pages);
     for(const directory of [false,true]){
+      const primary=navigation.primaryNavigation(role);
+      const expected=navigation.navigationGroups(role).filter(group=>directory||primary.some(item=>item.title===group.title)).flatMap(group=>group.pages);
       await page.evaluate(({role,directory})=>{window.unmountMenu?.();window.unmountMenu=MenuChecks.mountMenu(role,directory);},{role,directory});
       await page.waitForFunction(count=>document.querySelectorAll('button[data-menu-page]').length===count,expected.length);
+      if(!directory){
+        assert.deepEqual(await page.locator('button[data-menu-group]').evaluateAll(buttons=>buttons.map(button=>button.dataset.menuGroup)),role==='BOSS'?['F01','N02','N03','N04','N05','N06']:['A01','F25','A08','A15']);
+        for(const disclosure of await page.locator('button.boss-nav-disclosure').all())await disclosure.click();
+      }
       for(const entry of expected){
         const button=page.locator('button[data-menu-page="'+entry.id+'"]');assert.ok((await button.textContent()).includes(entry.title));await button.click();
         assert.equal(await page.evaluate(role=>MenuChecks.readBossLocation(new URL(location.href),role).page,role),entry.id);

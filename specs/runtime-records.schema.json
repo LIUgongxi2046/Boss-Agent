@@ -139,6 +139,11 @@
         "required_input_count": {"type": "integer", "minimum": 0},
         "task_entry": {"$ref": "#/$defs/ConversationTaskEntry"},
         "business_entry": {"$ref": "#/$defs/BusinessEntry"},
+        "source_selection": {"type": "object", "additionalProperties": false, "required": ["binding_id", "context_version", "source_refs", "source_pins", "native_session_created_at"], "properties": {
+          "binding_id": {"$ref": "#/$defs/Identifier"}, "context_version": {"type": "string", "pattern": "^[1-9][0-9]*$"}, "native_session_created_at": {"type": "string"},
+          "source_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source_id", "version"], "properties": {"source_id": {"$ref": "#/$defs/TaskEntryIdentifier"}, "version": {"$ref": "#/$defs/TaskEntryIdentifier"}}}},
+          "source_pins": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source_id", "version", "content_sha256"], "properties": {"source_id": {"$ref": "#/$defs/TaskEntryIdentifier"}, "version": {"$ref": "#/$defs/TaskEntryIdentifier"}, "content_sha256": {"$ref": "#/$defs/Sha256"}}}}
+        }},
         "attachment_refs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
           "required": ["attachment_id", "content_sha256", "processing_state"],
           "properties": {"attachment_id": {"$ref": "#/$defs/Identifier"},
@@ -156,6 +161,7 @@
       "type": "object", "additionalProperties": false,
       "required": ["date", "timezone", "snapshot_sha256", "order_version", "parameters_sha256", "client_request_id"],
       "properties": {
+        "source_selection": {"$ref": "#/$defs/ConversationContext/properties/source_selection"},
         "date": {"type": "string", "format": "date"}, "timezone": {"type": "string", "minLength": 1},
         "snapshot_sha256": {"$ref": "#/$defs/Sha256"}, "order_version": {"$ref": "#/$defs/Version"},
         "parameters_sha256": {"$ref": "#/$defs/Sha256"}, "client_request_id": {"type": ["string", "null"]},
@@ -217,6 +223,7 @@
         "request_id_source": {"enum": ["MESSAGE", "TURN", "SERVER_GENERATED"]}, "chat_id": {"type": ["string", "null"]}, "turn_id": {"type": ["string", "null"]},
         "namespace": {"$ref": "#/$defs/Identifier"}, "dataset_id": {"$ref": "#/$defs/Identifier"}, "dataset_version": {"$ref": "#/$defs/Version"},
         "configuration_version": {"$ref": "#/$defs/Version"}, "configuration_id": {"$ref": "#/$defs/Identifier"},
+        "model_connection": {"type": "object", "additionalProperties": false, "required": ["id", "version"], "properties": {"id": {"$ref": "#/$defs/Identifier"}, "version": {"$ref": "#/$defs/Version"}}},
         "runtime": {"$ref": "#/$defs/RuntimeSnapshot"}, "prompt_versions": {"type": "array", "items": {"$ref": "#/$defs/PromptVersion"}},
         "tool_config_sha256": {"$ref": "#/$defs/Sha256"}, "memory_reference": {"$ref": "#/$defs/MemoryReference"},
         "tool_configuration": {"type": "array", "items": {"$ref": "#/$defs/ToolConfiguration"}},
@@ -229,7 +236,7 @@
         "usage_coverage": {"enum": ["NOT_OBSERVED", "PARTIAL_OBSERVED_REQUESTS", "COMPLETE_OBSERVED_REQUESTS"]},
         "private_body_recorded": {"const": false}, "model_completion_observed": {"type": "boolean"}, "model_behavior_evaluation_passed": {"type": "boolean"},
         "model_attempts_coverage": {"const": "HTTP_REQUESTS_OBSERVED_ONLY"}, "termination_source": {"const": "CALLER_DEADLINE_EXPIRED"},
-        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"const":false},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03","FC04","FC07","N02"]},
+        "source_type":{"const":"SIMULATED"},"external_model_invoked":{"type":"boolean"},"external_delivery_verified":{"const":false},"feature_id":{"enum":["FC01","FC02","FC03","FC04","FC07","N02"]},
         "conversation_context":{"$ref":"#/$defs/ConversationContext"},
         "reminder_context":{"type":"object","additionalProperties":false,"required":["projection","projection_sha256"],"properties":{"projection":{"const":"notifications"},"projection_sha256":{"$ref":"#/$defs/Sha256"}}},
         "assignment_context":{"type":"object","additionalProperties":false,"required":["task_id","task_version","review_sha256"],"properties":{"task_id":{"$ref":"#/$defs/Identifier"},"task_version":{"$ref":"#/$defs/Version"},"review_sha256":{"$ref":"#/$defs/Sha256"}}},

@@ -9,6 +9,7 @@ from nanobot.agent.tools.context import current_request_context
 from nanobot.webui.session_identity import webui_session_key
 
 from business import checksum, require
+from boss_execution_scope import NAMESPACE
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from runtime_page_read_tools import _BossPageReadTool
 
@@ -49,7 +50,7 @@ class ConversationScope:
         context = self.context_provider(request)
         require(isinstance(context, ConversationContext) and context.role == "BOSS" and context.active is True,
                 "会话缺少当前本人认证", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and request.channel == "websocket" and bool(context.request_id)
+        require(context.namespace == NAMESPACE and request.channel == "websocket" and bool(context.request_id)
                 and bool(context.turn_id) and context.session_id == webui_session_key(context.chat_id)
                 and context.owner_id == request.sender_id
                 and context.session_id == request.session_key and context.chat_id == request.chat_id

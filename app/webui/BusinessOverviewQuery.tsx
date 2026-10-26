@@ -4,7 +4,7 @@ import {BossBIView} from "./BossBIView";
 import {savedOverviewScope} from "./BossBusinessOverview";
 import type {Overview} from "./business-overview-types";
 
-export function BusinessOverviewQuery({getToken,onSource,onReturn,onDirtyChange}:{getToken:()=>string;onSource:(id:string)=>void;onReturn:()=>void;onDirtyChange:(dirty:boolean)=>void}){
+export function BusinessOverviewQuery({getToken,onSource,onReturn,onDirtyChange,refreshVersion=0}:{getToken:()=>string;onSource:(id:string)=>void;onReturn:()=>void;onDirtyChange:(dirty:boolean)=>void;refreshVersion?:number}){
   const {client,token}=useClient();
   const [view,setView]=useState<Overview|null>(null),[error,setError]=useState("");
   useEffect(()=>{
@@ -19,5 +19,5 @@ export function BusinessOverviewQuery({getToken,onSource,onReturn,onDirtyChange}
     }).catch(reason=>{if(active)setError(reason instanceof Error?reason.message:String(reason));});
     return()=>{active=false;};
   },[client,token]);
-  return <div><section className="boss-panel" aria-label="经营关注查询来源"><h2>经营关注查询范围</h2><p>当前查询继承经营关注已经应用的法人、区域、期间与正式指标来源。表单中的补充条件只影响本次查询。</p><p>本次指标资料覆盖水产饲料外销，专业专题的资料缺口继续保留。</p><button className="boss-btn" onClick={onReturn}>返回经营关注</button>{error&&<p role="alert">{error}</p>}{!view&&!error&&<p role="status">正在重新核查经营范围与资料版本。</p>}</section>{view?.query_handoff&&<BossBIView getToken={getToken} onSource={onSource} initialScope={view.query_handoff} onDirtyChange={onDirtyChange}/>}</div>;
+  return <div><section className="boss-panel" aria-label="经营关注查询来源"><h2>经营关注查询范围</h2><p>当前查询继承经营关注已经应用的法人、区域、期间与正式指标来源。表单中的补充条件只影响本次查询。</p><p>本次指标资料覆盖水产饲料外销，专业专题的资料缺口继续保留。</p><button className="boss-btn" onClick={onReturn}>返回经营关注</button>{error&&<p role="alert">{error}</p>}{!view&&!error&&<p role="status">正在重新核查经营范围与资料版本。</p>}</section>{view?.query_handoff&&<BossBIView getToken={getToken} onSource={onSource} initialScope={view.query_handoff} onDirtyChange={onDirtyChange} refreshVersion={refreshVersion}/>}</div>;
 }

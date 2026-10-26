@@ -3,6 +3,8 @@ import { ArrowRight, ClipboardCheck, Clock3, FileSearch,
   Filter, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
 import type { AssignmentTask, TaskFeedback, TaskListResponse } from "./BossAssignmentFlow";
 import { BossPersonalCommitments, type SelfCommitment } from "./BossPersonalCommitments";
+import {V7Panel, V7Tabs, V7Empty} from "./BossV7UI";
+import {replaceBossHistory} from "./boss-history";
 type CenterTask = AssignmentTask & { related_meeting_id?: string };
 
 type Historical = {task_id:string;status:string;due_at?:string;purpose?:string};
@@ -15,17 +17,18 @@ type Response = TaskListResponse & {
   self_due_events?:{commitment_id:string;event_id:string;event_state:string;due_at:string}[];
   self_commitment_revisions?:SelfCommitment[];
 };
-type Tab = "本人承诺"|"他人交办"|"等待反馈"|"待核查结果";
+type Tab = "全部任务"|"本人承诺"|"他人交办"|"等待反馈"|"待核查结果";
 type Props = {
   data:Response|null;
   selectedTaskId:string;
   onSelectTask:(id:string)=>void;
   onOpenTask:(id:string)=>void;
+  onCreateTask:()=>void;
   onNavigate:(page:string)=>void;
   onReload:()=>void;
   onDirtyChange:(value:boolean)=>void;
 };
-const TABS:Tab[]=["本人承诺","他人交办","等待反馈","待核查结果"];
+const TABS:Tab[]=["全部任务","本人承诺","他人交办","等待反馈","待核查结果"];
 function labelTime(value?:string){return value?value.replace("T"," "):"未提供";}
 function Display({name,value}:{name:string;value?:string|number|null}){
   return <div className="boss-kv"><span>{name}</span><strong>{value??"未提供"}</strong></div>;
@@ -41,13 +44,13 @@ function dueStatus(task:AssignmentTask,clock?:string){
   if(!Number.isFinite(due)||!Number.isFinite(at))return "期限不可解析";
   return due<at?"已超模拟业务时钟":"当前期限未超过模拟业务时钟";
 }
-export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNavigate,onReload,onDirtyChange}:Props){
-  const [tab,setTab]=useState<Tab>(()=>{const value=new URLSearchParams(window.location.search).get("taskTab");return TABS.includes(value as Tab)?value as Tab:"他人交办";});
-  const [coordinator,setCoordinator]=useState("");
-  const [before,setBefore]=useState("");
-  const [status,setStatus]=useState("");
-  const [meeting,setMeeting]=useState("");
-  const [applied,setApplied]=useState({coordinator:"",before:"",status:"",meeting:""});
+export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCreateTask,onNavigate,onReload,onDirtyChange}:Props){
+  const [tab,setTab]=useState<Tab>(()=>{const value=new URLSearchParams(window.location.search).get("taskTab");return TABS.includes(value as Tab)?value as Tab:"全部任务";});
+  const [coordinator,setCoordinator]=useState(()=>new URLSearchParams(window.location.search).get("taskCoordinator")??"");
+  const [before,setBefore]=useState(()=>new URLSearchParams(window.location.search).get("taskBefore")??"");
+  const [status,setStatus]=useState(()=>new URLSearchParams(window.location.search).get("taskState")??"");
+  const [meeting,setMeeting]=useState(()=>new URLSearchParams(window.location.search).get("taskMeeting")??"");
+  const [applied,setApplied]=useState({coordinator,before,status,meeting});
   const [page,setPage]=useState(0);
   const tasks=(data?.tasks||[]) as CenterTask[];
   const feedback=data?.feedback||[];
@@ -60,13 +63,13 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
   const stateNames=Array.from(new Set(tasks.map(x=>x.status).filter(Boolean)));
   const filtered=useMemo(()=>{
     if(tab==="本人承诺")return [];
-    let subset=tasks.filter(t=>tab==="他人交办"||
+    let subset=tasks.filter(t=>tab==="全部任务"||tab==="他人交办"||
       tab==="等待反馈"&&["WAITING_FEEDBACK","IN_PROGRESS"].includes(t.status)||
       tab==="待核查结果"&&t.status==="RESULT_SUBMITTED");
     if(applied.coordinator)subset=subset.filter(t=>t.coordinator_id===applied.coordinator);
     if(applied.status)subset=subset.filter(t=>t.status===applied.status);
     if(applied.meeting)subset=subset.filter(t=>t.related_meeting_id===applied.meeting);
-    if(applied.before)subset=subset.filter(t=>t.due_at&&t.due_at.slice(0,10)<=applied.before);
+    if(applied.before)subset=subset.filter(t=>t.due_at&&t.timezone&&new Intl.DateTimeFormat("en-CA",{timeZone:t.timezone,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(t.due_at))<=applied.before);
     return [...subset].sort((a,b)=>(a.due_at||"").localeCompare(b.due_at||"")||
       a.task_id.localeCompare(b.task_id));
   },[tasks,tab,applied]);
@@ -81,21 +84,17 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
   const extension=[...chosenFeedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST");
   const submitted=[...chosenFeedback].reverse().find(f=>f.kind==="RESULT_SUBMITTED");
 
-  function apply(){setApplied({coordinator,before,status,meeting});setPage(0);}
-  function changeTab(value:Tab){setTab(value);setPage(0);const url=new URL(window.location.href);url.searchParams.set("taskTab",value);window.history.replaceState(window.history.state,"",url);}
+  function apply(){setApplied({coordinator,before,status,meeting});setPage(0);const url=new URL(window.location.href);for(const [key,value] of Object.entries({taskCoordinator:coordinator,taskBefore:before,taskState:status,taskMeeting:meeting}))value?url.searchParams.set(key,value):url.searchParams.delete(key);replaceBossHistory(url);}
+  function changeTab(value:Tab){setTab(value);setPage(0);const url=new URL(window.location.href);url.searchParams.set("taskTab",value);replaceBossHistory(url);}
   return <div className="boss-task-center-view">
-    <section className="boss-panel boss-task-center">
-      <div className="boss-minutes-tabs" role="tablist" aria-label="任务与承诺分类">
-        {TABS.map(key=><button type="button" role="tab" key={key}
-          aria-selected={tab===key} className={tab===key?"selected":""}
-          onClick={()=>changeTab(key)}>
-          {key}
-          <span>{key==="本人承诺"?((data?.self_commitments?.length||0)+(data?.historical_commitment?1:0)):
+    <div className="boss-task-center-columns"><div className="boss-column"><section className="boss-panel boss-task-center">
+      <div className="boss-panel-head"><h2>任务与承诺</h2><small>当前范围与筛选</small></div>
+      <V7Tabs label="任务与承诺分类" value={tab} onChange={changeTab} items={TABS.map(key=>({id:key,title:key,count:!data?undefined:
+            key==="全部任务"?tasks.length+(data.self_commitments?.length||0):
+            key==="本人承诺"?((data.self_commitments?.length||0)+(data.historical_commitment?1:0)):
             key==="他人交办"?tasks.length:
             key==="等待反馈"?tasks.filter(t=>["WAITING_FEEDBACK","IN_PROGRESS"].includes(t.status)).length:
-            tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}</span>
-        </button>)}
-      </div>
+            tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}))}/>
       <div className="boss-task-filter-grid" style={tab==="本人承诺"?{display:"none"}:undefined}>
         <label>负责人
           <select value={coordinator} onChange={e=>setCoordinator(e.target.value)}>
@@ -124,12 +123,10 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
         </button>
       </div>
     </section>
-    <div hidden={tab!=="本人承诺"}><BossPersonalCommitments items={data?.self_commitments||[]} businessClock={data?.business_clock} onReload={onReload} onDirtyChange={onDirtyChange} dueEvents={data?.self_due_events} revisions={data?.self_commitment_revisions}/></div>
-    <div className="boss-columns" style={tab==="本人承诺"?{gridTemplateColumns:"minmax(0,1fr)"}:undefined}>
-      <div className="boss-column">
+    <details className="boss-task-self-records" open={tab==="本人承诺"?true:undefined} hidden={tab!=="本人承诺"&&tab!=="全部任务"}><summary>本人承诺 · {data?`${data.self_commitments?.length??0} 项当前记录`:"尚未读取"}</summary><BossPersonalCommitments items={data?.self_commitments||[]} businessClock={data?.business_clock} onReload={onReload} onDirtyChange={onDirtyChange} dueEvents={data?.self_due_events} revisions={data?.self_commitment_revisions}/></details>
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>对象与正式业务记录</h2>
-            <small>原版 v6 五列信息 · 数据来自当前有权 SQLite 对象</small></div>
+          <div className="boss-panel-head"><h2>任务列表与结果核查</h2>
+            <small>负责人、有效期限与当前结果</small></div>
           {tab==="本人承诺" ? <>
             {data?.historical_commitment?<div className="boss-workspace-item">
               <strong>{data.historical_commitment.task_id}</strong>
@@ -137,7 +134,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
               <Display name="历史原定期限" value={labelTime(data.historical_commitment.due_at)}/>
               <p>这是已批准的历史背景快照，不属于当前生成的任务，不允许在这里代办完成。</p>
             </div>:<div className="boss-empty"><FolderOpen size={19}/>
-              <div><strong>没有已核验的本人承诺</strong><p>没有来源时不把他人交办视为老板本人承诺。</p></div>
+              <div><strong>没有已读取的历史承诺快照</strong><p>当前本人承诺在上方独立查询与管理。</p></div>
             </div>}
           </>:<>
             <div className="boss-task-table-heading" aria-hidden="true">
@@ -158,10 +155,10 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
                 </span>
               </button>;
             }):<div className="boss-empty"><FolderOpen size={19}/>
-              <div><strong>当前查询条件没有记录</strong><p>可修改筛选条件或前往 F06 创建真实交办，不能把空结果当作零经营数据。</p></div>
+              <div><strong>{data?"当前查询条件没有记录":"任务列表尚未读取"}</strong><p>查询后显示当前任务、负责人和证据状态。</p></div>
             </div>}
             <footer className="boss-task-table-footer">
-              <span>结果数：{filtered.length} · 每页 10 条</span>
+              <span>结果数：{data?filtered.length:"尚未读取"} · 每页 10 条</span>
               <div className="boss-actions">
                 <button className="boss-btn" type="button" disabled={currentPage===0}
                   onClick={()=>setPage(n=>Math.max(0,n-1))}>上一页</button>
@@ -173,15 +170,15 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
           </>}
           <div className="boss-actions">
             <button type="button" className="boss-btn boss-btn-primary"
-              onClick={()=>onNavigate("F06")}><ClipboardCheck size={15}/> 创建交办</button>
+              onClick={onCreateTask}><ClipboardCheck size={15}/> 创建交办</button>
             <button type="button" className="boss-btn" onClick={onReload}><RefreshCw size={15}/> 重读最新状态</button>
             <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>返回今日</button>
           </div>
         </section>
       </div>
-      <div className="boss-column" style={tab==="本人承诺"?{display:"none"}:undefined}>
+      <aside className="boss-column">
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>选中任务</h2>
+          <div className="boss-panel-head"><h2>当前选中任务</h2>
             <small>只读预览 · 重大动作进入 F06 本人确认</small></div>
           {selected?<>
             <Display name="任务 ID" value={selected.task_id}/>
@@ -219,14 +216,22 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onNa
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>状态与核查</h2></div>
           <Display name="当前模拟业务时钟" value={data?.business_clock?labelTime(data.business_clock):"未提供"}/>
-          <Display name="实际交办对象" value={tasks.length}/>
-          <Display name="结果待本人核查" value={tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}/>
+          <Display name="实际交办对象" value={data?tasks.length:"尚未读取"}/>
+          <Display name="结果待本人核查" value={data?tasks.filter(t=>t.status==="RESULT_SUBMITTED").length:"尚未读取"}/>
           <Display name="真实送达状态" value="未验证"/>
           <div className="boss-status"><Clock3 size={15}/>
             任务完成、延期、取消和催办必须进入当前对象的 F06 授权步骤；不会在总览中自动确认全部完成。
           </div>
         </section>
-      </div>
+      </aside>
     </div>
+    <V7Panel title="结果提交与本人确认" description="提交结果后，继续核查证据与当前任务版本。">
+      {tasks.some(task=>feedback.some(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED"))?<div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>任务</th><th>最近提交</th><th>证据</th><th>本人确认</th><th>继续处理</th></tr></thead><tbody>
+        {tasks.filter(task=>feedback.some(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED")).map(task=>{
+          const result=[...feedback].reverse().find(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED")!;
+          return <tr key={task.task_id}><td>{task.purpose||task.task_id}</td><td>{result.author_contact_id}<small>{labelTime(result.submitted_at)}</small></td><td>{result.evidence_refs?.length??0} 条{task.result_evidence_requires_resubmission&&<small>需要重新提交</small>}</td><td>{task.status==="COMPLETED_CONFIRMED"?"已确认完成":task.status==="CANCELED"?"任务已取消":"等待本人核查"}</td><td><button className="boss-btn" onClick={()=>onOpenTask(task.task_id)}>核查当前结果</button></td></tr>;
+        })}
+      </tbody></table></div>:<V7Empty title="尚无已提交结果">收到负责人提交后，在此核查证据与本人确认状态。</V7Empty>}
+    </V7Panel>
   </div>;
 }

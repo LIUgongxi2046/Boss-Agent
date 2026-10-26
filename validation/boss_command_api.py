@@ -41,6 +41,8 @@ from boss_owner_preferences import (goals_save, goals_confirm, notice_save, noti
 from boss_owner_authorizations import revoke as owner_authorization_revoke
 from boss_meetings import MeetingAPI, meeting_materials
 from boss_source_access import require_current_business_source
+from boss_v7_owner import ACTIONS as OWNER_WORKSPACE_ACTIONS, OwnerWorkspaceAPI
+from boss_v7_technical import ACTIONS as TECHNICAL_WORKSPACE_ACTIONS, TechnicalWorkspaceAPI
 from boss_supply_quality import ACTION_INPUTS as SUPPLY_QUALITY_ACTIONS, SupplyQualityAPI
 from boss_bi_scenarios import BIScenarioAPI, LOAD_ACTION as BI_SCENARIO_LOAD
 from boss_morning_inputs import MorningInputAPI, LOAD_ACTION as MORNING_COVERAGE_LOAD
@@ -57,7 +59,9 @@ from boss_meeting_approval import (
     application_seed, application_revise, approval_decide,
 )
 
-NAMESPACE = "ui-check"
+from boss_execution_scope import NAMESPACE
+from boss_memory import current_memory
+from boss_v7_memory import delete_memory_records
 MAX_PURPOSE = 1600
 MAX_MESSAGE = 2400
 ERROR_CODE = {
@@ -103,6 +107,8 @@ def _data_envelope(data, request_id):
 
 class BossCommandAPI:
     ACTION_ROLES = {
+        **OWNER_WORKSPACE_ACTIONS,
+        **TECHNICAL_WORKSPACE_ACTIONS,
         **{action: 'BOSS' for action in BUSINESS_OVERVIEW_READ_ACTIONS},
         "boss.simulation.alert.load": "MAINTAINER",
         **{"boss.alert." + action: "BOSS" for action in ("ack", "snooze", "close", "meeting.link", "assignment.create")},
@@ -202,7 +208,20 @@ class BossCommandAPI:
         if not isinstance(payload, dict):
             return 400, {"error": "PAYLOAD_MUST_BE_OBJECT"}
         try:
-            if action in BUSINESS_OVERVIEW_READ_ACTIONS:
+            with self.store.connect() as db:
+                self.store.active(db, NAMESPACE)
+                from boss_execution_transition import pending_transition
+                require(pending_transition(db, NAMESPACE) is None, "执行空间正在切换，请查询原请求")
+            if role == "MAINTAINER" and action not in TECHNICAL_WORKSPACE_ACTIONS:
+                from boss_v7_configuration import authorize_technical, technical_scope
+                scope = technical_scope(action)
+                if scope is not None:
+                    authorize_technical(self.store, scope, "WRITE")
+            if action in TECHNICAL_WORKSPACE_ACTIONS:
+                result = TechnicalWorkspaceAPI(self.store, self.runtime_control).execute(self, role, action, payload)
+            elif action in OWNER_WORKSPACE_ACTIONS:
+                result = OwnerWorkspaceAPI(self.store).execute(self, role, action, payload)
+            elif action in BUSINESS_OVERVIEW_READ_ACTIONS:
                 result = read_business_overview(self.store, role, action, payload)
             elif action == "boss.simulation.alert.load":
                 from boss_alert_rules import BusinessAlertInputAPI
@@ -241,6 +260,13 @@ class BossCommandAPI:
                 result = TodayAPI(self.store).reorder(role, payload)
             else:
                 result = self._transaction(action, payload)
+            if self.runtime_control is not None and action in {
+                "boss.memory.confirm", "boss.memory.delete", "boss.authorization.revoke",
+                "boss.owner_workspace.personal-memory.confirm", "boss.owner_workspace.personal-memory.delete",
+                "boss.owner_workspace.personal-memory.reconcile",
+                "boss.owner_workspace.authorizations.revoke", "boss.simulation.clock.advance",
+            }:
+                self.runtime_control.reconcile_memory()
             return 200, result
         except web.HTTPException as exc:
             return exc.status, {"error": ERROR_CODE.get(exc.status, "BUSINESS_REJECTED"), "status": exc.status}
@@ -254,13 +280,13 @@ class BossCommandAPI:
     def _exact(payload, keys):
         require(set(payload) == set(keys), "输入字段缺失或越权字段", web.HTTPBadRequest)
 
-    def _check_existing(self, db, action, payload):
+    def _check_existing(self, db, action, payload, *, namespace=NAMESPACE):
         key = _client_key(payload.get("client_request_id"))
         content = {k: v for k, v in payload.items() if k != "client_request_id"}
         digest = checksum({"action": action, "content": content})
         row = db.execute(
             "SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?",
-            (NAMESPACE, action, key),
+            (namespace, action, key),
         ).fetchone()
         if row is not None:
             require(row[0] == digest, "同一幂等标识不得提交不同内容")
@@ -323,6 +349,11 @@ class BossCommandAPI:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             self.store.active(db, NAMESPACE)
+            if self.ACTION_ROLES[action] == "MAINTAINER":
+                from boss_v7_configuration import check_technical_access, technical_scope
+                scope = technical_scope(action)
+                if scope is not None:
+                    check_technical_access(db, scope, "WRITE")
             key, digest, prev = self._check_existing(db, action, payload)
             if prev is not None:
                 return prev
@@ -681,7 +712,9 @@ class BossCommandAPI:
         self._exact(payload, {"client_request_id", "expected_version", "text"})
         require(_is_text(payload["text"], 4000),
                 "个人要求须为 1—4000 字", web.HTTPBadRequest)
-        current = self.store.get(db, NAMESPACE, "memory", "current")
+        current = current_memory(db, NAMESPACE)
+        if current is None:
+            current = {"memory_id": "memory-" + str(uuid.uuid4()), "version": "0"}
         require(current["version"] == payload["expected_version"],
                 "记忆版本已变化，须重新读取后确认")
         fingerprint = checksum({"text": payload["text"]})
@@ -708,7 +741,8 @@ class BossCommandAPI:
 
     def _memory_delete(self, db, payload):
         self._exact(payload, {"client_request_id", "expected_version"})
-        current = self.store.get(db, NAMESPACE, "memory", "current")
+        current = current_memory(db, NAMESPACE)
+        require(current is not None, "当前没有可删除的个人要求", web.HTTPNotFound)
         require(current["version"] == payload["expected_version"],
                 "记忆版本已变化，须重新读取后确认")
         require(current["confirmation_state"] != "DELETED",
@@ -718,12 +752,7 @@ class BossCommandAPI:
             {"expected_version": current["version"]},
             current["memory_id"], current["version"],
         )
-        current.update(
-            text="", confirmation_state="DELETED",
-            version=str(int(current["version"]) + 1),
-        )
-        current["memory_version"] = current["version"]
-        self.store.put(db, NAMESPACE, "memory", "current", current)
+        current = delete_memory_records(self.store, db, current, auth_id)
         return {
             "source_type": "SIMULATED", "memory_id": current["memory_id"],
             "version": current["version"], "confirmation_state": "DELETED",

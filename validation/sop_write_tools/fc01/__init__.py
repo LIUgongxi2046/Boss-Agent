@@ -10,6 +10,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, encode, require
+from boss_execution_scope import NAMESPACE
 from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from boss_simulation_api import SimulationAPI, SCHEMA as QUERY_SCHEMA, _context
@@ -89,7 +90,7 @@ class Fc01Tool(Tool):
             return schema
         if self.name == "bossEvidenceRead":
             return BossEvidenceReadTool(BossPageAPI(self.store), "BOSS").parameters
-        return BusinessTool(self.name, self.store, {}, {}, []).parameters
+        return BusinessTool(self.name, self.store, {"execution_namespace": NAMESPACE}, {}, []).parameters
 
     def cast_params(self, params):
         return params
@@ -100,7 +101,7 @@ class Fc01Tool(Tool):
                 "当前本人认证请求无效", web.HTTPForbidden)
         require(isinstance(context.allowed_tools, frozenset) and self.name in context.allowed_tools
                 and context.allowed_tools <= TOOLS, "当前请求没有允许此工具", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and bool(context.request_id) and bool(context.session_id),
+        require(context.namespace == NAMESPACE and bool(context.request_id) and bool(context.session_id),
                 "当前执行范围不支持", web.HTTPConflict)
         request = current_request_context()
         if request is not None:

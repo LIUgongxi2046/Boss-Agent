@@ -9,6 +9,7 @@ from business import require
 from boss_conversation import ConversationAPI, owner_role, validate
 from boss_conversation_attachments import ConversationAttachments
 from boss_business_overview_entry import validate as validate_business_entry
+from boss_conversation_sources import ConversationSources, validate as validate_sources
 
 CONVERSATION_READ_ACTIONS = frozenset({
     "boss.conversation.read", "boss.conversation.artifact", "boss.conversation.messages", "boss.conversation.attachments",
@@ -19,6 +20,7 @@ CONVERSATION_TASK_ACTIONS = frozenset({
 CONVERSATION_BUSINESS_ACTIONS = frozenset({
     "boss.conversation.business.prepare", "boss.conversation.business.bind", "boss.conversation.business.read", "boss.conversation.business.receipt", "boss.conversation.business.clear",
 })
+CONVERSATION_SOURCE_ACTIONS = frozenset({"boss.conversation.sources.list", "boss.conversation.sources.bind", "boss.conversation.sources.receipt"})
 REQUESTS_SCHEMA=json.loads((Path(__file__).resolve().parents[1]/"specs/conversation-requests.schema.json").read_text())
 
 
@@ -34,7 +36,30 @@ class PublicConversation:
         self.attachments = ConversationAttachments(sessions, media_root)
         self.task_entry = self.api.task_entry(sessions)
         self.business_entry = self.api.business_entry(sessions)
+        self.source_selection = ConversationSources(store, sessions)
         self.sessions, self.workspaces = sessions, workspaces
+
+    def sources(self, role, action, payload, *, attached, active):
+        owner_role(role)
+        require(active(), "当前本人认证已经失效", web.HTTPUnauthorized)
+        require(action in CONVERSATION_SOURCE_ACTIONS, "会话资料动作无效", web.HTTPBadRequest)
+        operation, schema = {"boss.conversation.sources.list": (self.source_selection.listing, "ListInput"),
+            "boss.conversation.sources.bind": (self.source_selection.bind, "BindInput"),
+            "boss.conversation.sources.receipt": (self.source_selection.receipt, "ReceiptInput")}[action]
+        validate_sources(schema, payload)
+        chat_id = payload["chat_id"]
+        require(is_valid_webui_chat_id(chat_id) and attached(chat_id), "当前连接未订阅所选资料会话", web.HTTPForbidden)
+        if action == "boss.conversation.sources.bind":
+            session_id = webui_session_key(chat_id)
+            if self.sessions.read_session_snapshot(session_id) is None:
+                require(self.workspaces is not None, "原生工作空间服务尚未就绪", web.HTTPServiceUnavailable)
+                require(active() and attached(chat_id), "保存资料选择期间身份或会话已经变化", web.HTTPForbidden)
+                self.workspaces.persist_scope(chat_id, self.workspaces.scope_for_session_key(session_id))
+            result = operation(role, payload, active=lambda: active() and attached(chat_id))
+        else:
+            result = operation(role, payload)
+        require(active() and attached(chat_id), "处理资料选择期间身份或会话已经变化", web.HTTPForbidden)
+        return result
 
     def task(self, role, action, payload, *, attached, active):
         owner_role(role)

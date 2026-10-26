@@ -13,6 +13,7 @@ from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 from business import ROOT, checksum, now, require, validate
+from boss_execution_scope import NAMESPACE as NS
 from boss_bi_queries import BIQueryAPI
 from public_bi_scenarios import loaded_scenarios, dimension_options
 from boss_runtime_records import ATTRIBUTE
@@ -128,7 +129,7 @@ class ProductBI:
         binding = request.attributes.get(ATTRIBUTE)
         request_id = binding.request_id if binding is not None else grant.key
         session_id = binding.session_id if binding is not None else request.session_key
-        return Fc02Context("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
+        return Fc02Context("BOSS", grant.owner_id, NS, grant.dataset_id, grant.dataset_version,
                            request_id, session_id, grant.active(), (grant.binding,), frozenset())
 
     async def scope_context(self, request):
@@ -144,11 +145,11 @@ class ProductBI:
         binding = request.attributes[ATTRIBUTE]
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "bi_public_request", grant.key)
+            row = self.store.get(db, NS, "bi_public_request", grant.key)
             require(row["status"] == "PREPARED", "原经营请求已经进入Runtime", web.HTTPConflict)
             row.update(status="RUNNING", runtime_request_id=binding.request_id, run_id=binding.run_id,
                        session_id=binding.session_id)
-            self.store.put(db, "ui-check", "bi_public_request", grant.key, row)
+            self.store.put(db, NS, "bi_public_request", grant.key, row)
 
     async def events(self, messages, tools):
         await asyncio.sleep(0)
@@ -169,8 +170,8 @@ class ProductBI:
         return LLMResponse(content="SIMULATED：当前查询已返回实际数值、范围和资料缺口，请查看结果及原始依据。", usage=None)
 
     def _context(self, db):
-        self.store.active(db, "ui-check")
-        return self.store.get(db, "ui-check", "initial", "snapshot")
+        self.store.active(db, NS)
+        return self.store.get(db, NS, "initial", "snapshot")
 
     def _request(self, role, payload, follow_up, active):
         require(role == "BOSS" and active(), "当前经营请求需要本人认证", web.HTTPForbidden)
@@ -183,21 +184,21 @@ class ProductBI:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             initial = self._context(db)
-            previous = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='bi_public_request' AND id=?", (key,)).fetchone()
+            previous = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='bi_public_request' AND id=?", (NS, key)).fetchone()
             if previous:
                 row = json.loads(previous[0])
                 require(row["owner_id"] == initial["owner_id"] and row["dataset_id"] == initial["dataset_id"] and row["dataset_version"] == initial["dataset_version"], "原查询请求范围不符", web.HTTPForbidden)
                 require(row["payload_sha256"] == checksum(payload), "相同请求编号的内容不同", web.HTTPConflict)
                 return None
             if follow_up:
-                parent = self.store.get(db, "ui-check", "query", payload["parent_query_id"])
+                parent = self.store.get(db, NS, "query", payload["parent_query_id"])
                 require(parent["envelope"]["owner_id"] == initial["owner_id"], "父查询不属于本人", web.HTTPForbidden)
                 session_id = parent["envelope"]["session_id"]
             else:
                 session_id = "sdk:bi-" + str(uuid4())
-            context = Fc02Context("BOSS", initial["owner_id"], "ui-check", initial["dataset_id"], initial["dataset_version"],
+            context = Fc02Context("BOSS", initial["owner_id"], NS, initial["dataset_id"], initial["dataset_version"],
                                   key, session_id, True, (), frozenset())
-            envelope = {"owner_id":context.owner_id,"execution_namespace":"ui-check","dataset_id":context.dataset_id,
+            envelope = {"owner_id":context.owner_id,"execution_namespace":NS,"dataset_id":context.dataset_id,
                         "dataset_version":context.dataset_version,"request_id":key,"session_id":session_id}
             if not follow_up:
                 require(isinstance(payload["scope"], dict), "经营范围需要正式字段", web.HTTPBadRequest)
@@ -207,7 +208,7 @@ class ProductBI:
                 binding = bind_query({name:value for name,value in params.items() if name != "envelope"})
             else:
                 binding = bind_scoped_followup(self.store, context, payload["parent_query_id"], payload["question"], payload["overrides"])
-            self.store.put(db, "ui-check", "bi_public_request", key, {"request_id":key,"payload_sha256":checksum(payload),
+            self.store.put(db, NS, "bi_public_request", key, {"request_id":key,"payload_sha256":checksum(payload),
                 "owner_id":context.owner_id,"dataset_id":context.dataset_id,"dataset_version":context.dataset_version,
                 "session_id":session_id,"status":"PREPARED","created_at":now()})
         return BIRequest(key, context.owner_id, context.dataset_id, context.dataset_version, session_id, binding, active)
@@ -220,7 +221,7 @@ class ProductBI:
         grant = self._request(role, payload, follow_up, active)
         if grant is None:
             return self.receipt(role, payload["client_request_id"])
-        task = asyncio.create_task(self.bot.run("读取当前明确经营条件，执行确定性查询并核查原始依据。外部模型事件为SIMULATED。",
+        task = asyncio.create_task(self.runtime.run_bot(self.bot, "读取当前明确经营条件，执行确定性查询并核查原始依据。外部模型事件为SIMULATED。",
                     session_key=grant.session_id, sender_id=grant.owner_id, ephemeral=True, attributes={BI_REQUEST:grant}))
         self.active_runs[grant.key] = task
         try:
@@ -255,7 +256,7 @@ class ProductBI:
             require(not query, "历史列表不接受额外字段", web.HTTPBadRequest)
             with self.store.connect() as db:
                 initial = self._context(db)
-                rows = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='bi_public_request' ORDER BY json_extract(body,'$.created_at') DESC")]
+                rows = [json.loads(item[0]) for item in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='bi_public_request' ORDER BY json_extract(body,'$.created_at') DESC", (NS,))]
             return {"source_type":"SIMULATED", "requests":[{"client_request_id":row["request_id"], "created_at":row["created_at"], "run_id":row.get("run_id")}
                 for row in rows if all(row[field] == initial[field] for field in ("owner_id","dataset_id","dataset_version"))]}
         raise web.HTTPNotFound(text="经营读取入口不存在")
@@ -265,11 +266,11 @@ class ProductBI:
         validate_public("CancelRequest", {"client_request_id":key})
         with self.store.connect() as db:
             initial = self._context(db)
-            row = self.store.get(db, "ui-check", "bi_public_request", key)
+            row = self.store.get(db, NS, "bi_public_request", key)
             require(all(row[field] == initial[field] for field in ("owner_id","dataset_id","dataset_version")), "原请求不属于当前范围", web.HTTPForbidden)
             if "runtime_request_id" not in row:
                 return {"client_request_id":key,"request_state":"RUNNING" if key in self.active_runs else "FAILED_BEFORE_RUNTIME","receipt":None,"run_id":None}
-            run = self.store.get(db,"ui-check","runtime_run",row["run_id"])
+            run = self.store.get(db,NS,"runtime_run",row["run_id"])
         receipt = self.api.receipt(role, row["session_id"], row["runtime_request_id"])
         return {"client_request_id":key,"request_state":run["status"],"receipt":receipt,"run_id":row["run_id"]}
 
@@ -285,7 +286,7 @@ class ProductBI:
 
 class PublicBIRecorder(Fc02RuntimeRecorder):
     def __init__(self, service, registry, runtime_snapshot):
-        super().__init__(service.store,"ui-check",registry,runtime_snapshot,service.context_provider)
+        super().__init__(service.store,NS,registry,runtime_snapshot,service.context_provider)
         self.service = service
 
     async def context(self, request):
@@ -306,11 +307,44 @@ class FeatureProvider(LLMProvider):
         self.assignment = assignment
         self.reminders = reminders
         self.conversation = None
+        self.external_provider = None
+        self.closing_providers = set()
+
+    def adopt_external(self, provider):
+        previous = self.external_provider
+        self.external_provider = provider
+        if previous is not None and previous._client is not None:
+            task = asyncio.create_task(previous._client.close())
+            self.closing_providers.add(task)
+
+    async def close_external(self):
+        if self.external_provider is not None and self.external_provider._client is not None:
+            await self.external_provider._client.close()
+        if self.closing_providers:
+            await asyncio.gather(*self.closing_providers)
+            self.closing_providers.clear()
+
+    @staticmethod
+    def _call_options(kwargs, streaming=False):
+        fields = {"max_tokens", "temperature", "reasoning_effort", "tool_choice", "provider_context"}
+        if streaming:
+            fields |= {"on_content_delta", "on_thinking_delta", "on_tool_call_delta"}
+        return {key: value for key, value in kwargs.items() if key in fields}
+
+    def _external_deadline(self):
+        request = current_request_context()
+        require(request is not None and ATTRIBUTE in request.attributes, "实际模型请求缺少运行归属")
+        binding = request.attributes[ATTRIBUTE]
+        require(binding.run_id in binding.recorder.model_deadlines, "实际模型请求缺少运行时间限制")
+        return binding.recorder.model_deadlines[binding.run_id]
 
     def get_default_model(self):
-        return "deepseek-flash"
+        return self.external_provider.get_default_model() if self.external_provider is not None else "deepseek-flash"
 
     async def chat(self, messages, tools=None, model=None, **kwargs):
+        if self.external_provider is not None:
+            async with asyncio.timeout_at(self._external_deadline()):
+                return await self.external_provider.chat(messages, tools, model, **self._call_options(kwargs))
         request = current_request_context()
         if self.reminders is not None and self.reminders.handles(request):
             return await self.reminders.provider.chat(messages, tools, model, **kwargs)
@@ -325,6 +359,9 @@ class FeatureProvider(LLMProvider):
         return await self.chat(messages, tools, model, **kwargs)
 
     async def chat_stream_with_retry(self, messages, tools=None, model=None, **kwargs):
+        if self.external_provider is not None:
+            async with asyncio.timeout_at(self._external_deadline()):
+                return await self.external_provider.chat_stream(messages, tools, model, **self._call_options(kwargs, True))
         result = await self.chat(messages, tools, model, **kwargs)
         if kwargs.get("on_content_delta") is not None and result.content:
             await kwargs["on_content_delta"](result.content)
@@ -333,7 +370,7 @@ class FeatureProvider(LLMProvider):
 
 class FeatureRecorder:
     def __init__(self, store, registry, snapshot, bi, morning=None, assignment=None, reminders=None):
-        self.fc01 = Fc01RuntimeRecorder(store,"ui-check",registry,snapshot)
+        self.fc01 = Fc01RuntimeRecorder(store,NS,registry,snapshot)
         self.bi = PublicBIRecorder(bi,registry,snapshot)
         self.morning_service = morning
         self.morning = morning.recorder(registry,snapshot) if morning is not None else None

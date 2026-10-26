@@ -10,7 +10,7 @@ from business import Store, require
 from controls import ControlStore
 
 
-def application(path):
+def application(path, *, execution_namespace=None):
     store = ControlStore(path)
     tokens = {"BOSS": os.environ["BOSS_PROBE_TOKEN"], "MAINTAINER": os.environ["MAINTAINER_PROBE_TOKEN"]}
     failure = os.environ.get("BOSS_PROBE_FAILURE", "NONE")
@@ -23,6 +23,11 @@ def application(path):
         role = next((name for name, token in tokens.items() if hmac.compare_digest(token, supplied)), None)
         require(role is not None, "未认证", web.HTTPUnauthorized)
         request["role"] = role
+        if execution_namespace is not None:
+            from boss_execution_transition import pending_transition
+            with store.connect() as db:
+                store.active(db, execution_namespace)
+                require(pending_transition(db, execution_namespace) is None, "执行空间正在切换")
         return await handler(request)
 
     def role(request, expected):
@@ -33,6 +38,7 @@ def application(path):
 
     async def initialize(request):
         role(request, "MAINTAINER")
+        require(execution_namespace is None, "当前实例需要通过数据集页面管理执行空间", web.HTTPForbidden)
         p = await request.json()
         return web.json_response(store.initialize(p["namespace"]))
 
@@ -97,6 +103,7 @@ def application(path):
 
     async def reset(request):
         role(request, "MAINTAINER")
+        require(execution_namespace is None, "当前实例需要通过数据集页面重置执行空间", web.HTTPForbidden)
         ns = request.match_info["ns"]
         p = await request.json()
         return web.json_response(store.control(ns, "reset", p))

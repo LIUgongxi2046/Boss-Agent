@@ -6,7 +6,9 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from business import checksum, encode, require
 from boss_morning import MorningAPI, SCHEMA, QUERY_ACTION
+from boss_page_api import BossPageAPI
 from fc03_agent import Fc03TodayTool
+from runtime_page_read_tools import BossEvidenceReadTool
 
 FORMAL_TOOLS = frozenset({"todayRead", "morningListRead", "morningDetailRead", "morningSourceRead"})
 
@@ -80,11 +82,13 @@ class FormalMorningTool(Fc03TodayTool):
             require(all(output[key] == getattr(context, key) for key in ("date", "timezone", "snapshot_sha256", "order_version")),
                     "晨间查询提交期间范围已经变化", web.HTTPConflict)
         else:
+            selection = json.loads(context.source_selection_json) if context.source_selection_json is not None else None
+            knowledge = next((ref for ref in selection["source_pins"] if ref["source_id"] == params.get("source_id")), None) if selection is not None else None
             if selected is not None:
                 require(params["list_id"] == selected["list_id"], "工具清单与当前事项不符", web.HTTPForbidden)
                 if self.name == "morningDetailRead":
                     require(params["item_id"] == selected["item_id"], "工具事项与本人选择不符", web.HTTPForbidden)
-                if self.name == "morningSourceRead":
+                if self.name == "morningSourceRead" and knowledge is None:
                     require(any(source["kind"] == "document" and source["id"] == params["source_id"] for source in selected["source_refs"]),
                             "来源不属于当前事项", web.HTTPForbidden)
             current_view = self.current_list(context, params["list_id"])
@@ -92,6 +96,10 @@ class FormalMorningTool(Fc03TodayTool):
                 output = current_view
             elif self.name == "morningDetailRead":
                 output = self.api.detail(context.role, params["list_id"], params["item_id"])
+            elif knowledge is not None:
+                document = json.loads(await BossEvidenceReadTool(BossPageAPI(self.store), context.role).execute(source=knowledge["source_id"]))
+                require(document["source_id"] == knowledge["source_id"] and document["version"] == knowledge["version"], "晨间知识资料版本已经变化", web.HTTPConflict)
+                output = {"document": document, "knowledge_selection": {key: selection[key] for key in ("binding_id", "context_version")}}
             else:
                 output = self.api.source(context.role, params["list_id"], params["source_id"])
         require(self.context() == context, "晨间读取期间认证范围已经变化", web.HTTPConflict)

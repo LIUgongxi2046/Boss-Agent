@@ -62,8 +62,10 @@ def project(store, db, context, day):
             require(all(row.get(field, context[field]) == context[field] for field in ("dataset_id", "dataset_version"))
                     and row.get("execution_namespace", ns) == ns, "晨间对象不属于当前执行范围", web.HTTPForbidden)
             rows[kind, identifier] = row
-    for kind, identifier, body in (("meeting", initial["meeting"]["meeting_id"], initial["meeting"]),
-                                   ("private_calendar", initial["private_calendar"]["calendar_id"], initial["private_calendar"])):
+    initial_objects = [("meeting", initial["meeting"]["meeting_id"], initial["meeting"])]
+    if initial["private_calendar"] is not None:
+        initial_objects.append(("private_calendar", initial["private_calendar"]["calendar_id"], initial["private_calendar"]))
+    for kind, identifier, body in initial_objects:
         if (kind, identifier) not in rows:
             metadata = db.execute("SELECT json_extract(body,'$.owner_id') FROM objects WHERE namespace=? AND kind=? AND id=?", (ns, kind, identifier)).fetchone()
             require(metadata is None or metadata[0] in (None, owner), "当前资料对象无权访问", web.HTTPForbidden)

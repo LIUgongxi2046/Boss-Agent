@@ -5,6 +5,7 @@ import json
 import os
 import secrets
 import signal
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -19,13 +20,14 @@ from nanobot.bus.queue import MessageBus
 from nanobot.channels.manager import ChannelManager
 from nanobot.config.loader import load_config, resolve_config_env_vars, set_config_path
 from nanobot.cron.service import CronService
-from nanobot.cron.types import CronSchedule
 from nanobot.cron.bound_runner import run_bound_cron_job
 from nanobot.session.manager import SessionManager
 from nanobot.session.recovery import RecoveryCoordinator
 from nanobot.session.webui_turns import WebuiTurnCoordinator, WebuiTurnRoutePolicy
 
-from business import OPERATIONS, ROOT, Store, encode, now
+from business import OPERATIONS, ROOT, Store, encode, now, require
+from boss_execution_scope import NAMESPACE, require_dataset_scope, validate_namespace
+from boss_execution_transition import ExecutionTransition, record_interrupted, restart_execution
 from connection import RecordedProvider, settings
 from controls import ControlStore
 from model_probe import Audit, BusinessTool
@@ -37,6 +39,7 @@ from boss_owner_preferences import record_runtime_goal_context_load
 from boss_agent_read_tools import BossResearchSourcesTool
 from boss_runtime_records import RuntimeRecorder
 from boss_memory_runtime import OwnerMemoryContext
+from boss_memory_sessions import MemoryAutoCompact, MemorySessionManager
 from product_runtime import ProductRuntime
 from boss_page_api import BossPageAPI
 from product_read_tools import product_read_tools
@@ -59,6 +62,7 @@ from application_paths import application_work_directory, application_ports, app
 
 WORK = application_work_directory(ROOT, os.environ.get("BOSS_APPLICATION_WORK_DIR"))
 PORTS = application_ports(os.environ.get("BOSS_APPLICATION_PORTS"))
+NATIVE_ROOT = WORK if NAMESPACE == "ui-check" else WORK / "spaces" / NAMESPACE
 
 
 def product_log_filter(record):
@@ -88,8 +92,10 @@ def prepare():
     os.environ["NANOBOT_WEBUI_SECRET"] = roles["BOSS"]
     os.environ["BOSS_PROBE_TOKEN"] = roles["BOSS"]
     os.environ["MAINTAINER_PROBE_TOKEN"] = roles["MAINTAINER"]
-    config = WORK / "config.json"
-    runtime_scope = WORK / "runtime-scope.json"
+    require(not NATIVE_ROOT.is_symlink() and not (WORK / "spaces").is_symlink(), "执行空间目录不能使用符号链接")
+    NATIVE_ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
+    config = NATIVE_ROOT / "config.json"
+    runtime_scope = NATIVE_ROOT / "runtime-scope.json"
     if config.is_symlink() or runtime_scope.is_symlink():
         raise ValueError("应用配置与实例目录声明不能使用符号链接")
     if not config.exists():
@@ -98,7 +104,7 @@ def prepare():
         runtime_scope.write_text(encode({"schema_version": 1, "configuration_path": str(config)}))
         runtime_scope.chmod(0o600)
         config.write_text(encode({
-            "agents": {"defaults": {"workspace": str(WORK / "workspace"), "provider": "deepseek",
+            "agents": {"defaults": {"workspace": str(NATIVE_ROOT / "workspace"), "provider": "deepseek",
                 "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096,
                 "timezone": "Asia/Shanghai", "timezoneMode": "manual", "dream": {"enabled": False},
                 "idleCompactAfterMinutes": 0, "maxToolResultChars": 200000}},
@@ -134,18 +140,29 @@ async def serve():
     account_store = AccountStore(WORK / "accounts/accounts.sqlite") if product_mode else None
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
+    if NAMESPACE != "ui-check":
+        require(config.workspace_path.resolve() == (NATIVE_ROOT / "workspace").resolve(),
+                "原生工作目录必须属于当前执行空间")
     if config.gateway.port != PORTS["gateway"] or config.channels.websocket["port"] != PORTS["webui"]:
         raise ValueError("已保存配置与当前指定端口不一致")
     if hashlib.sha256(config_path.read_bytes()).hexdigest() != effective_config_sha256:
         raise ValueError("应用启动期间配置发生变化")
     store = ControlStore(WORK / "business.sqlite")
+    store.service_started_at = now()
     with store.connect() as db:
-        existing = db.execute("SELECT snapshot FROM spaces WHERE namespace='ui-check'").fetchone()
+        existing = db.execute("SELECT snapshot FROM spaces WHERE namespace=?", (NAMESPACE,)).fetchone()
+        if existing is None:
+            require(NAMESPACE == "ui-check" and db.execute("SELECT 1 FROM spaces LIMIT 1").fetchone() is None,
+                    "当前执行空间缺少正式资料，不能自动重新初始化")
     if existing is None:
-        baseline = store.initialize("ui-check")
+        baseline = store.initialize(NAMESPACE)
     else:
-        baseline = {"namespace": "ui-check", "snapshot_sha256": existing[0]}
-    output = WORK / "diagnostics" if product_mode else ROOT.parent / "evidence/T02/application"
+        baseline = {"namespace": NAMESPACE, "snapshot_sha256": existing[0]}
+    with store.connect() as db:
+        store.active(db, NAMESPACE)
+        initial = store.get(db, NAMESPACE, "initial", "snapshot")
+        require_dataset_scope(db, NAMESPACE, initial)
+    output = NATIVE_ROOT / "diagnostics" if product_mode else ROOT.parent / "evidence/T02/application"
     output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
     if product_mode:
         output.chmod(0o700)
@@ -165,7 +182,11 @@ async def serve():
     audit = Audit(output / "events.json", records)
     audit.registry = registry
     bus = MessageBus()
-    sessions = SessionManager(config.workspace_path)
+    session_options = {"sessions_root": NATIVE_ROOT / "sessions" if NAMESPACE != "ui-check" else None}
+    sessions = (MemorySessionManager(config.workspace_path, business_store=store, **session_options)
+                if product_mode else SessionManager(config.workspace_path, **session_options))
+    if product_mode:
+        sessions.reconcile_memory()
     if morning is not None:
         morning.native.bind_sessions(sessions)
     conversation = ProductConversation(store, registry, lambda: runtime_control.snapshot(), ConversationAttachments(sessions, get_media_dir("websocket"))) if product_mode else None
@@ -179,12 +200,18 @@ async def serve():
     loop = AgentLoop.from_config(config, bus, provider=provider, tool_registry=registry, hooks=[audit],
                                  hook_factories=[runtime_recorder.hook_factory, morning.native.hook_factory] if runtime_recorder is not None else [],
                                  session_manager=sessions, turn_delivery_factory=delivery, recovery_admission=recovery)
+    if product_mode:
+        loop.auto_compact = MemoryAutoCompact(sessions, loop.consolidator,
+                                             session_ttl_minutes=config.agents.defaults.session_ttl_minutes,
+                                             bind_events=loop._idle_events)
+        sessions.invalidate_context = loop.auto_compact.invalidate_memory_context
     audit.runtime_snapshot = lambda: {"provider": "deepseek", "model_id": loop.model, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "config_sha256": effective_config_sha256}
     coordinator = WebuiTurnCoordinator(bus=bus, sessions=sessions, schedule_background=loop.schedule_background, recovery=recovery)
     unsubscribe = coordinator.subscribe()
     for name in list(registry.tool_names):
         registry.unregister(name)
-    envelope = {"request_id": "ui-check", "owner_id": "boss-1", "execution_namespace": "ui-check", "dataset_id": "selection", "dataset_version": "1", "session_id": "ui-check"}
+    envelope = {"request_id": NAMESPACE, "owner_id": initial["owner_id"], "execution_namespace": NAMESPACE,
+                "dataset_id": initial["dataset_id"], "dataset_version": initial["dataset_version"], "session_id": NAMESPACE}
     for operation in OPERATIONS:
         registry.register((FeatureBusinessTool(store, fc01, bi, operation) if operation in BI_TOOLS else Fc01Tool(store, fc01.context_provider, operation)) if product_mode else ApplicationTool(operation, store, envelope, bindings, records))
     def research_read_observed(metadata):
@@ -218,6 +245,7 @@ async def serve():
     if product_mode:
         runtime_control = ProductRuntime(store, config_path, loop, registry,
                                          [registry.get(name) for name in registry.tool_names], provider, workspace_api=workspace_pages, workspace_tool_factory=reminders.workspace_tool)
+        runtime_control.conversation_attachments = conversation.attachments
         fc01.runtime = runtime_control
         bi.runtime = runtime_control
         morning.runtime = runtime_control
@@ -225,11 +253,20 @@ async def serve():
         reminders.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
         skills = ProductSkills(runtime_control)
-    cron = CronService(WORK / "cron/jobs.json")
+    cron = CronService(NATIVE_ROOT / "cron/jobs.json")
+    from boss_scheduler_runtime import BossSchedulerRuntime, CONTROL_ID, TIME_ID
+    scheduler_runtime = BossSchedulerRuntime(store, cron)
+    store.scheduler_runtime = scheduler_runtime
+    scheduled_tasks = set()
     async def scheduled(job):
-        if job.name == "boss-events":
-            return encode(store.dispatch_due("ui-check"))
-        return await run_bound_cron_job(job, agent=loop, cron=cron)
+        task = asyncio.current_task()
+        scheduled_tasks.add(task)
+        try:
+            if job.id in {CONTROL_ID, TIME_ID}:
+                return await scheduler_runtime.on_job(job)
+            return await run_bound_cron_job(job, agent=loop, cron=cron)
+        finally:
+            scheduled_tasks.discard(task)
     cron.on_job = scheduled
     channels = ChannelManager(config, loop.bus, session_manager=loop.sessions, cron_service=cron,
                               webui_runtime_model_name=lambda: loop.model,
@@ -262,12 +299,19 @@ async def serve():
         channels.channels["websocket"].assignment = assignment
         channels.channels["websocket"].reminders = reminders
         channels.channels["websocket"].native_conversation = conversation
-    server = web.AppRunner(business_application(WORK / "business.sqlite"))
+    server = web.AppRunner(business_application(WORK / "business.sqlite", execution_namespace=NAMESPACE))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
     stop = asyncio.Event()
+    external_stop = asyncio.Event()
+    transition = ExecutionTransition(store, runtime_control, WORK, stop) if runtime_control is not None else None
+    if runtime_control is not None:
+        runtime_control.execution_transition = transition
+    def stop_application():
+        external_stop.set()
+        stop.set()
     for signum in (signal.SIGTERM, signal.SIGINT):
-        asyncio.get_running_loop().add_signal_handler(signum, stop.set)
+        asyncio.get_running_loop().add_signal_handler(signum, stop_application)
     async with Nanobot(loop, config=config) as bot:
         if fc01 is not None:
             fc01.bot = bot
@@ -276,9 +320,9 @@ async def serve():
             assignment.bot = bot
             reminders.bot = bot
         async def context(request):
-            current = store.context("ui-check")
-            selected_prompts = load_runtime_prompts(store, "ui-check")
-            confirmed_owner_goals = record_runtime_goal_context_load(store, "ui-check")
+            current = store.context(NAMESPACE)
+            selected_prompts = load_runtime_prompts(store, NAMESPACE)
+            confirmed_owner_goals = record_runtime_goal_context_load(store, NAMESPACE)
             return RuntimeContextBlock(
                 source="boss-confirmed-memory",
                 content=encode({
@@ -294,7 +338,7 @@ async def serve():
         if runtime_control is not None:
             async def owner_goals_context(request):
                 return RuntimeContextBlock(source="boss-confirmed-owner-goals", content=encode({
-                    "confirmed_owner_goals": record_runtime_goal_context_load(store, "ui-check"),
+                    "confirmed_owner_goals": record_runtime_goal_context_load(store, NAMESPACE),
                     "guidance_authority_boundary": "Technical prompts do not grant BOSS rights or authorize business writes.",
                 }))
             def guarded(provider):
@@ -327,23 +371,64 @@ async def serve():
             bot.runtime.add_context_provider(guarded(runtime_recorder.context))
         else:
             bot.runtime.add_context_provider(context)
-        await cron.start()
-        if not any(job.name == "boss-events" for job in cron.list_jobs(include_disabled=True)):
-            cron.add_job("boss-events", CronSchedule(kind="every", every_ms=500), "按当前业务时间检查获准事件", session_key="ui-check", origin_channel="websocket", origin_chat_id="ui-check")
         channel_task = asyncio.create_task(channels.start_all())
         agent_task = asyncio.create_task(loop.run())
+        async with asyncio.timeout(20):
+            while not channels.channels["websocket"].is_running:
+                require(not channel_task.done() and not agent_task.done(), "原生服务在就绪前已经终止")
+                await asyncio.sleep(0.05)
+        if transition is not None:
+            transition.mark_adopted()
+        await cron.start()
+        scheduler_runtime.start()
         (WORK / "instance.json").write_text(encode({"pid": os.getpid(), "at": now(), "ports": PORTS, "baseline": baseline, "max_tool_rounds": loop.max_iterations, "max_output_tokens": config.agents.defaults.max_tokens, "model": loop.model}))
         print("应用验证服务已启动", flush=True)
         await stop.wait()
         loop.stop()
         cron.stop()
+        scheduled = tuple(scheduled_tasks)
+        for task in scheduled:
+            task.cancel()
+        if scheduled:
+            await asyncio.wait(scheduled)
+            for task in scheduled:
+                if not task.cancelled():
+                    task.result()
+        if runtime_control is not None:
+            await runtime_control.stop_runs()
+        await loop.aclose()
         await channels.stop_all()
         await server.cleanup()
         await asyncio.gather(channel_task, agent_task)
+        if runtime_control is not None:
+            await runtime_control.close()
         unsubscribe()
+    if transition is not None:
+        transition.runtime_stopped = True
+        if external_stop.is_set():
+            record_interrupted(store)
+        else:
+            return transition.finish_stopped_runtime()
+    return None
 
 
 if __name__ == "__main__":
     WORK.mkdir(parents=True, exist_ok=True)
+    database_path = WORK / "business.sqlite"
+    if database_path.exists():
+        with sqlite3.connect(database_path.as_uri() + "?mode=ro", uri=True) as db:
+            active_spaces = db.execute("SELECT namespace FROM spaces WHERE active=1").fetchall()
+        require(len(active_spaces) == 1, "启动时有效执行空间无法唯一确定")
+        selected_namespace = validate_namespace(active_spaces[0][0])
+        if selected_namespace != NAMESPACE:
+            restart_execution(selected_namespace, __file__)
     with FileLock(str(WORK / "application.lock"), timeout=0):
-        asyncio.run(serve())
+        completed = False
+        try:
+            next_namespace = asyncio.run(serve())
+            completed = True
+        finally:
+            if not completed and database_path.exists():
+                record_interrupted(ControlStore(database_path))
+    if next_namespace is not None:
+        restart_execution(next_namespace, __file__)

@@ -1,437 +1,91 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AlertCircle, CalendarClock, CheckCircle2, Clock3,
-  FileSearch, Loader2, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
-import { useClient } from "@/providers/ClientProvider";
+import {useEffect,useRef,useState,type ReactNode} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import {AlertCircle,CalendarClock,FileSearch,Loader2,Plus,RefreshCw,ShieldCheck,Trash2,XCircle} from "lucide-react";
+import {useClient} from "@/providers/ClientProvider";
+import {useTransaction} from "./BossAssignmentFlow";
 
-type Contact = {
-  contact_id:string;name:string;organization:string;responsibility:string;
-  valid_from:string;valid_until:string;
-};
-type Details = {
-  origin:string;destination:string;starts_at:string;ends_at:string;timezone:string;
-  host_contact_id:string;buffer_minutes:number;
-  transport_refs:{source_id:string;version:string}[];
-};
-type Impact = {
-  meeting:{meeting_id:string;version:string;starts_at:string;
-    end_known:boolean;requires_review:boolean;start_overlap:boolean};
-  private_calendar:{version:string;status:string;conflict:boolean;private_body_exposed:boolean};
-  task_deadlines:{task_id:string;version:string;due_at:string;status:string}[];
-  other_confirmed_trips:{travel_id:string;version:string}[];
-  transport_missing:boolean;weather_source_present:boolean;
-  conflicts_need_acknowledgement:boolean;coverage:string;
-};
-type Travel = {
-  travel_id:string;version:string;status:string;
-  current:Details|null;pending:{details:Details;impact:Impact;
-    review_sha256:string;reviewed_at:string}|null;
-  pending_is_current?:boolean;
-  impact_at_confirmation?:Impact;updated_at:string;
-};
-type Projection = {
-  projection:"travel";source_type:"SIMULATED";business_clock:string;
-  owner_timezone:string;plans:Travel[];contacts:Contact[];
-  meeting:{meeting_id:string;version:string;starts_at:string;end_known:boolean};
-  real_transport_bookings:boolean;real_weather_retrieval:boolean;
-};
-type Result = {
-  travel_id:string;version:string;status:string;review_sha256?:string;
-  external_booking_created?:false;external_cancellation_performed?:false;
-};
-type Pending = {action:string;payload:Record<string,unknown>;
-  requestId:string;title:string;detail:string[]};
-type Props = {onNavigate:(page:string)=>void;onViewSource:(id:string)=>void};
-
-function Panel({title,caption,children}:{
-  title:string;caption?:string;children:ReactNode;
-}) {
-  return <section className="boss-panel">
-    <div className="boss-panel-head"><h2>{title}</h2>{caption&&<small>{caption}</small>}</div>
-    {children}
-  </section>;
-}
-function Item({label,children}:{label:string;children:ReactNode}) {
-  return <div className="boss-kv"><span>{label}</span><strong>{children}</strong></div>;
-}
-function zoneTime(instant:string) {
-  const match=instant.match(/^(.{16}):\d{2}([+-]\d{2}:\d{2})$/);
-  return {local:match?.[1]||instant.slice(0,16),offset:match?.[2]||"+08:00"};
-}
-function checkedInstant(local:string,offset:string) {
-  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(local))
-    throw new Error("请填写完整的本地日期与时间");
-  if(!/^[+-](?:0\d|1\d|2[0-3]):[0-5]\d$/.test(offset))
-    throw new Error("请填写明确的 UTC 偏移，例如 +08:00 或 -07:00");
-  return local+":00"+offset;
-}
-
-export function BossTravelView({onNavigate,onViewSource}:Props) {
-  const {client,getToken}=useClient();
-  const [data,setData]=useState<Projection|null>(null);
-  const [loading,setLoading]=useState(false);
-  const [revision,setRevision]=useState(0);
-  const [error,setError]=useState("");
-  const [notice,setNotice]=useState("");
-  const [selectedId,setSelectedId]=useState("");
-  const [origin,setOrigin]=useState("");
-  const [destination,setDestination]=useState("");
-  const [timezone,setTimezone]=useState("Asia/Shanghai");
-  const [startLocal,setStartLocal]=useState("");
-  const [endLocal,setEndLocal]=useState("");
-  const [startOffset,setStartOffset]=useState("+08:00");
-  const [endOffset,setEndOffset]=useState("+08:00");
-  const [hostId,setHostId]=useState("");
-  const [buffer,setBuffer]=useState(60);
-  const [sourceId,setSourceId]=useState("");
-  const [sourceVersion,setSourceVersion]=useState("");
-  const [cancelReason,setCancelReason]=useState("");
-  const [ackConflict,setAckConflict]=useState(false);
-  const [ackTransport,setAckTransport]=useState(false);
-  const [pending,setPending]=useState<Pending|null>(null);
-  const [approved,setApproved]=useState(false);
-  const [busy,setBusy]=useState(false);
-  const [checking,setChecking]=useState(false);
-  const modalRef=useRef<HTMLElement|null>(null);
-  const selected=data?.plans.find(p=>p.travel_id===selectedId);
-  const reviewed=selected?.pending;
-  const impact=reviewed?.impact||selected?.impact_at_confirmation;
-  const reload=()=>setRevision(x=>x+1);
-
+type Ref={source_id:string;version:string};
+type Contact={contact_id:string;name:string;organization:string;responsibility:string;valid_from:string;valid_until:string};
+type Details={origin:string;destination:string;starts_at:string;ends_at:string;starts_at_utc?:string;ends_at_utc?:string;timezone:string;host_contact_id:string;host_responsibility?:string;buffer_minutes:number;transport_refs:Ref[]};
+type Meeting={meeting_id:string;version:string;starts_at:string;ends_at?:string|null;state?:string;end_known:boolean};
+type Impact={meeting:Meeting&{requires_review:boolean;start_overlap:boolean};private_calendar:{version:string|null;status:string;conflict:boolean;private_body_exposed:boolean};task_deadlines:{task_id:string;version:string;due_at:string;status:string}[];other_confirmed_trips:{travel_id:string;version:string}[];transport_missing:boolean;weather_source_present:boolean;external_booking_verified?:boolean;conflicts_need_acknowledgement:boolean;coverage:string;preparation_items?:{id:string;title:string;due_at:string|null;meeting_id:string|null;meeting_version:string|null}[]};
+type Travel={travel_id:string;version:string;status:string;current:Details|null;pending:{details:Details;impact:Impact;review_sha256:string;reviewed_at:string}|null;pending_is_current?:boolean;impact_at_confirmation?:Impact;updated_at:string};
+type Projection={projection:"travel";source_type:"SIMULATED";execution_namespace?:string;business_clock:string;owner_timezone:string;plans:Travel[];contacts:Contact[];meeting:Meeting;real_transport_bookings:boolean;real_weather_retrieval:boolean;sources?:{source_id:string;version:string;status:string;author:string|null;published_at:string|null;valid_until:string|null}[]};
+type Form={origin:string;destination:string;starts_at:string;ends_at:string;timezone:string;host_contact_id:string;buffer_minutes:string;transport_refs:Ref[];basis:string};
+type Props={onNavigate:(page:string)=>void;onViewSource:(id:string)=>void;onDirtyChange?:(dirty:boolean)=>void;refreshVersion?:number};
+const EMPTY:Form={origin:"",destination:"",starts_at:"",ends_at:"",timezone:"",host_contact_id:"",buffer_minutes:"",transport_refs:[],basis:""};
+function Panel({title,children}:{title:string;children:ReactNode}){return <section className="boss-panel"><div className="boss-panel-head"><h2>{title}</h2></div>{children}</section>;}
+function Fact({label,value}:{label:string;value?:string|number|null}){return <div className="boss-kv"><span>{label}</span><strong>{value??"尚未核查"}</strong></div>;}
+function displayTime(value:string|undefined|null,zone:string|undefined){if(!value||!zone)return "尚未提供";return new Intl.DateTimeFormat("zh-CN",{dateStyle:"medium",timeStyle:"short",timeZone:zone}).format(new Date(value));}
+function signature(value:Projection,id:string){const plan=value.plans.find(row=>row.travel_id===id);return JSON.stringify([value.execution_namespace,id,plan,value.contacts,value.meeting,value.plans.map(row=>[row.travel_id,row.version,row.status]),value.sources]);}
+function savedForm(value:Projection,id:string):Form{const plan=value.plans.find(row=>row.travel_id===id),details=plan?.pending?.details??plan?.current;return details?{...details,buffer_minutes:String(details.buffer_minutes),basis:signature(value,id)}:{...EMPTY,basis:signature(value,id)};}
+export function BossTravelView(props:Props){const {token}=useClient(),identity=useRef({token,version:0});if(identity.current.token!==token)identity.current={token,version:identity.current.version+1};return <TravelView key={identity.current.version} {...props}/>;}
+function TravelView({onNavigate,onViewSource,onDirtyChange,refreshVersion}:Props){
+  const {getToken}=useClient();
+  const [data,setData]=useState<Projection|null>(null),[loading,setLoading]=useState(true),[revision,setRevision]=useState(0),[error,setError]=useState("");
+  const [selectedId,setSelectedId]=useState(""),selectedRef=useRef("");
+  const [form,setForm]=useState<Form>(EMPTY),[dirty,setDirty]=useState(false),dirtyRef=useRef(false);
+  const [cancelReason,setCancelReason]=useState(""),[showCancel,setShowCancel]=useState(false),[ackConflict,setAckConflict]=useState(false),[ackTransport,setAckTransport]=useState(false),[nextId,setNextId]=useState<string|null>(null);
+  const originRef=useRef<HTMLInputElement|null>(null),reload=()=>setRevision(value=>value+1);
+  const transaction=useTransaction(recorded=>{if(recorded){setDirty(false);dirtyRef.current=false;setForm(value=>({...value,basis:""}));setCancelReason("");setShowCancel(false);}setAckConflict(false);setAckTransport(false);reload();},id=>{selectedRef.current=id;setSelectedId(id);},undefined,"travel");
+  const edited=dirty||Boolean(cancelReason.trim())||ackConflict||ackTransport;dirtyRef.current=edited;
+  useEffect(()=>{onDirtyChange?.(edited||transaction.busy);return()=>onDirtyChange?.(false);},[edited,transaction.busy,onDirtyChange]);
+  useEffect(()=>{if(!edited&&!transaction.busy)return;const guard=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};window.addEventListener("beforeunload",guard);return()=>window.removeEventListener("beforeunload",guard);},[edited,transaction.busy]);
   useEffect(()=>{
-    const controller=new AbortController();
-    const token=getToken();
-    if(!token){setError("老板身份已失效，请重新登录");return;}
-    setLoading(true);
-    void fetch("/api/boss/ui/workspace/travel",{
-      headers:{Authorization:"Bearer "+token},cache:"no-store",
-      signal:controller.signal,
-    }).then(async res=>{
-      if(!res.ok)throw new Error("行程读取失败（HTTP "+res.status+"）");
-      const result=await res.json() as Projection;
-      if(result.projection!=="travel"||result.source_type!=="SIMULATED")
-        throw new Error("返回的资料超出本次获准业务范围");
-      return result;
-    }).then(result=>{
-      if(controller.signal.aborted)return;
-      setData(result);setLoading(false);
-      if(!selectedId&&result.plans.length===0)setTimezone(result.owner_timezone);
-    }).catch(e=>{
-      if(controller.signal.aborted)return;
-      setError(e instanceof Error?e.message:String(e));
-      setLoading(false);
-    });
-    return ()=>controller.abort();
-  },[revision,getToken]);
-
-  useEffect(()=>{
-    if(!pending)return;
-    const before=document.activeElement instanceof HTMLElement?document.activeElement:null;
-    modalRef.current?.focus();
-    const onKey=(event:KeyboardEvent)=>{
-      if(event.key==="Escape"&&!busy&&!checking){
-        setPending(null);setApproved(false);return;
-      }
-      if(event.key!=="Tab"||!modalRef.current)return;
-      const elements=Array.from(modalRef.current.querySelectorAll<HTMLElement>(
-        "input:not([disabled]),button:not([disabled])"
-      )).filter(el=>el.getClientRects().length>0);
-      if(!elements.length)return;
-      if(event.shiftKey&&document.activeElement===elements[0]){
-        event.preventDefault();elements[elements.length-1].focus();
-      }else if(!event.shiftKey&&document.activeElement===elements[elements.length-1]){
-        event.preventDefault();elements[0].focus();
-      }
-    };
-    document.addEventListener("keydown",onKey);
-    return ()=>{document.removeEventListener("keydown",onKey);before?.focus();};
-  },[pending?.requestId,busy,checking]);
-
-  function loadTravel(id:string) {
-    setSelectedId(id);setError("");setNotice("");setAckConflict(false);setAckTransport(false);
-    const record=data?.plans.find(x=>x.travel_id===id);
-    const details=record?.pending?.details||record?.current;
-    if(!details)return;
-    setOrigin(details.origin);setDestination(details.destination);
-    setTimezone(details.timezone);setHostId(details.host_contact_id);
-    setBuffer(details.buffer_minutes);
-    setStartLocal(zoneTime(details.starts_at).local);
-    setStartOffset(zoneTime(details.starts_at).offset);
-    setEndLocal(zoneTime(details.ends_at).local);
-    setEndOffset(zoneTime(details.ends_at).offset);
-    setSourceId(details.transport_refs[0]?.source_id||"");
-    setSourceVersion(details.transport_refs[0]?.version||"");
+    const controller=new AbortController(),token=getToken();setData(null);setLoading(true);setError("");setAckConflict(false);setAckTransport(false);
+    if(!token){setLoading(false);setError("老板身份已过期，请重新认证");return;}
+    void fetch("/api/boss/ui/workspace/travel",{headers:{Authorization:"Bearer "+token},cache:"no-store",signal:controller.signal}).then(async response=>{if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));if(!response.ok)throw new Error("行程读取失败（HTTP "+response.status+"）");const value=await response.json() as Projection;if(value.projection!=="travel"||value.source_type!=="SIMULATED")throw new Error("行程资料不属于当前获准范围");return value;}).then(value=>{if(controller.signal.aborted)return;setData(value);setLoading(false);if(!dirtyRef.current){if(selectedRef.current&&!value.plans.some(row=>row.travel_id===selectedRef.current)){setError("当前获准范围中没有原行程，请重新选择");return;}setForm(savedForm(value,selectedRef.current));}}).catch(reason=>{if(controller.signal.aborted)return;setLoading(false);setError(reason instanceof Error?reason.message:String(reason));});
+    return()=>controller.abort();
+  },[revision,refreshVersion,getToken]);
+  const current=!loading?data:null,selected=current?.plans.find(value=>value.travel_id===selectedId),reviewed=selected?.pending;
+  const details=reviewed?.details??selected?.current,impact=reviewed?.impact??selected?.impact_at_confirmation;
+  const stale=Boolean(current&&form.basis&&form.basis!==signature(current,selectedId));
+  const disabled=!current||!form.basis||stale||transaction.busy||selected?.status==="CANCELED";
+  function edit(change:Partial<Form>){if(disabled)return;setForm(value=>({...value,...change}));setDirty(true);dirtyRef.current=true;setAckConflict(false);setAckTransport(false);setError("");}
+  function select(id:string){if(!current||transaction.busy)return;selectedRef.current=id;setSelectedId(id);setForm(savedForm(current,id));setDirty(false);dirtyRef.current=false;setCancelReason("");setShowCancel(false);setAckConflict(false);setAckTransport(false);setNextId(null);setError("");}
+  function choose(id:string){if(edited)setNextId(id);else select(id);}
+  function review(){
+    if(disabled||!current)return;setError("");
+    const host=current.contacts.find(value=>value.contact_id===form.host_contact_id);
+    if(!form.origin.trim()||!form.destination.trim()||!host){setError("请填写起点、目的地并选择获准接待联系人");return;}
+    if(!form.timezone.trim()){setError("请填写行程所在地的IANA时区，老板时区仅用于显示");return;}
+    const start=Date.parse(form.starts_at),end=Date.parse(form.ends_at),clock=Date.parse(current.business_clock),buffer=Number(form.buffer_minutes);
+    if(!Number.isFinite(start)||!Number.isFinite(end)||start<=clock||end<=start||end-start>31*86400000){setError("请填写有效起止时间；开始需要晚于业务时间，行程时长不得超过31天");return;}
+    if(form.buffer_minutes===""||!Number.isInteger(buffer)||buffer<0||buffer>360){setError("请明确填写0—360分钟的行程缓冲");return;}
+    const refs=form.transport_refs.map(value=>({source_id:value.source_id.trim(),version:value.version.trim()}));
+    if(refs.length>5||refs.some(value=>!value.source_id||!value.version)||new Set(refs.map(value=>value.source_id)).size!==refs.length){setError("最多提供5份独立交通资料，每份资料需要来源编号和版本");return;}
+    transaction.propose("boss.travel.review",{travel_id:selectedId||null,expected_version:selected?.version??"0",origin:form.origin.trim(),destination:form.destination.trim(),starts_at:form.starts_at,ends_at:form.ends_at,timezone:form.timezone.trim(),host_contact_id:form.host_contact_id,buffer_minutes:buffer,transport_refs:refs},"检查行程影响并保存草稿",[form.origin+" → "+form.destination,"时间："+form.starts_at+" 至 "+form.ends_at+" · "+form.timezone,"接待联系人："+host.name+" · "+host.organization+" · "+host.contact_id,"缓冲："+buffer+"分钟","交通资料："+(refs.map(value=>value.source_id+" · v"+value.version).join("、")||"未提供"),"服务将核查本地时间、UTC时差与IANA时区，包括重复或不存在的夏令时时刻。核查通过后仍需本人确认具体变更。"]);
   }
-  function resetForm() {
-    setSelectedId("");setOrigin("");setDestination("");
-    setStartLocal("");setEndLocal("");setHostId("");setBuffer(60);
-    setTimezone(data?.owner_timezone||"Asia/Shanghai");
-    setSourceId("");setSourceVersion("");
-    setCancelReason("");setAckConflict(false);setAckTransport(false);
-    setError("");setNotice("");
+  function confirm(){
+    if(disabled||dirty||!selected||!reviewed||!selected.pending_is_current)return;setError("");
+    if(reviewed.impact.conflicts_need_acknowledgement&&!ackConflict){setError("请核查并确认会议、任务和私人时间影响");return;}
+    if(reviewed.impact.transport_missing&&!ackTransport){setError("请确认目前缺少有效交通预订依据");return;}
+    transaction.propose("boss.travel.confirm",{travel_id:selected.travel_id,expected_version:selected.version,review_sha256:reviewed.review_sha256,acknowledge_conflicts:ackConflict,acknowledge_missing_transport:ackTransport},"确认当前具体行程变更",["行程："+selected.travel_id+" · v"+selected.version,"已确认安排："+(selected.current?selected.current.starts_at+" 至 "+selected.current.ends_at:"尚无已确认安排"),"待确认安排："+reviewed.details.starts_at+" 至 "+reviewed.details.ends_at+" · "+reviewed.details.timezone,"起止地点："+reviewed.details.origin+" → "+reviewed.details.destination,"接待联系人："+reviewed.details.host_contact_id,"受影响会议："+reviewed.impact.meeting.meeting_id+" · v"+reviewed.impact.meeting.version,"受影响任务："+(reviewed.impact.task_deadlines.map(value=>value.task_id+" · v"+value.version).join("、")||"核查范围内未发现"),"确认应用内行程，交通预订和外部日历变更分别处理。"]);
   }
-  function propose(action:string,payload:Record<string,unknown>,title:string,detail:string[]){
-    setPending({action,payload,requestId:"boss-"+crypto.randomUUID(),title,detail});
-    setApproved(false);setError("");setNotice("");
-  }
-  function review() {
-    try{
-      if(!origin.trim()||!destination.trim()||!hostId)
-        throw new Error("起点、目的地及接待联系人必须填写");
-      if(sourceId.trim()&&!sourceVersion.trim()||!sourceId.trim()&&sourceVersion.trim())
-        throw new Error("交通来源与版本必须同时填写");
-      const starts_at=checkedInstant(startLocal,startOffset);
-      const ends_at=checkedInstant(endLocal,endOffset);
-      propose("boss.travel.review",{
-        travel_id:selectedId||null,expected_version:selected?.version||"0",
-        origin:origin.trim(),destination:destination.trim(),
-        starts_at,ends_at,timezone:timezone.trim(),
-        host_contact_id:hostId,buffer_minutes:buffer,
-        transport_refs:sourceId.trim()?[{
-          source_id:sourceId.trim(),version:sourceVersion.trim(),
-        }]:[],
-      },"保存并核查行程草稿",[
-        origin+" → "+destination,
-        starts_at+" — "+ends_at+" / "+timezone,
-        "接待人："+hostId+"，缓冲："+buffer+"分钟",
-        "本次不订票，不修改外部会议/日历。核查后仍需本人单独确认。",
-      ]);
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-  }
-  function confirm() {
-    if(!selected||!reviewed||!selected.pending_is_current){
-      setError("待确认方案已失效，请重新核查当前业务对象");return;
-    }
-    if(impact?.conflicts_need_acknowledgement&&!ackConflict){
-      setError("必须先明确知晓会议、任务或私人时间冲突");return;
-    }
-    if(impact?.transport_missing&&!ackTransport){
-      setError("必须先确认当前没有可验证的交通/预订依据");return;
-    }
-    propose("boss.travel.confirm",{
-      travel_id:selected.travel_id,expected_version:selected.version,
-      review_sha256:reviewed.review_sha256,
-      acknowledge_conflicts:ackConflict,acknowledge_missing_transport:ackTransport,
-    },"本人确认模拟行程",[
-      "行程 ID："+selected.travel_id+"，待核查版本："+selected.version,
-      reviewed.details.starts_at+" — "+reviewed.details.ends_at,
-      "已知会议/任务冲突："+(impact?.conflicts_need_acknowledgement?"存在":"未识别"),
-      "交通资料："+(impact?.transport_missing?"没有获准依据":"已固定版本"),
-      "只写入本人 SQLite 行程；没有实际预订、订票或外部改期。",
-    ]);
-  }
-  function cancel() {
-    if(!selected||!cancelReason.trim()){setError("请选择行程并填写取消原因");return;}
-    propose("boss.travel.cancel",{
-      travel_id:selected.travel_id,expected_version:selected.version,
-      reason:cancelReason.trim(),
-    },"取消模拟行程",[
-      "行程 ID："+selected.travel_id+"，当前版本："+selected.version,
-      "原因："+cancelReason.trim(),
-      "仅取消应用内模拟计划；不会取消实际预订。",
-    ]);
-  }
-  function applied(result:Result){
-    if(result.travel_id)setSelectedId(result.travel_id);
-    setNotice("SQLite 事务已记录："+result.status+"（版本 "+result.version+
-      "）。此结果不代表外部订票、通知或实际日历变更。");
-    setAckConflict(false);setAckTransport(false);
-    setPending(null);setApproved(false);reload();
-  }
-  async function submit(){
-    if(!pending||!approved||busy||checking)return;
-    setBusy(true);setError("");
-    try{
-      const result=await client.requestMutation<Result>(pending.action,{
-        ...pending.payload,client_request_id:pending.requestId,
-      });
-      applied(result);
-    }catch(e){
-      setError((e instanceof Error?e.message:String(e))+
-        "。当前可能已有已写入回执，请先按同一编号查询，勿更换请求编号重试。");
-    }finally{setBusy(false);}
-  }
-  async function reconcile(){
-    if(!pending||busy||checking)return;
-    const token=getToken();
-    if(!token){setError("身份失效，不能核对本次回执");return;}
-    setChecking(true);setError("");
-    try{
-      const params=new URLSearchParams({
-        action:pending.action,client_request_id:pending.requestId,
-      });
-      const response=await fetch("/api/boss/ui/operation-status?"+params,{
-        headers:{Authorization:"Bearer "+token},cache:"no-store",
-      });
-      if(!response.ok)throw new Error("回执查询失败，HTTP "+response.status);
-      const data=await response.json() as {
-        action:string;client_request_id:string;outcome:string;result?:Result;
-      };
-      if(data.action!==pending.action||data.client_request_id!==pending.requestId)
-        throw new Error("回执动作及请求标识不一致");
-      if(data.outcome==="RECORDED"&&data.result)applied(data.result);
-      else if(data.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
-        setError("当前库未找到原请求回执，不代表未执行；可按同一请求编号重试或重新读取业务对象。");
-        reload();
-      }else throw new Error("未识别回执状态，拒绝重复提交");
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
-    finally{setChecking(false);}
-  }
-
-  return <>
-    <div className="boss-workspace-toolbar">
-      <span className="boss-workspace-note">
-        <span className="boss-tag boss-tag-amber">SIMULATED · BOSS ONLY</span>
-        F11 · 行程安排 · 核查 / 本人确认 / 取消
-      </span>
-      <button className="boss-btn" onClick={reload} disabled={loading}>
-        {loading?<Loader2 size={15} className="boss-spin"/>:<RefreshCw size={15}/>} 重读行程
-      </button>
-    </div>
-    {error&&<div className="boss-status boss-status-error" role="alert">
-      <AlertCircle size={16}/>{error}
-    </div>}
-    {notice&&<div className="boss-status boss-status-ok" role="status">
-      <CheckCircle2 size={16}/>{notice}
-    </div>}
-    {loading&&<div className="boss-status"><Loader2 size={16} className="boss-spin"/>正在检查行程版本…</div>}
-    <div className="boss-columns">
-      <div className="boss-column">
-        <Panel title="行程草稿与时间范围" caption="采用原 Desktop v6 的筛选与工作卡片结构">
-          <div className="boss-form-grid">
-            <label>当前行程<select value={selectedId} onChange={e=>e.target.value?loadTravel(e.target.value):resetForm()}>
-              <option value="">新建行程</option>
-              {(data?.plans||[]).map(p=><option key={p.travel_id} value={p.travel_id}>
-                {p.travel_id.slice(0,18)} · {p.status} · v{p.version}
-              </option>)}
-            </select></label>
-            <label>起点<input value={origin} onChange={e=>setOrigin(e.target.value)}
-              placeholder="填写确切起点" maxLength={240}/></label>
-            <label>目的地<input value={destination} onChange={e=>setDestination(e.target.value)}
-              placeholder="填写确切目的地" maxLength={240}/></label>
-            <label>IANA 时区<input value={timezone} onChange={e=>setTimezone(e.target.value)}
-              placeholder="Asia/Shanghai" maxLength={80}/></label>
-            <label>开始本地时间<input type="datetime-local" value={startLocal}
-              onChange={e=>setStartLocal(e.target.value)}/></label>
-            <label>开始 UTC 偏移<input value={startOffset} onChange={e=>setStartOffset(e.target.value)}
-              placeholder="+08:00" maxLength={6}/></label>
-            <label>结束本地时间<input type="datetime-local" value={endLocal}
-              onChange={e=>setEndLocal(e.target.value)}/></label>
-            <label>结束 UTC 偏移<input value={endOffset} onChange={e=>setEndOffset(e.target.value)}
-              placeholder="+08:00" maxLength={6}/></label>
-            <label>接待联系人（稳定 ID）<select value={hostId} onChange={e=>setHostId(e.target.value)}>
-              <option value="">请选择获准联系人</option>
-              {(data?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
-                {c.name} · {c.organization} / {c.contact_id}
-              </option>)}
-            </select></label>
-            <label>预留缓冲（分钟）<select value={buffer} onChange={e=>setBuffer(Number(e.target.value))}>
-              {[0,30,60,120,240,360].map(n=><option key={n} value={n}>{n} 分钟</option>)}
-            </select></label>
-            <label>交通/预订依据 ID（可空）<input value={sourceId}
-              onChange={e=>setSourceId(e.target.value)} maxLength={128}
-              placeholder="尚无可信来源时留空"/></label>
-            <label>依据当前版本<input value={sourceVersion}
-              onChange={e=>setSourceVersion(e.target.value)} maxLength={30}
-              placeholder="与来源 ID 一起填写"/></label>
-          </div>
-          <p className="boss-helper">本地时间和 UTC 偏移必须同时与 IANA 时区吻合；
-            系统拒绝不存在的夏令时时刻。日期参考模拟业务时钟，不会推定实际交通时长。</p>
-          <Item label="模拟业务时钟">{data?.business_clock||"待读取"}</Item>
-          <div className="boss-actions">
-            <button type="button" className="boss-btn boss-btn-primary"
-              disabled={loading||busy||selected?.status==="CANCELED"} onClick={review}>
-              <CalendarClock size={15}/> 保存草稿并检查冲突
-            </button>
-            <button type="button" className="boss-btn" onClick={resetForm}>另建行程</button>
-          </div>
-        </Panel>
-        <Panel title="已保存行程" caption="同一 SQLite 行程版本；不显示虚构预订">
-          {(data?.plans||[]).length?
-            data?.plans.map(p=><button type="button" className="boss-task-row"
-              key={p.travel_id} onClick={()=>loadTravel(p.travel_id)}>
-              <strong>{p.current?.origin||p.pending?.details.origin||"待核查"}
-                {" → "}{p.current?.destination||p.pending?.details.destination||"待核查"}</strong>
-              <small>{p.travel_id} · {p.status} · 版本 {p.version}
-                {p.pending?" · 有待本人确认的核查稿":""}</small>
-            </button>):<p className="boss-helper">暂无已保存行程；第一次核查会生成持久化草稿。</p>}
-        </Panel>
-      </div>
-      <div className="boss-column">
-        <Panel title="冲突与准备事项" caption="固定当前会议、私人日历及任务版本">
-          <Item label="行程状态">{selected?.status||"尚未保存"}</Item>
-          <Item label="核查有效性">{reviewed?
-            selected?.pending_is_current?"当前有效":"来源已变化，需重新核查":"无待确认稿"}</Item>
-          <Item label="固定会议">{data?.meeting.meeting_id||"未载入"}</Item>
-          <Item label="会议时间">{data?.meeting.starts_at||"未知"}（结束时刻未知）</Item>
-          <Item label="会议影响">{impact?.meeting.requires_review?"需要复核":"未发现已知开始时刻冲突"}</Item>
-          <Item label="私人时间冲突">{impact?.private_calendar.conflict?"检测到重叠":"未发现重叠"}</Item>
-          <Item label="受影响期限">{impact?.task_deadlines.length??0} 项</Item>
-          <Item label="其他已确认行程冲突">{impact?.other_confirmed_trips.length??0} 项</Item>
-          <Item label="交通/预订凭据">{impact?.transport_missing?"缺失，不能证明已订":"来源版本已固定"}</Item>
-          {(impact?.task_deadlines||[]).map(row=><div className="boss-workspace-item" key={row.task_id}>
-            <strong>{row.task_id}</strong><small>任务 v{row.version} · {row.status} · 期限 {row.due_at}</small>
-          </div>)}
-          {(impact?.other_confirmed_trips||[]).map(row=><div className="boss-workspace-item" key={row.travel_id}>
-            <strong>其他行程：{row.travel_id}</strong><small>当前 v{row.version}</small>
-          </div>)}
-          {!impact&&<p className="boss-helper">保存核查稿之后才显示基于实际业务对象的冲突结论。</p>}
-          {reviewed&&<div className="boss-actions">
-            <label className="boss-confirm-check"><input type="checkbox" checked={ackConflict}
-              onChange={e=>setAckConflict(e.target.checked)}/>
-              <span>已核实会议、任务、私人时间及未知会议结束时刻的影响</span></label>
-            <label className="boss-confirm-check"><input type="checkbox" checked={ackTransport}
-              onChange={e=>setAckTransport(e.target.checked)}/>
-              <span>已知缺少交通预订或天气依据，不将模拟计划视为真实订票</span></label>
-            <button type="button" className="boss-btn boss-btn-primary"
-              disabled={busy||!selected?.pending_is_current}
-              onClick={confirm}><ShieldCheck size={15}/> 本人确认当前版本行程</button>
-          </div>}
-          {selected&&selected.status!=="CANCELED"&&<div className="boss-actions">
-            <label>取消原因<input value={cancelReason} onChange={e=>setCancelReason(e.target.value)}
-              placeholder="说明取消原因" maxLength={400}/></label>
-            <button type="button" className="boss-btn" disabled={busy}
-              onClick={cancel}><XCircle size={15}/> 取消该模拟行程</button>
-          </div>}
-        </Panel>
-        <Panel title="关联任务和资料" caption="F11 → F04 / F12 / N05">
-          <div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("F04")}>
-              <FileSearch size={15}/> 查看会前材料复核状态
-            </button>
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("F12")}>
-              <Clock3 size={15}/> 核对本人私人日程
-            </button>
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("N05")}>检查任务期限</button>
-            {sourceId&&<button type="button" className="boss-btn"
-              onClick={()=>onViewSource(sourceId)}>打开交通依据原文</button>}
-          </div>
-          <p className="boss-helper">行程确认只写入模拟计划，不会自动更改会议、发布交办、
-            发送外部消息、预订交通或声称天气查询已完成。</p>
-        </Panel>
-      </div>
-    </div>
-    {pending&&<div className="boss-confirm-backdrop">
-      <section ref={modalRef} role="dialog" aria-modal="true" tabIndex={-1}
-        className="boss-confirm" aria-labelledby="boss-travel-confirm-title">
-        <h3 id="boss-travel-confirm-title"><ShieldCheck size={18}/>{pending.title}</h3>
-        <p>当前老板身份需单独核实此次对象、时间、版本和范围。</p>
-        <dl>{pending.detail.map((line,i)=><div key={i}><dd>{line}</dd></div>)}</dl>
-        <label className="boss-confirm-check"><input type="checkbox"
-          checked={approved} disabled={busy} onChange={e=>setApproved(e.target.checked)}/>
-          <span>我已核对上述字段并同意执行本次模拟事务。</span>
-        </label>
-        {error&&<p className="boss-validation-error" role="alert">{error}</p>}
-        <footer className="boss-actions">
-          <button type="button" className="boss-btn" onClick={()=>{setPending(null);setApproved(false);}}
-            disabled={busy||checking}>返回</button>
-          <button type="button" className="boss-btn" disabled={busy||checking}
-            onClick={()=>void reconcile()}>{checking&&<Loader2 size={14} className="boss-spin"/>} 查询原请求回执</button>
-          <button type="button" className="boss-btn boss-btn-primary"
-            disabled={busy||checking||!approved} onClick={()=>void submit()}>
-            {busy&&<Loader2 size={14} className="boss-spin"/>} 确认并写入
-          </button>
-        </footer>
-      </section>
-    </div>}
-  </>;
+  function cancel(){if(disabled||dirty||!selected)return;if(!cancelReason.trim()){setError("请填写取消原因");return;}transaction.propose("boss.travel.cancel",{travel_id:selected.travel_id,expected_version:selected.version,reason:cancelReason.trim()},"取消当前行程",["行程："+selected.travel_id+" · v"+selected.version,"取消原因："+cancelReason.trim(),"取消应用内行程，已存在的交通预订需要另行处理。"]);}
+  function impactText(value:boolean|undefined,yes:string,no:string){return value===undefined?null:value?yes:no;}
+  return <div className="boss-travel-view">
+    <div className="boss-workspace-toolbar"><span className="boss-tag boss-tag-amber">SIMULATED</span><label>当前行程<select value={selectedId} disabled={loading||transaction.busy} onChange={event=>choose(event.target.value)}><option value="">新建行程</option>{current?.plans.map(value=><option key={value.travel_id} value={value.travel_id}>{(value.pending?.details??value.current)?.destination??value.travel_id} · {value.status} · v{value.version}</option>)}</select></label><button type="button" className="boss-btn" onClick={reload} disabled={loading||transaction.busy}>{loading?<Loader2 size={15} className="boss-spin"/>:<RefreshCw size={15}/>}重读行程</button></div>
+    {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}{transaction.notice&&<div role="status" className="boss-status boss-status-ok">{transaction.notice}</div>}{stale&&<div role="alert" className="boss-status boss-status-warn">行程或核查依据已经变化，输入内容已保留。请核查并恢复当前保存内容后继续。</div>}
+    <div className="boss-travel-columns"><main className="boss-column"><Panel title="行程时间与时区">
+      <fieldset className="boss-travel-form" disabled={disabled}><label>起点<input ref={originRef} maxLength={240} value={form.origin} onChange={event=>edit({origin:event.target.value})}/></label><label>目的地<input maxLength={240} value={form.destination} onChange={event=>edit({destination:event.target.value})}/></label><label>出发日期时间（含UTC时差）<input value={form.starts_at} onChange={event=>edit({starts_at:event.target.value})} placeholder="完整日期、时间及UTC时差"/></label><label>返回日期时间（含UTC时差）<input value={form.ends_at} onChange={event=>edit({ends_at:event.target.value})} placeholder="完整日期、时间及UTC时差"/></label><label>IANA时区<input maxLength={80} value={form.timezone} onChange={event=>edit({timezone:event.target.value})} placeholder="明确行程所在地的时区"/></label><label>接待联系人<select value={form.host_contact_id} onChange={event=>edit({host_contact_id:event.target.value})}><option value="">请选择获准联系人</option>{current?.contacts.map(value=><option key={value.contact_id} value={value.contact_id}>{value.name} · {value.organization} · {value.contact_id}</option>)}</select></label><label>前后缓冲（分钟）<input type="number" min={0} max={360} step={1} value={form.buffer_minutes} onChange={event=>edit({buffer_minutes:event.target.value})}/></label><p className="boss-helper">本地时间需要明确UTC时差与IANA时区。具体夏令时有效性由行程核查结果确认。</p><div className="boss-travel-source-editor"><h3>交通资料与版本</h3>{form.transport_refs.map((value,index)=><div key={index} className="boss-travel-source-row"><label>来源编号<input maxLength={128} value={value.source_id} onChange={event=>edit({transport_refs:form.transport_refs.map((row,position)=>position===index?{...row,source_id:event.target.value}:row)})}/></label><label>版本<input maxLength={40} value={value.version} onChange={event=>edit({transport_refs:form.transport_refs.map((row,position)=>position===index?{...row,version:event.target.value}:row)})}/></label><button className="boss-btn" type="button" aria-label={"移除第"+(index+1)+"份交通资料"} onClick={()=>edit({transport_refs:form.transport_refs.filter((_,position)=>position!==index)})}><Trash2 size={15}/></button></div>)}<button className="boss-btn" type="button" disabled={form.transport_refs.length>=5} onClick={()=>edit({transport_refs:[...form.transport_refs,{source_id:"",version:""}]})}><Plus size={15}/>添加交通资料</button></div></fieldset>
+      <div className="boss-actions"><button type="button" className="boss-btn" disabled={!current||transaction.busy||(!edited&&!stale)} onClick={()=>select(selectedId)}>恢复当前保存内容</button><button type="button" className="boss-btn" disabled={!current||transaction.busy} onClick={()=>choose("")}>另建行程</button>{dirty&&<span className="boss-helper">输入尚未保存，以下为已保存的时间核查结果。</span>}</div>
+      <div className="boss-travel-times"><h3>{reviewed?"待确认行程时间":"已确认行程时间"}</h3><Fact label="当地开始" value={displayTime(details?.starts_at,details?.timezone)}/><Fact label="当地结束" value={displayTime(details?.ends_at,details?.timezone)}/><Fact label="老板时间开始" value={displayTime(details?.starts_at,current?.owner_timezone)}/><Fact label="老板时间结束" value={displayTime(details?.ends_at,current?.owner_timezone)}/><Fact label="老板显示时区" value={current?.owner_timezone}/><Fact label="绝对开始时间" value={details?.starts_at_utc}/><Fact label="绝对结束时间" value={details?.ends_at_utc}/><Fact label="前后缓冲" value={details?details.buffer_minutes+"分钟":null}/><Fact label="业务时间" value={displayTime(current?.business_clock,current?.owner_timezone)}/></div>
+    </Panel><Panel title="受影响会议与事项">
+      <p className="boss-helper">{reviewed?"以下为待确认稿的核查结果。":selected?.impact_at_confirmation?"以下为确认时保存的影响记录，当前影响需要重新核查。":"尚未取得行程影响核查结果。"}</p><Fact label="核查覆盖" value={impact?.coverage}/><Fact label="关联会议" value={impact?.meeting.meeting_id}/><Fact label="核查采用会议版本" value={impact?.meeting.version}/><Fact label="当前会议版本" value={current?.meeting.version}/><Fact label="会议开始" value={displayTime(impact?.meeting.starts_at,current?.owner_timezone)}/><Fact label="会议结束" value={displayTime(impact?.meeting.ends_at,current?.owner_timezone)}/><Fact label="会议影响" value={impactText(impact?.meeting.requires_review,"需要复核","核查范围内未发现")}/><Fact label="私人时间冲突" value={impactText(impact?.private_calendar.conflict,"存在时间重叠","核查范围内未发现")}/><Fact label="私人日历状态" value={impact?.private_calendar.status}/><Fact label="受影响任务期限" value={impact?.task_deadlines.length}/><Fact label="其他已确认行程" value={impact?.other_confirmed_trips.length}/>
+      {impact?.task_deadlines.map(value=><article className="boss-workspace-item" key={value.task_id}><strong>{value.task_id} · {value.status}</strong><Fact label="任务版本" value={value.version}/><Fact label="有效期限" value={displayTime(value.due_at,current?.owner_timezone)}/></article>)}{impact?.other_confirmed_trips.map(value=><article className="boss-workspace-item" key={value.travel_id}><strong>{value.travel_id} · v{value.version}</strong><button type="button" className="boss-btn" disabled={!current?.plans.some(plan=>plan.travel_id===value.travel_id)||transaction.busy} onClick={()=>choose(value.travel_id)}>核查该行程</button></article>)}
+      <h3>准备期限</h3>{impact?.preparation_items?.map(value=><article className="boss-workspace-item" key={value.id}><strong>{value.title}</strong><Fact label="准备期限" value={displayTime(value.due_at,current?.owner_timezone)}/><Fact label="会议" value={value.meeting_id}/><Fact label="会议版本" value={value.meeting_version}/></article>)}{!impact?.preparation_items&&<p className="boss-helper">完整准备事项与期限尚未提供。</p>}
+    </Panel><Panel title="确认具体变更">
+      <Fact label="行程编号" value={selected?.travel_id}/><Fact label="当前版本" value={selected?.version}/><Fact label="当前状态" value={selected?.status}/><Fact label="待确认稿有效性" value={reviewed?selected?.pending_is_current?"当前有效":"需要重新核查":null}/><Fact label="已确认开始" value={selected?.current?.starts_at}/><Fact label="已确认结束" value={selected?.current?.ends_at}/><Fact label="待确认开始" value={reviewed?.details.starts_at}/><Fact label="待确认结束" value={reviewed?.details.ends_at}/><Fact label="待确认地点" value={reviewed?reviewed.details.origin+" → "+reviewed.details.destination:null}/><Fact label="待确认接待人" value={reviewed?.details.host_contact_id}/>
+      <fieldset className="boss-travel-confirm" disabled={disabled||dirty||!reviewed||!selected?.pending_is_current}><label className="boss-confirm-check"><input type="checkbox" checked={ackConflict} onChange={event=>setAckConflict(event.target.checked)}/>本人已核查会议、任务、私人时间及缺少会议结束时间的影响</label><label className="boss-confirm-check"><input type="checkbox" checked={ackTransport} onChange={event=>setAckTransport(event.target.checked)}/>本人已知当前交通资料的缺少范围，具体预订结果需要另行核查</label></fieldset>
+      {showCancel&&<div className="boss-travel-cancel"><label>取消原因<textarea maxLength={400} value={cancelReason} disabled={disabled||dirty} onChange={event=>setCancelReason(event.target.value)}/></label><div className="boss-actions"><button className="boss-btn" type="button" disabled={disabled||dirty||!cancelReason.trim()} onClick={cancel}>核查并取消当前行程</button><button className="boss-btn" type="button" disabled={transaction.busy} onClick={()=>{setShowCancel(false);setCancelReason("");}}>继续保留行程</button></div></div>}
+      <p className="boss-helper">确认应用内行程，原会议、任务、交通预订和外部通知分别处理。</p>{transaction.recovery}
+    </Panel></main><aside className="boss-column"><Panel title="来源与风险">
+      <Fact label="交通依据" value={impactText(impact?.transport_missing,"缺少有效依据","核查时已固定版本")}/><Fact label="天气来源" value={impactText(impact?.weather_source_present,"核查记录包含来源","尚未提供")}/><Fact label="实际预订核查" value={impactText(impact?.external_booking_verified,"已核查","尚未核查")}/><Fact label="实际天气检索" value={impactText(current?.real_weather_retrieval,"已执行","未执行")}/><Fact label="会议结束时间" value={impactText(impact?.meeting.end_known,"已提供","尚未提供，影响需复核")}/>
+      {details?.transport_refs.map(ref=>{const source=current?.sources?.find(value=>value.source_id===ref.source_id&&value.version===ref.version);return <article className="boss-workspace-item" key={ref.source_id}><strong>{ref.source_id} · v{ref.version}</strong><Fact label="当前有效性" value={source?.status}/><Fact label="作者" value={source?.author}/><Fact label="发布日期" value={source?.published_at}/><Fact label="有效截至" value={source?.valid_until}/><button type="button" className="boss-btn" onClick={()=>onViewSource(ref.source_id)}><FileSearch size={15}/>核查当前原文</button></article>;})}
+      {!details?.transport_refs.length&&<p className="boss-helper">当前材料没有交通依据。行程记录不能证明已经预订。</p>}<p className="boss-helper">日期跨越、夏令时歧义与时区不一致需要通过时间核查，缺少依据时保持待确认。</p>
+    </Panel><Panel title="后续入口"><div className="boss-actions"><button className="boss-btn" type="button" onClick={()=>onNavigate("F04")}>核查会前材料</button><button className="boss-btn" type="button" onClick={()=>onNavigate("F12")}>核对私人安排</button><button className="boss-btn" type="button" onClick={()=>onNavigate("N05")}>查看任务期限</button></div><Fact label="上次修改时间" value={displayTime(selected?.updated_at,current?.owner_timezone)}/></Panel></aside></div>
+    <footer className="boss-travel-footer boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={review}><CalendarClock size={15}/>检查影响</button><button type="button" className="boss-btn" disabled={disabled} onClick={()=>originRef.current?.focus()}>编辑行程</button><button type="button" className="boss-btn" disabled={disabled||dirty||!reviewed||!selected?.pending_is_current} onClick={confirm}><ShieldCheck size={15}/>确认具体变更</button><button type="button" className="boss-btn" disabled={disabled||dirty||!selected} onClick={()=>setShowCancel(true)}><XCircle size={15}/>取消行程</button></footer>
+    {transaction.dialog}<Dialog.Root open={nextId!==null} onOpenChange={open=>{if(!open)setNextId(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>当前行程存在未保存内容</Dialog.Title><Dialog.Description>可以继续编辑，或者放弃尚未提交的输入与确认选择后切换行程。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button type="button" className="boss-btn">继续编辑</button></Dialog.Close><button type="button" className="boss-btn" disabled={!current||transaction.busy} onClick={()=>{if(nextId!==null)select(nextId);}}>放弃编辑并切换行程</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
+  </div>;
 }

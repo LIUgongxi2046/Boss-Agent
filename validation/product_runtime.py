@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import inspect
 import json
@@ -7,7 +8,7 @@ from typing import Literal
 
 from aiohttp import web
 from nanobot.config.loader import load_config, resolve_config_env_vars
-from nanobot.providers.factory import ProviderSnapshot
+from nanobot.providers.factory import ProviderSnapshot, validate_provider_setup
 from nanobot.webui.settings_services import WebUISettingsConfig
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -15,10 +16,12 @@ from business import checksum, now, require
 from boss_prompt_config import obj
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from boss_agent_read_tools import BossResearchSourcesTool
+from boss_v7_models import ModelConnections, PROVIDERS
+from boss_v7_store import optional
 from runtime_sop_read_tools import BossWorkspaceReadTool, SOP_WORKSPACE_PROJECTIONS
 
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 ACTIONS = {"boss.runtime.save", "boss.runtime.validate", "boss.runtime.activate", "boss.runtime.deactivate"}
 
 
@@ -34,7 +37,12 @@ class RuntimeValues(BaseModel):
 class ProductRuntime:
     def __init__(self, store, config_path, loop, registry, available_tools, provider, *, workspace_api=None, workspace_tool_factory=None):
         self.store, self.loop, self.registry, self.provider = store, loop, registry, provider
+        self.execution_transition = None
+        self.conversation_attachments = None
+        self.active_tasks = set()
         self.config = WebUISettingsConfig(config_path)
+        self.models = ModelConnections(store, self)
+        self.models.recover()
         self.available = {tool.name: tool for tool in available_tools}
         require(workspace_api is None or workspace_api.store is store and workspace_api.namespace == NS,
                 "工作投影接口必须绑定当前业务数据库及执行空间")
@@ -57,9 +65,29 @@ class ProductRuntime:
             current = store.get(db, NS, "configuration", "current")
         self.config.run_serialized(lambda path: self._apply(self._native(), current["tool_scope"], current))
 
-    def _native(self):
+    def _native(self, model_record=None):
         source_sha = self._native_sha()
         config = resolve_config_env_vars(load_config(self.config.path), config_path=self.config.path)
+        if model_record is None:
+            with self.store.connect() as db:
+                model_record = optional(db, "model_connection_active", "current")
+        if model_record is not None:
+            values = model_record["values"]
+            require(bool(os.environ.get(values["credential_reference"])), "服务端凭据尚未配置", web.HTTPServiceUnavailable)
+            config.agents.defaults.model_preset = None
+            config.agents.defaults.model = values["model_id"]
+            config.agents.defaults.provider = values["provider"]
+            config.agents.defaults.fallback_models = []
+            config.agents.defaults.max_tool_iterations = values["max_tool_rounds"]
+            provider_config = getattr(config.providers, values["provider"])
+            provider_config.api_base = PROVIDERS[values["provider"]]["base_url"]
+            provider_config.api_key = os.environ[values["credential_reference"]]
+            if values["provider"] == "openai":
+                provider_config.api_type = "chat_completions"
+            validate_provider_setup(config)
+            require(config.agents.defaults.dream.enabled is False, "当前产品不允许后台模型任务", web.HTTPForbidden)
+            require(source_sha == self._native_sha(), "读取期间原生配置发生变化")
+            return config
         preset = config.resolve_preset()
         require(config.get_provider_name(preset.model, preset=preset) == "deepseek"
                 and preset.model == "deepseek-flash", "模型配置超出当前获准服务", web.HTTPForbidden)
@@ -116,16 +144,29 @@ class ProductRuntime:
                             "implementation_sha256": hashlib.sha256(Path(source).read_bytes()).hexdigest()})
         return checksum(records)
 
-    def _apply(self, config, scope, workspace_values):
+    def _apply(self, config, scope, workspace_values, model_record=None):
         scope = self._scope(scope)
         workspace = self._workspace(workspace_values)
+        if model_record is None:
+            with self.store.connect() as db:
+                model_record = optional(db, "model_connection_active", "current")
         preset = config.resolve_preset()
+        if model_record is not None and "max_output_tokens" in workspace_values:
+            preset = preset.model_copy(update={"max_tokens": workspace_values["max_output_tokens"]})
         generation = preset.to_generation_settings()
         native_sha = self._native_sha()
+        if model_record is not None:
+            from nanobot.agent.tools.context import current_request_context
+            def observe(event):
+                request = current_request_context()
+                require(request is not None and ATTRIBUTE in request.attributes, "实际模型请求缺少运行归属")
+                return request.attributes[ATTRIBUTE].recorder.observe_transport(event)
+            self.provider.adopt_external(self.models.provider(model_record["values"],
+                                         model_record["id"] + "-" + model_record["version"], observe))
         self.provider.generation = generation
         self.loop.runtime_resolver.adopt_snapshot(ProviderSnapshot(
             provider=self.provider, model=preset.model, context_window_tokens=preset.context_window_tokens,
-            signature=("boss-product", native_sha), generation=generation,
+            signature=("boss-product", native_sha, checksum(model_record) if model_record else "SIMULATED_FIRST"), generation=generation,
         ))
         self.loop.max_iterations = config.agents.defaults.max_tool_iterations
         for name in list(self.registry.tool_names):
@@ -137,22 +178,62 @@ class ProductRuntime:
                 self.registry.register(self.available[name])
         self.workspace_policy = workspace
         self.effective = {
-            "provider": "deepseek", "model_id": preset.model, "api_type": "chat_completions",
+            "provider": config.get_provider_name(preset.model, preset=preset), "model_id": preset.model, "api_type": "chat_completions",
             "max_tool_rounds": self.loop.max_iterations, "max_output_tokens": generation.max_tokens,
-            "timeout": 120, "config_sha256": native_sha,
+            "timeout": model_record["values"]["timeout_seconds"] if model_record else 120, "config_sha256": native_sha,
         }
+        self.model_reference = {"id": model_record["id"], "version": model_record["version"]} if model_record else None
         self.native_configuration = config.model_dump(mode="json")
+
+    def apply_model(self, record, current):
+        self.config.run_serialized(lambda path: self._apply(self._native(record), current["tool_scope"], current, record))
+
+    async def stop_runs(self):
+        current = asyncio.current_task()
+        tasks = tuple(task for task in self.active_tasks if task is not current and not task.done())
+        for task in tasks:
+            task.cancel()
+        if tasks:
+            await asyncio.wait(tasks)
+            for task in tasks:
+                if not task.cancelled():
+                    task.result()
+
+    async def close(self):
+        await self.stop_runs()
+        await self.models.close()
+        await self.provider.close_external()
+
+    async def run_bot(self, bot, message, **kwargs):
+        from boss_execution_transition import pending_transition
+        with self.store.connect() as db:
+            require(pending_transition(db, NS) is None, "执行空间正在切换，不能接收新的运行")
+        task = asyncio.create_task(bot.run(message, **kwargs))
+        self.active_tasks.add(task)
+        try:
+            return await task
+        finally:
+            self.active_tasks.discard(task)
 
     def snapshot(self):
         require(self._native_sha() == self.effective["config_sha256"],
                 "已保存配置尚未启用到当前Runtime")
+        with self.store.connect() as db:
+            current = self.store.get(db, NS, "configuration", "current")
+            require(current.get("model_connection") == self.model_reference, "模型连接尚未被Runtime采用")
         return dict(self.effective)
 
     def native_refresh_requested(self):
         # 原生配置保存后，由本人技术维护操作完成当前版本校验及启用。
         return self.loop.llm_runtime()
 
+    def reconcile_memory(self):
+        return self.loop.sessions.reconcile_memory()
+
     async def context(self, request):
+        from boss_execution_transition import pending_transition
+        with self.store.connect() as db:
+            require(pending_transition(db, NS) is None, "执行空间正在切换，不能接收新的运行")
         existing = request.attributes.get(ATTRIBUTE)
         if existing is not None:
             require(isinstance(existing, RuntimeBinding) and existing.recorder.store is self.store
@@ -225,6 +306,8 @@ class ProductRuntime:
                 api._exact(payload, {"client_request_id", "expected_version", "values"})
                 require(payload["expected_version"] == (draft["version"] if draft else "0"), "当前配置草稿已变化")
                 values = RuntimeValues.model_validate(payload["values"]).model_dump()
+                if current.get("model_connection"):
+                    require(values["max_tool_rounds"] == current["max_tool_rounds"], "模型轮数限制需要通过模型连接版本修改")
                 values["tool_scope"] = self._scope(values["tool_scope"])
                 values.update(self._workspace(values))
                 self._native()
@@ -245,6 +328,9 @@ class ProductRuntime:
                         and draft["content_sha256"] == payload["expected_content_sha256"], "配置草稿版本或内容已变化")
                 require(self._native_sha() == draft["native_config_sha256"], "原生配置已变化，请重新保存并校验")
                 require(self._catalog_sha() == draft["tool_catalog_sha256"], "工具定义或实现已变化，请重新保存并校验")
+                if current.get("model_connection"):
+                    require(draft["values"]["max_tool_rounds"] == current["max_tool_rounds"],
+                            "模型轮数限制需要通过模型连接版本修改")
                 self._scope(draft["values"]["tool_scope"])
                 self._workspace(draft["values"])
                 self._native()

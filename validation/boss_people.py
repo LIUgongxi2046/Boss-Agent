@@ -19,7 +19,7 @@ from boss_source_access import require_current_business_source
 from boss_supply_quality import external_adoption
 from boss_source_policy import source_validity
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 
 
 def _get(db, kind, key):

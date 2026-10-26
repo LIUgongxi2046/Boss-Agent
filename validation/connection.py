@@ -65,7 +65,13 @@ class RecordedProvider(OpenAICompatProvider):
     def __init__(self, config, output, *, redact_payload=False, transport_observer=None):
         self.redact_payload = redact_payload
         self.transport_observer = transport_observer
-        super().__init__(api_key=os.environ["DEEPSEEK_API_KEY"], api_base=config["base_url"], default_model=config["model_id"], spec=find_by_name("deepseek"), extra_body={"thinking": {"type": config["thinking"]}}, provider_name="deepseek")
+        provider_name = config.get("provider", "deepseek")
+        credential_reference = config.get("credential_reference", "DEEPSEEK_API_KEY")
+        self.timeout_seconds = config.get("timeout_seconds", 120)
+        super().__init__(api_key=os.environ[credential_reference], api_base=config["base_url"],
+                         default_model=config["model_id"], spec=find_by_name(provider_name),
+                         extra_body={"thinking": {"type": config["thinking"]}} if provider_name == "deepseek" else {},
+                         api_type="chat_completions", provider_name=provider_name)
         self.output = Path(output)
         loaded = json.loads(self.output.read_text()) if self.output.exists() else []
         self.requests = ([self._sanitize_history(row) for row in loaded]
@@ -160,7 +166,9 @@ class RecordedProvider(OpenAICompatProvider):
                     record["error"] = body.get("error")
             self.record(record)
 
-        self._client = AsyncOpenAI(api_key=os.environ["DEEPSEEK_API_KEY"], base_url=self._effective_base, max_retries=0, timeout=120, http_client=httpx.AsyncClient(timeout=120, event_hooks={"request": [request_hook], "response": [response_hook]}))
+        self._client = AsyncOpenAI(api_key=self._api_key_for_client, base_url=self._effective_base, max_retries=0,
+                                  timeout=self.timeout_seconds, http_client=httpx.AsyncClient(
+                                      timeout=self.timeout_seconds, event_hooks={"request": [request_hook], "response": [response_hook]}))
         self._client.chat.completions = RecordedCompletions(self._client, self)
 
 

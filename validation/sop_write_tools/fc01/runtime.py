@@ -111,8 +111,9 @@ class Fc01RuntimeHook(RuntimeRecordHook):
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)
-            row.update(model_completion_observed=False, model_behavior_evaluation_passed=False,
-                       usage=None, cost_total=None, price_version=None)
+            row["model_behavior_evaluation_passed"] = False
+            if not row.get("external_model_invoked"):
+                row.update(model_completion_observed=False, usage=None, cost_total=None, price_version=None)
             for event in row.get("simulated_model_events", []):
                 if event["state"] == "REQUESTED":
                     event["state"] = row["status"]

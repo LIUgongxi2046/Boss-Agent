@@ -52,10 +52,12 @@ def query_inputs(store, db, ns, initial, payload):
 
 
 def binding_current(store, db, ns, initial, binding, enforce=True):
+    from boss_v7_metrics import policy_fingerprint
     scenario = store.get(db, ns, "bi_scenario", binding["scenario_id"])
     require(scenario["owner_id"] == initial["owner_id"] and scenario["dataset_id"] == initial["dataset_id"]
             and scenario["dataset_version"] == initial["dataset_version"] and scenario["execution_namespace"] == ns, "经营场景范围不符", web.HTTPForbidden)
     valid = binding["definitions_sha256"] == checksum(initial["metric_definitions"])
+    valid = valid and binding.get("metric_policy_sha256", checksum({})) == policy_fingerprint(db, ns)
     clock = store.get(db, ns, "clock", "current")["at"]
     for saved in binding["document_snapshots"]:
         current = _document(store, db, ns, saved["source_id"])

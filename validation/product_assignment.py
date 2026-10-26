@@ -8,6 +8,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.providers.base import LLMResponse, ToolCallRequest
 
 from business import checksum, now, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_assignment_sources import AssignmentSourcesAPI
 from boss_business_overview import BusinessOverviewAPI
 from boss_runtime_records import ATTRIBUTE
@@ -42,7 +43,7 @@ class ProductAssignment:
 
     def _overview_record(self, db, key):
         context = _context(db)
-        row = self.store.get(db, "ui-check", "overview_assignment_preparation", key)
+        row = self.store.get(db, NS, "overview_assignment_preparation", key)
         require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")),
                 "经营准备原请求不属于当前本人资料", web.HTTPForbidden)
         return row
@@ -63,15 +64,15 @@ class ProductAssignment:
             checked = bridge.project_in_transaction(role, db, payload["input"])
             require(checked["context_sha256"] == payload["context_sha256"] and checked["current_use_verified"],
                     "经营准备范围或来源已经变化", web.HTTPConflict)
-            previous = db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='overview_assignment_preparation' AND id=?", (key,)).fetchone()
+            previous = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='overview_assignment_preparation' AND id=?", (NS, key)).fetchone()
             if previous:
                 require(self._overview_record(db, key)["input_sha256"] == digest,
                         "经营准备原编号内容不符", web.HTTPConflict)
             else:
-                require(db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='assignment_public_request' AND id=?", (key,)).fetchone() is None,
+                require(db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='assignment_public_request' AND id=?", (NS, key)).fetchone() is None,
                         "当前编号已经用于其他交办准备，请读取原请求", web.HTTPConflict)
                 context = _context(db)
-                self.store.put(db, "ui-check", "overview_assignment_preparation", key, {"client_request_id": key,
+                self.store.put(db, NS, "overview_assignment_preparation", key, {"client_request_id": key,
                     **{field: context[field] for field in ("owner_id", "dataset_id", "dataset_version")},
                     "input_sha256": digest, "input": payload["input"], "context_sha256": payload["context_sha256"],
                     "created_at": now()})
@@ -102,7 +103,7 @@ class ProductAssignment:
         with self.store.connect() as db:
             db.execute("BEGIN")
             row = self._overview_record(db, key)
-            recorded = db.execute("SELECT 1 FROM objects WHERE namespace='ui-check' AND kind='assignment_public_request' AND id=?", (key,)).fetchone()
+            recorded = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='assignment_public_request' AND id=?", (NS, key)).fetchone()
         result = self.receipt(role, key, active) if recorded else None
         require(active(), "经营准备读取期间本人身份已变化", web.HTTPUnauthorized)
         return {"source_type": "RUNTIME_RECORD", "client_request_id": key, "input": row["input"],
@@ -125,7 +126,7 @@ class ProductAssignment:
     def context_provider(self):
         request, grant = self._grant()
         binding = request.attributes.get(ATTRIBUTE)
-        return Fc07Context("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
+        return Fc07Context("BOSS", grant.owner_id, NS, grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else grant.key, binding.session_id if binding else grant.session_id,
             True, grant.task_id, grant.task_version, grant.review_sha256)
 
@@ -163,28 +164,28 @@ class ProductAssignment:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             context = _context(db)
-            previous = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='assignment_public_request' AND id=?", (key,)).fetchone()
+            previous = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='assignment_public_request' AND id=?", (NS, key)).fetchone()
             if previous:
                 require(json.loads(previous[0])["input_sha256"] == digest, "同编号交办读取内容不符", web.HTTPConflict)
             else:
-                self.store.put(db, "ui-check", "assignment_public_request", key, {"client_request_id": key, "input_sha256": digest,
+                self.store.put(db, NS, "assignment_public_request", key, {"client_request_id": key, "input_sha256": digest,
                     **{field: context[field] for field in ("owner_id", "dataset_id", "dataset_version")}, "task_id": payload["task_id"],
                     "task_version": payload["task_version"], "review_sha256": view["review_sha256"], "status": "PREPARED", "created_at": now()})
         if previous:
             return self.receipt(role, key, active)
         grant = AssignmentRequest(key, context["owner_id"], context["dataset_id"], context["dataset_version"], payload["task_id"],
             payload["task_version"], view["review_sha256"], "fc07:" + key, active)
-        result = await self.bot.run("SIMULATED：读取当前选中的交办及其来源，准备本人核查。", session_key=grant.session_id,
+        result = await self.runtime.run_bot(self.bot, "SIMULATED：读取当前选中的交办及其来源，准备本人核查。", session_key=grant.session_id,
             sender_id=grant.owner_id, ephemeral=True, attributes={GRANT: grant})
         require(not result.error and key in self.outputs and active(), "当前交办读取未完成，请核查原请求", web.HTTPConflict)
         output = self.outputs.pop(key)
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "assignment_public_request", key)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"])
+            row = self.store.get(db, NS, "assignment_public_request", key)
+            run = self.store.get(db, NS, "runtime_run", row["run_id"])
             require(run["status"] == "SUCCEEDED", "当前交办实际运行未成功", web.HTTPConflict)
             row.update(status="SUCCEEDED", result=output)
-            self.store.put(db, "ui-check", "assignment_public_request", key, row)
+            self.store.put(db, NS, "assignment_public_request", key, row)
         return self.receipt(role, key, active)
 
     def receipt(self, role, key, active):
@@ -193,9 +194,9 @@ class ProductAssignment:
         with self.store.connect() as db:
             db.execute("BEGIN")
             context = _context(db)
-            row = self.store.get(db, "ui-check", "assignment_public_request", key)
+            row = self.store.get(db, NS, "assignment_public_request", key)
             require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")), "原交办读取不属于当前资料范围", web.HTTPForbidden)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row.get("run_id") else None
+            run = self.store.get(db, NS, "runtime_run", row["run_id"]) if row.get("run_id") else None
         view = AssignmentSourcesAPI(self.store).read(role, row["task_id"])
         current = view["task"]["version"] == row["task_version"] and view["review_sha256"] == row["review_sha256"]
         return {"client_request_id": key, "task_id": row["task_id"], "task_version": row["task_version"], "run_id": row.get("run_id"),
@@ -205,7 +206,7 @@ class ProductAssignment:
 
 class PublicAssignmentRecorder(Fc07RuntimeRecorder):
     def __init__(self, service, registry, snapshot):
-        super().__init__(service.store, "ui-check", registry, snapshot, service.context_provider)
+        super().__init__(service.store, NS, registry, snapshot, service.context_provider)
         self.service = service
 
     async def context(self, request):
@@ -216,9 +217,9 @@ class PublicAssignmentRecorder(Fc07RuntimeRecorder):
             binding = request.attributes[ATTRIBUTE]
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
-                row = self.store.get(db, "ui-check", "assignment_public_request", grant.key)
+                row = self.store.get(db, NS, "assignment_public_request", grant.key)
                 row.update(status="RUNNING", run_id=binding.run_id)
-                self.store.put(db, "ui-check", "assignment_public_request", grant.key, row)
+                self.store.put(db, NS, "assignment_public_request", grant.key, row)
             return block
         finally:
             PREPARING_REQUEST.reset(token)

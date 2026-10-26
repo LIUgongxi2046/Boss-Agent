@@ -50,7 +50,7 @@ def test_native_notification_target_is_current_owner_only_and_readonly(demo):
     code, target = pages.serve("BOSS", "/api/boss/ui/notification-target", query)
     assert code == 200, target
     validate_public("NotificationTarget", target)
-    assert target == {"source_type": "SIMULATED", "event_id": "event-1", "event_version": "1", "category": "经营提醒", "page_id": "F02", "notification_saved": True, "system_delivery_verified": False}
+    assert target == {"source_type": "SIMULATED", "execution_namespace": "ui-check", "event_id": "event-1", "event_version": "1", "category": "经营提醒", "page_id": "F02", "notification_saved": True, "system_delivery_verified": False}
     for role, status in ((None, 401), ("MAINTAINER", 403)):
         assert pages.serve(role, "/api/boss/ui/notification-target", query)[0] == status
     for suffix in ("&owner_id=boss-1", "&event_id=event-1", "&confirmed=true"):

@@ -9,7 +9,7 @@ from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
-from nanobot.config.loader import save_config
+from nanobot.config.loader import load_config, save_config
 from nanobot.config.schema import Config
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
@@ -40,6 +40,7 @@ def product_morning(tmp_path):
         "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com"}}})
     filename = tmp_path / "config.json"
     save_config(config, filename)
+    config = load_config(filename)
     fc01, bi, morning = ProductFc01(store), ProductBI(store), ProductMorning(store)
     provider, registry = FeatureProvider(fc01, bi, morning), FeatureToolRegistry()
     recorder = FeatureRecorder(store, registry, lambda: runtime.snapshot(), bi, morning)

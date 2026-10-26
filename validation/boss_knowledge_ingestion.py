@@ -18,7 +18,7 @@ from markdown_it import MarkdownIt
 
 from business import now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 CUSTOM_SOURCE_ID = re.compile(r"sim-doc-[a-z0-9][a-z0-9-]{2,59}\Z")
 ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
 POTENTIAL_SECRET = re.compile(r"\bsk-[A-Za-z0-9_-]{25,}\b")
@@ -65,14 +65,17 @@ def _read(db, source_id):
     return json.loads(row[0]) if row else None
 
 
+def indexable_content(text):
+    rendered = MarkdownIt("commonmark", {"html": False}).render(text)
+    require(bool(rendered.strip()), "资料缺少可检索正文", web.HTTPBadRequest)
+    document = fragment_fromstring(rendered, create_parent="div")
+    indexed = "\n".join(document.itertext()).strip()
+    require(bool(indexed), "资料缺少可检索正文", web.HTTPBadRequest)
+    return indexed
+
+
 def _reindex(db, source_id, text):
-    indexed_text = None
-    if text is not None:
-        rendered = MarkdownIt("commonmark", {"html": False}).render(text)
-        require(bool(rendered.strip()), "资料缺少可检索正文", web.HTTPBadRequest)
-        document = fragment_fromstring(rendered, create_parent="div")
-        indexed_text = "\n".join(document.itertext()).strip()
-        require(bool(indexed_text), "资料缺少可检索正文", web.HTTPBadRequest)
+    indexed_text = indexable_content(text) if text is not None else None
     db.execute("DELETE FROM knowledge WHERE namespace=? AND source_id=?", (NS, source_id))
     if text is not None:
         db.execute(
@@ -94,7 +97,7 @@ def _change(api, db, data, payload, mode):
     title = _field_text(payload["title"], "资料标题", 120)
     author = _validate_author(data, payload["author_contact_id"])
     published = _validate_publication(payload["published_at"])
-    content = _field_text(payload["content"], "模拟资料内容", 12000, 30)
+    content = _field_text(payload["content"], "模拟资料内容", 2_000_000, 30)
     existing = _read(db, sid)
     if create:
         require(existing is None, "资料标识已存在，不能覆盖已有内容")
@@ -132,6 +135,7 @@ def _change(api, db, data, payload, mode):
         "withdrawn": False,
         "withdrawn_at": None,
         "index_state": "INDEXED_CURRENT",
+        "index_format": "COMMONMARK_TEXT_V1",
     }
     api.store.put(db, NS, "document", sid, record)
     _reindex(db, sid, content)

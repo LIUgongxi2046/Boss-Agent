@@ -31,9 +31,14 @@ class ConversationReferences:
             origin = recorded_conversation_context(run)
             for ref in origin["references"]:
                 add(ref["kind"], ref["id"], ref["version"], {"origin": "CONVERSATION_CONTEXT", "tool_id": None, "tool_call_id": None})
+        for ref in run.get("morning_context", {}).get("source_selection", {}).get("source_refs", []):
+            add("document", ref["source_id"], ref["version"], {"origin": "SOURCE_SELECTION", "tool_id": None, "tool_call_id": None})
         for step in run["tool_results"]:
             if "source_id" in step:
                 add("document", step["source_id"], step.get("version"),
+                    {"origin": "TOOL_RESULT", "tool_id": step["tool_id"], "tool_call_id": step["tool_call_id"]})
+            if "document_ref" in step:
+                add("document", step["document_ref"]["source_id"], step["document_ref"]["version"],
                     {"origin": "TOOL_RESULT", "tool_id": step["tool_id"], "tool_call_id": step["tool_call_id"]})
             if "task_id" in step:
                 add("task", step["task_id"], step.get("task_version"),

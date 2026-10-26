@@ -44,6 +44,8 @@ class Fc03RuntimeRecorder(Fc01RuntimeRecorder):
         reference["client_request_id"] = context.client_request_id
         if selected is not None:
             reference["selected_item_ref"] = selected
+        if context.source_selection_json is not None:
+            reference["source_selection"] = json.loads(context.source_selection_json)
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self._read(db, binding.run_id)
@@ -61,6 +63,10 @@ class Fc03RuntimeRecorder(Fc01RuntimeRecorder):
 
 
 class Fc03RuntimeHook(Fc01RuntimeHook):
+    def check_cancellation(self):
+        super().check_cancellation()
+        self.recorder.context_provider()
+
     async def on_execute_tool_error(self, context, tool_call, tool, params, error):
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")

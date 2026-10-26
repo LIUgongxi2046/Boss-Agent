@@ -58,7 +58,7 @@
       "page_id": "F01",
       "design_title": "今日工作",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F01-今日工作.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F01-今日工作.html",
       "requirement_ids": [
         "FR-01",
         "FR-11",
@@ -75,7 +75,7 @@
       "logical_architecture_route": "/app/boss/F01",
       "actual_webui_navigation": "?bossPage=F01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "CURRENT_CODE_COMPILES_V6_FUNCTIONS_PRESENT_V7_ACCEPTANCE_PENDING",
+      "render_status": "MORNING_STRUCTURE_AND_VERSION_BOUND_EDITING_IMPLEMENTED_PRODUCT_DOM_PENDING",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop + BossMorningView + BossToday + native ThreadShell",
       "verified_http_read_routes": [
@@ -132,7 +132,7 @@
       "page_id": "F02",
       "design_title": "经营提醒",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F02-经营提醒.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F02-经营提醒.html",
       "requirement_ids": [
         "FR-02",
         "FR-06",
@@ -149,9 +149,9 @@
       "logical_architecture_route": "/app/boss/F02",
       "actual_webui_navigation": "?bossPage=F02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_OWNER_NOTIFICATION_WRITE_AND_READ",
-      "component_file": "app/webui/BossWorkspaceView.tsx",
-      "component_name": "BossWorkspaceView",
+      "render_status": "V7_DETAIL_STRUCTURE_IMPLEMENTED_SERVICE_AND_PRODUCT_DOM_PENDING",
+      "component_file": "app/webui/BossReminderWorkspace.tsx",
+      "component_name": "BossReminderWorkspace",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/notifications"
       ],
@@ -183,7 +183,7 @@
       "page_id": "F03",
       "design_title": "经营查询与追问",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F03-经营查询与追问.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F03-经营查询与追问.html",
       "requirement_ids": [
         "FR-03"
       ],
@@ -194,18 +194,20 @@
       "logical_architecture_route": "/app/boss/F03",
       "actual_webui_navigation": "?bossPage=F03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_METRIC_UI",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "render_status": "V7_QUERY_STRUCTURE_IMPLEMENTED_FULL_SERVICE_FLOW_AND_PRODUCT_DOM_PENDING",
+      "component_file": "app/webui/BossBIView.tsx",
+      "component_name": "BossBIView",
       "verified_http_read_routes": [
         "GET /api/boss/ui/metrics"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.bi.query", "boss.bi.follow_up", "boss.bi.cancel"],
+      "code_wired_http_read_routes": ["GET /api/boss/ui/bi/scenarios", "GET /api/boss/ui/bi/dimensions", "GET /api/boss/ui/bi/history", "GET /api/boss/ui/bi/receipt", "GET /api/boss/ui/bi/query", "GET /api/boss/ui/metrics-evidence"],
+      "other_integration_points": ["BusinessOverviewQuery", "BIBasisComparison", "BIRecordContent"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "conversation.followup"
+        "complete_trend_projection",
+        "continuous_query_and_original_request_end_to_end_verification"
       ],
       "tests": [
         "app/tests/test_v6_contract.py"
@@ -341,7 +343,7 @@
       "page_id": "F06",
       "design_title": "交办详情",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F06-交办详情.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F06-交办详情.html",
       "requirement_ids": [
         "FR-06",
         "FR-28"
@@ -358,7 +360,7 @@
       "render_status": "WORKFLOW_CODE_INTEGRATED_NOT_E2E_VERIFIED",
       "component_file": "app/webui/BossAssignmentFlow.tsx",
       "component_name": "BossAssignmentFlow (nested in BossDesktop)",
-      "additional_component_files": ["app/webui/BossAssignmentSourceReview.tsx"],
+      "additional_component_files": ["app/webui/BossAssignmentDetails.tsx", "app/webui/BossAssignmentSourceReview.tsx", "app/webui/BossTaskConversationEntry.tsx"],
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
         "GET /api/boss/ui/tasks",
@@ -372,6 +374,8 @@
         "boss.assignment.extend",
         "boss.assignment.cancel",
         "boss.assignment.nudge",
+        "boss.assignment.extension.decide",
+        "boss.message.draft.save",
         "boss.assignment.sources.confirm"
       ],
       "other_integration_points": [
@@ -381,11 +385,9 @@
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [
-        "assignments.create",
-        "assignments.send",
-        "assignments.defer",
-        "assignments.complete",
-        "assignments.cancel"
+        "Complete authorized coordinator and context catalogs with source and execution-space versions",
+        "Terminal-task related assignment creation with related_task_id and related_task_version",
+        "Complete current-version UI and service flows for all assignment decisions"
       ],
       "tests": [
         "app/tests/test_v6_contract.py",
@@ -466,7 +468,7 @@
       "page_id": "F08",
       "design_title": "消息编辑",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F08-消息编辑.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F08-消息编辑.html",
       "requirement_ids": [
         "FR-08",
         "FR-28"
@@ -680,7 +682,7 @@
       "page_id": "F12",
       "design_title": "本人私人安排",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F12-本人私人安排.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F12-本人私人安排.html",
       "requirement_ids": [
         "FR-12",
         "FR-28"
@@ -695,8 +697,8 @@
       "actual_webui_navigation": "?bossPage=F12",
       "webui_navigation_is_server_access_control": false,
       "render_status": "PARTIAL_OWNER_PRIVATE_CALENDAR_BUSY_SHARING",
-      "component_file": "app/webui/BossCommunicationCalendar.tsx",
-      "component_name": "BossCommunicationCalendar",
+      "component_file": "app/webui/BossPrivateCalendar.tsx",
+      "component_name": "BossPrivateCalendar",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/calendar",
         "GET /api/boss/ui/operation-status",
@@ -795,7 +797,7 @@
       "page_id": "F14",
       "design_title": "原料与饲料",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F14-原料与饲料.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F14-原料与饲料.html",
       "requirement_ids": [
         "FR-14"
       ],
@@ -837,7 +839,7 @@
       "page_id": "F15",
       "design_title": "水产季节",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F15-水产季节.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F15-水产季节.html",
       "requirement_ids": [
         "FR-15"
       ],
@@ -854,7 +856,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F15"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.review.schedule"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -879,7 +882,7 @@
       "page_id": "F16",
       "design_title": "苗种批次",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F16-苗种批次.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F16-苗种批次.html",
       "requirement_ids": [
         "FR-16"
       ],
@@ -896,7 +899,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F16"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -920,7 +924,7 @@
       "page_id": "F17",
       "design_title": "动保与技服",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F17-动保与技服.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F17-动保与技服.html",
       "requirement_ids": [
         "FR-17"
       ],
@@ -937,7 +941,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F17"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.review.schedule"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -962,7 +967,7 @@
       "page_id": "F18",
       "design_title": "生猪合作",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F18-生猪合作.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F18-生猪合作.html",
       "requirement_ids": [
         "FR-18"
       ],
@@ -979,7 +984,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F18"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.review.schedule"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -1004,7 +1010,7 @@
       "page_id": "F19",
       "design_title": "禽类与反刍",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F19-禽类与反刍.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F19-禽类与反刍.html",
       "requirement_ids": [
         "FR-19"
       ],
@@ -1021,7 +1027,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F19"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.meeting.prepare"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -1046,7 +1053,7 @@
       "page_id": "F20",
       "design_title": "公司水产养殖",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F20-公司水产养殖.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F20-公司水产养殖.html",
       "requirement_ids": [
         "FR-20"
       ],
@@ -1063,7 +1070,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F20"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -1087,7 +1095,7 @@
       "page_id": "F21",
       "design_title": "食品与品质",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F21-食品与品质.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F21-食品与品质.html",
       "requirement_ids": [
         "FR-21"
       ],
@@ -1129,7 +1137,7 @@
       "page_id": "F22",
       "design_title": "海外业务",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F22-海外业务.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F22-海外业务.html",
       "requirement_ids": [
         "FR-22"
       ],
@@ -1146,7 +1154,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F22"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.meeting.prepare", "boss.sector.decision.save"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -1171,7 +1180,7 @@
       "page_id": "F23",
       "design_title": "研发应用",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/F23-研发应用.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/F23-研发应用.html",
       "requirement_ids": [
         "FR-23"
       ],
@@ -1188,7 +1197,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=F23"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.review.schedule", "boss.sector.decision.save"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -1633,7 +1643,7 @@
       "page_id": "N02",
       "design_title": "聊天交办",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N02-聊天交办.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/N02-聊天交办.html",
       "requirement_ids": [
         "FR-08",
         "FR-24",
@@ -1656,9 +1666,11 @@
       "logical_architecture_route": "/app/boss/N02",
       "actual_webui_navigation": "?bossPage=N02",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_NATIVE_CONVERSATION",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop + native ThreadShell",
+      "render_status": "NATIVE_CONVERSATION_WITH_V7_EXECUTION_AUTHORIZATION_SOURCES_METRICS_AND_RECOVERY",
+      "component_file": "app/webui/BossConversationWorkspace.tsx",
+      "component_name": "BossConversationWorkspace + native ThreadShell",
+      "additional_component_files": ["app/webui/BossConversationMetrics.tsx", "app/webui/BossConversationKnowledge.tsx", "app/webui/BossMetricTrend.tsx", "app/webui/BossConversationPosition.ts"],
+      "frontend_structure_status": "V7_COLUMNS_QUERY_ARTIFACTS_AND_SOURCE_SELECTION_IMPLEMENTED_BACKEND_AND_PRODUCT_DOM_PENDING",
       "verified_http_read_routes": [
         "GET /api/boss/identity"
       ],
@@ -1684,7 +1696,7 @@
       "page_id": "N03",
       "design_title": "经营关注",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/N03-经营关注.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/N03-经营关注.html",
       "requirement_ids": [
         "FR-02",
         "FR-03",
@@ -1728,21 +1740,20 @@
       "logical_architecture_route": "/app/boss/N03",
       "actual_webui_navigation": "?bossPage=N03",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_METRIC_UI",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "render_status": "OVERVIEW_STRUCTURE_AND_SECTOR_REFERENCE_IMPLEMENTED_SERVICE_FLOW_PENDING",
+      "component_file": "app/webui/BossBusinessOverview.tsx",
+      "component_name": "BossBusinessOverview",
+      "additional_component_files": ["app/webui/BossBusinessOverviewLayout.tsx", "app/webui/BusinessOverviewReference.tsx"],
+      "code_wired_read_routes": ["GET /api/boss/ui/business-overview/dimensions", "GET /api/boss/ui/evidence"],
       "verified_http_read_routes": [
         "GET /api/boss/ui/dashboard",
         "GET /api/boss/ui/metrics"
       ],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.conversation.business.clear", "boss.business_overview.read", "boss.business_overview.detail"],
+      "other_integration_points": ["Native business conversation and existing meeting or assignment preparation", "F14-F23 and V19 use overview_reference with fixed scope and snapshot"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [
-        "metrics.query",
-        "conversation.start"
-      ],
+      "operations_not_yet_implemented": ["Complete sector and supply-quality service adoption of overview_reference", "Full overview query, topic, source, conversation and return flows"],
       "tests": [
         "app/tests/test_v6_contract.py"
       ],
@@ -2196,7 +2207,7 @@
       "page_id": "D01",
       "design_title": "来源原文与支持关系",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D01-来源原文与支持关系.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D01-来源原文与支持关系.html",
       "requirement_ids": [
         "FR-03",
         "FR-09"
@@ -2210,24 +2221,20 @@
       "logical_architecture_route": "/app/boss/D01",
       "actual_webui_navigation": "?bossPage=D01",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_EVIDENCE_READ",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "render_status": "SOURCE_READER_STRUCTURE_IMPLEMENTED_HISTORY_SUPPORT_SERVICE_AND_PRODUCT_DOM_PENDING",
+      "component_file": "app/webui/BossSourceView.tsx",
+      "component_name": "BossSourceView",
+      "code_wired_read_routes": ["GET /api/boss/ui/evidence?source=...", "GET /api/boss/ui/evidence?source=...&version=..."],
       "verified_http_read_routes": [
         "GET /api/boss/ui/evidence"
       ],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["Version-pinned source quote metadata survives refresh and is cleared by ordinary menu navigation"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
-      "operations_not_yet_implemented": [],
-      "tests": [
-        "app/tests/test_v6_contract.py"
-      ],
-      "source_task_ids": [
-        "T18",
-        "T24"
-      ]
+      "operations_not_yet_implemented": ["Authorized historical source versions and source-version parameter validation", "Complete origin context and assertion support relationships"],
+      "tests": ["app/tests/test_v6_contract.py"],
+      "source_task_ids": ["T18", "T24"]
     },
     {
       "page_id": "D02",
@@ -2310,7 +2317,7 @@
       "page_id": "D04",
       "design_title": "选择负责人",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D04-选择负责人.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D04-选择负责人.html",
       "requirement_ids": [
         "FR-06",
         "FR-08"
@@ -2324,7 +2331,7 @@
       "logical_architecture_route": "/app/boss/D04",
       "actual_webui_navigation": "?bossPage=D04",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_CONTACT_PICKER_WITH_OWNER_SCOPE",
+      "render_status": "CONTACT_PICKER_STRUCTURE_IMPLEMENTED_PRODUCT_DOM_AND_SERVICE_SCOPE_PENDING",
       "component_file": "app/webui/BossAssignmentPicker.tsx",
       "component_name": "BossAssignmentPicker",
       "verified_http_read_routes": [],
@@ -2345,7 +2352,7 @@
       "page_id": "D05",
       "design_title": "选择时间与时区",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D05-选择时间与时区.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D05-选择时间与时区.html",
       "requirement_ids": [
         "FR-02",
         "FR-06",
@@ -2362,17 +2369,18 @@
       "logical_architecture_route": "/app/boss/D05",
       "actual_webui_navigation": "?bossPage=D05",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_TIMEZONE_DATE_PICKER",
+      "render_status": "TIMEZONE_PICKER_STRUCTURE_IMPLEMENTED_PRODUCT_DOM_AND_FLOW_PENDING",
       "component_file": "app/webui/BossAssignmentPicker.tsx",
       "component_name": "BossAssignmentPicker",
       "verified_http_read_routes": [],
       "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "other_integration_points": ["app/webui/local-time.ts", "Luxon date and timezone selection with explicit DST occurrence"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [],
       "tests": [
-        "app/tests/test_v6_contract.py"
+        "app/tests/test_v6_contract.py",
+        "app/tests/test_local_time.cjs"
       ],
       "source_task_ids": [
         "T18",
@@ -2383,7 +2391,7 @@
       "page_id": "D06",
       "design_title": "未保存修改提醒",
       "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D06-未保存修改提醒.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D06-未保存修改提醒.html",
       "requirement_ids": [
         "FR-05",
         "FR-08",
@@ -2400,12 +2408,12 @@
       "logical_architecture_route": "/app/shared/D06",
       "actual_webui_navigation": "?bossPage=D06",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_UNSAVED_DRAFT_NAVIGATION_GUARD",
+      "render_status": "V7_UNSAVED_GUARD_WITH_RECEIPT_BOUND_MINUTES_AND_MESSAGE_SAVE",
       "component_file": "app/webui/BossDesktop.tsx",
       "component_name": "BossDesktop",
       "verified_http_read_routes": [],
-      "code_wired_write_actions": [],
-      "other_integration_points": [],
+      "code_wired_write_actions": ["boss.minutes.save", "boss.message.draft.save"],
+      "other_integration_points": ["app/webui/draft-leave.ts", "app/webui/BossAccessStates.tsx", "app/webui/BossMeetingApproval.tsx", "app/webui/BossCommunicationCalendar.tsx"],
       "actual_e2e_verified": false,
       "visual_pixel_verified": false,
       "operations_not_yet_implemented": [],
@@ -2421,7 +2429,7 @@
       "page_id": "D07",
       "design_title": "访问权限限制",
       "role_gate": "AUTHENTICATED_BOSS_OR_MAINTAINER",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D07-访问权限限制.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D07-访问权限限制.html",
       "requirement_ids": [
         "FR-26",
         "FR-28"
@@ -2435,9 +2443,9 @@
       "logical_architecture_route": "/app/shared/D07",
       "actual_webui_navigation": "?bossPage=D07",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_AUTHORIZATION_DENIED_VIEW",
-      "component_file": "app/webui/BossDesktop.tsx",
-      "component_name": "BossDesktop",
+      "render_status": "V7_RESTRICTED_VIEW_WITH_AUTHORIZED_NAVIGATION",
+      "component_file": "app/webui/BossAccessStates.tsx",
+      "component_name": "BossRestrictedView",
       "verified_http_read_routes": [],
       "code_wired_write_actions": [],
       "other_integration_points": [],
@@ -2457,7 +2465,7 @@
       "page_id": "D08",
       "design_title": "登录状态已过期",
       "role_gate": "ANONYMOUS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/D08-登录状态已过期.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/D08-登录状态已过期.html",
       "requirement_ids": [
         "FR-26",
         "FR-28"
@@ -2471,7 +2479,7 @@
       "logical_architecture_route": "/app/auth/D08",
       "actual_webui_navigation": "Native AUTH_EXPIRED state",
       "webui_navigation_is_server_access_control": false,
-      "render_status": "PARTIAL_BRANDED_REAUTHENTICATION_WITHOUT_BUSINESS_REPLAY",
+      "render_status": "V7_BRANDED_REAUTHENTICATION_AND_RETURN_TO_LOGIN",
       "component_file": "app/webui/BossLogin.tsx",
       "component_name": "BossLogin",
       "verified_http_read_routes": ["GET /webui/bootstrap", "GET /api/boss/identity"],
@@ -3316,7 +3324,7 @@
       "page_id": "V19-BEEF",
       "design_title": "禽类与反刍",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-BEEF-禽类与反刍.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/V19-BEEF-禽类与反刍.html",
       "requirement_ids": [
         "FR-19"
       ],
@@ -3333,7 +3341,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=V19-BEEF"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.meeting.prepare"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -3358,7 +3367,7 @@
       "page_id": "V19-EGG",
       "design_title": "禽类与反刍",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-EGG-禽类与反刍.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/V19-EGG-禽类与反刍.html",
       "requirement_ids": [
         "FR-19"
       ],
@@ -3375,7 +3384,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=V19-EGG"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.meeting.prepare"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],
@@ -3400,7 +3410,7 @@
       "page_id": "V19-MILK",
       "design_title": "禽类与反刍",
       "role_gate": "BOSS",
-      "design_source": "Boss-Agent-Desktop-Complete-v6/pages/V19-MILK-禽类与反刍.html",
+      "design_source": "Boss-Agent-Desktop-Complete-v7/pages/V19-MILK-禽类与反刍.html",
       "requirement_ids": [
         "FR-19"
       ],
@@ -3417,7 +3427,8 @@
       "verified_http_read_routes": [
         "GET /api/boss/ui/sector?page=V19-MILK"
       ],
-      "code_wired_write_actions": [],
+      "code_wired_write_actions": ["boss.sector.coordinate.create", "boss.sector.meeting.prepare"],
+      "frontend_structure_status": "V7_STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_PENDING",
       "other_integration_points": [
         "authenticated native Agent conversation for identifying missing evidence"
       ],

@@ -36,19 +36,29 @@ class BusinessTool(Tool):
 
     @property
     def description(self):
+        from boss_v7_configuration import tool_policy
+        with self.store.connect() as db:
+            policy = tool_policy(db, self.operation, self.envelope["execution_namespace"])
+        if policy is not None:
+            return policy["values"]["description"]
         return {"query_metrics": "查询当前获准经营明细并计算指标，保存当前来源绑定并返回新的query_id。", "read_evidence": "读取已有查询对应的当前原始资料和明细。来源变化或查询缺少绑定时返回409，须重新query_metrics取得新query_id；撤销或到期来源停止采用。", "create_assignment": "按当前老板授权创建交办，校验来源、负责人及有效期限，并保存创建时来源绑定。", "send_assignment": "按当前老板授权模拟发送交办，重新核查创建时来源和当前负责人；来源变化或缺少绑定时停止，已提交结果查询原请求回执。", "read_assignment": "重新查询交办的正式状态；读取状态不产生本人完成授权。"}[self.operation]
 
     @property
     def parameters(self):
+        from boss_v7_configuration import tool_policy
         ref = OPERATIONS[self.operation]["input_schema"].rsplit("/", 1)[1]
         definitions = copy.deepcopy(SPEC["io_schema"]["$defs"])
+        with self.store.connect() as db:
+            policy = tool_policy(db, self.operation, self.envelope["execution_namespace"])
+        if policy is not None:
+            definitions = json.loads(policy["values"]["input_schema"])["$defs"]
         injected = {"envelope", "authorization_id", "idempotency_key"}
         for name in (ref, "legacy_query_input", "scoped_query_input"):
             definition = definitions.get(name)
             if definition is not None and "properties" in definition:
                 definition["properties"] = {key: value for key, value in definition["properties"].items() if key not in injected}
                 definition["required"] = [key for key in definition.get("required", []) if key not in injected]
-        return {"$ref": "#/$defs/" + ref, "$defs": definitions}
+        return {**definitions[ref], "$defs": definitions}
 
     async def execute(self, **kwargs):
         envelope = self.envelope

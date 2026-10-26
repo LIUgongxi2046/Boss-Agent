@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import inspect
 import json
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
@@ -12,6 +13,8 @@ from nanobot.agent.hook import AgentHook
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, encode, now, require
+from boss_execution_scope import NAMESPACE
+from boss_memory_runtime import MemoryContextInvalidated, require_current_memory_reference
 from boss_prompt_config import _record_runtime_context_load, _select_runtime_prompts
 from runtime_records_query import read_runtime_records
 
@@ -34,6 +37,7 @@ class RuntimeRecorder:
         self.registry = registry
         self.runtime_snapshot = runtime_snapshot
         self.deadline_expired = None
+        self.model_deadlines = {}
 
     def _read(self, db, run_id):
         return self.store.get(db, self.namespace, "runtime_run", run_id)
@@ -103,6 +107,8 @@ class RuntimeRecorder:
                 "model_completion_observed": False, "model_behavior_evaluation_passed": False,
                 "model_attempts_coverage": "HTTP_REQUESTS_OBSERVED_ONLY",
             }
+            if configuration.get("model_connection"):
+                row["model_connection"] = dict(configuration["model_connection"])
             self._save(db, row)
             _record_runtime_context_load(self.store, db, selected, self.namespace)
         block = RuntimeContextBlock(source="boss-runtime-configuration", content=encode({
@@ -126,6 +132,8 @@ class RuntimeRecorder:
             require(row["status"] == "RUNNING", "模型请求没有关联活动运行")
             request_id = event["model_request_id"]
             if event["type"] == "request":
+                if row.get("model_connection"):
+                    row["external_model_invoked"] = True
                 require(event["tool_config_sha256"] == row["tool_config_sha256"], "实际请求的工具定义与启用快照不符")
                 require(event["model"] == row["runtime"]["model_id"], "实际模型与启用快照不符")
                 require(not any(item["model_request_id"] == request_id for item in row["model_requests"]), "模型请求标识重复")
@@ -162,15 +170,49 @@ class RuntimeRecordHook(AgentHook):
         self.recorder = recorder
         self.run_id = run_id
 
+    def check_cancellation(self):
+        from boss_execution_transition import pending_transition
+        with self.recorder.store.connect() as db:
+            db.execute("BEGIN")
+            row = self.recorder._read(db, self.run_id)
+            transition = pending_transition(db, self.recorder.namespace)
+            require_current_memory_reference(self.recorder.store, db, self.recorder.namespace, row.get("memory_reference"))
+        if transition is not None:
+            raise asyncio.CancelledError("EXECUTION_SPACE_TRANSITION")
+        if row.get("cancel_request"):
+            raise asyncio.CancelledError("OWNER_REQUESTED_CANCELLATION")
+        if self.run_id in self.recorder.model_deadlines and asyncio.get_running_loop().time() >= self.recorder.model_deadlines[self.run_id]:
+            raise TimeoutError("运行已超过当前模型配置的时间限制")
+
+    async def before_iteration(self, context):
+        self.check_cancellation()
+
+    async def after_iteration(self, context):
+        self.check_cancellation()
+
+    async def on_stream(self, context, delta):
+        self.check_cancellation()
+
+    def finalize_content(self, context, content):
+        self.check_cancellation()
+        return content
+
+    async def before_execute_tool(self, context, tool_call, tool, params):
+        self.check_cancellation()
+
     async def before_run(self, context):
+        self.check_cancellation()
         with self.recorder.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)
             require(row["status"] == "QUEUED", "当前运行已经开始")
             row["status"] = "RUNNING"
+            if row.get("model_connection"):
+                self.recorder.model_deadlines[self.run_id] = asyncio.get_running_loop().time() + row["runtime"]["timeout"]
             self.recorder._save(db, row)
 
     async def before_execute_tools(self, context):
+        self.check_cancellation()
         with self.recorder.store.connect() as db:
             row = self.recorder._read(db, self.run_id)
         require(checksum(self.recorder.registry.get_definitions()) == row["tool_config_sha256"], "进行中运行的工具定义发生变化")
@@ -202,7 +244,10 @@ class RuntimeRecordHook(AgentHook):
             if row["finished_at"] is not None:
                 return
             reason = context.stop_reason
-            if isinstance(context.exception, asyncio.CancelledError):
+            if isinstance(context.exception, MemoryContextInvalidated):
+                status = "CANCELED"
+                reason = "OWNER_MEMORY_CONTEXT_CHANGED"
+            elif isinstance(context.exception, asyncio.CancelledError):
                 status = "TIMED_OUT" if self.recorder.deadline_expired is not None and self.recorder.deadline_expired() else "CANCELED"
             elif isinstance(context.exception, TimeoutError):
                 status = "TIMED_OUT"
@@ -225,13 +270,22 @@ class RuntimeRecordHook(AgentHook):
                 ) else "PARTIAL_OBSERVED_REQUESTS" if row["model_requests"] else "NOT_OBSERVED"
             )
             self.recorder._save(db, row)
+        self.recorder.model_deadlines.pop(self.run_id, None)
 
     async def after_run(self, context):
+        try:
+            self.check_cancellation()
+        finally:
+            failure = sys.exception()
+            if failure is not None:
+                context.exception = failure
+                context.stop_reason = "error"
+                context.error = type(failure).__name__
         self._finish(context)
 
     async def on_finally(self, context):
         self._finish(context)
 
 
-def runtime_records(store, role, namespace="ui-check", run_id=None, query=None):
+def runtime_records(store, role, namespace=NAMESPACE, run_id=None, query=None):
     return read_runtime_records(store, role, namespace, run_id, query)

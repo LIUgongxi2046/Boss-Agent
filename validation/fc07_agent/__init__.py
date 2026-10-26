@@ -6,6 +6,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.context import current_request_context
 
 from business import encode, require
+from boss_execution_scope import NAMESPACE
 from boss_assignment_sources import AssignmentSourcesAPI
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from model_probe import BusinessTool
@@ -49,7 +50,7 @@ class Fc07ReadTool(Tool):
 
     @property
     def parameters(self):
-        return BossAssignmentSourcesReadTool(self.store, "BOSS").parameters if self.name == "assignmentSourcesRead" else BusinessTool(self.name, self.store, {}, {}, []).parameters
+        return BossAssignmentSourcesReadTool(self.store, "BOSS").parameters if self.name == "assignmentSourcesRead" else BusinessTool(self.name, self.store, {"execution_namespace": NAMESPACE}, {}, []).parameters
 
     @property
     def description(self):
@@ -62,7 +63,7 @@ class Fc07ReadTool(Tool):
         context = self.context_provider()
         require(isinstance(context, Fc07Context) and context.role == "BOSS" and context.active is True,
                 "交办本人请求已经无效", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and context.request_id and context.session_id, "交办执行范围无效", web.HTTPForbidden)
+        require(context.namespace == NAMESPACE and context.request_id and context.session_id, "交办执行范围无效", web.HTTPForbidden)
         request = current_request_context()
         if runtime and request is not None:
             binding = request.attributes.get(ATTRIBUTE)

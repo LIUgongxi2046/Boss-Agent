@@ -36,6 +36,9 @@ def owner_role(role):
 
 
 def report_adoption(db, ns, data, clock, document):
+    from boss_v7_metrics import policy_fingerprint
+    if document.get("metric_policy_sha256", checksum({})) != policy_fingerprint(db, ns):
+        return {"state": "NEEDS_REIMPORT", "dependencies": [{"source_id": "metric-configuration", "status": "CHANGED"}]}
     metadata_valid = document.get("owner_id") == data["owner_id"] and document.get("execution_namespace") == ns and all(document.get(field) == data[field] for field in ("dataset_id", "dataset_version"))
     initial = get(db, ns, "initial", "snapshot")
     references = document.get("input_source_refs")

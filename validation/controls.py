@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from business import Store, checksum, encode, initial_materials, now, require
 from boss_source_access import require_current_simulated_source
 from boss_source_policy import source_validity
+from boss_notification_snapshot import notification_snapshot
 
 
 TEXT = {"type": "string", "minLength": 1}
@@ -193,22 +194,21 @@ class ControlStore(Store):
             if (document.get("source_type") == "SIMULATED" and document.get("access_scope") == data["owner_id"]
                     and source_validity(document, clock) == "VALID"
                     and external_adoption(db, ns, data, clock, document)["state"] != "NEEDS_REIMPORT"):
-                require(indexed == document["content"], "资料索引与当前原文不一致，需要重新摄取")
+                from boss_knowledge_ingestion import indexable_content
+                expected = indexable_content(document["content"]) if document.get("index_format") == "COMMONMARK_TEXT_V1" else document["content"]
+                require(indexed == expected, "资料索引与当前原文不一致，需要重新摄取")
                 results.append({"source_id": source_id, "content": document["content"]})
         return {"results": results}
 
     def control_private_calendar(self, db, ns, p):
+        from boss_calendar_state import current_calendar
         data = self.get(db, ns, "initial", "snapshot")
-        calendar_id = data["private_calendar"]["calendar_id"]
-        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='private_calendar' AND id=?", (ns, calendar_id)).fetchone()
-        if row is None:
-            current = data["private_calendar"]
-        else:
-            current = json.loads(row[0])
+        calendar_id = "private-1"
+        current = current_calendar(db, ns, data)
+        require(current is not None, "当前没有私人安排", web.HTTPNotFound)
         require(current["calendar_id"] == calendar_id and current["owner_id"] == data["owner_id"],
                 "私人安排不属于当前本人范围", web.HTTPForbidden)
-        if row is not None:
-            require(current["status"] == "ACTIVE", "私人安排当前已经删除", web.HTTPGone)
+        require(current["status"] == "ACTIVE", "私人安排当前已经删除", web.HTTPGone)
         return current
 
     def control_reference_status(self, db, ns, p):
@@ -287,6 +287,7 @@ class ControlStore(Store):
         from boss_alert_dispatch import dispatch
         from boss_alert_policy import record_dispatch
         from boss_owner_preferences import effective_owner_notice
+        from boss_scheduler_config import event_in_scope
         alert_results = dispatch(self, db, ns, only_event_id)
         schedule = self.get(db, ns, "schedule", "current")
         rules_row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='rules' AND id='current'", (ns,)).fetchone()
@@ -301,6 +302,8 @@ class ControlStore(Store):
         results = []
         for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind='event'", (ns,)).fetchall():
             event = json.loads(row[0])
+            if not event_in_scope(schedule, event):
+                continue
             if event.get("generated_by") == "BUSINESS_ALERT_INPUT":
                 continue
             if only_event_id is not None and event["event_id"] != only_event_id:
@@ -350,7 +353,7 @@ class ControlStore(Store):
                 result["owner_notice_version"] = owner_notice_version
             record_dispatch(self, db, ns, result)
             if reason is None:
-                delivery = {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"}
+                delivery = notification_snapshot(db, ns, event, {**result, "delivered_at": clock.isoformat(), "source_type": "SIMULATED"})
                 self.put(db, ns, "delivery", event["event_id"], delivery)
                 self.put(db, ns, "notification", event["event_id"] + ":" + event["version"], delivery)
             results.append(result)

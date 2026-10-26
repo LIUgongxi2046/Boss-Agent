@@ -7,7 +7,7 @@ from aiohttp import web
 
 from business import checksum, now, require
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 CONTINUING_USE_ACTIONS = frozenset({"memory.confirm", "owner_goals.confirm", "owner_notice.confirm",
                                    "owner_plan.save", "owner_plan.resume", "calendar.share",
                                    "business_alert.rule.activate", "business_alert.snooze", "today.reorder"})

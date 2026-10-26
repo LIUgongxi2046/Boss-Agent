@@ -20,7 +20,7 @@ from business import checksum, now, require
 from boss_meetings import meeting_materials
 from boss_source_access import require_current_business_source
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 ENTRY_KINDS = frozenset({"OPINION", "SUGGESTION", "DECISION", "ASSIGNMENT_DRAFT"})
 DECISIONS = frozenset({"APPROVE", "REJECT", "REQUEST_MORE"})
 

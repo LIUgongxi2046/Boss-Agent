@@ -17,7 +17,8 @@ from business import checksum, now, require
 from boss_meetings import meeting_materials
 from boss_source_access import require_current_business_source
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
+from boss_calendar_state import current_calendar
 FINAL_STATES = ("CONFIRMED", "CANCELED")
 
 
@@ -137,11 +138,9 @@ def _impact(api, db, data, details, exclude_travel_id=None):
         0 <= (start - meeting_start).total_seconds() < 86400
     )
     meeting_risk = meeting_inside or (meeting_active and meeting_end is None and meeting_near)
-    private = _get(db, "private_calendar", "private-1") or {
-        **data["private_calendar"], "version": "1", "status": "ACTIVE",
-    }
+    private = current_calendar(db, NS, data)
     private_overlap = False
-    if private.get("status") == "ACTIVE":
+    if private is not None and private.get("status") == "ACTIVE":
         pstart = datetime.fromisoformat(private["starts_at"])
         pend = datetime.fromisoformat(private["ends_at"])
         private_overlap = start < pend and end > pstart
@@ -182,7 +181,7 @@ def _impact(api, db, data, details, exclude_travel_id=None):
             "start_overlap": meeting_inside,
         },
         "private_calendar": {
-            "version": private["version"], "status": private["status"],
+            "version": private["version"] if private else None, "status": private["status"] if private else "ABSENT",
             "conflict": private_overlap, "private_body_exposed": False,
         },
         "task_deadlines": sorted(due, key=lambda row: row["task_id"]),

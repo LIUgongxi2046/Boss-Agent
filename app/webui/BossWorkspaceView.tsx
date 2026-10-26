@@ -3,23 +3,15 @@ import { AlertCircle, ArrowRight, CheckCircle2, Clock3,
   FileSearch, FolderOpen, Loader2, RefreshCw,
   ShieldCheck, Sparkles } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
-import {BossNativeNotification} from "./BossDesktopNotifications";
-import {useTransaction} from "./BossAssignmentFlow";
-import {BossReminderPreparation} from "./BossReminderPreparation";
-import {BossBusinessAlerts,type BusinessAlertRead} from "./BossBusinessAlerts";
 import {deliveredPage} from "./delivered-navigation";
 
-// Only these routes have real, role-scoped read projections. Routes absent
-// from this map still show the original transparent "not implemented" panel.
+// 业务投影使用正式服务的身份限制。
 export const WORKSPACE_PAGE_ROUTES: Record<string, string> = {
-  F02: "notifications",
-
-
   F13: "memory", F25: "dataset",
   F28: "authorizations", F29: "decisions",
-  F32: "system", N06: "notifications",
+  F32: "system",
   N09: "plans", N10: "authorizations",
-  N11: "decisions", D02: "authorizations", D09: "notifications",
+  N11: "decisions", D02: "authorizations",
   A01: "system", A02: "tool-catalog", A03: "dataset",
   A09: "tool-catalog",
   A10: "metric-definitions", A11: "relationships",
@@ -41,15 +33,6 @@ type Memory = {
   memory_id: string; text: string; version: string;
   confirmation_state: string;
 };
-type Event = {
-  event_id: string; version: string; state: string; impact: string;
-  due_at: string; task_id?: string;
-};
-type Reminder = {event_id: string; version: string; state: string; until?: string | null};
-type Notification = {
-  event_id: string; state?: string; source_type?: string;
-  created_at?: string; business_at?: string;
-};
 type Auth = {
   authorization_id: string; action: string; target_id: string; content_version: string;
   revoked: boolean; valid_until: string; valid_from?: string; version?:string;
@@ -62,9 +45,6 @@ type Workspace = {
   physical_secure_erasure_verified?: boolean;
   calendar?: RecordItem;
   sources?: Source[]; results?: DocHit[]; query?: string;
-  events?: Event[]; notifications?: Notification[]; reminders?: Reminder[];
-  deliveries?: RecordItem[]; rules?: RecordItem[]; dispatches?: RecordItem[];
-  owner_notification_preferences?: RecordItem|null;
   authorizations?: Auth[]; history?: RecordItem[]; messages?: RecordItem[];
   contacts?: RecordItem[]; meeting?: RecordItem | null;
   schedule?: RecordItem; business_clock?: string;
@@ -80,7 +60,6 @@ type Workspace = {
   steps?:{step_id:string;actor:string;action:string}[];coverage?:string;
   simulated_business_time?: string;
   installed_mac_app_verified?: boolean;
-  business_alerts?:BusinessAlertRead;
   model_connection_verified_here?: boolean;
 };
 
@@ -124,7 +103,7 @@ function Notice({message, error=false}: {message:string;error?:boolean}) {
   </div>;
 }
 const ROLES: Record<string,Role> = {
-  memory:"BOSS",calendar:"BOSS",notifications:"BOSS",authorizations:"BOSS",
+  memory:"BOSS",calendar:"BOSS",authorizations:"BOSS",
   decisions:"BOSS",outbox:"BOSS",sources:"BOSS",knowledge:"BOSS",
   organization:"BOSS",plans:"BOSS",dataset:"MAINTAINER",
   "source-index":"MAINTAINER","tool-catalog":"MAINTAINER",
@@ -132,12 +111,13 @@ const ROLES: Record<string,Role> = {
   scheduler:"MAINTAINER",audit:"MAINTAINER",system:"MAINTAINER",evaluation:"MAINTAINER",
 };
 
-export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpenTask,onDirtyChange}: {
+export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onDirtyChange,refreshVersion=0}: {
   pageId:string; role:Role;
   onNavigate:(id:string)=>void;
   onViewSource:(id:string)=>void;
   onOpenTask?:(taskId:string)=>void;
   onDirtyChange?:(dirty:boolean)=>void;
+  refreshVersion?:number;
 }) {
   const route = WORKSPACE_PAGE_ROUTES[pageId];
   const {client,getToken,token} = useClient();
@@ -157,9 +137,6 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
   const [timeInput,setTimeInput] = useState("");
   const [dirty,setDirty] = useState(false);
   const [revokeReason,setRevokeReason] = useState("");
-  const [selectedEvent,setSelectedEvent]=useState(()=>new URLSearchParams(window.location.search).get("bossEvent")??"");
-  useEffect(()=>{const changed=()=>setSelectedEvent(new URLSearchParams(window.location.search).get("bossEvent")??"");window.addEventListener("boss-notification-target-changed",changed);window.addEventListener("popstate",changed);return()=>{window.removeEventListener("boss-notification-target-changed",changed);window.removeEventListener("popstate",changed);};},[]);
-  useEffect(()=>{if(route!=="notifications"||!data||!selectedEvent)return;const target=document.getElementById("boss-notification-"+encodeURIComponent(selectedEvent));target?.scrollIntoView({block:"center"});target?.focus();},[route,data,selectedEvent]);
 
   useEffect(()=>{
     if(!route || ROLES[route]!==role) {setError("当前角色不允许访问该业务投影");return;}
@@ -171,6 +148,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
     if(!token){setError("身份过期，请重新认证");setLoading(false);return;}
     void fetch(path,{headers:{"Authorization":"Bearer "+token},cache:"no-store",signal:controller.signal})
       .then(async response=>{
+        if(response.status===401)window.dispatchEvent(new globalThis.Event("boss-auth-expired"));
         if(!response.ok)throw new Error("工作区服务拒绝读取（HTTP "+response.status+"）");
         const result=await response.json() as Workspace;
         if(result.source_type!=="SIMULATED"||result.projection!==route)
@@ -186,7 +164,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
         setError(e instanceof Error?e.message:String(e));setLoading(false);
       });
     return ()=>controller.abort();
-  },[route,role,revision,searched,getToken,token]);
+  },[route,role,revision,searched,getToken,token,refreshVersion]);
 
   useEffect(()=>{
     if(!pending)return;
@@ -208,7 +186,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
   },[pending?.id,busy]);
 
   function reload(){setRevision(x=>x+1);}
-  const reminderTx=useTransaction(reload,undefined,undefined,"reminder");
+  useEffect(()=>{const modified=Boolean(timeInput)||dirty||Boolean(pending)||busy;onDirtyChange?.(modified);if(!modified)return;const guard=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};window.addEventListener("beforeunload",guard);return()=>{window.removeEventListener("beforeunload",guard);onDirtyChange?.(false);};},[timeInput,dirty,pending,busy,onDirtyChange]);
   function propose(action:string, fields:Record<string,unknown>, title:string, scope:string[]){
     if(busy)return;
     setNotice("");setError("");
@@ -284,28 +262,6 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
         "删除后停止未来采用，不宣称已物理擦除全部备份或日志。",
       ]);
   }
-  function actOnReminder(event:Event, action:"ack"|"close"|"snooze"){
-    if(reminderTx.busy)return;
-    const current=(data?.reminders||[]).find(x=>x.event_id===event.event_id);
-    if(current?.state==="CLOSED"){setError("已关闭的提醒不能重新开启");return;}
-    const fields:Record<string,unknown>={
-      event_id:event.event_id,event_version:event.version,
-      reminder_version:current?.version||"0",
-    };
-    if(action==="snooze"){
-      try{fields.until=dateWithZone(timeInput);}catch(e){
-        setError(e instanceof Error?e.message:String(e));return;
-      }
-    }
-    reminderTx.propose(("boss.reminder."+action) as "boss.reminder.ack"|"boss.reminder.snooze"|"boss.reminder.close",fields,
-      action==="ack"?"确认知晓":action==="close"?"确认关闭":"确认暂缓提醒",
-      [
-        "源事件："+event.event_id,
-        "事件版本："+event.version+" · 当前提醒版本："+v(fields.reminder_version),
-        action==="snooze"?"暂缓至："+v(fields.until):"当前事件状态："+event.state,
-        "保留源事件及历史通知记录；不会假定任何外部消息已经发送。",
-      ]);
-  }
   function revokeAuthorization(record:Auth){
     if(pageId!=="N10"){setError("请进入本人授权页核对后撤销");return;}
     if(!record.can_revoke||!record.version){
@@ -361,9 +317,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
     {loading&&<Notice message="正在向本机受权限控制的业务服务读取数据与版本…"/>}
     {error&&<Notice error message={error}/>}
     {notice&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={17}/>{notice}</div>}
-    {route==="notifications"&&<BossReminderPreparation revision={revision}/>}
-    {route==="notifications"&&w?.business_alerts&&<BossBusinessAlerts projection={w.business_alerts} revision={revision} onReload={reload} onNavigate={onNavigate} onOpenTask={onOpenTask} onDirtyChange={onDirtyChange}/>}
-    {w&&<div className={"boss-columns "+(route==="notifications"?"boss-fc04-reminders":"")}>
+    {w&&<div className="boss-columns">
       <div className="boss-column">
         {route==="memory"&&<Layer title="长期决定与个人记忆" description="仅本人可修改 · FR-13">
           <Fact label="业务状态">{v(w.memory?.confirmation_state)}</Fact>
@@ -391,35 +345,6 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
             <p>{v(w.calendar?.private_body)}</p>
           </div>
           <Notice message="真实业务来源已读取。当前尚未实现私人安排新增、编辑和授权共享；不会把私人正文发送给维护端或联系人。"/>
-        </Layer>}
-        {route==="notifications"&&<Layer title="经营通知与提醒" description="FR-02 · 持续按真实事件版本读取">
-          {(w.events||[]).length? (w.events||[]).map(event=>{
-            const reminder=w.reminders?.find(r=>r.event_id===event.event_id);
-            return <article className="boss-workspace-item" id={"boss-notification-"+encodeURIComponent(event.event_id)} tabIndex={-1} aria-current={selectedEvent===event.event_id?"true":undefined} key={event.event_id}>
-              <div className="boss-workspace-item-top">
-                <strong>{event.event_id}</strong>
-                <span className="boss-tag boss-tag-blue">{event.state}</span>
-              </div>
-              <Fact label="事件版本">{event.version}</Fact>
-              <Fact label="事件到期">{date(event.due_at)}</Fact>
-              <Fact label="当前提醒决定">{reminder?.state||"尚未处理"}</Fact>
-              <Fact label="已交付通知">{(w.notifications||[]).filter(n=>n.event_id===event.event_id).length}</Fact>
-              <BossNativeNotification eventId={event.event_id} eventVersion={event.version}/>
-              <div className="boss-actions">
-                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
-                  onClick={()=>actOnReminder(event,"ack")}>已知晓</button>
-                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
-                  onClick={()=>actOnReminder(event,"snooze")}>暂缓</button>
-                <button className="boss-btn" type="button" disabled={reminderTx.busy||reminder?.state==="CLOSED"}
-                  onClick={()=>actOnReminder(event,"close")}>关闭</button>
-              </div>
-            </article>;
-          }):<Empty message="当前模拟空间还没有注入实际事件。维护端需要按获准数据集显式注入，不能制造虚假通知。"/>}
-          {(w.events||[]).length>0&&<label className="boss-field">
-            <span>暂缓至（Asia/Shanghai）</span>
-            <input type="datetime-local" value={timeInput} onChange={e=>setTimeInput(e.target.value)}/>
-          </label>}
-          <Notice message="知晓、暂缓和关闭按当前事件版本与提醒版本原子保存。关闭不删除历史通知。"/>
         </Layer>}
         {route==="knowledge"&&<Layer title="来源可追溯的资料检索" description="FR-09 · 只检索当前有效模拟资料">
           <form className="boss-workspace-search" onSubmit={e=>{e.preventDefault();setSearched(search.trim());}}>
@@ -598,7 +523,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
         </Layer>}
       </div>
       <div className="boss-column">
-        <Layer title="来源、状态和当前操作" description="统一的 Desktop v6 信任边界">
+        <Layer title="来源、状态和当前操作" description="当前身份和资料版本">
           <Fact label="数据来源">{w.source_type}</Fact>
           <Fact label="业务执行空间">{w.namespace}</Fact>
           <Fact label="资料版本">{w.data_version}</Fact>
@@ -610,36 +535,6 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
             </button>
           </div>
         </Layer>
-        {route==="notifications"&&<Layer title="本人通知要求与抑制记录"
-          description="N08 有效版本 · 仍受 A13 技术调度约束">
-          <Fact label="本人有效策略版本">{v(w.owner_notification_preferences?.version)}</Fact>
-          <Fact label="通知状态">{w.owner_notification_preferences?
-            (w.owner_notification_preferences.notifications_enabled?"按技术规则允许":"本人暂停"):
-            "未确认本人偏好（沿用已有技术规则）"}</Fact>
-          <Fact label="阅读格式">{v(w.owner_notification_preferences?.reading_format)}</Fact>
-          <Fact label="本人免打扰">{w.owner_notification_preferences?
-            String(w.owner_notification_preferences.quiet_start)+":00 — "+
-            String(w.owner_notification_preferences.quiet_end)+":00 / "+
-            v(w.owner_notification_preferences.timezone):"尚未设置"}</Fact>
-          {(w.dispatches||[]).map((row,i)=><div className="boss-workspace-item" key={String(i)}>
-            <strong>{v(row.event_id)} · {v(row.state)}</strong>
-            <small>模拟调度原因：{v(row.reason)} · 源版本 {v(row.event_version)}</small>
-            <small>技术规则 v{v(row.rule_version)} · 本人规则 v{v(row.owner_notice_version)}</small>
-          </div>)}
-          {!(w.dispatches||[]).length&&<Empty message="当前尚无来自原 CronService 的模拟事件调度结果。"/>}
-          <div className="boss-actions">
-            <button className="boss-btn" type="button" onClick={()=>onNavigate("N08")}>
-              查看或修改本人通知要求
-            </button>
-          </div>
-        </Layer>}
-        {route==="notifications"&&<Layer title="通知状态摘要">
-          <Fact label="模拟事件">{(w.events||[]).length}</Fact>
-          <Fact label="已生成通知">{(w.notifications||[]).length}</Fact>
-          <Fact label="送达回执">{(w.deliveries||[]).length}</Fact>
-          <Fact label="已保存的本人提醒决定">{(w.reminders||[]).length}</Fact>
-          <Notice message="未触发、静默、冷却和已送达须分别展示；总数为零不能解释为后台故障。"/>
-        </Layer>}
         {route==="memory"&&<Layer title="记忆采用及删除边界">
           <Fact label="记忆标识">{v(w.memory?.memory_id)}</Fact>
           <Fact label="未来采用规则">{v(w.future_turn_policy)}</Fact>
@@ -674,9 +569,6 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onOpen
           </Layer>}
       </div>
     </div>}
-    {route==="notifications"&&reminderTx.notice&&<Notice message={reminderTx.notice}/>}
-    {route==="notifications"&&reminderTx.dialog}
-    {route==="notifications"&&reminderTx.recovery}
     {pending&&<div className="boss-confirm-backdrop">
       <section className="boss-confirm" role="dialog" aria-modal="true"
         aria-labelledby="boss-workspace-confirm" tabIndex={-1} ref={modalRef}>

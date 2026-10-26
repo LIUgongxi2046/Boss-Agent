@@ -48,6 +48,7 @@ paths:
       parameters:
         - {name: event_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
         - {name: event_version, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
+        - {name: execution_namespace, in: query, required: false, schema: {type: string, minLength: 1, maxLength: 200}}
       responses:
         '200': {description: 当前已保存通知的无正文目标, content: {application/json: {schema: {$ref: '#/components/schemas/NotificationTarget'}}}}
         '400': {description: 缺少、重复或额外参数}
@@ -98,13 +99,15 @@ components:
     NotificationTarget:
       type: object
       additionalProperties: false
-      required: [source_type, event_id, event_version, category, page_id, notification_saved, system_delivery_verified]
+      required: [source_type, execution_namespace, event_id, event_version, category, page_id, notification_saved, system_delivery_verified]
       properties:
         source_type: {const: SIMULATED}
+        execution_namespace: {type: string, minLength: 1}
         event_id: {type: string, minLength: 1}
         event_version: {type: string, minLength: 1}
         category: {const: 经营提醒}
-        page_id: {const: F02}
+        page_id: {enum: [F02, D09]}
+        record_id: {type: string, minLength: 1}
         notification_saved: {const: true}
         system_delivery_verified: {const: false}
 x-websocket-operations:

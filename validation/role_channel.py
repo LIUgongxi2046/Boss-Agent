@@ -15,9 +15,10 @@ from websockets.http11 import Request
 from aiohttp import web
 
 from business import checksum, now
+from boss_execution_scope import NAMESPACE
 from boss_page_api import BossPageAPI
 from boss_command_api import BossCommandAPI
-from public_conversation import CONVERSATION_READ_ACTIONS, CONVERSATION_TASK_ACTIONS, CONVERSATION_BUSINESS_ACTIONS, PublicConversation, validate_request_result
+from public_conversation import CONVERSATION_READ_ACTIONS, CONVERSATION_TASK_ACTIONS, CONVERSATION_BUSINESS_ACTIONS, CONVERSATION_SOURCE_ACTIONS, PublicConversation, validate_request_result
 
 
 class RoleChannel(WebSocketChannel):
@@ -50,6 +51,14 @@ class RoleChannel(WebSocketChannel):
     def record(self, role, operation, status):
         with self.audit.open("a") as output:
             output.write(json.dumps({"at": now(), "role": role, "operation": operation, "status": status}, ensure_ascii=False) + "\n")
+
+    def execution_space_active(self):
+        if self.boss_commands is None:
+            return True
+        with self.boss_commands.store.connect() as db:
+            from boss_execution_transition import pending_transition
+            row = db.execute("SELECT active FROM spaces WHERE namespace=?", (NAMESPACE,)).fetchone()
+            return row is not None and row[0] == 1 and pending_transition(db, NAMESPACE) is None
 
     async def _dispatch_http(self, connection, request):
         address = urlsplit(request.path)
@@ -99,12 +108,14 @@ class RoleChannel(WebSocketChannel):
             if not self.gateway.tokens.check_api_token(request):
                 self.record(None, address.path, 401)
                 return connection.respond(401, "未认证")
+            if not self.execution_space_active():
+                return connection.respond(409, "执行空间已经切换，需要连接当前服务")
             if address.path == "/api/boss/identity":
                 if role not in ("BOSS", "MAINTAINER"):
                     self.record(role, address.path, 403)
                     return connection.respond(403, "身份权限不足")
                 self.record(role, address.path, 200)
-                return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE")}))
+                return connection.respond(200, json.dumps({"role": role, "owner_id": "boss-1" if role == "BOSS" else None, "execution_scope": os.environ.get("BOSS_EXECUTION_SCOPE"), "execution_namespace": NAMESPACE}))
             if address.path.startswith("/api/boss/ui/"):
                 if address.path in {"/api/boss/ui/conversation/task-entry", "/api/boss/ui/conversation/business-entry"}:
                     try:
@@ -223,7 +234,14 @@ class RoleChannel(WebSocketChannel):
         role = self.connection_roles.get(connection)
         kind = envelope.get("type")
         action = envelope.get("action", "")
-        if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS | CONVERSATION_TASK_ACTIONS | CONVERSATION_BUSINESS_ACTIONS:
+        if role in {"BOSS", "MAINTAINER"} and action != "boss.auth.logout" and not self.execution_space_active():
+            if kind == "webui_request":
+                await connection.send(json.dumps({"event": "webui_response", "request_id": envelope.get("request_id"),
+                    "ok": False, "error": "EXECUTION_SPACE_CHANGED", "status": 409}))
+            else:
+                await connection.close(code=1008, reason="执行空间已经切换")
+            return
+        if kind == "webui_request" and action in CONVERSATION_READ_ACTIONS | CONVERSATION_TASK_ACTIONS | CONVERSATION_BUSINESS_ACTIONS | CONVERSATION_SOURCE_ACTIONS:
             await self._conversation_response(connection, role, envelope)
             return
         if kind == "webui_request" and action in {"boss.conversation.request", "boss.conversation.requests"}:
@@ -478,7 +496,7 @@ class RoleChannel(WebSocketChannel):
         try:
             if self.conversation is None:
                 raise web.HTTPServiceUnavailable(text="当前会话读取服务尚未就绪")
-            operation = self.conversation.business if envelope["action"] in CONVERSATION_BUSINESS_ACTIONS else self.conversation.task if envelope["action"] in CONVERSATION_TASK_ACTIONS else self.conversation.read
+            operation = self.conversation.sources if envelope["action"] in CONVERSATION_SOURCE_ACTIONS else self.conversation.business if envelope["action"] in CONVERSATION_BUSINESS_ACTIONS else self.conversation.task if envelope["action"] in CONVERSATION_TASK_ACTIONS else self.conversation.read
             result = operation(role, envelope["action"], envelope.get("payload"),
                 attached=lambda chat_id: chat_id in self.webui_connection_chats(connection), active=active)
             if envelope["action"] in {"boss.conversation.business.prepare", "boss.conversation.business.clear"}:

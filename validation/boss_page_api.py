@@ -1,9 +1,3 @@
-"""Boss-Agent read projections for the first desktop React slice (T11/T18).
-
-Every result comes from the same scoped ControlStore used by the running Agent.
-No synthetic success, no client-supplied role, no uncontrolled business writes.
-This is the authorized selection demo (ui-check) only, not a production API.
-"""
 from __future__ import annotations
 
 import json
@@ -34,8 +28,11 @@ from public_notification_target import notification_target
 from public_business_alerts import read_alerts, read_rules, input_catalog
 from boss_business_overview import BusinessOverviewAPI
 from boss_supply_quality import SupplyQualityAPI, external_adoption
+from boss_v7_owner import OwnerWorkspaceAPI
+from boss_v7_runs import task_exceptions
+from boss_v7_technical import TechnicalWorkspaceAPI
 
-DEMO_NAMESPACE = "ui-check"
+from boss_execution_scope import NAMESPACE as DEMO_NAMESPACE
 METRIC_IDS = (
     "sales_quantity", "revenue", "cost", "gross_profit",
     "gross_margin", "gross_profit_per_tonne",
@@ -489,6 +486,19 @@ class BossPageAPI:
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
         try:
+            with self.store.connect() as db:
+                self.store.active(db, self.namespace)
+            if role == "MAINTAINER" and not path.startswith("/api/boss/ui/admin/technical/"):
+                from boss_v7_configuration import authorize_technical, technical_scope
+                scope = technical_scope(path)
+                if scope is not None:
+                    authorize_technical(self.store, scope, "READ")
+            if path.startswith("/api/boss/ui/admin/technical/"):
+                return 200, TechnicalWorkspaceAPI(self.store, self.runtime_control).read(role, path, query_string)
+            if path == "/api/boss/ui/task-exceptions":
+                return 200, task_exceptions(self.store, role, query_string)
+            if path.startswith("/api/boss/ui/owner/"):
+                return 200, OwnerWorkspaceAPI(self.store).read(role, path, query_string)
             if path == '/api/boss/ui/business-overview/dimensions':
                 require(not query_string, '经营范围选项不接受URL参数', web.HTTPBadRequest)
                 return 200, BusinessOverviewAPI(self.store).dimensions(role)

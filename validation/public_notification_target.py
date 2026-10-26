@@ -5,19 +5,30 @@ from urllib.parse import parse_qs
 from aiohttp import web
 
 from business import require
+from boss_execution_scope import NAMESPACE
+from boss_v7_owner_records import notification_history
 
 
 def notification_target(store, role, namespace, query_string):
     require(role == "BOSS", "通知返回需要本人身份", web.HTTPForbidden)
     values = parse_qs(query_string, keep_blank_values=True)
-    require(set(values) == {"event_id", "event_version"} and all(len(items) == 1 and 0 < len(items[0]) <= 200 for items in values.values()),
+    require({"event_id", "event_version"} <= set(values) <= {"event_id", "event_version", "execution_namespace"}
+            and all(len(items) == 1 and 0 < len(items[0]) <= 200 for items in values.values()),
             "通知目标参数无效", web.HTTPBadRequest)
     event_id, version = values["event_id"][0], values["event_version"][0]
-    require(namespace == "ui-check", "通知执行范围无效", web.HTTPConflict)
+    require(namespace == NAMESPACE, "通知执行范围无效", web.HTTPConflict)
     with store.connect() as db:
         db.execute("BEGIN")
         store.active(db, namespace)
         data = store.get(db, namespace, "initial", "snapshot")
+        original_namespace = values.get("execution_namespace", [namespace])[0]
+        if original_namespace != namespace:
+            matches = [row for row in notification_history(db, data)
+                       if row["namespace"] == original_namespace and row["target_id"] == event_id and row["version"] == version]
+            require(bool(matches), "原通知不属于获准历史空间或已经不可访问", web.HTTPNotFound)
+            return {"source_type": "SIMULATED", "execution_namespace": original_namespace,
+                    "event_id": event_id, "event_version": version, "category": "经营提醒", "page_id": "D09",
+                    "record_id": matches[0]["id"], "notification_saved": True, "system_delivery_verified": False}
         event = store.get(db, namespace, "event", event_id)
         require(event.get("owner_id", data["owner_id"]) == data["owner_id"] == "boss-1", "通知不属于当前本人", web.HTTPForbidden)
         require(event["version"] == version, "通知引用的事件版本已经变化", web.HTTPConflict)
@@ -49,4 +60,4 @@ def notification_target(store, role, namespace, query_string):
                 require(datetime.fromisoformat(reminder["until"]) <= datetime.fromisoformat(clock["at"]), "当前提醒仍在暂缓期间", web.HTTPConflict)
         saved = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='notification' AND json_extract(body,'$.event_id')=? AND json_extract(body,'$.event_version')=? AND json_extract(body,'$.state')='DELIVERED'", (namespace, event_id, version)).fetchone()
         require(saved is not None, "当前版本尚未保存通知", web.HTTPConflict)
-    return {"source_type": "SIMULATED", "event_id": event_id, "event_version": version, "category": "经营提醒", "page_id": "F02", "notification_saved": True, "system_delivery_verified": False}
+    return {"source_type": "SIMULATED", "execution_namespace": namespace, "event_id": event_id, "event_version": version, "category": "经营提醒", "page_id": "F02", "notification_saved": True, "system_delivery_verified": False}

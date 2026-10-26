@@ -7,7 +7,7 @@ from aiohttp import web
 from business import now, checksum, require
 from boss_source_policy import source_validity
 
-NS="ui-check"
+from boss_execution_scope import NAMESPACE as NS
 KINDS=("SECRETARY_ROLE","EXPRESSION","TASK_HINTS")
 SECRET=re.compile(r"\bsk-[A-Za-z0-9_-]{25,}\b")
 

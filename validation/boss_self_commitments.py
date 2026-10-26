@@ -13,7 +13,7 @@ from aiohttp import web
 from business import now, require, checksum
 from boss_source_access import require_current_simulated_source, require_current_business_source
 
-NS="ui-check"
+from boss_execution_scope import NAMESPACE as NS
 FINAL={"COMPLETED_CONFIRMED","CANCELED"}
 
 

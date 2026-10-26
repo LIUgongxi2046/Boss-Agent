@@ -7,6 +7,7 @@ from nanobot.agent.tools.context import current_request_context
 from nanobot.providers.base import LLMResponse, ToolCallRequest
 
 from business import now, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_runtime_records import ATTRIBUTE
 from boss_simulation_api import _context
 from boss_workspace_api import BossWorkspaceAPI
@@ -51,7 +52,7 @@ class ProductReminders:
     def context_provider(self):
         request, grant = self._grant()
         binding = request.attributes.get(ATTRIBUTE)
-        return Fc04Context("BOSS", grant.owner_id, "ui-check", grant.dataset_id, grant.dataset_version,
+        return Fc04Context("BOSS", grant.owner_id, NS, grant.dataset_id, grant.dataset_version,
             binding.request_id if binding else grant.key, binding.session_id if binding else grant.session_id, True, grant.projection_sha256)
 
     def view(self):
@@ -94,24 +95,24 @@ class ProductReminders:
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             context = _context(db)
-            previous = db.execute("SELECT body FROM objects WHERE namespace='ui-check' AND kind='reminder_public_request' AND id=?", (key,)).fetchone()
+            previous = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='reminder_public_request' AND id=?", (NS, key)).fetchone()
             if not previous:
-                self.store.put(db, "ui-check", "reminder_public_request", key, {"client_request_id": key,
+                self.store.put(db, NS, "reminder_public_request", key, {"client_request_id": key,
                     **{field: context[field] for field in ("owner_id", "dataset_id", "dataset_version")}, "projection_sha256": notifications_digest(view), "status": "PREPARED", "created_at": now()})
         if previous:
             return self.receipt(role, key, active)
         grant = ReminderRequest(key, context["owner_id"], context["dataset_id"], context["dataset_version"], notifications_digest(view), "fc04:" + key, active)
-        result = await self.bot.run("SIMULATED：读取当前获准的经营提醒、规则及本人处理状态。", session_key=grant.session_id,
+        result = await self.runtime.run_bot(self.bot, "SIMULATED：读取当前获准的经营提醒、规则及本人处理状态。", session_key=grant.session_id,
             sender_id=grant.owner_id, ephemeral=True, attributes={GRANT: grant})
         require(not result.error and key in self.outputs and active(), "当前提醒读取未完成，请核查原请求", web.HTTPConflict)
         output = self.outputs.pop(key)
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = self.store.get(db, "ui-check", "reminder_public_request", key)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"])
+            row = self.store.get(db, NS, "reminder_public_request", key)
+            run = self.store.get(db, NS, "runtime_run", row["run_id"])
             require(run["status"] == "SUCCEEDED", "实际提醒读取运行未成功", web.HTTPConflict)
             row.update(status="SUCCEEDED", result=output)
-            self.store.put(db, "ui-check", "reminder_public_request", key, row)
+            self.store.put(db, NS, "reminder_public_request", key, row)
         return self.receipt(role, key, active)
 
     def receipt(self, role, key, active):
@@ -120,9 +121,9 @@ class ProductReminders:
         with self.store.connect() as db:
             db.execute("BEGIN")
             context = _context(db)
-            row = self.store.get(db, "ui-check", "reminder_public_request", key)
+            row = self.store.get(db, NS, "reminder_public_request", key)
             require(all(row[field] == context[field] for field in ("owner_id", "dataset_id", "dataset_version")), "原提醒请求不属于当前本人资料", web.HTTPForbidden)
-            run = self.store.get(db, "ui-check", "runtime_run", row["run_id"]) if row.get("run_id") else None
+            run = self.store.get(db, NS, "runtime_run", row["run_id"]) if row.get("run_id") else None
         current = notifications_digest(self.view()) == row["projection_sha256"]
         return {"client_request_id": key, "run_id": row.get("run_id"), "request_state": run["status"] if run else row["status"],
             "adoption_state": "CURRENT" if current else "HISTORICAL_REQUIRES_REQUERY", "projection_sha256": row["projection_sha256"],
@@ -131,7 +132,7 @@ class ProductReminders:
 
 class PublicReminderRecorder(Fc04RuntimeRecorder):
     def __init__(self, service, registry, snapshot):
-        super().__init__(service.store, "ui-check", registry, snapshot, service.context_provider)
+        super().__init__(service.store, NS, registry, snapshot, service.context_provider)
         self.service = service
 
     def hook_factory(self, context):
@@ -146,9 +147,9 @@ class PublicReminderRecorder(Fc04RuntimeRecorder):
             _, grant = self.service._grant(request)
             with self.service.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
-                row = self.service.store.get(db, "ui-check", "reminder_public_request", grant.key)
+                row = self.service.store.get(db, NS, "reminder_public_request", grant.key)
                 row.update(status="RUNNING", run_id=request.attributes[ATTRIBUTE].run_id)
-                self.service.store.put(db, "ui-check", "reminder_public_request", grant.key, row)
+                self.service.store.put(db, NS, "reminder_public_request", grant.key, row)
             return block
         finally:
             PREPARING_REQUEST.reset(token)

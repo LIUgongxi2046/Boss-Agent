@@ -10,7 +10,7 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
-from nanobot.config.loader import save_config
+from nanobot.config.loader import load_config, save_config
 from nanobot.config.schema import Config
 
 from test_fc02_bi_queries import request
@@ -39,6 +39,7 @@ def product_bi(tmp_path):
         "providers":{"deepseek":{"apiKey":"${DEEPSEEK_API_KEY}","apiBase":"https://api.deepseek.com"}}})
     filename = tmp_path / "config.json"
     save_config(config, filename)
+    config = load_config(filename)
     fc01, bi = ProductFc01(store), ProductBI(store)
     provider = FeatureProvider(fc01, bi)
     registry = FeatureToolRegistry()

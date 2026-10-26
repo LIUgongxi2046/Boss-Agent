@@ -12,6 +12,7 @@ from business import checksum, now, require
 from boss_morning import SCHEMA
 from boss_simulation_api import _context
 from boss_conversation import ConversationAPI
+from boss_conversation_sources import ConversationSources
 
 
 VERSION = "1.1.0"
@@ -22,7 +23,7 @@ BIND_SCHEMA = {"type": "object", "additionalProperties": False, "$defs": SCHEMA[
     "dependentRequired": {"list_id": ["item_id"], "item_id": ["list_id"]}}
 REQUEST_ID_SCHEMA = {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9_.-]+$"}
 TERMINAL = frozenset({"SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT"})
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
 
 
 @dataclass(frozen=True)
@@ -39,12 +40,14 @@ class NativeMorningAdapter:
         self.request_attribute = request_attribute
         self.proofs = {}
         self.native_sessions = None
+        self.source_selection = None
 
     def bind_sessions(self, native_sessions):
         require(isinstance(native_sessions, SessionManager), "晨间绑定需要实际原生SessionManager", web.HTTPBadRequest)
         require(self.native_sessions is None or self.native_sessions is native_sessions,
                 "晨间绑定已经采用其他原生会话服务", web.HTTPConflict)
         self.native_sessions = native_sessions
+        self.source_selection = ConversationSources(self.store, native_sessions)
 
     def _identity(self, db):
         self.store.active(db, NS)
@@ -180,6 +183,8 @@ class NativeMorningAdapter:
         previous_key = binding["last_request_id"]
         binding = self._synchronize(binding)
         self._current(binding)
+        require(self.source_selection is not None, "晨间会话资料服务尚未接入", web.HTTPServiceUnavailable)
+        source_selection = self.source_selection.pin(chat_id)
         payload = {"client_request_id": key, "question": content, **{field: binding[field] for field in ("date", "timezone")}}
         if binding["list_id"] is not None:
             payload["list_id"] = binding["list_id"]
@@ -188,6 +193,7 @@ class NativeMorningAdapter:
         def current_active():
             if not active() or not attached(chat_id):
                 return False
+            require(self.source_selection.pin(chat_id) == source_selection, "晨间会话选择的知识资料已经变化", web.HTTPConflict)
             with self.store.connect() as db:
                 self._same_scope(binding, self._identity(db))
             self._current(binding)
@@ -196,7 +202,7 @@ class NativeMorningAdapter:
         require(grant is not None, "原生轮次已经准备，请读取原编号", web.HTTPConflict)
         prepared = False
         try:
-            grant = replace(grant, session_id=binding["session_id"])
+            grant = replace(grant, session_id=binding["session_id"], source_selection_json=json.dumps(source_selection) if source_selection is not None else None)
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
                 self._same_scope(binding, self._identity(db))
@@ -205,7 +211,7 @@ class NativeMorningAdapter:
                 row = self.store.get(db, NS, "morning_public_request", key)
                 require(row["status"] == "PREPARED", "晨间原生轮次已经开始", web.HTTPConflict)
                 row.update(session_id=binding["session_id"], native_binding_id=binding["binding_id"],
-                           native_chat_id=chat_id, native_turn_id=turn_id, native_content_sha256=checksum(content))
+                           native_chat_id=chat_id, native_turn_id=turn_id, native_content_sha256=checksum(content), source_selection=source_selection)
                 self.store.put(db, NS, "morning_public_request", key, row)
                 binding["last_request_id"] = key
                 self.store.put(db, NS, "morning_native_binding", binding["binding_id"], binding)

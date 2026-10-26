@@ -4,9 +4,9 @@ import {
 } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
-  AlertCircle, ArrowLeft, ArrowRight, Bell,
-  CheckCircle2, ChevronRight,
-  Clock3, FileSearch, FolderOpen, Loader2,
+  AlertCircle, ArrowLeft, Bell,
+  CheckCircle2,
+  Clock3, FolderOpen, Loader2,
   Menu, MessageCircle, RefreshCw, Search, Settings,
   X,
 } from "lucide-react";
@@ -18,6 +18,9 @@ import {bossPageId,menuPageUrl,readBossLocation} from "./boss-route";
 import { BossAssignmentFlow, MaintainerFeedback, type TaskListResponse, type MaintenanceTaskRef } from "./BossAssignmentFlow";
 import { BossWorkspaceView, WORKSPACE_PAGE_ROUTES } from "./BossWorkspaceView";
 import {BossNotificationReturn} from "./BossDesktopNotifications";
+import {BossSourceView} from "./BossSourceView";
+import {BossRestrictedView,BossUnsavedWorkspace} from "./BossAccessStates";
+import type {DraftLeaveHandle} from "./draft-leave";
 import { BossSectorView, SECTOR_PAGE_IDS } from "./BossSectorView";
 import { BossSupplyQualityView } from "./BossSupplyQualityView";
 import { EMPTY_SUPPLY_EDITOR, type SupplyQualityEditor } from "./BossSupplyQualityPanel";
@@ -25,10 +28,11 @@ import { MaintainerSupplyQuality, EMPTY_IMPORT_EDITOR, type SupplyImportEditor }
 import { BossAssignmentPicker, DEFAULT_ASSIGNMENT_DRAFT, type AssignmentDraft } from "./BossAssignmentPicker";
 import { BossMeetingApprovalView, MaintainerApplicationSeed } from "./BossMeetingApproval";
 import { BossMeetingBrief } from "./BossMeetingBrief";
-import { BossMeetingArrangement, type MeetingArrangementProjection } from "./BossMeetingArrangement";
+import type { MeetingArrangementProjection } from "./BossMeetingArrangement";
 import { MaintainerRuntimeRecords } from "./MaintainerRuntimeRecords";
 import { RuntimeTaskTechnicalView } from "./RuntimeTaskTechnicalView";
-import { ProductRuntimeConfiguration } from "./ProductRuntimeConfiguration";
+import {MaintainerModelWorkspace} from "./MaintainerModelConnections";
+import {BossRunDetails} from "./BossRunDetails";
 import { MaintainerMemoryStatus } from "./MaintainerMemoryStatus";
 import { MaintainerSkills } from "./MaintainerSkills";
 import { MaintainerSkillVersions } from "./MaintainerSkillVersions";
@@ -39,11 +43,27 @@ import { BossPeopleMeeting } from "./BossPeopleMeeting";
 import { BossOwnerPreferences } from "./BossOwnerPreferences";
 import { BossSettingsHub } from "./BossSettingsHub";
 import { BossTaskCenter } from "./BossTaskCenter";
+import {BossNotificationCenter} from "./BossNotificationCenter";
+import { BossMeetingLibrary } from "./BossMeetingLibrary";
+import { BossRuntimeOverview } from "./BossRuntimeOverview";
+import { BossVoicePaused } from "./BossVoicePaused";
+import {BossExecutionRecovery} from "./BossExecutionRecovery";
+import {BossTaskExceptions} from "./BossTaskExceptions";
+import {BossPersonalMemory} from "./BossPersonalMemory";
+import {BossOwnerRecords} from "./BossOwnerRecords";
+import {MaintainerAudit} from "./MaintainerAudit";
+import {MaintainerConfiguration,MaintainerMetricsConfiguration} from "./MaintainerConfiguration";
+import {MaintainerDatasets} from "./MaintainerDatasets";
+import {MaintainerSimulationCenter} from "./MaintainerSimulationCenter";
+import {MaintainerEvaluation} from "./MaintainerEvaluation";
+import {MaintainerRelationships} from "./MaintainerRelationships";
+import {MaintainerLocalSystem} from "./MaintainerLocalSystem";
 import { MaintainerPromptVersion } from "./MaintainerPromptVersion";
 import { BossResearchView } from "./BossResearchView";
 import { BossCommunicationCalendar } from "./BossCommunicationCalendar";
+import { BossPrivateCalendar } from "./BossPrivateCalendar";
 import { MaintainerMessageReply } from "./MaintainerMessageReply";
-import { MaintainerKnowledgeEditor } from "./MaintainerKnowledgeEditor";
+import {MaintainerKnowledgeWorkspace} from "./MaintainerKnowledgeWorkspace";
 import { MaintainerScheduler } from "./MaintainerScheduler";
 import { BossMorningView, type MorningReference,type MorningConversationRequest,type MorningBindingReceipt } from "./BossMorningView";
 import type {ConversationActions} from "./BossConversationWorkspace";
@@ -55,13 +75,16 @@ import {BossBusinessOverview} from "./BossBusinessOverview";
 import {useBusinessConversationEntry} from "./BusinessConversationEntry";
 import {BusinessOverviewQuery} from "./BusinessOverviewQuery";
 import {BusinessOverviewAlert} from "./BusinessOverviewAlert";
+import {BossReminderWorkspace} from "./BossReminderWorkspace";
 import {BusinessOverviewPreparation,savedOverviewPreparation} from "./BusinessOverviewPreparation";
 import type {OverviewSelection} from "./business-overview-types";
 import { MaintainerBIScenarios } from "./MaintainerBIScenarios";
+import {MaintainerSimulationEvents} from "./MaintainerSimulationEvents";
 import { MaintainerMorningCoverage } from "./MaintainerMorningCoverage";
 import { BossOwnerPlans, type OwnerPlanProjection } from "./BossOwnerPlans";
 import { useClient } from "@/providers/ClientProvider";
 import "./boss-v6.css";
+import "./boss-v7.css";
 
 type Role = "BOSS" | "MAINTAINER";
 const navigationGraphics:Record<string,ReactNode>={
@@ -100,13 +123,6 @@ type Dashboard = {
   notifications: { event_id: string; state: string }[];
 };
 type Tasks = TaskListResponse & { historical_commitment: HistoricalTask | null; source_type: string };
-type Meetings = {
-  source_type: string;
-  meeting: Dashboard["meeting"];
-  documents: { source_id: string; version: string; published_at: string; source_type: string }[];
-};
-type Evidence = { source_id: string; source_type: string; version: string; content: string; published_at?: string; author_contact_id?: string;
-  author_kind?:string;author_display_name?:string;generator_version?:string;business_basis?:string;allowed_use?:string;valid_from?:string;valid_until?:string };
 type Maintenance = { configured_provider: string; configured_model: string; configuration_version: string; source_type: string; status: string; counts: Record<string, number>; task_refs?: MaintenanceTaskRef[] };
 type ModelHealth = {
   source_type: string; provider: string; data_source: string;
@@ -127,17 +143,6 @@ type ModelHealth = {
   observed_error_count?: number;
 };
 type Identity = { role: Role | null; owner_id: string | null; execution_scope?:string|null };
-type PromptTechnicalView = {
-  runtime_eligibility: {
-    projection: "prompt-technical-status"; checked_at: string;
-    model_adoption_verified: false; configuration_mutation_performed: false;
-    items: { kind: string; enabled: boolean; prompt_id: string | null;
-      prompt_version: string | null; active_version: string | null;
-      future_context_eligible: boolean; exclusion_reasons: string[];
-      source_status: { source_id: string; pinned_version: string;
-        current_version: string | null; validity_state: string }[] }[];
-  };
-};
 type Animation = "idle" | "thinking" | "complete" | "notice";
 
 type Props = {
@@ -156,6 +161,7 @@ type Props = {
 };
 
 const pages = pageMeta as Record<string, DesignPage>;
+function unsupportedPage(page:string):never {throw new Error("页面没有对应的业务组件："+page);}
 function allowed(page: string, role: Role, mvp=false, _priority=false) {
   return deliveredPage(page,role,mvp)!==undefined;
 }
@@ -197,16 +203,6 @@ function Panel({ title, note, children, className = "" }: {
 function Tag({ children, tone = "blue" }: { children: ReactNode; tone?: "blue" | "green" | "amber" | "muted" }) {
   return <span className={"boss-tag boss-tag-" + tone}>{children}</span>;
 }
-function Quiet({ message }: { message: string }) {
-  return <div className="boss-empty"><FolderOpen size={22} aria-hidden="true" />
-    <div><strong>暂无可核查记录</strong><p>{message}</p></div>
-  </div>;
-}
-function localTime(value?: string) {
-  if (!value) return "待核查";
-  // Keep the original business-local timezone/offset visible. Never silently use host time.
-  return value.replace("T", " ").replace(/\+08:00$/, "（北京时间）");
-}
 function GlassButton({ children, onClick, primary = false, disabled = false }: {
   children: ReactNode; onClick: () => void; primary?: boolean; disabled?: boolean;
 }) {
@@ -237,6 +233,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [pageFilter, setPageFilter] = useState("");
   const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
   const [assignmentDirty, setAssignmentDirty] = useState(false);
+  useEffect(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);},[client,token]);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [workDirty, setWorkDirty] = useState(false);
   const [overviewDirty,setOverviewDirty]=useState(false),[queryDirty,setQueryDirty]=useState(false);
@@ -261,10 +258,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const supplyInterface=page==="F14"?"SI09":"SI10";
   const supplyEditor=currentSupply?.[supplyInterface]??EMPTY_SUPPLY_EDITOR;
   const importEditor=currentSupply?.import??EMPTY_IMPORT_EDITOR;
-  const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.approvedFor);
+  const supplyDirty=["F14","F21"].includes(page)&&Boolean(supplyEditor.pending||supplyEditor.pendingPreparation||supplyEditor.prepared||supplyEditor.originId||supplyEditor.purpose||supplyEditor.due||supplyEditor.evidence||supplyEditor.coordinatorId||supplyEditor.timezone||supplyEditor.approvedFor);
   const importDirty=page==="A03"&&Boolean(importEditor.text||importEditor.pending);
   const [pendingNavigation, setPendingNavigation] = useState<{id:string;focus:string;taskId?:string;sopId?:string;menu?:boolean}|null>(null);
   const [pendingLeaveAction,setPendingLeaveAction]=useState<(()=>void)|null>(null);
+  const draftLeaveRef=useRef<DraftLeaveHandle|null>(null);
+  const registerDraftLeave=useCallback((handle:DraftLeaveHandle|null)=>{draftLeaveRef.current=handle;},[]);
   const [sourceReviewDirty, setSourceReviewDirty] = useState(false);
   const updateAssignmentDraft = useCallback((field:keyof AssignmentDraft,value:string)=>{
     setAssignmentDraft(old=>({...old,[field]:value}));
@@ -278,11 +277,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   }|null>(null);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [tasks, setTasks] = useState<Tasks | null>(null);
-  const [meetings, setMeetings] = useState<Meetings | null>(null);
-  const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
   const [modelHealth, setModelHealth] = useState<ModelHealth | null>(null);
-  const [promptTechnicalView, setPromptTechnicalView] = useState<PromptTechnicalView | null>(null);
   const [ownerPlans, setOwnerPlans] = useState<OwnerPlanProjection | null>(null);
   const [meetingArrangement, setMeetingArrangement] = useState<MeetingArrangementProjection | null>(null);
   const [runtimeTask, setRuntimeTask] = useState<{taskId: string; runId: string} | null>(null);
@@ -327,7 +323,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     window.addEventListener("beforeunload",protect);
     return () => window.removeEventListener("beforeunload",protect);
   }, [assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,overviewDirty,queryDirty,supplyDirty,importDirty]);
-  const [originFocus, setOriginFocus] = useState("");
 
   useEffect(() => {
     const abort = new AbortController();
@@ -353,10 +348,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       return;
     }
     const changingTask = taskId !== undefined && taskId !== selectedTaskId;
-    if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) || (page==="F06"&&changingTask&&assignmentDirty)||
+    if (!bypassDirty && ((page === "F06" && sourceReviewDirty && (id !== page || changingTask)) || (page==="F06"&&changingTask&&(assignmentDirty||workDirty))||
         (id !== page && ((page === "F06" && assignmentDirty && !["D04","D05","D01"].includes(id)) ||
           (["N07","N08"].includes(page) && settingsDirty) ||
-          (["F01","MVP01","F02","N06","F04","N05","N09","F08","A08","A06","A13"].includes(page) && workDirty)||(page==="N03"&&overviewDirty)||(page==="F03"&&queryDirty)||supplyDirty||importDirty)))) {
+          workDirty||(page==="N03"&&overviewDirty)||(page==="F03"&&queryDirty)||supplyDirty||importDirty)))) {
       navigationFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       if(directoryOpen){
         const trigger=shellRef.current?.querySelector<HTMLButtonElement>('button.boss-search');
@@ -375,11 +370,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       onOpenNative(role);
     }
     if (id !== page && ["N07","N08"].includes(page)) setSettingsDirty(false);
-    if (id !== page && ["F01","MVP01","F02","N06","F04","N05","N09","F08","A08","A13"].includes(page)) setWorkDirty(false);
-    if (focus) setOriginFocus(focus);
+    if (id !== page) setWorkDirty(false);
     const url = menu?menuPageUrl(window.location.href,id,role):new URL(window.location.href);
     url.searchParams.set("bossPage", id);
-    if(menu)conversationReturn.current=false;
+    if(menu){conversationReturn.current=false;setSourceAnchor(null);if(id==="D01")setSourceId(readBossLocation(url,role).sourceId);}
     if(conversationReturn.current)url.searchParams.set("bossConversationReturn","N02");
     if (["NATIVE","N02"].includes(id)) url.searchParams.set("bossReturn", page);
     if(!menu&&(taskId ?? selectedTaskId))url.searchParams.set("bossTask",taskId ?? selectedTaskId);
@@ -454,19 +448,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     if (role === "BOSS") {
       if (page === "N09") read<OwnerPlanProjection>("/api/boss/ui/owner-plans", setOwnerPlans);
       if (page === "F04") read<MeetingArrangementProjection>("/api/boss/ui/meeting-arrangement", setMeetingArrangement);
-      if (["F01", "MVP01", "F06", "D04", "D05", "N06", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
+      if (["F01", "MVP01", "F06", "D04", "D05", "N07", "N09"].includes(page)) read<Dashboard>("/api/boss/ui/dashboard", setDashboard);
       if (["N05", "F06"].includes(page)) read<Tasks>("/api/boss/ui/tasks", setTasks);
-      if (["N04", "F04"].includes(page)) read<Meetings>("/api/boss/ui/meetings", setMeetings);
-      if (["F24", "D03"].includes(page)) read<ModelHealth>("/api/boss/ui/model-health", setModelHealth);
-      if (page === "D01") read<Evidence>("/api/boss/ui/evidence?source=" + encodeURIComponent(sourceId), setEvidence);
-    } else if (page === "A05") {
-      setPromptTechnicalView(null);
-      read<PromptTechnicalView>("/api/boss/ui/workspace/prompt-versions", value => {
-        if (value.runtime_eligibility?.projection !== "prompt-technical-status")
-          throw new Error("Prompt技术诊断返回格式错误");
-        setPromptTechnicalView(value);
-      });
-    } else if (["A04", "A08", "N12", "A01", "A15", "F30"].includes(page)) {
+    } else if (["A04", "A08", "A01", "A15", "F30"].includes(page)) {
       read<Maintenance>("/api/boss/ui/maintenance", setMaintenance);
       if (["A15", "F30"].includes(page)) read<ModelHealth>("/api/boss/ui/model-usage", setModelHealth);
     }
@@ -504,7 +488,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     return () => abort.abort();
   }, [getToken, page, role, selectedTaskId, requestVersion]);
 
-  const referenceMenu = ["F01","N02","N03"].includes(page)&&role==="BOSS"&&!mvpScope;
+  const referenceMenu = role==="BOSS"&&!mvpScope;
   const fromOverview=new URLSearchParams(window.location.search).get("overviewReturn")==="N03";
   const currentEntry=role?deliveredPage(page,role,mvpScope):undefined;
   const metadata = currentEntry?.state==="AUTHENTICATION"?{...pages[page],title:"当前登录状态",summary:"查看当前身份，需要切换账号时可以退出并返回登录表单。"}:page === "NATIVE" ? {
@@ -526,11 +510,17 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   };
   const goSource = (id = "finance-note", anchor?:{
     version:string;start:number;end:number;
-  }) => {
-    setSourceId(id);
-    const url=new URL(window.location.href);url.searchParams.set("bossSource",id);replaceBossHistory(url);
-    setSourceAnchor(anchor?{source_id:id,...anchor}:null);
-    navigate("D01", page);
+  },referenceVersion?:string) => {
+    guardLeave(()=>{
+      setSourceId(id);
+      const url=new URL(window.location.href);url.searchParams.set("bossSource",id);
+      for(const key of ["bossSourceVersion","bossSourceStart","bossSourceEnd","bossSourceReferenceVersion"])url.searchParams.delete(key);
+      if(anchor){url.searchParams.set("bossSourceVersion",anchor.version);url.searchParams.set("bossSourceStart",String(anchor.start));url.searchParams.set("bossSourceEnd",String(anchor.end));}
+      if(referenceVersion)url.searchParams.set("bossSourceReferenceVersion",referenceVersion);
+      replaceBossHistory(url);
+      setSourceAnchor(anchor?{source_id:id,...anchor}:null);
+      navigate("D01", page,true);
+    });
   };
   const selectTask = (id: string,bypassDirty=false) => navigate("F06", page, bypassDirty, id);
   const markOverviewReturn=()=>{const address=new URL(window.location.href);address.searchParams.set("overviewReturn","N03");replaceBossHistory(address);};
@@ -547,8 +537,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   </div>;
 
   if(page==="UNAVAILABLE")return <div className="boss-v6" data-role={role}><section className="boss-panel boss-unavailable" aria-label="当前入口不可用"><h1>当前身份无法打开此页面</h1><p>页面编号未知或不属于当前身份的菜单范围。请返回相应工作区。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>navigate(role==="BOSS"?"F01":"A08")}>返回工作区</button><button className="boss-btn" onClick={requestLogout}>退出当前身份</button></div></section></div>;
-  return <div className="boss-v6" data-role={role} data-page={page} ref={shellRef}>
-    <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);replaceBossHistory(url);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
+  return <div className="boss-v6" data-design="v7" data-role={role} data-page={page} ref={shellRef}>
+    <a className="boss-skip-link" href="#boss-main">跳转至当前工作内容</a>
+    <BossNotificationReturn role={role} onOpen={target=>{const url=new URL(window.location.href);if(target.page_id==="D09"&&target.record_id){url.searchParams.set("bossHistoryRecord",target.record_id);}else{url.searchParams.delete("bossHistoryRecord");url.searchParams.set("bossEvent",target.event_id);url.searchParams.set("bossEventVersion",target.event_version);}replaceBossHistory(url);navigate(target.page_id);window.dispatchEvent(new Event("boss-notification-target-changed"));}}/>
     <div className="boss-frame">
       <div className={"boss-layout " + (!sidebarOpen ? "boss-layout-slim" : "")}>
         <aside className="boss-sidebar" aria-label={role === "BOSS" ? "老板工作区" : "技术维护工作区"}>
@@ -577,7 +568,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </button>
             {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(["F01","N03"].includes(page))guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
-              {!referenceMenu&&<Tag tone="blue">本地桌面开发版</Tag>}
               <Tag tone="amber">模拟业务资料</Tag>
               {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}>{["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="notification"/>:<Bell size={18}/>}</button>
@@ -591,7 +581,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <section className="boss-stage">
             <div className={"boss-hero " + (["F01","N02","N03"].includes(page) ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
-                <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"} · {page} · {currentEntry?.stateLabel}</div>
+                <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"}</div>
                 <h1>{page === "F01" ? mvpScope?"今日采购成本事项":"早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
                 <p>{mvpScope&&page==="F01"?"核查同一采购报告的成本变化、原文与本人协调记录。":metadata?.summary || "按照 PRD 查看当前执行过程和资料来源。"}</p>
               </div>
@@ -599,7 +589,15 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </div>
             <section className="boss-native-surface" hidden={!isNative} aria-label={role === "BOSS" ? "聊天交办内容" : "应用设置内容"}>
               {role==="MAINTAINER"&&<div className="boss-native-context"><button className="boss-btn" type="button" onClick={() => navigate(businessPage.current??"A08")}><ArrowLeft size={16}/>返回业务页面</button><span>当前身份：技术维护</span></div>}
-              {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenSource:id=>{conversationReturn.current=true;goSource(id);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onReturn:()=>navigate(businessPage.current??(previousPage!=="NATIVE"&&previousPage!=="N02"&&allowed(previousPage,role,mvpScope,priorityScope)?previousPage:role==="BOSS"?"F01":"A08"))})}
+              {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenSource:(id,version)=>{conversationReturn.current=true;goSource(id,undefined,version);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onOpenPage:(target,runId)=>guardLeave(()=>{
+                conversationReturn.current=true;
+                const address=new URL(window.location.href);
+                if(runId)address.searchParams.set("bossRun",runId);else address.searchParams.delete("bossRun");
+                for(const key of ["bossIssue","bossOwnerRecord","bossTask","overviewReturn","overviewQuerySnapshot"])address.searchParams.delete(key);
+                const state={...window.history.state};delete state.bossRunView;delete state.bossIssueView;delete state.bossOwnerRecords;
+                window.history.replaceState(state,"",address);
+                navigate(target,page,true,"");
+              }),onReturn:()=>navigate(businessPage.current??(previousPage!=="NATIVE"&&previousPage!=="N02"&&allowed(previousPage,role,mvpScope,priorityScope)?previousPage:role==="BOSS"?"F01":"A08"))})}
             </section>
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-morning-content" hidden={page!=="F01"}>
               <BossMorningView key={morningDiscardVersion} refreshVersion={requestVersion} visible={page==="F01"} onDirtyChange={setWorkDirty}
@@ -610,6 +608,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </div>}
             {role==="BOSS"&&!mvpScope&&<div className="boss-content boss-overview-content" hidden={page!=="N03"}>
               <BossBusinessOverview visible={page==="N03"} refreshVersion={requestVersion} discardVersion={overviewDiscardVersion} onDirtyChange={setOverviewDirty}
+                onTopic={selection=>{if(!selection.page_id)throw new Error("经营专题入口缺少页面编号");markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("overviewSectorReference",JSON.stringify(selection));replaceBossHistory(address);navigate(selection.page_id==="F19"&&selection.use&&selection.use!=="BROILER"?"V19-"+selection.use:selection.page_id);}}
+                onViewSource={id=>{markOverviewReturn();goSource(id);}}
                 onQuery={view=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("overviewQuerySnapshot",view.snapshot_sha256);address.searchParams.delete("biRequest");address.searchParams.delete("biScenario");replaceBossHistory(address);navigate("F03");}}
                 onReminder={alert=>{markOverviewReturn();const address=new URL(window.location.href);address.searchParams.set("bossEvent",alert.event_id);address.searchParams.set("bossEventVersion",alert.event_version);replaceBossHistory(address);navigate("F02");window.dispatchEvent(new Event("boss-notification-target-changed"));}}
                 onTask={task=>{markOverviewReturn();selectTask(task.id);}} onDiscuss={businessConversation.start} conversationStatus={<>{businessConversation.status}{savedOverviewPreparation()&&<button className="boss-btn" onClick={()=>setOverviewPreparation(savedOverviewPreparation())}>核查原经营准备</button>}</>} onPrepare={(detail,use)=>setOverviewPreparation({scope:detail.applied_scope,page_id:detail.topic.page_id,use,snapshot_sha256:detail.snapshot_sha256})}/>
@@ -618,15 +618,11 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             {!isNative && !(role==="BOSS"&&!mvpScope&&["F01","N03"].includes(page)) && <div className="boss-content" key={page}>
               <div className="boss-meta-strip">
                 <div className="boss-state-line">
-                  <Tag tone={currentEntry?.state==="DEVELOPED"?"green":"amber"}>
-                    {currentEntry?.stateLabel}
-                  </Tag>
                   <span>{currentEntry?.state==="AUTHENTICATION"?"当前身份已经认证":metadata?.initial_state || "业务状态待读取"}</span>
                 </div>
                 <div className="boss-meta-actions">
                   {role==="BOSS"&&conversationReturn.current&&<button className="boss-btn" type="button" onClick={()=>navigate("N02")}><ArrowLeft size={15}/>返回原会话</button>}
                   {role==="BOSS"&&fromOverview&&<button className="boss-btn" type="button" onClick={returnOverview}><ArrowLeft size={15}/>返回经营关注</button>}
-                  <span>来源：Desktop v6 · {page}</span>
                   <button type="button" onClick={refresh} disabled={loading} aria-label="重新读取业务数据">
                     <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> 重新读取
                   </button>
@@ -635,11 +631,12 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
               {loading && <StatusLine text="正在从本机业务服务读取有权数据和当前状态…" />}
               {currentEntry?.state==="AUTHENTICATION"?<div className="boss-columns"><div className="boss-column"><Panel title="当前认证状态"><Value label="当前身份" value={role==="BOSS"?"本人":"技术维护"}/><p>当前账号已经登录。切换身份需要退出当前账号，然后使用登录表单。</p><GlassButton onClick={requestLogout}>退出当前身份并返回登录</GlassButton></Panel></div></div>:
-                currentEntry?.state==="PAUSED"?<div className="boss-columns"><div className="boss-column"><Panel title="语音交办暂停"><p>语音交办当前暂停，可以使用文字交办。</p><GlassButton onClick={()=>navigate("N02")}>使用文字交办</GlassButton></Panel></div></div>:
-                page==="D06"&&role==="MAINTAINER"?<Panel title="未保存修改保护"><p>切换页面、退出或关闭时，未保存编辑继续由现有D06确认流程处理。打开此说明页面不会提交或放弃任何业务记录。</p><GlassButton onClick={()=>navigate("A08")}>返回维护工作区</GlassButton></Panel>:
+                currentEntry?.state==="PAUSED"?<BossVoicePaused onNavigate={id=>navigate(id)}/>:
+                page==="D06"?<BossUnsavedWorkspace role={role} onNavigate={id=>navigate(id)}/>:
+                page==="D07"?<BossRestrictedView role={role} onNavigate={id=>navigate(id)}/>:
                 role === "BOSS" ? (
                 (page === "MVP01"||page==="F01"&&mvpScope) ? <BossMVPView contacts={dashboard?.contacts??[]} refreshVersion={requestVersion} onDirtyChange={setWorkDirty} onOpenTask={priorityScope?selectTask:undefined}/> :
-                page==="F03" ? fromOverview?<BusinessOverviewQuery getToken={getToken} onSource={goSource} onReturn={returnOverview} onDirtyChange={setQueryDirty}/>:<BossBIView getToken={getToken} onSource={goSource} onDirtyChange={setQueryDirty}/> :
+                page==="F03" ? fromOverview?<BusinessOverviewQuery getToken={getToken} onSource={goSource} onReturn={returnOverview} onDirtyChange={setQueryDirty} refreshVersion={requestVersion}/>:<BossBIView getToken={getToken} onSource={goSource} onDirtyChange={setQueryDirty} refreshVersion={requestVersion}/> :
                 page === "F06" ? <>{morningOrigin&&<BossMorningPreparation reference={morningOrigin} onReady={setMorningReady} onContext={setMorningContext} onReturn={()=>navigate("F01")} refreshVersion={requestVersion}/>}<BossAssignmentFlow
                   morningReference={morningOrigin??undefined} morningReady={morningReady} morningContext={morningContext}
                   messagesEnabled={!priorityScope}
@@ -647,166 +644,67 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onSelectTask={selectTask} onReload={refresh}
                   onViewSource={id => goSource(id??"finance-note")} context={dashboard}
                   draft={assignmentDraft} onDraftChange={updateAssignmentDraft}
-                  onDraftSaved={()=>setAssignmentDirty(false)}
+                  onDraftSaved={()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}}
+                  loading={loading} onDirtyChange={setWorkDirty} onNavigate={id=>navigate(id)}
+                  onDiscard={()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}}
+                  onNew={origin=>guardLeave(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT,relatedTask:origin?.task_id??"",relatedTaskVersion:origin?.version??""});setAssignmentDirty(Boolean(origin));selectTask("",true);})}
                   onOpenCoordinatorPicker={()=>navigate("D04")}
                   onOpenDuePicker={()=>navigate("D05")}
                   onViewMessages={()=>navigate("F08")}
                   onMessageDraftCreated={setDraftToReview}
-                />
-                <BossTaskConversationEntry task={tasks?.tasks.find(task=>task.task_id===selectedTaskId)??null} getToken={getToken}
+                  conversation={<BossTaskConversationEntry task={tasks?.tasks.find(task=>task.task_id===selectedTaskId)??null} getToken={getToken}
                   onBeforeStart={start=>{
-                    if(assignmentDirty||sourceReviewDirty){navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setPendingLeaveAction(()=>start);}
+                    if(assignmentDirty||sourceReviewDirty||workDirty){navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setPendingLeaveAction(()=>start);}
                     else start();
                   }} onCreateChat={onCreateTaskConversation}
                   onOpenChat={chatId=>{onOpenTaskConversation(chatId);navigate("N02","F06",true);}}
-                  onReturnTask={id=>selectTask(id)}/>
-                {selectedTaskId && <BossAssignmentSourceReview key={selectedTaskId} data={sourceReview}
+                  onReturnTask={id=>selectTask(id)}/>}
+                  sourceReview={selectedTaskId && <BossAssignmentSourceReview key={selectedTaskId} data={sourceReview}
                   loading={sourceReviewLoading} error={sourceReviewError} onReload={refresh} onCommand={scopedCommand}
                   onReceipt={(action, clientRequestId) => jsonRequest("/api/boss/ui/operation-status?action=" +
                     encodeURIComponent(action) + "&client_request_id=" + encodeURIComponent(clientRequestId), getToken)}
-                  onOpenSource={id => goSource(id)} onDirtyChange={setSourceReviewDirty}/>}</> :
+                  onOpenSource={id => goSource(id)} onDirtyChange={setSourceReviewDirty}/>}
+                /></> :
                 (page==="D04"||page==="D05") ? <BossAssignmentPicker
                   key={page} pageId={page} contacts={dashboard?.contacts||[]}
-                  timezone={dashboard?.profile.timezone||"Asia/Shanghai"}
+                  timezone={dashboard?.profile.timezone}
                   businessClock={dashboard?.business_clock} draft={assignmentDraft}
-                  onChange={updateAssignmentDraft} onReturn={()=>navigate("F06")}
+                  taskId={selectedTaskId} taskVersion={tasks?.tasks.find(task=>task.task_id===selectedTaskId)?.version} loading={loading}
+                  onChange={updateAssignmentDraft} onDirtyChange={setWorkDirty} onReturn={()=>navigate("F06","",true)}
                 /> :
-                page==="D06" ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="未保存修改提醒" note="D06 · 草稿保护">
-                      <StatusLine text="当前草稿不自动保存或发送；离开F06前会显示真实确认弹窗。"/>
-                      <GlassButton onClick={()=>navigate("F06")}>返回交办草稿</GlassButton>
-                    </Panel>
-                  </div>
-                </div> :
-                page==="D07" ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="访问权限限制" note="D07 · 服务端权限制约">
-                      <StatusLine variant="warn" text="角色权限由Gateway与业务服务同时核查，前端页面不能提升或绕过授权。"/>
-                      <Value label="当前身份" value={role}/>
-                      <GlassButton onClick={()=>navigate("F01")}>返回本人工作台</GlassButton>
-                    </Panel>
-                  </div>
-                </div> :
                 page === "N05" ? <BossTaskCenter
                   data={tasks} selectedTaskId={selectedTaskId}
                   onSelectTask={id=>{setSelectedTaskId(id);const url=new URL(window.location.href);url.searchParams.set("bossTask",id);replaceBossHistory(url);}}
                   onOpenTask={selectTask}
+                  onCreateTask={()=>guardLeave(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);selectTask("",true);})}
                   onNavigate={id=>navigate(id)} onReload={refresh} onDirtyChange={setWorkDirty}
                 /> :
-                page === "N04" ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="会议与资料" note="来源与作者均为模拟数据标注">
-                      {meetings?.meeting ? <>
-                        <Value label="会议 ID" value={meetings.meeting.meeting_id}/>
-                        <Value label="会议时间" value={localTime(meetings.meeting.starts_at)}/>
-                        <Value label="时区" value={meetings.meeting.timezone}/>
-                        <Value label="参会联系人" value={meetings.meeting.participant_ids.join("、")}/>
-                      </> : <Quiet message="暂无可读取的会议资料。" />}
-                    </Panel>
-                    <Panel title="关联来源">
-                      {meetings?.documents.map((d) => <button type="button" className="boss-task-row" key={d.source_id} onClick={() => goSource(d.source_id)}>
-                        <span className="boss-task-icon"><FileSearch size={18}/></span>
-                        <span><strong>{d.source_id}</strong><small>版本 {d.version} · {d.source_type} · {localTime(d.published_at)}</small></span>
-                        <ChevronRight size={17}/>
-                      </button>)}{!meetings?.documents.length && <Quiet message="尚无获准资料索引。" />}
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="业务连续性">
-                      <StatusLine text="纪要核查、意见/决定分类与分项交办属于后续开发任务；已连接会议与原文读取，未接入写入 API。" />
-                      <div className="boss-actions"><GlassButton onClick={() => navigate("N02")}>让 Agent 准备会议</GlassButton>
-                      <GlassButton onClick={() => navigate("F05")}>纪要分类核查</GlassButton>
-                      <GlassButton onClick={() => navigate("F07")}>查看申请审阅</GlassButton></div>
-                    </Panel>
-                  </div>
-                </div> :
-                ["F24","D03"].includes(page) ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="DeepSeek 实际运行详情" note={page+" · 源自本机脱敏 Provider 回执"}>
-                      {modelHealth?.runtime_response_observed ?
-                        <StatusLine variant="ok" text="本机服务收到过实际 DeepSeek 模型响应。此状态不代表当前业务已完成。" /> :
-                        <StatusLine variant="warn" text="本次本机运行尚无真实模型响应回执。仅有配置不等于服务已验证可用。" />}
-                      <Value label="Provider 观察" value={modelHealth?.provider}/>
-                      <Value label="当前模型" value={modelHealth?.latest_response?.model ?? "尚未观察"}/>
-                      <Value label="响应标识" value={modelHealth?.latest_response?.response_id}/>
-                      <Value label="响应时间" value={modelHealth?.latest_response?.at}/>
-                      <Value label="结束原因" value={modelHealth?.latest_response?.finish_reasons.join("、") || "待观察"}/>
-                      <div className="boss-actions">
-                        <GlassButton primary onClick={() => navigate("NATIVE")}>进入原生会话</GlassButton>
-                        <GlassButton onClick={refresh}>重新读取运行结果</GlassButton>
-                      </div>
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="Token 用量及费用覆盖">
-                      <Value label="实际请求数" value={modelHealth?.observed_request_count.toString()}/>
-                      <Value label="有回执的响应数" value={modelHealth?.observed_response_count.toString()}/>
-                      <Value label="Prompt Token" value={modelHealth?.reported_usage?.prompt_tokens?.toString()}/>
-                      <Value label="Completion Token" value={modelHealth?.reported_usage?.completion_tokens?.toString()}/>
-                      <Value label="Total Token" value={modelHealth?.reported_usage?.total_tokens?.toString()}/>
-                      <Value label="总费用" value="未知（用量缺口与计价尚待核对）"/>
-                      <StatusLine text="界面只显示真实响应元信息，不读取 Prompt、消息正文、服务端密钥或内部推理。" />
-                    </Panel>
-                  </div>
-                </div> :
-                page === "D01" ? <div className="boss-columns">
-                  <div className="boss-column">
-                    <Panel title="来源原文与支持关系">
-                      <Value label="来源 ID" value={evidence?.source_id}/>
-                      <Value label="版本" value={evidence?.version}/>
-                      <Value label="来源属性" value={evidence?.source_type}/>
-                      <Value label="作者" value={evidence?.author_display_name??evidence?.author_contact_id}/>
-                      {evidence?.author_kind&&<Value label="作者类型" value={evidence.author_kind}/>}
-                      {evidence?.business_basis&&<Value label="业务口径" value={evidence.business_basis}/>}
-                      {evidence?.allowed_use&&<Value label="允许用途" value={evidence.allowed_use}/>}
-                      {evidence?.valid_until&&<Value label="来源有效期" value={(evidence.valid_from??"未知")+" 至 "+evidence.valid_until}/>}
-                      {evidence?.content ? <blockquote className="boss-source boss-document-source">{
-                        sourceAnchor &&
-                        evidence.source_id===sourceAnchor.source_id &&
-                        evidence.version===sourceAnchor.version &&
-                        Number.isInteger(sourceAnchor.start) &&
-                        Number.isInteger(sourceAnchor.end) &&
-                        sourceAnchor.start>=0 &&
-                        sourceAnchor.end<=evidence.content.length &&
-                        sourceAnchor.start<sourceAnchor.end ? <>
-                          {evidence.content.slice(0,sourceAnchor.start)}
-                          <mark className="boss-source-highlight" id="boss-source-citation">
-                            {evidence.content.slice(sourceAnchor.start,sourceAnchor.end)}
-                          </mark>
-                          {evidence.content.slice(sourceAnchor.end)}
-                        </> : evidence.content
-                      }</blockquote> :
-                        <Quiet message="尚未读取原文；无效、超范围和已撤销文件不会显示正文。" />}
-                      {sourceAnchor && evidence &&
-                        (evidence.source_id!==sourceAnchor.source_id ||
-                         evidence.version!==sourceAnchor.version) &&
-                        <StatusLine variant="warn" text="研究引用的原始版本已发生变化。本页不会把新版本原文错误标记为旧版本的证据。" />}
-                    </Panel>
-                  </div>
-                  <div className="boss-column">
-                    <Panel title="返回当前工作">
-                      <div className="boss-actions"><GlassButton primary onClick={() => navigate(allowed(previousPage, role,mvpScope,priorityScope) ? previousPage : "F01")}><ArrowLeft size={15}/> 返回原页面</GlassButton>
-                        <GlassButton onClick={refresh}>重读来源</GlassButton></div>
-                      {originFocus && <p className="boss-helper">关联入口：{originFocus}。原有筛选和滚动恢复由后续 T08 进一步接入。</p>}
-                    </Panel>
-                  </div>
-                </div> :
+                page === "N04" ? <BossMeetingLibrary onViewSource={goSource} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
+                page === "N06" ? <BossNotificationCenter onNavigate={id=>navigate(id)} onOpenTask={selectTask} refreshVersion={requestVersion}/> :
+                page==="D03" ? <BossExecutionRecovery taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)}/> :
+                page==="F29" ? <BossTaskExceptions taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)} onViewSource={goSource} refreshVersion={requestVersion}/> :
+                page==="F13" ? <BossPersonalMemory onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty}/> :
+                ["N10","N11","F28","D02","D09"].includes(page) ? <BossOwnerRecords key={page} pageId={page} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource}/> :
+                page==="F24" ? <BossRunDetails taskId={selectedTaskId} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource} refreshVersion={requestVersion}/> :
+                page === "D01" ? <BossSourceView key={sourceId} sourceId={sourceId} anchor={sourceAnchor} originPage={previousPage} refreshVersion={requestVersion} onReturn={()=>navigate(allowed(previousPage,role,mvpScope,priorityScope)?previousPage:"F01")}/> :
                 (page==="F14"||page==="F21") ? <BossSupplyQualityView key={page} interfaceId={supplyInterface}
                   editor={supplyEditor} onEditorChange={changes=>updateSupplyEditor(supplyInterface,changes)}
+                  refreshVersion={requestVersion} onDirtyChange={setWorkDirty}
                   onOpenSource={goSource} onOpenTask={taskId=>navigate("F06","",false,taskId)}/> :
                 (SECTOR_PAGE_IDS as readonly string[]).includes(page) ? <BossSectorView
-                  key={page} pageId={page} onNavigate={id=>navigate(id)}
+                  key={page} pageId={page} onNavigate={id=>navigate(id,"",true)} onBeforeLeave={guardLeave}
                   onViewSource={goSource} onStartChat={onStartChat}
+                  onDirtyChange={setWorkDirty} onOpenTask={selectTask}
                 /> :
-                (page === "F08" || page === "F12") ? <BossCommunicationCalendar
+                page === "F12" ? <BossPrivateCalendar key={page} onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}/> :
+                page === "F08" ? <BossCommunicationCalendar
                   key={page} pageId={page} onViewSource={goSource}
                   onNavigate={id=>navigate(id)} focusDraftId={draftToReview}
-                  onDirtyChange={page==="F08"?setWorkDirty:undefined}
+                  onDirtyChange={setWorkDirty} onOpenTask={selectTask} refreshVersion={requestVersion} onDraftLeaveChange={registerDraftLeave}
                   onFocusDraftConsumed={()=>setDraftToReview("")}
                 /> :
                 page === "F26" ? <BossSettingsHub
-                  key={page} onNavigate={id=>navigate(id)} onLogout={requestLogout}
+                  key={page} onNavigate={id=>navigate(id)} onLogout={requestLogout} refreshVersion={requestVersion}
                 /> :
                 (page === "N07" || page === "N08") ? <BossOwnerPreferences
                   key={page} pageId={page} onNavigate={id=>navigate(id)}
@@ -815,68 +713,60 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 page === "F09" ? <BossResearchView
                   key={page} onNavigate={id=>navigate(id)}
                   onViewSource={goSource} onStartChat={onStartChat}
+                  onDirtyChange={setWorkDirty} refreshVersion={requestVersion}
                 /> :
                 page === "F10" ? <BossPeopleMeeting
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
+                  onOpenTask={selectTask} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}
                 /> :
                 page === "F11" ? <BossTravelView
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
+                  onDirtyChange={setWorkDirty} refreshVersion={requestVersion}
                 /> :
-                page === "F04" ? <><BossMeetingArrangement
-                  data={meetingArrangement} loading={loading} error={error}
-                  onReload={refresh} onCommand={scopedCommand} onDirtyChange={setWorkDirty}
-                /><BossMeetingBrief
+                page === "F04" ? <BossMeetingBrief
                   key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
                   onMessageDraftCreated={setDraftToReview}
-                  refreshVersion={requestVersion}
-                /></> :
+                  refreshVersion={requestVersion} onOpenTask={selectTask} onDirtyChange={setWorkDirty}
+                  arrangement={meetingArrangement} arrangementLoading={loading} arrangementError={error} onReloadArrangement={refresh}
+                /> :
                 (page === "F05" || page === "F07") ? <BossMeetingApprovalView
                   key={page} pageId={page}
                   onViewSource={goSource}
                   onNavigate={id=>navigate(id)}
                   onTaskCreated={id=>{setSelectedTaskId(id);refresh();}}
+                  onDirtyChange={setWorkDirty} refreshVersion={requestVersion} onDraftLeaveChange={registerDraftLeave}
                 /> :
                 page === "N09" ? <BossOwnerPlans data={ownerPlans} loading={loading} error={error}
-                  onReload={refresh} onDirtyChange={setWorkDirty} onCommand={scopedCommand}/> :
-                page==="F02"&&fromOverview?<BusinessOverviewAlert onNavigate={id=>navigate(id)} onOpenTask={selectTask} onDirtyChange={setWorkDirty}/>:
+                  onReload={refresh} onDirtyChange={setWorkDirty}/> :
+                page==="F02"&&fromOverview?<BusinessOverviewAlert refreshVersion={requestVersion} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onDirtyChange={setWorkDirty}/>:
+                page==="F02"?<BossReminderWorkspace refreshVersion={requestVersion} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource} onDirtyChange={setWorkDirty}/>:
                 WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
-                  key={page} role={role} pageId={page}
+                  key={page} role={role} pageId={page} refreshVersion={requestVersion}
                 onOpenTask={selectTask} onDirtyChange={setWorkDirty}
                   onNavigate={id=>navigate(id)} onViewSource={goSource}
                 /> :
-                <div className="boss-columns">
-                  <div className="boss-column"><Panel title={metadata?.title || "页面"} note="v6 设计源已固定">
-                    <StatusLine variant="warn" text="此页面已纳入 72 页实现映射，但业务组件及接口尚未接入。以下只展示来自真实设计元数据的字段要求。" />
-                    <div className="boss-field-grid">{(metadata?.sections || []).map((v,i)=>
-                      <div className="boss-field-line" key={v+i}><span>{v}</span><strong>待实现 · 无运行结果</strong></div>)}</div>
-                  </Panel></div>
-                  <div className="boss-column"><Panel title="待绑定字段与动作">
-                    <p className="boss-helper">字段：{metadata?.fields?.join("、") || "以 PRD 为准"}</p>
-                    <p className="boss-helper">动作：{metadata?.actions?.join("、") || "以 PRD 为准"}</p>
-                    <StatusLine text="未连接写入动作，不会显示模拟保存/发送成功。" />
-                  </Panel></div>
-                </div>
-              ) : page === "D07" ? <div className="boss-columns">
-                <div className="boss-column">
-                  <Panel title="当前角色访问限制" note="D07 · 无敏感信息">
-                    <StatusLine variant="warn" text="老板业务信息仅BOSS角色可访问；维护者不能代替老板批准、读取个人记忆或私人日历。"/>
-                    <Value label="当前身份" value={role}/>
-                    <GlassButton onClick={()=>navigate("A08")}>返回技术工作台</GlassButton>
-                  </Panel>
-                </div>
-              </div> : page === "A06" ? <>
+                unsupportedPage(page)
+              ) : page === "N12" ? <BossRuntimeOverview getToken={getToken} identityKey={token??""} onNavigate={id=>navigate(id)} onOpenRun={id=>{setRuntimeRunId(id);navigate("A15");}}/>
+              : page==="A01"||page==="A09" ? <MaintainerConfiguration key={page} domain={page==="A01"?"access":"tools"} onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}/>
+              : page==="A10" ? <MaintainerMetricsConfiguration onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}/>
+              : page==="A11" ? <MaintainerRelationships onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty} onViewSource={goSource}/>
+              : page==="A14" ? <MaintainerAudit onNavigate={id=>navigate(id)} onOpenRun={id=>{setRuntimeRunId(id);navigate("A15");}}/>
+              : ["A16","F31"].includes(page) ? <MaintainerEvaluation key={page} pageId={page==="A16"?"A16":"F31"} onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty} onOpenRun={id=>{setRuntimeRunId(id);navigate("A15");}}/>
+              : page==="F32" ? <MaintainerLocalSystem onNavigate={id=>navigate(id)}/>
+              : page==="F25" ? <MaintainerSimulationCenter onNavigate={id=>navigate(id)} onOpenRun={id=>{setRuntimeRunId(id);navigate("A15");}}/>
+              : page === "A06" ? <>
                 <MaintainerSkillVersions getToken={getToken} identityKey={token ?? ""} mutate={mutateSop}
                   initialSopId={selectedSop} onSopChange={sopChanged} onDirtyChange={setWorkDirty}
                   onNavigate={(id, reference) => navigate(id, "", false, undefined, reference?.sop_id)}/>
                 <details><summary>查看全部方法技术状态</summary><MaintainerSkills key={sopStatusVersion}/></details>
               </> : ["A15","F30"].includes(page) ? <>
                 {page === "A15" && runtimeSopReference && <StatusLine text={"方法上下文：" + runtimeSopReference + "。当前正式记录没有方法编号筛选，请按实际 run_id 核查；当前未验证本方法与记录的关联。"}/>}
-                {page === "A15" && <MaintainerRuntimeRecords getToken={getToken}
+                <MaintainerRuntimeRecords getToken={getToken} identityKey={token??""} pageId={page==="F30"?"F30":"A15"}
                   key={runtimeRunId} initialRunId={runtimeRunId}
-                  onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>}
-                {page === "A15" && runtimeTask && <RuntimeTaskTechnicalView getToken={getToken}
+                  onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>
+                {runtimeTask && <RuntimeTaskTechnicalView getToken={getToken}
                   taskId={runtimeTask.taskId} runId={runtimeTask.runId} onClose={() => setRuntimeTask(null)}/>}
-                <div className="boss-columns">
+                <details className="boss-runtime-extra"><summary>查看本机 Provider 审计汇总</summary><div className="boss-columns">
                 <div className="boss-column">
                   <Panel title="模型及工具实际运行记录" note={page+" · 只读技术元信息"}>
                     {modelHealth?.runtime_response_observed ?
@@ -901,8 +791,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                     <StatusLine text="部分取消、超时或服务错误可能没有 Token 回执，不能因此计为零费用。" />
                   </Panel>
                 </div>
-              </div></>
-              : page === "A04" ? <>
+              </div></details></>
+              : page === "A04" ? <MaintainerSimulationEvents onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty} onOpenRun={id=>{setRuntimeRunId(id);navigate("A15");}}>
               <MaintainerBIScenarios/>
               {!mvpScope&&<MaintainerMorningCoverage/>}
               <div className="boss-columns">
@@ -923,82 +813,32 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 <BossWorkspaceView key="A04" role={role} pageId="A04"
                   onNavigate={id=>navigate(id)} onViewSource={goSource}/>
               </div>
-              </> : page === "A13" ? <MaintainerScheduler
+              </MaintainerSimulationEvents> : page === "A13" ? <MaintainerScheduler
                 key="A13" onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}
-              /> : page === "A05" ? <>
-                <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)}/>
-                <Panel title="当前来源与采用条件" note="技术状态检查不执行模型任务">
-                  <Value label="最近检查" value={promptTechnicalView?.runtime_eligibility.checked_at}/>
-                  <GlassButton onClick={refresh} disabled={loading}>重新检查采用条件</GlassButton>
-                  {promptTechnicalView?.runtime_eligibility.items.map(item => <article className="boss-workspace-item" key={item.kind}>
-                    <strong>{item.kind}</strong>
-                    <Value label="启用状态" value={item.enabled ? "启用" : "尚未启用"}/>
-                    <Value label="Prompt与版本" value={item.prompt_id ? item.prompt_id + " · v" + item.prompt_version : "没有配置"}/>
-                    <Value label="后续上下文可采用" value={item.future_context_eligible ? "符合当前条件" : "当前不能采用"}/>
-                    <Value label="当前排除原因" value={item.exclusion_reasons.length ? item.exclusion_reasons.join("、") : "没有排除项"}/>
-                    {item.source_status.map(source => <div className="boss-kv" key={source.source_id}>
-                      <span>{source.source_id}</span>
-                      <strong>引用v{source.pinned_version} · 当前{source.current_version ? "v" + source.current_version : "版本不可见"} · {source.validity_state}</strong>
-                    </div>)}
-                  </article>)}
-                  <StatusLine text="采用条件由当前启用版本、来源和业务时间计算；实际模型遵从与业务结果需要各自验证。"/>
-                </Panel>
-              </> :
+              /> : page === "A05" ?
+                <MaintainerPromptVersion key="A05" onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}/>
+              :
                 page === "A02" ? <>
                   <MaintainerSimulationInspect onOpenTools={() => navigate("A09")}/>
-                  <BossWorkspaceView key="A02" role={role} pageId="A02" onNavigate={id => navigate(id)} onViewSource={goSource}/>
-                </> : page === "A07" ? <MaintainerKnowledgeEditor key="A07"/> :
+                  <details className="boss-interface-business-tools"><summary>查看已发布业务工具目录</summary><BossWorkspaceView key="A02" role={role} pageId="A02" onNavigate={id => navigate(id)} onViewSource={goSource}/></details>
+                </> : page === "A07" ? <MaintainerKnowledgeWorkspace onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}/> :
                 page === "A12" ? <>
-                  <MaintainerMemoryStatus getToken={getToken} onNavigate={(id, reference) => {
+                  <MaintainerMemoryStatus getToken={getToken} identityKey={token??""} onNavigate={(id, reference) => {
                     setRuntimeRunId(reference?.run_id ?? ""); navigate(id);
                   }}/>
-                  <BossWorkspaceView key="A12" role={role} pageId="A12" onNavigate={id=>navigate(id)} onViewSource={goSource}/>
+                  <details className="boss-memory-extra"><summary>查看其他获准技术记录</summary><BossWorkspaceView key="A12" role={role} pageId="A12" onNavigate={id=>navigate(id)} onViewSource={goSource}/></details>
                 </> :
                 page === "A03" ? <>
-                <BossWorkspaceView key="A03" role={role} pageId="A03"
-                  onNavigate={id=>navigate(id)} onViewSource={goSource}/>
+                <MaintainerDatasets onNavigate={id=>navigate(id)} onDirtyChange={setWorkDirty}/>
                 <div className="boss-workspace-extra">
                   <MaintainerSupplyQuality editor={importEditor} onEditorChange={updateImportEditor}/>
                   {allowed("F10","BOSS")&&<MaintainerApplicationSeed/>}
                 </div>
-              </> : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
+              </> : page==="A08" ? <MaintainerModelWorkspace onNavigate={id=>navigate(id)} getToken={getToken} onCommand={scopedCommand} onDirtyChange={setWorkDirty} onReload={refresh}/>
+              : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                 key={page} role={role} pageId={page}
                 onNavigate={id=>navigate(id)} onViewSource={goSource}
-              /> : <div className="boss-columns">
-                <div className="boss-column">
-                  {page === "A08" && <ProductRuntimeConfiguration getToken={getToken} onCommand={scopedCommand}
-                    onDirtyChange={setWorkDirty} onReload={refresh}/>}
-                  <Panel title={metadata?.title || "维护工作"} note="独立维护身份 · 仅获准元信息">
-                    {maintenance ? <>
-                      <Value label="当前模拟配置的 Provider" value={maintenance.configured_provider}/>
-                      <Value label="当前模拟配置的 Model" value={maintenance.configured_model}/>
-                      <Value label="配置版本" value={maintenance.configuration_version}/>
-                      <Value label="元数据来源" value={maintenance.status}/>
-                      <StatusLine text="运行配置和实际采用状态由公共模型运行配置提供；每项任务保留独立运行记录。" />
-                    </> : <Quiet message="请在原生 nanobot Settings 中查看真实模型和维护配置。" />}
-                    <div className="boss-actions">
-                      <GlassButton primary onClick={() => navigate("NATIVE")}>打开原生 Settings <ArrowRight size={15}/></GlassButton>
-                      <GlassButton onClick={refresh}>重新读取维护元信息</GlassButton>
-                    </div>
-                  </Panel>
-                  {page !== "A08" && <Panel title="页面工作项">
-                    <StatusLine variant="warn" text="当前仅接入受权限控制的维护元信息；正式配置保存、启用、重载及下一任务采用需按 PRD 逐项实现。" />
-                    {(metadata?.sections || []).map((v) => <Value key={v} label={v} value="待实现"/>)}
-                  </Panel>}
-                </div>
-                <div className="boss-column">
-                  <Panel title="维护范围">
-                    <Value label="访问角色" value="MAINTAINER"/>
-                    <Value label="当前业务权限" value="不能代老板审批、发送或更改个人记忆"/>
-                    <Value label="功能状态" value="T02 开源能力已验证；业务页仍需 T19 开发"/>
-                    <StatusLine text="原生 Settings 及纳管模型配置由固定 nanobot WebUI 负责，未来将在 v6 主题下统一重构。" />
-                  </Panel>
-                </div>
-              </div>}
-              <div className="boss-footer-line">
-                Boss Agent × 大鹏 · Desktop v6 视觉基线 · {page} ·
-                所有模拟资料均标注来源，页面导航不代表功能或验收通过。
-              </div>
+              /> : unsupportedPage(page)}
             </div>}
           </section>
         </main>
@@ -1009,10 +849,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
         <DialogPrimitive.Overlay className="boss-confirm-backdrop"/>
         <DialogPrimitive.Content className="boss-confirm boss-navigation-confirm" onCloseAutoFocus={(event) => {
           event.preventDefault();
-          if (navigationFocus.current?.isConnected) navigationFocus.current.focus();
-          requestAnimationFrame(()=>window.dispatchEvent(new Event("boss-navigation-focus-ready")));
+          requestAnimationFrame(()=>{
+            const confirmation=shellRef.current?.querySelector<HTMLElement>(".boss-fc07-confirm");
+            if(confirmation)confirmation.focus();else if(navigationFocus.current?.isConnected)navigationFocus.current.focus();
+            window.dispatchEvent(new Event("boss-navigation-focus-ready"));
+          });
         }}>
-        <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 未保存修改（D06）</h3></DialogPrimitive.Title>
+        <DialogPrimitive.Title asChild><h3><AlertCircle size={19}/> 本次修改尚未保存</h3></DialogPrimitive.Title>
         <DialogPrimitive.Description asChild><p>{["F14","F21","A03"].includes(page)?"当前模拟资料或协调表单存在编辑内容。离开将放弃尚未提交的编辑；已经提交但结果未确定的原请求会保留，返回后继续核查。":page === "A08" ? "当前运行配置有未保存内容。离开不会修改已经启用的配置。" : ["N07","N08"].includes(page)?
           "当前本人设置有未保存内容。离开将放弃当前编辑，但不会删除先前保存的草稿或已确认版本。":
           page === "A06" ? "当前方法有未保存内容。离开不会修改已经保存的草稿或当前原生方法。" :
@@ -1020,10 +863,17 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           page === "F08" ? "当前消息正文、收件人或附件有未保存内容。请选择继续编辑或明确放弃；已保存草稿与模拟发送记录继续保留。" :
           page==="N03"?"当前经营范围有尚未应用的修改。离开将放弃这些修改，已经应用的范围、查询和会话记录继续保留。":page==="F03"?"当前经营查询有尚未提交的条件。离开将放弃当前编辑，已经提交的原请求和保存结果继续保留。":
           ["F01","N09"].includes(page) ? "当前本人事项次序或计划有未保存内容。离开不会修改先前保存的正式记录。" :
-          "当前交办表单有未保存内容。离开前请本人明确选择：继续编辑，或放弃这些修改。此提示不会提交业务写入。"}</p></DialogPrimitive.Description>
+          "当前表单有未保存内容。离开前请明确选择继续编辑、保存草稿或放弃本次编辑。"}</p></DialogPrimitive.Description>
+        {draftLeaveRef.current&&<div className="boss-draft-leave-facts"><Value label="当前对象" value={draftLeaveRef.current.object}/><Value label="已有内容版本" value={draftLeaveRef.current.version}/><Value label="未保存范围" value={draftLeaveRef.current.changedFields.join("；")||"当前操作需要核查"}/><p className="boss-helper">保存草稿不会发送消息、批准申请或创建交办。只有正式保存回执确认后才继续离开。</p>{!draftLeaveRef.current.canSave&&<p role="status">{draftLeaveRef.current.unavailableReason}</p>}</div>}
         <div className="boss-actions">
-          <DialogPrimitive.Close asChild><button type="button" className="boss-btn">返回继续编辑</button></DialogPrimitive.Close>
-          <button type="button" className="boss-btn boss-btn-primary" onClick={()=>{
+          <DialogPrimitive.Close asChild><button type="button" className="boss-btn boss-btn-primary">继续编辑</button></DialogPrimitive.Close>
+          {draftLeaveRef.current&&<button type="button" className="boss-btn" disabled={!draftLeaveRef.current.canSave} onClick={()=>{
+            const handle=draftLeaveRef.current,destination=pendingNavigation,action=pendingLeaveAction;
+            if(!handle?.canSave||!destination&&!action)return;
+            handle.beginSave(()=>{setWorkDirty(false);if(action)action();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId,destination.menu);});
+            setPendingNavigation(null);setPendingLeaveAction(null);
+          }}>保存草稿并离开</button>}
+          <button type="button" className="boss-btn" onClick={()=>{
             const destination=pendingNavigation;
             const action=pendingLeaveAction;
             if (!destination&&!action) throw new Error("离开页面缺少目标");
@@ -1040,7 +890,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             setPendingNavigation(null);
             setPendingLeaveAction(null);
             if(action)action();else if(destination)navigate(destination.id,destination.focus,true,destination.taskId,destination.sopId,destination.menu);
-          }}>放弃草稿并离开</button>
+          }}>放弃本次编辑</button>
         </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
@@ -1048,7 +898,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     <DialogPrimitive.Root open={directoryOpen} onOpenChange={setDirectoryOpen}><DialogPrimitive.Portal container={shellRef.current}>
       <DialogPrimitive.Overlay className="boss-directory-backdrop">
       <DialogPrimitive.Content className="boss-directory" aria-label="全部页面导航" aria-labelledby={undefined} aria-describedby={undefined} onCloseAutoFocus={event=>{event.preventDefault();if(navigationFocus.current?.isConnected)navigationFocus.current.focus();}}>
-        <header><DialogPrimitive.Title asChild><strong>页面目录 · Desktop v6</strong></DialogPrimitive.Title>
+        <header><DialogPrimitive.Title asChild><strong>全部工作页面</strong></DialogPrimitive.Title>
           <button type="button" onClick={() => setDirectoryOpen(false)} aria-label="关闭目录"><X size={19}/></button></header>
         <label className="boss-directory-search"><Search size={17}/><input autoFocus value={pageFilter}
           onChange={(e) => setPageFilter(e.target.value)} placeholder="搜索页面编号或名称"/></label>

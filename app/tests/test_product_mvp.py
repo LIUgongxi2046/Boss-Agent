@@ -11,7 +11,7 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
-from nanobot.config.loader import save_config
+from nanobot.config.loader import load_config, save_config
 from nanobot.config.schema import Config
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
@@ -56,6 +56,7 @@ def mvp(tmp_path):
         "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com"}}})
     path = tmp_path / "config.json"
     save_config(config, path)
+    config = load_config(path)
     service, bi = ProductMVP(store), ProductBI(store)
     registry, provider = FeatureToolRegistry(), FeatureProvider(service, bi)
     recorder = FeatureRecorder(store, registry, lambda: runtime.snapshot(), bi)

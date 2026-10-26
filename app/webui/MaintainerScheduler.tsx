@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertCircle, CheckCircle2, Clock3, FileCheck2, Loader2,
   PauseCircle, PlayCircle, RefreshCw, ShieldCheck, XCircle,
@@ -11,12 +11,13 @@ import {deliveredPage} from "./delivered-navigation";
 type Schedule = {
   schedule_id:string;version:string;schedule_version:string;timezone:string;
   trigger:string;enabled:boolean;canceled:boolean;active_draft_version?:string;
+  name:string;executor_component:string;expression:string;authorized_scope:string[];restart_policy:string;
 };
 type Rules = {
   version:string;quiet_start:number;quiet_end:number;
   cooldown_seconds:number;important_escalation:boolean;timezone:string;
 };
-type Configuration = Omit<Rules,"version"> & {trigger:string};
+type Configuration = Omit<Rules,"version"> & {trigger:string;name:string;executor_component:string;expression:string;authorized_scope:string[];restart_policy:string};
 type Draft = {
   draft_id:string;version:string;configuration:Configuration;
   validation_state:"DRAFT"|"VALIDATED"|"ACTIVE";
@@ -27,7 +28,9 @@ type Scheduler = {
   draft:Draft|null;rules:Rules|null;simulated_business_time:string;
   recent_dispatches:{event_id:string;event_version:string;state:string;
     reason?:string;business_at:string}[];
-  cron_runtime_verified_here:false;next_run_time:null;
+  cron_runtime_verified_here:boolean;next_run_time:string|null;
+  executors:{id:string;label:string}[];authorized_scopes:{id:string;label:string}[];
+  restart_policies:{id:string;label:string}[];runtime:{state:string;active_run_count:number;resume_checked_at:string|null;quit_behavior:string};
   manual_dispatch_supported_here:boolean;external_delivery_verified:false;
   available_manual_events:{event_id:string;version:string;due_at:string;state:string}[];
 };
@@ -37,6 +40,7 @@ const DEFAULT:Configuration = {
   trigger:"EVENT_OR_TIME",timezone:"Asia/Shanghai",
   quiet_start:22,quiet_end:7,cooldown_seconds:1800,
   important_escalation:false,
+  name:"",executor_component:"",expression:"",authorized_scope:[],restart_policy:"",
 };
 function Kv({label,value}:{label:string;value:string|number|boolean|null|undefined}) {
   return <div className="boss-kv"><span>{label}</span><strong>{
@@ -54,6 +58,7 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
   const [error,setError]=useState("");
   const [selectedEvent,setSelectedEvent]=useState("");
   const [alertDirty,setAlertDirty]=useState(false);
+  const manualPanel=useRef<HTMLDetailsElement>(null);
   const reload=()=>setRevision(v=>v+1);
   const transaction=useTransaction(()=>{setDirty(false);onDirtyChange?.(false);reload();},undefined,undefined,"scheduler");
   const busy=transaction.busy,notice=transaction.notice;
@@ -80,6 +85,9 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
         setCfg(result.draft?.configuration||
           (result.rules?{
             trigger:result.schedule.trigger,timezone:result.schedule.timezone,
+            name:result.schedule.name,executor_component:result.schedule.executor_component,
+            expression:result.schedule.expression,authorized_scope:result.schedule.authorized_scope,
+            restart_policy:result.schedule.restart_policy,
             quiet_start:result.rules.quiet_start,quiet_end:result.rules.quiet_end,
             cooldown_seconds:result.rules.cooldown_seconds,
             important_escalation:result.rules.important_escalation,
@@ -177,12 +185,13 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
       "不会代老板确认任务完成或模拟真实消息送达。",
     ]);
   }
-  return <>
+  function openManual(){if(manualPanel.current){manualPanel.current.open=true;manualPanel.current.scrollIntoView({block:"center",behavior:"smooth"});document.getElementById("boss-scheduler-event")?.focus();}}
+  return <div className="boss-scheduler-workspace">
     <div className="boss-workspace-toolbar">
       <div className="boss-workspace-note"><span className="boss-tag boss-tag-amber">SIMULATED · TECH ONLY</span>
         A13 · 版本化调度草稿与运行开关
       </div>
-      <button type="button" className="boss-btn" disabled={loading} onClick={reload}>
+      <button type="button" className="boss-btn" disabled={loading||dirty||busy} onClick={reload}>
         {loading?<Loader2 size={15} className="boss-spin"/>:<RefreshCw size={15}/>} 重新读取
       </button>
     </div>
@@ -192,18 +201,27 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
     <div className="boss-columns">
       <div className="boss-column">
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>时间与事件触发配置</h2><small>保存、校验和启用各自独立</small></div>
-          <fieldset className="boss-fc04-fieldset" disabled={busy||loading}><div className="boss-form-grid">
-            <label>计划对象<input readOnly value={data?.schedule.schedule_id||"待加载"}/></label>
-            <label>当前技术版本<input readOnly value={data?.schedule.version||"待加载"}/></label>
+          <div className="boss-panel-head"><h2>调度对象与责任</h2><small>保存、校验和启用各自独立</small></div>
+          <fieldset className="boss-fc04-fieldset" disabled={busy||loading||!data}><div className="boss-form-grid">
+            <label>计划名称<input value={cfg.name??""} onChange={event=>edit("name",event.target.value)}/></label>
+            <label>唯一执行责任组件<select value={cfg.executor_component??""} onChange={event=>edit("executor_component",event.target.value)}><option value="">请选择</option>{data?.executors?.map(row=><option key={row.id} value={row.id}>{row.label}</option>)}</select></label>
+            <label>当前计划版本<input readOnly value={data?.schedule.version??"尚未读取"}/></label>
+            <label>下次触发时间<input readOnly value={data?.next_run_time??"尚未确认"}/></label>
+          </div></fieldset>
+          <Kv label="计划对象" value={data?.schedule.schedule_id}/>
+          <Kv label="当前获准范围" value={data?.schedule.authorized_scope.map(id=>data.authorized_scopes.find(row=>row.id===id)?.label??id).join("、")}/>
+        </section>
+        <section className="boss-panel">
+          <div className="boss-panel-head"><h2>条件、时区和去重</h2></div>
+          <fieldset className="boss-fc04-fieldset" disabled={busy||loading||!data}><div className="boss-form-grid">
             <label>触发条件<select value={cfg.trigger}
               onChange={e=>edit("trigger",e.target.value)}>
               <option value="EVENT_OR_TIME">EVENT_OR_TIME · 事件或时间</option>
+              <option value="CRON">定时计划</option><option value="EVENT">业务事件</option>
             </select></label>
-            <label>IANA时区<select value={cfg.timezone}
-              onChange={e=>edit("timezone",e.target.value)}>
-              <option value="Asia/Shanghai">Asia/Shanghai</option>
-            </select></label>
+            <label>IANA时区<input value={cfg.timezone} onChange={event=>edit("timezone",event.target.value)}/></label>
+            <label>调度表达式<input disabled={cfg.trigger==="EVENT"} value={cfg.expression??""} onChange={event=>edit("expression",event.target.value)}/></label>
+            <label>重启恢复行为<select value={cfg.restart_policy??""} onChange={event=>edit("restart_policy",event.target.value)}><option value="">请选择</option>{data?.restart_policies?.map(row=><option key={row.id} value={row.id}>{row.label}</option>)}</select></label>
             <label>静默开始小时<input type="number" min="0" max="23" step="1"
               value={cfg.quiet_start} onChange={e=>edit("quiet_start",Number(e.target.value))}/></label>
             <label>静默结束小时<input type="number" min="0" max="23" step="1"
@@ -216,41 +234,48 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
                 <option value="false">关闭（默认）</option><option value="true">允许 IMPORTANT 事件升级</option>
               </select>
             </label>
-          </div></fieldset>
+          </div><fieldset className="boss-v7-check-list"><legend>获准任务范围</legend>{data?.authorized_scopes?.map(row=><label key={row.id}><input type="checkbox" checked={cfg.authorized_scope?.includes(row.id)??false} onChange={event=>edit("authorized_scope",event.target.checked?[...(cfg.authorized_scope??[]),row.id]:(cfg.authorized_scope??[]).filter(id=>id!==row.id))}/>{row.label}</label>)}</fieldset></fieldset>
           <div className="boss-actions">
-            <button type="button" className="boss-btn" disabled={!data||busy}
-              onClick={save}><FileCheck2 size={16}/> 保存草稿</button>
+            <button type="button" className="boss-btn boss-btn-primary" disabled={!data||busy||!dirty}
+              onClick={save}><FileCheck2 size={16}/> 保存计划草稿</button>
             <button type="button" className="boss-btn"
               disabled={!data?.draft||data.draft.validation_state!=="DRAFT"||dirty||busy}
-              onClick={prepareValidate}><ShieldCheck size={16}/> 校验版本</button>
-            <button type="button" className="boss-btn boss-btn-primary"
-              disabled={!data?.draft||data.draft.validation_state!=="VALIDATED"||dirty||busy||data.schedule.canceled}
-              onClick={prepareActivate}><PlayCircle size={16}/> 启用已验证配置</button>
+              onClick={prepareValidate}><ShieldCheck size={16}/> 验证条件</button>
+            <button type="button" className="boss-btn" disabled={!dirty||busy||loading} onClick={()=>{setDirty(false);reload();}}>取消本次修改</button>
           </div>
           <div className="boss-status boss-status-warn"><Clock3 size={16}/>
             保存或验证技术配置不代表已经启用和采用。必须由已认证维护角色独立启用；老板任务和个人计划的授权不因此扩大。
           </div>
         </section>
+      </div><aside className="boss-column">
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>运行计划与启停</h2><small>取消后不可在原执行空间恢复</small></div>
+          <div className="boss-panel-head"><h2>执行控制</h2><small>取消后不可在原执行空间恢复</small></div>
+          <Kv label="计划状态" value={data?data.schedule.canceled?"已取消":data.schedule.enabled?"已启用":"未启用 / 已暂停":null}/>
+          <Kv label="应用退出后的状态" value={data?.runtime?.quit_behavior}/>
+          <Kv label="休眠恢复检查" value={data?.runtime?.resume_checked_at}/>
+          <Kv label="当前在途运行" value={data?.runtime?.active_run_count}/>
           <Kv label="启用状态" value={data?.schedule.enabled}/>
           <Kv label="取消状态" value={data?.schedule.canceled}/>
           <Kv label="当前规则版本" value={data?.rules?.version}/>
           <Kv label="实际生效草稿版本" value={data?.schedule.active_draft_version}/>
           <div className="boss-actions">
-            <button type="button" className="boss-btn" disabled={!data?.schedule.enabled||data.schedule.canceled||busy}
+            <button type="button" className="boss-btn boss-btn-primary" disabled={!data?.draft||data.draft.validation_state!=="VALIDATED"||dirty||busy||loading||data.schedule.canceled} onClick={prepareActivate}><PlayCircle size={16}/> 启用计划</button>
+            <button type="button" className="boss-btn" disabled={!data?.schedule.enabled||data.schedule.canceled||busy||dirty}
               onClick={()=>updateStatus("pause")}><PauseCircle size={15}/> 暂停</button>
-            <button type="button" className="boss-btn" disabled={data?.schedule.enabled||data?.schedule.canceled||!data||busy}
+            <button type="button" className="boss-btn" disabled={data?.schedule.enabled||data?.schedule.canceled||!data||busy||dirty}
               onClick={()=>updateStatus("resume")}><PlayCircle size={15}/> 恢复</button>
-            <button type="button" className="boss-btn" disabled={!data||data.schedule.canceled||busy}
+            <button type="button" className="boss-btn" disabled={!data||data.schedule.canceled||busy||dirty}
               onClick={()=>updateStatus("cancel")}><XCircle size={15}/> 取消本计划</button>
+            <button type="button" className="boss-btn" disabled={!data?.manual_dispatch_supported_here||busy||dirty} onClick={openManual}>获准手动执行</button>
           </div>
         </section>
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>获准手动模拟执行</h2><small>使用与CronService相同的到期/静默/重复抑制规则</small></div>
+        <section className="boss-panel"><div className="boss-panel-head"><h2>关联记录</h2></div><div className="boss-actions"><button className="boss-btn" disabled title="本人计划由老板身份查看">本人计划</button><button className="boss-btn" onClick={()=>onNavigate("A15")}>运行记录</button><button className="boss-btn" onClick={()=>onNavigate("A04")}>获准事件与业务时间</button>{deliveredPage("A14","MAINTAINER")&&<button className="boss-btn" onClick={()=>onNavigate("A14")}>授权与操作记录</button>}</div></section>
+      </aside></div>
+        <details className="boss-panel" ref={manualPanel}>
+          <summary>获准手动模拟执行</summary><p>使用与CronService相同的到期、静默及重复抑制规则。</p>
           <label className="boss-label" htmlFor="boss-scheduler-event">当前批准模拟事件</label>
           <select id="boss-scheduler-event" className="boss-single-input"
-            value={selectedEvent} onChange={e=>setSelectedEvent(e.target.value)}>
+            disabled={busy||loading||dirty} value={selectedEvent} onChange={e=>setSelectedEvent(e.target.value)}>
             <option value="">请选择已有模拟事件</option>
             {(data?.available_manual_events||[]).map(item=><option value={item.event_id} key={item.event_id}>
               {item.event_id} · v{item.version} · {item.state} · {item.due_at}
@@ -258,7 +283,7 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
           </select>
           <div className="boss-actions">
             <button type="button" className="boss-btn boss-btn-primary"
-              disabled={!data?.manual_dispatch_supported_here||!selectedEvent||busy}
+              disabled={!data?.manual_dispatch_supported_here||!selectedEvent||busy||loading||dirty||data.schedule.canceled}
               onClick={prepareManualRun}>
               <PlayCircle size={15}/> 核对并手动模拟触发</button>
           </div>
@@ -266,9 +291,10 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
             <Clock3 size={16}/> 模拟时钟未到期、静默时间或老板已关闭的提醒不会伪造成送达。
             这里的 DELIVERED 仅为模拟内部通知，不代表桌面系统通知或外部收件人已收到。
           </div>
-        </section>
+        </details>
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>调度记录</h2><small>实际数据库技术状态</small></div>
+          <div className="boss-panel-head"><h2>调度运行、去重及恢复记录</h2></div>
+          <div className="boss-scheduler-checks"><Kv label="执行责任组件" value={data?.schedule.executor_component}/><Kv label="当前计划时区" value={data?.schedule.timezone}/><Kv label="当前草稿版本" value={data?.draft?.version}/><Kv label="草稿校验状态" value={data?.draft?.validation_state??"尚未保存"}/><Kv label="重复抑制窗口" value={data?.rules?`${data.rules.cooldown_seconds} 秒`:null}/><Kv label="重启恢复方式" value={data?.restart_policies.find(row=>row.id===data.schedule.restart_policy)?.label??data?.schedule.restart_policy}/><Kv label="模拟业务时钟" value={data?.simulated_business_time}/><Kv label="CronService 运行核查" value={data?.cron_runtime_verified_here}/></div>
           {(data?.recent_dispatches||[]).map((row,i)=><div className="boss-workspace-item"
             key={row.event_id+"-"+i}>
             <strong>{row.event_id}</strong>
@@ -281,32 +307,7 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
             当前没有已写入数据库的调度结果；不能推定 CronService 运行成功。
           </p>}
         </section>
-      </div>
-      <div className="boss-column">
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>当前草稿与启用状态</h2></div>
-          <Kv label="草稿 ID" value={data?.draft?.draft_id}/>
-          <Kv label="草稿版本" value={data?.draft?.version}/>
-          <Kv label="校验状态" value={data?.draft?.validation_state||"NOT_SAVED"}/>
-          <Kv label="调度版本" value={data?.schedule.version}/>
-          <Kv label="模拟业务时钟" value={data?.simulated_business_time}/>
-          <Kv label="下一次执行时间" value={data?.next_run_time}/>
-          <Kv label="CronService 实机运行验证" value={data?.cron_runtime_verified_here}/>
-          <Kv label="模拟事件手动触发" value={data?.manual_dispatch_supported_here}/>
-          <div className="boss-status boss-status-warn"><AlertCircle size={16}/>
-            手动模拟执行现在使用与Cron相同的已授权本地调度器规则；但真实操作系统通知与重启恢复尚未实测。
-            下一次执行时间没有验证来源时保持未知。
-          </div>
-          <div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("A04")}>
-              查看获准事件与模拟业务时间</button>
-            {deliveredPage("A14","MAINTAINER")&&<button type="button" className="boss-btn" onClick={()=>onNavigate("A14")}>
-              查看脱敏授权与操作记录</button>}
-          </div>
-        </section>
-      </div>
-    </div>
-    <BossBusinessAlertAdministration onDirtyChange={setAlertDirty}/>
+    <details className="boss-panel"><summary>经营提醒调度管理</summary><BossBusinessAlertAdministration onDirtyChange={setAlertDirty}/></details>
     {transaction.dialog}{transaction.recovery}
-  </>;
+  </div>;
 }

@@ -1,10 +1,31 @@
 import {useEffect,useRef,useState} from "react";
 import {useClient} from "@/providers/ClientProvider";
 
-type Target={event_id:string;event_version:string};
+type Target={event_id:string;event_version:string;execution_namespace:string};
 type NativeState={supported:boolean;permission:"NOT_REPORTED_BY_SYSTEM"|"DENIED_BY_SYSTEM";state:string;failure_reason?:string|null;external_delivery_verified:false};
 type Bridge={invoke:(request:Record<string,unknown>)=>Promise<NativeState>;onNotificationOpen?:(listener:(target:Target)=>void)=>()=>void};
 function bridge(){return (window as Window&{bossDesktop?:Bridge}).bossDesktop;}
+type NotificationHost={platform:string;notifications_supported:boolean};
+export function BossNotificationPermissions(){
+  const [host,setHost]=useState<NotificationHost|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(""),[readAt,setReadAt]=useState("");
+  const sequence=useRef(0);
+  useEffect(()=>()=>{sequence.current++;},[]);
+  const native=(window as Window&{bossDesktop?:{invoke:(request:{action:"status"})=>Promise<NotificationHost>}}).bossDesktop;
+  async function read(){
+    if(!native||busy)return;
+    const current=++sequence.current;setBusy(true);setHost(null);setError("");setReadAt("");
+    await native.invoke({action:"status"}).then(value=>{if(current!==sequence.current)return;if(typeof value.notifications_supported!=="boolean"||typeof value.platform!=="string")throw new Error("桌面通知能力状态不完整");setHost(value);setReadAt(new Date().toISOString());}).catch(failure=>{if(current===sequence.current)setError(failure.message);}).finally(()=>{if(current===sequence.current)setBusy(false);});
+  }
+  return <section className="boss-notification-permissions" aria-label="系统通知许可与能力">
+    <div className="boss-kv"><span>当前入口</span><strong>{native?"桌面应用":"浏览器"}</strong></div>
+    <div className="boss-kv"><span>系统通知能力</span><strong>{host?host.notifications_supported?"系统支持":"系统不支持":"尚未读取"}</strong></div>
+    <div className="boss-kv"><span>全局通知许可</span><strong>当前宿主未提供直接读取结果</strong></div>
+    <div className="boss-kv"><span>检查时间</span><strong>{readAt||"尚未检查"}</strong></div>
+    <button className="boss-btn" disabled={busy||!native} onClick={()=>void read()}>{busy?"正在读取系统状态":"查看系统通知权限"}</button>
+    <p className="boss-v7-note">{native?"当前读取检查系统支持情况。具体事项的显示或拒绝结果可在通知中心核查。":"请在桌面应用中检查系统通知，当前可继续使用应用内通知中心。"}</p>
+    {error&&<p role="alert" className="boss-status boss-status-error">{error}</p>}
+  </section>;
+}
 const LABELS:Record<string,string>={NOT_REQUESTED:"尚未请求",REQUESTED:"已经请求，系统结果待核查",SHOWN:"系统报告已经显示",FAILED:"系统报告显示失败",CLICKED:"已经打开通知"};
 
 export function BossNativeNotification({eventId,eventVersion}:{eventId:string;eventVersion:string}){
@@ -32,7 +53,7 @@ export function BossNativeNotification({eventId,eventVersion}:{eventId:string;ev
   </section>;
 }
 
-export function BossNotificationReturn({role,onOpen}:{role:"BOSS"|"MAINTAINER"|null;onOpen:(target:Target)=>void}){
+export function BossNotificationReturn({role,onOpen}:{role:"BOSS"|"MAINTAINER"|null;onOpen:(target:Target&{page_id:"F02"|"D09";record_id?:string})=>void}){
   const {getToken,token}=useClient(),callback=useRef(onOpen);
   callback.current=onOpen;
   const [error,setError]=useState("");
@@ -41,13 +62,13 @@ export function BossNotificationReturn({role,onOpen}:{role:"BOSS"|"MAINTAINER"|n
     const controllers=new Set<AbortController>();let active=true;setError("");
     const unsubscribe=native.onNotificationOpen(target=>{
       if(role!=="BOSS"){setError("当前身份不能读取本人通知，请重新认证。");return;}
-      if(!target||typeof target.event_id!=="string"||typeof target.event_version!=="string"){setError("系统通知没有有效对象编号。");return;}
+      if(!target||typeof target.event_id!=="string"||typeof target.event_version!=="string"||typeof target.execution_namespace!=="string"||!target.execution_namespace){setError("系统通知没有有效对象编号与原执行空间。");return;}
       const controller=new AbortController();controllers.add(controller);
       void fetch("/api/boss/ui/notification-target?"+new URLSearchParams(target),{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal:controller.signal}).then(async response=>{
         if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
         if(!response.ok)throw new Error("当前通知无法打开，HTTP "+response.status);
         const value=await response.json();
-        if(active&&!controller.signal.aborted){if(value.event_id!==target.event_id||value.event_version!==target.event_version||value.page_id!=="F02")throw new Error("通知返回对象与当前请求不符");callback.current(target);setError("");}
+        if(active&&!controller.signal.aborted){if(value.event_id!==target.event_id||value.event_version!==target.event_version||value.execution_namespace!==target.execution_namespace||!["F02","D09"].includes(value.page_id)||value.page_id==="D09"&&typeof value.record_id!=="string")throw new Error("通知返回对象与当前请求不符");callback.current({...target,page_id:value.page_id,record_id:value.record_id});setError("");}
       }).catch(failure=>{if(active&&!controller.signal.aborted)setError(failure.message);}).finally(()=>controllers.delete(controller));
     });
     return()=>{active=false;unsubscribe();for(const controller of controllers)controller.abort();};

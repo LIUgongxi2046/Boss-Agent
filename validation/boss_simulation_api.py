@@ -8,6 +8,7 @@ from aiohttp import web
 from jsonschema import Draft202012Validator, FormatChecker
 
 from business import checksum, now, require
+from boss_execution_scope import NAMESPACE, require_dataset_scope
 from boss_memory import confirmed_memory
 from boss_owner_preferences import effective_owner_goals, effective_owner_notice, owner_profile
 from boss_source_policy import source_validity
@@ -74,7 +75,7 @@ def _context(db):
                      "json_extract(body,'$.source_type'),json_extract(body,'$.boss_profile.timezone'),json_extract(body,'$.periods') "
                      "FROM objects WHERE namespace=? AND kind='initial' AND id='snapshot'", (namespace,)).fetchone()
     require(row is not None and row[3] == "SIMULATED", "当前空间没有获准模拟资料")
-    require(row[0] == "boss-1" and row[1] == "selection" and row[2] == "1", "当前本人或数据版本不在获准资料范围", web.HTTPForbidden)
+    require_dataset_scope(db, namespace, {"owner_id": row[0], "dataset_id": row[1], "dataset_version": row[2], "source_type": row[3]})
     clock = db.execute("SELECT json_extract(body,'$.at') FROM objects WHERE namespace=? AND kind='clock' AND id='current'", (namespace,)).fetchone()
     require(clock is not None, "当前空间缺少业务时钟")
     return {"namespace": namespace, "owner_id": row[0], "dataset_id": row[1], "dataset_version": row[2],
@@ -290,8 +291,12 @@ class SimulationAPI:
             else:
                 parameters = (path, namespace)
             for row in db.execute(statement, parameters).fetchall():
+                if row[0] is None:
+                    continue
                 body = json.loads(row[0])
                 identifier = body[id_field]
+                if identifier is None:
+                    continue
                 if not _wanted(kind, identifier, ids):
                     continue
                 exists = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind=? AND id=?", (namespace, kind, identifier)).fetchone()
@@ -364,10 +369,13 @@ class SimulationAPI:
             refs.extend({"source_id": identifier, "version": body.get("evidence_versions", {}).get(identifier),
                          "source_sha256": body.get("evidence_fingerprints", {}).get(identifier)} for identifier in body.get("evidence_refs", []))
         if kind == "query":
+            from boss_v7_metrics import policy_fingerprint
             binding = _object(db, context["namespace"], "query_source_binding", record["object_id"])
             if binding is None:
                 record["content_state"] = "NEEDS_REVIEW"
             else:
+                if binding.get("metric_policy_sha256", checksum({})) != policy_fingerprint(db, context["namespace"]):
+                    record["content_state"] = "NEEDS_REVIEW"
                 require(binding["query_id"] == record["object_id"] and binding["owner_id"] == context["owner_id"]
                         and binding["dataset_id"] == context["dataset_id"] and binding["dataset_version"] == context["dataset_version"],
                         "查询来源绑定不属于当前空间", web.HTTPForbidden)
@@ -457,7 +465,7 @@ class SimulationAPI:
             if status != "VALID":
                 record["content_state"] = "NEEDS_REVIEW"
         if record["content_state"] != "NEEDS_REVIEW" and kind in ("meeting_brief", "person_brief", "meeting_draft", "travel_plan"):
-            if namespace != "ui-check" or not self._cached_context_current(db, context, record):
+            if namespace != NAMESPACE or not self._cached_context_current(db, context, record):
                 record["content_state"] = "NEEDS_REVIEW"
         if record["content_state"] == "NEEDS_REVIEW":
             record["data"] = None

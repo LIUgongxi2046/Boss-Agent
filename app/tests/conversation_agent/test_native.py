@@ -1,5 +1,6 @@
 import asyncio
 import base64
+from copy import deepcopy
 from dataclasses import replace
 import json
 import sys
@@ -10,12 +11,14 @@ import pytest
 from aiohttp import web
 from loguru import logger
 from nanobot import Nanobot
+from nanobot.agent.hook import AgentHook
 from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.context import RequestContext
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.providers.base import LLMResponse, ToolCallRequest
 from nanobot.config.schema import Config
 from nanobot.session.manager import SessionManager
+from nanobot.runtime_context import public_history_messages
 from nanobot.webui.media_gateway import WebUIMediaGateway
 
 from conftest import DOMAIN
@@ -24,6 +27,8 @@ from controls import ControlStore
 from boss_conversation import ConversationAPI
 from boss_conversation_attachments import ConversationAttachments
 from boss_command_api import BossCommandAPI
+from boss_memory_runtime import MemoryContextInvalidated, OwnerMemoryContext
+from boss_memory_sessions import MemoryAutoCompact, MemorySessionManager
 from conversation_agent.native import NativeConversationAgent
 from product_bi import FeatureToolRegistry
 
@@ -40,7 +45,7 @@ def native(tmp_path, request):
     config = Config.model_validate({"agents": {"defaults": {"workspace": str(tmp_path / "workspace"),
         "provider": "deepseek", "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 700,
         "maxToolResultChars": 200000, "dream": {"enabled": False}, "idleCompactAfterMinutes": 0}}})
-    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    sessions = MemorySessionManager(tmp_path / "workspace", business_store=store, sessions_root=tmp_path / "sessions")
     media_root = tmp_path / "media"
     media_root.mkdir()
     attachments = ConversationAttachments(sessions, media_root)
@@ -52,6 +57,8 @@ def native(tmp_path, request):
     agent.provider.generation = config.resolve_preset().to_generation_settings()
     loop = AgentLoop.from_config(config, session_manager=sessions, provider=agent.provider, tool_registry=registry,
         hook_factories=[agent.recorder.hook_factory])
+    loop.auto_compact = MemoryAutoCompact(sessions, loop.consolidator)
+    sessions.invalidate_context = loop.auto_compact.invalidate_memory_context
     for name in list(registry.tool_names):
         registry.unregister(name)
     for tool in agent.tools():
@@ -69,7 +76,7 @@ def read(native, kind):
         return [json.loads(row[0]) for row in db.execute("SELECT body FROM objects WHERE kind=? ORDER BY rowid", (kind,))]
 
 
-def execute(native, questions, *, upload=None, before_context=None):
+def execute(native, questions, *, upload=None, before_context=None, memory_context=False, hooks=None):
     store, agent, loop, config, gateway = native
     admitted = []
     async def run():
@@ -89,10 +96,14 @@ def execute(native, questions, *, upload=None, before_context=None):
             async def recorder(request):
                 if agent.handles(request):
                     return await agent.recorder.context(request)
-            remove = [bot.runtime.add_context_provider(provider) for provider in (transport, agent.native_context, agent.scope_context, recorder)]
+            providers = [transport, agent.native_context]
+            if memory_context:
+                providers.append(OwnerMemoryContext(store))
+            providers.extend([agent.scope_context, recorder])
+            remove = [bot.runtime.add_context_provider(provider) for provider in providers]
             try:
                 return [await bot.run(question, channel="websocket", chat_id=CHAT, session_key="websocket:" + CHAT,
-                    sender_id="boss-1", media=upload[1] if upload else None) for question in questions]
+                    sender_id="boss-1", media=upload[1] if upload else None, hooks=hooks) for question in questions]
             finally:
                 for unsubscribe in reversed(remove):
                     unsubscribe()
@@ -115,8 +126,148 @@ def test_native_current_input_plans_actual_parameters_and_follows_current_source
     assert not read(native, "task") and not read(native, "authorization")
 
 
+@pytest.mark.parametrize("change", ["delete", "replace", "revoke", "expire"])
+def test_native_run_stops_when_adopted_memory_changes(native, change):
+    store = native[0]
+    api = BossCommandAPI(store)
+    with store.connect() as db:
+        current = store.get(db, "ui-check", "memory", "current")
+    values = {"text": current["text"], "source_note": "采用本人当前要求", "visibility": "BOSS_ONLY",
+              "valid_until": "2026-10-23T00:00:00+08:00"}
+    status, confirmed = api.execute("BOSS", "boss.owner_workspace.personal-memory.confirm", {
+        "client_request_id": str(uuid4()), "expected_version": current["version"],
+        "expected_candidate_version": "0", "confirmation": True, "values": values,
+    })
+    assert status == 200, confirmed
+    confirmed = confirmed["result"]
+
+    class ChangeMemoryAfterRead(AgentHook):
+        def __init__(self):
+            super().__init__(reraise=True)
+            self.executed = False
+
+        async def after_execute_tool(self, context, tool_call, tool, params, result):
+            assert not self.executed
+            self.executed = True
+            if change == "expire":
+                store.control("ui-check", "clock", {"at": "2026-10-23T09:00:00+08:00"})
+                return
+            if change == "revoke":
+                status, changed = api.execute("BOSS", "boss.authorization.revoke", {
+                    "client_request_id": str(uuid4()), "authorization_id": confirmed["authorization_id"],
+                    "expected_version": "1", "reason": "本人撤销记忆确认",
+                })
+            else:
+                payload = {"client_request_id": str(uuid4()), "expected_version": confirmed["version"],
+                           "expected_candidate_version": "0", "confirmation": True}
+                if change == "replace":
+                    payload["values"] = values
+                status, changed = api.execute("BOSS", "boss.owner_workspace.personal-memory."
+                                              + ("confirm" if change == "replace" else "delete"), payload)
+            assert status == 200, changed
+
+    mutation = ChangeMemoryAfterRead()
+    with pytest.raises(MemoryContextInvalidated, match="OWNER_MEMORY_CONTEXT_CHANGED"):
+        execute(native, ["读取 finance-note"], memory_context=True, hooks=[mutation])
+    assert mutation.executed
+    row = read(native, "runtime_run")[0]
+    assert row["status"] == "CANCELED" and row["stop_reason"] == "OWNER_MEMORY_CONTEXT_CHANGED"
+    assert row["memory_reference"]["eligible"] is True
+    assert row["memory_reference"]["version"] == confirmed["version"]
+    assert len(row["tool_results"]) == len(row["simulated_model_events"]) == 1
+    assert row["model_completion_observed"] is False
+    assert read(native, "conversation_intent")[0]["status"] == "CANCELED"
+    assert not native[1].proofs
+
+
+def test_memory_cleanup_preserves_visible_history_and_excludes_previous_context_after_reopen(native):
+    store, _, loop, _, _ = native
+    api = BossCommandAPI(store)
+    with store.connect() as db:
+        memory = store.get(db, "ui-check", "memory", "current")
+    execute(native, ["读取 finance-note"], memory_context=True)
+    session = loop.sessions.get_or_create("websocket:" + CHAT)
+    original = public_history_messages(session.messages)
+    assert memory["text"] in json.dumps(session.messages, ensure_ascii=False)
+    session.commit_summary_checkpoint(memory["text"])
+    loop.sessions.save(session, fsync=True)
+    previous_session = deepcopy(session)
+    status, receipt = api.execute("BOSS", "boss.owner_workspace.personal-memory.delete", {
+        "client_request_id": str(uuid4()), "expected_version": memory["version"],
+        "expected_candidate_version": "0", "confirmation": True,
+    })
+    assert status == 200, receipt
+    result = loop.sessions.reconcile_memory()
+    assert result == {"sessions_checked": 1, "sessions_changed": 1}
+    assert public_history_messages(session.messages)[:len(original)] == original
+    assert memory["text"] not in json.dumps(session.messages, ensure_ascii=False)
+    assert "_last_summary" not in session.metadata and "runtime_checkpoint" not in session.metadata
+    assert session.provider_state is None and session.get_history() == []
+    loop.sessions.save(previous_session, fsync=True)
+    session = loop.sessions.get_or_create(session.key)
+    assert memory["text"] not in json.dumps(session.messages, ensure_ascii=False)
+    assert "_last_summary" not in session.metadata and session.get_history() == []
+    reopened = MemorySessionManager(loop.sessions.workspace, business_store=ControlStore(store.path),
+                                   sessions_root=loop.sessions.sessions_dir.parent)
+    saved = reopened.get_or_create(session.key)
+    assert saved.get_history() == [] and saved.metadata == session.metadata
+    assert public_history_messages(saved.messages)[:len(original)] == original
+    assert reopened.reconcile_memory() == {"sessions_checked": 1, "sessions_changed": 0}
+
+    class ObserveActualInput(AgentHook):
+        def __init__(self):
+            super().__init__(reraise=True)
+            self.seen = []
+
+        async def before_iteration(self, context):
+            self.seen.append(json.dumps(context.messages, ensure_ascii=False))
+
+    observed = ObserveActualInput()
+    results, _ = execute(native, ["读取 meeting-minutes"], memory_context=True, hooks=[observed])
+    assert "来源：meeting-minutes" in results[0].content
+    assert observed.seen and all(memory["text"] not in value for value in observed.seen)
+    assert all("读取 finance-note" not in value for value in observed.seen)
+    assert read(native, "runtime_run")[-1]["memory_reference"]["eligible"] is False
+    with store.connect() as db:
+        propagation = store.get(db, "ui-check", "memory_deletion", memory["memory_id"])
+    assert propagation["loaded_sessions"] == "NATIVE_REPLAY_AND_CONTEXT_CLEARED"
+    assert propagation["sessions_checked"] == 1 and propagation["backups"] == "NOT_VERIFIED"
+
+
+def test_memory_cleanup_failure_stops_context_admission_and_records_failure(native):
+    store, _, loop, _, _ = native
+    execute(native, ["读取 finance-note"], memory_context=True)
+    session = loop.sessions.get_or_create("websocket:" + CHAT)
+    clean = deepcopy(session)
+    user_message = next(row for row in session.messages if row["role"] == "user")
+    user_message["content"] += "\n" + public_history_messages([user_message])[0]["content"]
+    original_manager = SessionManager(loop.sessions.workspace, sessions_root=loop.sessions.sessions_dir.parent)
+    original_manager.save(session, fsync=True)
+    with store.connect() as db:
+        current = store.get(db, "ui-check", "memory", "current")
+    status, result = BossCommandAPI(store).execute("BOSS", "boss.owner_workspace.personal-memory.delete", {
+        "client_request_id": str(uuid4()), "expected_version": current["version"],
+        "expected_candidate_version": "0", "confirmation": True,
+    })
+    assert status == 200, result
+    with pytest.raises(web.HTTPConflict):
+        loop.sessions.reconcile_memory()
+    with store.connect() as db:
+        propagation = store.get(db, "ui-check", "memory_deletion", current["memory_id"])
+    assert propagation["loaded_sessions"] == "FAILED" and propagation["failure_reason"]
+    with pytest.raises(web.HTTPConflict):
+        loop.sessions.get_or_create(session.key)
+    assert len(read(native, "runtime_run")) == 1
+    loop.sessions.save(clean, fsync=True)
+    loop.sessions.reconcile_memory()
+    with store.connect() as db:
+        propagation = store.get(db, "ui-check", "memory_deletion", current["memory_id"])
+    assert propagation["loaded_sessions"] == "NATIVE_REPLAY_AND_CONTEXT_CLEARED"
+    assert propagation["failure_reason"] is None
+
+
 def test_real_upload_is_metadata_and_does_not_become_business_source(native):
-    actual = (DOMAIN / "Boss-Agent-Desktop-Complete-v6/assets/boss-logo-from-reference.png").read_bytes()
+    actual = (DOMAIN / "Boss-Agent-Desktop-Complete-v7/assets/boss-logo-from-reference.png").read_bytes()
     selected = [{"name": "boss-logo-from-reference.png", "data_url": "data:image/png;base64," + base64.b64encode(actual).decode()}]
     paths, failure = native[4].store_inbound_attachments(selected)
     assert failure is None

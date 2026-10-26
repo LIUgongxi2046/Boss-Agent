@@ -4,6 +4,7 @@ from aiohttp import web
 from nanobot.agent.tools.base import Tool
 
 from business import encode, require
+from boss_execution_scope import NAMESPACE
 from boss_source_access import require_current_business_source
 
 
@@ -28,7 +29,7 @@ class _BossPageReadTool(Tool):
         return params
 
     def _scope(self):
-        require(self._api.namespace=="ui-check","当前正式读取接口仅支持已绑定执行空间",web.HTTPConflict)
+        require(self._api.namespace==NAMESPACE,"当前正式读取接口仅支持已绑定执行空间",web.HTTPConflict)
         with self._api.store.connect() as db:
             db.execute("BEGIN")
             self._api.store.active(db,self._api.namespace)

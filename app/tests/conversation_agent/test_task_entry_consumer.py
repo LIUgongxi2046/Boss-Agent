@@ -14,6 +14,7 @@ from conversation_agent.native import NativeConversationAgent
 from test_cancel_deadline import arguments, run_for
 from test_native import complete_query_text, native, read
 from test_observable_failure import session
+from test_sources import selection
 
 
 CHAT = "n02-bound-task-consumer"
@@ -71,6 +72,24 @@ def test_bound_current_task_consumes_exact_formal_selection_and_original_hash(na
     assert all(row["task_entry"] == pinned(bound) for row in read(native, "conversation_intent"))
     assert read(native, "task") == original_tasks and read(native, "authorization") == original_authorizations
     assert entry.read("BOSS", CONTEXT)["entry"] == bound
+
+
+def test_task_discussion_reads_selected_knowledge_without_changing_task(native):
+    task = create_task(native, "n02-task-with-knowledge")
+    _, bound = bind_task(native, task)
+    request = selection(native, "meeting-minutes", chat=CHAT)
+    assert native[1].source_selection.bind("BOSS", request, active=lambda: True)["outcome"] == "RECORDED"
+    tasks, authorizations = read(native, "task"), read(native, "authorization")
+    async def check():
+        async with session(native) as (bot, _):
+            return await bot.run("查看当前任务", **arguments(CHAT))
+    result = asyncio.run(check())
+    assert task["task_id"] in result.content and "meeting-minutes" in result.content
+    run = read(native, "runtime_run")[0]
+    assert run["conversation_context"]["task_entry"] == pinned(bound)
+    assert run["conversation_context"]["source_selection"]["source_refs"] == request["source_refs"]
+    assert any(step["tool_id"] == "bossEvidenceRead" and step["source_id"] == "meeting-minutes" for step in run["tool_results"])
+    assert read(native, "task") == tasks and read(native, "authorization") == authorizations
 
 
 def send_task(native, task):

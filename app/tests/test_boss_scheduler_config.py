@@ -159,7 +159,7 @@ def test_cancel_blocks_reenable_same_execution_namespace(services):
 
 @pytest.mark.parametrize("mutation",[
     {"trigger":"WRONG_EVENT"},
-    {"timezone":"Europe/London"},
+        {"timezone":"Invalid/Unknown"},
     {"quiet_start":24},
     {"quiet_end":-1},
     {"cooldown_seconds":86401},

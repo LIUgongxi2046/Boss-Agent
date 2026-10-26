@@ -6,6 +6,7 @@ from nanobot import RuntimeContextBlock
 from nanobot.agent.tools.context import current_request_context
 
 from business import checksum, encode, require
+from boss_execution_scope import NAMESPACE as NS
 from boss_runtime_records import ATTRIBUTE, RuntimeRecordHook
 from product_bi import PREPARING_REQUEST
 from conversation_agent import ConversationReadTool
@@ -34,7 +35,7 @@ class ConversationSimulatedProvider(Fc01SimulatedProvider):
 
 class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
     def __init__(self, scope, registry, runtime_snapshot, *, intent_adapter=None):
-        super().__init__(scope.store, "ui-check", registry, runtime_snapshot)
+        super().__init__(scope.store, NS, registry, runtime_snapshot)
         self.scope = scope
         self.intent_adapter = intent_adapter
         self.deadlines = {}
@@ -75,6 +76,10 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
 
 
 class ConversationRuntimeHook(Fc01RuntimeHook):
+    def check_cancellation(self):
+        super().check_cancellation()
+        self.recorder.scope.current()
+
     async def before_run(self, context):
         await super().before_run(context)
         with self.recorder.store.connect() as db:
@@ -93,9 +98,6 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
             self.recorder._save(db, row)
         raise RuntimeError("会话读取工具执行失败")
 
-    async def before_iteration(self, context):
-        self.recorder.scope.current()
-
     async def after_execute_tool(self, context, tool_call, tool, params, result):
         output = json.loads(result)
         safe = {key: output[key] for key in ("source_type", "source_id", "version", "review_sha256") if key in output}
@@ -111,10 +113,10 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
             storage = {"query": "query", "task": "task", "morning_list": "morning_list", "message_draft": "message_draft"}
             with self.recorder.store.connect() as db:
                 if kind == "message":
-                    rows = db.execute("SELECT id FROM objects WHERE namespace='ui-check' AND id=? AND kind IN ('message_outbox','outbox')", (identifier,)).fetchall()
+                    rows = db.execute("SELECT id FROM objects WHERE namespace=? AND id=? AND kind IN ('message_outbox','outbox')", (self.recorder.namespace, identifier)).fetchall()
                     require(len(rows) == 1, "消息产物缺少唯一正式存储记录")
                 else:
-                    self.recorder.store.get(db, "ui-check", storage[kind], identifier)
+                    self.recorder.store.get(db, self.recorder.namespace, storage[kind], identifier)
             field = {"query": "query_id", "task": "task_id", "morning_list": "list_id", "message": "message_id", "message_draft": "draft_id"}[kind]
             safe[field] = identifier
             if kind in {"task", "message_draft"} and "version" in data:

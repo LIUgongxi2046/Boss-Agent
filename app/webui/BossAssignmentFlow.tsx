@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import type {MorningReference} from "./BossMorningView";
 import type {MorningPreparationContext} from "./BossMorningPreparation";
 import {
-  AlertCircle, ArrowRight, CheckCircle2, Clock3, ClipboardCheck,
-  FileSearch, Loader2, MessageSquareText, RefreshCw, ShieldCheck, XCircle,
+  AlertCircle, CheckCircle2, Loader2, RefreshCw, ShieldCheck,
 } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 import type { AssignmentDraft } from "./BossAssignmentPicker";
-import {BossAssignmentPreparation} from "./BossAssignmentPreparation";
+import {BossAssignmentDetails} from "./BossAssignmentDetails";
 import {BossOriginalReceipt} from "./BossOriginalReceipt";
 
 export interface AssignmentTask {
@@ -21,6 +21,7 @@ export interface AssignmentTask {
   source_reference_state?: "CURRENT" | "NEEDS_REVIEW";
   source_reference_reasons?: string[];
   source_versions?:Record<string,string>;result_evidence_requires_resubmission?:boolean;
+  related_meeting_id?:string|null;related_event_ids?:string[];related_task_id?:string|null;
 }
 export interface TaskFeedback {
   feedback_id: string; task_id: string;
@@ -45,11 +46,13 @@ export interface TaskDueEvent {
 }
 export interface TaskListResponse {
   tasks: AssignmentTask[];
+  business_clock?:string;source_type?:string;namespace?:string;data_version?:string;
   feedback?: TaskFeedback[];
   linked_messages?: TaskLinkedMessage[];
   task_due_events?: TaskDueEvent[];
 }
 export interface AssignmentContext {
+  namespace?:string;dataset_version?:string;business_clock?:string;
   meeting: { meeting_id: string; starts_at: string } | null;
   event?: { event_id: string; status: string };
   assignment_source_ids?: string[];
@@ -66,15 +69,25 @@ type Action =
   | "boss.commitment.create" | "boss.commitment.extend" | "boss.commitment.cancel" | "boss.commitment.complete"
   | "boss.reminder.ack" | "boss.reminder.snooze" | "boss.reminder.close"
   | "boss.owner.notice.save" | "boss.owner.notice.confirm"
+  | "boss.owner.goals.save" | "boss.owner.goals.confirm"
+  | "boss.minutes.save" | "boss.minutes.confirm" | "boss.minutes.assignment.create" | "boss.approval.decide" | "boss.simulation.application.seed" | "boss.simulation.application.revise"
   | "boss.owner.plan.save" | "boss.owner.plan.pause" | "boss.owner.plan.resume" | "boss.owner.plan.cancel"
   | "boss.scheduler.draft.save" | "boss.scheduler.draft.validate" | "boss.scheduler.activate" | "boss.scheduler.manual_run" | "boss.scheduler.pause" | "boss.scheduler.resume" | "boss.scheduler.cancel"
   | "boss.alert.ack" | "boss.alert.snooze" | "boss.alert.close" | "boss.alert.meeting.link" | "boss.alert.assignment.create"
   | "boss.alert.rule.save" | "boss.alert.rule.validate" | "boss.alert.rule.activate" | "boss.alert.rule.disable"
   | "boss.simulation.alert.rule.save" | "boss.simulation.alert.rule.validate" | "boss.simulation.alert.rule.activate" | "boss.simulation.alert.rule.disable" | "boss.simulation.alert.load"
-  | "boss.message.draft.save";
+  | "boss.message.draft.save" | "boss.message.send" | "boss.research.prepare"
+  | "boss.people.prepare" | "boss.people.attach" | "boss.people.detach"
+  | "boss.meeting.brief.prepare" | "boss.meeting.draft.save" | "boss.meeting.confirm" | "boss.meeting.cancel" | "boss.meeting.held"
+  | "boss.travel.review" | "boss.travel.confirm" | "boss.travel.cancel"
+  | "boss.calendar.save" | "boss.calendar.share" | "boss.calendar.share.revoke" | "boss.calendar.delete"
+  | "boss.sector.coordinate.create" | "boss.sector.review.schedule" | "boss.sector.meeting.prepare" | "boss.sector.decision.save";
 type Result = {
+  tasks_created?:number;messages_sent?:number;decision_count_confirmed?:number;
+  record_id?:string;record_version?:string;page_id?:string;query_id?:string;execution_namespace?:string;action_code?:string;
+  message_sent?:boolean;message_id?:string;send_state?:string;recipient_id?:string;external_channel_invoked?:boolean;research_id?:string;brief_id?:string;meeting_id?:string;travel_id?:string;calendar_id?:string;share_id?:string;share_status?:string;
   task_id?: string; task?: { task_id: string; status: string; version: string };
-  status?: string; state?:string;version?: string; feedback_id?: string; draft_id?: string; commitment_id?:string;event_id?:string;plan_id?:string;
+  status?: string; state?:string;version?: string; feedback_id?: string; draft_id?: string; commitment_id?:string;event_id?:string;event_version?:string;plan_id?:string;application_id?:string;minute_id?:string;
 };
 type Pending = {
   action: Action; payload: Record<string, unknown>;
@@ -92,18 +105,28 @@ function required(value: string, field: string): string {
 }
 function displayTime(value?: string) { return value ? value.replace("T", " ") : "待核查"; }
 
-type TransactionScope="assignment"|"feedback"|"commitment"|"reminder"|"ownerNotice"|"ownerGoalsReadonly"|"plan"|"scheduler"|"alerts"|"alertRules"|"alertInput";
+type TransactionScope="assignment"|"feedback"|"commitment"|"reminder"|"ownerNotice"|"ownerGoals"|"plan"|"scheduler"|"alerts"|"alertRules"|"alertInput"|"meetingApproval"|"minutesAssignment"|"research"|"people"|"meetingBrief"|"meetingArrangement"|"travel"|"privateCalendar"|"messageOperation"|"sectorOperation";
 const TRANSACTION_ACTIONS:Record<TransactionScope,Action[]>={
   assignment:["boss.assignment.create","boss.assignment.send","boss.assignment.nudge","boss.assignment.extend","boss.assignment.extension.decide","boss.assignment.cancel","boss.assignment.complete","boss.message.draft.save"],
   feedback:["boss.simulation.feedback"],commitment:["boss.commitment.create","boss.commitment.extend","boss.commitment.cancel","boss.commitment.complete"],
-  reminder:["boss.reminder.ack","boss.reminder.snooze","boss.reminder.close"],ownerNotice:["boss.owner.notice.save","boss.owner.notice.confirm"],ownerGoalsReadonly:[],
+  reminder:["boss.reminder.ack","boss.reminder.snooze","boss.reminder.close"],ownerNotice:["boss.owner.notice.save","boss.owner.notice.confirm"],ownerGoals:["boss.owner.goals.save","boss.owner.goals.confirm"],
   plan:["boss.owner.plan.save","boss.owner.plan.pause","boss.owner.plan.resume","boss.owner.plan.cancel"],
   scheduler:["boss.scheduler.draft.save","boss.scheduler.draft.validate","boss.scheduler.activate","boss.scheduler.manual_run","boss.scheduler.pause","boss.scheduler.resume","boss.scheduler.cancel"],
   alerts:["boss.alert.ack","boss.alert.snooze","boss.alert.close","boss.alert.meeting.link","boss.alert.assignment.create"],
   alertRules:["boss.alert.rule.save","boss.alert.rule.validate","boss.alert.rule.activate","boss.alert.rule.disable","boss.simulation.alert.rule.save","boss.simulation.alert.rule.validate","boss.simulation.alert.rule.activate","boss.simulation.alert.rule.disable"],
   alertInput:["boss.simulation.alert.load"],
+  meetingApproval:["boss.minutes.save","boss.minutes.confirm","boss.approval.decide","boss.simulation.application.seed","boss.simulation.application.revise"],
+  minutesAssignment:["boss.minutes.assignment.create"],
+  research:["boss.research.prepare","boss.message.draft.save"],
+  people:["boss.people.prepare","boss.people.attach","boss.people.detach"],
+  meetingBrief:["boss.meeting.brief.prepare","boss.message.draft.save"],
+  meetingArrangement:["boss.meeting.draft.save","boss.meeting.confirm","boss.meeting.cancel","boss.meeting.held"],
+  travel:["boss.travel.review","boss.travel.confirm","boss.travel.cancel"],
+  privateCalendar:["boss.calendar.save","boss.calendar.share","boss.calendar.share.revoke","boss.calendar.delete"],
+  messageOperation:["boss.message.draft.save","boss.message.send"],
+  sectorOperation:["boss.sector.coordinate.create","boss.sector.review.schedule","boss.sector.meeting.prepare","boss.sector.decision.save"],
 };
-export function useTransaction(onReload: () => void, onCreated?: (id: string) => void, onMessageDraftCreated?: (id: string) => void, scope:TransactionScope="assignment") {
+export function useTransaction(onReload: (recorded?:boolean,action?:string) => void, onCreated?: (id: string) => void, onMessageDraftCreated?: (id: string) => void, scope:TransactionScope="assignment") {
   const { client, getToken, token } = useClient();
   const [lookupBusy,setLookupBusy] = useState(false);
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -152,10 +175,11 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
     return () => { document.removeEventListener("keydown", onKeyDown); previous?.focus(); };
   }, [pending?.id]);
   const propose = useCallback((action: Action, payload: Record<string, unknown>, title: string, preview: string[]) => {
-    if(new URLSearchParams(window.location.search).has(scope+"Request")){setError("当前原请求仍需核查，请查询同一编号。");return;}
-    setPending({ action, payload, id: "boss-" + crypto.randomUUID(), title, preview, target:typeof payload.task_id==="string"?payload.task_id:typeof payload.commitment_id==="string"?payload.commitment_id:typeof payload.event_id==="string"?payload.event_id:typeof payload.plan_id==="string"?payload.plan_id:"" });
+    if(new URLSearchParams(window.location.search).has(scope+"Request")){setError("当前原请求仍需核查，请查询同一编号。");return false;}
+    setPending({ action, payload, id: "boss-" + crypto.randomUUID(), title, preview, target:scope==="messageOperation"&&typeof payload.draft_id==="string"?payload.draft_id:scope==="privateCalendar"&&typeof payload.share_id==="string"?payload.share_id:scope==="travel"&&typeof payload.travel_id==="string"?payload.travel_id:scope==="meetingArrangement"&&typeof payload.meeting_id==="string"?payload.meeting_id:typeof payload.task_id==="string"?payload.task_id:typeof payload.commitment_id==="string"?payload.commitment_id:typeof payload.event_id==="string"?payload.event_id:typeof payload.plan_id==="string"?payload.plan_id:typeof payload.application_id==="string"?payload.application_id:typeof payload.brief_id==="string"?payload.brief_id:"" });
     setUncertain(false);
     setApproved(false); setError(""); setNotice("");
+    return true;
   }, [scope]);
   const submit = useCallback(async () => {
     if (!pending || !approved || busy || uncertain || pending.restored) return;
@@ -165,12 +189,40 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
         pending.action, { ...pending.payload, client_request_id: pending.id },
       );
       if(current!==epoch.current)return;
+      if(scope==="sectorOperation"&&(!result.record_id||!result.record_version||result.page_id!==pending.payload.page_id||result.query_id!==pending.payload.query_id||result.execution_namespace!==pending.payload.execution_namespace||result.action_code!==pending.payload.action_code||result.messages_sent!==0||result.external_channel_invoked!==false))throw new Error("专题操作回执与查询范围、执行空间或保存后果不匹配");
+      if(pending.action==="boss.minutes.save"&&(!result.minute_id||result.meeting_id!==pending.payload.meeting_id||!result.version||result.state!=="DRAFT_REVIEW"||result.tasks_created!==0||result.messages_sent!==0||result.decision_count_confirmed!==0))throw new Error("纪要草稿回执与当前会议或保存范围不匹配");
+      if((scope==="reminder"||scope==="alerts")&&(!result.event_id||result.event_id!==pending.target||result.event_version!==pending.payload.event_version||!result.version))throw new Error("提醒回执与当前事件、版本或决定不匹配");
+      if(scope==="messageOperation"){
+        if(!result.draft_id||pending.target&&pending.target!==result.draft_id)throw new Error("消息回执与当前草稿不匹配");
+        if(pending.action==="boss.message.draft.save"&&(result.status!=="DRAFT"||result.message_sent!==false))throw new Error("草稿回执缺少未发送状态");
+        if(pending.action==="boss.message.send"){
+          if(!result.message_id||result.send_state!=="SENT_SIMULATED"||result.external_channel_invoked!==false||result.recipient_id!==pending.payload.recipient_id)throw new Error("发送回执与当前收件人或发送状态不匹配");
+          onMessageDraftCreated?.(result.draft_id);
+        }
+      }
+      if(TRANSACTION_ACTIONS.privateCalendar.includes(pending.action)){
+        const object=pending.action.includes(".share")?result.share_id:result.calendar_id;
+        if(!object||pending.target&&pending.target!==object)throw new Error("私人安排回执与当前对象不匹配");
+      }
+      if(TRANSACTION_ACTIONS.meetingArrangement.includes(pending.action)&&(!result.meeting_id||result.meeting_id!==pending.target))throw new Error("会议回执与当前对象不匹配");
+      if(TRANSACTION_ACTIONS.travel.includes(pending.action)){
+        if(!result.travel_id||pending.target&&result.travel_id!==pending.target)throw new Error("行程回执与当前对象不匹配");
+        onCreated?.(result.travel_id);
+      }
+      if(pending.action.startsWith("boss.people.")){
+        if(!result.brief_id||pending.target&&pending.target!==result.brief_id)throw new Error("会面材料回执与当前对象不匹配");
+        onCreated?.(result.brief_id);
+      }
+      if(pending.action==="boss.minutes.assignment.create"){
+        if(!result.task_id||result.status!=="OPEN"||result.message_sent!==false)throw new Error("当前交办回执需要核查未发送状态");
+        onCreated?.(result.task_id);
+      }
       if (pending.action === "boss.assignment.create" && result.task_id) onCreated?.(result.task_id);
       if (pending.action === "boss.commitment.create" && result.commitment_id) onCreated?.(result.commitment_id);
       if (pending.action === "boss.message.draft.save" && result.draft_id) onMessageDraftCreated?.(result.draft_id);
-      setNotice("实际模拟业务已保存。状态：" + (result.status || result.state || result.task?.status || "已记录") +
-        "；对象：" + (result.task_id || result.task?.task_id || result.commitment_id || result.event_id || result.plan_id || "未知") + "。请重读当前状态。");
-      remember(null);setUncertain(false);setPending(null); setApproved(false); onReload();
+      setNotice("实际模拟业务已保存。状态：" + (result.status || result.state || result.send_state || result.share_status || result.task?.status || "已记录") +
+        "；对象：" + (result.record_id || result.task_id || result.task?.task_id || result.commitment_id || result.event_id || result.plan_id || result.application_id || result.minute_id || result.research_id || result.draft_id || result.brief_id || result.meeting_id || result.travel_id || result.calendar_id || result.share_id || "未知") + "。请重读当前状态。");
+      remember(null);setUncertain(false);setPending(null); setApproved(false); onReload(true,pending.action);
     } catch (e) {
       if(current!==epoch.current)return;
       const status=e instanceof Error&&"status" in e&&typeof e.status==="number"?e.status:null;
@@ -179,7 +231,7 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
       setError((e instanceof Error ? e.message : String(e)) +
         "。请核查正式状态；结果尚未确定时仅查询原请求编号。");
     } finally { if(current===epoch.current)setBusy(false); }
-  }, [approved, busy, client, onCreated, onMessageDraftCreated, onReload, pending,uncertain,remember]);
+  }, [approved, busy, client, onCreated, onMessageDraftCreated, onReload, pending,uncertain,remember,scope]);
   const reconcile = useCallback(async () => {
     if (!pending || busy || lookupBusy) return;
     const token = getToken();
@@ -196,21 +248,46 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
       if(res.status===401||res.status===403){setPending(null);setApproved(false);setNotice("");remember(null);if(res.status===401)window.dispatchEvent(new Event("boss-auth-expired"));}
       if (!res.ok) throw new Error("幂等回执查询失败（HTTP " + res.status + "）");
       const body = await res.json() as {
-        action:string;client_request_id:string;outcome:string;result?:Result;
+        action:string;client_request_id:string;outcome:string;result?:Result;write_performed_by_lookup?:boolean;
       };
       if(current!==epoch.current)return;
       if(body.action!==pending.action||body.client_request_id!==pending.id)
         throw new Error("操作回执身份与本次动作不匹配");
       if(body.outcome==="RECORDED"&&body.result){
-        const target=pending.action.startsWith("boss.alert.")?body.result.event_id:body.result.task_id??body.result.task?.task_id??body.result.commitment_id??body.result.event_id??body.result.plan_id;
+        if(scope==="sectorOperation"&&(body.write_performed_by_lookup!==false||!body.result.record_id||!body.result.record_version||!body.result.page_id||!body.result.query_id||!body.result.execution_namespace||!body.result.action_code||body.result.messages_sent!==0||body.result.external_channel_invoked!==false||pending.payload.query_id&&body.result.query_id!==pending.payload.query_id||pending.payload.execution_namespace&&body.result.execution_namespace!==pending.payload.execution_namespace||pending.payload.action_code&&body.result.action_code!==pending.payload.action_code))throw new Error("原专题操作回执缺少查询依据或与当前请求不符");
+        if(pending.action==="boss.minutes.save"&&(body.write_performed_by_lookup!==false||!body.result.minute_id||!body.result.meeting_id||!body.result.version||body.result.state!=="DRAFT_REVIEW"||body.result.tasks_created!==0||body.result.messages_sent!==0||body.result.decision_count_confirmed!==0||pending.payload.meeting_id&&body.result.meeting_id!==pending.payload.meeting_id))throw new Error("原纪要草稿回执缺少只读依据或保存范围不符");
+        if((scope==="reminder"||scope==="alerts")&&(!body.result.event_id||!body.result.event_version||!body.result.version||pending.payload.event_version&&body.result.event_version!==pending.payload.event_version))throw new Error("原提醒回执缺少事件版本或与当前请求不匹配");
+        if(scope==="messageOperation"){
+          if(body.write_performed_by_lookup!==false||!body.result.draft_id)throw new Error("原消息回执缺少只读核查依据或草稿编号");
+          if(pending.action==="boss.message.draft.save"&&(body.result.status!=="DRAFT"||body.result.message_sent!==false))throw new Error("原草稿回执缺少未发送状态");
+          if(pending.action==="boss.message.send"){
+            if(!body.result.message_id||body.result.send_state!=="SENT_SIMULATED"||body.result.external_channel_invoked!==false||!body.result.recipient_id)throw new Error("原发送回执缺少收件人或发送结果");
+            if(pending.payload.recipient_id&&body.result.recipient_id!==pending.payload.recipient_id)throw new Error("原发送回执与收件人不匹配");
+          }
+        }
+        if(pending.action==="boss.minutes.assignment.create"){
+          if(!body.result.task_id||body.result.status!=="OPEN"||body.result.message_sent!==false)throw new Error("原交办回执需要核查未发送状态");
+          onCreated?.(body.result.task_id);
+        }
+        const target=scope==="messageOperation"?body.result.draft_id:TRANSACTION_ACTIONS.privateCalendar.includes(pending.action)?pending.action.includes(".share")?body.result.share_id:body.result.calendar_id:TRANSACTION_ACTIONS.travel.includes(pending.action)?body.result.travel_id:TRANSACTION_ACTIONS.meetingArrangement.includes(pending.action)?body.result.meeting_id:pending.action.startsWith("boss.alert.")?body.result.event_id:body.result.task_id??body.result.task?.task_id??body.result.commitment_id??body.result.event_id??body.result.plan_id??body.result.application_id??body.result.brief_id;
+        if(TRANSACTION_ACTIONS.privateCalendar.includes(pending.action)&&!target)throw new Error("原请求回执缺少私人安排或分享编号");
         if(pending.target&&pending.target!==target)throw new Error("原请求回执不属于当前业务对象");
+        if(scope==="messageOperation"&&pending.action==="boss.message.send"&&body.result.draft_id)onMessageDraftCreated?.(body.result.draft_id);
+        if(TRANSACTION_ACTIONS.travel.includes(pending.action)){
+          if(!body.result.travel_id)throw new Error("原请求回执缺少行程标识");
+          onCreated?.(body.result.travel_id);
+        }
+        if(pending.action.startsWith("boss.people.")){
+          if(!body.result.brief_id)throw new Error("原请求回执缺少会面材料标识");
+          onCreated?.(body.result.brief_id);
+        }
         if(pending.action==="boss.assignment.create"&&body.result.task_id)
           onCreated?.(body.result.task_id);
         if(pending.action==="boss.commitment.create"&&body.result.commitment_id)onCreated?.(body.result.commitment_id);
         if(pending.action==="boss.message.draft.save"&&body.result.draft_id)
           onMessageDraftCreated?.(body.result.draft_id);
-        setNotice("已从实际 SQLite 幂等回执核实该交办动作已保存，任务状态正在重读。");
-        remember(null);setUncertain(false);setPending(null);setApproved(false);onReload();
+        setNotice("原请求回执已确认当前操作保存成功，正式状态正在重读。");
+        remember(null);setUncertain(false);setPending(null);setApproved(false);onReload(true,pending.action);
       }else if(body.outcome==="NOT_FOUND_IN_CURRENT_STORE"){
         setError("当前没有该请求回执，执行结果仍未确定，请继续读取同一原编号。");
         onReload();
@@ -218,7 +295,7 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
     } catch(e) {
       if(current===epoch.current)setError(e instanceof Error?e.message:String(e));
     }finally{if(current===epoch.current)setLookupBusy(false);}
-  },[pending,busy,lookupBusy,getToken,onCreated,onMessageDraftCreated,onReload,remember]);
+  },[pending,busy,lookupBusy,getToken,onCreated,onMessageDraftCreated,onReload,remember,scope]);
   const dialog = pending ? <div className="boss-confirm-backdrop">
     <section ref={dialogRef} tabIndex={-1} className="boss-confirm boss-fc07-confirm" role="dialog" aria-modal="true" aria-labelledby="boss-confirm-title">
       <h3 id="boss-confirm-title"><ShieldCheck size={19}/> {pending.title}</h3>
@@ -242,13 +319,14 @@ export function useTransaction(onReload: () => void, onCreated?: (id: string) =>
     </section>
   </div> : null;
   const unresolved=new URLSearchParams(window.location.search).has(scope+"Request");
-  const recovery=!pending&&unresolved?<BossOriginalReceipt scope={scope} actions={TRANSACTION_ACTIONS[scope]} onRecorded={onReload}/>:null;
+  const recovery=!pending&&unresolved?<BossOriginalReceipt scope={scope} actions={TRANSACTION_ACTIONS[scope]} onRecorded={()=>onReload(true)}/>:null;
   return { propose, dialog, recovery, notice, busy:busy||uncertain||lookupBusy||(!pending&&unresolved) };
 }
 
 export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onReload, onViewSource, context,
   draft, onDraftChange, onDraftSaved, onOpenCoordinatorPicker, onOpenDuePicker,
-  onViewMessages, onMessageDraftCreated, morningReference, morningReady=true, morningContext, messagesEnabled=true }: {
+  onViewMessages, onMessageDraftCreated, morningReference, morningReady=true, morningContext, messagesEnabled=true,
+  loading=false,onDirtyChange,onNavigate,onDiscard,onNew,sourceReview,conversation }: {
   tasks: TaskListResponse | null; selectedTaskId: string;
   onSelectTask: (id: string, bypassDirty?:boolean) => void; onReload: () => void;
   onViewSource: (id?:string) => void; context: AssignmentContext | null;
@@ -260,16 +338,18 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   onMessageDraftCreated: (id: string) => void;
   morningReference?:MorningReference;morningReady?:boolean;morningContext?:MorningPreparationContext|null;
   messagesEnabled?:boolean;
+  loading?:boolean;onDirtyChange?:(dirty:boolean)=>void;onNavigate:(page:string)=>void;onDiscard:()=>void;onNew:(task?:AssignmentTask)=>void;sourceReview?:ReactNode;conversation?:ReactNode;
 }) {
-  const { propose, dialog, recovery, notice, busy } = useTransaction(()=>{onDraftSaved();onReload();}, id => {
+  const { propose, dialog, recovery, notice, busy:transactionBusy } = useTransaction(recorded=>{if(recorded)onDraftSaved();onReload();}, id => {
     onSelectTask(id,true); onDraftSaved();
   }, onMessageDraftCreated);
-  const {purpose,coordinator,due,evidence,body,newDue,reason}=draft;
-  const [error,setError]=useState("");
+  const {purpose,coordinator,due,evidence,body,newDue,reason,timezone}=draft;
+  const [error,setError]=useState(""),[discardOpen,setDiscardOpen]=useState(false);
+  const busy=transactionBusy||Boolean(dialog);
   const {getToken,token}=useClient();
   const [extensionHistory,setExtensionHistory]=useState<{task_id:string;task_version:string;due_at:string;decisions:{decision_id:string;feedback_id:string;decision:"APPROVE"|"REJECT";old_due_at:string;new_due_at:string;reason:string|null;request_reason:string;decided_at:string;previous_task_version:string;task_version:string}[]}|null>(null);
-  const rows=tasks?.tasks||[];
-  const current=selectedTaskId?rows.find(t=>t.task_id===selectedTaskId):rows[0];
+  const rows=loading?[]:tasks?.tasks||[];
+  const current=rows.find(t=>t.task_id===selectedTaskId);
   const feedback=useMemo(()=>(tasks?.feedback||[]).filter(f=>current&&f.task_id===current.task_id),[current,tasks]);
   const linkedMessages=useMemo(()=>(tasks?.linked_messages||[]).filter(
     row=>current&&row.task_id===current.task_id
@@ -277,8 +357,21 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const taskDue=useMemo(()=>(tasks?.task_due_events||[]).find(
     row=>current&&row.task_id===current.task_id
   ),[current,tasks]);
-  const completed=[...feedback].reverse().find(f=>f.kind==="RESULT_SUBMITTED"&&!f.historical_only&&Boolean(f.evidence_refs?.length));
-  const extension=extensionHistory?[...feedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST"&&!f.historical_only&&!extensionHistory.decisions.some(decision=>decision.feedback_id===f.feedback_id)):undefined;
+  const currentBasis=current?JSON.stringify([tasks?.namespace,tasks?.data_version,current,feedback]):context?JSON.stringify([context.namespace,context.dataset_version,context.meeting,context.event,context.contacts,context.assignment_source_ids,morningReference,morningContext]):"";
+  const stale=Boolean(draft.basis&&currentBasis&&draft.basis!==currentBasis);
+  const editable=!loading&&!busy&&!stale;
+  const sourceIds=morningReference?morningContext?.source_ids??[]:(draft.sourceIds?draft.sourceIds.split("\n").map(item=>item.trim()).filter(Boolean):context?.assignment_source_ids??[]);
+  const meetingId=morningReference?morningContext?.meeting_id??null:draft.meetingId||context?.meeting?.meeting_id||null;
+  const eventIds=morningReference?morningContext?.event_ids??[]:draft.eventIds?draft.eventIds.split("\n").map(item=>item.trim()).filter(Boolean):context?.event?[context.event.event_id]:[];
+  const clock=tasks?.business_clock??context?.business_clock,terminal=Boolean(current&&["CANCELED","COMPLETED_CONFIRMED"].includes(current.status));
+  const overdue=current?.due_at&&clock&&!terminal&&Number.isFinite(Date.parse(current.due_at))&&Number.isFinite(Date.parse(clock))?Date.parse(current.due_at)<Date.parse(clock):null;
+  useEffect(()=>{onDirtyChange?.(busy);return()=>onDirtyChange?.(false);},[busy,onDirtyChange]);
+  function edit(field:keyof AssignmentDraft,value:string){if(!editable)return;if(!draft.basis)onDraftChange("basis",currentBasis);onDraftChange(field,value);}
+  function absolute(value:string,label:string){if(!Number.isFinite(Date.parse(value))||!/(Z|[+-]\d{2}:\d{2})$/.test(value))throw new Error("请填写包含UTC时差的完整"+label);return value;}
+  const result=[...feedback].reverse().find(f=>f.kind==="RESULT_SUBMITTED"&&!f.historical_only);
+  const completed=result?.evidence_refs?.length?result:undefined;
+  const currentExtensions=extensionHistory?.task_id===current?.task_id&&extensionHistory?.task_version===current?.version?extensionHistory:null;
+  const extension=currentExtensions?[...feedback].reverse().find(f=>f.kind==="EXTENSION_REQUEST"&&!f.historical_only&&!currentExtensions.decisions.some(decision=>decision.feedback_id===f.feedback_id)):undefined;
   useEffect(()=>{
     const abort=new AbortController();setExtensionHistory(null);
     if(current?.task_id&&current.version)void fetch("/api/boss/ui/assignment-extensions?"+new URLSearchParams({task_id:current.task_id}),{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal:abort.signal}).then(async response=>{
@@ -291,28 +384,28 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
     }).catch(failure=>{if(!abort.signal.aborted)setError(failure.message);});
     return()=>abort.abort();
   },[current?.task_id,current?.version,getToken,token]);
-  const safe=(fn:()=>void)=>{setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
+  const safe=(fn:()=>void)=>{if(!editable)return;setError("");try{fn()}catch(e){setError(e instanceof Error?e.message:String(e))}};
   const prepareCreate=()=>safe(()=>{
     if(morningReference&&(!morningReady||!morningContext?.source_ids.length))throw new Error("请重新核查当前晨间事项与来源版本");
-    if(!context||!morningReference&&(!context.meeting?.meeting_id||!context.event?.event_id||!context.assignment_source_ids?.includes("finance-note")))
-      throw new Error("未取得关联会议、事件或有效资料，拒绝创建。");
-    const meetingId=morningReference?morningContext!.meeting_id:context.meeting!.meeting_id;
-    const eventIds=morningReference?morningContext!.event_ids:[context.event!.event_id];
-    const sourceIds=morningReference?morningContext!.source_ids:["finance-note"];
-    const purposeText=required(purpose,"交办目的"),proof=required(evidence,"证据要求");
+    if(!context||!sourceIds.length||sourceIds.some(id=>!(morningReference?morningContext?.source_ids:context.assignment_source_ids)?.includes(id)))throw new Error("创建交办需要当前获准来源。");
+    const purposeText=required(purpose,"交办目的"),proof=required(evidence,"证据要求").split("\n").map(item=>item.trim()).filter(Boolean);
+    if(proof.length>8||proof.some(item=>item.length>160))throw new Error("证据要求最多8项，每项最多160字。");
     if(!coordinator||!context.contacts.some(c=>c.contact_id===coordinator))
       throw new Error("请选择获准的唯一负责人");
-    const dueAt=shanghai(due);
+    const dueAt=absolute(due,"交办期限"),zone=required(timezone,"IANA时区");new Intl.DateTimeFormat("zh-CN",{timeZone:zone}).format(new Date(dueAt));
+    if(!clock||!Number.isFinite(Date.parse(clock)))throw new Error("尚未取得有效业务时钟，请重新读取。");
+    if(Date.parse(dueAt)<=Date.parse(clock))throw new Error("交办期限必须晚于当前业务时钟。");
     propose("boss.assignment.create",{
       purpose:purposeText,coordinator_id:coordinator,due_at:dueAt,
-      timezone:"Asia/Shanghai",evidence_requirements:[proof],
+      timezone:zone,evidence_requirements:proof,
       related_meeting_id:meetingId,
       related_event_ids:eventIds,
       source_refs:sourceIds,content_version:"1",
       ...(morningReference?{morning_reference:morningReference}:{}),
+      ...(draft.relatedTask?{related_task_id:draft.relatedTask,related_task_version:draft.relatedTaskVersion}:{}),
     },"核对并创建交办",[
       "目的："+purposeText,"负责人："+coordinator,"期限："+dueAt,
-      "证据："+proof,"会议："+(meetingId??"没有关联会议"),
+      "证据："+proof.join("；"),"期限时区："+zone,"会议："+(meetingId??"没有关联会议"),
       "关联事件："+(eventIds.join("、")||"没有关联事件"),"资料来源："+sourceIds.join("、"),
     ]);
   });
@@ -351,17 +444,17 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const prepareFollowup=()=>safe(()=>{
     if(!current||!current.version||!current.coordinator_id)
       throw new Error("请先选择已保存的交办任务");
-    if(!["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status))
-      throw new Error("只有已经独立发送、正在等待或处理反馈的任务可以准备催办");
-    if(current.source_reference_state!=="CURRENT")
+    if(!["WAITING_FEEDBACK","IN_PROGRESS","RESULT_SUBMITTED"].includes(current.status))
+      throw new Error("当前任务状态不能准备后续沟通草稿");
+    if(current.status!=="RESULT_SUBMITTED"&&current.source_reference_state!=="CURRENT")
       throw new Error("原始资料已经变化，不能据此继续催办");
-    const message=required(body,"催办草稿正文");
+    const message=required(body,"后续沟通正文");
     propose("boss.message.draft.save",{
       draft_id:null,expected_version:"0",
       recipient_id:current.coordinator_id,
       related_task_id:current.task_id,body:message,
       attachment_refs:[],visibility:"RECIPIENT_ONLY",
-    },"保存当前交办的催办草稿",[
+    },current.status==="RESULT_SUBMITTED"?"保存当前结果的补充材料请求":"保存当前交办的催办草稿",[
       "关联任务："+current.task_id,
       "唯一负责人："+current.coordinator_id,
       "当前任务状态："+current.status,
@@ -384,7 +477,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   });
   const prepareExtend=(decision:"APPROVE"|"REJECT")=>safe(()=>{
     if(!current||!extension||!current.version)throw new Error("未取得有效延期申请。");
-    const date=decision==="APPROVE"?shanghai(newDue):null;
+    const date=decision==="APPROVE"?absolute(newDue,"新期限"):null;
     const note=required(reason,"本人决定理由");
     propose("boss.assignment.extension.decide",{
       task_id:current.task_id,task_version:current.version,
@@ -408,190 +501,16 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
     ]);
   });
   return <div className="boss-assignment-scope">
-    <div className="boss-columns">
-      <div className="boss-column">
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>创建交办</h2><small>F06 · 当前老板授权</small></div>
-          <div className="boss-form-grid">
-            <label htmlFor="assignment-coordinator"><span id="assignment-coordinator-label">唯一负责人</span><select id="assignment-coordinator" aria-labelledby="assignment-coordinator-label" value={coordinator} onChange={e=>onDraftChange("coordinator",e.target.value)}>
-              <option value="">请选择</option>
-              {(context?.contacts||[]).map(c=><option key={c.contact_id} value={c.contact_id}>
-                {c.name} · {c.organization} · {c.responsibility}
-              </option>)}
-            </select></label>
-            <label>期限（Asia/Shanghai）<input type="datetime-local" value={due} onChange={e=>onDraftChange("due",e.target.value)}/></label>
-          </div>
-          <div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={onOpenCoordinatorPicker}>选择负责人（D04）</button>
-            <button type="button" className="boss-btn" onClick={onOpenDuePicker}>选择时间与时区（D05）</button>
-          </div>
-          <label className="boss-label" htmlFor="assignment-purpose">交办目的</label>
-          <textarea id="assignment-purpose" rows={3} value={purpose} onChange={e=>onDraftChange("purpose",e.target.value)}
-            placeholder="说明目的、范围、要求与应交付的产物"/>
-          <label className="boss-label" htmlFor="assignment-evidence">证据要求</label>
-          <input id="assignment-evidence" className="boss-single-input" value={evidence} onChange={e=>onDraftChange("evidence",e.target.value)}/>
-          <p className="boss-helper">会议：{morningReference?morningContext?.meeting_id??"没有关联会议":context?.meeting?.meeting_id||"待读取"} ·
-            关联事件：{morningReference?morningContext?.event_ids.join("、")||"没有关联事件":context?.event?.event_id||"待读取"} · 资料：{morningReference?morningContext?.source_ids.join("、")||"依据尚待核查":context?.assignment_source_ids?.join("、")||"待读取"}</p>
-          <div className="boss-actions">
-            <button className="boss-btn boss-btn-primary" type="button" onClick={prepareCreate} disabled={busy||Boolean(morningReference&&!morningReady)}>
-              <ShieldCheck size={15}/> 核对并创建</button>
-            <button className="boss-btn" type="button" onClick={()=>onViewSource()}>查看来源</button>
-          </div>
-          <p className="boss-helper">创建与发送是两个独立操作，不会自动发出消息。</p>
-        </section>
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>当前交办列表</h2><small>仅展示 SQLite 正式状态</small></div>
-          {rows.length?rows.map(t=><button key={t.task_id} type="button" onClick={()=>onSelectTask(t.task_id)}
-            className={"boss-task-row "+(current?.task_id===t.task_id?"selected":"")}>
-            <span className="boss-task-icon"><ClipboardCheck size={17}/></span>
-            <span><strong>{t.purpose||t.task_id}</strong>
-              <small>{t.status} · v{t.version||"?"} · {displayTime(t.due_at)}</small>
-              <small>负责人：{t.coordinator_id||"待核查"}</small>
-            </span><ArrowRight size={15}/>
-          </button>):<p className="boss-helper">没有持久化交办，设计示例不会被视为正式任务。</p>}
-          <div className="boss-actions"><button className="boss-btn" type="button" onClick={onReload}>
-            <RefreshCw size={15}/> 重新读取任务状态</button></div>
-        </section>
-      </div>
-      <div className="boss-column">
-        {current?.version&&<BossAssignmentPreparation key={current.task_id} taskId={current.task_id} taskVersion={current.version}/>}
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>交办详情与模拟发送</h2><small>有效授权 · 当前对象版本</small></div>
-          {current ? <>
-            <div className="boss-kv"><span>任务 ID</span><strong>{current.task_id}</strong></div>
-            <div className="boss-kv"><span>任务目的与产物</span><strong>{current.purpose}</strong></div>
-            <div className="boss-kv"><span>唯一负责人</span><strong>{current.coordinator_id}</strong></div>
-            <div className="boss-kv"><span>当前版本</span><strong>{current.version}</strong></div>
-            <div className="boss-kv"><span>时区</span><strong>{current.timezone}</strong></div>
-            <div className="boss-kv"><span>正式状态</span><strong>{current.status}</strong></div>
-            <div className="boss-kv"><span>截止时间</span><strong>{displayTime(current.due_at)}</strong></div>
-            <div className="boss-kv"><span>证据要求</span><strong>{current.evidence_requirements?.join("、")||"缺少"}</strong></div>
-            <div className="boss-kv"><span>原始依据版本</span>
-              <strong>{current.source_reference_state||"NEEDS_REVIEW"}</strong>
-            </div>
-            {current.source_reference_state!=="CURRENT"&&
-              <div className="boss-status boss-status-warn" role="status">
-                <AlertCircle size={16}/> 当前依据需要复核：
-                {(current.source_reference_reasons||[]).join("、")||"缺少可核验版本"}。
-                旧授权不能应用于已撤销或换版材料。
-              </div>}
-            {current.origin_minute_id&&<div className="boss-workspace-item" role="group" aria-label="纪要交办原始来源">
-              <strong>已确认纪要关联</strong>
-              <div className="boss-kv"><span>纪要 / 条目</span>
-                <strong>{current.origin_minute_id} · {current.origin_entry_id}</strong></div>
-              <div className="boss-kv"><span>纪要版本</span>
-                <strong>v{current.origin_minute_version}</strong></div>
-              <div className="boss-kv"><span>原文来源</span>
-                <strong>{current.origin_source_id} · v{current.origin_source_version}</strong></div>
-              <div className="boss-actions">
-                <button className="boss-btn" type="button" onClick={()=>onViewSource()}>
-                  <FileSearch size={15}/> 核对当前业务来源</button>
-              </div>
-              <p className="boss-helper">本次交办由本人单独授权创建；是否发送以当前任务真实状态为准。</p>
-            </div>}
-            <label className="boss-label">模拟发件内容</label>
-            <textarea rows={3} value={body} onChange={e=>onDraftChange("body",e.target.value)} placeholder="输入准备发给唯一负责人的正文"/>
-            <div className="boss-actions"><button className="boss-btn boss-btn-primary" type="button"
-              disabled={current.status!=="OPEN"||current.source_reference_state!=="CURRENT"||busy} onClick={prepareSend}>
-              <MessageSquareText size={15}/> 核对并模拟发送</button></div>
-          </>:<p className="boss-helper">请先选择或创建交办。</p>}
-          <p className="boss-helper">模拟 SENT 只代表本地发件箱已记录；任务仍需反馈。</p>
-          {current&&["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status)&&
-            <div className="boss-actions">
-              {messagesEnabled&&<button type="button" className="boss-btn"
-                disabled={busy||current.source_reference_state!=="CURRENT"}
-                onClick={prepareFollowup}>
-                <MessageSquareText size={15}/> 保存关联催办草稿（F08）
-              </button>}
-              <button type="button" className="boss-btn boss-btn-primary"
-                disabled={busy||current.source_reference_state!=="CURRENT"}
-                onClick={prepareNudge}>
-                <MessageSquareText size={15}/> 本人核对并模拟催办
-              </button>
-              {messagesEnabled&&<button type="button" className="boss-btn" onClick={onViewMessages}>
-                打开 F08 草稿与模拟发件箱
-              </button>}
-            </div>}
-        </section>
-        <section className="boss-panel">
-          <div className="boss-panel-head">
-            <h2>到期提醒与调度结果</h2><small>FR06 · 服务端模拟时钟</small>
-          </div>
-          {taskDue ? <>
-            <div className="boss-kv"><span>到期事件 ID</span><strong>{taskDue.event_id}</strong></div>
-            <div className="boss-kv"><span>事件版本</span><strong>{taskDue.event_version}</strong></div>
-            <div className="boss-kv"><span>到期时刻</span><strong>{displayTime(taskDue.due_at)}</strong></div>
-            <div className="boss-kv"><span>事件状态</span><strong>{taskDue.event_state}</strong></div>
-            <div className="boss-kv"><span>实际派发检查</span><strong>{taskDue.dispatch_state}</strong></div>
-            <div className="boss-kv"><span>抑制原因</span><strong>{taskDue.dispatch_reason||"无记录"}</strong></div>
-          </> : <p className="boss-helper">
-            尚未经老板独立授权发送的任务不会启动到期催办；当前没有已登记的任务到期事件。
-          </p>}
-          <p className="boss-helper">
-            仅注册本机模拟到期事件。取消或确认完成后终止后续催办，延期须由老板批准；
-            当前不具备真实外部通知送达证明。
-          </p>
-        </section>
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>关联发件与回复状态</h2><small>F06 / F08 同一任务 ID · 真实 SQLite</small></div>
-          {linkedMessages.length ? linkedMessages.map(message=>
-            <div key={message.message_id} className="boss-feedback">
-              <div><span className="boss-tag boss-tag-blue">{message.type}</span>
-                <small>{displayTime(message.sent_at)}</small></div>
-              <div className="boss-kv"><span>消息编号</span><strong>{message.message_id}</strong></div>
-              <p>{message.body}</p><p>本人授权 {message.authorization_id??"当时未记录"}</p>
-              <div className="boss-kv"><span>收件人</span><strong>{message.recipient_id}</strong></div>
-              <div className="boss-kv"><span>模拟发送</span><strong>{message.send_state}</strong></div>
-              <div className="boss-kv"><span>真实送达</span><strong>{message.delivery_state}</strong></div>
-              <div className="boss-kv"><span>回复</span><strong>{message.reply_state}</strong></div>
-            </div>
-          ) : <p className="boss-helper">当前交办尚无已保存的模拟发件；任务创建并不等于发送。</p>}
-          <p className="boss-helper">
-            两类消息分别来自 F06 交办发件箱和 F08 后续发件箱；
-            NOT_VERIFIED 表示没有真实外部送达证明，不可解释为已经送达。
-          </p>
-          {messagesEnabled&&<div className="boss-actions">
-            <button type="button" className="boss-btn" onClick={onViewMessages}>
-              <MessageSquareText size={15}/> 查看 F08 消息与回复
-            </button>
-          </div>}
-        </section>
-        <section className="boss-panel">
-          <div className="boss-panel-head"><h2>反馈与本人决定</h2><small>进展、结果提交、确认完成分别记录</small></div>
-          {feedback.length ? feedback.map(f=><div className="boss-feedback" key={f.feedback_id}>
-            <div><span className="boss-tag boss-tag-amber">{f.kind}</span><small>{displayTime(f.submitted_at)}</small></div>
-            <p>{f.content||"未提供正文"}</p>
-            <small>作者：{f.author_contact_id||"待核查"} · 提交时任务版本：{f.task_version??"未知"} · {f.historical_only?"仅保留历史":"当前反馈"}</small>
-            <div className="boss-actions">{f.evidence_refs?.map(id=><button className="boss-btn" key={id} type="button" onClick={()=>onViewSource(id)}>查看反馈原文 {id} · v{f.evidence_versions?.[id]??"未知"} · {f.evidence_states?.[id]??"待核查"}</button>)}</div>
-            {f.proposed_due_at && <small>申请新期限：{displayTime(f.proposed_due_at)}</small>}
-          </div>):<p className="boss-helper">暂无署名反馈。不能提前认定完成。</p>}
-          <div className="boss-actions">
-            <button className="boss-btn boss-btn-primary" type="button"
-              disabled={!current||current.status!=="RESULT_SUBMITTED"||!completed||current.source_reference_state!=="CURRENT"||current.result_evidence_requires_resubmission||busy} onClick={prepareComplete}>
-              <CheckCircle2 size={15}/> 核查证据并确认完成</button>
-          </div>
-          {current?.result_evidence_requires_resubmission&&<p role="status">当前结果证据已经变化，需要负责人重新提交，确认来源不能代替重新提交结果。</p>}
-          {current?.status==="RESULT_SUBMITTED"&&!completed&&<p role="status">当前结果缺少完成证据，需要负责人补充并重新提交。</p>}
-          <div className="boss-form-grid boss-form-below">
-            <label>新期限（北京时间）<input type="datetime-local" value={newDue} onChange={e=>onDraftChange("newDue",e.target.value)}/></label>
-          </div>
-          {extension&&<p>当前延期申请 {extension.feedback_id} · 申请期限 {displayTime(extension.proposed_due_at)} · 理由 {extension.content}；当前期限仍为 {displayTime(current?.due_at)}。</p>}
-          <label className="boss-label">本人决定理由</label>
-          <input aria-label="本人决定理由" className="boss-single-input" value={reason} onChange={e=>onDraftChange("reason",e.target.value)} placeholder="填写延期决定或取消的具体理由"/>
-          <div className="boss-actions"><button type="button" className="boss-btn" disabled={!extension||busy||current?.source_reference_state!=="CURRENT"||["CANCELED","COMPLETED_CONFIRMED"].includes(current?.status??"")}
-            onClick={()=>prepareExtend("APPROVE")}><Clock3 size={15}/> 本人核查并批准延期</button>
-            <button type="button" className="boss-btn" disabled={!extension||busy||["CANCELED","COMPLETED_CONFIRMED"].includes(current?.status??"")} onClick={()=>prepareExtend("REJECT")}>本人核查并拒绝延期</button></div>
-          {extensionHistory?.decisions.map(decision=><article className="boss-feedback" key={decision.decision_id}><p>延期决定 {decision.decision} · {decision.feedback_id} · {displayTime(decision.decided_at)}</p><p>原期限 {displayTime(decision.old_due_at)} · 决定后期限 {displayTime(decision.new_due_at)} · 版本 {decision.previous_task_version} → {decision.task_version}</p><p>申请理由：{decision.request_reason}</p><p>本人理由：{decision.reason??"当时未记录"}</p></article>)}
-          <div className="boss-actions"><button type="button" className="boss-btn" onClick={prepareCancel}
-            disabled={!current||busy||["CANCELED","COMPLETED_CONFIRMED"].includes(current.status)}>
-            <XCircle size={15}/> 核对并取消交办</button></div>
-        </section>
-        {error && <div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
-        {notice && <div role="status" className="boss-status boss-status-ok"><CheckCircle2 size={16}/>{notice}</div>}
-      </div>
-    </div>
-    {dialog}
-    {recovery}
+    <BossAssignmentDetails rows={rows} selectedTaskId={selectedTaskId} current={current} context={context} draft={draft} feedback={feedback} messages={linkedMessages} taskDue={taskDue}
+      extensions={currentExtensions} extension={extension} completed={completed} clock={clock} overdue={overdue} sourceIds={sourceIds} meetingId={meetingId} eventIds={eventIds}
+      editable={editable} loading={loading} stale={stale} busy={busy} morningBlocked={Boolean(morningReference&&!morningReady)} messagesEnabled={messagesEnabled}
+      sourceReview={sourceReview} conversation={conversation} edit={edit} onSelect={onSelectTask} onReload={onReload} onSource={onViewSource} onNavigate={onNavigate} onNew={onNew}
+      onDiscard={()=>setDiscardOpen(true)} onCoordinator={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenCoordinatorPicker();}} onDue={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenDuePicker();}}
+      onMessages={onViewMessages} onCreate={prepareCreate} onSend={prepareSend} onNudge={prepareNudge} onFollowup={prepareFollowup} onComplete={prepareComplete} onExtend={prepareExtend} onCancel={prepareCancel}/>
+    {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
+    {notice&&<div role="status" className="boss-status boss-status-ok"><CheckCircle2 size={16}/>{notice}</div>}
+    {dialog}{recovery}
+    <Dialog.Root open={discardOpen} onOpenChange={setDiscardOpen}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>清除未提交编辑</Dialog.Title><Dialog.Description>清除当前交办表单中尚未提交的内容，并采用当前读取的任务及资料版本。已经保存的任务和反馈继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button type="button" className="boss-btn">保留编辑</button></Dialog.Close><button type="button" className="boss-btn boss-btn-primary" disabled={busy} onClick={()=>{onDiscard();setError("");setDiscardOpen(false);}}>确认清除编辑</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
 }
 

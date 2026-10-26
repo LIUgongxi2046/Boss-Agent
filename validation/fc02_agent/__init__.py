@@ -8,6 +8,7 @@ from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.context import current_request_context
 
 from business import SPEC, OPERATIONS, checksum, encode, require
+from boss_execution_scope import NAMESPACE
 from boss_runtime_records import ATTRIBUTE, RuntimeBinding
 from model_probe import BusinessTool
 
@@ -111,7 +112,7 @@ class Fc02Tool(Tool):
 
     @property
     def description(self):
-        return BusinessTool(self.name, self.store, {}, {}, []).description
+        return BusinessTool(self.name, self.store, {"execution_namespace": NAMESPACE}, {}, []).description
 
     def cast_params(self, params):
         return params
@@ -120,7 +121,7 @@ class Fc02Tool(Tool):
         context = self.context_provider()
         require(isinstance(context, Fc02Context) and context.role == "BOSS" and context.active is True,
                 "BI本人认证请求无效", web.HTTPForbidden)
-        require(context.namespace == "ui-check" and context.request_id and context.session_id,
+        require(context.namespace == NAMESPACE and context.request_id and context.session_id,
                 "当前BI执行范围无效", web.HTTPForbidden)
         require(isinstance(context.query_bindings, tuple) and all(isinstance(item, QueryBinding) for item in context.query_bindings)
                 and isinstance(context.readable_query_ids, frozenset), "BI可信请求结构无效", web.HTTPBadRequest)

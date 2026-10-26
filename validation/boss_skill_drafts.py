@@ -18,6 +18,7 @@ from packaging.version import VERSION_PATTERN, Version
 
 from boss_native_skills import HUMAN_ONLY_OPERATIONS, _require_role
 from business import checksum, now
+from boss_execution_scope import NAMESPACE
 from boss_knowledge_ingestion import POTENTIAL_SECRET
 
 
@@ -30,7 +31,7 @@ def digest(text):
 
 
 class BossSkillDrafts:
-    def __init__(self, store, catalog, config_path, namespace="ui-check"):
+    def __init__(self, store, catalog, config_path, namespace=NAMESPACE):
         self.store, self.catalog = store, catalog
         self.config_path = Path(config_path)
         self.namespace = namespace

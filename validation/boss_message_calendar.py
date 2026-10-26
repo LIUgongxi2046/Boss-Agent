@@ -18,7 +18,8 @@ from business import checksum, now, require
 from boss_meetings import meeting_materials
 from boss_source_access import require_current_business_source
 
-NS = "ui-check"
+from boss_execution_scope import NAMESPACE as NS
+from boss_calendar_state import current_calendar
 MAX_TEXT = 2400
 
 
@@ -245,11 +246,7 @@ def message_reply(api, db, data, payload):
 
 
 def _calendar(db, data):
-    return _exists(db, "private_calendar", "private-1") or {
-        **data["private_calendar"],
-        "version": "1", "status": "ACTIVE",
-        "title": "", "location": "", "attachment_refs": [],
-    }
+    return current_calendar(db, NS, data)
 
 
 
@@ -293,8 +290,10 @@ def calendar_save(api, db, data, payload):
         "attachment_refs", "acknowledge_conflict",
     })
     current = _calendar(db, data)
-    require(current["status"] == "ACTIVE",
+    require(current is None or current["status"] == "ACTIVE",
             "已删除的私人日程不能在旧标识上恢复")
+    if current is None:
+        current = {"calendar_id": "private-1", "owner_id": data["owner_id"], "version": "0"}
     require(current["version"] == payload["expected_version"],
             "私人日程版本变化，须重新读取")
     tz = payload["timezone"]
@@ -367,6 +366,7 @@ def calendar_share(api, db, data, payload):
         "recipient_id", "purpose", "expires_at", "fields",
     })
     current = _calendar(db, data)
+    require(current is not None, "当前没有可分享的私人安排", web.HTTPNotFound)
     require(current["status"] == "ACTIVE"
             and current["version"] == payload["expected_version"],
             "私人日程版本已变化，须重新确认")
@@ -431,6 +431,7 @@ def calendar_revoke(api, db, data, payload):
 def calendar_delete(api, db, data, payload):
     api._exact(payload, {"client_request_id","expected_version"})
     current = _calendar(db, data)
+    require(current is not None, "当前没有可删除的私人安排", web.HTTPNotFound)
     require(current["status"] == "ACTIVE"
             and current["version"] == payload["expected_version"],
             "日程版本变化或此前已删除")
