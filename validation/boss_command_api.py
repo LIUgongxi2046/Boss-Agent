@@ -630,8 +630,10 @@ class BossCommandAPI:
             "source_refs": payload["source_refs"], "task_id": result["task_id"],
             "plan_id": None, "meeting_id": meeting["meeting_id"], "source_type": "SIMULATED",
         })
-        return {"record_id": identifier, "version": "1", "state": "TASK_CREATED", "kind": "COORDINATE",
-                "title": payload["action_code"], "created_at": now(), "query_id": payload["query_id"],
+        return {"record_id": identifier, "version": "1", "record_version": "1", "state": "TASK_CREATED",
+                "kind": "COORDINATE", "title": payload["action_code"], "created_at": now(),
+                "page_id": page, "query_id": payload["query_id"], "execution_namespace": NAMESPACE,
+                "action_code": payload["action_code"], "messages_sent": 0, "external_channel_invoked": False,
                 "source_ids": [pack["source_id"]], "task_id": result["task_id"], "plan_id": None,
                 "meeting_id": meeting["meeting_id"], "task_status": result["status"]}
 

@@ -65,8 +65,10 @@ def save_decision(api, db, snapshot, payload):
         "task_id": None, "plan_id": None, "meeting_id": None, "source_type": "SIMULATED",
     }
     api.store.put(db, NAMESPACE, RECORD_KIND, identifier, record)
-    return {"record_id": identifier, "version": "1", "state": "RECORDED", "kind": "DECISION",
-            "title": record["title"], "created_at": record["created_at"], "query_id": record["query_id"],
+    return {"record_id": identifier, "version": "1", "record_version": "1", "state": "RECORDED",
+            "kind": "DECISION", "title": record["title"], "created_at": record["created_at"],
+            "page_id": page, "query_id": record["query_id"], "execution_namespace": NAMESPACE,
+            "action_code": payload["action_code"], "messages_sent": 0, "external_channel_invoked": False,
             "source_ids": record["source_ids"], "task_id": None, "plan_id": None, "meeting_id": None}
 
 
@@ -131,21 +133,45 @@ def schedule_review(api, db, snapshot, payload):
     require(1 <= len(evidence) <= 8 and all(0 < len(item) <= 160 for item in evidence),
             "证据要求缺少或无效", web.HTTPBadRequest)
     identifier = "sector-" + str(uuid.uuid4())
+    event_id = "sector-review-" + str(uuid.uuid4())
+    plan_id = "sector-review-plan-" + str(uuid.uuid4())
+    plan_content = {"plan_id": plan_id, "event_ids": [event_id], "timezone": payload["timezone"],
+                    "not_before": payload["due_at"], "purpose": "专题复查：" + purpose.strip()}
+    authorization_id = api._authorize(db, "owner_plan.save", plan_content, plan_id, "1")
+    api.store.put(db, NAMESPACE, "owner_plan", plan_id, {
+        **plan_content, "version": "1", "event_versions": {event_id: "1"}, "state": "ACTIVE",
+        "authorization_id": authorization_id, "owner_id": snapshot["owner_id"],
+        "source_type": "SIMULATED", "updated_at": now(), "execution_owner": "CronService",
+    })
+    api.store.put(db, NAMESPACE, "event", event_id, {
+        "event_id": event_id, "version": "1", "state": "OPEN", "impact": "NORMAL",
+        "due_at": payload["due_at"], "owner_id": snapshot["owner_id"], "owner_plan_id": plan_id,
+        "source_type": "SIMULATED", "generated_by": "SECTOR_REVIEW",
+        "source_refs": [{"source_id": document["source_id"], "version": document["version"]}],
+    })
+    if db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='rules' AND id='current'",
+                  (NAMESPACE,)).fetchone() is None:
+        api.store.put(db, NAMESPACE, "rules", "current", {
+            "version": "1", "cooldown_seconds": 3600, "quiet_start": 22, "quiet_end": 7,
+            "timezone": "Asia/Shanghai", "important_escalation": False,
+        })
     record = {
         "record_id": identifier, "version": "1", "kind": "REVIEW", "title": payload["action_code"],
-        "state": "REVIEW_REQUESTED", "created_at": now(), "page_id": page,
+        "state": "REVIEW_SCHEDULED", "created_at": now(), "page_id": page,
         "query_id": payload["query_id"], "dataset_version": snapshot["dataset_version"],
         "namespace": NAMESPACE, "purpose": purpose.strip(), "expected_output": output.strip(),
         "coordinator_id": payload["coordinator_id"], "due_at": payload["due_at"], "timezone": payload["timezone"],
         "evidence_requirements": evidence, "source_ids": [document["source_id"]],
-        "source_refs": payload["source_refs"], "task_id": None, "plan_id": None, "meeting_id": None,
-        "scheduled_by_plan_service": False, "source_type": "SIMULATED",
+        "source_refs": payload["source_refs"], "task_id": None, "plan_id": plan_id,
+        "event_id": event_id, "meeting_id": None,
+        "scheduled_by_plan_service": True, "source_type": "SIMULATED",
     }
     api.store.put(db, NAMESPACE, RECORD_KIND, identifier, record)
-    return {"record_id": identifier, "version": "1", "state": "REVIEW_REQUESTED", "kind": "REVIEW",
-            "title": payload["action_code"], "created_at": record["created_at"],
-            "query_id": payload["query_id"], "source_ids": record["source_ids"],
-            "task_id": None, "plan_id": None, "meeting_id": None}
+    return {"record_id": identifier, "version": "1", "record_version": "1", "state": "REVIEW_SCHEDULED",
+            "kind": "REVIEW", "title": payload["action_code"], "created_at": record["created_at"],
+            "page_id": page, "query_id": payload["query_id"], "execution_namespace": NAMESPACE,
+            "action_code": payload["action_code"], "messages_sent": 0, "external_channel_invoked": False,
+            "source_ids": record["source_ids"], "task_id": None, "plan_id": plan_id, "meeting_id": None}
 
 
 MEETING_LABELS = {"准备会面", "准备跨时区会议"}
@@ -215,7 +241,9 @@ def prepare_meeting(api, db, snapshot, payload):
         "scheduled_by_meeting_service": False, "message_sent": False, "source_type": "SIMULATED",
     }
     api.store.put(db, NAMESPACE, RECORD_KIND, identifier, record)
-    return {"record_id": identifier, "version": "1", "state": "DRAFT_SAVED", "kind": "MEETING",
-            "title": payload["action_code"], "created_at": record["created_at"],
-            "query_id": payload["query_id"], "source_ids": record["source_ids"],
-            "task_id": None, "plan_id": None, "meeting_id": None, "message_sent": False}
+    return {"record_id": identifier, "version": "1", "record_version": "1", "state": "DRAFT_SAVED",
+            "kind": "MEETING", "title": payload["action_code"], "created_at": record["created_at"],
+            "page_id": page, "query_id": payload["query_id"], "execution_namespace": NAMESPACE,
+            "action_code": payload["action_code"], "messages_sent": 0, "external_channel_invoked": False,
+            "source_ids": record["source_ids"], "task_id": None, "plan_id": None, "meeting_id": None,
+            "message_sent": False}

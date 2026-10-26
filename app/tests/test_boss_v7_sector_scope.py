@@ -155,12 +155,24 @@ def test_owner_review_request_is_recorded_without_plan(store):
                "evidence_requirements": "批次回访记录"}
     status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.review.schedule", payload)
     assert status == 200, receipt
-    assert receipt["kind"] == "REVIEW" and receipt["state"] == "REVIEW_REQUESTED"
-    assert receipt["plan_id"] is None and receipt["task_id"] is None
+    assert receipt["kind"] == "REVIEW" and receipt["state"] == "REVIEW_SCHEDULED"
+    assert receipt["plan_id"] and receipt["task_id"] is None
+    assert receipt["record_version"] == "1" and receipt["page_id"] == "F15"
+    assert receipt["execution_namespace"] == "ui-check" and receipt["action_code"] == "安排复查"
+    assert receipt["messages_sent"] == 0 and receipt["external_channel_invoked"] is False
     projection = BossSectorAPI(store).serve("BOSS", query(page="F15"))[1]
     follow = next(row for row in projection["followups"] if row["record_id"] == receipt["record_id"])
-    assert follow["kind"] == "REVIEW"
+    assert follow["kind"] == "REVIEW" and follow["plan_id"] == receipt["plan_id"]
     assert any(action["kind"] == "REVIEW" and action["allowed"] for action in projection["followup_actions"])
+    with store.connect() as db:
+        plan = store.get(db, "ui-check", "owner_plan", receipt["plan_id"])
+        event_id = plan["event_ids"][0]
+        store.control_clock(db, "ui-check", {"at": "2026-10-25T10:00:00+08:00"})
+        store.dispatch_due_in_transaction(db, "ui-check")
+        notification = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='notification' AND id=?",
+                                  ("ui-check", event_id + ":1")).fetchone()
+    assert notification is not None
+    assert json.loads(notification[0])["event_id"] == event_id
 
 
 def test_owner_meeting_draft_is_saved_without_meeting_or_message(store):

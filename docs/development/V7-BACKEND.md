@@ -243,7 +243,9 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_v7_sector_actions.py`实现本人专题决定命令`boss.sector.decision.save`，仅对具备“记录资源决定”“调整项目”“记录安排”动作的页面开放。保存前核查页面、执行空间、数据集版本、由当前条件计算的查询编号、动作类别、来源版本以及目的与决定正文；版本不一致返回冲突。决定保存为带记录编号、版本、查询编号和来源的正式记录，不创建任务、计划或会议，也不发送消息。
 
-专题读取返回`followup_actions`与`followups`：决定、协调、复查与会议类动作在资料包可用时开放；已保存记录按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。
+专题读取返回`followup_actions`与`followups`：决定、协调、复查与会议类动作在资料包可用时开放；已保存记录按页面列出并保留原查询编号。所有专题操作回执包含`record_id`、`record_version`、`page_id`、`query_id`、`execution_namespace`、`action_code`、`messages_sent=0`与`external_channel_invoked=false`，页面据此核对原请求与保存后果。
+
+2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。
 
 ## 专题会议草稿
 
@@ -255,7 +257,9 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss.sector.review.schedule`面向“安排复查”“安排后续查询”“继续验证”“准备经营复查”。保存前核查页面、执行空间、数据集版本、查询编号、动作类别、来源版本、目的与预期产物、复查负责人、复查时间与证据要求；复查时间必须使用明确IANA时区、晚于业务时钟且不超过366天。
 
-复查请求保存为`REVIEW_REQUESTED`记录，包含复查时间、负责人、证据与来源，列出在专题后续记录中；该记录不创建任务或本人计划，计划调度服务未接入时不声称已经排程。2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`8项通过，耗时3.80秒，日志`.work/takeover/sector-review-tests.log`；认证后F15显示“安排复查”可用，页面填写复查信息并确认提交后生成`REVIEW_REQUESTED`记录，任务与计划编号保持为空，日志`.work/takeover/sector-review-http.log`与`.work/takeover/sector-review-ui.log`。
+复查保存为本人计划与复查事件：计划记录复查时间、用途与事件版本，事件记录到期时间与来源，均使用本人授权；专题记录保存为`REVIEW_SCHEDULED`并关联计划编号，可从专题后续记录进入本人计划页面。业务时钟到达复查时间后，CronService按当前规则判断免打扰与冷却并写入通知与投递记录，不执行外部消息发送。
+
+2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`9项通过，耗时2.24秒，日志`.work/takeover/sector-review-tests.log`；检查覆盖计划创建、事件版本、专题记录关联、回执字段，以及时钟推进后到期派发产生通知。认证后F15显示“安排复查”可用；页面提交后回执核对通过、计划出现在本人计划页面，后续记录为`REVIEW_SCHEDULED`并关联计划编号，日志`.work/takeover/sector-review-http.log`与`.work/takeover/sector-review-ui.log`。
 
 ## 专题协调交办
 
