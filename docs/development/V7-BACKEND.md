@@ -217,7 +217,7 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 
 注入事件同时写入带到期时间的业务事件，到期后由CronService按当前规则判断免打扰与冷却并写入通知与投递记录；读取时按实际投递把通知结果标记为`SCHEDULED`、`PENDING_CRON`或`DELIVERED`。时钟推进采用当前版本、只允许前进且单次不超过366天。
 
-2026-10-26检查`app/tests/test_boss_v7_simulation_events.py`6项通过，耗时2.22秒，日志`.work/takeover/simulation-events-tests.log`；检查覆盖注入后的通知排程、时钟到达后派发与投递记录。事件对任务及Agent的实际效果仍待后续接入，完整产品未交付。
+2026-10-26检查`app/tests/test_boss_v7_simulation_events.py`6项通过，耗时2.22秒，日志`.work/takeover/simulation-events-tests.log`；检查覆盖注入后的通知排程、时钟到达后派发与投递记录。认证后的A04页面注入事件后显示通知`SCHEDULED`，推进业务时钟后调度器完成派发，读取记录显示`DELIVERED`与通知编号，日志`.work/takeover/simulation-events-ui.log`。事件对任务及Agent的实际效果仍待后续接入，完整产品未交付。
 
 ## 会话授权摘要
 

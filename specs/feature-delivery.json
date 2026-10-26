@@ -596,7 +596,7 @@
       "regression_log": ".work/takeover/simulation-events-regression-20261026.log",
       "authenticated_http": "200",
       "http_log": ".work/takeover/simulation-events-http.log",
-      "authenticated_ui": "EVENT_TYPE_TARGET_AUTHOR_SOURCE_CHAIN_RENDERED",
+      "authenticated_ui": "INJECT_SCHEDULED_AND_DELIVERED_AFTER_CLOCK_ADVANCE",
       "ui_log": ".work/takeover/simulation-events-ui.log",
       "dispatched_notification": "SCHEDULED_THEN_DELIVERED_AT_DUE",
       "effects": [
