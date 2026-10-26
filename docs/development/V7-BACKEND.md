@@ -261,7 +261,7 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 复查保存为本人计划与复查事件：计划记录复查时间、用途与事件版本，事件记录到期时间与来源，均使用本人授权；专题记录保存为`REVIEW_SCHEDULED`并关联计划编号，可从专题后续记录进入本人计划页面。业务时钟到达复查时间后，CronService按当前规则判断免打扰与冷却并写入通知与投递记录，不执行外部消息发送。
 
-2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`9项通过，耗时2.24秒，日志`.work/takeover/sector-review-tests.log`；检查覆盖计划创建、事件版本、专题记录关联、回执字段，以及时钟推进后到期派发产生通知。认证后F15显示“安排复查”可用；页面提交后回执核对通过、计划出现在本人计划页面，后续记录为`REVIEW_SCHEDULED`并关联计划编号，日志`.work/takeover/sector-review-http.log`与`.work/takeover/sector-review-ui.log`。
+复查计划可在本人计划页面取消；取消后计划状态为`CANCELED`，到期不再派发。2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`10项通过，耗时2.45秒，日志`.work/takeover/sector-review-tests.log`；检查覆盖计划创建、事件版本、专题记录关联、回执字段、时钟推进后到期派发产生通知，以及取消后计划状态。认证后F15显示“安排复查”可用；页面提交后回执核对通过、计划出现在本人计划页面，后续记录为`REVIEW_SCHEDULED`并关联计划编号，日志`.work/takeover/sector-review-http.log`与`.work/takeover/sector-review-ui.log`。
 
 ## 专题协调交办
 

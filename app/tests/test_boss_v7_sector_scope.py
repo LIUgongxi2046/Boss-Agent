@@ -200,6 +200,28 @@ def test_owner_meeting_draft_is_saved_without_meeting_or_message(store):
     assert status == 409, body
 
 
+def test_scheduled_review_plan_can_be_cancelled_by_owner(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F15",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": query_id_for("F15", {}, None), "action_code": "安排复查",
+               "filters": {}, "overview_reference": None,
+               "source_refs": [{"source_id": "sector-f15-a", "version": "1"}],
+               "purpose": "复查季节供货", "timezone": "Asia/Shanghai",
+               "coordinator_id": "coordinator-1", "coordinator_version": "1",
+               "due_at": "2026-10-25T10:00:00+08:00", "expected_output": "复查记录",
+               "evidence_requirements": "批次回访记录"}
+    status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.review.schedule", payload)
+    assert status == 200, receipt
+    status, cancelled = BossCommandAPI(store).execute("BOSS", "boss.owner.plan.cancel", {
+        "client_request_id": str(__import__("uuid").uuid4()), "plan_id": receipt["plan_id"],
+        "expected_version": "1"})
+    assert status == 200, cancelled
+    assert cancelled["state"] == "CANCELED"
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "owner_plan", receipt["plan_id"])["state"] == "CANCELED"
+
+
 def test_stale_query_and_other_roles_are_rejected(store):
     seed(store)
     payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",
