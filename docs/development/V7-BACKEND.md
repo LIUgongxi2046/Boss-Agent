@@ -297,6 +297,18 @@ Agent工具范围由`RuntimeValues.tool_scope`限制为1至19项，并与工具�
 
 2026-10-26检查原生会话、专题工具与专题范围共50项通过，耗时31.48秒，日志`.work/takeover/sector-conversation-filters-tests.log`；会话询问“水产季节当前指标与明细”时调用`bossSectorRead`读取F15，回答包含指标与明细数量；询问“水产季节 华东 当前指标与明细”时调用参数带区域筛选，回答明细3条，运行记录保存参数摘要，未创建任务或授权。
 
+## 真实模型接入
+
+业务数据全部来自模拟资料包与模拟业务对象。模型调用使用服务端配置的 DeepSeek 凭据：密钥保存在项目根目录的 `boss agent.md` 与 `validation/connection.json` 指向的引用文件，两处均被 Git 忽略；应用启动时由 `connection.settings()` 读入进程环境，代码与文档不保存密钥。
+
+A08 模型连接使用 Provider `deepseek`、`chat_completions`、model_id `deepseek-flash` 与凭据引用 `DEEPSEEK_API_KEY`。实际连接验证通过文本回答、工具调用与流式输出三项能力，启用后运行方式为 `EXTERNAL_PROVIDER`，运行记录保存连接编号与版本。
+
+A08 运行配置启用 19 项工具，包含会话读取工具与 `bossSectorRead`；工作资料读取范围为 `WORKSPACE_PROJECTIONS`，启用 12 个页面资料投影。真实模型可以按当前工具范围选择读取参数，工具 Schema 与各工具本人范围继续生效；写入动作仍通过业务工具与本人授权。
+
+2026-10-26 完成实际模型会话：询问“水产季节当前指标与明细”时模型执行 3 次 `bossSectorRead`，回答引用 F15 订单趋势“2026-08 为 500.9 吨、2026-09 为 420.6 吨、2026-10 为 2166.6 吨”，运行记录状态为完成，日志`.work/takeover/chat-answer.log`；模型连接验证与运行方式记录见`.work/takeover/deepseek-validation-poll.log`与`.work/takeover/deepseek-activation-ui.log`。
+
+检查原生会话、专题工具与运行配置共157项通过，1项历史 Schema 基线检查因仓库在该基线之后已更新记录定义而未通过，日志`.work/takeover/conversation-suite-model.log`。Doubao 凭据保存在同一文件，接入需要 Ark 端点编号与对应 Provider 适配，当前未启用。
+
 ## 继续条件与未接入范围
 
 会议草稿当前保存为专题记录，不创建正式会议；正式接入需要多会议模型、参会人与邀请权限的产品决定，当前不把草稿声明为会议。

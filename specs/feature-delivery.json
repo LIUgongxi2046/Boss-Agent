@@ -743,6 +743,22 @@
       "active_scope": "GOVERNED_BY_A08_CONFIGURATION",
       "full_product": "NOT_VERIFIED"
     },
+    "backend_model_integration_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "DEEPSEEK_EXTERNAL_PROVIDER_ACTIVE_WITH_SIMULATED_DATA",
+      "provider": "deepseek",
+      "model_id": "deepseek-flash",
+      "runtime_mode": "EXTERNAL_PROVIDER",
+      "connection_validation": "PASSED_TEXT_TOOL_STREAM",
+      "runtime_tools": 19,
+      "workspace_mode": "WORKSPACE_PROJECTIONS",
+      "conversation_tool_call": "THREE_BOSS_SECTOR_READ_STEPS",
+      "answer_evidence": ".work/takeover/chat-answer.log",
+      "checks": "157_PASSED_1_HISTORICAL_BASELINE_FAILED",
+      "check_log": ".work/takeover/conversation-suite-model.log",
+      "credentials": "REFERENCE_ONLY_OUTSIDE_GIT",
+      "doubao": "NOT_ENABLED_REQUIRES_ARK_ENDPOINT"
+    },
     "backend_sector_decision_validation": {
       "task_id": "V7-BACKEND",
       "status": "OWNER_DECISION_RECORDS_IMPLEMENTED_OTHER_ACTIONS_PENDING",
