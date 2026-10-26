@@ -164,7 +164,7 @@ class ConversationQueryTool(ConversationReadTool):
         require(not list(Draft202012Validator(self.parameters, format_checker=FormatChecker()).iter_errors(params)),
                 "会话查询参数不符合正式Schema", web.HTTPBadRequest)
         context = self.scope.current()
-        require((self.name, checksum(params)) in context.allowed_calls, "查询参数超出本次明确范围", web.HTTPForbidden)
+        require(self.name in context.allowed_tools, "查询工具超出本次会话范围", web.HTTPForbidden)
         result = await self.delegate.execute(**params)
         require(self.scope.current() == context, "查询期间当前范围已经变化", web.HTTPConflict)
         return result

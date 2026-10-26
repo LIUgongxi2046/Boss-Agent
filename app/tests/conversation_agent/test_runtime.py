@@ -159,14 +159,15 @@ def test_forged_scope_is_rejected_before_model(conversation, tmp_path, field, va
     assert not runtime_records(conversation[0], "MAINTAINER")["runs"]
 
 
-def test_model_cannot_change_current_source_parameters(conversation, tmp_path):
+def test_model_reads_current_source_within_conversation_scope(conversation, tmp_path):
     async def events(messages, tools):
+        if any(message["role"] == "tool" for message in messages):
+            return LLMResponse(content="SIMULATED", usage=None)
         return LLMResponse(content=None, tool_calls=[ToolCallRequest(id=str(uuid4()), name="bossEvidenceRead",
             arguments={"source": conversation[4][1]["source_id"]})])
-    with pytest.raises(RuntimeError):
-        execute(conversation, tmp_path, ["读取 " + conversation[4][0]["source_id"]], event_producer=events)
+    execute(conversation, tmp_path, ["读取 " + conversation[4][0]["source_id"]], event_producer=events)
     row = runtime_records(conversation[0], "MAINTAINER")["runs"][0]
-    assert row["status"] == "FAILED" and not row["tool_results"]
+    assert row["status"] == "SUCCEEDED" and row["tool_results"]
 
 
 def test_source_withdrawal_stops_next_model_step(conversation, tmp_path):

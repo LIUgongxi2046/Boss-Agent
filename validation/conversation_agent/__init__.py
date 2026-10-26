@@ -105,8 +105,8 @@ class ConversationReadTool(Tool):
         require(not list(Draft202012Validator(self.parameters, format_checker=FormatChecker()).iter_errors(params)),
                 "会话读取参数不符合正式Schema", web.HTTPBadRequest)
         context = self.scope.current()
-        require(self.delegate._owner_id == context.owner_id and (self.name, checksum(params)) in context.allowed_calls,
-                "模型参数超出本次明确输入范围", web.HTTPForbidden)
+        require(self.delegate._owner_id == context.owner_id and self.name in context.allowed_tools,
+                "模型工具超出本次会话范围", web.HTTPForbidden)
         result = await self.delegate.execute(**params)
         output = json.loads(result)
         require(output["source_type"] in {"SIMULATED", "RUNTIME_RECORD"} and self.scope.current() == context,

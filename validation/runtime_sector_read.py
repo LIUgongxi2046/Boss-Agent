@@ -8,8 +8,10 @@ from urllib.parse import urlencode
 from aiohttp import web
 
 from business import encode, require
-from boss_sector_api import BossSectorAPI, SECTORS
+from boss_sector_api import CATALOGUE, BossSectorAPI, SECTORS
 from runtime_page_read_tools import _BossPageReadTool
+
+PAGE_TITLES = "；".join(page + "=" + str(CATALOGUE[page]["title"]) for page in sorted(SECTORS))
 
 
 class BossSectorReadTool(_BossPageReadTool):
@@ -25,8 +27,10 @@ class BossSectorReadTool(_BossPageReadTool):
     @property
     def parameters(self):
         return {"type": "object",
-                "properties": {"page": {"type": "string", "enum": sorted(SECTORS)},
-                               "filters": {"type": "object", "additionalProperties": {"type": "string"}}},
+                "properties": {"page": {"type": "string", "enum": sorted(SECTORS),
+                                        "description": "专题页面编号与标题对照：" + PAGE_TITLES},
+                               "filters": {"type": "object", "additionalProperties": {"type": "string"},
+                                           "description": "可选筛选项，键为页面筛选项名称，值为对应取值"}},
                 "required": ["page"], "additionalProperties": False}
 
     async def execute(self, page, filters=None):

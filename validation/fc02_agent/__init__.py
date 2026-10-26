@@ -108,7 +108,7 @@ class Fc02Tool(Tool):
                 injected = {"envelope", "authorization_id", "idempotency_key"}
                 definition["properties"] = {key: value for key, value in definition["properties"].items() if key not in injected}
                 definition["required"] = [key for key in definition.get("required", []) if key not in injected]
-        return {"$ref": "#/$defs/" + ref, "$defs": definitions}
+        return {"type": "object", "$ref": "#/$defs/" + ref, "$defs": definitions}
 
     @property
     def description(self):

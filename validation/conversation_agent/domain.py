@@ -39,7 +39,8 @@ class ConversationDomainReadTool(_BossPageReadTool):
     def parameters(self):
         artifact = {key: deepcopy(value) for key, value in SCHEMA["$defs"]["ArtifactInput"]["properties"].items()
                     if key not in {"session_id", "chat_id"}}
-        return {"$defs": deepcopy(SCHEMA["$defs"]), "oneOf": [branch(name) for name in ("runs", "messages", "attachments")]
+        return {"type": "object", "$defs": deepcopy(SCHEMA["$defs"]),
+                "oneOf": [branch(name) for name in ("runs", "messages", "attachments")]
                 + [branch("artifact", artifact), branch("record", {"kind": {"enum": ["task", "message", "message_draft"]},
                     "id": {"$ref": "#/$defs/Id"}})]}
 
