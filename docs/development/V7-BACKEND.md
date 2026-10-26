@@ -205,7 +205,9 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 
 版本目录来自正式状态：数据快照为当前执行空间的`selection` v1，模型为当前配置`deepseek-flash` v1，Prompt使用当前已启用版本，未配置时明确标注“内置运行时提示 vbuiltin-1”；SOP版本读取`agent/skills`中SOP01—SOP13的`0.1.0`。每次尝试保存全部断言预期与实际观察、证据编号、耗时与失败清单；没有模型请求时费用保持null、覆盖标记`NO_MODEL_REQUESTS`。失败的断言保存为失败记录，已结束的尝试不能取消；重置保留全部历史并新建尝试。评分与断言不进入Agent上下文，尝试记录不改写业务对象。
 
-2026-10-26检查`app/tests/test_boss_v7_evaluation.py`4项通过，耗时3.53秒，日志`.work/takeover/evaluation-tests.log`；与会议资料目录、会议审批、纪要交办及V7服务回归65项通过，耗时12.27秒，日志`.work/takeover/evaluation-regression-20261026.log`。认证后的运行实例读取返回200，A16页面显示两个任务集、数据快照、模型、Prompt与13项SOP版本，日志`.work/takeover/evaluation-http.log`与`.work/takeover/evaluation-ui.log`。没有执行真实模型请求；实际评测运行与完整评分隔离验收继续待执行。
+2026-10-26检查`app/tests/test_boss_v7_evaluation.py`4项通过，耗时3.53秒，日志`.work/takeover/evaluation-tests.log`；与会议资料目录、会议审批、纪要交办及V7服务回归65项通过，耗时12.27秒，日志`.work/takeover/evaluation-regression-20261026.log`。认证后的运行实例读取返回200，A16页面显示两个任务集、数据快照、模型、Prompt与13项SOP版本，日志`.work/takeover/evaluation-http.log`与`.work/takeover/evaluation-ui.log`。
+
+2026-10-26 A16页面实际选择任务集、数据快照、模型、Prompt与SOP，确认配对条件后通过原生写入启动评测。服务记录尝试`eval-…`，状态`PASSED`，包含4项断言与4份证据，`usage_coverage`为`NO_MODEL_REQUESTS`；没有执行真实模型请求。日志`.work/takeover/evaluation-start-ui.log`。完整评分隔离与用户验收继续待执行。
 
 ## 场景与事件（A04）
 

@@ -568,6 +568,8 @@
       "http_log": ".work/takeover/evaluation-http.log",
       "authenticated_ui": "TASK_SETS_SNAPSHOT_MODEL_PROMPT_AND_13_SOPS_RENDERED",
       "ui_log": ".work/takeover/evaluation-ui.log",
+      "authenticated_ui_start": "ATTEMPT_PASSED_4_ASSERTIONS_4_EVIDENCE",
+      "ui_start_log": ".work/takeover/evaluation-start-ui.log",
       "external_model_requests": "NOT_RUN",
       "full_product": "NOT_VERIFIED"
     },
