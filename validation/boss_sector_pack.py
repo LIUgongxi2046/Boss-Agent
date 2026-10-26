@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from business import now
 from boss_sector_api import CATALOGUE, SECTORS
 
-PACK_VERSION = "2"
+PACK_VERSION = "3"
 DEFINITION = "SECTOR-PACK-1"
 UNIT_MAP = {
     "F14": ["CNY/吨", "CNY/吨", "CNY/吨", "CNY/吨"],
@@ -117,9 +117,14 @@ def _page_facts(page):
         unit = units[index] if index < len(units) else ""
         points = [{"period": period, "value": _number(page, label, period, unit)} for period in PERIODS]
         metrics.append({"label": label, "unit": unit, "points": points})
+    design = CATALOGUE.get(page) or {}
+    filter_options = {
+        label: [{"id": choice, "label": choice} for choice in FILTER_CHOICES.get(label, ["范围A", "范围B"])]
+        for label in (design.get("filters") or [])
+    }
     return {"metrics": metrics, "rows": _rows(page), "sections": _sections(page),
             "relations": _relations(page), "workflow": _workflow(page),
-            "period": PERIODS[-1], "periods": PERIODS}
+            "filter_options": filter_options, "period": PERIODS[-1], "periods": PERIODS}
 
 
 def _document(page, snapshot):

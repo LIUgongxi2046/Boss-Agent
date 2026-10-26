@@ -231,7 +231,7 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_sector_pack.py`按执行空间写入一次版本化模拟资料包`SECTOR-PACK-1`：每个专题页一份来源文档，包含2026-08至2026-10三项指标点、单位、定义版本与明确`SIMULATED`标记，数据由固定种子生成，不代表真实经营结果。包在应用启动时按数据集版本写入，重复启动不重复生成。
 
-专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。
+专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。资料包按页面配置提供`filter_options`，页面以选择框呈现区域、品种、阶段与比较周期等条件；选择后按明细维度筛选，例如 F15 选择“华东”后不再返回“华南”行。2026-10-26检查同一测试文件6项通过，耗时17.83秒，日志`.work/takeover/sector-filters-tests.log`；认证后 F15 返回4组筛选选项与6条明细，页面显示4个选择框并在应用“华东”后只保留对应行，日志`.work/takeover/sector-filters-http.log`与`.work/takeover/sector-filters-ui.log`。
 
 2026-10-26检查同一测试文件4项通过，耗时1.81秒，日志`.work/takeover/sector-records-tests.log`；认证后的F15、F16、F17、F22读取返回200，F15为6条明细与4个章节，F16含7项关系，F17含5个流程阶段，页面显示明细、章节、关系与阶段，日志`.work/takeover/sector-records-http.log`与`.work/takeover/sector-records-ui.log`。
 

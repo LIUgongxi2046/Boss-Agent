@@ -63,6 +63,8 @@ def test_pack_provides_metrics_trend_and_source(store):
     assert body["trend"]["metric_id"] == first["label"]
     assert [point["period"] for point in body["trend"]["points"]] == ["2026-08", "2026-09", "2026-10"]
     assert body["sources"][0]["source_id"] == "sector-f15-a"
+    assert set(body["filter_options"]) == {"区域", "品种", "阶段", "比较周期"}
+    assert body["filter_options"]["区域"][0]["id"] == "华东"
     assert all(row["state"] == "SIMULATED" for row in body["coverage"])
     assert any("明细" in field for field in body["missing_fields"])
     assert len(body["records"]) == 6
