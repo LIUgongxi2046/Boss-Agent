@@ -58,6 +58,8 @@ for(const role of ["BOSS","MAINTAINER"] as const){
 }
 DELIVERED_NAVIGATION.BOSS.MVP01={id:"MVP01",title:"采购成本协调",group:"今日工作",feature:"MVP01",directory:false,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 DELIVERED_NAVIGATION.BOSS.NATIVE={...DELIVERED_NAVIGATION.BOSS.N02,id:"NATIVE",directory:false};
+const BOSS_DIRECTORY=new Set(["F01","N02","N03","F02","F03","F14","F21","N04","N05","N06","N08","N09"]);
+for(const [id,entry] of Object.entries(DELIVERED_NAVIGATION.BOSS))entry.directory=BOSS_DIRECTORY.has(id);
 DELIVERED_NAVIGATION.MAINTAINER.NATIVE={id:"NATIVE",title:"应用设置",group:"Agent配置",feature:"UI02",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 
 export function deliveredPage(page:string,role:Role,_mvp=false):NavigationEntry|undefined{

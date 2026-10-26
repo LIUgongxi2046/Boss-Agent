@@ -568,7 +568,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </button>
             {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(["F01","N03"].includes(page))guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
-              <Tag tone="amber">模拟业务资料</Tag>
+              {role==="MAINTAINER"&&<Tag tone="amber">模拟业务资料</Tag>}
               {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
                 onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}>{["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="notification"/>:<Bell size={18}/>}</button>
               }

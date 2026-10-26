@@ -39,7 +39,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const [taskContext,setTaskContext]=useState<TaskConversationContext|null>(null),[taskContextError,setTaskContextError]=useState(""),[taskContextChecking,setTaskContextChecking]=useState(false);
   const [businessContext,setBusinessContext]=useState<BusinessContext|null>(null),[businessContextError,setBusinessContextError]=useState("");
   const [artifact,setArtifact]=useState<Artifact|null>(null),[artifactOpen,setArtifactOpen]=useState(false),[artifactError,setArtifactError]=useState(""),[artifactLoading,setArtifactLoading]=useState(false);
-  const [historyOpen,setHistoryOpen]=useState(true),[selectedRunId,setSelectedRunId]=useState("");
+  const [historyOpen,setHistoryOpen]=useState(false),[selectedRunId,setSelectedRunId]=useState("");
   const scope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
   const taskScope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
   const workspace=useRef<HTMLDivElement|null>(null);
@@ -198,7 +198,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
             {sessions.length?<ul>{sessions.map(value=><li key={value.key}><button aria-current={value.key===activeKey?"page":undefined} onClick={()=>onSelectChat(value.key)}><MessageCircle size={16}/><span>{value.title}<small>{value.updatedAt}</small></span></button></li>)}</ul>:<p className="boss-n02-empty">尚无可用会话</p>}
             <div className="boss-chat-history-note"><p>会话与对象分别保存</p><span>返回会话时恢复原消息位置；资料版本与已确认决定沿用对应业务记录。</span></div>
           </aside>
-          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"连续对话"}</h2><p>讨论事项、补充材料，核查执行结果</p></div><span className="boss-n02-chip">{connectionStatus==="open"?"会话已连接":"连接待恢复"}</span></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><AgentProcess run={latest} runs={view?.runs??[]} onSelect={setSelectedRunId}/><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
+          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"新对话"}</h2><p>说说今天想让我帮你处理什么</p></div><div className="boss-chat-toolbar"><button className="boss-btn" type="button" onClick={onNewChat}><Plus size={16}/>新对话</button><button className="boss-btn" type="button" aria-expanded={historyOpen} onClick={()=>setHistoryOpen(value=>!value)}><History size={16}/>{historyOpen?"收起历史":"历史对话"}</button><button className="boss-btn" type="button" onClick={actions.onReturn}><ArrowLeft size={16}/>返回</button><span className="boss-n02-chip">{connectionStatus==="open"?"已连接":"连接中"}</span></div></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><AgentProcess run={latest} runs={view?.runs??[]} onSelect={setSelectedRunId}/><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
         </div>
         {error&&<div className="boss-n02-note error" role="alert">{error}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新读取当前记录</button></div>}
       </section>
@@ -269,18 +269,21 @@ function QueryDetails({data}:{data:Record<string,unknown>}){
 
 const toolNames:Record<string,string>={query_metrics:"查询经营数据",read_evidence:"读取资料原文",bossSectorRead:"读取专题数据",bossTasksRead:"读取任务与承诺",bossMeetingsRead:"读取会议资料",bossEvidenceRead:"读取来源原文",bossWorkspaceRead:"读取工作资料",conversationRead:"读取会话记录",create_assignment:"创建交办",send_assignment:"发送交办",read_assignment:"读取交办状态",morningListRead:"读取晨间清单",morningDetailRead:"读取事项详情",morningSourceRead:"读取事项来源",todayRead:"读取今日工作",ownerPlansRead:"读取本人计划",assignmentSourcesRead:"读取交办来源",businessOverviewRead:"读取经营概览"};
 
+const runNames:Record<string,string>={RUNNING:"正在处理",QUEUED:"等待中",SUCCEEDED:"已完成",FAILED:"未完成",CANCELED:"已取消",WAITING_INPUT:"等待补充",TIMED_OUT:"超时",INTERRUPTED:"已中断",UNKNOWN:"待确认"};
 function AgentProcess({run,runs,onSelect}:{run:Run|undefined;runs:Run[];onSelect:(id:string)=>void}){
   if(!runs.length)return null;
   const steps=run?.tool_steps??[];
   const running=run?.status==="RUNNING"||run?.status==="QUEUED";
-  return <section className="boss-n02-agent" aria-label="Agent 处理过程" aria-live="polite">
+  const state=run?.status?(runNames[run.status]??"已完成"):"等待中";
+  const stepState=(status:string)=>status==="SUCCEEDED"?"已完成":runNames[status]??"已完成";
+  return <section className="boss-n02-agent" aria-label="处理过程" aria-live="polite">
     <header className="boss-n02-agent-head"><h3>处理过程</h3>
-      {runs.length>1&&<select aria-label="选择运行" value={run?.run_id??""} onChange={event=>onSelect(event.target.value)}>{runs.map(item=><option key={item.run_id} value={item.run_id}>{item.started_at} · {label(item.status)}</option>)}</select>}
-      <span className={"boss-n02-chip"+(running?" boss-n02-chip-active":"")}>{run?label(run.status):"等待运行"}</span>
+      {runs.length>1&&<select aria-label="选择运行" value={run?.run_id??""} onChange={event=>onSelect(event.target.value)}>{runs.map(item=><option key={item.run_id} value={item.run_id}>{item.started_at} · {runNames[item.status]??"已完成"}</option>)}</select>}
+      <span className={"boss-n02-chip"+(running?" boss-n02-chip-active":"")}>{state}</span>
     </header>
     <ol className="boss-n02-agent-steps">
-      {steps.map((step,index)=><li key={step.tool_call_id+index} data-state={step.status}><span className="boss-n02-agent-index">{String(index+1).padStart(2,"0")}</span><div><strong>{toolNames[step.tool_id]??step.tool_id}</strong><small>{step.status?label(step.status):"已完成"}</small></div></li>)}
-      {!steps.length&&run&&<li data-state={run.status}><span className="boss-n02-agent-index">··</span><div><strong>{running?"正在理解需求":"本次未调用工具"}</strong><small>{label(run.status)}</small></div></li>}
+      {steps.map((step,index)=><li key={step.tool_call_id+index} data-state={step.status}><span className="boss-n02-agent-index">{String(index+1).padStart(2,"0")}</span><div><strong>{toolNames[step.tool_id]??step.tool_id}</strong><small>{step.status?stepState(step.status):"已完成"}</small></div></li>)}
+      {!steps.length&&run&&<li data-state={run.status}><span className="boss-n02-agent-index">··</span><div><strong>{running?"正在理解需求":"本次未调用工具"}</strong><small>{state}</small></div></li>}
     </ol>
     {run?.tool_errors.length?<div className="boss-n02-agent-errors">{run.tool_errors.map((error,index)=><p key={error.tool_id+index}>{(toolNames[error.tool_id]??error.tool_id)+"未完成"} · {error.error_type}</p>)}</div>:null}
   </section>;

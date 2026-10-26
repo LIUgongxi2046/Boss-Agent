@@ -232,31 +232,29 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     {error&&<p role="alert" className="boss-status boss-status-error">{error}</p>}{loading&&<p role="status">正在读取当前日期资料</p>}
     {list&&list.adoption_state!=="CURRENT"&&<p className="boss-status" role="status">{label(list.adoption_state)}，当前依据需重新查询，历史结果不用于本次操作。</p>}
     <div className="boss-f01-grid"><main className="boss-f01-main">
-    <Panel title="业务日期与资料范围"><form className="boss-f01-scope" onSubmit={event=>{event.preventDefault();if(dayDraft&&!disabled){if(dateDirty)changeDay(dayDraft);else setRevision(value=>value+1);}}}>
-      <label>业务日期<input aria-label="业务日期" type="date" required value={dayDraft?.date??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,date:event.target.value})}/></label>
-      <label>IANA 时区<input aria-label="IANA 时区" required value={dayDraft?.timezone??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,timezone:event.target.value})}/></label>
-      <label className="boss-f01-cutoff">资料截至时间<output>{view?.data_as_of??"来源截至时间不完整"}</output><small>清单读取时间 {view?.read_at??"等待读取"}</small></label>
-      <div className="boss-f01-scope-actions"><span className="boss-tag boss-tag-amber">SIMULATED</span><button type="submit" className="boss-btn boss-btn-primary" disabled={disabled||loading||!dayDraft}>更新当前事项</button></div>
-    </form><p>当前范围 {day?.date??"等待读取"} · {day?.timezone??"等待读取"}；业务时钟 {view?.business_clock??"等待读取"}</p></Panel>
+    <Panel title="日期"><form className="boss-f01-scope" onSubmit={event=>{event.preventDefault();if(dayDraft&&!disabled){if(dateDirty)changeDay(dayDraft);else setRevision(value=>value+1);}}}>
+      <label>日期<input aria-label="日期" type="date" required value={dayDraft?.date??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,date:event.target.value})}/></label>
+      <div className="boss-f01-scope-actions"><button type="submit" className="boss-btn boss-btn-primary" disabled={disabled||loading||!dayDraft}>切换日期</button></div>
+    </form><p>当前查看 {day?.date??"今天"}</p></Panel>
       <BossToday key={view?.list_id??day?.date??""} data={ordered} loading={loading} error="" onReload={()=>setRevision(value=>value+1)} onNavigate={onNavigate}
         presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={chooseItem} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
         orderScope={current&&view?.list_id?{list_id:view.list_id,date:view.date,timezone:view.timezone}:undefined} onReadOrder={readOrder} onReorder={payload=>client.requestMutation("boss.today.reorder",payload).then(()=>undefined)}>
         <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);if(shouldClearMorningSelectionOnFilter(next,selected,view?.items??[])){setSelected("");setDetail(null);setDetailLoading(false);setDetailError("");setSourceId("");setDocument(null);setSourceError("");remember({morningCategory:next,morningItem:null,morningSource:null});}else remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
       </BossToday>
-      <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>交给 Boss Agent</h2></div></header>
-        <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-f01-entry-label" htmlFor="morning-question">本次需求</label>
-          <textarea id="morning-question" placeholder="今天有哪些事项需要本人决定、协调或知晓？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
-          <div className="boss-f01-entry-actions">{busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消本次请求</button>}<button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
+      <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>问问今天的事</h2></div></header>
+        <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-f01-entry-label" htmlFor="morning-question">想处理什么</label>
+          <textarea id="morning-question" placeholder="比如：今天有哪些事需要我处理？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
+          <div className="boss-f01-entry-actions">{busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消</button>}<button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送</button></div>
         </form>
       </section>
     </main><aside className="boss-f01-aside" aria-label="今日工作相关信息">
-      <Panel title="选中事项与关联对象">{detail&&current?<>
-        <dl className="boss-f01-detail-fields"><div><dt>对象与当前版本</dt><dd>{detail.item.title} · {detail.item.object_id} · v{detail.item.version??"未知"}</dd></div><div><dt>关联来源</dt><dd>{detail.documents.length} 项</dd></div><div><dt>关联会议</dt><dd>{meetings.length?meetings.map(value=>value.reference.id+" · v"+value.reference.version).join("、"):"没有关联会议"}</dd></div><div><dt>交办记录</dt><dd>{detail.item.existing_measures.filter(value=>value.kind==="task").map(value=>value.id+" · v"+value.version).join("、")||"没有关联交办记录"}</dd></div></dl>
-        <div className="boss-actions"><button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>准备交办</button>
-          {meetings.length>0&&<button id="morning-meeting" className="boss-btn" disabled={disabled} onClick={()=>{overlayFocus.current=window.document.activeElement as HTMLElement;setMeetingOpen(true);}}>打开关联会议</button>}
-          {["F06","N05","F02"].includes(detail.item.page_id)&&<button id="morning-related" className="boss-btn" disabled={disabled} onClick={()=>openRelated(detail.item)}>打开关联事项</button>}</div>
-        <div className="boss-actions">{detail.documents.map(value=><button id={"morning-source-"+value.source_id} className="boss-btn" key={value.source_id} disabled={busy||uncertain} onClick={()=>chooseSource(value.source_id)}>查看依据：{value.source_id} · v{value.version}</button>)}</div>
-        <details><summary>查看事项完整资料与排序理由</summary>
+      <Panel title="事项详情">{detail&&current?<>
+        <dl className="boss-f01-detail-fields"><div><dt>事项</dt><dd>{detail.item.title}</dd></div><div><dt>相关资料</dt><dd>{detail.documents.length} 项</dd></div><div><dt>相关会议</dt><dd>{meetings.length?meetings.length+" 场":"没有会议"}</dd></div><div><dt>相关交办</dt><dd>{detail.item.existing_measures.filter(value=>value.kind==="task").length||"没有"}</dd></div></dl>
+        <div className="boss-actions"><button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>安排交办</button>
+          {meetings.length>0&&<button id="morning-meeting" className="boss-btn" disabled={disabled} onClick={()=>{overlayFocus.current=window.document.activeElement as HTMLElement;setMeetingOpen(true);}}>查看会议</button>}
+          {["F06","N05","F02"].includes(detail.item.page_id)&&<button id="morning-related" className="boss-btn" disabled={disabled} onClick={()=>openRelated(detail.item)}>查看事项</button>}</div>
+        <div className="boss-actions">{detail.documents.map(value=><button id={"morning-source-"+value.source_id} className="boss-btn" key={value.source_id} disabled={busy||uncertain} onClick={()=>chooseSource(value.source_id)}>查看资料{value.source_id}</button>)}</div>
+        <details><summary>查看完整内容</summary>
         <h3>{detail.item.title}</h3><p>{detail.item.reason}</p><p>处理人 {detail.item.coordinator_id??"尚未提供"} · 有效期限 {detail.item.due_at??"尚未提供"} · 当前状态 {morningState(detail.item.state??"尚未提供")}</p>
         <p>时间 {detail.item.starts_at??"尚未提供"} 至 {detail.item.ends_at??"尚未提供"} · 对象时区 {detail.item.timezone??"尚未提供"}</p><p>地点 {detail.item.location??"尚未提供"}</p>
         {detail.item.sorting_reasons?.map(reason=><p key={reason}>{morningReason(reason)}</p>)}{detail.item.goal_matches.map(goal=><p key={goal}>关联本人目标：{goal}</p>)}

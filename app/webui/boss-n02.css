@@ -156,4 +156,9 @@
 .boss-n02-agent-steps li[data-state="RUNNING"] .boss-n02-agent-index{background:#dcecff;animation:boss-n02-agent-pulse 1.2s ease-in-out infinite}
 .boss-n02-agent-errors p{margin:6px 0 0;color:#ae2536;font-size:12px}
 .boss-n02-chip-active{background:#e6f7ee;color:#1d7a4a}
+.boss-chat-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.boss-chat-toolbar .boss-btn{min-height:36px;padding:6px 10px;font-size:13px}
+.boss-v6[data-page="N02"] .boss-stage{padding:0 10px 10px}
+.boss-n02 .boss-n02-conversation{padding:0;border:0;background:transparent;box-shadow:none}
+.boss-n02 .boss-n02-message-column{padding:14px 16px}
 @keyframes boss-n02-agent-pulse{50%{opacity:.55}}

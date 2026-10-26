@@ -930,3 +930,9 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
 .boss-v6[data-design="v7"] .boss-stage p,
 .boss-v6[data-design="v7"] .boss-stage small,
 .boss-v6[data-design="v7"] .boss-stage span{overflow-wrap:anywhere}
+.boss-v6[data-design="v7"]:not([data-page="N02"]) .boss-stage{display:block;overflow-y:auto;overflow-x:hidden}
+.boss-v6[data-design="v7"]:not([data-page="N02"]) .boss-content{overflow:visible;height:auto;min-height:0}
+.boss-v6[data-page="N02"] .boss-hero{display:none}
+.boss-n02 .boss-n02-context,.boss-n02 .boss-n02-aside,.boss-n02 .boss-chat-below{display:none}
+.boss-n02 .boss-n02-conversation-grid{grid-template-columns:minmax(0,1fr)}
+.boss-n02 .boss-n02-conversation-grid.boss-n02-history-hidden{grid-template-columns:minmax(0,1fr)}
