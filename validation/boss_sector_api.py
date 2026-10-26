@@ -6,12 +6,17 @@ comes only from the current ControlStore and its versioned sources.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from urllib.parse import parse_qs
 
 from aiohttp import web
 
-from business import now
+from business import checksum, now
 from boss_execution_scope import NAMESPACE
+
+CATALOGUE_PATH = Path(__file__).resolve().parents[1] / "Boss-Agent-Desktop-Complete-v7/meta/页面配置.json"
+CATALOGUE = json.loads(CATALOGUE_PATH.read_text(encoding="utf-8")) if CATALOGUE_PATH.exists() else {}
 
 SECTORS = {
     "F14": ("原料与饲料", ["原料", "产品", "法人", "期间"],
@@ -54,15 +59,35 @@ class BossSectorAPI:
         if role != "BOSS":
             return (401 if role is None else 403), {"error": "FORBIDDEN"}
         params = parse_qs(query_string, keep_blank_values=True)
-        if set(params) != {"page"} or len(params["page"]) != 1:
+        if ("page" not in params or len(params["page"]) != 1 or not params["page"][0]
+                or set(params) - {"page", "filters", "overview_reference"}):
             return 400, {"error": "INVALID_SCOPE"}
         page = params["page"][0]
         if page not in SECTORS:
             return 404, {"error": "UNKNOWN_SECTOR"}
-        title, filters, kpis = SECTORS[page]
+        applied = {}
+        if "filters" in params:
+            try:
+                parsed = json.loads(params["filters"][0])
+            except json.JSONDecodeError:
+                return 400, {"error": "INVALID_FILTERS"}
+            if not isinstance(parsed, dict) or not all(
+                    isinstance(key, str) and isinstance(value, str) for key, value in parsed.items()):
+                return 400, {"error": "INVALID_FILTERS"}
+            applied = {key: value for key, value in parsed.items() if value}
+        overview = None
+        if "overview_reference" in params:
+            try:
+                overview = json.loads(params["overview_reference"][0])
+            except json.JSONDecodeError:
+                return 400, {"error": "INVALID_OVERVIEW_REFERENCE"}
+            if not isinstance(overview, dict):
+                return 400, {"error": "INVALID_OVERVIEW_REFERENCE"}
+        title, design_filters, kpis = SECTORS[page]
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
             base = self.store.get(db, self.namespace, "initial", "snapshot")
+            clock = self.store.get(db, self.namespace, "clock", "current")
             # Water-feed external sales are related to F14. They do *not*
             # include the actual raw-material market prices, contracts,
             # warehouse receipts or formula cost expected by FR-14.
@@ -73,7 +98,6 @@ class BossSectorAPI:
                     (self.namespace,),
                 ).fetchone()
                 if row is not None:
-                    import json
                     doc = json.loads(row[0])
                     if (not doc.get("withdrawn") and
                             doc.get("access_scope") == base["owner_id"] and
@@ -86,21 +110,43 @@ class BossSectorAPI:
                             "related_scope": "region-1 EXTERNAL_SALES water-feed comparison",
                             "not_evidence_for": "raw-material quotation, contract, inventory or consumption cost",
                         })
+        design = CATALOGUE.get(page) or {}
+        timezone = base["boss_profile"].get("timezone", "Asia/Shanghai")
+        today = clock["at"][:10]
+        contacts = [{"contact_id": contact["contact_id"], "version": "1",
+                     "display_name": contact["name"], "organization": contact["organization"],
+                     "responsibility": contact["responsibility"],
+                     "eligible": contact["valid_from"] <= today <= contact["valid_until"]}
+                    for contact in base["contacts"]]
+        sources = [{"source_id": doc["source_id"], "version": doc["version"], "source_type": "SIMULATED",
+                    "published_at": doc.get("published_at"), "related_scope": doc["related_scope"],
+                    "validity_state": "VALID", "author_display_name": doc.get("author_display_name")}
+                   for doc in matching]
+        coverage = [{"label": label, "value": "尚未提供", "state": "SOURCE_NOT_AVAILABLE"}
+                    for label in (design.get("right") or [])]
+        missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
+        if matching:
+            missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
         return 200, {
-            "page_id": page, "title": title, "design_filters": filters,
-            "kpi_labels": kpis,
-            "metrics": [
-                {"label": label, "value": None, "unit": None,
-                 "data_status": "SOURCE_NOT_AVAILABLE"}
-                for label in kpis
-            ],
-            "related_source_refs": matching,
+            "projection": "sector-workspace", "page_id": page, "title": title,
+            "source_type": "SIMULATED", "namespace": self.namespace,
+            "dataset_version": base["dataset_version"], "read_at": now(),
+            "query_id": f"{page}-{checksum({'filters': applied, 'overview': overview})[:16]}",
+            "business_clock": clock["at"], "overview_reference": overview,
+            "design_filters": design_filters, "filter_options": {},
+            "applied_filters": applied,
+            "metrics": [{"id": f"{page}-kpi-{index}", "label": label, "value": None, "unit": None,
+                         "period": None, "source_ids": [], "state": "SOURCE_NOT_AVAILABLE",
+                         "definition_version": "1", "comparability": "当前没有可比较的正式明细"}
+                        for index, label in enumerate(kpis)],
+            "trend": None, "records": [], "sections": [], "relations": [], "workflow": [],
+            "sources": sources, "coverage": coverage, "missing_fields": missing,
+            "availability": "SOURCE_NOT_AVAILABLE", "contacts": contacts,
+            "followup_actions": [], "resource_options": [], "timezones": [timezone],
+            "owner_timezone": timezone, "related_source_refs": matching,
             "sector_specific_dataset_available": False,
             "sector_kpi_calculations_supported": False,
-            "data_gap": ("已有关联水产饲料外销经营资料，但不足以计算本页的原料价格、合同和领用成本。"
-                         if matching else "尚无本专题经过核验的有效模拟业务明细。"),
+            "data_gap": ("已有关联水产饲料外销经营资料，但不足以计算本页指标。" if matching
+                         else "尚无本专题经过核验的有效模拟业务明细。"),
             "business_scope": "selection dataset; not a full enterprise ERP",
-            "source_type": "SIMULATED", "namespace": self.namespace,
-            "dataset_version": base["dataset_version"],
-            "read_at": now(),
         }

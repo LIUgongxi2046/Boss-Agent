@@ -631,13 +631,23 @@
         "V19-MILK",
         "V19-BEEF"
       ],
-      "status": "STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_AND_PRODUCT_DOM_PENDING",
+      "status": "STRUCTURE_IMPLEMENTED_SCOPE_RESPONSE_AVAILABLE_SECTOR_DATA_PACK_PENDING",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
       "build_log": ".work/takeover/sector-workspace-build-final.log",
       "navigation": "5_PASSED_REAL_CHROMIUM_AND_REACT",
       "navigation_log": ".work/takeover/sector-workspace-routing.log",
-      "authenticated_application": "NOT_RUN",
+      "authenticated_application": "F15_F22_RENDERED_EXPLICIT_NO_DATA_STATE",
       "actual_query_and_followup_flow": "NOT_RUN",
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_sector_scope_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "SCOPE_ECHO_AND_HONEST_NO_DATA_STATE_IMPLEMENTED_DATA_PACK_PENDING",
+      "checks": "3_PASSED",
+      "check_log": ".work/takeover/sector-scope-tests.log",
+      "authenticated_ui": "F15_F22_NO_SCOPE_ERROR_COVERAGE_AND_MISSING_RENDERED",
+      "ui_log": ".work/takeover/sector-scope-ui.log",
+      "remaining": ["SECTOR_SIMULATED_DATASET_PACK", "SECTOR_FOLLOWUP_ACTIONS", "SECTOR_METRIC_CALCULATION"],
       "full_product": "NOT_VERIFIED"
     },
     "frontend_shared_access_validation": {
