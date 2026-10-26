@@ -196,3 +196,13 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 目录动作携带目标页面与来源编号，包括准备会议、打开纪要、阅读原文、继续讨论、查看历史决定、打开申请和打开人员会面；会议尚无纪要时“打开纪要”保持不可用并给出原因。目标页面接收`bossLibraryContext`与`bossLibraryAction`并据此选取对象的功能仍待接入，完整连续流程尚未验证。
 
 2026-10-26检查`app/tests/test_boss_meeting_library.py`3项通过，耗时2.03秒，日志`.work/takeover/meeting-library-tests.log`；会议审批、纪要交办及V7服务回归61项通过，耗时9.59秒，日志`.work/takeover/v7-owner-regression-20261026.log`。认证后的运行实例读取返回200，记录为meeting-1、finance-note、meeting-minutes，覆盖为meeting/document COMPLETE及approval/research/people NOT_PROVIDED，日志`.work/takeover/meeting-library-http.log`。N04实际页面显示“经营会议 · 2026-10-23”行、参会人与分类计数（会议1、资料2），日志`.work/takeover/meeting-library-ui.log`。没有执行会议材料写入、审批决定或外部请求；完整产品与用户验收继续未完成。
+
+## 评测服务（A16/F31）
+
+对应FR-31及V7-FRONTEND评测接收要求。`boss_v7_evaluation.py`提供`/api/boss/ui/admin/technical/evaluation`读取及`boss.technical.evaluation.start/reset/cancel`写入，身份限定MAINTAINER，写入走现有SQLite事务与原请求回执。
+
+任务集采用当前获准模拟资料。`selection-core`包含四项断言：毛利率与原始明细一致、会议材料在业务时钟下有效且属于本人、本人记忆保持已确认版本、评测不写业务对象；`selection-evidence`包含来源版本与数据集摘要两项断言。启动必须携带全部所选对象的当前版本并明确确认人工配对条件；版本变化返回冲突。
+
+版本目录来自正式状态：数据快照为当前执行空间的`selection` v1，模型为当前配置`deepseek-flash` v1，Prompt使用当前已启用版本，未配置时明确标注“内置运行时提示 vbuiltin-1”；SOP版本读取`agent/skills`中SOP01—SOP13的`0.1.0`。每次尝试保存全部断言预期与实际观察、证据编号、耗时与失败清单；没有模型请求时费用保持null、覆盖标记`NO_MODEL_REQUESTS`。失败的断言保存为失败记录，已结束的尝试不能取消；重置保留全部历史并新建尝试。评分与断言不进入Agent上下文，尝试记录不改写业务对象。
+
+2026-10-26检查`app/tests/test_boss_v7_evaluation.py`4项通过，耗时3.53秒，日志`.work/takeover/evaluation-tests.log`；与会议资料目录、会议审批、纪要交办及V7服务回归65项通过，耗时12.27秒，日志`.work/takeover/evaluation-regression-20261026.log`。认证后的运行实例读取返回200，A16页面显示两个任务集、数据快照、模型、Prompt与13项SOP版本，日志`.work/takeover/evaluation-http.log`与`.work/takeover/evaluation-ui.log`。没有执行真实模型请求；实际评测运行与完整评分隔离验收继续待执行。

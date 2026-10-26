@@ -364,6 +364,21 @@
       "read_writes_business_objects": false,
       "full_product": "NOT_VERIFIED"
     },
+    "backend_evaluation_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "TASK_SETS_ATTEMPTS_EVIDENCE_AND_RECEIPTS_IMPLEMENTED_DEFAULT_CATALOGS_MARKED",
+      "task_sets": ["selection-core", "selection-evidence"],
+      "checks": "4_PASSED",
+      "check_log": ".work/takeover/evaluation-tests.log",
+      "regression": "65_PASSED",
+      "regression_log": ".work/takeover/evaluation-regression-20261026.log",
+      "authenticated_http": "200",
+      "http_log": ".work/takeover/evaluation-http.log",
+      "authenticated_ui": "TASK_SETS_SNAPSHOT_MODEL_PROMPT_AND_13_SOPS_RENDERED",
+      "ui_log": ".work/takeover/evaluation-ui.log",
+      "external_model_requests": "NOT_RUN",
+      "full_product": "NOT_VERIFIED"
+    },
     "frontend_sector_validation": {
       "pages": ["F15", "F16", "F17", "F18", "F19", "F20", "F22", "F23", "V19-EGG", "V19-MILK", "V19-BEEF"],
       "status": "STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_AND_PRODUCT_DOM_PENDING",
