@@ -863,6 +863,12 @@
         "scope": "MEMORY_KNOWLEDGE_ACCESS_BASIC_TOOLS_SCHEDULER_AND_LOCAL_METADATA",
         "full_product": "NOT_VERIFIED"
       },
+      "latest_consolidated_check": {
+        "result": "156_PASSED",
+        "date": "2026-10-26",
+        "log": ".work/takeover/round31-regression.log",
+        "scope": "V7_BACKEND_AGENT_AND_NATIVE_CONVERSATION_SERVICES"
+      },
       "memory_runtime": {
         "status": "IN_FLIGHT_AND_NATIVE_SESSION_CONTEXT_SCOPED_VERIFIED",
         "local_validation": "62_PASSED",
