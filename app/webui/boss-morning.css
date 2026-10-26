@@ -94,3 +94,8 @@ div:has(> .boss-f01-dialog.boss-v6){display:grid;place-items:center;align-conten
 .boss-f01-more>summary{cursor:pointer;font-size:15px;font-weight:600;color:#244768;list-style-position:inside}
 .boss-f01-more[open]>summary{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eaf0f7}
 .boss-f01-more .boss-f01-detail-fields{margin-bottom:8px}
+.boss-f01-datebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 2px}
+.boss-f01-datebar label{display:flex;align-items:center;gap:8px;font-size:14px;color:#52647a}
+.boss-f01-datebar input{width:auto;min-width:150px;min-height:40px;padding:7px 10px;border:1px solid #dce4ed;border-radius:8px;background:#fff;font:inherit}
+.boss-f01-datebar span{color:#7a8ca3;font-size:13px}
+.boss-v6[data-page="F01"] .boss-f01-main{gap:10px}

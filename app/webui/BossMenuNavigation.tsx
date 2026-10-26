@@ -15,9 +15,12 @@ export function BossPrimaryNavigation({role,page,expanded,onNavigate,referenceIc
       if(!Icon)throw new Error("当前菜单分组缺少图标");
       const active=selected?.group===title;
       const open=openGroups.includes(id);
-      return <section className="boss-nav-group" key={id} aria-label={title}><div className="boss-nav-group-heading"><button type="button" data-menu-group={id} className={"boss-nav-item "+(active?"active":"")} onClick={()=>onNavigate(id)} title={title} aria-current={active?"page":undefined}>
+      const pages=groups.find(group=>group.title===title)?.pages??[];
+      const single=pages.length<=1;
+      const target=single&&pages[0]?pages[0].id:id;
+      return <section className="boss-nav-group" key={id} aria-label={title}><div className="boss-nav-group-heading"><button type="button" data-menu-group={id} className={"boss-nav-item "+(active?"active":"")} onClick={()=>onNavigate(target)} title={title} aria-current={active?"page":undefined}>
         {referenceIcon?referenceIcon(id):<Icon size={18} strokeWidth={1.8} aria-hidden="true"/>}{expanded&&<span>{title}</span>}
-      </button>{expanded&&<button type="button" className="boss-nav-disclosure" aria-label={(open?"收起":"展开")+title+"页面"} aria-expanded={open} aria-controls={"boss-navigation-"+id} onClick={()=>setOpenGroups(current=>open?current.filter(value=>value!==id):[...current,id])}><ChevronDown size={14}/></button>}</div>{expanded&&<div id={"boss-navigation-"+id} className="boss-nav-pages" hidden={!open}>{groups.find(group=>group.title===title)?.pages.map(entry=><MenuPage key={entry.id} entry={entry} page={page} onNavigate={onNavigate}/>)}</div>}</section>;
+      </button>{expanded&&!single&&<button type="button" className="boss-nav-disclosure" aria-label={(open?"收起":"展开")+title+"页面"} aria-expanded={open} aria-controls={"boss-navigation-"+id} onClick={()=>setOpenGroups(current=>open?current.filter(value=>value!==id):[...current,id])}><ChevronDown size={14}/></button>}</div>{expanded&&!single&&<div id={"boss-navigation-"+id} className="boss-nav-pages" hidden={!open}>{pages.map(entry=><MenuPage key={entry.id} entry={entry} page={page} onNavigate={onNavigate}/>)}</div>}</section>;
     })}
   </nav>;
 }

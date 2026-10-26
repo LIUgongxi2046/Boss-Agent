@@ -161,4 +161,13 @@
 .boss-v6[data-page="N02"] .boss-stage{padding:0 10px 10px}
 .boss-n02 .boss-n02-conversation{padding:0;border:0;background:transparent;box-shadow:none}
 .boss-n02 .boss-n02-message-column{padding:14px 16px}
+.boss-n02,.boss-v6[data-page="N02"] .boss-n02{display:block;height:100%;min-height:0;padding:0;overflow:hidden;grid-template-columns:none;grid-template-rows:none}
+.boss-n02 .boss-n02-main,.boss-v6[data-page="N02"] .boss-n02-main{display:block;width:100%;height:100%;min-height:0}
+.boss-n02 .boss-n02-conversation{display:flex;flex-direction:column;height:100%;min-height:0}
+.boss-n02 .boss-n02-conversation>.boss-n02-heading{display:none}
+.boss-n02 .boss-n02-conversation-grid{display:block;flex:1;min-height:0}
+.boss-n02 .boss-n02-message-column{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden}
+.boss-n02 .boss-chat-thread-heading{flex:none}
+.boss-n02 .boss-n02-thread{flex:1;min-height:0;overflow-y:auto}
+.boss-n02 .boss-n02-agent{flex:none}
 @keyframes boss-n02-agent-pulse{50%{opacity:.55}}

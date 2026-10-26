@@ -232,12 +232,13 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     {error&&<p role="alert" className="boss-status boss-status-error">{error}</p>}{loading&&<p role="status">正在读取当前日期资料</p>}
     {list&&list.adoption_state!=="CURRENT"&&<p className="boss-status" role="status">{label(list.adoption_state)}，当前依据需重新查询，历史结果不用于本次操作。</p>}
     <div className="boss-f01-grid"><main className="boss-f01-main">
-    <Panel title="日期"><form className="boss-f01-scope" onSubmit={event=>{event.preventDefault();if(dayDraft&&!disabled){if(dateDirty)changeDay(dayDraft);else setRevision(value=>value+1);}}}>
-      <label>日期<input aria-label="日期" type="date" required value={dayDraft?.date??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,date:event.target.value})}/></label>
-      <div className="boss-f01-scope-actions"><button type="submit" className="boss-btn boss-btn-primary" disabled={disabled||loading||!dayDraft}>切换日期</button></div>
-    </form><p>当前查看 {day?.date??"今天"}</p></Panel>
+    <form className="boss-f01-datebar" onSubmit={event=>{event.preventDefault();if(dayDraft&&!disabled){if(dateDirty)changeDay(dayDraft);else setRevision(value=>value+1);}}}>
+      <label>查看日期<input aria-label="日期" type="date" required value={dayDraft?.date??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,date:event.target.value})}/></label>
+      <button type="submit" className="boss-btn" disabled={disabled||loading||!dayDraft}>切换</button>
+      <span>{view?`共 ${view.items.length} 项`:"正在读取"}</span>
+    </form>
       <BossToday key={view?.list_id??day?.date??""} data={ordered} loading={loading} error="" onReload={()=>setRevision(value=>value+1)} onNavigate={onNavigate}
-        presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={chooseItem} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
+        presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={current?chooseItem:(item)=>openRelated(item)} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
         orderScope={current&&view?.list_id?{list_id:view.list_id,date:view.date,timezone:view.timezone}:undefined} onReadOrder={readOrder} onReorder={payload=>client.requestMutation("boss.today.reorder",payload).then(()=>undefined)}>
         <div className="boss-f01-categories" role="group" aria-label="事项分类">{categories.map(({id,title})=><button className={"boss-f01-category "+(category===id?"selected":"")} key={id} type="button" aria-pressed={category===id} onClick={()=>{const next=category===id?"ALL":id;setCategory(next);if(shouldClearMorningSelectionOnFilter(next,selected,view?.items??[])){setSelected("");setDetail(null);setDetailLoading(false);setDetailError("");setSourceId("");setDocument(null);setSourceError("");remember({morningCategory:next,morningItem:null,morningSource:null});}else remember({morningCategory:next});}}>{title}<span>{view?counts[id]+" 项":"数量待读取"}</span></button>)}</div>
       </BossToday>
@@ -264,8 +265,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         {detail.documents.length===0&&<p>当前事项尚未提供原文材料。</p>}
         {view?.preparation_materials.filter(value=>value.item_id===selected).map(value=><div key={value.item_id}><p>准备期限 {value.preparation_due_at??"尚未提供"}</p>{value.requirements.map(text=><p key={text}>{text}</p>)}</div>)}
         </details>
-      </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在核查":detailError?"当前读取失败":current?"尚未取得详情":list?"需重新查询清单":"仅为日期预览":"尚未选择事项"}</dd></div>)}</dl>
-        <p>{selected?detailLoading?"正在核查当前事项与来源版本。":detailError?"详情读取失败，原有清单仍在；请重新核查该事项。":current?"当前事项尚未取得可采用详情，请核查来源。":list?"当前清单需要重新查询，历史内容不可直接操作。":"此项仅为日期预览，尚不能读取正式详情或绑定交办。请先通过“本次需求”提交晨间问题，取得正式清单后核查事项。":current?"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>
+      </>:<><dl className="boss-f01-detail-fields">{["事项","相关资料","相关会议","相关交办"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在查看":detailError?"查看失败":current?"详情待查看":list?"需要重新查看":"选择事项后查看":"尚未选择"}</dd></div>)}</dl>
+        <p>{selected?(detailLoading?"正在查看事项。":detailError?"暂时无法查看，请重试。":current?"点开上方事项查看内容。":list?"请重新查看今日事项。":"点开上方事项即可查看相关内容。"):"点开上方事项即可查看相关内容，也可以直接问我想怎么处理。"}</p>
         {detailError&&current&&selected&&<div className="boss-status boss-status-error" role="alert"><span>{detailError}</span><button id="morning-detail-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setDetailRevision(value=>value+1)}>重新核查当前事项</button></div>}</>}</Panel>
       <details className="boss-panel boss-f01-more"><summary>状态与更多信息</summary><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
       <div className="boss-actions"><button id="morning-tasks" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N05","");}}>任务与承诺</button><button id="morning-notifications" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N06","");}}>通知中心</button></div>
