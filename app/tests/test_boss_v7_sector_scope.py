@@ -142,6 +142,27 @@ def test_owner_coordination_creates_task_and_followup(store):
     assert status == 400, body
 
 
+def test_owner_review_request_is_recorded_without_plan(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F15",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": query_id_for("F15", {}, None), "action_code": "安排复查",
+               "filters": {}, "overview_reference": None,
+               "source_refs": [{"source_id": "sector-f15-a", "version": "1"}],
+               "purpose": "复查季节供货", "timezone": "Asia/Shanghai",
+               "coordinator_id": "coordinator-1", "coordinator_version": "1",
+               "due_at": "2026-10-25T10:00:00+08:00", "expected_output": "复查记录",
+               "evidence_requirements": "批次回访记录"}
+    status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.review.schedule", payload)
+    assert status == 200, receipt
+    assert receipt["kind"] == "REVIEW" and receipt["state"] == "REVIEW_REQUESTED"
+    assert receipt["plan_id"] is None and receipt["task_id"] is None
+    projection = BossSectorAPI(store).serve("BOSS", query(page="F15"))[1]
+    follow = next(row for row in projection["followups"] if row["record_id"] == receipt["record_id"])
+    assert follow["kind"] == "REVIEW"
+    assert any(action["kind"] == "REVIEW" and action["allowed"] for action in projection["followup_actions"])
+
+
 def test_stale_query_and_other_roles_are_rejected(store):
     seed(store)
     payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",

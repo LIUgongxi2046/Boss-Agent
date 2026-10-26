@@ -84,3 +84,65 @@ def followups(db, page):
                      "source_ids": record.get("source_ids", [])})
     rows.sort(key=lambda item: item["created_at"], reverse=True)
     return rows
+
+
+REVIEW_LABELS = {"安排复查", "安排后续查询", "继续验证", "准备经营复查"}
+
+
+def schedule_review(api, db, snapshot, payload):
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo, available_timezones
+    require(set(payload) == {"client_request_id", "page_id", "execution_namespace", "dataset_version",
+                             "query_id", "action_code", "filters", "overview_reference", "source_refs",
+                             "purpose", "timezone", "coordinator_id", "coordinator_version",
+                             "due_at", "expected_output", "evidence_requirements"},
+            "专题复查字段不完整", web.HTTPBadRequest)
+    page = payload["page_id"]
+    require(page in SECTORS, "专题页面不属于当前范围", web.HTTPBadRequest)
+    require(payload["execution_namespace"] == NAMESPACE, "执行空间不一致", web.HTTPConflict)
+    require(payload["dataset_version"] == snapshot["dataset_version"], "数据集版本已经变化", web.HTTPConflict)
+    filters, overview = payload["filters"], payload["overview_reference"]
+    require(isinstance(filters, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in filters.items()),
+            "筛选条件无效", web.HTTPBadRequest)
+    require(overview is None or isinstance(overview, dict), "经营范围引用无效", web.HTTPBadRequest)
+    require(payload["query_id"] == query_id_for(page, filters, overview),
+            "专题查询版本已经变化，请重新读取", web.HTTPConflict)
+    require(payload["action_code"] in REVIEW_LABELS, "专题复查动作不在获准范围", web.HTTPBadRequest)
+    document = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='document' AND id=?",
+                          (NAMESPACE, "sector-" + page.lower() + "-a")).fetchone()
+    require(document is not None, "当前专题模拟资料尚未生成", web.HTTPConflict)
+    document = json.loads(document[0])
+    require(isinstance(payload["source_refs"], list)
+            and payload["source_refs"] == [{"source_id": document["source_id"], "version": document["version"]}],
+            "来源版本已经变化", web.HTTPConflict)
+    purpose = payload["purpose"]
+    output = payload["expected_output"]
+    require(isinstance(purpose, str) and 0 < len(purpose.strip()) <= 400, "复查目的为空或过长", web.HTTPBadRequest)
+    require(isinstance(output, str) and 0 < len(output.strip()) <= 600, "预期产物为空或过长", web.HTTPBadRequest)
+    require(payload["coordinator_id"] == "coordinator-1"
+            and payload["coordinator_version"] == "1", "复查负责人无效或版本已经变化", web.HTTPConflict)
+    require(payload["timezone"] in available_timezones(), "复查时区无效", web.HTTPBadRequest)
+    due = datetime.fromisoformat(payload["due_at"])
+    clock = datetime.fromisoformat(api.store.get(db, NAMESPACE, "clock", "current")["at"])
+    require(due.tzinfo is not None and due.utcoffset() == due.astimezone(ZoneInfo(payload["timezone"])).utcoffset(),
+            "复查时间必须与时区一致", web.HTTPBadRequest)
+    require(clock < due <= clock + timedelta(days=366), "复查时间无效", web.HTTPBadRequest)
+    evidence = [line.strip() for line in payload["evidence_requirements"].splitlines() if line.strip()]
+    require(1 <= len(evidence) <= 8 and all(0 < len(item) <= 160 for item in evidence),
+            "证据要求缺少或无效", web.HTTPBadRequest)
+    identifier = "sector-" + str(uuid.uuid4())
+    record = {
+        "record_id": identifier, "version": "1", "kind": "REVIEW", "title": payload["action_code"],
+        "state": "REVIEW_REQUESTED", "created_at": now(), "page_id": page,
+        "query_id": payload["query_id"], "dataset_version": snapshot["dataset_version"],
+        "namespace": NAMESPACE, "purpose": purpose.strip(), "expected_output": output.strip(),
+        "coordinator_id": payload["coordinator_id"], "due_at": payload["due_at"], "timezone": payload["timezone"],
+        "evidence_requirements": evidence, "source_ids": [document["source_id"]],
+        "source_refs": payload["source_refs"], "task_id": None, "plan_id": None, "meeting_id": None,
+        "scheduled_by_plan_service": False, "source_type": "SIMULATED",
+    }
+    api.store.put(db, NAMESPACE, RECORD_KIND, identifier, record)
+    return {"record_id": identifier, "version": "1", "state": "REVIEW_REQUESTED", "kind": "REVIEW",
+            "title": payload["action_code"], "created_at": record["created_at"],
+            "query_id": payload["query_id"], "source_ids": record["source_ids"],
+            "task_id": None, "plan_id": None, "meeting_id": None}

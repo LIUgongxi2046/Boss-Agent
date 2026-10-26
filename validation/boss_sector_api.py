@@ -163,7 +163,7 @@ class BossSectorAPI:
             kind = ACTION_KINDS.get(label)
             if kind is None:
                 continue
-            allowed = kind in {"DECISION", "COORDINATE"} and bool(facts)
+            allowed = kind in {"DECISION", "COORDINATE", "REVIEW"} and bool(facts)
             followup_actions.append({"code": label, "label": label, "kind": kind, "allowed": allowed,
                                      "reason": "" if allowed else "当前服务尚未提供该后续动作",
                                      "option_required": False})

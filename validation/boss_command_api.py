@@ -187,6 +187,7 @@ class BossCommandAPI:
         "boss.owner.plan.cancel": "BOSS",
         "boss.today.reorder": "BOSS",
         "boss.sector.coordinate.create": "BOSS",
+        "boss.sector.review.schedule": "BOSS",
         "boss.sector.decision.save": "BOSS",
         "boss.runtime.save": "MAINTAINER",
         "boss.runtime.validate": "MAINTAINER",
@@ -468,6 +469,9 @@ class BossCommandAPI:
                 result = owner_authorization_revoke(self, db, data, payload)
             elif action == "boss.sector.coordinate.create":
                 result = self._sector_coordinate(db, data, payload, key)
+            elif action == "boss.sector.review.schedule":
+                from boss_v7_sector_actions import schedule_review
+                result = schedule_review(self, db, data, payload)
             elif action == "boss.sector.decision.save":
                 from boss_v7_sector_actions import save_decision
                 result = save_decision(self, db, data, payload)
