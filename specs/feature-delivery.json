@@ -738,8 +738,9 @@
       "a08_ui": "TOOL_OPTION_VISIBLE_WHEN_RUNTIME_SCOPE_EXPANDED",
       "a08_log": ".work/takeover/sector-agent-tool-a08.log",
       "conversation_native_read": "F15_READ_AND_METRICS_RENDERED",
-      "conversation_checks": "62_PASSED",
-      "conversation_log": ".work/takeover/sector-agent-conversation-tests.log",
+      "conversation_filtered_read": "F15_EAST_FILTER_APPLIED_THREE_RECORDS",
+      "conversation_checks": "50_PASSED",
+      "conversation_log": ".work/takeover/sector-conversation-filters-tests.log",
       "active_scope": "GOVERNED_BY_A08_CONFIGURATION",
       "full_product": "NOT_VERIFIED"
     },

@@ -639,3 +639,16 @@ def test_native_sector_question_reads_current_sector_pack(native):
     row = read(native, "runtime_run")[0]
     assert row["tool_results"][0]["tool_id"] == "bossSectorRead"
     assert not read(native, "task") and not read(native, "authorization")
+
+
+def test_native_sector_question_applies_current_filter_values(native):
+    from boss_sector_pack import ensure_sector_pack
+    store = native[0]
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        ensure_sector_pack(store, db, store.get(db, "ui-check", "initial", "snapshot"))
+    results, admitted = execute(native, ["水产季节 华东 当前指标与明细"])
+    assert "明细：3 条" in results[0].content
+    row = read(native, "runtime_run")[0]
+    assert row["tool_results"][0]["tool_id"] == "bossSectorRead"
+    assert row["tool_results"][0]["parameters_sha256"] == checksum({"page": "F15", "filters": {"区域": "华东"}})

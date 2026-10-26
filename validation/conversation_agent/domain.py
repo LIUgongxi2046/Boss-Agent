@@ -116,7 +116,22 @@ class ConversationPlanner:
         sector = next((page for page, design in SECTOR_CATALOGUE.items()
                        if len(str(design.get("title") or "")) >= 4 and str(design["title"]).casefold() in lowered), None)
         if sector is not None:
-            add("bossSectorRead", {"page": sector})
+            parameters = {"page": sector}
+            with self.store.connect() as db:
+                row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='document' AND id=?",
+                                 (NS, "sector-" + sector.lower() + "-a")).fetchone()
+            if row is not None:
+                options = (json.loads(row[0]).get("sector_facts") or {}).get("filter_options") or {}
+                filters = {}
+                for name, values in options.items():
+                    for value in values:
+                        label = value.get("label") if isinstance(value, dict) else value
+                        if label and str(label).casefold() in lowered:
+                            filters[name] = str(label)
+                            break
+                if filters:
+                    parameters["filters"] = filters
+            add("bossSectorRead", parameters)
         query_plan = ConversationQueries(self.store, self.api).plan(text, query, pending_query_scope)
         if query_plan.binding is not None:
             add("query_metrics", json.loads(query_plan.binding.parameters_json))

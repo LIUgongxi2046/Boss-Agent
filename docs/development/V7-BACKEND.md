@@ -293,9 +293,9 @@ Agent工具范围由`RuntimeValues.tool_scope`限制为1至19项，并与工具�
 
 ## 会话中的专题读取
 
-`ConversationPlanner`在用户文本包含专题标题时生成`bossSectorRead`调用，页面标题至少四个字，短标识不参与匹配。`ConversationReadTool`按本轮`allowed_calls`校验页面参数，模拟提供者把指标、明细、来源与缺口写入回答；原生会话检查覆盖新增调用与运行记录。
+`ConversationPlanner`在用户文本包含专题标题时生成`bossSectorRead`调用，页面标题至少四个字，短标识不参与匹配。文本同时包含当前页面的筛选值时，调用参数带上对应筛选项；筛选值来自当前资料包的`filter_options`。`ConversationReadTool`按本轮`allowed_calls`校验页面与筛选参数，模拟提供者把指标、明细、来源与缺口写入回答；原生会话检查覆盖新增调用与运行记录。
 
-2026-10-26检查原生会话、专题工具、运行记录与运行配置共62项通过，耗时34.57秒，日志`.work/takeover/sector-agent-conversation-tests.log`；会话询问“水产季节当前指标与明细”时调用`bossSectorRead`读取F15，回答包含指标与明细数量，运行记录保存工具编号，未创建任务或授权。
+2026-10-26检查原生会话、专题工具与专题范围共50项通过，耗时31.48秒，日志`.work/takeover/sector-conversation-filters-tests.log`；会话询问“水产季节当前指标与明细”时调用`bossSectorRead`读取F15，回答包含指标与明细数量；询问“水产季节 华东 当前指标与明细”时调用参数带区域筛选，回答明细3条，运行记录保存参数摘要，未创建任务或授权。
 
 ## 继续条件与未接入范围
 
