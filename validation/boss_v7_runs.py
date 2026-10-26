@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from urllib.parse import parse_qs
 
 from aiohttp import web
@@ -7,6 +8,36 @@ from business import now, require
 from boss_v7_store import NAMESPACE, optional, role_required, rows
 
 ACTIVE = {"QUEUED", "RUNNING", "WAITING_INPUT"}
+
+
+def _active_authorization(db, task_id):
+    moment = datetime.now(timezone.utc)
+    for row in rows(db, "authorization"):
+        if row.get("revoked"):
+            continue
+        payload = row.get("payload") or {}
+        if row.get("target_id") != task_id and payload.get("task_id") != task_id:
+            continue
+        until = row.get("valid_until")
+        if until is not None and datetime.fromisoformat(until) <= moment:
+            continue
+        return row
+    return None
+
+
+def _authorization_summary(db, task):
+    authorization = _active_authorization(db, task["task_id"])
+    waiting = []
+    if authorization is None:
+        waiting.append("缺少本人对当前动作的有效授权")
+    if task.get("source_reference_state") not in (None, "CURRENT"):
+        waiting.append("当前依据需要重新核查")
+    return {
+        "state": "AUTHORIZED" if authorization is not None else "MISSING_AUTHORIZATION",
+        "target_label": task["task_id"] + (" · " + task["purpose"] if task.get("purpose") else ""),
+        "waiting_inputs": waiting,
+        "coverage": "COMPLETE" if authorization is not None else "PARTIAL",
+    }
 
 
 def read_runs(store, db, snapshot):
@@ -65,6 +96,7 @@ def read_runs(store, db, snapshot):
                        "request_id": run.get("cancel_request", {}).get("request_id"),
                        "action": "boss.owner_workspace.runs.cancel" if run.get("cancel_request") else None,
                        "steps": steps, "usage": usage,
+                       "authorization_summary": _authorization_summary(db, task) if task else None,
                        "artifacts": list({row["id"]: row for row in artifacts}.values()), "source_ids": sorted(sources)})
     return sorted(result, key=lambda row: row["started_at"], reverse=True)
 

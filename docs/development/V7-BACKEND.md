@@ -214,3 +214,11 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 投影来自当前正式状态：执行空间、数据集版本、业务时钟及其版本、获准事件类型与目标、模拟作者、当前有效来源及全部操作记录。保存时逐项核查命名空间、数据集、时钟版本、目标版本、作者版本、来源版本与资料时间；内容、作者、来源或时间变化即拒绝。事件与回复保存为模拟记录与模拟事件对象；结果分项标记保存`RECORDED`、任务与通知`NOT_TRIGGERED`、模拟执行`NOT_TRIGGERED`、Agent`NOT_REQUESTED`，不把记录保存解释为业务执行。时钟推进采用当前版本、只允许前进且单次不超过366天，任务与通知结果标记`PENDING_CRON`，实际派发由CronService负责。
 
 2026-10-26检查`app/tests/test_boss_v7_simulation_events.py`5项通过，耗时2.72秒，日志`.work/takeover/simulation-events-tests.log`；与评测、会议资料目录、会议审批、纪要交办及V7服务回归70项通过，耗时9.51秒，日志`.work/takeover/simulation-events-regression-20261026.log`。认证后的运行实例读取与A04页面版本选项见`.work/takeover/simulation-events-http.log`与`.work/takeover/simulation-events-ui.log`。事件对任务、通知及Agent的实际效果仍待后续接入，完整产品未交付。
+
+## 会话授权摘要
+
+对应FR-24/29及V7-FRONTEND第33项接收要求。`read_runs`为绑定当前任务的运行增加`authorization_summary`：执行对象、授权状态、待补条件与覆盖范围。授权取自当前正式authorization对象：未撤销、未过期，且目标或载荷任务与运行绑定任务一致；来源引用状态不是`CURRENT`时列入待补条件；没有有效授权时状态为`MISSING_AUTHORIZATION`、覆盖为`PARTIAL`。未绑定任务的运行不生成摘要，N02保持“尚未核查”。
+
+N02“授权与必要决定”区域按该字段显示执行对象、有效授权、待补条件与覆盖范围；缺少条件只从正式记录产生，不推断授权通过，也不扩大业务写入权限。
+
+2026-10-26检查`app/tests/test_boss_v7_authorization_summary.py`3项通过，耗时0.56秒，日志`.work/takeover/authorization-summary-tests.log`；运行记录、V7服务、评测与模拟事件回归38项通过，耗时11.43秒，日志`.work/takeover/authorization-summary-regression.log`。完整授权条件、Agent上下文采用及界面连续操作继续待验证，完整产品未交付。

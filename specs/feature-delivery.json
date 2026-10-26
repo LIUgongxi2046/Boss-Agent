@@ -393,6 +393,16 @@
       "effects": ["TASKS_NOT_TRIGGERED", "NOTIFICATIONS_NOT_TRIGGERED", "AGENT_NOT_REQUESTED", "CLOCK_PENDING_CRON"],
       "full_product": "NOT_VERIFIED"
     },
+    "backend_authorization_summary_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "RUN_BOUND_AUTHORIZATION_SUMMARY_IMPLEMENTED",
+      "checks": "3_PASSED",
+      "check_log": ".work/takeover/authorization-summary-tests.log",
+      "regression": "38_PASSED",
+      "regression_log": ".work/takeover/authorization-summary-regression.log",
+      "frontend_consumer": "N02_AUTHORIZATION_SECTION",
+      "full_product": "NOT_VERIFIED"
+    },
     "frontend_sector_validation": {
       "pages": ["F15", "F16", "F17", "F18", "F19", "F20", "F22", "F23", "V19-EGG", "V19-MILK", "V19-BEEF"],
       "status": "STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_AND_PRODUCT_DOM_PENDING",
