@@ -597,9 +597,9 @@ export function MaintainerApplicationSeed() {
           <label>申请标题<input value={title} onChange={e=>setTitle(e.target.value)} placeholder="模拟申请的具体标题"/></label>
         </div>
         <label className="boss-label">申请说明</label>
-        <textarea rows={3} value={description} onChange={e=>setDescription(e.target.value)}/>
+        <textarea aria-label="申请说明" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/>
         <label className="boss-label">模拟申请附件内容（12—2500 字）</label>
-        <textarea rows={4} value={attachment} onChange={e=>setAttachment(e.target.value)}
+        <textarea aria-label="模拟申请附件内容" rows={4} value={attachment} onChange={e=>setAttachment(e.target.value)}
           placeholder="必须写入获准的模拟资料。此正文只供老板端按权限查看。"/>
         <div className="boss-actions">
           <button type="button" className="boss-btn boss-btn-primary" onClick={seed}

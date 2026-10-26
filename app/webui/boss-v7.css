@@ -927,3 +927,6 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
 .boss-v6[data-design="v7"] .boss-stage input[type="date"],
 .boss-v6[data-design="v7"] .boss-stage input[type="datetime-local"]{min-height:40px}
 .boss-v6[data-design="v7"] .boss-helper{overflow-wrap:anywhere;word-break:break-word}
+.boss-v6[data-design="v7"] .boss-stage p,
+.boss-v6[data-design="v7"] .boss-stage small,
+.boss-v6[data-design="v7"] .boss-stage span{overflow-wrap:anywhere}
