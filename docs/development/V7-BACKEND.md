@@ -243,7 +243,13 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_v7_sector_actions.py`实现本人专题决定命令`boss.sector.decision.save`，仅对具备“记录资源决定”“调整项目”“记录安排”动作的页面开放。保存前核查页面、执行空间、数据集版本、由当前条件计算的查询编号、动作类别、来源版本以及目的与决定正文；版本不一致返回冲突。决定保存为带记录编号、版本、查询编号和来源的正式记录，不创建任务、计划或会议，也不发送消息。
 
-专题读取返回`followup_actions`与`followups`：决定、协调与复查类动作在资料包可用时开放，会议类动作明确标记“当前服务尚未提供该后续动作”；已保存决定、协调与复查记录按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。
+专题读取返回`followup_actions`与`followups`：决定、协调、复查与会议类动作在资料包可用时开放；已保存记录按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。
+
+## 专题会议草稿
+
+`boss.sector.meeting.prepare`面向“准备会面”“准备跨时区会议”。保存前核查页面、执行空间、数据集版本、查询编号、动作类别、来源版本、目的、参会人、会议开始与结束时间、时区及地点；参会人必须来自当前有效目录，时间必须包含明确时区且结束晚于开始，地点为必填。
+
+结果保存为`DRAFT_SAVED`记录，包含参会人、时间、地点、来源与查询编号；不创建正式会议、不修改会议邀请，也不发送消息。2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`9项通过，耗时3.10秒，日志`.work/takeover/sector-meeting-tests.log`；认证后F22显示“准备跨时区会议”可用，页面填写参会人、时间与地点并确认提交后生成`DRAFT_SAVED`记录，会议编号为空，日志`.work/takeover/sector-meeting-http.log`与`.work/takeover/sector-meeting-ui.log`。会议服务的正式接入与邀请流程继续待接入。
 
 ## 专题复查登记
 

@@ -681,7 +681,7 @@
       "ui_log": ".work/takeover/sector-metrics-ui.log",
       "filter_options": "EXPOSED_AND_APPLIED",
       "metric_calculation": "DERIVED_FROM_FILTERED_DETAIL_ROWS_SUM_OR_AVERAGE",
-      "remaining": ["SECTOR_MEETING_ACTIONS"],
+      "remaining": ["SECTOR_MEETING_SERVICE_INTEGRATION"],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_review_validation": {
@@ -695,6 +695,19 @@
       "ui_log": ".work/takeover/sector-review-ui.log",
       "plan_created": false,
       "task_created": false,
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_sector_meeting_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "MEETING_DRAFT_RECORDED_MEETING_SERVICE_INTEGRATION_PENDING",
+      "checks": "9_PASSED",
+      "check_log": ".work/takeover/sector-meeting-tests.log",
+      "authenticated_http": "F22_MEETING_ACTION_ALLOWED",
+      "http_log": ".work/takeover/sector-meeting-http.log",
+      "authenticated_ui": "MEETING_DRAFT_SUBMITTED_DRAFT_SAVED_RECORDED",
+      "ui_log": ".work/takeover/sector-meeting-ui.log",
+      "meeting_created": false,
+      "message_sent": false,
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_coordinate_validation": {

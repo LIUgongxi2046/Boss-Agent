@@ -146,3 +146,76 @@ def schedule_review(api, db, snapshot, payload):
             "title": payload["action_code"], "created_at": record["created_at"],
             "query_id": payload["query_id"], "source_ids": record["source_ids"],
             "task_id": None, "plan_id": None, "meeting_id": None}
+
+
+MEETING_LABELS = {"准备会面", "准备跨时区会议"}
+
+
+def prepare_meeting(api, db, snapshot, payload):
+    from datetime import datetime
+    from zoneinfo import ZoneInfo, available_timezones
+    require(set(payload) == {"client_request_id", "page_id", "execution_namespace", "dataset_version",
+                             "query_id", "action_code", "filters", "overview_reference", "source_refs",
+                             "purpose", "timezone", "attendee_refs", "starts_at", "ends_at", "location"},
+            "专题会议字段不完整", web.HTTPBadRequest)
+    page = payload["page_id"]
+    require(page in SECTORS, "专题页面不属于当前范围", web.HTTPBadRequest)
+    require(payload["execution_namespace"] == NAMESPACE, "执行空间不一致", web.HTTPConflict)
+    require(payload["dataset_version"] == snapshot["dataset_version"], "数据集版本已经变化", web.HTTPConflict)
+    filters, overview = payload["filters"], payload["overview_reference"]
+    require(isinstance(filters, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in filters.items()),
+            "筛选条件无效", web.HTTPBadRequest)
+    require(overview is None or isinstance(overview, dict), "经营范围引用无效", web.HTTPBadRequest)
+    require(payload["query_id"] == query_id_for(page, filters, overview),
+            "专题查询版本已经变化，请重新读取", web.HTTPConflict)
+    require(payload["action_code"] in MEETING_LABELS, "专题会议动作不在获准范围", web.HTTPBadRequest)
+    purpose = payload["purpose"]
+    require(isinstance(purpose, str) and 0 < len(purpose.strip()) <= 400, "会议目的为空或过长", web.HTTPBadRequest)
+    location = payload["location"]
+    require(isinstance(location, str) and 0 < len(location.strip()) <= 500, "会议地点为空或过长", web.HTTPBadRequest)
+    require(payload["timezone"] in available_timezones(), "会议时区无效", web.HTTPBadRequest)
+    starts = datetime.fromisoformat(payload["starts_at"])
+    ends = datetime.fromisoformat(payload["ends_at"])
+    clock = datetime.fromisoformat(api.store.get(db, NAMESPACE, "clock", "current")["at"])
+    zone = ZoneInfo(payload["timezone"])
+    require(all(moment.tzinfo is not None and moment.utcoffset() == moment.astimezone(zone).utcoffset()
+                for moment in (starts, ends)), "会议时间必须与时区一致", web.HTTPBadRequest)
+    require(clock < starts < ends, "会议时间无效", web.HTTPBadRequest)
+    contacts = {row["contact_id"]: row for row in snapshot["contacts"]}
+    attendee_refs = payload["attendee_refs"]
+    require(isinstance(attendee_refs, list) and 1 <= len(attendee_refs) <= 8
+            and all(isinstance(row, dict) and set(row) == {"contact_id", "version"} for row in attendee_refs),
+            "参会人无效", web.HTTPBadRequest)
+    seen = set()
+    today = clock.date().isoformat()
+    for row in attendee_refs:
+        contact = contacts.get(row["contact_id"])
+        require(contact is not None and row["version"] == "1" and row["contact_id"] not in seen
+                and contact["valid_from"] <= today <= contact["valid_until"], "参会人不在当前有效目录", web.HTTPConflict)
+        seen.add(row["contact_id"])
+    source_ids = []
+    for reference in payload["source_refs"]:
+        require(isinstance(reference, dict) and set(reference) == {"source_id", "version"},
+                "来源字段无效", web.HTTPBadRequest)
+        document = api.store.get(db, NAMESPACE, "document", reference["source_id"])
+        require(document.get("version") == reference["version"]
+                and document.get("access_scope") == snapshot["owner_id"]
+                and not document.get("withdrawn") and document.get("source_type") == "SIMULATED",
+                "来源不在当前获准范围", web.HTTPConflict)
+        source_ids.append(document["source_id"])
+    identifier = "sector-" + str(uuid.uuid4())
+    record = {
+        "record_id": identifier, "version": "1", "kind": "MEETING", "title": payload["action_code"],
+        "state": "DRAFT_SAVED", "created_at": now(), "page_id": page, "query_id": payload["query_id"],
+        "dataset_version": snapshot["dataset_version"], "namespace": NAMESPACE,
+        "purpose": purpose.strip(), "timezone": payload["timezone"],
+        "attendee_refs": attendee_refs, "starts_at": payload["starts_at"], "ends_at": payload["ends_at"],
+        "location": location.strip(), "source_ids": sorted(set(source_ids)),
+        "source_refs": payload["source_refs"], "task_id": None, "plan_id": None, "meeting_id": None,
+        "scheduled_by_meeting_service": False, "message_sent": False, "source_type": "SIMULATED",
+    }
+    api.store.put(db, NAMESPACE, RECORD_KIND, identifier, record)
+    return {"record_id": identifier, "version": "1", "state": "DRAFT_SAVED", "kind": "MEETING",
+            "title": payload["action_code"], "created_at": record["created_at"],
+            "query_id": payload["query_id"], "source_ids": record["source_ids"],
+            "task_id": None, "plan_id": None, "meeting_id": None, "message_sent": False}

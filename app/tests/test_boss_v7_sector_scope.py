@@ -111,7 +111,7 @@ def test_owner_decision_is_saved_and_listed_for_current_query(store):
     projection = BossSectorAPI(store).serve("BOSS", query(page="F22"))[1]
     assert any(row["record_id"] == record_id and row["kind"] == "DECISION" for row in projection["followups"])
     assert any(action["kind"] == "DECISION" and action["allowed"] for action in projection["followup_actions"])
-    assert any(not action["allowed"] for action in projection["followup_actions"] if action["kind"] != "DECISION")
+    assert all(action["allowed"] for action in projection["followup_actions"])
 
 
 def test_owner_coordination_creates_task_and_followup(store):
@@ -161,6 +161,31 @@ def test_owner_review_request_is_recorded_without_plan(store):
     follow = next(row for row in projection["followups"] if row["record_id"] == receipt["record_id"])
     assert follow["kind"] == "REVIEW"
     assert any(action["kind"] == "REVIEW" and action["allowed"] for action in projection["followup_actions"])
+
+
+def test_owner_meeting_draft_is_saved_without_meeting_or_message(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": query_id_for("F22", {}, None), "action_code": "准备跨时区会议",
+               "filters": {}, "overview_reference": None,
+               "source_refs": [{"source_id": "sector-f22-a", "version": "1"}],
+               "purpose": "讨论交付缺口", "timezone": "Asia/Shanghai",
+               "attendee_refs": [{"contact_id": "coordinator-1", "version": "1"}],
+               "starts_at": "2026-10-25T10:00:00+08:00", "ends_at": "2026-10-25T11:00:00+08:00",
+               "location": "线上会议"}
+    status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.meeting.prepare", payload)
+    assert status == 200, receipt
+    assert receipt["kind"] == "MEETING" and receipt["state"] == "DRAFT_SAVED"
+    assert receipt["meeting_id"] is None and receipt["message_sent"] is False
+    projection = BossSectorAPI(store).serve("BOSS", query(page="F22"))[1]
+    follow = next(row for row in projection["followups"] if row["record_id"] == receipt["record_id"])
+    assert follow["kind"] == "MEETING"
+    assert any(action["kind"] == "MEETING" and action["allowed"] for action in projection["followup_actions"])
+    bad = {**payload, "client_request_id": str(__import__("uuid").uuid4()),
+           "attendee_refs": [{"contact_id": "missing", "version": "1"}]}
+    status, body = BossCommandAPI(store).execute("BOSS", "boss.sector.meeting.prepare", bad)
+    assert status == 409, body
 
 
 def test_stale_query_and_other_roles_are_rejected(store):
