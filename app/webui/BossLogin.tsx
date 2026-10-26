@@ -26,6 +26,7 @@ export async function bossFetchBootstrap(baseUrl="",secret="",timeoutMs=15000,ac
 
 export function bossClearSavedSecret(){requestedRole=null;clearSavedSecret();}
 
+type DesktopBridge={invoke:(request:Record<string,unknown>)=>Promise<Record<string,unknown>>};
 type Props={mode?:"auth"|"loading"|"error";failed?:boolean;expired?:boolean;message?:string;onSecret:(secret:string,expectedRole:Role)=>void};
 
 export function BossLogin({mode="auth",failed=false,expired:expiredProp=false,message="",onSecret}:Props){
@@ -44,6 +45,19 @@ export function BossLogin({mode="auth",failed=false,expired:expiredProp=false,me
   const busy=pending||mode==="loading";
   const error=validation||(failed&&!returnedToLogin?"登录已过期，请重新登录。":mode==="error"?message.includes("身份范围")?"当前账号不能进入所选工作区。":"暂时无法登录，请稍后重试。":"");
   useEffect(()=>{setReturnedToLogin(false);},[expiredProp,failed]);
+  useEffect(()=>{
+    const bridge=(window as Window&{bossDesktop?:DesktopBridge}).bossDesktop;
+    if(!bridge)return;
+    let active=true;
+    void bridge.invoke({action:"status"}).then(async status=>{
+      if(!active||status.demo_account_injection_supported!==true)return;
+      const account=await bridge.invoke({action:"test_account",role});
+      if(!active||account.role!==role||typeof account.username!=="string"||typeof account.password!=="string")return;
+      setUsername(previous=>previous||String(account.username));
+      setPassword(previous=>previous||String(account.password));
+    }).catch(()=>{});
+    return()=>{active=false;};
+  },[role]);
   function returnLogin(){
     if(busy)return;
     setReturnedToLogin(true);setUsername("");setPassword("");setVisible(false);setValidation("");requestedRole=null;

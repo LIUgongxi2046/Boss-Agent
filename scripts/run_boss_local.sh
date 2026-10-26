@@ -33,6 +33,9 @@ if [[ ! -f "$APPLICATION_WORK/accounts/accounts.sqlite" ]]; then
 fi
 export BOSS_VALIDATION_ROOT="$ROOT/validation"
 export BOSS_PRODUCT_UI=1
+# 本机验收实例允许桌面端读取本地账号文件预填登录表单，不自动提交。
+export BOSS_EXECUTION_SCOPE="BOSS-PRIORITY-ITERATION"
+export BOSS_DEMO_ACCOUNT_INJECTION=1
 echo "启动 Boss Agent 本机研发环境。"
 cd "$ROOT"
 exec npm --prefix validation/desktop run start
