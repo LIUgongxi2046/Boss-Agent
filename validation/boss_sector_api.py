@@ -137,11 +137,26 @@ class BossSectorAPI:
                      "state": "SIMULATED" if facts else "SOURCE_NOT_AVAILABLE"}
                     for label in (design.get("right") or [])]
         if facts:
-            missing = ["指标来自模拟资料包；明细、关系与后续动作尚未提供"]
+            missing = ["明细与指标来自模拟资料包；后续动作尚未提供"]
         else:
             missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
             if matching:
                 missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
+        records, sections, relations, workflow = [], [], [], []
+        if facts:
+            pack_source_ids = [pack["source_id"]]
+            for row in facts.get("rows", []):
+                dims = row.get("dims", {})
+                if any(key in dims and dims[key] != value for key, value in applied.items()):
+                    continue
+                records.append({"id": row["id"], "values": row["values"],
+                                "source_ids": pack_source_ids, "version": "1", "state": "SIMULATED"})
+            sections = [{**row, "state": "SIMULATED", "source_ids": pack_source_ids}
+                        for row in facts.get("sections", [])]
+            relations = [{**row, "source_ids": pack_source_ids}
+                         for row in facts.get("relations", [])]
+            workflow = [{**row, "source_ids": row.get("source_ids") or pack_source_ids}
+                        for row in facts.get("workflow", [])]
         return 200, {
             "projection": "sector-workspace", "page_id": page, "title": title,
             "source_type": "SIMULATED", "namespace": self.namespace,
@@ -165,7 +180,7 @@ class BossSectorAPI:
                                    "source_ids": [pack["source_id"]]}
                                   for point in facts["metrics"][0]["points"]]}
                       if facts and facts["metrics"] else None),
-            "records": [], "sections": [], "relations": [], "workflow": [],
+            "records": records, "sections": sections, "relations": relations, "workflow": workflow,
             "sources": sources, "coverage": coverage, "missing_fields": missing,
             "availability": "SIMULATED_METRICS_ONLY" if facts else "SOURCE_NOT_AVAILABLE", "contacts": contacts,
             "followup_actions": [], "resource_options": [], "timezones": [timezone],

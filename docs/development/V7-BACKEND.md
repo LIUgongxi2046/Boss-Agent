@@ -231,4 +231,4 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_sector_pack.py`按执行空间写入一次版本化模拟资料包`SECTOR-PACK-1`：每个专题页一份来源文档，包含2026-08至2026-10三项指标点、单位、定义版本与明确`SIMULATED`标记，数据由固定种子生成，不代表真实经营结果。包在应用启动时按数据集版本写入，重复启动不重复生成。
 
-专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`；明细、关系与后续动作仍标记为待提供。2026-10-26检查同一测试文件4项通过，耗时1.07秒，日志`.work/takeover/sector-pack-tests.log`；认证后的F15、F17、F22读取返回200并包含数值、单位与来源，页面显示单位、模拟覆盖与来源编号，日志`.work/takeover/sector-pack-http.log`与`.work/takeover/sector-pack-ui.log`。专题明细、关系、后续动作及完整指标计算继续待接入。
+专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。2026-10-26检查同一测试文件4项通过，耗时1.81秒，日志`.work/takeover/sector-records-tests.log`；认证后的F15、F16、F17、F22读取返回200，F15为6条明细与4个章节，F16含7项关系，F17含5个流程阶段，页面显示明细、章节、关系与阶段，日志`.work/takeover/sector-records-http.log`与`.work/takeover/sector-records-ui.log`。专题后续动作、完整指标计算口径及真实业务资料继续待接入。

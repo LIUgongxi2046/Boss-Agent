@@ -64,9 +64,14 @@ def test_pack_provides_metrics_trend_and_source(store):
     assert body["sources"][0]["source_id"] == "sector-f15-a"
     assert all(row["state"] == "SIMULATED" for row in body["coverage"])
     assert any("明细" in field for field in body["missing_fields"])
+    assert len(body["records"]) == 6
+    assert body["records"][0]["state"] == "SIMULATED"
+    assert body["records"][0]["source_ids"] == ["sector-f15-a"]
+    assert body["sections"] and all(row["state"] == "SIMULATED" for row in body["sections"])
 
 
 def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
+    seed(store)
     api = BossSectorAPI(store)
     _, first = api.serve("BOSS", query(page="F15"))
     overview = {"page_id": "N03", "use": "BROILER", "snapshot_sha256": "abc",
@@ -79,6 +84,8 @@ def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
     assert second["applied_filters"] == {"区域": "华东"}
     assert second["overview_reference"] == overview
     assert second["query_id"] != first["query_id"]
+    assert 0 < len(second["records"]) < len(first["records"])
+    assert all(row["values"]["区域"] == "华东" for row in second["records"])
 
 
 def test_invalid_scope_is_rejected(store):
