@@ -110,6 +110,11 @@ class BossSectorAPI:
                             "related_scope": "region-1 EXTERNAL_SALES water-feed comparison",
                             "not_evidence_for": "raw-material quotation, contract, inventory or consumption cost",
                         })
+            pack_row = db.execute(
+                "SELECT body FROM objects WHERE namespace=? AND kind='document' AND id=?",
+                (self.namespace, "sector-" + page.lower() + "-a"),
+            ).fetchone()
+            pack = json.loads(pack_row[0]) if pack_row else None
         design = CATALOGUE.get(page) or {}
         timezone = base["boss_profile"].get("timezone", "Asia/Shanghai")
         today = clock["at"][:10]
@@ -118,15 +123,25 @@ class BossSectorAPI:
                      "responsibility": contact["responsibility"],
                      "eligible": contact["valid_from"] <= today <= contact["valid_until"]}
                     for contact in base["contacts"]]
-        sources = [{"source_id": doc["source_id"], "version": doc["version"], "source_type": "SIMULATED",
-                    "published_at": doc.get("published_at"), "related_scope": doc["related_scope"],
-                    "validity_state": "VALID", "author_display_name": doc.get("author_display_name")}
-                   for doc in matching]
-        coverage = [{"label": label, "value": "尚未提供", "state": "SOURCE_NOT_AVAILABLE"}
+        facts = pack.get("sector_facts") if pack else None
+        pack_source = ({"source_id": pack["source_id"], "version": pack["version"], "source_type": "SIMULATED",
+                        "published_at": pack.get("published_at"), "related_scope": f"{page} 模拟指标",
+                        "validity_state": "VALID", "author_display_name": "李文"} if pack else None)
+        sources = ([pack_source] if pack_source else []) + [
+            {"source_id": doc["source_id"], "version": doc["version"], "source_type": "SIMULATED",
+             "published_at": doc.get("published_at"), "related_scope": doc["related_scope"],
+             "validity_state": "VALID", "author_display_name": doc.get("author_display_name")}
+            for doc in matching]
+        coverage = [{"label": label,
+                     "value": "模拟指标已生成" if facts else "尚未提供",
+                     "state": "SIMULATED" if facts else "SOURCE_NOT_AVAILABLE"}
                     for label in (design.get("right") or [])]
-        missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
-        if matching:
-            missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
+        if facts:
+            missing = ["指标来自模拟资料包；明细、关系与后续动作尚未提供"]
+        else:
+            missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
+            if matching:
+                missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
         return 200, {
             "projection": "sector-workspace", "page_id": page, "title": title,
             "source_type": "SIMULATED", "namespace": self.namespace,
@@ -135,17 +150,28 @@ class BossSectorAPI:
             "business_clock": clock["at"], "overview_reference": overview,
             "design_filters": design_filters, "filter_options": {},
             "applied_filters": applied,
-            "metrics": [{"id": f"{page}-kpi-{index}", "label": label, "value": None, "unit": None,
-                         "period": None, "source_ids": [], "state": "SOURCE_NOT_AVAILABLE",
-                         "definition_version": "1", "comparability": "当前没有可比较的正式明细"}
-                        for index, label in enumerate(kpis)],
-            "trend": None, "records": [], "sections": [], "relations": [], "workflow": [],
+            "metrics": ([{"id": f"{page}-kpi-{index}", "label": metric["label"],
+                          "value": metric["points"][-1]["value"], "unit": metric["unit"],
+                          "period": facts["period"], "source_ids": [pack["source_id"]],
+                          "state": "SIMULATED", "definition_version": "1",
+                          "comparability": "同一模拟资料包与指标定义版本"}
+                         for index, metric in enumerate(facts["metrics"])] if facts else
+                        [{"id": f"{page}-kpi-{index}", "label": label, "value": None, "unit": None,
+                          "period": None, "source_ids": [], "state": "SOURCE_NOT_AVAILABLE",
+                          "definition_version": "1", "comparability": "当前没有可比较的正式明细"}
+                         for index, label in enumerate(kpis)]),
+            "trend": ({"metric_id": facts["metrics"][0]["label"], "unit": facts["metrics"][0]["unit"],
+                       "points": [{"period": point["period"], "value": point["value"],
+                                   "source_ids": [pack["source_id"]]}
+                                  for point in facts["metrics"][0]["points"]]}
+                      if facts and facts["metrics"] else None),
+            "records": [], "sections": [], "relations": [], "workflow": [],
             "sources": sources, "coverage": coverage, "missing_fields": missing,
-            "availability": "SOURCE_NOT_AVAILABLE", "contacts": contacts,
+            "availability": "SIMULATED_METRICS_ONLY" if facts else "SOURCE_NOT_AVAILABLE", "contacts": contacts,
             "followup_actions": [], "resource_options": [], "timezones": [timezone],
             "owner_timezone": timezone, "related_source_refs": matching,
-            "sector_specific_dataset_available": False,
-            "sector_kpi_calculations_supported": False,
+            "sector_specific_dataset_available": bool(facts),
+            "sector_kpi_calculations_supported": bool(facts),
             "data_gap": ("已有关联水产饲料外销经营资料，但不足以计算本页指标。" if matching
                          else "尚无本专题经过核验的有效模拟业务明细。"),
             "business_scope": "selection dataset; not a full enterprise ERP",

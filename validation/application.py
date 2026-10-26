@@ -162,6 +162,12 @@ async def serve():
         store.active(db, NAMESPACE)
         initial = store.get(db, NAMESPACE, "initial", "snapshot")
         require_dataset_scope(db, NAMESPACE, initial)
+    if product_mode:
+        from boss_sector_pack import ensure_sector_pack
+        with store.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            store.active(db, NAMESPACE)
+            ensure_sector_pack(store, db, store.get(db, NAMESPACE, "initial", "snapshot"))
     output = NATIVE_ROOT / "diagnostics" if product_mode else ROOT.parent / "evidence/T02/application"
     output.mkdir(parents=True, exist_ok=True, mode=0o700 if product_mode else 0o755)
     if product_mode:

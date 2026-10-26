@@ -227,4 +227,8 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 对应FR-14至FR-23及V7-FRONTEND专题接收要求。`boss_sector_api.py`接收`page`、可选`filters`与`overview_reference`，校验JSON对象与字段类型，回显实际应用条件并生成稳定`query_id`。返回`sector-workspace`投影，包含业务时钟、指标定义版本、按页面配置生成的覆盖标签、缺失字段、联系人及记录/趋势/关系集合；没有正式专题明细时指标保持`SOURCE_NOT_AVAILABLE`，不以示例数值填充。经营关注入口的范围引用原样返回，供页面核对同一查询范围。
 
-2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`3项通过，耗时1.44秒，日志`.work/takeover/sector-scope-tests.log`；认证后的F15与F22页面正常读取范围响应，覆盖标签与缺失字段显示，日志`.work/takeover/sector-scope-ui.log`。专题模拟资料包、指标计算与后续动作服务仍待接入。
+2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`3项通过，耗时1.44秒，日志`.work/takeover/sector-scope-tests.log`；认证后的F15与F22页面正常读取范围响应，覆盖标签与缺失字段显示，日志`.work/takeover/sector-scope-ui.log`。
+
+`boss_sector_pack.py`按执行空间写入一次版本化模拟资料包`SECTOR-PACK-1`：每个专题页一份来源文档，包含2026-08至2026-10三项指标点、单位、定义版本与明确`SIMULATED`标记，数据由固定种子生成，不代表真实经营结果。包在应用启动时按数据集版本写入，重复启动不重复生成。
+
+专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`；明细、关系与后续动作仍标记为待提供。2026-10-26检查同一测试文件4项通过，耗时1.07秒，日志`.work/takeover/sector-pack-tests.log`；认证后的F15、F17、F22读取返回200并包含数值、单位与来源，页面显示单位、模拟覆盖与来源编号，日志`.work/takeover/sector-pack-http.log`与`.work/takeover/sector-pack-ui.log`。专题明细、关系、后续动作及完整指标计算继续待接入。

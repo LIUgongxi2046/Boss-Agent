@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 from urllib.parse import urlencode
@@ -8,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "validation"))
 
 from boss_sector_api import BossSectorAPI, CATALOGUE
+from boss_sector_pack import ensure_sector_pack
 from controls import ControlStore
 
 
@@ -16,6 +18,13 @@ def store(tmp_path):
     result = ControlStore(tmp_path / "sector-scope.sqlite")
     result.initialize("ui-check")
     return result
+
+
+def seed(store):
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        snapshot = store.get(db, "ui-check", "initial", "snapshot")
+        ensure_sector_pack(store, db, snapshot)
 
 
 def query(**values):
@@ -39,6 +48,24 @@ def test_default_projection_matches_frontend_scope_contract(store):
     assert body["availability"] == "SOURCE_NOT_AVAILABLE"
 
 
+def test_pack_provides_metrics_trend_and_source(store):
+    seed(store)
+    status, body = BossSectorAPI(store).serve("BOSS", query(page="F15"))
+    assert status == 200
+    assert body["availability"] == "SIMULATED_METRICS_ONLY"
+    assert body["sector_specific_dataset_available"] is True
+    first = body["metrics"][0]
+    assert first["value"] is not None and first["unit"] == "吨"
+    assert first["period"] == "2026-10"
+    assert first["source_ids"] == ["sector-f15-a"]
+    assert first["state"] == "SIMULATED"
+    assert body["trend"]["metric_id"] == first["label"]
+    assert [point["period"] for point in body["trend"]["points"]] == ["2026-08", "2026-09", "2026-10"]
+    assert body["sources"][0]["source_id"] == "sector-f15-a"
+    assert all(row["state"] == "SIMULATED" for row in body["coverage"])
+    assert any("明细" in field for field in body["missing_fields"])
+
+
 def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
     api = BossSectorAPI(store)
     _, first = api.serve("BOSS", query(page="F15"))
@@ -47,7 +74,7 @@ def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
                           "period_start": "2026-10-01", "period_end": "2026-10-10",
                           "timezone": "Asia/Shanghai", "attention": []}}
     status, second = api.serve("BOSS", urlencode({"page": "F15", "filters": '{"区域":"华东"}',
-                                                  "overview_reference": __import__("json").dumps(overview)}))
+                                                  "overview_reference": json.dumps(overview)}))
     assert status == 200
     assert second["applied_filters"] == {"区域": "华东"}
     assert second["overview_reference"] == overview

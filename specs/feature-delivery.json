@@ -631,7 +631,7 @@
         "V19-MILK",
         "V19-BEEF"
       ],
-      "status": "STRUCTURE_IMPLEMENTED_SCOPE_RESPONSE_AVAILABLE_SECTOR_DATA_PACK_PENDING",
+      "status": "STRUCTURE_IMPLEMENTED_SIMULATED_METRIC_PACK_AVAILABLE_DETAILS_AND_PRODUCT_DOM_PENDING",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
       "build_log": ".work/takeover/sector-workspace-build-final.log",
       "navigation": "5_PASSED_REAL_CHROMIUM_AND_REACT",
@@ -645,9 +645,23 @@
       "status": "SCOPE_ECHO_AND_HONEST_NO_DATA_STATE_IMPLEMENTED_DATA_PACK_PENDING",
       "checks": "3_PASSED",
       "check_log": ".work/takeover/sector-scope-tests.log",
-      "authenticated_ui": "F15_F22_NO_SCOPE_ERROR_COVERAGE_AND_MISSING_RENDERED",
+      "authenticated_ui": "F15_F22_SCOPE_RESPONSE_COVERAGE_AND_MISSING_RENDERED",
       "ui_log": ".work/takeover/sector-scope-ui.log",
-      "remaining": ["SECTOR_SIMULATED_DATASET_PACK", "SECTOR_FOLLOWUP_ACTIONS", "SECTOR_METRIC_CALCULATION"],
+      "remaining": ["SECTOR_FOLLOWUP_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_sector_pack_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "SIMULATED_METRIC_PACK_AND_TREND_IMPLEMENTED_DETAILS_PENDING",
+      "definition": "SECTOR-PACK-1",
+      "pages": ["F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "V19-BEEF", "V19-EGG", "V19-MILK"],
+      "checks": "4_PASSED",
+      "check_log": ".work/takeover/sector-pack-tests.log",
+      "authenticated_http": "F15_F17_F22_200_WITH_VALUES_UNITS_SOURCES",
+      "http_log": ".work/takeover/sector-pack-http.log",
+      "authenticated_ui": "F15_F22_UNITS_COVERAGE_AND_SOURCE_RENDERED",
+      "ui_log": ".work/takeover/sector-pack-ui.log",
+      "remaining": ["SECTOR_DETAIL_RECORDS", "SECTOR_RELATIONS_AND_WORKFLOW", "SECTOR_FOLLOWUP_ACTIONS"],
       "full_product": "NOT_VERIFIED"
     },
     "frontend_shared_access_validation": {
