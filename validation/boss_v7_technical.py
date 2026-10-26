@@ -10,6 +10,7 @@ from boss_v7_local_system import read_local_system
 from boss_v7_models import ModelConnections
 from boss_v7_datasets import DatasetWorkspace
 from boss_v7_evaluation import cancel as evaluation_cancel, read_evaluation, start as evaluation_start
+from boss_v7_simulation_events import advance_clock, read_simulation_events, record as record_simulation_event
 from boss_v7_relationships import read_relationships, save_contact
 from boss_v7_store import NAMESPACE, execute_transaction, read_receipt, role_required
 
@@ -21,7 +22,8 @@ ACTIONS.update({PREFIX + domain + "." + action: "MAINTAINER" for domain in CONFI
 ACTIONS.update({PREFIX + "models." + action: "MAINTAINER" for action in ("save", "validate", "activate", "cancel")})
 ACTIONS.update({PREFIX + "datasets." + action: "MAINTAINER" for action in ("generate", "validate", "load", "reset", "inspect-reset")})
 ACTIONS.update({PREFIX + "evaluation." + action: "MAINTAINER" for action in ("start", "reset", "cancel")})
-DOMAINS = {"relationships", "audit", "knowledge", "local-system", "models", "datasets", "evaluation"} | CONFIG_DOMAINS
+ACTIONS.update({PREFIX + "simulation-events." + action: "MAINTAINER" for action in ("inject", "reply", "advance-clock")})
+DOMAINS = {"relationships", "audit", "knowledge", "local-system", "models", "datasets", "evaluation", "simulation-events"} | CONFIG_DOMAINS
 
 
 class TechnicalWorkspaceAPI:
@@ -74,6 +76,8 @@ class TechnicalWorkspaceAPI:
                 data = read_local_system(self.store, db)
             elif domain == "evaluation":
                 data = read_evaluation(self.store, db, snapshot)
+            elif domain == "simulation-events":
+                data = read_simulation_events(self.store, db, snapshot, query)
             else:
                 data = read_audit(db)
             return {"projection": domain, "private_body_available_here": False, "namespace": NAMESPACE, "read_at": now(), **data}
@@ -94,6 +98,10 @@ class TechnicalWorkspaceAPI:
                 if action == "cancel":
                     return evaluation_cancel(api, db, payload)
                 return evaluation_start(api, db, snapshot, payload, reset=action == "reset")
+            if domain == "simulation-events":
+                if action == "advance-clock":
+                    return advance_clock(api.store, db, snapshot, payload)
+                return record_simulation_event(api.store, db, snapshot, payload, action)
             if command == PREFIX + "relationships.save":
                 return save_contact(api, db, snapshot, payload)
             return mutate_knowledge(api, db, snapshot, payload, action)

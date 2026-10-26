@@ -206,3 +206,11 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 版本目录来自正式状态：数据快照为当前执行空间的`selection` v1，模型为当前配置`deepseek-flash` v1，Prompt使用当前已启用版本，未配置时明确标注“内置运行时提示 vbuiltin-1”；SOP版本读取`agent/skills`中SOP01—SOP13的`0.1.0`。每次尝试保存全部断言预期与实际观察、证据编号、耗时与失败清单；没有模型请求时费用保持null、覆盖标记`NO_MODEL_REQUESTS`。失败的断言保存为失败记录，已结束的尝试不能取消；重置保留全部历史并新建尝试。评分与断言不进入Agent上下文，尝试记录不改写业务对象。
 
 2026-10-26检查`app/tests/test_boss_v7_evaluation.py`4项通过，耗时3.53秒，日志`.work/takeover/evaluation-tests.log`；与会议资料目录、会议审批、纪要交办及V7服务回归65项通过，耗时12.27秒，日志`.work/takeover/evaluation-regression-20261026.log`。认证后的运行实例读取返回200，A16页面显示两个任务集、数据快照、模型、Prompt与13项SOP版本，日志`.work/takeover/evaluation-http.log`与`.work/takeover/evaluation-ui.log`。没有执行真实模型请求；实际评测运行与完整评分隔离验收继续待执行。
+
+## 场景与事件（A04）
+
+对应FR-25与V7-FRONTEND第10项接收要求。`boss_v7_simulation_events.py`提供`/api/boss/ui/admin/technical/simulation-events`读取及`boss.technical.simulation-events.inject/reply/advance-clock`写入，身份限定MAINTAINER，写入走现有SQLite事务与原请求回执。
+
+投影来自当前正式状态：执行空间、数据集版本、业务时钟及其版本、获准事件类型与目标、模拟作者、当前有效来源及全部操作记录。保存时逐项核查命名空间、数据集、时钟版本、目标版本、作者版本、来源版本与资料时间；内容、作者、来源或时间变化即拒绝。事件与回复保存为模拟记录与模拟事件对象；结果分项标记保存`RECORDED`、任务与通知`NOT_TRIGGERED`、模拟执行`NOT_TRIGGERED`、Agent`NOT_REQUESTED`，不把记录保存解释为业务执行。时钟推进采用当前版本、只允许前进且单次不超过366天，任务与通知结果标记`PENDING_CRON`，实际派发由CronService负责。
+
+2026-10-26检查`app/tests/test_boss_v7_simulation_events.py`5项通过，耗时2.72秒，日志`.work/takeover/simulation-events-tests.log`；与评测、会议资料目录、会议审批、纪要交办及V7服务回归70项通过，耗时9.51秒，日志`.work/takeover/simulation-events-regression-20261026.log`。认证后的运行实例读取与A04页面版本选项见`.work/takeover/simulation-events-http.log`与`.work/takeover/simulation-events-ui.log`。事件对任务、通知及Agent的实际效果仍待后续接入，完整产品未交付。

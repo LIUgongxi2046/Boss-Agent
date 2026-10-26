@@ -379,6 +379,20 @@
       "external_model_requests": "NOT_RUN",
       "full_product": "NOT_VERIFIED"
     },
+    "backend_simulation_events_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "EVENT_AND_REPLY_RECORDS_IMPLEMENTED_EFFECTS_PENDING",
+      "checks": "5_PASSED",
+      "check_log": ".work/takeover/simulation-events-tests.log",
+      "regression": "70_PASSED",
+      "regression_log": ".work/takeover/simulation-events-regression-20261026.log",
+      "authenticated_http": "200",
+      "http_log": ".work/takeover/simulation-events-http.log",
+      "authenticated_ui": "EVENT_TYPE_TARGET_AUTHOR_SOURCE_CHAIN_RENDERED",
+      "ui_log": ".work/takeover/simulation-events-ui.log",
+      "effects": ["TASKS_NOT_TRIGGERED", "NOTIFICATIONS_NOT_TRIGGERED", "AGENT_NOT_REQUESTED", "CLOCK_PENDING_CRON"],
+      "full_product": "NOT_VERIFIED"
+    },
     "frontend_sector_validation": {
       "pages": ["F15", "F16", "F17", "F18", "F19", "F20", "F22", "F23", "V19-EGG", "V19-MILK", "V19-BEEF"],
       "status": "STRUCTURE_AND_FOLLOWUP_FORMS_IMPLEMENTED_BACKEND_AND_PRODUCT_DOM_PENDING",
