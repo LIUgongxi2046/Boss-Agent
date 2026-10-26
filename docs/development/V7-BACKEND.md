@@ -262,3 +262,7 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 研究准备接受可选的`source_refs`与`execution_namespace`：执行空间必须一致，来源为1至8项且不重复；每项在当前有效目录中按编号与版本核查。所选来源会写入研究范围；后续匹配只在所选来源内进行，未选来源计入`not_selected`。没有提供选择时保持原有覆盖行为。
 
 2026-10-26检查`app/tests/test_boss_v7_research_sources.py`3项通过、已有研究检查1项跳过，耗时10.49秒，日志`.work/takeover/research-sources-tests.log`；认证后读取返回两份当前来源，页面显示两个选择框，选择`finance-note`并提交后研究范围保存该来源且匹配结果仅含`finance-note`，日志`.work/takeover/research-sources-http.log`与`.work/takeover/research-sources-ui.log`。研究结论质量与完整用户流程继续待验证。
+
+## Agent 工具范围边界
+
+Agent 工具范围由`RuntimeValues.tool_scope`限制为1至18项，并与工具配置Schema、原请求校验及A09/A15页面共同使用。新增只读或业务工具前，必须先更新工具范围定义、配置页面与对应检查，再注册到Runtime registry；只增加registry条目会使配置校验失败。当前由既有工具集服务，专题只读工具尚未纳入范围。
