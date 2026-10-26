@@ -307,7 +307,7 @@ A08 运行配置启用 19 项工具，包含会话读取工具与 `bossSectorRea
 
 2026-10-26 完成实际模型会话：询问“水产季节当前指标与明细”时模型执行 3 次 `bossSectorRead`，回答引用 F15 订单趋势“2026-08 为 801.5 吨、2026-09 为 520.1 吨、2026-10 为 2575.3 吨”，运行记录状态为完成，日志`.work/takeover/chat-answer-pack5.log`；模型连接验证与运行方式记录见`.work/takeover/deepseek-validation-poll.log`与`.work/takeover/deepseek-activation-ui.log`。
 
-检查原生会话、专题工具与运行配置共157项通过，1项历史 Schema 基线检查因仓库在该基线之后已更新记录定义而未通过，日志`.work/takeover/conversation-suite-model.log`。Doubao 凭据保存在同一文件，接入需要 Ark 端点编号与对应 Provider 适配，当前未启用。
+检查原生会话、专题工具与运行配置共157项通过，1项历史 Schema 基线检查因仓库在该基线之后已更新记录定义而未通过，日志`.work/takeover/conversation-suite-model.log`；后端、专题、评测、模拟事件与原生会话集中检查159项通过，耗时31.33秒，日志`.work/takeover/round39-regression.log`。Doubao 凭据保存在同一文件，接入需要 Ark 端点编号与对应 Provider 适配，当前未启用。
 
 ## 继续条件与未接入范围
 

@@ -756,6 +756,8 @@
       "answer_evidence": ".work/takeover/chat-answer-pack5.log",
       "checks": "157_PASSED_1_HISTORICAL_BASELINE_FAILED",
       "check_log": ".work/takeover/conversation-suite-model.log",
+      "backend_regression": "159_PASSED",
+      "backend_log": ".work/takeover/round39-regression.log",
       "credentials": "REFERENCE_ONLY_OUTSIDE_GIT",
       "doubao": "NOT_ENABLED_REQUIRES_ARK_ENDPOINT"
     },
@@ -881,10 +883,10 @@
         "full_product": "NOT_VERIFIED"
       },
       "latest_consolidated_check": {
-        "result": "156_PASSED",
+        "result": "159_PASSED",
         "date": "2026-10-26",
-        "log": ".work/takeover/round31-regression.log",
-        "scope": "V7_BACKEND_AGENT_AND_NATIVE_CONVERSATION_SERVICES"
+        "log": ".work/takeover/round39-regression.log",
+        "scope": "V7_BACKEND_AGENT_NATIVE_CONVERSATION_AND_SECTOR_SERVICES"
       },
       "memory_runtime": {
         "status": "IN_FLIGHT_AND_NATIVE_SESSION_CONTEXT_SCOPED_VERIFIED",
