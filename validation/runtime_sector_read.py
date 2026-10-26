@@ -1,8 +1,5 @@
-"""Read-only sector projection for the owner Agent runtime.
-
-Uses the same simulated pack and filters as the F15-F23 pages. The tool does
-not create tasks, plans, meetings or decisions and never sends messages.
-"""
+# 专题只读工具：使用与 F15-F23 页面相同的模拟资料包与筛选条件。
+# 不创建任务、计划、会议或决定，也不发送消息。
 from __future__ import annotations
 
 import json

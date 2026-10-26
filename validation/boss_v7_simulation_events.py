@@ -1,10 +1,6 @@
-"""Simulation event and reply records for A04.
-
-Maintainer-only. Every save verifies the current execution space, dataset,
-target, author, source and clock versions. Saved records keep the separate
-outcomes for business tasks, notifications, simulation and Agent processing;
-none of them is reported successful unless actually produced.
-"""
+# A04 模拟事件与回复记录，仅维护者可用。
+# 每次保存核查执行空间、数据集、对象、发起人、来源与时钟版本；
+# 任务、通知、模拟与 Agent 处理分别记录结果，未实际产生的不标记为成功。
 from __future__ import annotations
 
 import json

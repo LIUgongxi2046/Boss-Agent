@@ -1,9 +1,5 @@
-"""Meeting, document, approval and people-directory projection for N04.
-
-The catalogue reads only current owner-visible objects in the current execution
-space. Missing categories stay explicit; no sample record, approval or meeting
-state is generated when the service has no data.
-"""
+# N04 资料目录：会议、资料、审批、研究与人员。
+# 只读取当前执行空间内本人可见对象；缺少数据时保留明确缺失，不生成样例。
 from __future__ import annotations
 
 import json

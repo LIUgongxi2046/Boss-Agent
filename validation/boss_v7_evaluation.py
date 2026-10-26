@@ -1,9 +1,5 @@
-"""Deterministic evaluation attempts for A16/F31.
-
-Task sets assert current approved simulated data; they do not call external
-models. Every attempt, cancelled or failed, stays readable. Assertion results
-and evidence are recorded from actual reads, never from a preset pass.
-"""
+# A16/F31 评测：使用当前获准模拟数据执行断言，不调用外部模型。
+# 每次尝试保留可读状态，断言结果与证据来自实际读取。
 from __future__ import annotations
 
 import json

@@ -1,9 +1,5 @@
-"""Owner-recorded sector follow-up decisions.
-
-Only the decision action is implemented: it saves the owner's project or
-resource decision together with the current sector query reference. Task,
-plan and meeting creation remain separate services and are not claimed here.
-"""
+# 专题后续动作：决定记录、复查计划、会议草稿与资源选项。
+# 每项动作先核查当前查询、来源版本与本人范围，再保存对应记录。
 from __future__ import annotations
 
 import json

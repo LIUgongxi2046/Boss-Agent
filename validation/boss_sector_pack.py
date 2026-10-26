@@ -1,9 +1,5 @@
-"""Deterministic simulated sector metric pack for F14-F23.
-
-The pack is seeded once per execution space as versioned SIMULATED source
-documents. Values are generated from a fixed seed; they are not real business
-results and carry no claim beyond the explicit simulated range.
-"""
+# F14-F23 专题模拟资料包：每个执行空间生成一次带版本的 SIMULATED 来源文档。
+# 数值由固定种子生成，仅代表模拟范围。
 from __future__ import annotations
 
 import hashlib
