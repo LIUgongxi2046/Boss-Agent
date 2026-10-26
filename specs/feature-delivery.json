@@ -358,6 +358,8 @@
       "regression_log": ".work/takeover/v7-owner-regression-20261026.log",
       "authenticated_http": "200",
       "http_log": ".work/takeover/meeting-library-http.log",
+      "authenticated_ui": "MEETING_ROW_AND_COUNTS_RENDERED",
+      "ui_log": ".work/takeover/meeting-library-ui.log",
       "downstream_context": "PENDING",
       "read_writes_business_objects": false,
       "full_product": "NOT_VERIFIED"

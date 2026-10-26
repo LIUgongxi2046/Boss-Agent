@@ -60,7 +60,7 @@ async function measure(page, id) {
       children: [...item.children].map(child => ({ width: Math.round(child.getBoundingClientRect().width), ...box(child) })) }));
     return { id, title: document.title, stage: stage ? box(stage) : null, columns, panels, headings,
       horizontalOverflow: document.documentElement.scrollWidth > innerWidth,
-      text: (root?.innerText || "").slice(0, 6000) };
+      text: (root?.innerText || "").slice(0, 20000) };
   }, id);
 }
 
