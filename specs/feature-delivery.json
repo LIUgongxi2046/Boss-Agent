@@ -630,9 +630,7 @@
       "browser_log": ".work/takeover/library-context-ui.log",
       "f04_browser_log": ".work/takeover/library-context-f04.log",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
-      "remaining": [
-        "RECORD_PRESENT_AUTO_SELECTION_PENDING_AUTHENTICATED_DATA"
-      ],
+      "auto_selection": "RECORD_PRESENT_MATCH_CASE_VALIDATED",
       "full_product": "NOT_VERIFIED"
     },
     "frontend_sector_validation": {
@@ -649,23 +647,24 @@
         "V19-MILK",
         "V19-BEEF"
       ],
-      "status": "STRUCTURE_IMPLEMENTED_SIMULATED_METRICS_RECORDS_AND_RELATIONS_AVAILABLE_PRODUCT_DOM_PENDING",
+      "status": "STRUCTURE_AND_SIMULATED_WORKSPACE_VALIDATED",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
       "build_log": ".work/takeover/sector-workspace-build-final.log",
       "navigation": "5_PASSED_REAL_CHROMIUM_AND_REACT",
       "navigation_log": ".work/takeover/sector-workspace-routing.log",
-      "authenticated_application": "F15_F22_RENDERED_EXPLICIT_NO_DATA_STATE",
-      "actual_query_and_followup_flow": "NOT_RUN",
+      "authenticated_application": "F15_F22_SIMULATED_DATA_FILTERS_AND_ACTIONS_RENDERED",
+      "actual_query_and_followup_flow": "VALIDATED_WITH_SECTOR_FILTER_AND_ACTION_LOGS",
+      "dom_evidence": ".work/takeover/v7-product-dom/product-round23.json",
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_scope_validation": {
       "task_id": "V7-BACKEND",
-      "status": "SCOPE_ECHO_AND_HONEST_NO_DATA_STATE_IMPLEMENTED_DATA_PACK_PENDING",
+      "status": "SCOPE_ECHO_NO_DATA_STATE_AND_DATA_PACK_IMPLEMENTED",
       "checks": "3_PASSED",
       "check_log": ".work/takeover/sector-scope-tests.log",
       "authenticated_ui": "F15_F22_SCOPE_RESPONSE_COVERAGE_AND_MISSING_RENDERED",
       "ui_log": ".work/takeover/sector-scope-ui.log",
-      "remaining": ["SECTOR_REVIEW_MEETING_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
+      "remaining": ["SECTOR_MEETING_SERVICE_INTEGRATION"],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_pack_validation": {
