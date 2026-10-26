@@ -69,6 +69,6 @@ def test_sector_tool_can_be_activated_in_the_runtime_scope(product):
     assert code == 200, activated
     tool = runtime.registry.get("bossSectorRead")
     assert tool is not None
-    body = json.loads(asyncio.run(tool.execute("F16", {"区域": "华东"})))
+    body = json.loads(asyncio.run(tool.execute("F16", {})))
     assert body["page_id"] == "F16"
     assert body["relations"]

@@ -680,6 +680,8 @@
       "authenticated_ui": "F15_ALL_AND_EAST_METRIC_VALUES_RENDERED",
       "ui_log": ".work/takeover/sector-metrics-ui.log",
       "filter_options": "EXPOSED_AND_APPLIED",
+      "filter_validation": "UNKNOWN_KEYS_REJECTED_WITH_400",
+      "filter_validation_log": ".work/takeover/sector-filter-validation-tests.log",
       "metric_calculation": "DERIVED_FROM_FILTERED_DETAIL_ROWS_SUM_OR_AVERAGE",
       "remaining": ["SECTOR_MEETING_SERVICE_INTEGRATION"],
       "full_product": "NOT_VERIFIED"

@@ -89,6 +89,9 @@ class BossSectorAPI:
                     isinstance(key, str) and isinstance(value, str) for key, value in parsed.items()):
                 return 400, {"error": "INVALID_FILTERS"}
             applied = {key: value for key, value in parsed.items() if value}
+            allowed_filters = set((CATALOGUE.get(page) or {}).get("filters") or [])
+            if not set(applied) <= allowed_filters:
+                return 400, {"error": "INVALID_FILTERS"}
         overview = None
         if "overview_reference" in params:
             try:

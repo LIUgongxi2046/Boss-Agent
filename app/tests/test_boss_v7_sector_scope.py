@@ -206,5 +206,6 @@ def test_invalid_scope_is_rejected(store):
     assert api.serve("BOSS", query(page="F99"))[0] == 404
     assert api.serve("BOSS", query(page="F15", extra="1"))[0] == 400
     assert api.serve("BOSS", query(page="F15", filters="{bad"))[0] == 400
+    assert api.serve("BOSS", query(page="F15", filters='{"未知条件":"值"}'))[0] == 400
     assert api.serve("MAINTAINER", query(page="F15"))[0] == 403
     assert api.serve(None, query(page="F15"))[0] == 401
