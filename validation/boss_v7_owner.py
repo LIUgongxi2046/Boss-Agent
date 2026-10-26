@@ -7,6 +7,7 @@ from boss_owner_authorizations import revoke
 from boss_v7_memory import read_memory, mutate_memory
 from boss_v7_owner_records import authorizations, decisions, notification_history
 from boss_v7_runs import read_runs, cancel_run
+from boss_v7_library import read_meeting_library
 from boss_v7_store import NAMESPACE, execute_transaction, read_receipt, role_required
 from boss_session_history import session_history
 
@@ -14,7 +15,7 @@ PREFIX = "boss.owner_workspace."
 ACTIONS = {PREFIX + domain + "." + action: "BOSS" for domain, actions in {
     "personal-memory": ("confirm", "delete", "reconcile"), "authorizations": ("revoke",), "runs": ("cancel",),
 }.items() for action in actions}
-DOMAINS = {"personal-memory", "authorizations", "decisions", "notification-history", "runs", "session-history"}
+DOMAINS = {"personal-memory", "authorizations", "decisions", "notification-history", "runs", "session-history", "meeting-library"}
 
 
 class OwnerWorkspaceAPI:
@@ -36,6 +37,8 @@ class OwnerWorkspaceAPI:
             snapshot = self.store.get(db, NAMESPACE, "initial", "snapshot")
             if domain == "session-history":
                 data = session_history(db, snapshot, query)
+            elif domain == "meeting-library":
+                data = read_meeting_library(self.store, db, snapshot)
             elif domain == "personal-memory":
                 data = read_memory(self.store, db, snapshot)
             elif domain == "runs":

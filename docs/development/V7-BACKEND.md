@@ -186,3 +186,13 @@ F13历史版本增加归档空间选择与分页展示。归档个人要求保�
 最终返回检查使用原生Runtime的实际结束状态：来源在模型生成回答后发生变化时，返回前核查拒绝采用，并记录FAILED及已完成工具结果。资料服务、Runtime记录与本人记忆检查29项通过，耗时7.70秒，日志`.work/takeover/main-final-context.log`；晨间资料读取、工具读取后撤销和回答生成后撤销检查3项通过，耗时9.38秒，日志`.work/takeover/main-final-morning.log`。
 
 Python编译及`git diff --check`通过。前端源码没有因本次服务接入修改，沿用`.work/takeover/conversation-complete-build.log`的TypeScript与Vite构建证据。认证后的知识选择界面、完整授权摘要、查询趋势及其余32项服务要求继续保留；没有认证用户应用、执行真实外部模型请求或进行视觉检查，完整产品尚未交付。
+
+## 会议资料目录（N04）
+
+对应FR-04/05/07/09/10的资料目录及V7-FRONTEND第14项接收要求。`boss_v7_library.py`提供本人只读投影，接入`/api/boss/ui/owner/meeting-library`；只读取当前执行空间的正式对象，读取不写业务对象或审计。
+
+会议记录采用当前会议对象及初始快照版本，参会人、材料版本、材料缺口、纪要状态与关联交办分别核查；材料按当前业务时间判断有效状态。资料记录只列出本人获准的模拟来源；撤销、失效或越出本人范围的来源保留状态并禁用“阅读原文”。待决定申请采用正式application对象及附件状态；人员会面采用person_brief当前版本与有效来源。研究材料当前没有正式存储对象，返回`NOT_PROVIDED`及原因，不生成样例记录。
+
+目录动作携带目标页面与来源编号，包括准备会议、打开纪要、阅读原文、继续讨论、查看历史决定、打开申请和打开人员会面；会议尚无纪要时“打开纪要”保持不可用并给出原因。目标页面接收`bossLibraryContext`与`bossLibraryAction`并据此选取对象的功能仍待接入，完整连续流程尚未验证。
+
+2026-10-26检查`app/tests/test_boss_meeting_library.py`3项通过，耗时2.03秒，日志`.work/takeover/meeting-library-tests.log`；会议审批、纪要交办及V7服务回归61项通过，耗时9.59秒，日志`.work/takeover/v7-owner-regression-20261026.log`。认证后的运行实例读取返回200，记录为meeting-1、finance-note、meeting-minutes，覆盖为meeting/document COMPLETE及approval/research/people NOT_PROVIDED，日志`.work/takeover/meeting-library-http.log`。没有执行会议材料写入、审批决定或外部请求；完整产品与用户验收继续未完成。
