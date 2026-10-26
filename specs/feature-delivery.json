@@ -647,21 +647,32 @@
       "check_log": ".work/takeover/sector-scope-tests.log",
       "authenticated_ui": "F15_F22_SCOPE_RESPONSE_COVERAGE_AND_MISSING_RENDERED",
       "ui_log": ".work/takeover/sector-scope-ui.log",
-      "remaining": ["SECTOR_FOLLOWUP_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
+      "remaining": ["SECTOR_COORDINATE_REVIEW_MEETING_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_pack_validation": {
       "task_id": "V7-BACKEND",
-      "status": "SIMULATED_METRICS_RECORDS_SECTIONS_RELATIONS_WORKFLOW_IMPLEMENTED_ACTIONS_PENDING",
+      "status": "SIMULATED_METRICS_RECORDS_SECTIONS_RELATIONS_WORKFLOW_IMPLEMENTED_DECISIONS_AVAILABLE",
       "definition": "SECTOR-PACK-1",
       "pages": ["F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "V19-BEEF", "V19-EGG", "V19-MILK"],
-      "checks": "4_PASSED",
-      "check_log": ".work/takeover/sector-records-tests.log",
+      "checks": "6_PASSED",
+      "check_log": ".work/takeover/sector-decisions-tests.log",
       "authenticated_http": "F15_F16_F17_F22_200_WITH_RECORDS_SECTIONS_RELATIONS_WORKFLOW",
       "http_log": ".work/takeover/sector-records-http.log",
       "authenticated_ui": "F15_F16_F17_RECORDS_SECTIONS_RELATIONS_WORKFLOW_RENDERED",
       "ui_log": ".work/takeover/sector-records-ui.log",
-      "remaining": ["SECTOR_FOLLOWUP_ACTIONS", "SECTOR_METRIC_CALCULATION_RULES"],
+      "remaining": ["SECTOR_COORDINATE_REVIEW_MEETING_ACTIONS", "SECTOR_METRIC_CALCULATION_RULES"],
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_sector_decision_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "OWNER_DECISION_RECORDS_IMPLEMENTED_OTHER_ACTIONS_PENDING",
+      "checks": "6_PASSED",
+      "check_log": ".work/takeover/sector-decisions-tests.log",
+      "authenticated_http": "F22_DECISION_ACTION_ALLOWED_AND_FOLLOWUPS_LISTED",
+      "http_log": ".work/takeover/sector-decisions-http.log",
+      "authenticated_ui": "DECISION_FORM_OPENED_WITH_PURPOSE_AND_DECISION_FIELDS",
+      "ui_log": ".work/takeover/sector-decisions-ui.log",
       "full_product": "NOT_VERIFIED"
     },
     "frontend_shared_access_validation": {

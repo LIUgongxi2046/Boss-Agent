@@ -51,6 +51,20 @@ SECTORS = {
 }
 
 
+ACTION_KINDS = {
+    "选择统筹负责人": "COORDINATE", "交办": "COORDINATE", "创建联合核查": "COORDINATE",
+    "授权资源协调": "COORDINATE", "资源协调": "COORDINATE", "授权核查任务": "COORDINATE",
+    "授权设备协调": "COORDINATE", "安排复查": "REVIEW", "安排后续查询": "REVIEW",
+    "继续验证": "REVIEW", "准备经营复查": "REVIEW", "准备会面": "MEETING",
+    "准备跨时区会议": "MEETING", "记录资源决定": "DECISION", "调整项目": "DECISION",
+    "记录安排": "DECISION",
+}
+
+
+def query_id_for(page, applied, overview):
+    return f"{page}-{checksum({'filters': applied, 'overview': overview})[:16]}"
+
+
 class BossSectorAPI:
     def __init__(self, store, namespace=NAMESPACE):
         self.store, self.namespace = store, namespace
@@ -115,6 +129,8 @@ class BossSectorAPI:
                 (self.namespace, "sector-" + page.lower() + "-a"),
             ).fetchone()
             pack = json.loads(pack_row[0]) if pack_row else None
+            from boss_v7_sector_actions import followups as sector_followups
+            followup_rows = sector_followups(db, page)
         design = CATALOGUE.get(page) or {}
         timezone = base["boss_profile"].get("timezone", "Asia/Shanghai")
         today = clock["at"][:10]
@@ -142,6 +158,15 @@ class BossSectorAPI:
             missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
             if matching:
                 missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
+        followup_actions = []
+        for label in (design.get("actions") or []):
+            kind = ACTION_KINDS.get(label)
+            if kind is None:
+                continue
+            allowed = kind == "DECISION" and bool(facts)
+            followup_actions.append({"code": label, "label": label, "kind": kind, "allowed": allowed,
+                                     "reason": "" if allowed else "当前服务尚未提供该后续动作",
+                                     "option_required": False})
         records, sections, relations, workflow = [], [], [], []
         if facts:
             pack_source_ids = [pack["source_id"]]
@@ -161,7 +186,7 @@ class BossSectorAPI:
             "projection": "sector-workspace", "page_id": page, "title": title,
             "source_type": "SIMULATED", "namespace": self.namespace,
             "dataset_version": base["dataset_version"], "read_at": now(),
-            "query_id": f"{page}-{checksum({'filters': applied, 'overview': overview})[:16]}",
+            "query_id": query_id_for(page, applied, overview),
             "business_clock": clock["at"], "overview_reference": overview,
             "design_filters": design_filters, "filter_options": {},
             "applied_filters": applied,
@@ -183,7 +208,8 @@ class BossSectorAPI:
             "records": records, "sections": sections, "relations": relations, "workflow": workflow,
             "sources": sources, "coverage": coverage, "missing_fields": missing,
             "availability": "SIMULATED_METRICS_ONLY" if facts else "SOURCE_NOT_AVAILABLE", "contacts": contacts,
-            "followup_actions": [], "resource_options": [], "timezones": [timezone],
+            "followup_actions": followup_actions, "followups": followup_rows,
+            "resource_options": [], "timezones": [timezone],
             "owner_timezone": timezone, "related_source_refs": matching,
             "sector_specific_dataset_available": bool(facts),
             "sector_kpi_calculations_supported": bool(facts),

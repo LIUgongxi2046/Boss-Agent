@@ -186,6 +186,7 @@ class BossCommandAPI:
         "boss.owner.plan.resume": "BOSS",
         "boss.owner.plan.cancel": "BOSS",
         "boss.today.reorder": "BOSS",
+        "boss.sector.decision.save": "BOSS",
         "boss.runtime.save": "MAINTAINER",
         "boss.runtime.validate": "MAINTAINER",
         "boss.runtime.activate": "MAINTAINER",
@@ -464,6 +465,9 @@ class BossCommandAPI:
                 result = notice_confirm(self, db, data, payload)
             elif action == "boss.authorization.revoke":
                 result = owner_authorization_revoke(self, db, data, payload)
+            elif action == "boss.sector.decision.save":
+                from boss_v7_sector_actions import save_decision
+                result = save_decision(self, db, data, payload)
             else:
                 raise web.HTTPNotFound()
             self._record(db, action, payload, key, digest, result)

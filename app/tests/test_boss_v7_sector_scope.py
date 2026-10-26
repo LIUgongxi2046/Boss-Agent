@@ -8,7 +8,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "validation"))
 
-from boss_sector_api import BossSectorAPI, CATALOGUE
+from boss_command_api import BossCommandAPI
+from boss_sector_api import BossSectorAPI, CATALOGUE, query_id_for
 from boss_sector_pack import ensure_sector_pack
 from controls import ControlStore
 
@@ -86,6 +87,36 @@ def test_filters_and_overview_reference_are_echoed_and_change_query_id(store):
     assert second["query_id"] != first["query_id"]
     assert 0 < len(second["records"]) < len(first["records"])
     assert all(row["values"]["区域"] == "华东" for row in second["records"])
+
+
+def test_owner_decision_is_saved_and_listed_for_current_query(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": query_id_for("F22", {}, None), "action_code": "记录资源决定",
+               "filters": {}, "overview_reference": None,
+               "source_refs": [{"source_id": "sector-f22-a", "version": "1"}],
+               "purpose": "核查交付缺口", "decision": "按当前范围继续观察"}
+    status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.decision.save", payload)
+    assert status == 200, receipt
+    record_id = receipt["record_id"]
+    projection = BossSectorAPI(store).serve("BOSS", query(page="F22"))[1]
+    assert any(row["record_id"] == record_id and row["kind"] == "DECISION" for row in projection["followups"])
+    assert any(action["kind"] == "DECISION" and action["allowed"] for action in projection["followup_actions"])
+    assert any(not action["allowed"] for action in projection["followup_actions"] if action["kind"] != "DECISION")
+
+
+def test_stale_query_and_other_roles_are_rejected(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": "F22-stale", "action_code": "记录资源决定", "filters": {},
+               "overview_reference": None, "source_refs": [{"source_id": "sector-f22-a", "version": "1"}],
+               "purpose": "核查", "decision": "维持"}
+    status, body = BossCommandAPI(store).execute("BOSS", "boss.sector.decision.save", payload)
+    assert status == 409, body
+    status, body = BossCommandAPI(store).execute("MAINTAINER", "boss.sector.decision.save", payload)
+    assert status == 403, body
 
 
 def test_invalid_scope_is_rejected(store):

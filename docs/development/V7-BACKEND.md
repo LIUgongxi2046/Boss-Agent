@@ -231,4 +231,12 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_sector_pack.py`按执行空间写入一次版本化模拟资料包`SECTOR-PACK-1`：每个专题页一份来源文档，包含2026-08至2026-10三项指标点、单位、定义版本与明确`SIMULATED`标记，数据由固定种子生成，不代表真实经营结果。包在应用启动时按数据集版本写入，重复启动不重复生成。
 
-专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。2026-10-26检查同一测试文件4项通过，耗时1.81秒，日志`.work/takeover/sector-records-tests.log`；认证后的F15、F16、F17、F22读取返回200，F15为6条明细与4个章节，F16含7项关系，F17含5个流程阶段，页面显示明细、章节、关系与阶段，日志`.work/takeover/sector-records-http.log`与`.work/takeover/sector-records-ui.log`。专题后续动作、完整指标计算口径及真实业务资料继续待接入。
+专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。
+
+2026-10-26检查同一测试文件4项通过，耗时1.81秒，日志`.work/takeover/sector-records-tests.log`；认证后的F15、F16、F17、F22读取返回200，F15为6条明细与4个章节，F16含7项关系，F17含5个流程阶段，页面显示明细、章节、关系与阶段，日志`.work/takeover/sector-records-http.log`与`.work/takeover/sector-records-ui.log`。
+
+## 专题后续决定
+
+`boss_v7_sector_actions.py`实现本人专题决定命令`boss.sector.decision.save`，仅对具备“记录资源决定”“调整项目”“记录安排”动作的页面开放。保存前核查页面、执行空间、数据集版本、由当前条件计算的查询编号、动作类别、来源版本以及目的与决定正文；版本不一致返回冲突。决定保存为带记录编号、版本、查询编号和来源的正式记录，不创建任务、计划或会议，也不发送消息。
+
+专题读取返回`followup_actions`与`followups`：决定类动作在资料包可用时开放，协调、复查、会议类动作明确标记“当前服务尚未提供该后续动作”；已保存决定按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。协调、复查与会议类后续动作及指标计算口径继续待接入。
