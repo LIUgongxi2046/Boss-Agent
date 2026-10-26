@@ -43,6 +43,19 @@ def main() -> None:
     with STORE.connect() as db:
         marker = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='demo_seed' AND id=?",
                             ("ui-check", MARKER_ID)).fetchone()
+        application = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='application'",
+                                 ("ui-check",)).fetchone()
+    if application is None:
+        status, body = API.execute("MAINTAINER", "boss.simulation.application.seed", {
+            "client_request_id": str(uuid.uuid4()), "application_id": "application-1",
+            "applicant_contact_id": "coordinator-1", "amount_cny": "3000.00",
+            "title": "华东区域交付缺口补充材料",
+            "description": "请批准补充批次回访记录与库存明细，用于核查交付缺口。",
+            "attachment_text": "模拟附件：华东区域批次回访记录，库存明细与交付缺口说明。",
+        })
+        print("boss.simulation.application.seed", status, str(body)[:180])
+        if status != 200:
+            raise SystemExit("application seed failed")
     if marker is not None:
         print("demo seed already present")
         return
