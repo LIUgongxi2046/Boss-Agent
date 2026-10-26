@@ -727,7 +727,7 @@
     },
     "backend_sector_agent_tool_validation": {
       "task_id": "V7-BACKEND",
-      "status": "READ_ONLY_SECTOR_TOOL_REGISTERED_ACTIVATION_AND_REGISTRY_READ_VERIFIED",
+      "status": "SECTOR_TOOL_REGISTERED_ACTIVATED_AND_USED_IN_NATIVE_CONVERSATION",
       "tool_scope_limit": 19,
       "checks": "22_PASSED",
       "check_log": ".work/takeover/sector-agent-tool-tests.log",
@@ -736,6 +736,9 @@
       "runtime_activation": "SCOPE_ACTIVATED_F16_EXECUTED_VIA_REGISTRY",
       "a08_ui": "TOOL_OPTION_VISIBLE_WHEN_RUNTIME_SCOPE_EXPANDED",
       "a08_log": ".work/takeover/sector-agent-tool-a08.log",
+      "conversation_native_read": "F15_READ_AND_METRICS_RENDERED",
+      "conversation_checks": "62_PASSED",
+      "conversation_log": ".work/takeover/sector-agent-conversation-tests.log",
       "active_scope": "GOVERNED_BY_A08_CONFIGURATION",
       "full_product": "NOT_VERIFIED"
     },

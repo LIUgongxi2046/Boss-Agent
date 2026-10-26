@@ -625,3 +625,17 @@ def test_admission_can_be_explicitly_canceled_before_runtime(native):
     value = native[1].receipt("BOSS", receipt["client_request_id"], active=lambda: True)
     assert value["request_state"] == "CANCELED" and value["run_id"] is None
     assert not read(native, "runtime_run")
+
+
+def test_native_sector_question_reads_current_sector_pack(native):
+    from boss_sector_pack import ensure_sector_pack
+    store = native[0]
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        ensure_sector_pack(store, db, store.get(db, "ui-check", "initial", "snapshot"))
+    results, admitted = execute(native, ["水产季节当前指标与明细"])
+    assert "F15" in results[0].content and "明细：" in results[0].content
+    assert "当前资料无法确定" not in results[0].content
+    row = read(native, "runtime_run")[0]
+    assert row["tool_results"][0]["tool_id"] == "bossSectorRead"
+    assert not read(native, "task") and not read(native, "authorization")

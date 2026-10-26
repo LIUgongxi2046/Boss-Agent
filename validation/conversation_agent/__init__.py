@@ -16,7 +16,7 @@ from runtime_page_read_tools import _BossPageReadTool
 
 VERSION = "1.4.0"
 CONVERSATION_REQUEST = "product_conversation_request"
-READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead", "conversationRead"})
+READ_TOOLS = frozenset({"bossDashboardRead", "bossTasksRead", "bossMeetingsRead", "bossEvidenceRead", "bossWorkspaceRead", "bossSectorRead", "conversationRead"})
 CONVERSATION_TOOLS = READ_TOOLS | {"query_metrics"}
 AVAILABLE_CONVERSATION_TOOLS = CONVERSATION_TOOLS | {"businessOverviewRead"}
 

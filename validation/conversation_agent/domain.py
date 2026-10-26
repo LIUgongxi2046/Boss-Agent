@@ -11,6 +11,7 @@ from boss_conversation import ConversationAPI, SCHEMA, validate
 from boss_page_api import BossPageAPI
 from boss_runtime_records import ATTRIBUTE
 from boss_simulation_api import _context
+from boss_sector_api import CATALOGUE as SECTOR_CATALOGUE
 from nanobot.agent.tools.context import current_request_context
 from runtime_page_read_tools import _BossPageReadTool
 from conversation_agent.queries import ConversationQueries, mentioned
@@ -112,6 +113,10 @@ class ConversationPlanner:
                 checks.append(check)
         if any(word in lowered for word in ("不要", "不用", "不需要", "别执行")):
             return ConversationPlan((), tuple(references), ("请明确当前需要执行的读取动作",), tuple(checks))
+        sector = next((page for page, design in SECTOR_CATALOGUE.items()
+                       if len(str(design.get("title") or "")) >= 4 and str(design["title"]).casefold() in lowered), None)
+        if sector is not None:
+            add("bossSectorRead", {"page": sector})
         query_plan = ConversationQueries(self.store, self.api).plan(text, query, pending_query_scope)
         if query_plan.binding is not None:
             add("query_metrics", json.loads(query_plan.binding.parameters_json))

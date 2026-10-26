@@ -228,6 +228,8 @@ class RuntimeRecordHook(AgentHook):
             db.execute("BEGIN IMMEDIATE")
             row = self.recorder._read(db, self.run_id)
             for field, kind in (("query_id", "query"), ("task_id", "task"), ("message_id", "outbox")):
+                if field == "query_id" and tool_call.name != "query_metrics":
+                    continue
                 if field in output:
                     self.recorder.store.get(db, self.recorder.namespace, kind, output[field])
                     reference[field] = output[field]

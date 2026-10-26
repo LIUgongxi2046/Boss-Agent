@@ -11,4 +11,4 @@ def product_read_tools(store, pages, observation_sink=None):
         BossTodayReadTool(store, "BOSS"), BossOwnerPlansReadTool(store, "BOSS"), BossAssignmentSourcesReadTool(store, "BOSS"),
         BossDashboardReadTool(pages, "BOSS"), BossMeetingsReadTool(pages, "BOSS"), BossEvidenceReadTool(pages, "BOSS"),
         BossTasksReadTool(pages, "BOSS"), BossCalendarConflictReadTool(pages, "BOSS"), BossCalendarSharePreviewTool(pages, "BOSS"),
-        BossSectorReadTool(store, "BOSS")]
+        BossSectorReadTool(pages, "BOSS")]

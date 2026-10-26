@@ -104,6 +104,14 @@ def result_text(name, data):
             if item["text"] is not None:
                 lines.append(excerpt(item["text"]))
         return lines
+    if name == "bossSectorRead":
+        lines = [data["page_id"] + " · " + data["title"] + "；读取时间：" + data["read_at"]]
+        for metric in data["metrics"]:
+            lines.append(metric["label"] + "：" + (str(metric["value"]) + " " + metric["unit"]
+                         if metric["value"] is not None else "当前资料无法确定"))
+        lines.append("明细：" + str(len(data["records"])) + " 条；来源：" + str(len(data["sources"])) + " 项。")
+        lines.extend("资料缺口：" + value for value in data["missing_fields"])
+        return lines
     titles = {"bossDashboardRead": "当前概览", "bossTasksRead": "当前任务", "bossMeetingsRead": "当前会议", "bossWorkspaceRead": "当前工作事项"}
     require(name in titles, "当前工具没有正式文字呈现方式")
     lines = [titles[name] + ("：" + data["projection"] if "projection" in data else "。")]

@@ -18,6 +18,7 @@ from boss_source_access import require_current_business_source
 from boss_conversation_sources import ConversationSources
 from runtime_page_read_tools import BossDashboardReadTool, BossEvidenceReadTool, BossMeetingsReadTool
 from runtime_sop_read_tools import BossTasksReadTool, BossWorkspaceReadTool
+from runtime_sector_read import BossSectorReadTool
 from conversation_agent import CONVERSATION_REQUEST, CONVERSATION_TOOLS, READ_TOOLS, ConversationContext, ConversationScope, ConversationReadTool
 from conversation_agent.domain import ConversationPlanner, ConversationDomainReadTool, artifact_digest
 from conversation_agent.runtime import ConversationRuntimeRecorder, ConversationSimulatedProvider
@@ -58,6 +59,7 @@ class NativeConversationAgent:
         self.delegates = [BossDashboardReadTool(api, "BOSS"), BossTasksReadTool(api, "BOSS"),
             BossMeetingsReadTool(api, "BOSS"), BossEvidenceReadTool(api, "BOSS"),
             BossWorkspaceReadTool(api, "BOSS", allowed_projections=["notifications", "travel", "calendar", "research"]),
+            BossSectorReadTool(api, "BOSS"),
             ConversationDomainReadTool(api, self.scope, attachments)]
         self.delegates.append(BusinessOverviewReadTool(store, self.scope, self.business_entry))
         self.provider = ConversationSimulatedProvider(self.events, self.scope)
