@@ -286,3 +286,13 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 Agent工具范围由`RuntimeValues.tool_scope`限制为1至19项，并与工具配置Schema、原请求校验及A09/A15页面共同使用。新增只读或业务工具前，必须先更新工具范围定义、配置页面与对应检查，再注册到Runtime registry；只增加registry条目会使配置校验失败。
 
 `bossSectorRead`已按该顺序接入：工具定义加入`product-runtime.openapi.yaml`的可用工具列表与最大项数，`RuntimeValues`同步为19项，只读工具注册在`runtime_sector_read.py`并由`product_read_tools`装配。工具按专题页面与筛选条件读取同一模拟指标、明细、章节、关系、流程、来源与缺失范围，只读且不创建交办、计划、会议或决定。2026-10-26检查`app/tests/test_sector_runtime_tool.py`、`test_product_runtime_configuration.py`与`test_product_read_scope.py`共22项通过，耗时7.33秒，日志`.work/takeover/sector-agent-tool-tests.log`；认证后运行配置的`available_tools`包含`bossSectorRead`，A08页面展开“工具与工作资料的 Runtime 范围”后可见该选项，当前启用范围仍由A08配置决定，日志`.work/takeover/sector-agent-tool-http.log`与`.work/takeover/sector-agent-tool-a08.log`。运行配置激活包含该工具的范围后，工具通过registry执行F16读取并返回关系资料；真实模型会话中的工具调用仍待验证。
+
+## 继续条件与未接入范围
+
+会议草稿当前保存为专题记录，不创建正式会议；正式接入需要多会议模型、参会人与邀请权限的产品决定，当前不把草稿声明为会议。
+
+会话中的专题读取需要同时满足三项：规划器把专题意图写入`allowed_calls`、模拟提供者渲染对应工具结果、原生会话检查覆盖新增调用。工具已在运行配置中可启用，但会话规划仍只生成既有读取调用。
+
+注入事件的到期通知依赖明确到期时间与来源策略；当前事件记录不具备到期字段，因此任务与通知保持`NOT_TRIGGERED`，CronService 派发只作用于既有事件。
+
+真实模型调用需要用户明确授权外部请求；当前保持显式模拟，不自行切换。
