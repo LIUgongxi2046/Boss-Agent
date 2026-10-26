@@ -547,7 +547,7 @@
       "http_log": ".work/takeover/meeting-library-http.log",
       "authenticated_ui": "MEETING_ROW_AND_COUNTS_RENDERED",
       "ui_log": ".work/takeover/meeting-library-ui.log",
-      "downstream_context": "F05_F07_F10_CONTEXT_CONSUMED_F04_SINGLE_MEETING",
+      "downstream_context": "F04_F05_F07_F10_CONTEXT_CONSUMED",
       "read_writes_business_objects": false,
       "full_product": "NOT_VERIFIED"
     },
@@ -600,6 +600,7 @@
     },
     "frontend_library_context_validation": {
       "pages": [
+        "F04",
         "F05",
         "F07",
         "F10"
@@ -607,11 +608,11 @@
       "status": "CONTEXT_PARSING_AND_SELECTION_IMPLEMENTED",
       "parsing_checks": "2_PASSED",
       "parsing_log": ".work/takeover/library-context-tests.log",
-      "browser_checks": "3_MISMATCH_NOTICES_AND_3_NEGATIVE_CASES_PASSED",
+      "browser_checks": "F04_MISMATCH_AND_MATCH_CASES_PLUS_F05_F07_F10_NOTICES_AND_NEGATIVES_PASSED",
       "browser_log": ".work/takeover/library-context-ui.log",
+      "f04_browser_log": ".work/takeover/library-context-f04.log",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
       "remaining": [
-        "F04_MULTI_MEETING_CONTEXT_PENDING",
         "RECORD_PRESENT_AUTO_SELECTION_PENDING_AUTHENTICATED_DATA"
       ],
       "full_product": "NOT_VERIFIED"

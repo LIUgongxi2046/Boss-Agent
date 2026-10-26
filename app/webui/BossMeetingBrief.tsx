@@ -3,6 +3,7 @@ import {AlertCircle,ClipboardList,FileSearch,Loader2,RefreshCw,Send,ShieldCheck}
 import {useClient} from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
 import {BossMeetingArrangement,type MeetingArrangementProjection} from "./BossMeetingArrangement";
+import {readLibraryContext} from "./library-context";
 
 type Source={source_id:string;version:string|null;status:string;published_at?:string;valid_from?:string|null;valid_until?:string|null;author_contact_id?:string;excerpt:string|null};
 type Commitment={task_id:string;status:string;due_at:string;is_historical:boolean;evidence_requirements:string[]};
@@ -46,7 +47,7 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
       if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
       if(!response.ok)throw new Error("会前材料读取失败（HTTP "+response.status+"）");
       const value=await response.json() as Briefing;if(value.projection!=="briefing"||value.source_type!=="SIMULATED")throw new Error("资料来源不符合当前获准范围");return value;
-    }).then(value=>{if(controller.signal.aborted)return;setData(value);setLoading(false);}).catch(reason=>{if(controller.signal.aborted)return;setLoading(false);setError(reason instanceof Error?reason.message:String(reason));});
+    }).then(value=>{if(controller.signal.aborted)return;setData(value);setLoading(false);const context=readLibraryContext();if(context?.kind==="meeting"&&(context.id!==value.current.meeting.meeting_id||context.version!==value.current.meeting.version)){setError("原会议不在当前目录或版本已经变化，请返回会议资料重新选择。");}}).catch(reason=>{if(controller.signal.aborted)return;setLoading(false);setError(reason instanceof Error?reason.message:String(reason));});
     return()=>controller.abort();
   },[revision,refreshVersion,getToken]);
   const current=!loading?data:null,b=current?.current,saved=current?.saved_brief;
