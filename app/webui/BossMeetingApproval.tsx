@@ -10,6 +10,7 @@ import { BossMinutesAssignmentActions } from "./BossMinutesAssignmentActions";
 import {useTransaction} from "./BossAssignmentFlow";
 import type {DraftLeaveRegistration} from "./draft-leave";
 import {V7Panel, V7Empty, V7Steps, V7Tabs} from "./BossV7UI";
+import {readLibraryContext} from "./library-context";
 import "./boss-v6.css";
 
 type Kind = "OPINION" | "SUGGESTION" | "DECISION" | "ASSIGNMENT_DRAFT";
@@ -165,6 +166,17 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
       if(abort.signal.aborted)return;
       if(result.source_type!=="SIMULATED"||result.projection!==segment)throw Error("业务投影来源不符");
       setData(result);setLoading(false);
+      if(!dirtyRef.current){
+        const context=readLibraryContext();
+        if(pageId==="F07"&&context?.kind==="approval"){
+          const target=(result as Decisions).applications.find(row=>row.application_id===context.id);
+          if(target){setSelectedApplication(target.application_id);setBasis(approvalSignature(target));setDecision("");setComment("");}
+          else setError("原申请不在当前目录，请重新选择。");
+        }
+        if(pageId==="F05"&&context?.kind==="meeting"&&context.id!==((result as MinutesResponse).meeting?.meeting_id)){
+          setError("原会议不在当前目录，请返回会议资料重新选择。");
+        }
+      }
       if(pageId==="F05"){
         const minutes=result as MinutesResponse;
         if(!dirtyRef.current){

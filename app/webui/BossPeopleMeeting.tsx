@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import {AlertCircle,ClipboardCheck,FileSearch,Loader2,Plus,RefreshCw,ShieldCheck,Trash2,Users,XCircle} from "lucide-react";
 import {useClient} from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
+import {readLibraryContext} from "./library-context";
 
 type Contact={contact_id:string;name:string;organization:string;responsibility:string;valid_from:string;valid_until:string};
 type SourceRef={source_id:string;version:string};
@@ -62,7 +63,7 @@ function PeopleMeeting({onNavigate,onViewSource,onOpenTask,onDirtyChange,refresh
       const value=await response.json() as Projection;
       if(value.source_type!=="SIMULATED"||value.projection!=="people")throw new Error("资料不属于获准的会面范围");
       return value;
-    }).then(value=>{if(controller.signal.aborted)return;setData(value);setLoading(false);if(!dirtyRef.current){if(briefRef.current&&!value.briefs.some(row=>row.brief_id===briefRef.current)){setError("当前获准材料中没有原会面记录，请重新选择");return;}setForm(savedForm(value,briefRef.current));}}).catch(reason=>{if(controller.signal.aborted)return;setLoading(false);setError(reason instanceof Error?reason.message:String(reason));});
+    }).then(value=>{if(controller.signal.aborted)return;setData(value);setLoading(false);if(!dirtyRef.current){const context=readLibraryContext();const target=context?.kind==="people"?value.briefs.find(row=>row.brief_id===context.id):undefined;if(target&&!briefRef.current){briefRef.current=target.brief_id;setBriefId(target.brief_id);}else if(context?.kind==="people"&&!target){setError("原会面记录不在当前目录，请重新选择");return;}if(briefRef.current&&!value.briefs.some(row=>row.brief_id===briefRef.current)){setError("当前获准材料中没有原会面记录，请重新选择");return;}setForm(savedForm(value,briefRef.current));}}).catch(reason=>{if(controller.signal.aborted)return;setLoading(false);setError(reason instanceof Error?reason.message:String(reason));});
     return()=>controller.abort();
   },[revision,refreshVersion,getToken]);
   const current=!loading?data:null,selected=current?.briefs.find(value=>value.brief_id===briefId),compiled=selected?.compiled;
