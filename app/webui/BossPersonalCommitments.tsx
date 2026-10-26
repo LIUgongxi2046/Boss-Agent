@@ -68,7 +68,7 @@ export function BossPersonalCommitments({items,businessClock,onReload,onDirtyCha
       <label>承诺依据来源 ID<input value={sourceId} onChange={event=>setSourceId(event.target.value)}/></label>
       <label>承诺依据版本<input value={sourceVersion} onChange={event=>setSourceVersion(event.target.value)}/></label>
     </div><div className="boss-actions"><button className="boss-btn" type="button" onClick={()=>void readSource("create")}>读取本人承诺依据</button><button className="boss-btn boss-btn-primary" type="button" onClick={()=>checked(make)}><ShieldCheck size={15}/> 本人核对并创建承诺</button></div></fieldset>
-    <p>本人承诺与他人交办分别保存，不向其他人员发送消息。到期事件采用本机模拟业务时钟，真实外部通知尚未验证。</p>
+    <p>本人承诺与他人交办分别保存，不向其他人员发送消息。到期提醒按当前业务时间计算。</p>
     {items.length?items.map(item=><button type="button" className={"boss-task-row "+(active?.commitment_id===item.commitment_id?"selected":"")} key={item.commitment_id} disabled={busy} onClick={()=>select(item.commitment_id)}><CheckCircle2 size={17}/><span><strong>{item.purpose}</strong><small>{item.commitment_id} · v{item.version} · {item.status}</small><small>期限 {item.due_at} · {item.timezone} · {item.importance}</small></span></button>):<p>当前没有本人承诺，可在核查有效来源后创建。</p>}
     {active&&<><p>本人承诺 {active.commitment_id} · 版本 {active.version} · 状态 {active.status}</p><p>有效期限 {active.due_at} · {active.timezone} · 当前模拟业务时钟 {businessClock??"未知"}</p><p>来源状态 {active.source_reference_state??"尚未核查"} · 核查要求 {active.evidence_requirements.join("；")}</p>
       <p>原始依据 {active.source_refs.map(reference=>reference.source_id+" v"+reference.version).join("；")}</p><p>完成证据 {active.completion_evidence?.map(reference=>reference.source_id+" v"+reference.version).join("；")||"尚未确认"}</p>

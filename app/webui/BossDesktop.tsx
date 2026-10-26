@@ -629,7 +629,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 </div>
               </div>
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
-              {loading && <StatusLine text="正在从本机业务服务读取有权数据和当前状态…" />}
+              {loading && <StatusLine text="正在读取当前数据与状态…" />}
               {currentEntry?.state==="AUTHENTICATION"?<div className="boss-columns"><div className="boss-column"><Panel title="当前认证状态"><Value label="当前身份" value={role==="BOSS"?"本人":"技术维护"}/><p>当前账号已经登录。切换身份需要退出当前账号，然后使用登录表单。</p><GlassButton onClick={requestLogout}>退出当前身份并返回登录</GlassButton></Panel></div></div>:
                 currentEntry?.state==="PAUSED"?<BossVoicePaused onNavigate={id=>navigate(id)}/>:
                 page==="D06"?<BossUnsavedWorkspace role={role} onNavigate={id=>navigate(id)}/>:

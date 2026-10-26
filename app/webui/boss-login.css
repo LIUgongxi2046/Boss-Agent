@@ -1,45 +1,45 @@
-.boss-login{--login-blue:#005bac;--login-border:#dce4ed;box-sizing:border-box;min-height:100vh;padding:34px clamp(24px,6vw,96px);background:radial-gradient(ellipse at 10% 15%,#e6f2ff,transparent 55%),linear-gradient(125deg,#f5f7fa,#fff 65%,#f0f7ee);color:#172b4d;font:16px/1.5 Inter,"PingFang SC","Microsoft YaHei",sans-serif}
+.boss-login{--login-blue:#005bac;--login-border:#dce4ed;box-sizing:border-box;min-height:100vh;padding:22px clamp(20px,5vw,72px);background:radial-gradient(ellipse at 10% 15%,#e6f2ff,transparent 55%),linear-gradient(125deg,#f5f7fa,#fff 65%,#f0f7ee);color:#172b4d;font:16px/1.5 Inter,"PingFang SC","Microsoft YaHei",sans-serif}
 .boss-login *{box-sizing:border-box}
-.boss-login-brand{display:flex;align-items:center;gap:12px;min-height:48px;max-width:1160px;margin:auto}
-.boss-login-brand img{width:38px;height:38px;object-fit:contain}
+.boss-login-brand{display:flex;align-items:center;gap:12px;min-height:46px;max-width:1120px;margin:auto}
+.boss-login-brand img{width:36px;height:36px;object-fit:contain}
 .boss-login-brand strong{font-size:21px;letter-spacing:-.4px;color:#073b70}
 .boss-login-brand>span{font-size:14px;color:#52647a}
-.boss-login-brand .boss-login-service{margin-left:auto;border:1px solid #dce4ed;background:#fff;border-radius:9px;padding:6px 12px}
-.boss-login-layout{display:grid;grid-template-columns:minmax(300px,1fr) 480px;gap:60px;max-width:1160px;padding:35px clamp(0px,4vw,85px);margin:30px auto 40px;align-items:center}
-.boss-login-welcome{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:15px}
-.boss-login-mascot{width:min(340px,100%);height:255px;object-fit:contain}
-.boss-login-welcome h1{font-size:40px;line-height:1.2;font-weight:750;letter-spacing:-1px;color:#073b70;margin:0}
+.boss-login-brand .boss-login-service{margin-left:auto;border:1px solid #dce4ed;background:#fff;border-radius:9px;padding:5px 12px}
+.boss-login-layout{display:grid;grid-template-columns:minmax(300px,1fr) 460px;gap:48px;max-width:1120px;padding:18px clamp(0px,4vw,85px);margin:14px auto 20px;align-items:center}
+.boss-login-welcome{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.boss-login-mascot{width:min(320px,100%);height:220px;object-fit:contain}
+.boss-login-welcome h1{font-size:36px;line-height:1.2;font-weight:750;letter-spacing:-1px;color:#073b70;margin:0}
 .boss-login-welcome p{color:#52647a;margin:0;font-size:15px}
-.boss-login-accent{width:46px;height:4px;background:#5ca63b;border-radius:3px;margin:24px 0 18px}
+.boss-login-accent{width:46px;height:4px;background:#5ca63b;border-radius:3px;margin:12px 0 8px}
 .boss-login-welcome .boss-login-welcome-note{font-size:14px}
-.boss-login-card{background:white;border:1px solid #e5eef9;border-radius:22px;padding:29px 31px;box-shadow:0 18px 48px rgba(45,104,167,.1);min-width:0}
-.boss-login-card h2{font-size:22px;line-height:1.4;margin:0 0 7px;letter-spacing:-.4px;color:#073b70}
-.boss-login-description{font-size:14px;color:#52647a;margin:0 0 24px}
-.boss-login-roles{border:0;padding:0 0 22px;margin:0 0 22px;display:grid;grid-template-columns:1fr 1fr;gap:12px;border-bottom:1px solid #e6ebf1;min-width:0}
+.boss-login-card{background:white;border:1px solid #e5eef9;border-radius:20px;padding:22px 26px;box-shadow:0 18px 48px rgba(45,104,167,.1);min-width:0}
+.boss-login-card h2{font-size:21px;line-height:1.4;margin:0 0 4px;letter-spacing:-.4px;color:#073b70}
+.boss-login-description{font-size:14px;color:#52647a;margin:0 0 16px}
+.boss-login-roles{border:0;padding:0 0 14px;margin:0 0 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-bottom:1px solid #e6ebf1;min-width:0}
 .boss-login-roles legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-.boss-login-roles label{position:relative;border:1px solid #e3ebf6;border-radius:14px;display:flex;align-items:flex-start;flex-direction:column;gap:8px;padding:19px 12px;color:#52647a;cursor:pointer}
+.boss-login-roles label{position:relative;border:1px solid #e3ebf6;border-radius:12px;display:flex;align-items:flex-start;flex-direction:column;gap:6px;padding:13px 12px;color:#52647a;cursor:pointer}
 .boss-login-roles label.selected{border-color:#8fc3ff;background:#eef7ff;color:#0c6cf0}
 .boss-login-roles label strong{font-size:16px}.boss-login-roles label small{font-size:12px}
 .boss-login-roles input{position:absolute;width:16px;height:16px;top:8px;right:8px;accent-color:#0968ea}
-.boss-login-card form{display:flex;flex-direction:column;gap:18px}
-.boss-login-field{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:600;color:#52647a}
-.boss-login-field>input,.boss-login-input{border:1px solid #dce4ed;border-radius:9px;min-height:46px;width:100%;background:#fff;color:#172b4d}
-.boss-login-field>input{padding:10px 12px;font:inherit;font-size:16px}
+.boss-login-card form{display:flex;flex-direction:column;gap:12px}
+.boss-login-field{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:600;color:#52647a}
+.boss-login-field>input,.boss-login-input{border:1px solid #dce4ed;border-radius:9px;min-height:44px;width:100%;background:#fff;color:#172b4d}
+.boss-login-field>input{padding:9px 12px;font:inherit;font-size:16px}
 .boss-login-input{display:flex;align-items:center;overflow:hidden}
-.boss-login-input input{border:0;background:transparent;outline:none;min-width:0;width:100%;padding:10px 12px;font:inherit;font-size:16px;color:#172b4d}
-.boss-login-input button{display:grid;place-items:center;min-width:44px;min-height:44px;background:transparent;border:0;color:#52647a;cursor:pointer}
+.boss-login-input input{border:0;background:transparent;outline:none;min-width:0;width:100%;padding:9px 12px;font:inherit;font-size:16px;color:#172b4d}
+.boss-login-input button{display:grid;place-items:center;min-width:42px;min-height:42px;background:transparent;border:0;color:#52647a;cursor:pointer}
 .boss-login-input:focus-within{outline:2px solid #0968ea;outline-offset:2px}
-.boss-login-submit{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;border:1px solid #0968ea;border-radius:9px;background:#0968ea;color:white;font:inherit;font-weight:600;cursor:pointer}
-.boss-login-card .boss-login-status{font-size:13px;line-height:21px;color:#63788d;margin:0}
-.boss-login-error{font-size:14px;color:#ae2536;background:#fff1f2;padding:10px 12px;border:1px solid #f2ccd1;border-radius:9px;margin:0}
-.boss-login-footer{display:flex;gap:12px;margin-top:20px;border-top:1px solid #e6ebf1;padding-top:16px}
-.boss-login-secondary{min-height:44px;flex:1;border:1px solid #dce4ed;border-radius:9px;background:white;color:#005bac;font:inherit;font-size:14px;padding:8px 12px;cursor:pointer}
-.boss-login-assistance{font-size:14px;color:#52647a;margin-top:16px}
-.boss-login-expired-note{margin:0 0 22px;padding:13px 15px;border:1px solid #dce9f8;border-radius:12px;background:#f1f7ff;color:#365675;font-size:13px;line-height:1.65}.boss-login-expired-note strong{display:block;color:#073b70}.boss-login-expired-note p{margin:6px 0 0}
+.boss-login-submit{display:flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border:1px solid #0968ea;border-radius:9px;background:#0968ea;color:white;font:inherit;font-weight:600;cursor:pointer}
+.boss-login-card .boss-login-status{font-size:12px;line-height:18px;color:#63788d;margin:0}
+.boss-login-error{font-size:14px;color:#ae2536;background:#fff1f2;padding:9px 11px;border:1px solid #f2ccd1;border-radius:9px;margin:0}
+.boss-login-footer{display:flex;gap:12px;margin-top:10px;border-top:1px solid #e6ebf1;padding-top:10px}
+.boss-login-secondary{min-height:40px;flex:1;border:1px solid #dce4ed;border-radius:9px;background:white;color:#005bac;font:inherit;font-size:14px;padding:7px 12px;cursor:pointer}
+.boss-login-assistance{font-size:13px;color:#52647a;margin-top:10px}
 .boss-login button:disabled{opacity:.55;cursor:default}
 .boss-login button:focus-visible,.boss-login input:focus-visible{outline:2px solid #0968ea;outline-offset:3px}
 .boss-login-spin{animation:boss-login-spin .9s linear infinite}
 @keyframes boss-login-spin{to{transform:rotate(360deg)}}
-@media(max-width:1100px){.boss-login{padding:24px}.boss-login-layout{gap:28px;padding:35px 0;grid-template-columns:minmax(220px,1fr) minmax(340px,480px)}.boss-login-mascot{height:220px}.boss-login-welcome h1{font-size:30px}}
-@media(max-width:650px){.boss-login{padding:20px 16px}.boss-login-brand{gap:8px}.boss-login-brand>span:not(.boss-login-service){display:none}.boss-login-brand .boss-login-service{font-size:12px;padding:4px 8px}.boss-login-layout{display:flex;flex-direction:column;margin:28px auto;max-width:460px;gap:24px}.boss-login-welcome{width:100%}.boss-login-mascot{height:100px;width:110px}.boss-login-welcome h1{font-size:26px;margin:8px 0}.boss-login-welcome p{font-size:14px}.boss-login-accent,.boss-login-welcome-note{display:none}.boss-login-card{width:100%;padding:24px}.boss-login-card h2{font-size:21px}}
+@media(max-width:1100px){.boss-login{padding:18px}.boss-login-layout{gap:24px;padding:12px 0;grid-template-columns:minmax(220px,1fr) minmax(340px,460px)}.boss-login-mascot{height:200px}.boss-login-welcome h1{font-size:30px}}
+@media(max-height:860px) and (min-width:651px){.boss-login{padding:14px clamp(20px,5vw,72px)}.boss-login-brand{min-height:40px}.boss-login-brand img{width:32px;height:32px}.boss-login-layout{margin:8px auto 10px;padding:6px clamp(0px,3vw,40px);gap:32px}.boss-login-mascot{height:170px}.boss-login-welcome{gap:6px}.boss-login-welcome h1{font-size:30px}.boss-login-accent,.boss-login-welcome-note{display:none}.boss-login-card{padding:18px 22px}.boss-login-description{margin-bottom:12px}.boss-login-roles{padding-bottom:10px;margin-bottom:10px;gap:8px}.boss-login-roles label{padding:10px 10px}.boss-login-card form{gap:9px}.boss-login-footer{margin-top:8px;padding-top:8px}.boss-login-secondary{min-height:38px}}
+@media(max-width:650px){.boss-login{padding:18px 16px}.boss-login-brand{gap:8px}.boss-login-brand>span:not(.boss-login-service){display:none}.boss-login-brand .boss-login-service{font-size:12px;padding:4px 8px}.boss-login-layout{display:flex;flex-direction:column;margin:20px auto;max-width:460px;gap:18px}.boss-login-welcome{width:100%}.boss-login-mascot{height:100px;width:110px}.boss-login-welcome h1{font-size:26px;margin:6px 0}.boss-login-welcome p{font-size:14px}.boss-login-accent,.boss-login-welcome-note{display:none}.boss-login-card{width:100%;padding:20px}.boss-login-card h2{font-size:21px}}
 @media(prefers-reduced-motion:reduce){.boss-login-spin{animation:none}}

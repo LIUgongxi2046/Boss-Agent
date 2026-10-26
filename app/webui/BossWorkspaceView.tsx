@@ -287,7 +287,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onDirt
     propose("boss.simulation.event.seed",{event_id:id},"注入获准模拟事件",[
       "事件标识："+id,
       "只使用当前已批准的数据集，不虚构新事件或联系人的身份。",
-      "调度结果由本机 CronService 后续执行，不能提前标记送达。",
+      "调度结果在后续执行中更新，成功前不会标记送达。",
     ]);
   }
   function advanceClock(){
@@ -314,7 +314,7 @@ export function BossWorkspaceView({pageId, role, onNavigate, onViewSource,onDirt
         {loading?<Loader2 className="boss-spin" size={15}/>:<RefreshCw size={15}/>} 重新读取
       </button>
     </div>
-    {loading&&<Notice message="正在向本机受权限控制的业务服务读取数据与版本…"/>}
+    {loading&&<Notice message="正在读取当前数据与版本…"/>}
     {error&&<Notice error message={error}/>}
     {notice&&<div className="boss-status boss-status-ok" role="status"><CheckCircle2 size={17}/>{notice}</div>}
     {w&&<div className="boss-columns">

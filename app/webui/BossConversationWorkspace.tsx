@@ -63,7 +63,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
       // 身份或连接变化后，重新核查运行、附件与原请求范围。
       setView(null);setAttachments([]);setAttachmentError("");setAttachmentLoading(false);setReceipts([]);
       setError(role==="BOSS"&&visible&&chatId
-        ?"原生会话连接尚未就绪或已中断；连接恢复后将重新读取当前运行、附件和原请求记录。":"");
+        ?"会话连接中断，正在恢复。":"");
       return;
     }
     let disposed=false,timer:ReturnType<typeof setTimeout>|undefined;
