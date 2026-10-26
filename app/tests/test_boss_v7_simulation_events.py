@@ -66,7 +66,7 @@ def test_inject_and_reply_record_outcomes_without_claiming_effects(store):
     result = receipt["result"]
     assert result["saved"]["state"] == "RECORDED"
     assert result["tasks"]["state"] == "NOT_TRIGGERED"
-    assert result["notifications"]["state"] == "NOT_TRIGGERED"
+    assert result["notifications"]["state"] == "SCHEDULED"
     assert result["agent"]["state"] == "NOT_REQUESTED"
     status, receipt = BossCommandAPI(store).execute("MAINTAINER", "boss.technical.simulation-events.reply",
                                                     payload(store))
@@ -100,3 +100,20 @@ def test_clock_advance_uses_current_version_and_moves_forward(store):
 def test_owner_role_is_rejected(store):
     with pytest.raises(web.HTTPForbidden):
         read(store, "BOSS")
+
+
+def test_injected_event_dispatches_notification_after_clock_reaches_event_time(store):
+    status, receipt = BossCommandAPI(store).execute("MAINTAINER", "boss.technical.simulation-events.inject",
+                                                    payload(store))
+    assert status == 200, receipt
+    result = receipt["result"]
+    event_id = result["notifications"]["ids"][0]
+    with store.connect() as db:
+        store.control_clock(db, "ui-check", {"at": "2026-10-22T10:00:00+08:00"})
+        store.dispatch_due_in_transaction(db, "ui-check")
+    projection = read(store)
+    record = next(row for row in projection["records"] if row["id"] == result["record_id"])
+    assert record["notifications"]["state"] == "DELIVERED"
+    notification_id = record["notifications"]["ids"][0]
+    with store.connect() as db:
+        assert store.get(db, "ui-check", "notification", notification_id)["event_id"] == event_id

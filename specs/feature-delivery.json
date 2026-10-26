@@ -589,8 +589,8 @@
     },
     "backend_simulation_events_validation": {
       "task_id": "V7-BACKEND",
-      "status": "EVENT_AND_REPLY_RECORDS_IMPLEMENTED_EFFECTS_PENDING",
-      "checks": "5_PASSED",
+      "status": "EVENT_AND_REPLY_RECORDS_IMPLEMENTED_NOTIFICATION_DISPATCH_VERIFIED",
+      "checks": "6_PASSED",
       "check_log": ".work/takeover/simulation-events-tests.log",
       "regression": "70_PASSED",
       "regression_log": ".work/takeover/simulation-events-regression-20261026.log",
@@ -598,11 +598,11 @@
       "http_log": ".work/takeover/simulation-events-http.log",
       "authenticated_ui": "EVENT_TYPE_TARGET_AUTHOR_SOURCE_CHAIN_RENDERED",
       "ui_log": ".work/takeover/simulation-events-ui.log",
+      "dispatched_notification": "SCHEDULED_THEN_DELIVERED_AT_DUE",
       "effects": [
         "TASKS_NOT_TRIGGERED",
-        "NOTIFICATIONS_NOT_TRIGGERED",
-        "AGENT_NOT_REQUESTED",
-        "CLOCK_PENDING_CRON"
+        "NOTIFICATIONS_DISPATCHED",
+        "AGENT_NOT_REQUESTED"
       ],
       "full_product": "NOT_VERIFIED"
     },

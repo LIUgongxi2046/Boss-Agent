@@ -67,10 +67,24 @@ def _time(value, label):
 
 
 def _records(db):
+    clock = datetime.fromisoformat(_clock(db)["at"])
     rows = []
     for row in db.execute("SELECT body FROM objects WHERE namespace=? AND kind=? ORDER BY id",
                           (NAMESPACE, RECORD_KIND)).fetchall():
-        rows.append(json.loads(row[0]))
+        record = json.loads(row[0])
+        notifications = record.get("notifications") or {}
+        if notifications.get("state") in {"SCHEDULED", "PENDING_CRON"} and notifications.get("ids"):
+            event_id = notifications["ids"][0]
+            delivery = _get(db, "delivery", event_id)
+            if delivery is not None:
+                notification_id = delivery.get("notification_id") or (
+                    delivery["event_id"] + ":" + delivery["event_version"])
+                record["notifications"] = {"state": "DELIVERED", "ids": [notification_id], "error": None}
+            elif datetime.fromisoformat(record["event_at"]) > clock:
+                record["notifications"] = {"state": "SCHEDULED", "ids": [event_id], "error": None}
+            else:
+                record["notifications"] = {"state": "PENDING_CRON", "ids": [event_id], "error": None}
+        rows.append(record)
     rows.sort(key=lambda item: item["created_at"], reverse=True)
     return rows
 
@@ -131,7 +145,7 @@ def record(store, db, snapshot, payload, action):
         "author_id": author["id"], "event_at": payload["event_at"], "content": payload["content"].strip(),
         "saved": saved,
         "tasks": {"state": "NOT_TRIGGERED", "ids": [], "error": None},
-        "notifications": {"state": "NOT_TRIGGERED", "ids": [], "error": None},
+        "notifications": {"state": "SCHEDULED", "ids": [identifier], "error": None},
         "simulation": {"state": "NOT_TRIGGERED", "ids": [], "error": None},
         "agent": {"state": "NOT_REQUESTED", "ids": [], "error": None},
         "run_ids": [],
@@ -143,6 +157,18 @@ def record(store, db, snapshot, payload, action):
         "event_at": payload["event_at"], "content": record_row["content"],
         "source_type": "SIMULATED",
     })
+    store.put(db, NAMESPACE, "event", identifier, {
+        "event_id": identifier, "version": "1", "state": "OPEN", "impact": "NORMAL",
+        "due_at": payload["event_at"], "owner_id": snapshot["owner_id"],
+        "source_type": "SIMULATED", "generated_by": "SIMULATION_INJECTION",
+        "source_refs": [{"source_id": source["id"], "version": source["version"]}],
+    })
+    if db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='rules' AND id='current'",
+                  (NAMESPACE,)).fetchone() is None:
+        store.put(db, NAMESPACE, "rules", "current", {
+            "version": "1", "cooldown_seconds": 3600, "quiet_start": 22, "quiet_end": 7,
+            "timezone": "Asia/Shanghai", "important_escalation": False,
+        })
     return {"source_type": "SIMULATED", "record_id": identifier, "action": action,
             "saved": saved, "tasks": record_row["tasks"], "notifications": record_row["notifications"],
             "simulation": record_row["simulation"], "agent": record_row["agent"]}
