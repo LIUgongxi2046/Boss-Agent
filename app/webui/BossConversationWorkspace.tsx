@@ -43,7 +43,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
   const scope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
   const taskScope=useRef<{client:typeof client;token:typeof token;chatId:string|null;role:typeof role}|null>(null);
   const workspace=useRef<HTMLDivElement|null>(null);
-  const generation=useRef(0),artifactGeneration=useRef(0),progress=useRef<HTMLDivElement|null>(null),artifactFocus=useRef<HTMLElement|null>(null);
+  const generation=useRef(0),artifactGeneration=useRef(0),artifactFocus=useRef<HTMLElement|null>(null);
   useEffect(()=>client.onStatus(setConnectionStatus),[client]);
   useEffect(()=>{if(role==="BOSS"&&visible&&chatId&&connectionStatus==="open")client.attach(chatId);},[client,role,visible,chatId,connectionStatus]);
   useEffect(()=>{
@@ -187,7 +187,7 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
         <div className="boss-n02-actions"><button className="boss-btn" onClick={actions.onReturn}><ArrowLeft size={16}/>返回业务页面</button><button className="boss-btn" onClick={onNewChat}><Plus size={16}/>新建会话</button><button className="boss-btn" type="button" aria-expanded={historyOpen} onClick={()=>setHistoryOpen(value=>!value)}><History size={16}/>历史会话</button></div>
       </section>
       <section className="boss-n02-panel boss-n02-conversation" aria-labelledby="boss-n02-conversation-title">
-        <header className="boss-n02-heading"><h2 id="boss-n02-conversation-title">对话与任务运行</h2><span className="boss-n02-chip">语音输入暂停</span></header>
+        <header className="boss-n02-heading"><h2 id="boss-n02-conversation-title">对话与任务运行</h2></header>
         <div className={"boss-n02-conversation-grid "+(!historyOpen?"boss-n02-history-hidden":"")}>
           <aside className="boss-n02-history" hidden={!historyOpen} aria-label="历史会话">
             <div className="boss-n02-heading"><h3>会话与任务</h3></div>
@@ -198,25 +198,17 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
             {sessions.length?<ul>{sessions.map(value=><li key={value.key}><button aria-current={value.key===activeKey?"page":undefined} onClick={()=>onSelectChat(value.key)}><MessageCircle size={16}/><span>{value.title}<small>{value.updatedAt}</small></span></button></li>)}</ul>:<p className="boss-n02-empty">尚无可用会话</p>}
             <div className="boss-chat-history-note"><p>会话与对象分别保存</p><span>返回会话时恢复原消息位置；资料版本与已确认决定沿用对应业务记录。</span></div>
           </aside>
-          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"连续对话"}</h2><p>讨论事项、补充材料，核查执行结果</p></div><span className="boss-n02-chip">{connectionStatus==="open"?"会话已连接":"连接待恢复"}</span></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
+          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"连续对话"}</h2><p>讨论事项、补充材料，核查执行结果</p></div><span className="boss-n02-chip">{connectionStatus==="open"?"会话已连接":"连接待恢复"}</span></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><AgentProcess run={latest} runs={view?.runs??[]} onSelect={setSelectedRunId}/><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
         </div>
-        <div className="boss-n02-progress" ref={progress} tabIndex={-1} aria-labelledby="boss-n02-progress-title">
-          <h2 id="boss-n02-progress-title">可观察执行步骤</h2>
-          {!!view?.runs.length&&<label className="boss-n02-session-select">关联运行<select aria-label="关联运行" value={latest?.run_id??""} onChange={event=>setSelectedRunId(event.target.value)}>{view.runs.map(run=><option key={run.run_id} value={run.run_id}>{run.started_at} · {label(run.status)}</option>)}</select></label>}
-          {error?<div className="boss-n02-note error" role="alert">{error}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新读取当前记录</button></div>:chatId&&!view?<p role="status">正在核查当前会话与运行记录</p>:!latest?<p className="boss-n02-note">尚未产生运行记录。可以输入问题、补充材料或说明需要推进的事项。</p>:<>
-            <Row name="运行编号" value={latest.run_id}/><Row name="执行结果" value={label(latest.status)}/><Row name="结束原因" value={latest.stop_reason??"尚未结束"}/><Row name="开始时间" value={latest.started_at}/><Row name="结束时间" value={latest.finished_at??"尚未结束"}/><Row name="采用配置" value={latest.configuration_id+" · 版本 "+latest.configuration_version}/>
-            {latest.tool_steps.length?<ol className="boss-n02-steps">{latest.tool_steps.map((step,index)=><li key={step.tool_call_id+index}><FileText size={16}/><span>{step.tool_id}</span><strong>{step.status?label(step.status):"结果已保存"}</strong></li>)}</ol>:<p>本次没有已记录的工具步骤。</p>}
-            <div className="boss-n02-actions">{latest.artifacts.map(reference=><button className="boss-btn" key={reference.kind+reference.id} data-conversation-return={"artifact:"+latest.run_id+":"+reference.kind+":"+reference.id} onClick={()=>void openArtifact(latest,reference)}>{kindLabel[reference.kind]}<span>{reference.id}</span></button>)}</div>
-          </>}
-        </div>
+        {error&&<div className="boss-n02-note error" role="alert">{error}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>重新读取当前记录</button></div>}
       </section>
     </div>
     <aside className="boss-n02-aside">
       <section className="boss-n02-panel" aria-labelledby="boss-n02-latest-title"><h2 id="boss-n02-latest-title">任务执行</h2><Row name="运行状态" value={latest?label(latest.status):"尚未运行"}/><Row name="已记录步骤" value={latest?latest.tool_steps.length+" 项":"尚未读取"}/>
         {latest?.tool_steps.length?<ol className="boss-chat-side-steps">{latest.tool_steps.slice(-3).map((step,index)=><li key={step.tool_call_id+index}><span>{String(latest.tool_steps.length-Math.min(latest.tool_steps.length,3)+index+1).padStart(2,"0")}</span><div><strong>{step.tool_id}</strong><p>{label(step.status)}</p></div></li>)}</ol>:<p>取得实际工具记录后显示执行步骤。</p>}
         <button className="boss-btn" disabled={!latest} data-conversation-return="run:details" onClick={()=>{if(latest)openBusiness(()=>actions.onOpenPage("F24",latest.run_id));}}>查看完整执行</button>
-        <div className="boss-n02-actions"><button className="boss-btn" onClick={()=>{setSelectedRunId("");progress.current?.scrollIntoView({block:"nearest"});progress.current?.focus();}}>查看最新进展</button><button className="boss-btn" onClick={()=>setRevision(value=>value+1)}><RefreshCw size={16}/>读取原执行结果</button></div>
-        <details aria-label="原请求记录"><summary>原请求记录（{receipts.length}）</summary>{receipts.length?receipts.map(receipt=><div className="boss-n02-source" key={receipt.client_request_id}><strong>{receipt.client_request_id}</strong><span>{receipt.request_state==="ADMITTED"?"已经接收":label(receipt.request_state)}</span><span>原轮次 {receipt.turn_id}</span>{receipt.run_id?<button className="boss-btn" onClick={()=>{setSelectedRunId(receipt.run_id!);progress.current?.scrollIntoView({block:"nearest"});progress.current?.focus();}}>读取关联运行</button>:<p>当前没有已建立的运行记录。读取原请求不会重新执行。</p>}</div>):<p>当前会话没有一般请求记录。晨间绑定按原业务记录核查。</p>}</details>
+        <div className="boss-n02-actions"><button className="boss-btn" onClick={()=>setRevision(value=>value+1)}><RefreshCw size={16}/>读取原执行结果</button></div>
+        <details aria-label="原请求记录"><summary>原请求记录（{receipts.length}）</summary>{receipts.length?receipts.map(receipt=><div className="boss-n02-source" key={receipt.client_request_id}><strong>{receipt.client_request_id}</strong><span>{receipt.request_state==="ADMITTED"?"已经接收":label(receipt.request_state)}</span><span>原轮次 {receipt.turn_id}</span>{receipt.run_id?<button className="boss-btn" onClick={()=>setSelectedRunId(receipt.run_id!)}>读取关联运行</button>:<p>当前没有已建立的运行记录。读取原请求不会重新执行。</p>}</div>):<p>当前会话没有一般请求记录。晨间绑定按原业务记录核查。</p>}</details>
       </section>
       <section className="boss-n02-panel" aria-label="授权与必要决定"><h2>授权与必要决定</h2><Row name="执行对象" value={latest?.authorization_summary?.target_label??taskEntry?.task_reference.id??"尚未核查"}/><Row name="有效授权" value={latest?.authorization_summary?label(latest.authorization_summary.state):"尚未取得当前授权结果"}/><Row name="待补条件" value={latest?.authorization_summary?latest.authorization_summary.waiting_inputs.length+" 项":"尚未取得完整条件"}/>{latest?.authorization_summary?.waiting_inputs.map((item,index)=><p className="boss-n02-note warn" key={index}>{item}</p>)}{latest?.authorization_summary?.coverage==="PARTIAL"&&<p>当前条件清单尚不完整。</p>}<div className="boss-n02-actions"><button className="boss-btn" data-conversation-return="decisions" onClick={()=>openBusiness(()=>actions.onOpenPage("F28"))}>查看必要决定</button><button className="boss-btn" data-conversation-return="authorizations" onClick={()=>openBusiness(()=>actions.onOpenPage("N10"))}>核查有效授权</button></div></section>
       <section className="boss-n02-panel" aria-label="来源与依据" tabIndex={-1}><h2>资料与产物</h2><Row name="已保存产物" value={latest?latest.artifacts.length+" 项":"尚未读取"}/><Row name="来源引用" value={latest?documentRefs.length+" 项":"尚未读取"}/>
@@ -228,7 +220,6 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
           {attachmentError&&<div role="alert" className="boss-n02-note error">附件读取失败，不能判定当前附件为空：{attachmentError}<button className="boss-btn" type="button" onClick={()=>setRevision(value=>value+1)}>重新读取当前附件</button></div>}
           {!attachmentError&&(attachments.length?attachments.map(file=><div className="boss-n02-source" key={file.attachment_id}><strong>{file.original_name??file.stored_name??"附件名称未知"}</strong><span>{file.mime_type??"类型未知"} · {file.size_bytes===null?"当前大小未知":file.size_bytes+" bytes"} · {fileState[file.processing_state]}</span>{file.processing_state!=="STORED"&&<p className="boss-n02-note warn">上传记录大小：{file.recorded_size_bytes===null?"未知":file.recorded_size_bytes+" bytes"}。当前附件不能作为已核查的业务依据。</p>}</div>):!attachmentLoading&&<p>本次读取确认暂无已保存附件。当前选择及未发送附件保留在输入区域。</p>)}</details>
       </section>
-      <section className="boss-n02-panel" aria-label="执行异常"><h2>执行异常</h2>{latest?.tool_errors.length?latest.tool_errors.map((value,index)=><p className="boss-n02-note error" key={value.tool_id+index}>{value.tool_id} · {value.error_type}</p>):<p>{latest?"当前运行没有已记录的工具错误。":"尚未取得实际运行记录。"}</p>}<p>执行结果未知时，读取原记录核查。发送、送达、回复和交办完成分别记录。</p><div className="boss-n02-actions"><button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>执行结果核查</button><button className="boss-btn" disabled={!latest} data-conversation-return="run:exceptions" onClick={()=>{if(latest)openBusiness(()=>actions.onOpenPage("F29",latest.run_id));}}>任务异常详情</button><button className="boss-btn" data-conversation-return="messages" onClick={()=>openBusiness(actions.onOpenMessages)}>查看消息草稿与回复</button></div></section>
     </aside>
     <div className="boss-chat-below">
     <section className="boss-n02-panel boss-chat-deliverables" aria-labelledby="boss-chat-deliverables-title">
@@ -240,11 +231,6 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
       <header className="boss-n02-heading"><h2 id="boss-chat-metrics-title">经营指标与来源核查</h2><button className="boss-btn" data-conversation-return="query" onClick={()=>openBusiness(()=>actions.onOpenPage("F03"))}>经营查询</button></header><p>查看本次查询的指标、期间、范围和计算依据。</p>
       <BossConversationMetrics key={String(token)+":"+chatId+":"+latest?.run_id} chatId={chatId} runId={latest?.run_id??null} queries={latest?.artifacts.filter(reference=>reference.kind==="query")??[]} active={isActiveN02Scope(latestScope.current)} refreshVersion={revision} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))} onOpen={id=>{const reference=latest?.artifacts.find(item=>item.kind==="query"&&item.id===id);if(latest&&reference)void openArtifact(latest,reference);}}/>
     </section>
-    </div>
-    <div className="boss-chat-below boss-chat-below-three">
-    <section className="boss-n02-panel boss-chat-handoff" aria-label="会话转交办"><h2>会话转交办</h2><p>核对目标、负责人、期限和证据要求后，由本人确认。</p><button className="boss-btn boss-btn-primary" data-conversation-return="handoff:new" onClick={()=>openBusiness(()=>actions.onOpenTask(""))}>准备交办</button></section>
-    <section className="boss-n02-panel boss-chat-source-summary" aria-label="来源核验"><h2>来源核验</h2><Row name="当前来源引用" value={documentRefs.length?documentRefs.length+" 项":"尚未记录"}/><Row name="资料采用" value="以当前版本及访问权限为准"/><button className="boss-btn" onClick={()=>{const section=workspace.current?.querySelector<HTMLElement>('[aria-label="来源与依据"]');section?.scrollIntoView({block:"start",behavior:"smooth"});section?.focus();}}>查看来源与依据</button></section>
-    <section className="boss-n02-panel boss-chat-recovery" aria-label="原运行与恢复"><h2>原运行与恢复</h2><p>连接中断后读取原运行，保留已经保存的消息、产物和业务结果。</p><Row name="原运行状态" value={latest?label(latest.status):"尚未运行"}/><button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>查询原执行结果</button></section>
     </div>
     <Dialog.Root open={artifactOpen&&visible} onOpenChange={open=>{setArtifactOpen(open);if(!open)++artifactGeneration.current;}}><Dialog.Portal><Dialog.Overlay className="boss-n02-dialog-overlay"/><Dialog.Content className="boss-n02-dialog" onCloseAutoFocus={event=>{event.preventDefault();if(visible&&artifactFocus.current?.isConnected)artifactFocus.current.focus({preventScroll:true});}}><Dialog.Title>当前产物与依据</Dialog.Title><Dialog.Description>根据当前会话的原运行引用，重新核查实际对象与来源。</Dialog.Description><Dialog.Close className="boss-icon-button" aria-label="关闭产物详情"><X size={18}/></Dialog.Close>
       {artifactLoading&&<p role="status">正在核查当前产物</p>}
@@ -279,4 +265,23 @@ function QueryDetails({data}:{data:Record<string,unknown>}){
   const query=data as {context_snapshot:Record<string,unknown>;values:{metric_id:string;period_scope:string;scope_description:string;value:string|null;unit:string;formula:string;definition_version:string;display_rounding:string}[];comparison:{state:string;reasons:string[]};missing_fields:string[];unexplained_causes:string[];detail_refs:string[]};
   const fields:Record<string,string>={period_start:"查询开始",period_end:"查询结束",comparison_start:"比较开始",comparison_end:"比较结束",region_id:"区域",region_ids:"全部区域",product_ids:"产品",metric_ids:"指标",legal_entity_id:"法人主体",currency:"币种",quantity_unit:"数量单位",trade_scope:"交易范围",definition_version:"指标定义版本",business_basis:"业务口径",settlement_state:"结算状态",parent_query_id:"父查询",scenario_id:"经营资料范围"};
   return <section aria-label="查询完整结果"><h3>查询条件与结果</h3>{Object.entries(fields).filter(([field])=>query.context_snapshot[field]!==undefined).map(([field,name])=><Row key={field} name={name} value={Array.isArray(query.context_snapshot[field])?(query.context_snapshot[field] as string[]).join("、"):String(query.context_snapshot[field])}/>)}<div className="boss-n02-query-table"><table><thead><tr>{["指标","期间","范围","数值","单位","公式","定义版本","显示规则"].map(name=><th key={name}>{name}</th>)}</tr></thead><tbody>{query.values.map((value,index)=><tr key={index}><th>{value.metric_id}</th><td>{value.period_scope}</td><td>{value.scope_description}</td><td>{value.value??"当前无法确定"}</td><td>{value.unit}</td><td>{value.formula}</td><td>{value.definition_version}</td><td>{value.display_rounding}</td></tr>)}</tbody></table></div><Row name="比较状态" value={query.comparison.state}/>{query.comparison.reasons.map(reason=><p key={reason}>{reason}</p>)}<Row name="资料缺口" value={query.missing_fields.join("、")||"没有已记录缺口"}/>{query.unexplained_causes.map(value=><p key={value}>{value}</p>)}<details><summary>查看结果明细编号</summary>{query.detail_refs.map(id=><p key={id}>{id}</p>)}</details></section>;
+}
+
+const toolNames:Record<string,string>={query_metrics:"查询经营数据",read_evidence:"读取资料原文",bossSectorRead:"读取专题数据",bossTasksRead:"读取任务与承诺",bossMeetingsRead:"读取会议资料",bossEvidenceRead:"读取来源原文",bossWorkspaceRead:"读取工作资料",conversationRead:"读取会话记录",create_assignment:"创建交办",send_assignment:"发送交办",read_assignment:"读取交办状态",morningListRead:"读取晨间清单",morningDetailRead:"读取事项详情",morningSourceRead:"读取事项来源",todayRead:"读取今日工作",ownerPlansRead:"读取本人计划",assignmentSourcesRead:"读取交办来源",businessOverviewRead:"读取经营概览"};
+
+function AgentProcess({run,runs,onSelect}:{run:Run|undefined;runs:Run[];onSelect:(id:string)=>void}){
+  if(!runs.length)return null;
+  const steps=run?.tool_steps??[];
+  const running=run?.status==="RUNNING"||run?.status==="QUEUED";
+  return <section className="boss-n02-agent" aria-label="Agent 处理过程" aria-live="polite">
+    <header className="boss-n02-agent-head"><h3>处理过程</h3>
+      {runs.length>1&&<select aria-label="选择运行" value={run?.run_id??""} onChange={event=>onSelect(event.target.value)}>{runs.map(item=><option key={item.run_id} value={item.run_id}>{item.started_at} · {label(item.status)}</option>)}</select>}
+      <span className={"boss-n02-chip"+(running?" boss-n02-chip-active":"")}>{run?label(run.status):"等待运行"}</span>
+    </header>
+    <ol className="boss-n02-agent-steps">
+      {steps.map((step,index)=><li key={step.tool_call_id+index} data-state={step.status}><span className="boss-n02-agent-index">{String(index+1).padStart(2,"0")}</span><div><strong>{toolNames[step.tool_id]??step.tool_id}</strong><small>{step.status?label(step.status):"已完成"}</small></div></li>)}
+      {!steps.length&&run&&<li data-state={run.status}><span className="boss-n02-agent-index">··</span><div><strong>{running?"正在理解需求":"本次未调用工具"}</strong><small>{label(run.status)}</small></div></li>}
+    </ol>
+    {run?.tool_errors.length?<div className="boss-n02-agent-errors">{run.tool_errors.map((error,index)=><p key={error.tool_id+index}>{(toolNames[error.tool_id]??error.tool_id)+"未完成"} · {error.error_type}</p>)}</div>:null}
+  </section>;
 }

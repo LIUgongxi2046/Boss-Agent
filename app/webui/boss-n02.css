@@ -144,3 +144,16 @@
  .boss-n02-panel,.boss-n02-message-column,.boss-n02-progress{padding:15px}.boss-n02-kv{grid-template-columns:90px minmax(0,1fr)}
  .boss-n02-heading{flex-wrap:wrap}
 }
+.boss-n02-agent{border:1px solid #e2ebf5;border-radius:14px;background:#f8fbff;padding:12px 14px;margin:12px 0}
+.boss-n02-agent-head{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap}
+.boss-n02-agent-head h3{font-size:14px;line-height:20px;margin:0;color:#244768}
+.boss-n02-agent-head select{max-width:260px;min-width:0}
+.boss-n02-agent-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.boss-n02-agent-steps li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#365675}
+.boss-n02-agent-index{width:24px;height:24px;border-radius:7px;background:#e6f0fb;color:#0c6cf0;display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+.boss-n02-agent-steps strong{display:block;font-size:13px;line-height:20px;color:#1d3a5a}
+.boss-n02-agent-steps small{color:#6a7f95;font-size:12px;line-height:18px}
+.boss-n02-agent-steps li[data-state="RUNNING"] .boss-n02-agent-index{background:#dcecff;animation:boss-n02-agent-pulse 1.2s ease-in-out infinite}
+.boss-n02-agent-errors p{margin:6px 0 0;color:#ae2536;font-size:12px}
+.boss-n02-chip-active{background:#e6f7ee;color:#1d7a4a}
+@keyframes boss-n02-agent-pulse{50%{opacity:.55}}

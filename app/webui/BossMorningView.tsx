@@ -7,7 +7,6 @@ import {isSafeMorningFocusId,readMorningReturnPoint} from "./morning-return";
 import {currentMorningDetailScope,shouldClearMorningSelectionOnFilter} from "./morning-detail-scope";
 import {validateMorningBindingReceipt,canAcknowledgeMissingMorningBinding,type MorningBinding,type MorningBindingReceipt} from "./morning-binding-recovery";
 export type {MorningBinding,MorningBindingReceipt} from "./morning-binding-recovery";
-import {V7Metric, V7Panel, V7Steps} from "./BossV7UI";
 import "./boss-morning.css";
 import "./boss-f01-shell.css";
 
@@ -247,9 +246,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
       <section className="boss-panel boss-f01-entry"><header className="boss-panel-head"><div><h2>交给 Boss Agent</h2></div></header>
         <form onSubmit={event=>{event.preventDefault();void submit();}}><label className="boss-f01-entry-label" htmlFor="morning-question">本次需求</label>
           <textarea id="morning-question" placeholder="今天有哪些事项需要本人决定、协调或知晓？" required maxLength={4000} value={question} disabled={busy||uncertain||denied} onChange={event=>{setQuestion(event.target.value);setQuestionDirty(true);}}/>
-          <div className="boss-f01-entry-actions"><button className="boss-btn" type="button" disabled title="语音输入暂停">语音输入</button><button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
-          <p className="boss-helper">当前入口整理晨间事项。交办创建、发送与确认分别由本人决定。</p>
-          {busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消会话交接</button>}
+          <div className="boss-f01-entry-actions">{busy&&<button className="boss-btn" type="button" disabled={handoffCanceled} onClick={cancelHandoff}>取消本次请求</button>}<button className="boss-btn boss-btn-primary" type="submit" disabled={disabled||dateDirty||loading||!view||!question.trim()}><Send size={16}/>发送任务</button></div>
         </form>
       </section>
     </main><aside className="boss-f01-aside" aria-label="今日工作相关信息">
@@ -272,7 +269,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
       </>:<><dl className="boss-f01-detail-fields">{["对象与当前版本","关联来源","关联会议","交办记录"].map(field=><div key={field}><dt>{field}</dt><dd>{selected?detailLoading?"正在核查":detailError?"当前读取失败":current?"尚未取得详情":list?"需重新查询清单":"仅为日期预览":"尚未选择事项"}</dd></div>)}</dl>
         <p>{selected?detailLoading?"正在核查当前事项与来源版本。":detailError?"详情读取失败，原有清单仍在；请重新核查该事项。":current?"当前事项尚未取得可采用详情，请核查来源。":list?"当前清单需要重新查询，历史内容不可直接操作。":"此项仅为日期预览，尚不能读取正式详情或绑定交办。请先通过“本次需求”提交晨间问题，取得正式清单后核查事项。":current?"选择列表中的事项，查看同一版本的资料和操作。":"提交晨间问题取得有效清单后，可以查看详情、保存次序和准备交办。"}</p>
         {detailError&&current&&selected&&<div className="boss-status boss-status-error" role="alert"><span>{detailError}</span><button id="morning-detail-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setDetailRevision(value=>value+1)}>重新核查当前事项</button></div>}</>}</Panel>
-      <Panel title="保存与返回"><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
+      <details className="boss-panel boss-f01-more"><summary>状态与更多信息</summary><dl className="boss-f01-detail-fields"><div><dt>排序保存状态</dt><dd>{orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}</dd></div><div><dt>资料完整性</dt><dd>{view?label(view.coverage_state):"尚待读取"}</dd></div></dl>
       <div className="boss-actions"><button id="morning-tasks" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N05","");}}>任务与承诺</button><button id="morning-notifications" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onNavigate("N06","");}}>通知中心</button></div>
       <details><summary>查看资料与业务记录</summary>
       <details><summary>当前进展与查询记录</summary><p>{list?label(list.adoption_state):"当前日期预览"} · 清单版本 {view?.list_version??"尚未生成"}</p><p>业务日 {view?.day_start??"等待读取"} 至 {view?.day_end??"等待读取"}</p>
@@ -299,24 +296,8 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         {view?.missing_sources.map(value=><p className="boss-helper" key={value}>{morningReason(value)}</p>)}
         {view?.source_statuses.map(source=><article className="boss-f01-related" key={source.source_id}><p>{source.source_id} · v{source.version??"未知"} · {label(source.status)}</p><p>资料截至 {source.data_as_of??"未知"} · 作者 {source.author_contact_id??"未知"} · 更新 {source.observed_at??"未知"}</p><button className="boss-btn" disabled={!current||source.status!=="VALID"||busy||uncertain} onClick={()=>chooseSource(source.source_id)}>查看来源原文</button></article>)}
         <details><summary>查看未纳入的对象与原因</summary>{view?.excluded_items.map(value=><p key={value.kind+value.id}>{value.kind} / {value.id} / v{value.version} · {morningReason(value.reason)}</p>)}</details></details>
-      <details><summary>本人目标与阅读要求</summary><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></details></details></Panel>
+      <details><summary>本人目标与阅读要求</summary><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></details></details></details>
     </aside></div>
-    <div className="boss-v7-addendum">
-      <V7Panel title="完整事项明细与排序记录" description="当前清单、资料截止与排序保存状态来自同一份正式读取结果。">
-        <div className="boss-v7-metrics">
-          <V7Metric label="业务日期" value={day?.date??"等待读取"} note={day?.timezone}/>
-          <V7Metric label="资料截至" value={view?.data_as_of??"待读取"}/>
-          <V7Metric label="当前参与事项" value={view?view.items.length+" 项":"尚未读取"}/>
-          <V7Metric label="排序保存" value={orderDirty?"尚未保存":label(order?.state??view?.order_state??"NOT_SET")}/>
-        </div>
-        <V7Steps steps={[
-          {title:"读取当前事项",description:view?"已读取清单 · 版本 "+view.list_version:"等待当前日期与正式清单",state:view?"complete":"waiting"},
-          {title:"分析本人参与原因",description:view&&view.items.length?"当前 "+view.items.length+" 项参与事项":"尚未取得参与事项",state:view&&view.items.length?"complete":"waiting"},
-          {title:"保存人工调整次序",description:orderDirty?"存在尚未保存的次序调整":order?.state?"当前次序 "+label(order.state):"尚无保存的次序记录",state:orderDirty?"current":order?.state?"complete":"waiting"},
-          {title:"打开事项关联对象",description:selected&&detail?"已打开 "+detail.item.title:"选择事项后进入来源、会议或交办",state:selected&&detail?"complete":"waiting"},
-        ]}/>
-      </V7Panel>
-    </div>
     <Dialog open={Boolean(sourceId)&&visible} onOpenChange={open=>{if(!open){setSourceId("");setDocument(null);setSourceError("");remember({morningSource:null});}}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-source-description"><DialogTitle>当前来源原文</DialogTitle><DialogDescription id="morning-source-description">当前清单与来源版本经服务端重新核查。关闭后返回当前事项。</DialogDescription>
       <DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>
       {document&&current?<article id="morning-source"><h3>{document.source_id} · v{document.version}</h3><p>作者 {document.author_display_name??document.author_contact_id??document.author_kind??"尚未提供"} · 用途 {document.allowed_use??"以当前资料权限为准"}</p><p>发布 {document.published_at??"未知"} · 更新 {document.observed_at??"未知"}</p><p>有效时间 {document.valid_from??"未知"} 至 {document.valid_until??"未知"}</p><p>引用位置 {document.original_locator===undefined?"尚未提供":JSON.stringify(document.original_locator)}</p><blockquote>{document.content??"原文未提供"}</blockquote></article>:<div><p role={sourceError&&current?"alert":"status"}>{!current?"当前清单为预览或已失效，暂不能读取原文，请重新查询正式清单。":sourceError||"正在读取当前来源"}</p>{current&&sourceError&&<button id="morning-source-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setSourceRevision(value=>value+1)}>重新核查当前来源</button>}</div>}

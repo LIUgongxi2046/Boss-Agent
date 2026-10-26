@@ -91,3 +91,6 @@ div:has(> .boss-f01-dialog.boss-v6){display:grid;place-items:center;align-conten
 @media(max-width:1250px){.boss-f01-grid{grid-template-columns:minmax(0,1fr) 260px}}
 @media(max-width:1050px){.boss-f01-grid{grid-template-columns:1fr}.boss-f01-aside{display:flex}.boss-f01-scope{grid-template-columns:repeat(2,minmax(0,1fr))}.boss-f01-categories{gap:5px}.boss-f01-category{flex-direction:column}}
 @media(max-width:700px){.boss-f01-categories,.boss-f01-aside,.boss-f01-detail-fields,.boss-f01-scope{grid-template-columns:1fr}.boss-f01-category{flex-direction:row}.boss-f01-scope label,.boss-f01-scope input{width:100%}.boss-f01.boss-morning-view .boss-panel{padding:15px}.boss-f01 .boss-panel-head{flex-wrap:wrap}.boss-f01-detail-fields>div{grid-template-columns:90px minmax(0,1fr)}.boss-f01-item{flex-wrap:wrap}.boss-f01-item-category{margin-left:44px}}
+.boss-f01-more>summary{cursor:pointer;font-size:15px;font-weight:600;color:#244768;list-style-position:inside}
+.boss-f01-more[open]>summary{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eaf0f7}
+.boss-f01-more .boss-f01-detail-fields{margin-bottom:8px}
