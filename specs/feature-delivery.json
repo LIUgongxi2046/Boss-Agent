@@ -665,12 +665,12 @@
       "check_log": ".work/takeover/sector-scope-tests.log",
       "authenticated_ui": "F15_F22_SCOPE_RESPONSE_COVERAGE_AND_MISSING_RENDERED",
       "ui_log": ".work/takeover/sector-scope-ui.log",
-      "remaining": ["SECTOR_COORDINATE_REVIEW_MEETING_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
+      "remaining": ["SECTOR_REVIEW_MEETING_ACTIONS", "SECTOR_DETAIL_RECORDS_AND_RELATIONS"],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_pack_validation": {
       "task_id": "V7-BACKEND",
-      "status": "SIMULATED_METRICS_RECORDS_SECTIONS_RELATIONS_WORKFLOW_IMPLEMENTED_DECISIONS_AVAILABLE",
+      "status": "SIMULATED_METRICS_RECORDS_SECTIONS_RELATIONS_WORKFLOW_COORDINATION_AND_DECISIONS_AVAILABLE",
       "definition": "SECTOR-PACK-1",
       "pages": ["F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "V19-BEEF", "V19-EGG", "V19-MILK"],
       "checks": "6_PASSED",
@@ -681,7 +681,18 @@
       "ui_log": ".work/takeover/sector-metrics-ui.log",
       "filter_options": "EXPOSED_AND_APPLIED",
       "metric_calculation": "DERIVED_FROM_FILTERED_DETAIL_ROWS_SUM_OR_AVERAGE",
-      "remaining": ["SECTOR_COORDINATE_REVIEW_MEETING_ACTIONS"],
+      "remaining": ["SECTOR_REVIEW_MEETING_ACTIONS"],
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_sector_coordinate_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "COORDINATION_TASK_CREATION_IMPLEMENTED",
+      "checks": "7_PASSED",
+      "check_log": ".work/takeover/sector-coordinate-tests.log",
+      "authenticated_http": "F15_COORDINATE_ACTIONS_ALLOWED",
+      "http_log": ".work/takeover/sector-coordinate-http.log",
+      "authenticated_ui": "COORDINATION_SUBMITTED_TASK_CREATED",
+      "ui_log": ".work/takeover/sector-coordinate-ui.log",
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_decision_validation": {

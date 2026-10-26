@@ -343,7 +343,7 @@ class Store:
         # against an authenticated CURRENT morning list, exact item, snapshot,
         # owner and document refs by BossCommandAPI._create.
         require(verified_morning_selection or all(
-            identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1")
+            identifier == "finance-note" or document.get("simulation_definition") in (DEFINITION, "FC04-ALERT-1", "SECTOR-PACK-1")
             for identifier, document in documents.items()),
             "来源不属于当前明确支持的交办资料", web.HTTPBadRequest)
         self.require_current_coordinator(db, ns, data, p["coordinator_id"])

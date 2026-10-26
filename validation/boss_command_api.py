@@ -186,6 +186,7 @@ class BossCommandAPI:
         "boss.owner.plan.resume": "BOSS",
         "boss.owner.plan.cancel": "BOSS",
         "boss.today.reorder": "BOSS",
+        "boss.sector.coordinate.create": "BOSS",
         "boss.sector.decision.save": "BOSS",
         "boss.runtime.save": "MAINTAINER",
         "boss.runtime.validate": "MAINTAINER",
@@ -465,6 +466,8 @@ class BossCommandAPI:
                 result = notice_confirm(self, db, data, payload)
             elif action == "boss.authorization.revoke":
                 result = owner_authorization_revoke(self, db, data, payload)
+            elif action == "boss.sector.coordinate.create":
+                result = self._sector_coordinate(db, data, payload, key)
             elif action == "boss.sector.decision.save":
                 from boss_v7_sector_actions import save_decision
                 result = save_decision(self, db, data, payload)
@@ -548,6 +551,81 @@ class BossCommandAPI:
                 "task_id": result["task_id"], "task_version": result["version"], "authorization_id": auth_id})
         return {**result, "source_type": "SIMULATED",
                 "authorization_scope": "BOSS_CONFIRMED"}
+
+    SECTOR_COORDINATE_ACTIONS = frozenset({
+        "选择统筹负责人", "交办", "创建联合核查", "授权资源协调", "资源协调", "授权核查任务", "授权设备协调",
+    })
+
+    def _sector_coordinate(self, db, data, payload, key):
+        from boss_sector_api import SECTORS, query_id_for
+        from zoneinfo import available_timezones
+        self._exact(payload, {
+            "client_request_id", "page_id", "execution_namespace", "dataset_version", "query_id",
+            "action_code", "filters", "overview_reference", "source_refs", "purpose",
+            "timezone", "coordinator_id", "coordinator_version", "due_at",
+            "expected_output", "evidence_requirements",
+        })
+        page = payload["page_id"]
+        require(page in SECTORS, "专题页面不属于当前范围", web.HTTPBadRequest)
+        require(payload["execution_namespace"] == NAMESPACE, "执行空间不一致", web.HTTPConflict)
+        require(payload["dataset_version"] == data["dataset_version"], "数据集版本已经变化", web.HTTPConflict)
+        filters, overview = payload["filters"], payload["overview_reference"]
+        require(isinstance(filters, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in filters.items()),
+                "筛选条件无效", web.HTTPBadRequest)
+        require(overview is None or isinstance(overview, dict), "经营范围引用无效", web.HTTPBadRequest)
+        require(payload["query_id"] == query_id_for(page, filters, overview),
+                "专题查询版本已经变化，请重新读取", web.HTTPConflict)
+        require(payload["action_code"] in self.SECTOR_COORDINATE_ACTIONS, "专题协调动作不在获准范围", web.HTTPBadRequest)
+        pack = self.store.get(db, NAMESPACE, "document", "sector-" + page.lower() + "-a")
+        require(isinstance(payload["source_refs"], list)
+                and payload["source_refs"] == [{"source_id": pack["source_id"], "version": pack["version"]}],
+                "来源版本已经变化", web.HTTPConflict)
+        require(_is_text(payload["purpose"]), "协调目的为空或过长", web.HTTPBadRequest)
+        require(_is_text(payload["expected_output"], 600), "预期产物为空或过长", web.HTTPBadRequest)
+        combined = payload["purpose"].strip() + "（预期产物：" + payload["expected_output"].strip() + "）"
+        require(_is_text(combined), "协调内容过长", web.HTTPBadRequest)
+        require(payload["coordinator_id"] == "coordinator-1",
+                "当前模拟协调仅允许经过验证的统筹负责人", web.HTTPBadRequest)
+        require(payload["coordinator_version"] == "1", "负责人版本已经变化", web.HTTPConflict)
+        require(payload["timezone"] in available_timezones(), "协调时区无效", web.HTTPBadRequest)
+        due = _aware_due(payload["due_at"], payload["timezone"])
+        clock = self.store.get(db, NAMESPACE, "clock", "current")
+        require(due > datetime.fromisoformat(clock["at"]), "协调期限必须晚于当前业务时间", web.HTTPBadRequest)
+        evidence = [line.strip() for line in payload["evidence_requirements"].splitlines() if line.strip()]
+        require(1 <= len(evidence) <= 8 and all(_is_text(item, 160) for item in evidence),
+                "证据要求缺少或无效", web.HTTPBadRequest)
+        meeting, event = data["meeting"], data["event"]
+        bound = {"page_id": page, "query_id": payload["query_id"], "filters": filters,
+                 "overview_reference": overview, "action_code": payload["action_code"],
+                 "coordinator_id": payload["coordinator_id"], "due_at": payload["due_at"],
+                 "timezone": payload["timezone"], "purpose": combined,
+                 "evidence_requirements": evidence, "source_refs": payload["source_refs"]}
+        auth_id = self._authorize(db, "sector.coordinate.create", bound, "sector:" + page, "1")
+        tool_input = {"purpose": combined, "coordinator_id": payload["coordinator_id"],
+                      "due_at": payload["due_at"], "timezone": payload["timezone"],
+                      "evidence_requirements": evidence,
+                      "related_meeting_id": meeting["meeting_id"],
+                      "related_event_ids": [event["event_id"]],
+                      "source_refs": [pack["source_id"]], "content_version": "1",
+                      "authorization_id": auth_id, "idempotency_key": key,
+                      "envelope": _data_envelope(data, key)}
+        validate("assignment_input", tool_input)
+        result = self.store.create_assignment(db, NAMESPACE, data, tool_input)
+        identifier = "sector-" + str(uuid.uuid4())
+        self.store.put(db, NAMESPACE, "sector_followup", identifier, {
+            "record_id": identifier, "version": "1", "kind": "COORDINATE",
+            "title": payload["action_code"], "state": "TASK_CREATED", "created_at": now(),
+            "page_id": page, "query_id": payload["query_id"], "dataset_version": data["dataset_version"],
+            "namespace": NAMESPACE, "purpose": combined, "coordinator_id": payload["coordinator_id"],
+            "due_at": payload["due_at"], "timezone": payload["timezone"],
+            "evidence_requirements": evidence, "source_ids": [pack["source_id"]],
+            "source_refs": payload["source_refs"], "task_id": result["task_id"],
+            "plan_id": None, "meeting_id": meeting["meeting_id"], "source_type": "SIMULATED",
+        })
+        return {"record_id": identifier, "version": "1", "state": "TASK_CREATED", "kind": "COORDINATE",
+                "title": payload["action_code"], "created_at": now(), "query_id": payload["query_id"],
+                "source_ids": [pack["source_id"]], "task_id": result["task_id"], "plan_id": None,
+                "meeting_id": meeting["meeting_id"], "task_status": result["status"]}
 
     def _send(self, db, data, payload, key):
         self._exact(payload, {

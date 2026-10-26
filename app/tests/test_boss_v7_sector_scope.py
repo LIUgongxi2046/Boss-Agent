@@ -114,6 +114,34 @@ def test_owner_decision_is_saved_and_listed_for_current_query(store):
     assert any(not action["allowed"] for action in projection["followup_actions"] if action["kind"] != "DECISION")
 
 
+def test_owner_coordination_creates_task_and_followup(store):
+    seed(store)
+    payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F15",
+               "execution_namespace": "ui-check", "dataset_version": "1",
+               "query_id": query_id_for("F15", {}, None), "action_code": "交办", "filters": {},
+               "overview_reference": None,
+               "source_refs": [{"source_id": "sector-f15-a", "version": "1"}],
+               "purpose": "协调季节供货", "timezone": "Asia/Shanghai",
+               "coordinator_id": "coordinator-1", "coordinator_version": "1",
+               "due_at": "2026-10-25T10:00:00+08:00", "expected_output": "供货计划",
+               "evidence_requirements": "批次回访记录\n库存明细"}
+    status, receipt = BossCommandAPI(store).execute("BOSS", "boss.sector.coordinate.create", payload)
+    assert status == 200, receipt
+    with store.connect() as db:
+        task = store.get(db, "ui-check", "task", receipt["task_id"])
+    assert task["status"] == "OPEN"
+    assert task["related_meeting_id"] == "meeting-1"
+    assert task["source_refs"] == ["sector-f15-a"]
+    projection = BossSectorAPI(store).serve("BOSS", query(page="F15"))[1]
+    follow = next(row for row in projection["followups"] if row["record_id"] == receipt["record_id"])
+    assert follow["task_id"] == receipt["task_id"]
+    assert any(action["kind"] == "COORDINATE" and action["allowed"] for action in projection["followup_actions"])
+    bad = {**payload, "client_request_id": str(__import__("uuid").uuid4()),
+           "coordinator_id": "finance-1"}
+    status, body = BossCommandAPI(store).execute("BOSS", "boss.sector.coordinate.create", bad)
+    assert status == 400, body
+
+
 def test_stale_query_and_other_roles_are_rejected(store):
     seed(store)
     payload = {"client_request_id": str(__import__("uuid").uuid4()), "page_id": "F22",

@@ -243,7 +243,13 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 `boss_v7_sector_actions.py`实现本人专题决定命令`boss.sector.decision.save`，仅对具备“记录资源决定”“调整项目”“记录安排”动作的页面开放。保存前核查页面、执行空间、数据集版本、由当前条件计算的查询编号、动作类别、来源版本以及目的与决定正文；版本不一致返回冲突。决定保存为带记录编号、版本、查询编号和来源的正式记录，不创建任务、计划或会议，也不发送消息。
 
-专题读取返回`followup_actions`与`followups`：决定类动作在资料包可用时开放，协调、复查、会议类动作明确标记“当前服务尚未提供该后续动作”；已保存决定按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。协调、复查与会议类后续动作及指标计算口径继续待接入。
+专题读取返回`followup_actions`与`followups`：决定与协调类动作在资料包可用时开放，复查、会议类动作明确标记“当前服务尚未提供该后续动作”；已保存决定与协调记录按页面列出并保留原查询编号。2026-10-26检查同一测试文件6项通过，耗时8.82秒，日志`.work/takeover/sector-decisions-tests.log`；认证后的F22读取显示决定动作开放，页面点击后出现目的与决定表单，日志`.work/takeover/sector-decisions-http.log`与`.work/takeover/sector-decisions-ui.log`。
+
+## 专题协调交办
+
+`boss.sector.coordinate.create`面向“选择统筹负责人”“交办”“创建联合核查”“授权资源协调”等协调动作。保存前核查页面、执行空间、数据集版本、查询编号、动作类别与来源版本；目的与预期产物合并为交办内容，负责人限定为当前有效的统筹负责人，期限使用明确 IANA 时区并晚于业务时钟，证据要求为1至8项。
+
+协调请求先写入本人授权，再通过现有交办创建服务生成 OPEN 任务，关联当前经营会议与事件，并保存带任务编号的协调记录；任务可从任务与承诺页面继续发送与确认，协调记录按页面列出。2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`7项通过，耗时12.03秒，日志`.work/takeover/sector-coordinate-tests.log`；认证后的F15页面显示协调动作开放，填写目的、负责人、期限、产物与证据后通过确认提交，服务返回`TASK_CREATED`并保存任务编号，日志`.work/takeover/sector-coordinate-http.log`与`.work/takeover/sector-coordinate-ui.log`。复查与会议类后续动作继续待接入。
 
 ## 集中复验（2026-10-26）
 
