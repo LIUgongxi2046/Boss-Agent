@@ -72,6 +72,7 @@ def _meeting(db, data, clock):
         sources.append({"source_id": source_id, "version": document.get("version"),
                         "location": document.get("original_locator")})
     minute = _get(db, "minutes", meeting["meeting_id"])
+    brief = _get(db, "meeting_brief", meeting["meeting_id"])
     tasks = [row for row in _list(db, "task") if row.get("related_meeting_id") == meeting["meeting_id"]]
     participants = [contact for contact in data["contacts"]
                     if contact["contact_id"] in meeting.get("participant_ids", [])]
@@ -94,9 +95,9 @@ def _meeting(db, data, clock):
         "material_state": material_state,
         "material_gaps": gaps,
         "meeting_state": meeting.get("state", "DRAFT"),
-        "preparation_state": None,
+        "preparation_state": brief.get("state") if brief else None,
         "minute_state": minute.get("state") if minute else None,
-        "assignment_state": "OPEN" if tasks else None,
+        "assignment_state": "、".join(sorted({task.get("status", "UNKNOWN") for task in tasks})) if tasks else None,
         "source_refs": sources,
         "related_objects": [{ "id": contact["contact_id"], "title": contact["name"], "kind": "contact"}
                             for contact in participants]
@@ -110,6 +111,8 @@ def _documents(db, data, clock):
     timezone = data["boss_profile"].get("timezone", "Asia/Shanghai")
     records = []
     for document in _list(db, "document"):
+        if document.get("simulation_definition") == "SECTOR-PACK-1":
+            continue
         state = _document_state(document, clock)
         accessible = state == "VALID"
         records.append({

@@ -78,6 +78,19 @@ def test_library_reads_minutes_and_application_states_without_writing(store):
         assert db.execute("SELECT COUNT(*) FROM audit").fetchone()[0] == 0
 
 
+def test_meeting_preparation_and_assignment_states_come_from_current_objects(store):
+    with store.connect() as db:
+        store.put(db, "ui-check", "meeting_brief", "meeting-1",
+                  {"brief_id": "brief-1", "meeting_id": "meeting-1", "version": "1",
+                   "state": "READY_FOR_REVIEW"})
+        store.put(db, "ui-check", "task", "task-1",
+                  {"task_id": "task-1", "version": "1", "purpose": "准备材料",
+                   "status": "OPEN", "related_meeting_id": "meeting-1"})
+    meeting = next(record for record in read(store)["records"] if record["kind"] == "meeting")
+    assert meeting["preparation_state"] == "READY_FOR_REVIEW"
+    assert meeting["assignment_state"] == "OPEN"
+
+
 def test_library_rejects_non_owner_roles(store):
     with pytest.raises(web.HTTPForbidden):
         read(store, "MAINTAINER")

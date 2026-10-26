@@ -547,7 +547,7 @@
     },
     "backend_meeting_library_validation": {
       "task_id": "V7-BACKEND",
-      "status": "OWNER_LIBRARY_PROJECTION_IMPLEMENTED_DOWNSTREAM_CONTEXT_PENDING",
+      "status": "OWNER_LIBRARY_PROJECTION_IMPLEMENTED_DOWNSTREAM_CONTEXT_CONSUMED",
       "categories": [
         "meeting",
         "document",
@@ -555,12 +555,12 @@
         "research",
         "people"
       ],
-      "checks": "3_PASSED",
-      "check_log": ".work/takeover/meeting-library-tests.log",
+      "checks": "4_PASSED",
+      "check_log": ".work/takeover/meeting-library-states-tests.log",
       "regression": "61_PASSED",
       "regression_log": ".work/takeover/v7-owner-regression-20261026.log",
-      "authenticated_http": "200",
-      "http_log": ".work/takeover/meeting-library-http.log",
+      "authenticated_http": "200_THREE_RECORDS_SECTOR_PACK_EXCLUDED",
+      "http_log": ".work/takeover/meeting-library-states-http.log",
       "authenticated_ui": "MEETING_ROW_AND_COUNTS_RENDERED",
       "ui_log": ".work/takeover/meeting-library-ui.log",
       "downstream_context": "F04_F05_F07_F10_CONTEXT_CONSUMED",

@@ -193,9 +193,9 @@ Python编译及`git diff --check`通过。前端源码没有因本次服务接�
 
 会议记录采用当前会议对象及初始快照版本，参会人、材料版本、材料缺口、纪要状态与关联交办分别核查；材料按当前业务时间判断有效状态。资料记录只列出本人获准的模拟来源；撤销、失效或越出本人范围的来源保留状态并禁用“阅读原文”。待决定申请采用正式application对象及附件状态；人员会面采用person_brief当前版本与有效来源。研究材料当前没有正式存储对象，返回`NOT_PROVIDED`及原因，不生成样例记录。
 
-目录动作携带目标页面与来源编号，包括准备会议、打开纪要、阅读原文、继续讨论、查看历史决定、打开申请和打开人员会面；会议尚无纪要时“打开纪要”保持不可用并给出原因。目标页面接收`bossLibraryContext`与`bossLibraryAction`并据此选取对象的功能仍待接入，完整连续流程尚未验证。
+目录动作携带目标页面与来源编号，包括准备会议、打开纪要、阅读原文、继续讨论、查看历史决定、打开申请和打开人员会面；会议尚无纪要时“打开纪要”保持不可用并给出原因。F04、F05、F07、F10已接收`bossLibraryContext`与`bossLibraryAction`并选取对象；对象不存在或版本变化时显示明确提示。
 
-2026-10-26检查`app/tests/test_boss_meeting_library.py`3项通过，耗时2.03秒，日志`.work/takeover/meeting-library-tests.log`；会议审批、纪要交办及V7服务回归61项通过，耗时9.59秒，日志`.work/takeover/v7-owner-regression-20261026.log`。认证后的运行实例读取返回200，记录为meeting-1、finance-note、meeting-minutes，覆盖为meeting/document COMPLETE及approval/research/people NOT_PROVIDED，日志`.work/takeover/meeting-library-http.log`。N04实际页面显示“经营会议 · 2026-10-23”行、参会人与分类计数（会议1、资料2），日志`.work/takeover/meeting-library-ui.log`。没有执行会议材料写入、审批决定或外部请求；完整产品与用户验收继续未完成。
+会议的筹备状态来自当前`meeting_brief`对象，交办状态来自关联任务当前状态；专题模拟资料包文档不进入会议资料目录。2026-10-26检查`app/tests/test_boss_meeting_library.py`4项通过，耗时0.68秒，日志`.work/takeover/meeting-library-states-tests.log`；认证后的运行实例读取返回200，记录为meeting-1、finance-note、meeting-minutes，覆盖为meeting/document COMPLETE及approval/research/people NOT_PROVIDED，日志`.work/takeover/meeting-library-states-http.log`。N04实际页面显示“经营会议 · 2026-10-23”行、参会人与分类计数（会议1、资料2），日志`.work/takeover/meeting-library-ui.log`。没有执行会议材料写入、审批决定或外部请求；完整产品与用户验收继续未完成。
 
 ## 评测服务（A16/F31）
 
