@@ -237,7 +237,7 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 专题读取使用该资料包返回指标数值、单位、期间、来源编号、三点趋势与模拟覆盖标签，`availability`为`SIMULATED_METRICS_ONLY`。资料包同时提供按页面字段生成的模拟明细、章节文本、F16与F20的关系证据、F17的流程阶段；`applied_filters`参与明细筛选，来源统一指向当前资料包文档。资料包按页面配置提供`filter_options`，页面以选择框呈现区域、品种、阶段与比较周期等条件；选择后按明细维度筛选，例如 F15 选择“华东”后不再返回“华南”行。筛选键必须属于当前页面配置的筛选条件，未知键返回400；Agent专题工具使用同一校验。2026-10-26检查`app/tests/test_boss_v7_sector_scope.py`与`test_sector_runtime_tool.py`共12项通过，耗时2.95秒，日志`.work/takeover/sector-filter-validation-tests.log`。
 
-指标数值按筛选后的明细与单位计算：数量类指标求和，比例类指标取平均，趋势末点同步为当前计算结果。2026-10-26检查同一测试文件6项通过，耗时3.24秒，日志`.work/takeover/sector-metrics-tests.log`；认证后 F15 全部6条明细对应“订单”2166.6，选择“华东”后3条明细对应1083.3，页面显示两个数值，日志`.work/takeover/sector-metrics-http.log`与`.work/takeover/sector-metrics-ui.log`。筛选选项与明细的检查日志保留在`.work/takeover/sector-filters-http.log`与`.work/takeover/sector-filters-ui.log`。
+指标数值按筛选后的明细与单位计算：数量类指标求和，比例类指标取平均，趋势末点同步为当前计算结果。明细行使用区域、品种与阶段的唯一组合，当前期间为2026-10，每行数值独立生成。2026-10-26检查同一测试文件6项通过，耗时3.24秒，日志`.work/takeover/sector-metrics-tests.log`；认证后 F15 全部6条明细对应“订单”2575.3，选择“华东”后3条明细对应1411.0，页面显示两个数值，日志`.work/takeover/sector-metrics-v5-http.log`与`.work/takeover/sector-metrics-ui.log`。筛选选项与明细的检查日志保留在`.work/takeover/sector-filters-http.log`与`.work/takeover/sector-filters-ui.log`。
 
 2026-10-26检查同一测试文件4项通过，耗时1.81秒，日志`.work/takeover/sector-records-tests.log`；认证后的F15、F16、F17、F22读取返回200，F15为6条明细与4个章节，F16含7项关系，F17含5个流程阶段，页面显示明细、章节、关系与阶段，日志`.work/takeover/sector-records-http.log`与`.work/takeover/sector-records-ui.log`。
 
@@ -305,7 +305,7 @@ A08 模型连接使用 Provider `deepseek`、`chat_completions`、model_id `deep
 
 A08 运行配置启用 19 项工具，包含会话读取工具与 `bossSectorRead`；工作资料读取范围为 `WORKSPACE_PROJECTIONS`，启用 12 个页面资料投影。真实模型可以按当前工具范围选择读取参数，工具 Schema 与各工具本人范围继续生效；写入动作仍通过业务工具与本人授权。
 
-2026-10-26 完成实际模型会话：询问“水产季节当前指标与明细”时模型执行 3 次 `bossSectorRead`，回答引用 F15 订单趋势“2026-08 为 500.9 吨、2026-09 为 420.6 吨、2026-10 为 2166.6 吨”，运行记录状态为完成，日志`.work/takeover/chat-answer.log`；模型连接验证与运行方式记录见`.work/takeover/deepseek-validation-poll.log`与`.work/takeover/deepseek-activation-ui.log`。
+2026-10-26 完成实际模型会话：询问“水产季节当前指标与明细”时模型执行 3 次 `bossSectorRead`，回答引用 F15 订单趋势“2026-08 为 801.5 吨、2026-09 为 520.1 吨、2026-10 为 2575.3 吨”，运行记录状态为完成，日志`.work/takeover/chat-answer-pack5.log`；模型连接验证与运行方式记录见`.work/takeover/deepseek-validation-poll.log`与`.work/takeover/deepseek-activation-ui.log`。
 
 检查原生会话、专题工具与运行配置共157项通过，1项历史 Schema 基线检查因仓库在该基线之后已更新记录定义而未通过，日志`.work/takeover/conversation-suite-model.log`。Doubao 凭据保存在同一文件，接入需要 Ark 端点编号与对应 Provider 适配，当前未启用。
 

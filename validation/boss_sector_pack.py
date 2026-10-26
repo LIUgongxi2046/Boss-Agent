@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from business import now
 from boss_sector_api import CATALOGUE, SECTORS
 
-PACK_VERSION = "4"
+PACK_VERSION = "5"
 DEFINITION = "SECTOR-PACK-1"
 UNIT_MAP = {
     "F14": ["CNY/吨", "CNY/吨", "CNY/吨", "CNY/吨"],
@@ -39,8 +39,8 @@ FILTER_CHOICES = {
 TEXT_FIELDS = {"天气观察": ["晴间多云 · 模拟", "多云转雨 · 模拟"], "适用单位": ["公斤/头 · 模拟", "公斤/头 · 模拟"]}
 
 
-def _number(page, label, period, unit):
-    digest = hashlib.sha256((page + "|" + label + "|" + period + "|" + DEFINITION).encode()).digest()
+def _number(page, label, period, unit, salt=""):
+    digest = hashlib.sha256((page + "|" + label + "|" + period + "|" + DEFINITION + "|" + salt).encode()).digest()
     value = int.from_bytes(digest[:4], "big")
     if unit == "%":
         return str(round(1 + value % 8800 / 100, 2))
@@ -61,12 +61,19 @@ def _rows(page):
     kpi_units = UNIT_MAP.get(page, [""] * len(kpis))
     unit_by_label = {label: kpi_units[index] if index < len(kpi_units) else ""
                      for index, label in enumerate(kpis)}
+    period = PERIODS[-1]
+    varying = [label for label in filters if label != "比较周期"]
     rows = []
     for index in range(6):
         values, dims = {}, {}
-        for label in filters:
+        remainder = index
+        for label in varying:
             choices = FILTER_CHOICES.get(label, ["范围A", "范围B"])
-            dims[label] = choices[index % len(choices)]
+            dims[label] = choices[remainder % len(choices)]
+            remainder //= len(choices)
+        if "比较周期" in filters:
+            dims["比较周期"] = period
+        for label in filters:
             values[label] = dims[label]
         for label in fields:
             if label in TEXT_FIELDS:
@@ -75,7 +82,7 @@ def _rows(page):
             elif label in dims:
                 values[label] = dims[label]
             else:
-                values[label] = _number(page, label, PERIODS[-1], unit_by_label.get(label, ""))
+                values[label] = _number(page, label, period, unit_by_label.get(label, ""), str(index))
         rows.append({"id": page.lower() + "-row-" + str(index + 1), "values": values,
                      "dims": dims, "version": "1", "state": "SIMULATED"})
     return rows
