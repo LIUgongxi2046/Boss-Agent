@@ -170,4 +170,5 @@
 .boss-n02 .boss-chat-thread-heading{flex:none}
 .boss-n02 .boss-n02-thread{flex:1;min-height:0;overflow-y:auto}
 .boss-n02 .boss-n02-agent{flex:none}
+.boss-n02 .boss-chat-knowledge{display:none}
 @keyframes boss-n02-agent-pulse{50%{opacity:.55}}

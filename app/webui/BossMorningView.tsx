@@ -40,7 +40,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const {client,getToken,token}=useClient();
   const [day,setDay]=useState<Day|null>(null),[view,setView]=useState<View|null>(null),[list,setList]=useState<Read|null>(null);
   const [question,setQuestion]=useState(""),[questionDirty,setQuestionDirty]=useState(false),[receipt,setReceipt]=useState<Receipt|null>(null),[history,setHistory]=useState<History>({requests:[]});
-  const [dayDraft,setDayDraft]=useState<Day|null>(null),[category,setCategory]=useState<TodayItem["category"]|"ALL">("ALL"),[meetingOpen,setMeetingOpen]=useState(false);
+  const [dayDraft,setDayDraft]=useState<Day|null>(null),[category,setCategory]=useState<TodayItem["category"]|"ALL">("ALL"),[meetingOpen,setMeetingOpen]=useState(false),[readOnlyItem,setReadOnlyItem]=useState<TodayItem|null>(null);
   const [requestId,setRequestId]=useState(""),[selected,setSelected]=useState(""),[sourceId,setSourceId]=useState("");
   const [bindingId,setBindingId]=useState(""),[nativeBinding,setNativeBinding]=useState<MorningBinding|null>(null),[missingBindingReceipt,setMissingBindingReceipt]=useState<MorningBindingReceipt|null>(null);
   const handoff=useRef<AbortController|null>(null),[handoffCanceled,setHandoffCanceled]=useState(false);
@@ -227,7 +227,16 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
   const meetings=detail?.objects.filter(object=>object.reference.kind==="meeting"&&detail.item.related_meetings?.some(ref=>ref.id===object.reference.id&&ref.version===object.reference.version))??[];
   const captureReturn=()=>{const active=window.document.activeElement,focus=active instanceof HTMLElement&&surface.current?.contains(active)&&isSafeMorningFocusId(active.id)?active.id:"morning-question";returnPoint.current={scroll:surface.current?.closest(".boss-content")?.scrollTop??0,focus};remember({morningScroll:String(returnPoint.current.scroll),morningFocus:focus,morningCategory:category});};
   const discuss=()=>{if(question.trim())void submit(true);else{const input=window.document.getElementById("morning-question");input?.focus();input?.scrollIntoView({block:"center"});}};
-  const openRelated=(item:TodayItem)=>{captureReturn();onNavigate(item.page_id,item.object_id);};
+  const openRelated=(item:TodayItem)=>{
+    captureReturn();
+    if(item.read_only){setReadOnlyItem(item);return;}
+    if(item.page_id==="F07"){
+      const address=new URL(window.location.href);
+      address.searchParams.set("bossLibraryContext",JSON.stringify({id:item.object_id,kind:"approval",version:item.version??"1",namespace:"ui-check"}));
+      window.history.replaceState(window.history.state,"",address);
+    }
+    onNavigate(item.page_id,item.object_id);
+  };
   return <div ref={surface} className="boss-morning-view boss-f01" aria-busy={loading||busy}>
     {error&&<p role="alert" className="boss-status boss-status-error">{error}</p>}{loading&&<p role="status">正在读取当前日期资料</p>}
     {list&&list.adoption_state!=="CURRENT"&&<p className="boss-status" role="status">{label(list.adoption_state)}，当前依据需重新查询，历史结果不用于本次操作。</p>}
@@ -300,6 +309,9 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     <Dialog open={Boolean(sourceId)&&visible} onOpenChange={open=>{if(!open){setSourceId("");setDocument(null);setSourceError("");remember({morningSource:null});}}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-source-description"><DialogTitle>当前来源原文</DialogTitle><DialogDescription id="morning-source-description">当前清单与来源版本经服务端重新核查。关闭后返回当前事项。</DialogDescription>
       <DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>
       {document&&current?<article id="morning-source"><h3>{document.source_id} · v{document.version}</h3><p>作者 {document.author_display_name??document.author_contact_id??document.author_kind??"尚未提供"} · 用途 {document.allowed_use??"以当前资料权限为准"}</p><p>发布 {document.published_at??"未知"} · 更新 {document.observed_at??"未知"}</p><p>有效时间 {document.valid_from??"未知"} 至 {document.valid_until??"未知"}</p><p>引用位置 {document.original_locator===undefined?"尚未提供":JSON.stringify(document.original_locator)}</p><blockquote>{document.content??"原文未提供"}</blockquote></article>:<div><p role={sourceError&&current?"alert":"status"}>{!current?"当前清单为预览或已失效，暂不能读取原文，请重新查询正式清单。":sourceError||"正在读取当前来源"}</p>{current&&sourceError&&<button id="morning-source-retry" type="button" className="boss-btn" disabled={busy||denied} onClick={()=>setSourceRevision(value=>value+1)}>重新核查当前来源</button>}</div>}
+    </DialogContent></Dialog>
+    <Dialog open={Boolean(readOnlyItem)&&visible} onOpenChange={open=>{if(!open)setReadOnlyItem(null);}}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-readonly-description"><DialogTitle>{readOnlyItem?.title??"事项"}</DialogTitle><DialogDescription id="morning-readonly-description">这是已保存的事项，仅供查看。</DialogDescription><DialogClose className="boss-icon-button boss-f01-close" aria-label="关闭"><X size={20}/></DialogClose>
+      {readOnlyItem&&<article><p>{readOnlyItem.reason}</p><p>期限 {readOnlyItem.due_at??"未提供"} · 状态 {readOnlyItem.state?morningState(readOnlyItem.state):"未提供"}</p>{readOnlyItem.coordinator_id&&<p>处理人 {readOnlyItem.coordinator_id}</p>}</article>}
     </DialogContent></Dialog>
     <Dialog open={meetingOpen&&visible} onOpenChange={setMeetingOpen}><DialogContent showCloseButton={false} onCloseAutoFocus={event=>{event.preventDefault();overlayFocus.current?.focus({preventScroll:true});}} overlayClassName="boss-f01-overlay" className="boss-f01-dialog boss-v6" aria-describedby="morning-meeting-description"><DialogTitle>关联会议与准备材料</DialogTitle><DialogDescription id="morning-meeting-description">当前事项所引用的会议，只读展示当前清单绑定的版本。</DialogDescription><DialogClose className="boss-icon-button boss-f01-close" aria-label="返回当前事项"><X size={20}/></DialogClose>
       {current&&detail?meetings.map(object=><article key={object.reference.id}><h3>{String(object.data.title??"会议与会前材料")}</h3><p>会议 {object.reference.id} · v{object.reference.version}</p><p>{String(object.data.starts_at??"开始时间尚未提供")} 至 {String(object.data.ends_at??"结束时间尚未提供")} · {String(object.data.timezone??view?.timezone??"时区尚未提供")}</p><p>地点 {String(object.data.location??"尚未提供")}</p><p>材料 {Array.isArray(object.data.material_ids)?object.data.material_ids.join("、"):"尚未提供"}</p></article>):<p>当前依据需要重新核查。</p>}
