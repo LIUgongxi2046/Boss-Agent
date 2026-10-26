@@ -58,9 +58,9 @@ components:
         tool_scope:
           type: array
           minItems: 1
-          maxItems: 18
+          maxItems: 19
           uniqueItems: true
-          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead, todayRead, ownerPlansRead, assignmentSourcesRead, bossDashboardRead, bossMeetingsRead, bossEvidenceRead, bossTasksRead, bossCalendarConflictRead, bossCalendarSharePreview, bossSupplyQualityRead, bossSupplyQualityQuery, bossSupplyQualityPrepare]}
+          items: {enum: [query_metrics, read_evidence, create_assignment, send_assignment, read_assignment, bossWorkspaceRead, todayRead, ownerPlansRead, assignmentSourcesRead, bossDashboardRead, bossMeetingsRead, bossEvidenceRead, bossTasksRead, bossCalendarConflictRead, bossCalendarSharePreview, bossSupplyQualityRead, bossSupplyQualityQuery, bossSupplyQualityPrepare, bossSectorRead]}
         workspace_read_mode: {$ref: '#/components/schemas/WorkspaceMode'}
         workspace_projections: {$ref: '#/components/schemas/WorkspaceProjections'}
       allOf:

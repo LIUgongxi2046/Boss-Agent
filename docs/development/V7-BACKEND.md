@@ -265,4 +265,6 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 ## Agent 工具范围边界
 
-Agent 工具范围由`RuntimeValues.tool_scope`限制为1至18项，并与工具配置Schema、原请求校验及A09/A15页面共同使用。新增只读或业务工具前，必须先更新工具范围定义、配置页面与对应检查，再注册到Runtime registry；只增加registry条目会使配置校验失败。当前由既有工具集服务，专题只读工具尚未纳入范围。
+Agent工具范围由`RuntimeValues.tool_scope`限制为1至19项，并与工具配置Schema、原请求校验及A09/A15页面共同使用。新增只读或业务工具前，必须先更新工具范围定义、配置页面与对应检查，再注册到Runtime registry；只增加registry条目会使配置校验失败。
+
+`bossSectorRead`已按该顺序接入：工具定义加入`product-runtime.openapi.yaml`的可用工具列表与最大项数，`RuntimeValues`同步为19项，只读工具注册在`runtime_sector_read.py`并由`product_read_tools`装配。工具按专题页面与筛选条件读取同一模拟指标、明细、章节、关系、流程、来源与缺失范围，只读且不创建交办、计划、会议或决定。2026-10-26检查`app/tests/test_sector_runtime_tool.py`、`test_product_runtime_configuration.py`与`test_product_read_scope.py`共21项通过，耗时41.37秒，日志`.work/takeover/sector-agent-tool-tests.log`；认证后运行配置的`available_tools`包含`bossSectorRead`，当前启用范围仍由A08配置决定，日志`.work/takeover/sector-agent-tool-http.log`。实际模型会话采用该工具仍待启用范围与真实会话验证。
