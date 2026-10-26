@@ -246,3 +246,11 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 ## 集中复验（2026-10-26）
 
 后端检查91项通过，耗时30.90秒，日志`.work/takeover/round12-regression.log`。覆盖会议资料目录、评测、模拟事件、运行授权摘要、专题范围与决定、会议审批、纪要交办、V7服务与运行记录。正式准备脚本构建通过，日志`.work/takeover/round12-build.log`；运行实例WebUI返回200。该结果证明上述源码范围与限定检查通过，不表示完整业务、专题数据口径、Agent接入或用户验收完成。
+
+## 专题研究资料选择
+
+对应FR-09及V7-FRONTEND第20项接收要求。研究投影增加`source_selection_available`、`available_sources`、`execution_namespace`与`data_version`；可用来源只包括本人获准、当前有效且非专题模拟包文档，逐项返回编号、版本、标题与参考状态。
+
+研究准备接受可选的`source_refs`与`execution_namespace`：执行空间必须一致，来源为1至8项且不重复；每项在当前有效目录中按编号与版本核查。所选来源会写入研究范围；后续匹配只在所选来源内进行，未选来源计入`not_selected`。没有提供选择时保持原有覆盖行为。
+
+2026-10-26检查`app/tests/test_boss_v7_research_sources.py`3项通过、已有研究检查1项跳过，耗时10.49秒，日志`.work/takeover/research-sources-tests.log`；认证后读取返回两份当前来源，页面显示两个选择框，选择`finance-note`并提交后研究范围保存该来源且匹配结果仅含`finance-note`，日志`.work/takeover/research-sources-http.log`与`.work/takeover/research-sources-ui.log`。研究结论质量与完整用户流程继续待验证。

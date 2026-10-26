@@ -338,12 +338,26 @@
         "F08",
         "N02"
       ],
-      "status": "PAGE_STRUCTURE_IMPLEMENTED_PRODUCT_DOM_AND_SERVICE_FLOW_PENDING",
+      "status": "SOURCE_SELECTION_AND_RESEARCH_SCOPE_IMPLEMENTED_PRODUCT_DOM_PENDING",
       "build": "TYPESCRIPT_AND_VITE_PASSED_20261026",
       "build_log": ".work/takeover/research-build.log",
-      "authenticated_application": "NOT_RUN",
+      "authenticated_application": "SELECTION_AND_SCOPE_VERIFIED",
       "actual_research_message_and_agent_requests": "NOT_RUN",
-      "claims_source_selection_and_library_receivers": "BACKEND_PENDING",
+      "claims_source_selection_and_library_receivers": "SOURCE_SELECTION_IMPLEMENTED_LIBRARY_RECEIVER_PENDING",
+      "selection_tests": "3_PASSED",
+      "selection_test_log": ".work/takeover/research-sources-tests.log",
+      "selection_ui_log": ".work/takeover/research-sources-ui.log",
+      "full_product": "NOT_VERIFIED"
+    },
+    "backend_research_sources_validation": {
+      "task_id": "V7-BACKEND",
+      "status": "AVAILABLE_SOURCES_AND_SELECTED_SCOPE_IMPLEMENTED",
+      "checks": "3_PASSED_1_SKIPPED",
+      "check_log": ".work/takeover/research-sources-tests.log",
+      "authenticated_http": "TWO_CURRENT_SOURCES_RETURNED",
+      "http_log": ".work/takeover/research-sources-http.log",
+      "authenticated_ui": "SELECTION_SAVED_AND_MATCHED_ONLY_SELECTED_SOURCE",
+      "ui_log": ".work/takeover/research-sources-ui.log",
       "full_product": "NOT_VERIFIED"
     },
     "frontend_people_validation": {
