@@ -255,6 +255,8 @@ N02“授权与必要决定”区域按该字段显示执行对象、有效授�
 
 后端检查91项通过，耗时30.90秒，日志`.work/takeover/round12-regression.log`。覆盖会议资料目录、评测、模拟事件、运行授权摘要、专题范围与决定、会议审批、纪要交办、V7服务与运行记录。正式准备脚本构建通过，日志`.work/takeover/round12-build.log`；运行实例WebUI返回200。该结果证明上述源码范围与限定检查通过，不表示完整业务、专题数据口径、Agent接入或用户验收完成。
 
+专题资料包、协调与决定、研究资料选择、Agent专题工具接入后再次集中检查118项通过，耗时21.64秒，日志`.work/takeover/round23-regression.log`；72页产品DOM复测216份记录，宽度差异0项、横向溢出0项、错误状态0项，证据`.work/takeover/v7-product-dom/product-round23.json`。真实模型会话中的工具调用、专题复查与会议类后续动作仍待验证。
+
 ## 专题研究资料选择
 
 对应FR-09及V7-FRONTEND第20项接收要求。研究投影增加`source_selection_available`、`available_sources`、`execution_namespace`与`data_version`；可用来源只包括本人获准、当前有效且非专题模拟包文档，逐项返回编号、版本、标题与参考状态。
