@@ -697,12 +697,13 @@
     },
     "backend_sector_agent_tool_validation": {
       "task_id": "V7-BACKEND",
-      "status": "READ_ONLY_SECTOR_TOOL_REGISTERED_AND_AVAILABLE",
+      "status": "READ_ONLY_SECTOR_TOOL_REGISTERED_ACTIVATION_AND_REGISTRY_READ_VERIFIED",
       "tool_scope_limit": 19,
-      "checks": "21_PASSED",
+      "checks": "22_PASSED",
       "check_log": ".work/takeover/sector-agent-tool-tests.log",
       "authenticated_http": "AVAILABLE_TOOLS_INCLUDE_BOSS_SECTOR_READ",
       "http_log": ".work/takeover/sector-agent-tool-http.log",
+      "runtime_activation": "SCOPE_ACTIVATED_F16_EXECUTED_VIA_REGISTRY",
       "active_scope": "GOVERNED_BY_A08_CONFIGURATION",
       "full_product": "NOT_VERIFIED"
     },
