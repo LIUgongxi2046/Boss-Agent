@@ -41,9 +41,11 @@
           "1280x800",
           "1024x768"
         ],
-        "evidence": ".work/takeover/v7-product-dom/product-after-fidelity.json",
+        "evidence": ".work/takeover/v7-product-dom/product-round13.json",
         "panel_width_mismatches": 0,
         "horizontal_overflow": 0,
+        "runtime_error_states": 0,
+        "recheck": "AFTER_BACKEND_AND_REBUILDS_20261026",
         "intentional_differences": [
           "D03_BESPOKE_RECOVERY_SECTIONS",
           "D06_EDIT_PROTECTION_INSTEAD_OF_DESIGN_FEEDBACK",
