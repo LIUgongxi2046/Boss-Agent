@@ -704,6 +704,8 @@
       "authenticated_http": "AVAILABLE_TOOLS_INCLUDE_BOSS_SECTOR_READ",
       "http_log": ".work/takeover/sector-agent-tool-http.log",
       "runtime_activation": "SCOPE_ACTIVATED_F16_EXECUTED_VIA_REGISTRY",
+      "a08_ui": "TOOL_OPTION_VISIBLE_WHEN_RUNTIME_SCOPE_EXPANDED",
+      "a08_log": ".work/takeover/sector-agent-tool-a08.log",
       "active_scope": "GOVERNED_BY_A08_CONFIGURATION",
       "full_product": "NOT_VERIFIED"
     },
