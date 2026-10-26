@@ -29,7 +29,7 @@ const DEFINITIONS:Record<Domain,{title:string;sections:Section[];side:string}>={
       {key:"name",label:"配置名称",required:true},{key:"subject_id",label:"维护身份",type:"select",options:"maintainers",required:true},
       {key:"object_scopes",label:"允许访问的对象范围",type:"multiselect",options:"object_scopes",required:true},
       {key:"permissions",label:"技术权限",type:"multiselect",options:"technical_permissions",required:true}]},
-    {title:"关联内容与处理范围",description:"老板本人决定及私人正文继续由本人权限控制。",fields:[
+    {title:"关联内容与处理边界",description:"老板本人决定及私人正文继续由本人权限控制。",fields:[
       {key:"valid_from",label:"开始时间（Asia/Shanghai）",type:"datetime-local",required:true},
       {key:"valid_until",label:"结束时间（Asia/Shanghai）",type:"datetime-local",required:true},
       {key:"change_note",label:"变更说明",type:"textarea",required:true}]}]},

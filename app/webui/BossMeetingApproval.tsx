@@ -468,13 +468,14 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
         </>}
       </div>
     </div>
-    {pageId==="F05"&&<>
+    {pageId==="F05"&&<div className="boss-v7-addendum">
       <V7Panel title="逐项创建、发送及补充核查" description="每条交办分别关联纪要版本、任务和本人授权。">
         {minute?.entries.some(entry=>entry.kind==="ASSIGNMENT_DRAFT")?<div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>纪要条目</th><th>来源版本</th><th>创建任务</th><th>发送状态</th><th>授权引用</th></tr></thead><tbody>{minute.entries.filter(entry=>entry.kind==="ASSIGNMENT_DRAFT").map(entry=>{
           const linked=minutes?.linked_assignments.find(item=>item.entry_id===entry.entry_id&&item.minute_version===minute.version);
           return <tr key={entry.entry_id}><td>{entry.text||"来源需要复核"}<small>{entry.entry_id}</small></td><td>v{minute.source_version}<small>{minute.source_reference_state}</small></td><td>{linked?<button className="boss-btn" onClick={()=>{onTaskCreated(linked.task_id);onNavigate("F06");}}>{linked.task_id}</button>:"尚未创建"}</td><td>{linked?.send_status==="SENT_SIMULATED"?"已模拟发送":"尚未发送"}</td><td>{linked?.authorization_id||"尚无当前动作授权"}</td></tr>;
         })}</tbody></table></div>:<V7Empty title="尚无交办草稿">在交办草稿分类中整理具体事项，确认纪要后逐项创建。</V7Empty>}
       </V7Panel>
+      <div className="boss-v7-equal-columns">
       <V7Panel title="交办草稿检查">
         <V7Steps steps={[
           {title:"原文有效",description:source?"已读取原文 v"+source.version:"等待可用原文",state:source?"complete":"waiting"},
@@ -484,7 +485,8 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
         ]}/>
       </V7Panel>
       <V7Panel title="与当前事项联动"><div className="boss-actions"><button className="boss-btn" onClick={()=>onNavigate("N04")}>会议与资料</button><button className="boss-btn" onClick={()=>onNavigate("N05")}>任务与承诺</button><button className="boss-btn" onClick={()=>onNavigate("N11")}>历史决定</button></div></V7Panel>
-    </>}
+      </div>
+    </div>}
     {pageId==="F07"&&<footer className="boss-owner-actions"><button type="button" className="boss-btn boss-btn-primary" onClick={submitDecision} disabled={disabled||!app||!decision||!comment.trim()||!["PENDING_DECISION","WAITING_MATERIAL"].includes(app.state)}><ShieldCheck size={15}/>提交当前版本决定</button><button type="button" className="boss-btn" onClick={restoreEditor} disabled={loading||mutation.busy}>取消未执行操作</button><button type="button" className="boss-btn" onClick={reload} disabled={loading||mutation.busy}><RefreshCw size={15}/>重读正式状态</button></footer>}
     {mutation.dialog}
     <Dialog.Root open={nextApplication!==null} onOpenChange={open=>{if(!open)setNextApplication(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>当前申请存在未提交意见</Dialog.Title><Dialog.Description>切换申请前可以继续编辑，或者放弃当前尚未提交的意见。已经保存的本人决定继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn">继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{if(nextApplication!==null)selectApplication(nextApplication);}}>放弃编辑并切换申请</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>

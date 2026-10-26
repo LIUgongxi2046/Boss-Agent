@@ -225,7 +225,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
         </section>
       </aside>
     </div>
-    <V7Panel title="结果提交与本人确认" description="提交结果后，继续核查证据与当前任务版本。">
+    <V7Panel title="结果提交与本人确认的状态区分" description="提交结果后，继续核查证据与当前任务版本。">
       {tasks.some(task=>feedback.some(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED"))?<div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>任务</th><th>最近提交</th><th>证据</th><th>本人确认</th><th>继续处理</th></tr></thead><tbody>
         {tasks.filter(task=>feedback.some(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED")).map(task=>{
           const result=[...feedback].reverse().find(item=>item.task_id===task.task_id&&item.kind==="RESULT_SUBMITTED")!;

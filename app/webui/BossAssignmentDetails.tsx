@@ -2,6 +2,7 @@ import type {ReactNode} from "react";
 import type {AssignmentContext,AssignmentTask,TaskDueEvent,TaskFeedback,TaskLinkedMessage} from "./BossAssignmentFlow";
 import type {AssignmentDraft} from "./BossAssignmentPicker";
 import {BossAssignmentPreparation} from "./BossAssignmentPreparation";
+import {V7Metric, V7Panel, V7Steps} from "./BossV7UI";
 
 export type AssignmentExtensions={task_id:string;task_version:string;due_at:string;decisions:{decision_id:string;feedback_id:string;decision:"APPROVE"|"REJECT";old_due_at:string;new_due_at:string;reason:string|null;request_reason:string;decided_at:string;previous_task_version:string;task_version:string}[]};
 type Props={rows:AssignmentTask[];selectedTaskId:string;current?:AssignmentTask;context:AssignmentContext|null;draft:AssignmentDraft;feedback:TaskFeedback[];messages:TaskLinkedMessage[];taskDue?:TaskDueEvent;extensions:AssignmentExtensions|null;extension?:TaskFeedback;completed?:TaskFeedback;clock?:string;overdue:boolean|null;sourceIds:string[];meetingId:string|null;eventIds:string[];editable:boolean;loading:boolean;stale:boolean;busy:boolean;morningBlocked:boolean;messagesEnabled:boolean;sourceReview?:ReactNode;conversation?:ReactNode;edit:(field:keyof AssignmentDraft,value:string)=>void;onSelect:(id:string)=>void;onReload:()=>void;onSource:(id:string)=>void;onNavigate:(id:string)=>void;onNew:(task?:AssignmentTask)=>void;onDiscard:()=>void;onCoordinator:()=>void;onDue:()=>void;onMessages:()=>void;onCreate:()=>void;onSend:()=>void;onNudge:()=>void;onFollowup:()=>void;onComplete:()=>void;onExtend:(decision:"APPROVE"|"REJECT")=>void;onCancel:()=>void};
@@ -15,6 +16,14 @@ export function BossAssignmentDetails(props:Props){
   const missing=Boolean(selectedTaskId&&!current),canEdit=editable&&!missing;
   const currentSources=current?.source_refs??sourceIds;
   const completeReason=!current?"创建交办并取得结果后可以核查完成。":current.status!=="RESULT_SUBMITTED"?"当前状态尚不允许确认完成。":!completed?"当前结果缺少完成证据，请要求补充。":current.result_evidence_requires_resubmission?"结果证据已经变化，需要负责人重新提交。":current.source_reference_state!=="CURRENT"?"交办来源需要重新核查。":"核查结果和全部证据后，由本人确认完成。";
+  const resultFeedback=feedback.filter(item=>item.kind==="RESULT_SUBMITTED");
+  const flowSteps=[
+    {title:"创建交办",description:current?"已创建 · 版本 "+(current.version??"待核查"):"创建记录不代表已经发送",state:current?"complete" as const:"waiting" as const},
+    {title:"发送及送达",description:messages.length?"已记录 "+messages.length+" 条模拟发送；真实送达待查询":"等待真实发送记录查询",state:messages.length?"complete" as const:current?"current" as const:"waiting" as const},
+    {title:"收到反馈",description:feedback.length?"已记录 "+feedback.length+" 条反馈":"尚未收到负责人反馈",state:feedback.length?"complete" as const:"waiting" as const},
+    {title:"结果提交",description:completed?"已取得含证据的结果":resultFeedback.length?"已提交结果，证据待本人核查":"等待负责人提交结果与证据",state:completed?"complete" as const:resultFeedback.length?"current" as const:"waiting" as const},
+    {title:"本人确认完成",description:current?.status==="COMPLETED_CONFIRMED"?"已经确认完成":current?.status==="CANCELED"?"交办已经取消，历史结果只读":"仅证据完整并由本人确认后完成",state:current?.status==="COMPLETED_CONFIRMED"?"complete" as const:"waiting" as const},
+  ];
   return <>
     <div className="boss-assignment-toolbar"><label>当前任务<select value={selectedTaskId} disabled={loading||busy} onChange={event=>event.target.value?props.onSelect(event.target.value):props.onNew()}><option value="">创建交办</option>{rows.map(task=><option key={task.task_id} value={task.task_id}>{task.purpose||task.task_id} · {statusNames[task.status]??task.status}</option>)}</select></label><span className="boss-tag boss-tag-blue">他人交办</span><span className="boss-tag">{current?statusNames[current.status]??current.status:"草稿"}</span><span className="boss-helper">{current?.version?"当前版本 "+current.version:"尚未创建"}</span><div className="boss-actions"><button type="button" className="boss-btn" onClick={()=>props.onNavigate("N05")}>返回任务列表</button><button type="button" className="boss-btn" disabled={loading||busy} onClick={props.onReload}>重新读取</button></div></div>
     {loading&&<p role="status" className="boss-status">正在读取当前交办与反馈。</p>}
@@ -52,5 +61,28 @@ export function BossAssignmentDetails(props:Props){
       {messagesEnabled&&["WAITING_FEEDBACK","IN_PROGRESS","RESULT_SUBMITTED"].includes(current.status)&&<button type="button" className="boss-btn" disabled={!canEdit||!draft.body.trim()||current.status!=="RESULT_SUBMITTED"&&current.source_reference_state!=="CURRENT"} onClick={props.onFollowup}>{current.status==="RESULT_SUBMITTED"?"保存补充材料请求":"保存后续沟通草稿"}</button>}
       <button type="button" className="boss-btn" onClick={()=>document.getElementById("assignment-result-evidence")?.focus()}>查看结果证据</button><button type="button" className="boss-btn boss-btn-primary" title={completeReason} disabled={!canEdit||current.status!=="RESULT_SUBMITTED"||!completed||current.source_reference_state!=="CURRENT"||current.result_evidence_requires_resubmission} onClick={props.onComplete}>核查并确认完成</button><button type="button" className="boss-btn" disabled={!canEdit||terminal||!draft.reason.trim()} onClick={props.onCancel}>核查并取消交办</button>
     </>}<button type="button" className="boss-btn" disabled={busy||!draft.basis} onClick={props.onDiscard}>清除未提交编辑</button></div>
+    <div className="boss-v7-addendum">
+      <V7Panel title="交办全流程与有效授权核查" description="创建、发送、反馈、结果提交和本人确认分别记录，发送与完成都需要独立授权。">
+        <V7Steps steps={flowSteps}/>
+        <div className="boss-v7-metrics">
+          <V7Metric label="原有效期限" value={extensions?.decisions[0]?.old_due_at??current?.due_at??"待核查"}/>
+          <V7Metric label="延期申请" value={extension?"待本人决定":extensions?.decisions.length?"已有决定记录":"尚未批准"}/>
+          <V7Metric label="证据完整性" value={current?current.result_evidence_requires_resubmission?"需要重新提交":completed?"已取得完成记录":"待核查":"尚未创建"}/>
+          <V7Metric label="确认完成" value={current?.status==="COMPLETED_CONFIRMED"?"已确认":current?.status==="CANCELED"?"已取消":"未确认"}/>
+        </div>
+      </V7Panel>
+      <div className="boss-v7-equal-columns">
+        <V7Panel title="结果产物与证据索引">
+          {resultFeedback.length?resultFeedback.map(item=><article className="boss-feedback" key={item.feedback_id}><p>{item.content||"未提供正文"}</p><p className="boss-helper">作者 {item.author_contact_id??"待核查"} · 提交时间 {item.submitted_at??"待核查"} · 任务版本 {item.task_version??"待核查"}</p><div className="boss-actions">{item.evidence_refs?.map(id=><button type="button" className="boss-btn" key={id} onClick={()=>props.onSource(id)}>{id} · 版本 {item.evidence_versions?.[id]??"待核查"} · {item.evidence_states?.[id]??"待核查"}</button>)}</div></article>):<p className="boss-helper">尚无已记录的提交产物；取得结果后在此核查作者、时间、版本与证据，不得在缺少资料时确认完成。</p>}
+        </V7Panel>
+        <V7Panel title="取消交办的影响">
+          <p>取消只作用于未来催办和未执行步骤，既有历史消息、已提交产物和日志继续可读。</p>
+          <div className="boss-actions">
+            <button type="button" className="boss-btn" onClick={()=>props.onNavigate("D03")}>查询执行结果</button>
+            <button type="button" className="boss-btn" onClick={()=>props.onNavigate("N05")}>返回任务中心</button>
+          </div>
+        </V7Panel>
+      </div>
+    </div>
   </>;
 }

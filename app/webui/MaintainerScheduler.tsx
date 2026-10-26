@@ -293,7 +293,7 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
           </div>
         </details>
         <section className="boss-panel">
-          <div className="boss-panel-head"><h2>调度运行、去重及恢复记录</h2></div>
+          <div className="boss-panel-head"><h2>调度运行、去重及恢复边界</h2></div>
           <div className="boss-scheduler-checks"><Kv label="执行责任组件" value={data?.schedule.executor_component}/><Kv label="当前计划时区" value={data?.schedule.timezone}/><Kv label="当前草稿版本" value={data?.draft?.version}/><Kv label="草稿校验状态" value={data?.draft?.validation_state??"尚未保存"}/><Kv label="重复抑制窗口" value={data?.rules?`${data.rules.cooldown_seconds} 秒`:null}/><Kv label="重启恢复方式" value={data?.restart_policies.find(row=>row.id===data.schedule.restart_policy)?.label??data?.schedule.restart_policy}/><Kv label="模拟业务时钟" value={data?.simulated_business_time}/><Kv label="CronService 运行核查" value={data?.cron_runtime_verified_here}/></div>
           {(data?.recent_dispatches||[]).map((row,i)=><div className="boss-workspace-item"
             key={row.event_id+"-"+i}>
