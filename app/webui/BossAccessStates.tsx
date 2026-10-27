@@ -8,11 +8,11 @@ export function BossRestrictedView({role,onNavigate}:Props){
     <span className="boss-access-icon"><LockKeyhole size={30} aria-hidden="true"/></span>
     <h2 id="boss-access-title">无法访问此内容</h2>
     <p>当前身份没有该对象的读取或操作权限。</p>
-    <span className="boss-tag">当前身份：{role==="MAINTAINER"?"技术维护":"本人"}</span>
+    <span className="boss-tag">当前身份：{role==="MAINTAINER"?"技术管理员":"老板本人"}</span>
     <p className="boss-helper">受限对象的标题、正文、附件、录音及派生摘要均不可见。访问记录只显示当前身份获准查询的内容。</p>
     <div className="boss-actions">
-      <button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate(role==="MAINTAINER"?"A01":"F01")}><ArrowLeft size={16}/>返回获准页面</button>
-      <button type="button" className="boss-btn" onClick={()=>onNavigate(role==="MAINTAINER"?"A14":"N11")}><ScrollText size={16}/>查询访问记录</button>
+      <button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate(role==="MAINTAINER"?"N12":"F01")}><ArrowLeft size={16}/>{role==="MAINTAINER"?"返回管理首页":"返回我的工作台"}</button>
+      <button type="button" className="boss-btn" onClick={()=>onNavigate(role==="MAINTAINER"?"A14":"N11")}><ScrollText size={16}/>{role==="MAINTAINER"?"查看本次访问诊断":"查询访问记录"}</button>
     </div>
   </section>;
 }
@@ -25,7 +25,7 @@ export function BossUnsavedWorkspace({role,onNavigate}:Props){
         <V7Fact label="本次编辑范围">请进入相应编辑页面查看</V7Fact>
         <V7Fact label="当前版本">按原对象读取</V7Fact>
         <p className="boss-helper">继续编辑会保留表单内容；保存草稿成功后才会离开。放弃本次编辑需要明确选择，已经保存的记录继续保留。</p>
-        <div className="boss-actions">{role==="BOSS"?<><button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate("F05")}>打开会议纪要</button><button type="button" className="boss-btn" onClick={()=>onNavigate("F08")}>打开消息草稿</button></>:<button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate("A08")}>打开维护配置</button>}</div>
+        <div className="boss-actions">{role==="BOSS"?<><button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate("F05")}>前往会议纪要</button><button type="button" className="boss-btn" onClick={()=>onNavigate("F08")}>前往消息草稿</button></>:<button type="button" className="boss-btn boss-btn-primary" onClick={()=>onNavigate("A08")}>打开维护配置</button>}</div>
       </V7Panel>
       <V7Panel title="完整退出的独立影响">
         <V7Fact label="本地调度">完整退出后停止</V7Fact><V7Fact label="录音采集">完整退出后停止；当前语音服务暂停</V7Fact><V7Fact label="未执行步骤">完整退出后停止</V7Fact><V7Fact label="已保存记录">继续保留</V7Fact><V7Fact label="未知结果">重新认证后按原请求查询</V7Fact>

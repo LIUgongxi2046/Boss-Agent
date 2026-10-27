@@ -85,17 +85,17 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
       <label>会议<input value={draft.meeting} placeholder="会议编号或原文关键词" onChange={event=>editFilter("meeting",event.target.value)}/></label>
       <label>决定类型<select value={draft.kind} onChange={event=>editFilter("kind",event.target.value)}><option value="">全部类型</option>{[...new Set(api.data?.records.map(row=>row.title)??[])].map(value=><option key={value}>{value}</option>)}</select></label>
       <label>来源<input value={draft.source} onChange={event=>editFilter("source",event.target.value)}/></label>
-    </>:<label>目标对象或来源<input value={draft.query} onChange={event=>editFilter("query",event.target.value)}/></label>}
+    </>:<label>目标对象或来源<input value={draft.query} placeholder={isList?"按名称搜索，编号可在高级条件输入":"按名称搜索"} onChange={event=>editFilter("query",event.target.value)}/></label>}
     {isList&&<label>记录范围<select value={tab} onChange={event=>{setTab(event.target.value);setPage(1);}}><option value="ALL">全部状态</option>{[...new Set(["CURRENT","EXPIRED","REVOKED","EXECUTED",...api.data?.records.map(row=>row.effective_state)??[]])].map(value=><option key={value} value={value}>{ownerState(value)}</option>)}</select></label>}
     {isDecisions&&<label>执行空间<select value={draft.namespace} onChange={event=>editFilter("namespace",event.target.value)}><option value="">全部获准空间</option>{[...new Set(api.data?.records.map(row=>row.namespace)??[])].map(value=><option key={value}>{value}</option>)}</select></label>}
-    <button className="boss-btn boss-btn-primary" type="submit" disabled={api.loading}>查询 / 应用</button>
+    <button className="boss-btn boss-btn-primary" type="submit" disabled={api.loading}>{isList?"筛选授权":isDecisions?"筛选历史决定":"查询"}</button>
   </form>;
   const selector=<div className="boss-owner-filters">
     <label>{isHistory?"获准历史记录":"目标事项与当前版本"}<select value={selected} onChange={event=>select(event.target.value)}>
       <option value="">请选择记录</option>{api.data?.records.map(row=><option key={row.id} value={row.id}>{row.title} · {row.target_id??row.id} · v{row.version}{row.historical?" · 历史只读":""}</option>)}
     </select></label>
     {isHistory?<><V7Fact label="原数据集">{record?.dataset_id??"尚未选择"}</V7Fact><V7Fact label="原执行空间">{record?.namespace??"尚未选择"}</V7Fact><V7Fact label="历史版本">{record?.version??"尚未选择"}</V7Fact></>:<><V7Fact label="当前身份">老板本人</V7Fact><V7Fact label="内容版本">{record?.version??"尚未选择"}</V7Fact></>}
-    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>查询 / 更新</button>
+    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>{isHistory?"刷新当前事项状态":"刷新授权状态"}</button>
   </div>;
   const statePanel=<V7Panel title="状态与核查">
     <V7Fact label="记录状态">{record?ownerState(record.effective_state):api.loading?"正在读取":"尚未选择记录"}</V7Fact>
@@ -103,7 +103,7 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
     <V7Fact label="读取时间">{api.data?.read_at??"尚未读取"}</V7Fact>
     <V7Fact label="业务时钟">{api.data?.business_clock??"尚未读取"}</V7Fact>
     {record?.historical&&<p className="boss-v7-note">原执行空间已归档，仅供本人查询历史内容。</p>}
-    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>重读正式状态</button>
+    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>刷新正式状态</button>
   </V7Panel>;
   const sources=<V7Panel title="来源与依据">
     {record?<><OwnerRecordIdentity record={record}/><OwnerConditions record={record}/><OwnerSources record={record} onViewSource={onViewSource}/></>:<V7Empty title="尚未选择记录">选择记录后查看当时版本与来源状态。</V7Empty>}
@@ -125,7 +125,7 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
     {!isList&&!isDecisions&&selector}
     {isNecessary?<>
       {conditionPanel}
-      <div className="boss-owner-actions"><button className="boss-btn boss-btn-primary" disabled={!record?.missing.length||record.historical} onClick={()=>setDecisionOpen(true)}>查看必要决定</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>打开原事项</button><button className="boss-btn" onClick={()=>onNavigate("N10")}>返回本人授权</button></div>
+      <div className="boss-owner-actions"><button className="boss-btn boss-btn-primary" disabled={!record?.missing.length||record.historical} onClick={()=>setDecisionOpen(true)}>核对本次决定</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>打开原事项</button><button className="boss-btn" onClick={()=>onNavigate("N10")}>查看我的授权记录</button></div>
       {record&&!record.missing.length&&<p className="boss-v7-note">当前记录没有返回缺少条件。后续操作在原事项中按当前有效指令处理。</p>}
     </>:<div className="boss-owner-columns"><div className="boss-column">
       {isList?<V7Panel title="对象与记录">
@@ -151,15 +151,15 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
       {statePanel}
     </aside></div>}
     {!isNecessary&&<div className="boss-owner-actions" aria-label="当前记录操作">
-      {isList?<><button className="boss-btn" disabled={!record} onClick={()=>onNavigate("F28")}>查看当前内容</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} onClick={continuation}>打开任务</button><button className="boss-btn boss-owner-danger" disabled={!record?.can_revoke||busy||record.historical} onClick={requestRevoke}>撤销授权</button><button className="boss-btn" disabled={!canRecover} onClick={recover}>查询实际结果</button></>:
-       isDecisions?<><button className="boss-btn" disabled={!record} onClick={inspectOriginal}>打开原文</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>查看当前事项</button><button className="boss-btn" disabled={!canContinue} onClick={()=>onNavigate("N02")}>继续讨论</button><button className="boss-btn" onClick={()=>onNavigate("F13")}>返回记忆</button></>:
-       isHistory?<><button className="boss-btn" onClick={()=>onNavigate("N06")}>返回通知</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>查询对应事项</button><button className="boss-btn" disabled={!record} onClick={inspectTimeline}>查看历史记录</button></>:
-       <><button className="boss-btn boss-btn-primary" disabled={!record?.missing.length||record.historical} onClick={()=>setDecisionOpen(true)}>提交必要决定</button><button className="boss-btn boss-owner-danger" disabled={!record?.can_revoke||busy||record.historical} onClick={requestRevoke}>撤销授权</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} title="前往原事项，核查并取消尚未执行步骤" onClick={continuation}>取消未执行动作</button><button className="boss-btn" disabled={!record} onClick={inspectTimeline}>查看记录</button></>}
+      {isList?<><button className="boss-btn" disabled={!record} onClick={()=>{if(!record)return;const url=new URL(window.location.href);url.searchParams.set("bossOwnerRecord",record.id);window.history.replaceState(window.history.state,"",url);onNavigate("F28");}}>查看授权详情</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} onClick={continuation}>打开关联交办</button><button className="boss-btn boss-owner-danger" disabled={!record?.can_revoke||busy||record.historical} onClick={requestRevoke}>撤销授权</button><button className="boss-btn" disabled={!canRecover} onClick={recover}>查看执行记录</button></>:
+       isDecisions?<><button className="boss-btn" disabled={!record} onClick={inspectOriginal}>查看当时依据</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>查看当前事项</button><button className="boss-btn" disabled={!canContinue} onClick={()=>onNavigate("N02")}>基于这项决定继续讨论</button></>:
+       isHistory?<><button className="boss-btn" onClick={()=>onNavigate("N06")}>返回通知</button><button className="boss-btn" disabled={!canContinue} onClick={continuation}>查看当前事项</button></>:
+       <><button className="boss-btn boss-btn-primary" disabled={!record?.missing.length||record.historical} onClick={()=>setDecisionOpen(true)}>{record?"核对并确认"+record.title:"核对并确认"}</button><button className="boss-btn boss-owner-danger" disabled={!record?.can_revoke||busy||record.historical} onClick={requestRevoke}>撤销授权</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} title="前往原事项，核查并取消尚未执行步骤" onClick={continuation}>取消未执行动作</button><button className="boss-btn" disabled={!record} onClick={inspectTimeline}>查看授权及执行历史</button></>}
     </div>}
     <Dialog.Root open={decisionOpen&&!!record&&!record.historical&&record.missing.length>0} onOpenChange={setDecisionOpen}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog boss-owner-decision-dialog">
       <Dialog.Title>当前动作必要决定</Dialog.Title><Dialog.Description>核查当前对象、内容版本和具体缺少条件，在原事项中补充有效指令。当前弹窗不会提交业务写入。</Dialog.Description>
       {record&&<OwnerRecordFacts record={record}/>}
-      <div className="boss-actions"><Dialog.Close asChild><button className="boss-btn">返回原任务上下文</button></Dialog.Close><button className="boss-btn boss-btn-primary" disabled={!canContinue} onClick={continuation}>补充必要决定</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} title="前往原事项，核查并取消尚未执行步骤" onClick={continuation}>取消未执行操作</button></div>
+      <div className="boss-actions"><Dialog.Close asChild><button className="boss-btn">返回原任务上下文</button></Dialog.Close><button className="boss-btn boss-btn-primary" disabled={!canContinue} onClick={continuation}>打开原事项核对</button><button className="boss-btn" disabled={!canContinue||!record?.task_id} title="前往原事项，核查并取消尚未执行步骤" onClick={continuation}>取消未执行操作</button></div>
     </Dialog.Content></Dialog.Portal></Dialog.Root>
     <Dialog.Root open={revoke&&!!record&&!record.historical} onOpenChange={setRevoke}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog">
       <Dialog.Title>撤销当前授权</Dialog.Title><Dialog.Description>授权 {record?.authorization_id}，目标 {record?.target_id}，内容版本 {record?.version}。撤销将停止后续采用，已经执行的历史记录保留。</Dialog.Description>

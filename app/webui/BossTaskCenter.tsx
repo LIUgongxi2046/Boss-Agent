@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ArrowRight, ClipboardCheck, Clock3, FileSearch,
-  Filter, FolderOpen, RefreshCw, ShieldCheck } from "lucide-react";
+  Filter, FolderOpen, ShieldCheck } from "lucide-react";
 import type { AssignmentTask, TaskFeedback, TaskListResponse } from "./BossAssignmentFlow";
 import { BossPersonalCommitments, type SelfCommitment } from "./BossPersonalCommitments";
 import {V7Panel, V7Tabs, V7Empty} from "./BossV7UI";
@@ -17,7 +17,7 @@ type Response = TaskListResponse & {
   self_due_events?:{commitment_id:string;event_id:string;event_state:string;due_at:string}[];
   self_commitment_revisions?:SelfCommitment[];
 };
-type Tab = "全部任务"|"本人承诺"|"他人交办"|"等待反馈"|"待核查结果";
+type Tab = "全部"|"我的承诺"|"我交办的";
 type Props = {
   data:Response|null;
   selectedTaskId:string;
@@ -28,7 +28,11 @@ type Props = {
   onReload:()=>void;
   onDirtyChange:(value:boolean)=>void;
 };
-const TABS:Tab[]=["全部任务","本人承诺","他人交办","等待反馈","待核查结果"];
+const TABS:Tab[]=["全部","我的承诺","我交办的"];
+const STATUS_LABELS:Record<string,string>={OPEN:"待我决定",IN_PROGRESS:"执行中",WAITING_FEEDBACK:"待反馈",RESULT_SUBMITTED:"待我验收",COMPLETED_CONFIRMED:"已完成",CANCELED:"已取消"};
+const KNOWN_STATUSES=["OPEN","IN_PROGRESS","WAITING_FEEDBACK","OVERDUE","RESULT_SUBMITTED","COMPLETED_CONFIRMED","CANCELED"];
+function statusLabel(value:string){return STATUS_LABELS[value]??value;}
+function statusText(value:string){return STATUS_LABELS[value]?STATUS_LABELS[value]+"（"+value+"）":value;}
 function labelTime(value?:string){return value?value.replace("T"," "):"未提供";}
 function Display({name,value}:{name:string;value?:string|number|null}){
   return <div className="boss-kv"><span>{name}</span><strong>{value??"未提供"}</strong></div>;
@@ -37,15 +41,20 @@ function countEvidence(task:AssignmentTask,feedback:TaskFeedback[]){
   const own=feedback.filter(x=>x.task_id===task.task_id);
   return own.flatMap(x=>x.evidence_refs||[]).length;
 }
+function isOverdue(task:AssignmentTask,clock?:string){
+  if(!task.due_at||!clock)return false;
+  if(["CANCELED","COMPLETED_CONFIRMED"].includes(task.status))return false;
+  const due=Date.parse(task.due_at),at=Date.parse(clock);
+  return Number.isFinite(due)&&Number.isFinite(at)&&due<at;
+}
 function dueStatus(task:AssignmentTask,clock?:string){
   if(!task.due_at||!clock)return "期限状态未核查";
   if(["CANCELED","COMPLETED_CONFIRMED"].includes(task.status))return "历史终态";
-  const due=Date.parse(task.due_at),at=Date.parse(clock);
-  if(!Number.isFinite(due)||!Number.isFinite(at))return "期限不可解析";
-  return due<at?"已超模拟业务时钟":"当前期限未超过模拟业务时钟";
+  if(!Number.isFinite(Date.parse(task.due_at))||!Number.isFinite(Date.parse(clock)))return "期限不可解析";
+  return isOverdue(task,clock)?"已超模拟业务时钟":"当前期限未超过模拟业务时钟";
 }
-export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCreateTask,onNavigate,onReload,onDirtyChange}:Props){
-  const [tab,setTab]=useState<Tab>(()=>{const value=new URLSearchParams(window.location.search).get("taskTab");return TABS.includes(value as Tab)?value as Tab:"全部任务";});
+export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCreateTask,onReload,onDirtyChange}:Props){
+  const [tab,setTab]=useState<Tab>(()=>{const value=new URLSearchParams(window.location.search).get("taskTab");return TABS.includes(value as Tab)?value as Tab:"全部";});
   const [coordinator,setCoordinator]=useState(()=>new URLSearchParams(window.location.search).get("taskCoordinator")??"");
   const [before,setBefore]=useState(()=>new URLSearchParams(window.location.search).get("taskBefore")??"");
   const [status,setStatus]=useState(()=>new URLSearchParams(window.location.search).get("taskState")??"");
@@ -60,24 +69,24 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
     (x):x is string=>typeof x==="string"&&x.length>0)));
   const meetings=Array.from(new Set(tasks.map(x=>x.related_meeting_id).filter(
     (x):x is string=>typeof x==="string"&&x.length>0)));
-  const stateNames=Array.from(new Set(tasks.map(x=>x.status).filter(Boolean)));
+  const extraStatuses=[...new Set(tasks.map(x=>x.status).filter(Boolean))].filter(value=>!KNOWN_STATUSES.includes(value));
+  const statusOptions=[...KNOWN_STATUSES.map(value=>({value,label:value==="OVERDUE"?"逾期":statusLabel(value)})),...extraStatuses.map(value=>({value,label:statusLabel(value)}))];
   const filtered=useMemo(()=>{
-    if(tab==="本人承诺")return [];
-    let subset=tasks.filter(t=>tab==="全部任务"||tab==="他人交办"||
-      tab==="等待反馈"&&["WAITING_FEEDBACK","IN_PROGRESS"].includes(t.status)||
-      tab==="待核查结果"&&t.status==="RESULT_SUBMITTED");
+    if(tab==="我的承诺")return [];
+    let subset=[...tasks];
     if(applied.coordinator)subset=subset.filter(t=>t.coordinator_id===applied.coordinator);
-    if(applied.status)subset=subset.filter(t=>t.status===applied.status);
+    if(applied.status==="OVERDUE")subset=subset.filter(t=>isOverdue(t,data?.business_clock));
+    else if(applied.status)subset=subset.filter(t=>t.status===applied.status);
     if(applied.meeting)subset=subset.filter(t=>t.related_meeting_id===applied.meeting);
     if(applied.before)subset=subset.filter(t=>t.due_at&&t.timezone&&new Intl.DateTimeFormat("en-CA",{timeZone:t.timezone,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(t.due_at))<=applied.before);
     return [...subset].sort((a,b)=>(a.due_at||"").localeCompare(b.due_at||"")||
       a.task_id.localeCompare(b.task_id));
-  },[tasks,tab,applied]);
+  },[tasks,tab,applied,data?.business_clock]);
   const pageSize=10;
   const pages=Math.max(1,Math.ceil(filtered.length/pageSize));
   const currentPage=Math.min(page,pages-1);
   const shown=filtered.slice(currentPage*pageSize,currentPage*pageSize+pageSize);
-  const selected=filtered.find(t=>t.task_id===selectedTaskId)||shown[0]||null;
+  const selected=filtered.find(t=>t.task_id===selectedTaskId)||null;
   const chosenFeedback=feedback.filter(f=>selected&&f.task_id===selected.task_id);
   const chosenMessages=messages.filter(f=>selected&&f.task_id===selected.task_id);
   const due=events.find(e=>selected&&e.task_id===selected.task_id);
@@ -90,12 +99,11 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
     <div className="boss-task-center-columns"><div className="boss-column"><section className="boss-panel boss-task-center">
       <div className="boss-panel-head"><h2>任务与承诺</h2><small>当前范围与筛选</small></div>
       <V7Tabs label="任务与承诺分类" value={tab} onChange={changeTab} items={TABS.map(key=>({id:key,title:key,count:!data?undefined:
-            key==="全部任务"?tasks.length+(data.self_commitments?.length||0):
-            key==="本人承诺"?((data.self_commitments?.length||0)+(data.historical_commitment?1:0)):
-            key==="他人交办"?tasks.length:
-            key==="等待反馈"?tasks.filter(t=>["WAITING_FEEDBACK","IN_PROGRESS"].includes(t.status)).length:
-            tasks.filter(t=>t.status==="RESULT_SUBMITTED").length}))}/>
-      <div className="boss-task-filter-grid" style={tab==="本人承诺"?{display:"none"}:undefined}>
+            key==="全部"?tasks.length+(data.self_commitments?.length||0):
+            key==="我的承诺"?data.self_commitments?.length||0:
+            tasks.length}))}/>
+      <p className="boss-v7-note">计数按当前读取的正式记录计算，不含历史承诺快照；身份分类与进度筛选可以组合。</p>
+      <div className="boss-task-filter-grid" style={tab==="我的承诺"?{display:"none"}:undefined}>
         <label>负责人
           <select value={coordinator} onChange={e=>setCoordinator(e.target.value)}>
             <option value="">全部已知负责人</option>
@@ -109,7 +117,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
         <label>任务状态
           <select value={status} onChange={e=>setStatus(e.target.value)}>
             <option value="">全部状态</option>
-            {stateNames.map(key=><option key={key} value={key}>{key}</option>)}
+            {statusOptions.map(item=><option key={item.value} value={item.value}>{item.label}</option>)}
           </select>
         </label>
         <label>关联会议
@@ -119,20 +127,20 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
           </select>
         </label>
         <button type="button" className="boss-btn boss-btn-primary" onClick={apply}>
-          <Filter size={15}/> 查询 / 应用
+          <Filter size={15}/> 筛选任务
         </button>
       </div>
     </section>
-    <details className="boss-task-self-records" open={tab==="本人承诺"?true:undefined} hidden={tab!=="本人承诺"&&tab!=="全部任务"}><summary>本人承诺 · {data?`${data.self_commitments?.length??0} 项当前记录`:"尚未读取"}</summary><BossPersonalCommitments items={data?.self_commitments||[]} businessClock={data?.business_clock} onReload={onReload} onDirtyChange={onDirtyChange} dueEvents={data?.self_due_events} revisions={data?.self_commitment_revisions}/></details>
+    <details className="boss-task-self-records" open={tab==="我的承诺"?true:undefined} hidden={tab!=="我的承诺"&&tab!=="全部"}><summary>本人承诺 · {data?`${data.self_commitments?.length??0} 项当前记录`:"尚未读取"}</summary><BossPersonalCommitments items={data?.self_commitments||[]} businessClock={data?.business_clock} onReload={onReload} onDirtyChange={onDirtyChange} dueEvents={data?.self_due_events} revisions={data?.self_commitment_revisions}/></details>
         <section className="boss-panel">
           <div className="boss-panel-head"><h2>任务列表与结果核查</h2>
             <small>负责人、有效期限与当前结果</small></div>
-          {tab==="本人承诺" ? <>
+          {tab==="我的承诺" ? <>
             {data?.historical_commitment?<div className="boss-workspace-item">
               <strong>{data.historical_commitment.task_id}</strong>
               <Display name="历史状态" value={data.historical_commitment.status}/>
               <Display name="历史原定期限" value={labelTime(data.historical_commitment.due_at)}/>
-              <p>这是已批准的历史背景快照，不属于当前生成的任务，不允许在这里代办完成。</p>
+              <p>这是已批准的历史背景快照，不属于当前生成的任务，不计入分类计数，不允许在这里代办完成。</p>
             </div>:<div className="boss-empty"><FolderOpen size={19}/>
               <div><strong>没有已读取的历史承诺快照</strong><p>当前本人承诺在上方独立查询与管理。</p></div>
             </div>}
@@ -143,13 +151,15 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
             </div>
             {shown.length?shown.map(task=>{
               const f=feedback.filter(x=>x.task_id===task.task_id);
+              const latest=[...f].filter(x=>x.submitted_at).sort((a,b)=>(b.submitted_at??"").localeCompare(a.submitted_at??""))[0];
               return <button key={task.task_id} type="button" className={
                 "boss-task-table-row "+(selected?.task_id===task.task_id?"selected":"")}
+                aria-label={[task.purpose||"未提供任务目的",task.coordinator_id||"负责人待核查",labelTime(task.due_at),statusLabel(task.status)].join("，")}
                 onClick={()=>onSelectTask(task.task_id)}>
-                <span><strong>{task.purpose||"未提供任务目的"}</strong><small>{task.task_id}</small></span>
+                <span><strong>{task.purpose||"未提供任务目的"}</strong></span>
                 <span>{task.coordinator_id||"待核查"}</span>
                 <span>{labelTime(task.due_at)}<small>{task.timezone||"时区待核查"}</small></span>
-                <span>{task.status}<small>{f.length} 条署名反馈</small></span>
+                <span>{statusLabel(task.status)}<small>{f.length} 条署名反馈{latest?.submitted_at&&" · 最新 "+labelTime(latest.submitted_at)}</small></span>
                 <span>{countEvidence(task,feedback)} 条引用
                   <small>{task.source_reference_state==="NEEDS_REVIEW"?"来源需复核":"来源有效性："+(task.source_reference_state||"未知")}</small>
                 </span>
@@ -170,9 +180,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
           </>}
           <div className="boss-actions">
             <button type="button" className="boss-btn boss-btn-primary"
-              onClick={onCreateTask}><ClipboardCheck size={15}/> 创建交办</button>
-            <button type="button" className="boss-btn" onClick={onReload}><RefreshCw size={15}/> 重读最新状态</button>
-            <button type="button" className="boss-btn" onClick={()=>onNavigate("F01")}>返回今日</button>
+              onClick={onCreateTask}><ClipboardCheck size={15}/> 新建交办</button>
           </div>
         </section>
       </div>
@@ -182,7 +190,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
             <small>只读预览 · 重大动作进入 F06 本人确认</small></div>
           {selected?<>
             <Display name="任务 ID" value={selected.task_id}/>
-            <Display name="正式状态" value={selected.status}/>
+            <Display name="正式状态" value={statusText(selected.status)}/>
             <Display name="内容版本" value={selected.version}/>
             <Display name="当前期限" value={labelTime(selected.due_at)}/>
             <Display name="逾期属性" value={dueStatus(selected,data?.business_clock)}/>
@@ -203,7 +211,7 @@ export function BossTaskCenter({data,selectedTaskId,onSelectTask,onOpenTask,onCr
             <div className="boss-actions">
               <button type="button" className="boss-btn boss-btn-primary"
                 onClick={()=>onOpenTask(selected.task_id)}>
-                <ArrowRight size={15}/> 进入任务详情
+                <ArrowRight size={15}/> 打开交办
               </button>
               <button type="button" className="boss-btn" onClick={()=>onOpenTask(selected.task_id)}>
                 <FileSearch size={15}/> 查看反馈及证据

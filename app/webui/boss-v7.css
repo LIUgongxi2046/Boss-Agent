@@ -41,6 +41,10 @@
 .boss-v6[data-design="v7"] .boss-user>span:last-child{font-size:11px;line-height:1.4;font-weight:400}
 .boss-v6[data-design="v7"] .boss-user small{font-size:10px;font-weight:400;color:#647b98}
 .boss-v6[data-design="v7"] .boss-user:hover{background:#edf6ff}
+.boss-v6[data-design="v7"] .boss-user-area{position:relative}
+.boss-v6[data-design="v7"] .boss-account-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:40;min-width:180px;padding:6px;border:1px solid #dbe8f6;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(24,59,105,.16)}
+.boss-v6[data-design="v7"] .boss-account-menu button{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px 10px;border:0;border-radius:9px;background:transparent;color:#263a56;font:13px/1.5 Inter,"PingFang SC","Microsoft YaHei",sans-serif;text-align:left;cursor:pointer}
+.boss-v6[data-design="v7"] .boss-account-menu button:hover{background:#eef6ff;color:#075fd5}
 .boss-v6[data-design="v7"] .boss-stage{padding:4px 23px 22px 28px;gap:14px}
 .boss-v6[data-design="v7"] .boss-hero{height:146px;min-height:146px;flex-basis:146px;padding:22px;border:0;border-radius:20px;background:radial-gradient(ellipse at 85% 5%,rgba(97,238,196,.26),transparent 43%),radial-gradient(ellipse at 68% 58%,rgba(81,172,255,.2),transparent 41%),linear-gradient(107deg,rgba(249,252,255,.78),rgba(232,245,255,.56))}
 .boss-v6[data-design="v7"] .boss-hero::after{content:none}
@@ -409,6 +413,10 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
 .boss-minutes-view .boss-source{overflow:auto;max-height:320px;white-space:pre-wrap}
 @media(max-width:700px){.boss-v6[data-design="v7"] .boss-approval-view>.boss-columns{grid-template-columns:minmax(0,1fr)}}
 .boss-run-view{display:flex;flex-direction:column;gap:13px;min-width:0}
+.boss-run-goal{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;padding:12px 16px;border:1px solid #e1edf9;border-radius:14px;background:#f7fbff}
+.boss-run-goal span{font-size:12px;color:#647b98}
+.boss-run-goal strong{font-size:16px;line-height:1.5;color:#172b4d}
+.boss-run-goal small{font-size:12px;color:#647b98}
 .boss-run-columns{display:grid;grid-template-columns:minmax(0,1fr) 278px;gap:12px;align-items:start}
 .boss-v6[data-design="v7"] .boss-run-columns .boss-panel{padding:17px 18px;border-radius:17px;font-size:14px;line-height:22px}
 .boss-v6[data-design="v7"] .boss-run-columns .boss-panel-head h2{font-size:16px;line-height:24px}

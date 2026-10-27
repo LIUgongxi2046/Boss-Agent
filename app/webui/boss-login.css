@@ -14,7 +14,8 @@
 .boss-login-welcome .boss-login-welcome-note{font-size:14px}
 .boss-login-card{background:white;border:1px solid #e5eef9;border-radius:20px;padding:22px 26px;box-shadow:0 18px 48px rgba(45,104,167,.1);min-width:0}
 .boss-login-card h2{font-size:21px;line-height:1.4;margin:0 0 4px;letter-spacing:-.4px;color:#073b70}
-.boss-login-description{font-size:14px;color:#52647a;margin:0 0 16px}
+.boss-login-description{font-size:14px;color:#52647a;margin:0 0 8px}
+.boss-login-instance{font-size:12px;line-height:1.6;color:#6a7c92;margin:0 0 14px}
 .boss-login-roles{border:0;padding:0 0 14px;margin:0 0 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-bottom:1px solid #e6ebf1;min-width:0}
 .boss-login-roles legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .boss-login-roles label{position:relative;border:1px solid #e3ebf6;border-radius:12px;display:flex;align-items:flex-start;flex-direction:column;gap:6px;padding:13px 12px;color:#52647a;cursor:pointer}

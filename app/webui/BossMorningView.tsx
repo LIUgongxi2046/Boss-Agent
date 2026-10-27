@@ -38,7 +38,7 @@ const coverageLabels:Record<string,string>={CONFIRMED:"已经确认",NOT_SET:"�
 
 export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConversation,onOpenConversation,refreshVersion,visible=true}:{onNavigate:(page:string,id:string)=>void;onDirtyChange:(value:boolean)=>void;onPrepare:(item:TodayItem,reference:MorningReference)=>void;onStartConversation:(value:MorningConversationRequest,signal:AbortSignal)=>Promise<MorningBindingReceipt>;onOpenConversation:(chatId:string)=>void;refreshVersion:number;visible?:boolean}){
   const {client,getToken,token}=useClient();
-  const [day,setDay]=useState<Day|null>(null),[view,setView]=useState<View|null>(null),[list,setList]=useState<Read|null>(null);
+  const [day,setDay]=useState<Day|null>(null),[today,setToday]=useState<Day|null>(null),[view,setView]=useState<View|null>(null),[list,setList]=useState<Read|null>(null);
   const [question,setQuestion]=useState(""),[questionDirty,setQuestionDirty]=useState(false),[receipt,setReceipt]=useState<Receipt|null>(null),[history,setHistory]=useState<History>({requests:[]});
   const [dayDraft,setDayDraft]=useState<Day|null>(null),[category,setCategory]=useState<TodayItem["category"]|"ALL">("ALL"),[meetingOpen,setMeetingOpen]=useState(false),[readOnlyItem,setReadOnlyItem]=useState<TodayItem|null>(null);
   const [requestId,setRequestId]=useState(""),[selected,setSelected]=useState(""),[sourceId,setSourceId]=useState("");
@@ -107,7 +107,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     void read<Day>("/api/boss/ui/today",abort.signal).then(async value=>{
       if(!active())return;
       const date=parameters.get("morningDate")??value.date,timezone=parameters.get("morningTimezone")??value.timezone;
-      setDay({date,timezone});setDayDraft({date,timezone});
+      setToday(value);setDay({date,timezone});setDayDraft({date,timezone});
       if(binding)await restoreBinding(binding,abort.signal);else if(key){setUncertain(true);await restore(key,abort.signal,true);}
     }).catch(failure=>{if(active())setError(failure.message);}).finally(()=>{if(active())setLoading(false);});
     void read<History>("/api/boss/ui/morning/history",abort.signal).then(value=>{if(active())setHistory(value);},failure=>{if(active())setError(failure.message);});
@@ -243,8 +243,9 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     <div className="boss-f01-grid"><main className="boss-f01-main">
     <form className="boss-f01-datebar" onSubmit={event=>{event.preventDefault();if(dayDraft&&!disabled){if(dateDirty)changeDay(dayDraft);else setRevision(value=>value+1);}}}>
       <label>查看日期<input aria-label="日期" type="date" required value={dayDraft?.date??""} disabled={disabled||!dayDraft} onChange={event=>dayDraft&&setDayDraft({...dayDraft,date:event.target.value})}/></label>
-      <button type="submit" className="boss-btn" disabled={disabled||loading||!dayDraft}>切换</button>
-      <span>{view?`共 ${view.items.length} 项`:"正在读取"}</span>
+      <button type="submit" className="boss-btn" disabled={disabled||loading||!dayDraft}>查看该日</button>
+      <button type="button" className="boss-btn" disabled={disabled||!today||(day?.date===today.date&&day?.timezone===today.timezone)} onClick={()=>{if(today)changeDay(today);}}>回到今天</button>
+      <span>{view?`共 ${view.items.length} 项`:"正在读取"}{day&&today&&(day.date!==today.date||day.timezone!==today.timezone)?" · 正在预览历史日期":""}</span>
     </form>
       <BossToday key={view?.list_id??day?.date??""} data={ordered} loading={loading} error="" onReload={()=>setRevision(value=>value+1)} onNavigate={onNavigate}
         presentation="compact" category={category} selectedItemId={selected} onDirtyChange={setOrderDirty} orderEnabled={Boolean(current)&&!busy&&!uncertain&&!dateDirty} onSelectItem={current?chooseItem:(item)=>openRelated(item)} onDiscuss={discuss} discussEnabled={Boolean(detail&&current)&&!disabled&&!dateDirty}
@@ -260,10 +261,10 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
     </main><aside className="boss-f01-aside" aria-label="今日工作相关信息">
       <Panel title="事项详情">{detail&&current?<>
         <dl className="boss-f01-detail-fields"><div><dt>事项</dt><dd>{detail.item.title}</dd></div><div><dt>相关资料</dt><dd>{detail.documents.length} 项</dd></div><div><dt>相关会议</dt><dd>{meetings.length?meetings.length+" 场":"没有会议"}</dd></div><div><dt>相关交办</dt><dd>{detail.item.existing_measures.filter(value=>value.kind==="task").length||"没有"}</dd></div></dl>
-        <div className="boss-actions"><button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>安排交办</button>
+        <div className="boss-actions"><button id="morning-prepare" className="boss-btn" disabled={disabled} onClick={()=>{captureReturn();onPrepare(detail.item,{list_id:detail.list_id,list_version:detail.list_version,item_id:detail.item.item_id,snapshot_sha256:detail.snapshot_sha256});}}>准备交办</button>
           {meetings.length>0&&<button id="morning-meeting" className="boss-btn" disabled={disabled} onClick={()=>{overlayFocus.current=window.document.activeElement as HTMLElement;setMeetingOpen(true);}}>查看会议</button>}
           {["F06","N05","F02"].includes(detail.item.page_id)&&<button id="morning-related" className="boss-btn" disabled={disabled} onClick={()=>openRelated(detail.item)}>查看事项</button>}</div>
-        <div className="boss-actions">{detail.documents.map(value=><button id={"morning-source-"+value.source_id} className="boss-btn" key={value.source_id} disabled={busy||uncertain} onClick={()=>chooseSource(value.source_id)}>查看资料{value.source_id}</button>)}</div>
+        <div className="boss-actions">{detail.documents.map(value=><button id={"morning-source-"+value.source_id} className="boss-btn" key={value.source_id} disabled={busy||uncertain} title={"查看依据："+value.source_id} onClick={()=>chooseSource(value.source_id)}>查看依据</button>)}</div>
         <details><summary>查看完整内容</summary>
         <h3>{detail.item.title}</h3><p>{detail.item.reason}</p><p>处理人 {detail.item.coordinator_id??"尚未提供"} · 有效期限 {detail.item.due_at??"尚未提供"} · 当前状态 {morningState(detail.item.state??"尚未提供")}</p>
         <p>时间 {detail.item.starts_at??"尚未提供"} 至 {detail.item.ends_at??"尚未提供"} · 对象时区 {detail.item.timezone??"尚未提供"}</p><p>地点 {detail.item.location??"尚未提供"}</p>
@@ -302,7 +303,7 @@ export function BossMorningView({onNavigate,onDirtyChange,onPrepare,onStartConve
         {view?.source_coverage.map(region=><p key={region.region_id}>{region.region_id} · {label(region.state)} · 截至 {region.as_of??"未知"}</p>)}
         {view?.input_coverage?.map(input=><p className="boss-f01-input-coverage" key={input.kind}>{inputLabels[input.kind]??input.kind} · {coverageLabels[input.state]??input.state} · 已提供 {input.provided_count} / 纳入 {input.included_count} / 未纳入 {input.excluded_count} · 完整范围数量 {input.reported_total??"未知"}</p>)}
         {view?.missing_sources.map(value=><p className="boss-helper" key={value}>{morningReason(value)}</p>)}
-        {view?.source_statuses.map(source=><article className="boss-f01-related" key={source.source_id}><p>{source.source_id} · v{source.version??"未知"} · {label(source.status)}</p><p>资料截至 {source.data_as_of??"未知"} · 作者 {source.author_contact_id??"未知"} · 更新 {source.observed_at??"未知"}</p><button className="boss-btn" disabled={!current||source.status!=="VALID"||busy||uncertain} onClick={()=>chooseSource(source.source_id)}>查看来源原文</button></article>)}
+        {view?.source_statuses.map(source=><article className="boss-f01-related" key={source.source_id}><p>{source.source_id} · v{source.version??"未知"} · {label(source.status)}</p><p>资料截至 {source.data_as_of??"未知"} · 作者 {source.author_contact_id??"未知"} · 更新 {source.observed_at??"未知"}</p><button className="boss-btn" disabled={!current||source.status!=="VALID"||busy||uncertain} onClick={()=>chooseSource(source.source_id)}>查看依据</button></article>)}
         <details><summary>查看未纳入的对象与原因</summary>{view?.excluded_items.map(value=><p key={value.kind+value.id}>{value.kind} / {value.id} / v{value.version} · {morningReason(value.reason)}</p>)}</details></details>
       <details><summary>本人目标与阅读要求</summary><p>{view?.profile.owner_confirmation==="CONFIRMED"?"当前有效本人确认目标":"本人目标尚未设置或当前确认不适用"}</p>{view?.profile.goals?.map(goal=><p key={goal}>{goal}</p>)}{view?.profile.topics?.map(topic=><p key={topic}>关注 {topic}</p>)}<p>{view?.profile.reading_requirement??"阅读要求尚未提供"}</p></details></details></details>
     </aside></div>

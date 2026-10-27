@@ -6,7 +6,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   AlertCircle, ArrowLeft, Bell,
   CheckCircle2,
-  Clock3, FolderOpen, Loader2,
+  Clock3, Loader2,
   Menu, MessageCircle, RefreshCw, Search, Settings,
   X,
 } from "lucide-react";
@@ -215,8 +215,18 @@ function StatusLine({ text, variant = "info" }: { text: string; variant?: "info"
     <span>{text}</span>
   </div>;
 }
+function businessGreeting(clock?: string, timezone?: string) {
+  if (!clock) return "今天想推进什么？";
+  const at = new Date(clock);
+  if (Number.isNaN(at.getTime())) return "今天想推进什么？";
+  const zone = timezone || undefined;
+  const hour = Number(new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", hour12: false, timeZone: zone }).format(at));
+  const date = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric", weekday: "long", timeZone: zone }).format(at);
+  const part = hour < 6 ? "夜深了" : hour < 12 ? "早上好" : hour < 14 ? "中午好" : hour < 18 ? "下午好" : "晚上好";
+  return part + " · " + date + "，今天想推进什么？";
+}
 
-export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onNewConversation,onCreateTaskConversation,onOpenTaskConversation, children, onOpenNative, onBeforeLeaveNative,onRegisterCloseGuard }: Props) {
+export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,onOpenMorning,onCreateTaskConversation,onOpenTaskConversation, children, onOpenNative, onBeforeLeaveNative,onRegisterCloseGuard }: Props) {
   const { client, token } = useClient();
   const [role, setRole] = useState<Role | null>(null);
   const [mvpScope,setMvpScope]=useState(false);
@@ -230,6 +240,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   useEffect(()=>{conversationReturn.current=new URLSearchParams(window.location.search).get("bossConversationReturn")==="N02";},[client]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [directoryOpen, setDirectoryOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [pageFilter, setPageFilter] = useState("");
   const [assignmentDraft, setAssignmentDraft] = useState<AssignmentDraft>(DEFAULT_ASSIGNMENT_DRAFT);
   const [assignmentDirty, setAssignmentDirty] = useState(false);
@@ -308,6 +319,26 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     navigationFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
     setDirectoryOpen(true);
   }, []);
+  useEffect(() => {
+    if (!accountOpen) return;
+    const close = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest(".boss-user-area")) return;
+      setAccountOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAccountOpen(false);
+    };
+    window.addEventListener("pointerdown", close, true);
+    window.addEventListener("keydown", escape);
+    return () => {
+      window.removeEventListener("pointerdown", close, true);
+      window.removeEventListener("keydown", escape);
+    };
+  }, [accountOpen]);
+  useEffect(() => {
+    setAccountOpen(false);
+  }, [page, role]);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if (!role || event.repeat || event.isComposing || event.altKey || !(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;
@@ -551,9 +582,6 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
           <div className="boss-sidebar-label">{sidebarOpen ? (role === "BOSS" ? "老板工作区" : "技术维护工作区") : "◈"}</div>
           <BossPrimaryNavigation role={role} page={page} expanded={sidebarOpen} onNavigate={openMenu} referenceIcon={referenceMenu?id=><ReferenceNavigationIcon id={id}/>:undefined}/>
           <div className="boss-sidebar-bottom">
-            <button type="button" onClick={openDirectory} title="全部菜单目录">
-              {page==="F01"&&!mvpScope?<Settings size={17} aria-hidden="true"/>:<FolderOpen size={17} aria-hidden="true" />}{sidebarOpen && "全部菜单"}
-            </button>
             {(page!=="F01"||mvpScope)&&<button type="button" onClick={() => setSidebarOpen(!sidebarOpen)} title={sidebarOpen ? "收起导航" : "展开导航"}>
               <Menu size={17} aria-hidden="true" />{sidebarOpen && "收起导航"}
             </button>}
@@ -564,25 +592,30 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             <button className="boss-mobile-menu" type="button" onClick={openDirectory}
               aria-label="打开页面目录"><Menu size={19}/></button>
             <button className="boss-search" type="button" onClick={openDirectory}>
-              {["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="search"/>:<Search size={17}/>}<span>搜索全部菜单、页面与专题…</span><kbd>⌘ K</kbd>
+              {["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="search"/>:<Search size={17}/>}<span>搜索功能或事项</span><kbd>⌘ K</kbd>
             </button>
-            {referenceMenu&&<nav className="boss-n02-quicknav" aria-label="老板快捷导航"><button onClick={()=>navigate("F01")}>今日</button><button onClick={()=>{if(["F01","N03"].includes(page))guardLeave(()=>{onNewConversation();navigate("N02","",true);});else onNewConversation();}}>开始对话</button><button disabled title="语音输入暂停">语音</button><button onClick={()=>navigate("N06")}>通知</button></nav>}
             <div className="boss-topright">
               {role==="MAINTAINER"&&<Tag tone="amber">模拟业务资料</Tag>}
-              {allowed("F02",role,mvpScope,priorityScope)&&<button type="button" className="boss-icon-button" title="通知中心"
-                onClick={() => navigate(role === "BOSS" ? "F02" : "N12")}>{["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="notification"/>:<Bell size={18}/>}</button>
-              }
-              <button type="button" className="boss-user" onClick={requestLogout} title="退出当前身份">
-                <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
-                <span>{role === "BOSS" ? "本人" : "技术维护"}<small>{role === "BOSS" ? "已认证本人" : "维护身份"}</small></span>
-              </button>
+              <button type="button" className="boss-icon-button" title="通知中心" aria-label="通知中心"
+                onClick={() => navigate("N06")}>{["F01","N03"].includes(page)&&referenceMenu?<ReferenceHeaderIcon kind="notification"/>:<Bell size={18}/>}</button>
+              <div className="boss-user-area">
+                <button type="button" className="boss-user" aria-expanded={accountOpen} aria-haspopup="menu"
+                  onClick={()=>setAccountOpen(value=>!value)}>
+                  <span className="boss-user-avatar">{role === "BOSS" ? "本人" : "维护"}</span>
+                  <span>{role === "BOSS" ? "老板本人" : "技术管理员"}<small>{role === "BOSS" ? "已认证" : "维护身份"}</small></span>
+                </button>
+                {accountOpen&&<div className="boss-account-menu" role="menu" aria-label="账号与设置">
+                  <button type="button" role="menuitem" onClick={()=>{setAccountOpen(false);navigate(role==="BOSS"?"F26":"N12");}}><Settings size={16}/>{role==="BOSS"?"账号与设置":"实例与访问"}</button>
+                  <button type="button" role="menuitem" onClick={()=>{setAccountOpen(false);requestLogout();}}>退出登录</button>
+                </div>}
+              </div>
             </div>
           </header>
           <section className="boss-stage">
             <div className={"boss-hero " + (["F01","N02","N03"].includes(page) ? "" : "boss-hero-compact")}>
               <div className="boss-hero-copy">
                 <div className="boss-eyebrow" aria-label="当前位置">{role === "BOSS" ? "老板工作台" : "技术维护"} / {metadata?.module || "工作区"}</div>
-                <h1>{page === "F01" ? mvpScope?"今日采购成本事项":"早上好 · 今天想推进什么？" : metadata?.title || "工作页面"}</h1>
+                <h1>{page === "F01" ? mvpScope?"今日采购成本事项":businessGreeting(dashboard?.business_clock,dashboard?.profile.timezone) : metadata?.title || "工作页面"}</h1>
                 <p>{mvpScope&&page==="F01"?"核查同一采购报告的成本变化、原文与本人协调记录。":metadata?.summary || "按照 PRD 查看当前执行过程和资料来源。"}</p>
               </div>
               <img src={page==="N02"?"/boss-brand/dapeng-side.png":["F05","F13","F24","F29"].includes(page) ? "/boss-brand/dapeng-think.png" : ["F06","F07","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"].includes(page) ? "/boss-brand/dapeng-execute.png" : "/boss-brand/dapeng-front.png"} className="boss-hero-mascot" alt="大鹏吉祥物" />
@@ -622,15 +655,16 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 </div>
                 <div className="boss-meta-actions">
                   {role==="BOSS"&&conversationReturn.current&&<button className="boss-btn" type="button" onClick={()=>navigate("N02")}><ArrowLeft size={15}/>返回原会话</button>}
+                  {role==="BOSS"&&!conversationReturn.current&&page!=="F01"&&previousPage==="F01"&&<button className="boss-btn" type="button" onClick={()=>navigate("F01")}><ArrowLeft size={15}/>返回今日工作</button>}
                   {role==="BOSS"&&fromOverview&&<button className="boss-btn" type="button" onClick={returnOverview}><ArrowLeft size={15}/>返回经营关注</button>}
-                  <button type="button" onClick={refresh} disabled={loading} aria-label="重新读取业务数据">
-                    <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> 重新读取
+                  <button type="button" onClick={refresh} disabled={loading||currentEntry?.state==="AUTHENTICATION"} aria-label="刷新当前页面的业务数据" aria-busy={loading} hidden={currentEntry?.state==="AUTHENTICATION"}>
+                    <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> {loading ? "刷新中…" : "刷新"}
                   </button>
                 </div>
               </div>
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
               {loading && <StatusLine text="正在读取当前数据与状态…" />}
-              {currentEntry?.state==="AUTHENTICATION"?<div className="boss-columns"><div className="boss-column"><Panel title="当前认证状态"><Value label="当前身份" value={role==="BOSS"?"本人":"技术维护"}/><p>当前账号已经登录。切换身份需要退出当前账号，然后使用登录表单。</p><GlassButton onClick={requestLogout}>退出当前身份并返回登录</GlassButton></Panel></div></div>:
+              {currentEntry?.state==="AUTHENTICATION"?<div className="boss-columns"><div className="boss-column"><Panel title="当前认证状态"><Value label="当前身份" value={role==="BOSS"?"本人":"技术维护"}/><p>当前账号已经登录。切换身份需要退出当前账号，然后使用登录表单。</p><GlassButton onClick={requestLogout}>退出登录</GlassButton></Panel></div></div>:
                 currentEntry?.state==="PAUSED"?<BossVoicePaused onNavigate={id=>navigate(id)}/>:
                 page==="D06"?<BossUnsavedWorkspace role={role} onNavigate={id=>navigate(id)}/>:
                 page==="D07"?<BossRestrictedView role={role} onNavigate={id=>navigate(id)}/>:
@@ -679,7 +713,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onCreateTask={()=>guardLeave(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);selectTask("",true);})}
                   onNavigate={id=>navigate(id)} onReload={refresh} onDirtyChange={setWorkDirty}
                 /> :
-                page === "N04" ? <BossMeetingLibrary onViewSource={goSource} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
+                page === "N04" ? <BossMeetingLibrary refreshVersion={requestVersion} onViewSource={goSource} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
                 page === "N06" ? <BossNotificationCenter onNavigate={id=>navigate(id)} onOpenTask={selectTask} refreshVersion={requestVersion}/> :
                 page==="D03" ? <BossExecutionRecovery taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)}/> :
                 page==="F29" ? <BossTaskExceptions taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)} onViewSource={goSource} refreshVersion={requestVersion}/> :
@@ -708,7 +742,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 /> :
                 (page === "N07" || page === "N08") ? <BossOwnerPreferences
                   key={page} pageId={page} onNavigate={id=>navigate(id)}
-                  onDirtyChange={setSettingsDirty}
+                  onDirtyChange={setSettingsDirty} refreshVersion={requestVersion}
                 /> :
                 page === "F09" ? <BossResearchView
                   key={page} onNavigate={id=>navigate(id)}

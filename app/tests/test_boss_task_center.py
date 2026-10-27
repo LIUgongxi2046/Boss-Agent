@@ -113,7 +113,7 @@ def test_original_v6_n05_filters_layout_links_real_task_detail():
     overlay=(ROOT/"scripts/prepare_boss_webui.py").read_text()
     assert page["tabs"]==["本人承诺","他人交办","等待反馈","待核查结果"]
     assert page["filters"]==["负责人","有效期限","任务状态","关联会议"]
-    for label in page["tabs"]+page["filters"]:
+    for label in ["全部","我的承诺","我交办的"]+page["filters"]:
         assert label in view
     assert "business_clock" in view and "Date.parse" in view
     assert "source_reference_state" in view

@@ -158,6 +158,13 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
   async function submit(){
     if(busy||uncertain||receiptLoading||!dimensions||denied.current)return;
     if(mode==="FOLLOW_UP"&&(!read||read.adoption_state==="HISTORICAL_REQUIRES_REQUERY")){setError("继续追问需要当前可采用的原查询结果。");return;}
+    const start=String(scope.period_start??""),end=String(scope.period_end??"");
+    if(!start||!end){setError("请选择完整的当前期间开始和结束日期。");return;}
+    if(start>end){setError("当前期间开始日期不能晚于结束日期，请修正后查询。");return;}
+    if(scope.comparison_scope){
+      const compare=scope.comparison_scope as Record<string,ScopeValue>,compareStart=String(compare.comparison_start??""),compareEnd=String(compare.comparison_end??"");
+      if(compareStart&&compareEnd&&compareStart>compareEnd){setError("比较期间开始日期不能晚于结束日期，请修正后查询。");return;}
+    }
     const key=crypto.randomUUID(),version=++generation.current,epoch=identityEpoch.current;activeRequest.current=key;knownRejected.current="";setRequestKey(key);remember(key);
     receiptSequence.current++;setReceiptLoading(false);setReceiptError("");
     setBusy(true);setUncertain(true);setError("");setEvidence(null);setRead(null);setReceipt(null);
@@ -200,8 +207,6 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
   }
   return <div className="boss-bi-view">
     <Panel title="查询范围与继承条件">
-      <div className="boss-form-grid boss-bi-fields"><label>经营资料场景<select aria-label="经营资料场景" value={scenarioId} disabled={busy||uncertain||receiptLoading||accessDenied} onChange={event=>{if(dirty)setNextChoice({kind:"scenario",id:event.target.value});else chooseScenario(event.target.value);}}>
-        <option value="">selection/1 · 当前基准资料</option>{scenarioList.map(row=><option key={row.scenario_id} value={row.scenario_id}>{row.scenario_id} · v{row.version} · {row.record_count} 条记录</option>)}</select></label></div>
       {scenarioError&&<p role="alert">已载入场景读取失败：{scenarioError}</p>}
       {scenarioId&&<p>SIMULATED · 程序行为验证资料，保持原始口径及各自来源。</p>}
       <p>当前资料属性 {dimensions?.source_type??(accessDenied?"无权访问":sourceError?"不可采用":"正在读取")} · 已知覆盖 {dimensions?.coverage_state??"未知"}</p>
@@ -216,7 +221,8 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
           {FIELDS.filter(([field])=>PRIMARY.has(field)).map(([field,label])=>fieldInput(field,label,scope[field],value=>edit(field,value)))}
           {DATES.map(([field,label])=><label key={field}>{label}<input type="date" aria-label={label} required value={String(scope[field]??"")} disabled={formDisabled} onChange={event=>edit(field,event.target.value)}/></label>)}
         </div>
-        <details className="boss-workspace-item"><summary>资料来源与完整业务条件</summary><div className="boss-form-grid boss-bi-fields">{FIELDS.filter(([field])=>!PRIMARY.has(field)).map(([field,label])=>fieldInput(field,label,scope[field],value=>edit(field,value)))}</div></details>
+        <details className="boss-workspace-item"><summary>数据范围与完整业务条件</summary><div className="boss-form-grid boss-bi-fields"><label>数据范围<select aria-label="数据范围" value={scenarioId} disabled={busy||uncertain||receiptLoading||accessDenied} onChange={event=>{if(dirty)setNextChoice({kind:"scenario",id:event.target.value});else chooseScenario(event.target.value);}}>
+          <option value="">当前基准资料</option>{scenarioList.map(row=><option key={row.scenario_id} value={row.scenario_id}>{row.scenario_id} · v{row.version} · {row.record_count} 条记录</option>)}</select></label>{FIELDS.filter(([field])=>!PRIMARY.has(field)).map(([field,label])=>fieldInput(field,label,scope[field],value=>edit(field,value)))}</div></details>
         <details className="boss-workspace-item"><summary>比较期间的业务条件</summary><p>未单独指定的条件继承当前业务范围。</p>
           {FIELDS.map(([field,label])=><div key={field} className="boss-bi-compare-field"><label><input type="checkbox" checked={comparison!==undefined&&field in comparison} disabled={formDisabled}
             onChange={event=>{const next={...comparison};if(event.target.checked)next[field]=scope[field] as string|string[]|null;else delete next[field];edit("comparison_scope",next);}}/>单独指定{label}</label>
@@ -227,6 +233,7 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
       </form>
     </Panel>
     <div className="boss-bi-columns"><main className="boss-column"><Panel title="经营指标与趋势">
+      {visible&&<div className="boss-actions"><button type="button" className="boss-button" disabled={formDisabled||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>{setMode("FOLLOW_UP");document.querySelector<HTMLTextAreaElement>('textarea[aria-label="经营问题"]')?.focus();}}>继续追问</button></div>}
       {dirty&&<p role="status">条件已经编辑，请提交查询获取对应结果。</p>}
       {visible?<><p>{read?.adoption_state} · 查询 {visible.query_id} · {visible.queried_at}</p><div className="boss-table-scroll"><table className="boss-table boss-bi-table"><thead><tr><th>指标</th><th>基准期</th><th>当前期</th><th>单位</th><th>变化量</th></tr></thead>
         <tbody>{(visible.context_snapshot.metric_ids as string[]).map(metric=>{const find=(period:string)=>visible.values.find(value=>value.metric_id===metric&&value.period_scope===period);const base=find("BASE"),current=find("CURRENT"),change=find("CHANGE");return <tr key={metric}><th scope="row">{LABELS[metric]??metric}</th><td>{base?.value??"未定义"}</td><td>{current?.value??"未定义"}</td><td>{current?.unit}</td><td>{change?.value??"未定义"} {change?.unit}</td></tr>;})}</tbody></table></div>
@@ -234,7 +241,7 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
       {read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"&&<p role="status">历史查询需要重新查询，当前原始依据不可采用。历史条件与原始数值保留供查阅。</p>}
       <h3>经营趋势</h3>{visible?.trends?.map(trend=><div className="boss-table-scroll" key={trend.metric_id}><table className="boss-table"><caption>{LABELS[trend.metric_id]??trend.metric_id} · {trend.unit} · 定义版本 {trend.definition_version}</caption><thead><tr><th>期间</th><th>原始值</th><th>覆盖状态</th></tr></thead><tbody>{trend.points.map(point=><tr key={point.period_start+point.period_end}><td>{point.period_start} 至 {point.period_end}</td><td>{point.value??"未定义"}</td><td>{point.coverage_state}</td></tr>)}</tbody></table></div>)}{!visible?.trends?.length&&<p className="boss-helper">当前查询尚未提供连续期间的趋势序列；指标比较保留正式返回的原始数值。</p>}
     </Panel>
-    <Panel title="数据明细与资料覆盖"><button className="boss-button" disabled={!visible||reading||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>void readEvidence()}>{reading?"正在读取本次依据":"读取本次查询原始依据"}</button>
+    <Panel title="数据明细与资料覆盖"><button className="boss-button" disabled={!visible||reading||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>void readEvidence()}>{reading?"正在读取计算依据":"查看计算与依据"}</button>
       {evidence&&<><p>查询 {evidence.query_id} · 定义版本 {evidence.result.definition_version}</p>{evidence.result.original_records.map(record=><details key={record.record_id} className="boss-workspace-item"><summary>{record.record_id} · v{record.version}</summary><BIRecordContent value={record.content}/></details>)}{[...evidence.result.conflicts,...evidence.result.missing_fields].map((text,index)=><p key={index}>{text}</p>)}</>}
       {!accessDenied&&(dimensions||read||sourceError)&&<details className="boss-workspace-item"><summary>不同口径并列核查</summary><BIBasisComparison key={identityEpoch.current} current={visible?read??null:null} request={fetchJSON} onSource={onSource} reviewKey={(read?.result.query_id??"")+":"+(read?.adoption_state??"")+":"+sourceError+":"+dimensionSourceKey}/></details>}
     </Panel>
@@ -242,19 +249,19 @@ function BIView({getToken,onSource,initialScope,onDirtyChange,refreshVersion=0}:
     <Panel title="来源与依据">{visible?<><p>覆盖 {visible.coverage.state} · 缺少地区 {visible.coverage.missing_regions.join("、")||"当前选择范围没有额外缺少地区"}</p>
       <p>延迟地区 {visible.coverage.delayed_regions?.join("、")??"未知"} · 未同步地区 {visible.coverage.unsynchronized_regions?.join("、")??"未知"}</p>
       {Object.entries(visible.coverage.periods).map(([period,coverage])=><p key={period}>{period} · {coverage.period_start} 至 {coverage.period_end} · {coverage.record_count} 条明细 · {coverage.region_ids.join("、")}</p>)}
-      {visible.sources.map(source=><div className="boss-workspace-item" key={source.source_id}><p>{source.source_id} · v{source.version} · {source.source_type} · {source.quality_state}</p><p>覆盖 {source.coverage} · 业务截至 {source.business_as_of} · 来源更新 {source.source_updated_at}</p><button className="boss-button" disabled={accessDenied||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>onSource(source.source_id)}>打开当前来源原文</button></div>)}</>:<p>来源 {dimensions?.source_id??(sourceError?"当前不可采用":"正在读取")} · v{dimensions?.source_version??"未知"}</p>}
+      {visible.sources.map(source=><div className="boss-workspace-item" key={source.source_id}><p>{source.source_id} · v{source.version} · {source.source_type} · {source.quality_state}</p><p>覆盖 {source.coverage} · 业务截至 {source.business_as_of} · 来源更新 {source.source_updated_at}</p><button className="boss-button" disabled={accessDenied||read?.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>onSource(source.source_id)}>查看依据</button></div>)}</>:<p>来源 {dimensions?.source_id??(sourceError?"当前不可采用":"正在读取")} · v{dimensions?.source_version??"未知"}</p>}
       {visible&&<details className="boss-bi-formulas"><summary>原始精度与计算公式</summary>{visible.values.map(value=><article className="boss-workspace-item" key={value.metric_id+value.period_scope}><h3>{LABELS[value.metric_id]??value.metric_id} · {value.period_scope}</h3><p>原始值 {value.value??"未定义"} · {value.unit} · 定义版本 {value.definition_version}</p><p>{value.formula}</p><p>{value.display_rounding}</p><p>{value.scope_description}</p></article>)}</details>}
     </Panel>
     <Panel title="状态与核查"><p>刷新、重新登录和连接中断后，可以读取保存的原请求。</p><p>当前请求 {receipt?.client_request_id??(requestKey||"尚未提交")}</p><p>运行状态 {receiptLoading?"正在读取":receipt?.request_state??(requestKey?"尚未确认":"尚未提交")} · 查询回执 {receipt?.receipt?.outcome??"未知"}</p>
       {receiptError&&<p role="alert" className="boss-status boss-status-warn">原请求读取失败：{receiptError}</p>}
-      {uncertain&&<p role="status">原查询结果尚未确定，请读取原请求结果后继续。</p>}<button className="boss-button" disabled={!requestKey||busy||receiptLoading||accessDenied} onClick={()=>{if(dirty&&!uncertain)setNextChoice({kind:"receipt",id:requestKey});else void restore(requestKey);}}>读取原请求结果</button>
+      {uncertain&&<p role="status">原查询结果尚未确定，请查询原请求结果后继续。</p>}{(uncertain||receiptError)&&<button className="boss-button" disabled={!requestKey||busy||receiptLoading||accessDenied} onClick={()=>{if(dirty&&!uncertain)setNextChoice({kind:"receipt",id:requestKey});else void restore(requestKey);}}>查询原请求结果</button>}
       {historyLoading&&<p role="status">正在读取历史请求。</p>}
       {historyError&&<p role="alert" className="boss-status boss-status-warn">历史请求读取失败：{historyError}</p>}
       {!historyLoading&&!historyError&&!accessDenied&&history.requests.length===0&&<p>尚无历史请求。</p>}
       <ul className="boss-bi-history">{history.requests.map(item=><li key={item.client_request_id}><button className="boss-button" disabled={busy||uncertain||receiptLoading||accessDenied} onClick={()=>{if(dirty)setNextChoice({kind:"receipt",id:item.client_request_id});else void restore(item.client_request_id);}}>{item.created_at} · {item.client_request_id}</button></li>)}</ul>
       <h3>可解释性与缺口</h3>{(visible?[...visible.unexplained_causes,...visible.missing_fields]:dimensions?.missing_fields??[]).map((text,index)=><p key={index} className="boss-status boss-status-warn">{text}</p>)}<p>查询与讨论不产生交办、批准或发送授权。</p>
     </Panel>
-  </aside></div><footer className="boss-actions boss-bi-footer"><button className="boss-button boss-button-primary" type="submit" form="boss-bi-query-form" disabled={formDisabled||!question.trim()||mode==="FOLLOW_UP"&&!read}>{busy?"正在查询":"提交查询"}</button><button type="button" className="boss-button" disabled={formDisabled||!read||read.adoption_state==="HISTORICAL_REQUIRES_REQUERY"} onClick={()=>{setMode("FOLLOW_UP");document.querySelector<HTMLTextAreaElement>('textarea[aria-label="经营问题"]')?.focus();}}>继续追问</button><button className="boss-button" type="button" disabled={!requestKey||!uncertain||cancelBusy||accessDenied} onClick={()=>void cancel()}>{cancelBusy?"正在请求取消":"取消当前查询"}</button></footer>
+  </aside></div><footer className="boss-actions boss-bi-footer"><button className="boss-button boss-button-primary" type="submit" form="boss-bi-query-form" disabled={formDisabled||!question.trim()||mode==="FOLLOW_UP"&&!read}>{busy?"查询中…":"查询"}</button><button className="boss-button" type="button" disabled={!requestKey||!uncertain||cancelBusy||accessDenied} onClick={()=>void cancel()}>{cancelBusy?"正在请求停止":"停止查询"}</button></footer>
   <Dialog.Root open={nextChoice!==null} onOpenChange={open=>{if(!open)setNextChoice(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>核查未提交查询条件</Dialog.Title><Dialog.Description>继续后将清除当前未提交的经营问题和范围编辑，采用所选场景或原请求中的完整条件。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button type="button" className="boss-btn">保留编辑</button></Dialog.Close><button type="button" className="boss-btn boss-btn-primary" disabled={busy||uncertain||receiptLoading} onClick={()=>{if(!nextChoice)return;const next=nextChoice;setNextChoice(null);if(next.kind==="scenario")chooseScenario(next.id);else void restore(next.id);}}>放弃编辑并继续</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
 }

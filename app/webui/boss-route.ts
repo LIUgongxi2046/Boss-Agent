@@ -11,7 +11,7 @@ export function menuPageUrl(address:string,id:string,role:Role):URL{
   const page=bossPageId(id,role);
   if(!deliveredPage(page,role))throw new Error("当前身份没有此菜单入口");
   const url=new URL(address);
-  for(const key of ["bossReturn","bossConversationReturn","bossSource","bossSourceVersion","bossSourceStart","bossSourceEnd","bossSourceReferenceVersion","bossTask","bossSop","bossEvent","bossEventVersion","bossOwnerRecord","bossHistoryRecord","bossSimulationSection","bossLibraryContext","bossLibraryAction","libraryTab","libraryQuery","libraryDate","libraryState","librarySelected","taskTab","taskCoordinator","taskBefore","taskState","taskMeeting","bossCommitment","bossRun","bossIssue","bossRecoveryRequest","bossRecoveryAction","overviewReturn","overviewQuerySnapshot","overviewSectorReference"])url.searchParams.delete(key);
+  for(const key of ["bossReturn","bossConversationReturn","bossSource","bossSourceVersion","bossSourceStart","bossSourceEnd","bossSourceReferenceVersion","bossTask","bossSop","bossEvent","bossEventVersion","bossOwnerRecord","bossHistoryRecord","bossSimulationSection","bossLibraryContext","bossLibraryAction","libraryTab","libraryQuery","libraryDateFrom","libraryDateTo","libraryState","librarySelected","taskTab","taskCoordinator","taskBefore","taskState","taskMeeting","bossCommitment","bossRun","bossIssue","bossRecoveryRequest","bossRecoveryAction","overviewReturn","overviewQuerySnapshot","overviewSectorReference"])url.searchParams.delete(key);
   url.searchParams.set("bossPage",page);
   return url;
 }
