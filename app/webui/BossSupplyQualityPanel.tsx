@@ -31,13 +31,14 @@ const ACTION="boss.supply_quality.coordinate";
 const value=(quantity:string|null,unit="")=>quantity===null?"未知":quantity+(unit?" "+unit:"");
 function Card({title,children}:{title:string;children:ReactNode}){return <section className="boss-panel"><div className="boss-panel-head"><h2>{title}</h2></div>{children}</section>;}
 const FIELD_LABELS:Record<string,string>={material_id:"原料编号",product_id:"产品编号",legal_entity_id:"法人编号",asset_owner_id:"资产归属",cost_owner_id:"成本归属",quantity:"数量",quantity_unit:"数量单位",currency:"币种",price:"行情价格",price_unit:"价格单位",origin:"产地",quoted_at:"报价时间",contract_id:"合同编号",unit_price:"合同单价",quality_state:"库存质量",quality_requirements:"质量要求",quality_requirement:"质量要求",formula_id:"配方编号",professional_state:"专业状态",composition_complete:"配方完整性",ingredients:"配方组成",ratio:"配方比例",ratio_unit:"比例单位",valid_from:"有效起始",valid_until:"有效截至",batch_id:"批次编号",input_batch_id:"原料批次",output_batch_id:"产出批次",processing_id:"加工编号",inventory_id:"库存编号",customer_id:"客户编号",complaint_id:"客诉编号",trace_id:"关系编号",trace_state:"关系状态",inspection_state:"检验状态",input_quantity:"投入数量",output_quantity:"产出数量",loss_quantity:"损耗数量",destination_quantity:"流向数量",professional_record_id:"专业意见编号",author_contact_id:"专业作者",applicability:"适用范围",content:"专业内容",conclusion:"专业结论",followup_at:"后续检查时间",coverage:"资料覆盖",description:"说明",event_id:"原事件编号",state:"当前状态",order_id:"订单编号",status:"业务状态",delivery_window:"交付时间",starts_at:"开始时间",ends_at:"结束时间",report_scope_id:"报告范围",cost_basis_id:"成本口径",period_start:"期间开始",period_end:"期间结束",total_cost:"报告总成本",unit_cost:"报告单位成本",purpose:"用途",species:"品类",stage:"阶段"};
+const REVIEW_STATE_LABELS:Record<string,string>={PENDING_REVIEW:"待专业复核",PROFESSIONALLY_CONFIRMED:"专业已确认",REVIEW_RESULT_REPORTED:"复核结果已报告"};
 function RecordValue({item}:{item:unknown}):ReactNode{if(item===null||item===undefined)return "未知";if(Array.isArray(item))return item.length?item.map((value,index)=><div key={index}><RecordValue item={value}/></div>):"当前没有记录";if(typeof item==="object")return <RecordFields data={item as Record<string,unknown>}/>;return String(item);}
 function RecordFields({data}:{data:Record<string,unknown>}){return <dl className="boss-supply-record-fields">{Object.entries(data).map(([key,item])=><div key={key}><dt>{FIELD_LABELS[key]??key}</dt><dd><RecordValue item={item}/></dd></div>)}</dl>;}
 
 export function BossSupplyQualityPanel({interfaceId,data,loading,error,onReload,onOpenSource,onOpenTask,onCommand,onReceipt,editor,onEditorChange}:Props){
   const heading=useId();
   const [search,setSearch]=useState("");
-  const [showCoordination,setShowCoordination]=useState(false),detailsRef=useRef<HTMLElement|null>(null),linksRef=useRef<HTMLDivElement|null>(null);
+  const [showCoordination,setShowCoordination]=useState(false),detailsRef=useRef<HTMLElement|null>(null),linksRef=useRef<HTMLDivElement|null>(null),costRef=useRef<HTMLDivElement|null>(null),reviewRef=useRef<HTMLDivElement|null>(null),affectedRef=useRef<HTMLDivElement|null>(null);
   const {originId,purpose,due,evidence,approvedFor,pending}=editor;
   const coordinatorId=editor.coordinatorId??"",timezone=editor.timezone??"";
   const setOriginId=(originId:string)=>onEditorChange({originId});
@@ -77,7 +78,7 @@ export function BossSupplyQualityPanel({interfaceId,data,loading,error,onReload,
     },(reason:unknown)=>{setBusy(false);setFailure(reason instanceof Error?reason.message:String(reason));
       if(!reconcile&&reason instanceof Error&&"status" in reason&&typeof reason.status==="number"&&[400,401,403,404,409,410,422].includes(reason.status)){remember("Preparation",null);onEditorChange({pendingPreparation:null});}});
   }
-  function saved(){remember("Coordinate",null);onEditorChange({...EMPTY_SUPPLY_EDITOR});setBusy(false);setShowCoordination(false);setNotice("协调任务已经保存，请打开交办查看发送与后续状态。");onReload();}
+  function saved(){remember("Coordinate",null);onEditorChange({...EMPTY_SUPPLY_EDITOR});setBusy(false);setShowCoordination(false);setNotice("交办任务已经保存，请打开交办查看发送与后续状态。");onReload();}
   async function submit(){
     if(busy||pending||editor.pendingPreparation||!ready||approvedFor!==approvalKey)return;
     const payload={client_request_id:"supply-coordinate-"+crypto.randomUUID(),interface_id:data!.interface_id,
@@ -111,9 +112,9 @@ export function BossSupplyQualityPanel({interfaceId,data,loading,error,onReload,
       setFailure("当前没有查到原请求回执，执行结果仍未确定。请保留原请求编号继续核查。");onReload();
     },(error:unknown)=>{setBusy(false);setFailure(error instanceof Error?error.message:String(error));});
   }
+  const reviewRecords=data?.records.filter(record=>record.entity_type==="professional_record"&&(typeof record.data.event_id==="string"||typeof record.data.batch_id==="string"))??[];
   return <div className="boss-supply-workspace" aria-labelledby={heading}>
-    <div className="boss-workspace-toolbar"><strong id={heading}>{interfaceId==="SI10"?"批次追溯与品质核查":"原料与库存协调"}</strong>
-      <button type="button" className="boss-btn" disabled={loading||busy} onClick={onReload}>重新读取当前资料</button></div>
+    <div className="boss-workspace-toolbar"><strong id={heading}>{interfaceId==="SI10"?"批次追溯与品质核查":"原料与库存协调"}</strong></div>
     <p className="boss-helper">SIMULATED · 当前外部资料仅用于程序行为检查；专业结论、采购执行与质量放行分别由原业务系统负责。</p>
     {loading&&<p role="status">正在读取当前来源与业务资料</p>}
     {(error||failure)&&<p className="boss-status boss-status-error" role="alert">{error||failure}</p>}
@@ -123,7 +124,7 @@ export function BossSupplyQualityPanel({interfaceId,data,loading,error,onReload,
     {pending&&<section aria-label="协调原请求核查"><p className="boss-helper" role="status">请求编号：{String(pending.client_request_id)}；执行结果通过原请求核查。</p>
       <div className="boss-actions"><button type="button" className="boss-btn" disabled={busy} onClick={()=>void reconcile()}>核查原请求回执</button></div></section>}
     {stale&&<p className="boss-status boss-status-warn">当前资料或协调状态已经变化，编辑内容需要重新核查。<button type="button" className="boss-btn" disabled={busy||Boolean(pending)||Boolean(editor.pendingPreparation)} onClick={()=>onEditorChange({basis:data?.review_sha256,approvedFor:null,prepared:null})}>采用当前依据重新核查</button></p>}
-    <div className="boss-supply-columns"><main className="boss-column"><Card title={interfaceId==="SI09"?"经营指标与趋势":"关系与来源核查"}>
+    <div className="boss-supply-columns"><main className="boss-column"><div ref={costRef} tabIndex={-1}><Card title={interfaceId==="SI09"?"经营指标与趋势":"关系与来源核查"}>
     {data&&<>
       <p>资料版本 {data.dataset_version} · 业务时间 {data.business_at} · 读取时间 {data.read_at}</p>
       <p>最近导入：{data.last_import?data.last_import.state+" · "+data.last_import.record_count+" 条记录 · "+data.last_import.received_at:"尚无导入记录"}</p>
@@ -146,48 +147,64 @@ export function BossSupplyQualityPanel({interfaceId,data,loading,error,onReload,
           {report.baseline&&<p>基期 {report.baseline.period_start} 至 {report.baseline.period_end} · 数量 {value(report.baseline.quantity,report.quantity_unit)} · 金额 {value(report.baseline.total_cost,report.currency)} · 单位成本 {value(report.baseline.unit_cost,report.currency+"/"+report.quantity_unit)}</p>}
           <p>报告单位成本变化 {value(report.unit_cost_change,report.currency+"/"+report.quantity_unit)} · 报告总成本变化 {value(report.total_cost_change,report.currency)} · 比较状态 {report.comparison_state}</p>
           <p className="boss-helper">{report.formula}</p>{report.missing_fields.map(field=><p className="boss-helper" key={field}>{field}</p>)}
-          <button type="button" className="boss-btn" disabled={busy} onClick={()=>onOpenSource(report.current.source_id)}>打开当前成本报告</button>
+          <button type="button" className="boss-btn" disabled={busy} onClick={()=>onOpenSource(report.current.source_id)}>查看依据</button>
         </section>)}
         {row.excluded_inventory.length>0&&<p>排除库存：{row.excluded_inventory.map(item=>item.inventory_id+"（"+item.reason+"）").join("、")}</p>}
       </article>)}
       {data.trace&&<section aria-label="批次关系与数量">
-        <h3>加工投入与产出</h3>{data.trace.processing_totals.map(row=><p key={row.processing_id}>{row.processing_id}：投入 {value(row.input_quantity,row.quantity_unit)}；产出 {value(row.output_quantity,row.quantity_unit)}；损耗 {value(row.loss_quantity,row.quantity_unit)}</p>)}
-        <h3>已确认库存关系</h3>{data.trace.confirmed_inventory.map((row,index)=><p key={index}>{row.inventory_id} · 产出批次 {row.batch_id} · {value(row.quantity,row.quantity_unit)}</p>)}
-        <h3>已确认客户关系</h3>{data.trace.confirmed_customers.map((row,index)=><p key={index}>{row.customer_id} · {value(row.quantity,row.quantity_unit)}</p>)}
+        <div className="boss-workspace-toolbar"><h3>加工投入与产出</h3><button type="button" className="boss-btn" onClick={()=>{affectedRef.current?.scrollIntoView({block:"start",behavior:"smooth"});affectedRef.current?.focus();}}>查看受影响库存／客户</button></div>{data.trace.processing_totals.map(row=><p key={row.processing_id}>{row.processing_id}：投入 {value(row.input_quantity,row.quantity_unit)}；产出 {value(row.output_quantity,row.quantity_unit)}；损耗 {value(row.loss_quantity,row.quantity_unit)}</p>)}
+        <div ref={affectedRef} tabIndex={-1} aria-label="受影响库存与客户">
+          <h3>已确认库存关系</h3>{data.trace.confirmed_inventory.map((row,index)=><p key={index}>{row.inventory_id} · 产出批次 {row.batch_id} · {value(row.quantity,row.quantity_unit)}</p>)}
+          <h3>已确认客户关系</h3>{data.trace.confirmed_customers.map((row,index)=><p key={index}>{row.customer_id} · {value(row.quantity,row.quantity_unit)}</p>)}
+          {!data.trace.confirmed_inventory.length&&!data.trace.confirmed_customers.length&&<p className="boss-helper">尚无关系证据支持的库存或客户，影响数量未知。</p>}
+        </div>
         {Object.entries(data.trace.relationships_by_state).map(([state,rows])=><details key={state} open={state==="CONFIRMED"}><summary>{state} · {rows.length} 条关系</summary>{rows.map((row,index)=><article className="boss-workspace-item" key={index}><RecordFields data={row}/></article>)}</details>)}
         <p className="boss-helper">关系确认、专业意见和原质量事件分别保存；当前关系不构成质量原因确认。</p>
       </section>}
       {interfaceId==="SI09"&&<p className="boss-helper">趋势依据当前与基期成本报告展示；报价变化、合同价格与实际成本各自采用对应资料。</p>}
-    </>}{!data&&!loading&&<p className="boss-helper">等待取得与当前查询条件一致的计算及关系结果。</p>}</Card>
+    </>}{!data&&!loading&&<p className="boss-helper">等待取得与当前查询条件一致的计算及关系结果。</p>}</Card></div>
       <section className="boss-panel" ref={detailsRef} tabIndex={-1} aria-label="业务原始记录"><div className="boss-panel-head"><h2>{interfaceId==="SI09"?"数据明细与资料覆盖":"关联记录"}</h2></div>
         <label className="boss-field">查找当前记录编号<input value={search} onChange={event=>setSearch(event.target.value)}/></label>
+        <p className="boss-helper">展开一条记录后可查看原始记录，或将其采用为交办依据；页面底部准备交办时需要选择一条依据。</p>
         {data?.records.filter(record=>!search.trim()||record.record_id.includes(search.trim())).map(record=><details key={record.entity_type+":"+record.record_id}>
           <summary>{record.entity_type} · {record.record_id} · v{record.version} · {record.state}</summary>
           <p>作者 {record.author_contact_id} · 观察 {record.observed_at} · 生效 {record.valid_from} · 到期 {record.valid_until??"尚未提供"}</p>
-          <RecordFields data={record.data}/><div className="boss-actions"><button type="button" className="boss-btn" disabled={busy} onClick={()=>onOpenSource(record.source_id)}>打开当前原始记录</button><button type="button" className="boss-btn" disabled={busy||Boolean(pending)||Boolean(editor.pendingPreparation)} onClick={()=>{if(originId&&originId!==record.entity_type+":"+record.record_id&&(purpose||due||evidence)){setFailure("协调表单已有编辑内容，请在表单中明确选择依据");setShowCoordination(true);return;}onEditorChange({originId:record.entity_type+":"+record.record_id,basis:data.review_sha256,approvedFor:null,prepared:null});setShowCoordination(true);}}>核查协调依据</button></div>
+          <RecordFields data={record.data}/><div className="boss-actions"><button type="button" className="boss-btn" disabled={busy} onClick={()=>onOpenSource(record.source_id)}>查看原始记录</button><button type="button" className="boss-btn" disabled={busy||Boolean(pending)||Boolean(editor.pendingPreparation)} onClick={()=>{if(originId&&originId!==record.entity_type+":"+record.record_id&&(purpose||due||evidence)){setFailure("交办表单已有编辑内容，请在表单中明确选择依据");setShowCoordination(true);return;}onEditorChange({originId:record.entity_type+":"+record.record_id,basis:data.review_sha256,approvedFor:null,prepared:null});setShowCoordination(true);}}>采用为交办依据</button></div>
         </details>)}
         {data?.source_statuses.filter(record=>record.data===null).map(record=><p key={record.record_id} role="status">{record.record_id}：需要核查当前来源；{record.source_refs.filter(reference=>reference.status!=="VALID").map(reference=>reference.source_id+" · "+reference.status).join("；")}</p>)}
         {data&&!data.records.length&&<p className="boss-helper">当前范围没有可采用的原始记录。</p>}
       </section>
     </main><aside className="boss-column"><Card title="来源与依据">
       <div className="boss-kv"><span>执行空间</span><strong>{data?.execution_namespace??"尚未提供"}</strong></div><div className="boss-kv"><span>资料版本</span><strong>{data?.dataset_version??"尚未提供"}</strong></div><div className="boss-kv"><span>业务时间</span><strong>{data?.business_at??"尚未提供"}</strong></div><div className="boss-kv"><span>核查摘要</span><strong>{data?.review_sha256??"尚未提供"}</strong></div>
-      {data?.records.filter(record=>["feed_formula","professional_record"].includes(record.entity_type)||record.entity_type+":"+record.record_id===originId).map(record=><article className="boss-workspace-item" key={record.entity_type+":"+record.record_id}><strong>{record.entity_type} · {record.record_id}</strong><p>作者：{record.author_contact_id}</p><p>版本：{record.version} · 来源：{record.source_id} / v{record.source_version}</p><p>观察时间：{record.observed_at}</p><p>有效期：{record.valid_from} — {record.valid_until??"尚未提供"}</p><p>专业状态：{record.state}</p><RecordFields data={record.data}/><button type="button" className="boss-btn" onClick={()=>onOpenSource(record.source_id)}>核查当前来源</button></article>)}
+      {data?.records.filter(record=>["feed_formula","professional_record"].includes(record.entity_type)||record.entity_type+":"+record.record_id===originId).map(record=><article className="boss-workspace-item" key={record.entity_type+":"+record.record_id}><strong>{record.entity_type} · {record.record_id}</strong><p>作者：{record.author_contact_id}</p><p>版本：{record.version} · 来源：{record.source_id} / v{record.source_version}</p><p>观察时间：{record.observed_at}</p><p>有效期：{record.valid_from} — {record.valid_until??"尚未提供"}</p><p>专业状态：{record.state}</p><RecordFields data={record.data}/><button type="button" className="boss-btn" onClick={()=>onOpenSource(record.source_id)}>查看依据</button></article>)}
       <p className="boss-helper">有效配方、专业意见和检验记录按正式来源及时间范围采用。未知关系和缺少成本依据继续保留。</p>
-    </Card><Card title="状态与核查"><div className="boss-kv"><span>资料可用性</span><strong>{data?.availability??"尚未查询"}</strong></div><div className="boss-kv"><span>读取时间</span><strong>{data?.read_at??"尚未提供"}</strong></div><h3>资料缺少范围</h3>{data?.missing_fields.map(field=><p className="boss-helper" key={field}>{field}</p>)}<h3>原质量事件</h3>{data?.events.map(event=><article className="boss-workspace-item" key={event.record_id}><strong>{event.record_id}</strong><p>原事件版本：{event.version}</p><p>专业处理状态：{event.state}</p><button type="button" className="boss-btn" onClick={()=>onOpenSource(event.source_id)}>核查原事件</button></article>)}{data&&!data.events.length&&<p className="boss-helper">当前范围没有原质量事件。</p>}
-      <div ref={linksRef} tabIndex={-1}><h3>协调交办与后续检查</h3>{data?.coordination_links.map(link=><article className="boss-workspace-item" key={link.task_id}><strong>{link.task_id}</strong><p>依据：{link.origin_record_id} / v{link.origin_version}</p><button type="button" className="boss-btn" disabled={busy||Boolean(pending)} onClick={()=>onOpenTask(link.task_id)}>核查交办与后续检查</button></article>)}{data&&!data.coordination_links.length&&<p className="boss-helper">当前没有协调交办记录。</p>}</div><p className="boss-helper">协调完成与供应恢复、原事件状态、质量放行分别核查。</p>
+    </Card><Card title="状态与核查"><div className="boss-kv"><span>资料可用性</span><strong>{data?.availability??"尚未查询"}</strong></div><div className="boss-kv"><span>读取时间</span><strong>{data?.read_at??"尚未提供"}</strong></div><h3>资料缺少范围</h3>{data?.missing_fields.map(field=><p className="boss-helper" key={field}>{field}</p>)}<h3>原质量事件</h3>{data?.events.map(event=><article className="boss-workspace-item" key={event.record_id}><strong>{event.record_id}</strong><p>原事件版本：{event.version}</p><p>专业处理状态：{event.state}</p><button type="button" className="boss-btn" onClick={()=>onOpenSource(event.source_id)}>查看依据</button></article>)}{data&&!data.events.length&&<p className="boss-helper">当前范围没有原质量事件。</p>}
+      {interfaceId==="SI10"&&<div ref={reviewRef} tabIndex={-1}><h3>复核记录</h3>{reviewRecords.length?reviewRecords.map(record=><article className="boss-workspace-item" key={record.entity_type+":"+record.record_id}><strong>{record.record_id}</strong><p>记录作者：{record.author_contact_id} · 版本：{record.version}</p><p>复核状态：{REVIEW_STATE_LABELS[record.state]??record.state}</p><RecordFields data={record.data}/><button type="button" className="boss-btn" onClick={()=>onOpenSource(record.source_id)}>查看依据</button></article>):<p className="boss-helper">尚未复核：当前资料没有复核记录。</p>}</div>}
+      <div ref={linksRef} tabIndex={-1}><h3>协调交办与后续检查</h3>{data?.coordination_links.map(link=><article className="boss-workspace-item" key={link.task_id}><strong>{link.task_id}</strong><p>依据：{link.origin_record_id} / v{link.origin_version}</p><button type="button" className="boss-btn" disabled={busy||Boolean(pending)} onClick={()=>onOpenTask(link.task_id)}>打开协调任务</button></article>)}{data&&!data.coordination_links.length&&<p className="boss-helper">当前没有协调交办记录。</p>}</div><p className="boss-helper">协调完成与供应恢复、原事件状态、质量放行分别核查。</p>
     </Card></aside></div>
-    <footer className="boss-supply-footer boss-actions"><button type="button" className="boss-btn" disabled={!data} onClick={()=>{detailsRef.current?.scrollIntoView({block:"start",behavior:"smooth"});detailsRef.current?.focus();}}>{interfaceId==="SI09"?"查看明细与假设":"打开原始记录"}</button>{interfaceId==="SI09"?<button type="button" className="boss-btn" disabled title="当前来源范围的会议材料准备尚待服务接入">准备会议</button>:<button type="button" className="boss-btn" disabled={!data} onClick={()=>{linksRef.current?.scrollIntoView({block:"start",behavior:"smooth"});linksRef.current?.focus();}}>查看后续检查</button>}<button type="button" className="boss-btn boss-btn-primary" disabled={!data||busy} onClick={()=>setShowCoordination(true)}>{interfaceId==="SI09"?"授权资源协调":"授权统筹交办"}</button></footer>
-    <Dialog.Root open={showCoordination} onOpenChange={open=>{if(!busy)setShowCoordination(open);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog boss-supply-dialog"><Dialog.Title>授权统筹交办</Dialog.Title><Dialog.Description>核查当前来源、负责人、期限和证据要求。协调任务需要独立发送与完成确认。</Dialog.Description><section aria-label="本人协调交办">
+    {data?<footer className="boss-supply-footer boss-actions">
+      {interfaceId==="SI09"?<>
+        <button type="button" className="boss-btn" onClick={()=>{costRef.current?.scrollIntoView({block:"start",behavior:"smooth"});costRef.current?.focus();}}>查看成本明细与计算条件</button>
+        <button type="button" className="boss-btn" disabled aria-describedby={heading+"-meeting"}>准备成本分析会议</button>
+        <span className="boss-helper" id={heading+"-meeting"}>准备成本分析会议需要会议时间、参会人与材料服务；当前服务尚未接入。</span>
+        <button type="button" className="boss-btn boss-btn-primary" disabled={busy||data.records.length===0} onClick={()=>setShowCoordination(true)}>准备协调交办</button>
+      </>:<>
+        <button type="button" className="boss-btn" onClick={()=>{reviewRef.current?.scrollIntoView({block:"start",behavior:"smooth"});reviewRef.current?.focus();}}>复核记录</button>
+        <button type="button" className="boss-btn boss-btn-primary" disabled={busy||data.records.length===0} onClick={()=>setShowCoordination(true)}>准备品质核查交办</button>
+      </>}
+      {data.records.length===0&&<span className="boss-helper">当前范围没有可交办的记录，请核查导入状态与资料范围。</span>}
+    </footer>:<p className="boss-helper">查询后显示当前范围可用的后续操作；未选择对象时不显示业务操作。</p>}
+    <Dialog.Root open={showCoordination} onOpenChange={open=>{if(!busy)setShowCoordination(open);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog boss-supply-dialog"><Dialog.Title>{interfaceId==="SI09"?"准备协调交办":"准备品质核查交办"}</Dialog.Title><Dialog.Description>核查当前来源、负责人、期限和证据要求。交办任务需要独立发送与完成确认。</Dialog.Description><section aria-label="本人交办表单">
         <fieldset disabled={busy||loading||!data||stale||Boolean(pending)||Boolean(editor.pendingPreparation)||data.records.length===0}>
-          <label className="boss-field">协调依据<select aria-label="协调依据" value={originId} onChange={event=>{setOriginId(event.target.value);changed();}}><option value="">请选择当前记录</option>{data?.records.map(record=><option key={record.entity_type+":"+record.record_id} value={record.entity_type+":"+record.record_id}>{record.entity_type} · {record.record_id} · v{record.version}</option>)}</select></label>
-          <label className="boss-field">协调目的<textarea aria-label="协调目的" maxLength={2000} value={purpose} onChange={event=>{setPurpose(event.target.value);changed();}}/></label>
+          <label className="boss-field">交办依据<select aria-label="交办依据" value={originId} onChange={event=>{setOriginId(event.target.value);changed();}}><option value="">请选择当前记录</option>{data?.records.map(record=><option key={record.entity_type+":"+record.record_id} value={record.entity_type+":"+record.record_id}>{record.entity_type} · {record.record_id} · v{record.version}</option>)}</select></label>
+          <label className="boss-field">交办目的<textarea aria-label="交办目的" maxLength={2000} value={purpose} onChange={event=>{setPurpose(event.target.value);changed();}}/></label>
           <label className="boss-field">统筹负责人{data?.coordinators?<select value={coordinatorId} onChange={event=>{onEditorChange({coordinatorId:event.target.value});changed();}}><option value="">请选择负责人</option>{data.coordinators.map(contact=><option key={contact.contact_id} value={contact.contact_id}>{contact.name} · {contact.organization} · {contact.responsibility} [{contact.contact_id}]</option>)}</select>:<input value={coordinatorId} placeholder="填写完整负责人编号，当前职责由服务核查" onChange={event=>{onEditorChange({coordinatorId:event.target.value});changed();}}/>}</label>
           <label className="boss-field">截止时间（包含UTC时差）<input value={due} placeholder="ISO 8601完整时间" onChange={event=>{setDue(event.target.value);changed();}}/></label><label className="boss-field">IANA时区<input value={timezone} onChange={event=>{onEditorChange({timezone:event.target.value});changed();}}/></label>
           <label className="boss-field">证据要求（每行一项，最多八项）<textarea aria-label="证据要求（每行一项，最多八项）" value={evidence} onChange={event=>{setEvidence(event.target.value);changed();}}/></label>
           <label className="boss-confirm-check"><input type="checkbox" checked={ready&&approvedFor===approvalKey} disabled={!ready} onChange={event=>setApprovedFor(event.target.checked?approvalKey:null)}/>本人确认当前依据、负责人、期限与证据要求</label>
         </fieldset>
-        {!pending&&!editor.pendingPreparation&&<button type="button" className="boss-btn" disabled={busy||!ready} onClick={()=>void prepare()}>通过模拟助手准备当前协调材料</button>}
-        {!pending&&<div className="boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={busy||!ready||approvedFor!==approvalKey||Boolean(editor.pendingPreparation)} onClick={()=>void submit()}>{busy?"正在核查":"本人确认创建协调任务"}</button></div>}
+        {!pending&&!editor.pendingPreparation&&<button type="button" className="boss-btn" disabled={busy||!ready} onClick={()=>void prepare()}>通过模拟助手准备当前交办材料</button>}
+        {!pending&&<div className="boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={busy||!ready||approvedFor!==approvalKey||Boolean(editor.pendingPreparation)} onClick={()=>void submit()}>{busy?"正在核查":"核对并创建交办"}</button></div>}
         {failure&&<p role="alert" className="boss-status boss-status-error">{failure}</p>}{stale&&<p className="boss-helper">当前依据已经变化，请关闭表单并重新核查当前资料。</p>}{(pending||editor.pendingPreparation)&&<p className="boss-helper">原请求结果尚待核查，请关闭表单后使用原请求查询入口。</p>}<Dialog.Close asChild><button type="button" className="boss-btn" disabled={busy}>返回资料页面</button></Dialog.Close>
       </section>
     </Dialog.Content></Dialog.Portal></Dialog.Root>

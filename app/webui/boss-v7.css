@@ -783,6 +783,7 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
 .boss-supply-columns .boss-workspace-item{overflow-wrap:anywhere}
 .boss-supply-columns .boss-actions{flex-wrap:wrap}
 .boss-supply-footer{position:sticky;bottom:0;z-index:2;background:rgba(247,250,255,.96);border:1px solid #dce8f4;border-radius:13px;padding:12px;flex-wrap:wrap}
+.boss-supply-footer .boss-helper{flex-basis:100%}
 .boss-supply-dialog{max-height:85vh;overflow:auto;width:min(720px,calc(100vw - 32px))}
 .boss-supply-dialog fieldset{border:0;padding:0;margin:14px 0}
 @media(max-width:700px){.boss-supply-columns{grid-template-columns:minmax(0,1fr)}.boss-supply-filters fieldset{grid-template-columns:repeat(2,minmax(0,1fr))}}

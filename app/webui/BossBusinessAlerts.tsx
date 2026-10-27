@@ -59,7 +59,7 @@ export function BossBusinessAlertRules({role,revision=0,onSaved,onDirtyChange,ti
       <button className="boss-btn" disabled={!data?.draft||data.draft.state!=="DRAFT"||dirty||locked||stale} onClick={()=>propose("validate")}>校验经营规则草稿</button>
       <button className="boss-btn boss-btn-primary" disabled={!data?.draft||data.draft.state!=="VALIDATED"||dirty||locked||stale} onClick={()=>propose("activate")}>确认启用经营规则</button>
       <button className="boss-btn" disabled={!data?.active||data.active.state!=="ACTIVE"||dirty||locked||stale} onClick={()=>propose("disable")}>停用经营规则</button>
-      <button className="boss-btn" disabled={locked} onClick={()=>{setDirty(false);setBasis("");setGeneration(item=>item+1);}}>放弃编辑并读取经营规则</button>
+      <button className="boss-btn" disabled={locked} onClick={()=>{setDirty(false);setBasis("");setGeneration(item=>item+1);}}>放弃本次规则编辑</button>
     </div>{transaction.dialog}{transaction.recovery}
   </section>;
 }
