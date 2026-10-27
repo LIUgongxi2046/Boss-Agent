@@ -35,6 +35,7 @@
 - 页面读取：独立实例 `http://127.0.0.1:8972` 使用 BOSS 账号读取 F01、N02、N03、N04、N05、N06、N07、N08、N09、F02、F03、F24、D01、D04、D05；15 页均为 `overflow=false`、`errors=0`、HTTP 4xx/5xx 为 0。记录位于 `.work/product-audit-20261026/页面编号.json`。
 - 第四轮页面读取：BOSS 账号读取 F14—F23、V19-EGG／MILK／BEEF 共 13 页；MAINTAINER 账号读取 A01、A02、A03、A04、A09、A10 共 6 页。19 页均为 `overflow=false`、`errors=0`、HTTP 4xx/5xx 为 0。维护端顶层重复刷新已全部隐藏，由各页页内刷新承担。
 - 第五轮页面读取：MAINTAINER 账号读取 A05、A06、A07；BOSS 账号读取 D09；登录页 D08 在第二轮已验证。4 页均为 `overflow=false`、`errors=0`、HTTP 4xx/5xx 为 0。运行实例已恢复为 BOSS 登录。
+- 全量复核：BOSS 账号读取 47 个业务页面，MAINTAINER 账号读取 23 个技术与公共页面，共 70 页；逐页记录检查 `overflow=false`、`errors=0`、HTTP 4xx/5xx 为 0。N01、D08 认证页在登录流程中单独验证。运行实例已恢复为 BOSS 登录。
 - 登录流程：使用新文案“老板／管理员”“登录”完成实际账号登录并进入 F01。
 - 已知未通过：`app/tests/test_boss_task_center.py` 两个用例在本次修改前即失败；一个引用已不存在的 `Boss-Agent-Desktop-Complete-v6` 设计目录，另一个要求 `BossMeetingBrief.tsx` 中不存在的 `onMessageDraftCreated(r.draft_id)`。本批只把 N05 页签断言更新为报告要求的新文案，未改动第二个用例。
 
