@@ -660,9 +660,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   {role==="BOSS"&&!conversationReturn.current&&page!=="F01"&&previousPage==="F01"&&<button className="boss-btn" type="button" onClick={()=>navigate("F01")}><ArrowLeft size={15}/>返回今日工作</button>}
                   {role==="BOSS"&&!conversationReturn.current&&page==="F04"&&<button className="boss-btn" type="button" onClick={()=>navigate("N04")}><ArrowLeft size={15}/>返回会议与资料</button>}
                   {role==="BOSS"&&fromOverview&&<button className="boss-btn" type="button" onClick={returnOverview}><ArrowLeft size={15}/>返回经营关注</button>}
-                  <button type="button" onClick={refresh} disabled={loading||currentEntry?.state==="AUTHENTICATION"} aria-label="刷新当前页面的业务数据" aria-busy={loading} hidden={currentEntry?.state==="AUTHENTICATION"}>
+                  {!(currentEntry?.state==="AUTHENTICATION"||["A13","A14","A15","F30"].includes(page))&&<button type="button" onClick={refresh} disabled={loading} aria-label="刷新当前页面的业务数据" aria-busy={loading}>
                     <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> {loading ? "刷新中…" : currentRefreshLabel}
-                  </button>
+                  </button>}
                 </div>
               </div>
               {error && <StatusLine variant="error" text={"业务读取失败：" + error + "。已保留先前可见结果，不会自动执行写入。"} />}
@@ -800,6 +800,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 {page === "A15" && runtimeSopReference && <StatusLine text={"方法上下文：" + runtimeSopReference + "。当前正式记录没有方法编号筛选，请按实际 run_id 核查；当前未验证本方法与记录的关联。"}/>}
                 <MaintainerRuntimeRecords getToken={getToken} identityKey={token??""} pageId={page==="F30"?"F30":"A15"}
                   key={runtimeRunId} initialRunId={runtimeRunId}
+                  onOpenRunDetails={id=>{setRuntimeRunId(id);navigate("F30");}}
+                  onBackToList={()=>window.history.back()}
                   onOpenTask={(taskId, runId) => setRuntimeTask({taskId, runId})}/>
                 {runtimeTask && <RuntimeTaskTechnicalView getToken={getToken}
                   taskId={runtimeTask.taskId} runId={runtimeTask.runId} onClose={() => setRuntimeTask(null)}/>}

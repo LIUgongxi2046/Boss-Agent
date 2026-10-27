@@ -11,7 +11,7 @@ export function V7Empty({title="当前范围没有记录",children}:{title?:stri
 }
 
 export function V7ReadState({loading,error,onReload}:{loading:boolean;error?:string;onReload?:()=>void}){
-  if(error)return <div className="boss-status boss-status-error" role="alert"><AlertCircle size={18}/><div><p>{error}</p>{onReload&&<button className="boss-btn" onClick={onReload}>重新读取</button>}</div></div>;
+  if(error)return <div className="boss-status boss-status-error" role="alert"><AlertCircle size={18}/><div><p>{error}</p>{onReload&&<button className="boss-btn" onClick={onReload}>刷新</button>}</div></div>;
   if(loading)return <div className="boss-status" role="status"><Loader2 size={18} className="boss-spin"/>正在读取当前资料与状态</div>;
   return null;
 }

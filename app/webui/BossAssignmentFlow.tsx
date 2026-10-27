@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import * as Dialog from "@radix-ui/react-dialog";
 import type {MorningReference} from "./BossMorningView";
 import type {MorningPreparationContext} from "./BossMorningPreparation";
 import {
@@ -344,12 +343,17 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
     onSelectTask(id,true); onDraftSaved();
   }, onMessageDraftCreated);
   const {purpose,coordinator,due,evidence,body,newDue,reason,timezone}=draft;
-  const [error,setError]=useState(""),[discardOpen,setDiscardOpen]=useState(false);
+  const [error,setError]=useState("");
   const busy=transactionBusy||Boolean(dialog);
   const {getToken,token}=useClient();
   const [extensionHistory,setExtensionHistory]=useState<{task_id:string;task_version:string;due_at:string;decisions:{decision_id:string;feedback_id:string;decision:"APPROVE"|"REJECT";old_due_at:string;new_due_at:string;reason:string|null;request_reason:string;decided_at:string;previous_task_version:string;task_version:string}[]}|null>(null);
   const rows=loading?[]:tasks?.tasks||[];
   const current=rows.find(t=>t.task_id===selectedTaskId);
+  const contactName=(id?:string)=>{
+    if(!id)return "尚未选择";
+    const contact=context?.contacts.find(item=>item.contact_id===id);
+    return contact?contact.name+"（"+contact.organization+" · "+contact.responsibility+"）":id;
+  };
   const feedback=useMemo(()=>(tasks?.feedback||[]).filter(f=>current&&f.task_id===current.task_id),[current,tasks]);
   const linkedMessages=useMemo(()=>(tasks?.linked_messages||[]).filter(
     row=>current&&row.task_id===current.task_id
@@ -388,11 +392,12 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const prepareCreate=()=>safe(()=>{
     if(morningReference&&(!morningReady||!morningContext?.source_ids.length))throw new Error("请重新核查当前晨间事项与来源版本");
     if(!context||!sourceIds.length||sourceIds.some(id=>!(morningReference?morningContext?.source_ids:context.assignment_source_ids)?.includes(id)))throw new Error("创建交办需要当前获准来源。");
-    const purposeText=required(purpose,"交办目的"),proof=required(evidence,"证据要求").split("\n").map(item=>item.trim()).filter(Boolean);
-    if(proof.length>8||proof.some(item=>item.length>160))throw new Error("证据要求最多8项，每项最多160字。");
+    const purposeText=required(purpose,"目的"),proof=required(evidence,"验收依据").split("\n").map(item=>item.trim()).filter(Boolean);
+    if(proof.length>8||proof.some(item=>item.length>160))throw new Error("验收依据最多8项，每项最多160字。");
     if(!coordinator||!context.contacts.some(c=>c.contact_id===coordinator))
       throw new Error("请选择获准的唯一负责人");
-    const dueAt=absolute(due,"交办期限"),zone=required(timezone,"IANA时区");new Intl.DateTimeFormat("zh-CN",{timeZone:zone}).format(new Date(dueAt));
+    if(!due.trim()||!timezone.trim())throw new Error("请选择截止时间与时区。");
+    const dueAt=absolute(due,"截止时间"),zone=required(timezone,"时区");new Intl.DateTimeFormat("zh-CN",{timeZone:zone}).format(new Date(dueAt));
     if(!clock||!Number.isFinite(Date.parse(clock)))throw new Error("尚未取得有效业务时钟，请重新读取。");
     if(Date.parse(dueAt)<=Date.parse(clock))throw new Error("交办期限必须晚于当前业务时钟。");
     propose("boss.assignment.create",{
@@ -404,8 +409,9 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       ...(morningReference?{morning_reference:morningReference}:{}),
       ...(draft.relatedTask?{related_task_id:draft.relatedTask,related_task_version:draft.relatedTaskVersion}:{}),
     },"核对并创建交办",[
-      "目的："+purposeText,"负责人："+coordinator,"期限："+dueAt,
-      "证据："+proof.join("；"),"期限时区："+zone,"会议："+(meetingId??"没有关联会议"),
+      "目的："+purposeText,"唯一负责人："+contactName(coordinator)+" · "+coordinator,
+      "截止时间："+displayTime(dueAt)+" · "+zone,
+      "验收依据："+proof.join("；"),"会议："+(meetingId??"没有关联会议"),
       "关联事件："+(eventIds.join("、")||"没有关联事件"),"资料来源："+sourceIds.join("、"),
     ]);
   });
@@ -419,11 +425,12 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       task_id:current.task_id,task_version:current.version,
       recipient_id:current.coordinator_id,body:message,content_version:"1",
     },"模拟发送前确认",[
-      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"唯一收件人："+current.coordinator_id,
-      "期限："+current.due_at+" · "+current.timezone,"依据："+(current.source_refs??[]).map(id=>id+" v"+(current.source_versions?.[id]??"未知")).join("；"),
+      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"唯一负责人："+contactName(current.coordinator_id)+" · "+current.coordinator_id,
+      "截止时间："+displayTime(current.due_at)+" · "+(current.timezone??"时区待核查"),"依据："+(current.source_refs??[]).map(id=>id+" v"+(current.source_versions?.[id]??"未知")).join("；"),
       "正文："+message,"仅写入模拟发件箱，不会真正发送至外部人员。",
     ]);
   });
+  const lastNudge=[...linkedMessages].reverse().find(row=>row.type==="ASSIGNMENT_NUDGE");
   const prepareNudge=()=>safe(()=>{
     if(!current?.version||!current.coordinator_id||
        !["WAITING_FEEDBACK","IN_PROGRESS"].includes(current.status))
@@ -436,8 +443,9 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       recipient_id:current.coordinator_id,body:message,
     },"本人授权独立催办",[
       "交办："+current.task_id+" · 当前版本 "+current.version,
-      "目的："+current.purpose,"期限："+current.due_at+" · "+current.timezone,
-      "收件人："+current.coordinator_id,"催办正文："+message,
+      "目的："+current.purpose,"截止时间："+displayTime(current.due_at)+" · "+(current.timezone??"时区待核查"),
+      "收件人："+contactName(current.coordinator_id)+" · "+current.coordinator_id,"催办正文："+message,
+      "上次催办："+(lastNudge?displayTime(lastNudge.sent_at):"已读取记录中没有催办"),
       "只记录本地模拟发件，真正送达仍待核查；24小时模拟时钟内禁止重复催办。",
     ]);
   });
@@ -454,11 +462,11 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       recipient_id:current.coordinator_id,
       related_task_id:current.task_id,body:message,
       attachment_refs:[],visibility:"RECIPIENT_ONLY",
-    },current.status==="RESULT_SUBMITTED"?"保存当前结果的补充材料请求":"保存当前交办的催办草稿",[
+    },current.status==="RESULT_SUBMITTED"?"保存补材料草稿":"保存沟通草稿",[
       "关联任务："+current.task_id,
-      "唯一负责人："+current.coordinator_id,
+      "唯一负责人："+contactName(current.coordinator_id)+" · "+current.coordinator_id,
       "当前任务状态："+current.status,
-      "催办正文："+message,
+      "草稿正文："+message,
       "只保存 F08 DRAFT，不会自动发送或生成送达回执。",
     ]);
   });
@@ -469,8 +477,8 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
       throw new Error("原始来源已更改或撤销，不能确认完成。");
     propose("boss.assignment.complete",{
       task_id:current.task_id,task_version:current.version,feedback_id:completed.feedback_id,
-    },"老板确认完成",[
-      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"负责人："+current.coordinator_id,"结果提交："+completed.feedback_id,
+    },"验收并确认完成",[
+      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"唯一负责人："+contactName(current.coordinator_id)+" · "+current.coordinator_id,"结果提交："+completed.feedback_id,
       "证据："+(completed.evidence_refs||[]).map(id=>id+" v"+(completed.evidence_versions?.[id]??"未知")).join("；"),
       "仅在本人确认后更新为 COMPLETED_CONFIRMED。",
     ]);
@@ -478,39 +486,39 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const prepareExtend=(decision:"APPROVE"|"REJECT")=>safe(()=>{
     if(!current||!extension||!current.version)throw new Error("未取得有效延期申请。");
     const date=decision==="APPROVE"?absolute(newDue,"新期限"):null;
+    if(date&&(!clock||!Number.isFinite(Date.parse(clock))||Date.parse(date)<=Date.parse(clock)))throw new Error("新期限必须晚于当前业务时钟。");
     const note=required(reason,"本人决定理由");
     propose("boss.assignment.extension.decide",{
       task_id:current.task_id,task_version:current.version,
       feedback_id:extension.feedback_id,due_at:date,decision,reason:note,
     },decision==="APPROVE"?"本人批准延期":"本人拒绝延期",[
       "交办："+current.task_id+" · 当前版本 "+current.version,
-      "原期限："+displayTime(current.due_at),
-      "延期依据："+extension.feedback_id,"申请期限："+displayTime(extension.proposed_due_at),"申请理由："+extension.content,
-      "本人决定："+decision,"决定后期限："+(date??current.due_at),"本人理由："+note,
+      "原期限："+displayTime(current.due_at)+" · "+(current.timezone??"时区待核查"),
+      "延期依据："+extension.feedback_id,"申请期限："+displayTime(extension.proposed_due_at)+" · "+(current.timezone??"时区待核查"),"申请理由："+extension.content,
+      "本人决定："+decision,"决定后期限："+displayTime(date??current.due_at),"本人理由："+note,
       "未批准前旧期限持续有效。",
     ]);
   });
-  const prepareCancel=()=>safe(()=>{
+  const prepareCancel=(reasonText:string)=>safe(()=>{
     if(!current||!current.version)throw new Error("请选择有效任务。");
-    const why=required(reason,"取消原因");
+    const why=required(reasonText,"取消原因");
     propose("boss.assignment.cancel",{
       task_id:current.task_id,task_version:current.version,reason:why,
-    },"老板确认取消交办",[
-      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"负责人："+current.coordinator_id,"原因："+why,
-      "先前已发送的模拟消息和历史反馈不会撤销。",
+    },"确认取消交办",[
+      "交办："+current.task_id+" v"+current.version,"目的："+current.purpose,"唯一负责人："+contactName(current.coordinator_id)+" · "+current.coordinator_id,"原因："+why,
+      "取消后停止未来催办；先前已发送的模拟消息和历史反馈不会撤销。",
     ]);
   });
   return <div className="boss-assignment-scope">
     <BossAssignmentDetails rows={rows} selectedTaskId={selectedTaskId} current={current} context={context} draft={draft} feedback={feedback} messages={linkedMessages} taskDue={taskDue}
       extensions={currentExtensions} extension={extension} completed={completed} clock={clock} overdue={overdue} sourceIds={sourceIds} meetingId={meetingId} eventIds={eventIds}
       editable={editable} loading={loading} stale={stale} busy={busy} morningBlocked={Boolean(morningReference&&!morningReady)} messagesEnabled={messagesEnabled}
-      sourceReview={sourceReview} conversation={conversation} edit={edit} onSelect={onSelectTask} onReload={onReload} onSource={onViewSource} onNavigate={onNavigate} onNew={onNew}
-      onDiscard={()=>setDiscardOpen(true)} onCoordinator={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenCoordinatorPicker();}} onDue={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenDuePicker();}}
+      sourceReview={sourceReview} conversation={conversation} edit={edit} onSelect={onSelectTask} onSource={onViewSource} onNavigate={onNavigate} onNew={onNew}
+      onDiscard={onDiscard} onCoordinator={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenCoordinatorPicker();}} onDue={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenDuePicker();}}
       onMessages={onViewMessages} onCreate={prepareCreate} onSend={prepareSend} onNudge={prepareNudge} onFollowup={prepareFollowup} onComplete={prepareComplete} onExtend={prepareExtend} onCancel={prepareCancel}/>
     {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
     {notice&&<div role="status" className="boss-status boss-status-ok"><CheckCircle2 size={16}/>{notice}</div>}
     {dialog}{recovery}
-    <Dialog.Root open={discardOpen} onOpenChange={setDiscardOpen}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>清除未提交编辑</Dialog.Title><Dialog.Description>清除当前交办表单中尚未提交的内容，并采用当前读取的任务及资料版本。已经保存的任务和反馈继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button type="button" className="boss-btn">保留编辑</button></Dialog.Close><button type="button" className="boss-btn boss-btn-primary" disabled={busy} onClick={()=>{onDiscard();setError("");setDiscardOpen(false);}}>确认清除编辑</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
 }
 
