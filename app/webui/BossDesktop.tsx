@@ -528,7 +528,9 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     module: role === "BOSS" ? "会话" : "应用设置",
     summary: role === "BOSS" ? "继续当前会话，核查回复与工具结果。" : "使用当前维护身份管理应用设置。",
     initial_state: "当前身份与原生连接保持",
-  } : page==="MVP01"?{...pages.F01,title:"采购成本协调",module:"采购成本协调",summary:"核查当前采购报告的成本变化、原文与本人协调记录。"}:pages[page];
+  } : page==="F27"?{...pages.F27,summary:"语音服务当前暂停；录音、上传与转写不会启动，可以使用文字交办。",initial_state:"语音服务已暂停"} : page==="F11"?{...pages.F11,initial_state:"按当前行程读取状态"}:page==="F32"?{...pages.F32,initial_state:"运行条件按当前实例检查结果核查"}:page==="MVP01"?{...pages.F01,title:"采购成本协调",module:"采购成本协调",summary:"核查当前采购报告的成本变化、原文与本人协调记录。"}:pages[page];
+  const refreshLabel:Record<string,string>={F04:"刷新会议材料",F05:"刷新版本",F07:"刷新申请",N04:"刷新目录",N05:"刷新任务",N06:"刷新通知",F02:"刷新这条提醒",F08:"刷新消息记录",F13:"刷新记忆",F24:"刷新状态",F29:"刷新状态",A03:"刷新数据集",A07:"刷新资料"};
+  const currentRefreshLabel=refreshLabel[page]??"刷新";
   const isNative = ["NATIVE","N02"].includes(page);
   const refresh = () => setRequestVersion((v) => v + 1);
   const scopedCommand = async (action: string, payload: Record<string, unknown>): Promise<void> => {
@@ -656,9 +658,10 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 <div className="boss-meta-actions">
                   {role==="BOSS"&&conversationReturn.current&&<button className="boss-btn" type="button" onClick={()=>navigate("N02")}><ArrowLeft size={15}/>返回原会话</button>}
                   {role==="BOSS"&&!conversationReturn.current&&page!=="F01"&&previousPage==="F01"&&<button className="boss-btn" type="button" onClick={()=>navigate("F01")}><ArrowLeft size={15}/>返回今日工作</button>}
+                  {role==="BOSS"&&!conversationReturn.current&&page==="F04"&&<button className="boss-btn" type="button" onClick={()=>navigate("N04")}><ArrowLeft size={15}/>返回会议与资料</button>}
                   {role==="BOSS"&&fromOverview&&<button className="boss-btn" type="button" onClick={returnOverview}><ArrowLeft size={15}/>返回经营关注</button>}
                   <button type="button" onClick={refresh} disabled={loading||currentEntry?.state==="AUTHENTICATION"} aria-label="刷新当前页面的业务数据" aria-busy={loading} hidden={currentEntry?.state==="AUTHENTICATION"}>
-                    <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> {loading ? "刷新中…" : "刷新"}
+                    <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> {loading ? "刷新中…" : currentRefreshLabel}
                   </button>
                 </div>
               </div>
@@ -717,7 +720,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 page === "N06" ? <BossNotificationCenter onNavigate={id=>navigate(id)} onOpenTask={selectTask} refreshVersion={requestVersion}/> :
                 page==="D03" ? <BossExecutionRecovery taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)}/> :
                 page==="F29" ? <BossTaskExceptions taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)} onViewSource={goSource} refreshVersion={requestVersion}/> :
-                page==="F13" ? <BossPersonalMemory onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty}/> :
+                page==="F13" ? <BossPersonalMemory onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}/> :
                 ["N10","N11","F28","D02","D09"].includes(page) ? <BossOwnerRecords key={page} pageId={page} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource}/> :
                 page==="F24" ? <BossRunDetails taskId={selectedTaskId} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource} refreshVersion={requestVersion}/> :
                 page === "D01" ? <BossSourceView key={sourceId} sourceId={sourceId} anchor={sourceAnchor} originPage={previousPage} refreshVersion={requestVersion} onReturn={()=>navigate(allowed(previousPage,role,mvpScope,priorityScope)?previousPage:"F01")}/> :
@@ -754,7 +757,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onOpenTask={selectTask} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}
                 /> :
                 page === "F11" ? <BossTravelView
-                  key={page} onNavigate={id=>navigate(id)} onViewSource={goSource}
+                  key={page} onNavigate={id=>navigate(id)} onViewSource={goSource} onOpenTask={selectTask}
                   onDirtyChange={setWorkDirty} refreshVersion={requestVersion}
                 /> :
                 page === "F04" ? <BossMeetingBrief

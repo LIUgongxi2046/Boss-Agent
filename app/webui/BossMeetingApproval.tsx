@@ -109,7 +109,7 @@ function useConfirmedMutation(onSuccess:(action?:string)=>void){
 
 type ViewProps={
   pageId:"F05"|"F07";
-  onViewSource:(sourceId:string)=>void;
+  onViewSource:(sourceId:string,anchor?:{version:string;start:number;end:number},referenceVersion?:string)=>void;
   onNavigate:(pageId:string)=>void;
   onTaskCreated:(taskId:string)=>void;
   onDirtyChange:(dirty:boolean)=>void;
@@ -139,12 +139,14 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
   const [comment,setComment]=useState("");
   const [basis,setBasis]=useState("");
   const [nextApplication,setNextApplication]=useState<string|null>(null);
-  const [versionFilter,setVersionFilter]=useState(""),[materialFilter,setMaterialFilter]=useState("");
+  const [materialFilter,setMaterialFilter]=useState("");
+  const [lastRemoved,setLastRemoved]=useState<{entry:Entry;index:number}|null>(null),[discardOpen,setDiscardOpen]=useState(false);
   const edited=dirty||Boolean(text.trim()||anchor||decision||comment.trim());
+  const minutesEdited=dirty||Boolean(text.trim()||anchor),opinionEdited=Boolean(decision||comment.trim());
   const dirtyRef=useRef(edited);dirtyRef.current=edited;
   const reload=()=>setRevision(x=>x+1);
   const savedLeave=useRef<(()=>void)|null>(null);
-  const mutation=useConfirmedMutation(action=>{dirtyRef.current=false;setDirty(false);setText("");setAnchor("");setDecision("");setComment("");setBasis("");reload();if(action==="boss.minutes.save"){const finish=savedLeave.current;savedLeave.current=null;finish?.();}});
+  const mutation=useConfirmedMutation(action=>{dirtyRef.current=false;setDirty(false);setText("");setAnchor("");setDecision("");setComment("");setBasis("");setLastRemoved(null);setDiscardOpen(false);reload();if(action==="boss.minutes.save"){const finish=savedLeave.current;savedLeave.current=null;finish?.();}});
   useEffect(()=>{if(!mutation.dialog&&!mutation.busy)savedLeave.current=null;},[mutation.dialog,mutation.busy]);
   useEffect(()=>{onDirtyChange(edited||assignmentEdited||mutation.busy||Boolean(mutation.dialog));},[edited,assignmentEdited,mutation.busy,mutation.dialog,onDirtyChange]);
   useEffect(()=>{const prevent=(event:BeforeUnloadEvent)=>{if(dirtyRef.current||mutation.busy){event.preventDefault();event.returnValue="";}};window.addEventListener("beforeunload",prevent);return()=>window.removeEventListener("beforeunload",prevent);},[mutation.busy]);
@@ -183,6 +185,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
           setEntries((minutes.minute?.entries??[]).map(row=>({
             kind:row.kind,text:row.text,source_anchor:row.source_anchor,
           })));
+          setLastRemoved(null);
         }
         const id=minutes.minute?.source_id || "meeting-minutes";
         const response=await fetch("/api/boss/ui/evidence?source="+encodeURIComponent(id),{
@@ -209,12 +212,30 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
   },[source?.content]);
   const app=approvals?.applications.find(x=>x.application_id===selectedApplication);
   const selected=app?.application_id||"";
+  const applicationDecisions=(approvals?.decisions||[]).filter(item=>item.application_id===selected);
+  const latestDecision=applicationDecisions.length?applicationDecisions[applicationDecisions.length-1]:null;
+  const linkedAssignments=minutes?.linked_assignments??[];
   const minute=minutes?.minute;
   const stale=Boolean(basis&&(pageId==="F05"?minutes&&source&&basis!==minuteSignature(minutes,source):app&&basis!==approvalSignature(app)));
   const disabled=loading||mutation.busy||!data||!basis||stale;
+  const sourceCurrent=Boolean(minute&&source&&source.source_id===minute.source_id&&source.version===minute.source_version&&minute.source_reference_state==="CURRENT");
+  const minuteConfirmable=Boolean(minute&&minute.state==="DRAFT_REVIEW"&&sourceCurrent);
+  const confirmReason=!minutes?"纪要尚未读取":!minute?"当前没有已保存的纪要草稿":minute.state!=="DRAFT_REVIEW"?"当前纪要已经确认，不能再确认纪要":!source?"原始纪要未能读取，不能确认纪要":!sourceCurrent?"原始资料版本已经变化或需要复核，请刷新版本后重新核查":stale?"来源或纪要版本已经变化，请放弃本次修改后重新核查":edited?"存在未保存编辑，请先保存本次版本":mutation.busy?"正在核对并提交上一项操作，请稍后确认":"";
+  const saveReason=!minutes?"纪要尚未读取":!source?"当前未能读取原始纪要，不能保存":!entries.length?"当前没有纪要条目，先添加条目":text.trim()||anchor?"请先把当前输入加入分类条目":stale?"来源或纪要版本已经变化，请放弃本次修改后重新核查":!dirty?"当前没有待保存的修改":mutation.busy?"正在核对并提交上一项操作":"";
+  const decisionReason=!app?"尚未选择申请":!["PENDING_DECISION","WAITING_MATERIAL"].includes(app.state)?"当前申请状态不再接受新的决定":app.attachment_status!=="CURRENT"?"申请附件已撤销或已经变化，只能请求补充":"";
+  const submitLabel=decision==="APPROVE"?"核对并同意":decision==="REJECT"?"核对并拒绝":decision==="REQUEST_MORE"?"提交补材料要求":"";
   useEffect(()=>{if(app&&!dirtyRef.current)setBasis(approvalSignature(app));},[app]);
   function selectApplication(id:string){const selected=approvals?.applications.find(row=>row.application_id===id);setSelectedApplication(id);setDecision("");setComment("");setDirty(false);setBasis(selected?approvalSignature(selected):"");setNextApplication(null);}
-  function restoreEditor(){if(pageId==="F05"){setEntries((minute?.entries??[]).map(({kind,text,source_anchor})=>({kind,text,source_anchor})));setText("");setAnchor("");if(minutes&&source)setBasis(minuteSignature(minutes,source));}else{setDecision("");setComment("");if(app)setBasis(approvalSignature(app));}setDirty(false);setError("");}
+  function restoreEditor(){if(pageId==="F05"){setEntries((minute?.entries??[]).map(({kind,text,source_anchor})=>({kind,text,source_anchor})));setText("");setAnchor("");if(minutes&&source)setBasis(minuteSignature(minutes,source));}else{setDecision("");setComment("");if(app)setBasis(approvalSignature(app));}setDirty(false);setLastRemoved(null);setDiscardOpen(false);setError("");}
+  function removeEntry(index:number){
+    const entry=entries[index];if(!entry||disabled)return;
+    setEntries(old=>old.filter((_,item)=>item!==index));setLastRemoved({entry,index});setDirty(true);setError("");
+  }
+  function undoRemove(){
+    if(!lastRemoved||disabled)return;
+    setEntries(old=>{const next=old.slice();next.splice(Math.min(lastRemoved.index,next.length),0,lastRemoved.entry);return next;});
+    setLastRemoved(null);setDirty(true);
+  }
   const save=()=>{
     if(disabled)return false;
     setError("");
@@ -303,7 +324,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
     {mutation.notice&&<div className="boss-status boss-status-ok" role="status">
       <CheckCircle2 size={16}/>{mutation.notice}</div>}
     {mutation.recovery}
-    {stale&&<Tip warning>原对象、金额或资料版本已经变化，当前编辑继续保留。请核查新版本并恢复当前保存内容后重新决定。</Tip>}
+    {stale&&<Tip warning>原对象、金额或资料版本已经变化，当前编辑继续保留。请核查新版本，并在确认放弃本次修改后重新决定。</Tip>}
     <div className="boss-columns">
       <div className="boss-column">
         {pageId==="F05" ? <>
@@ -331,27 +352,28 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
                 </select>
                 <div className="boss-actions">
                   <button className="boss-btn" type="button" onClick={addEntry}
-                    disabled={!source||disabled}><Plus size={16}/> 添加本条内容</button>
+                    disabled={!source||disabled||!text.trim()||!anchor}><Plus size={16}/> 添加条目</button>
+                  {(!source||!text.trim()||!anchor)&&<span className="boss-helper">{!source?"当前没有可采用的原文，不能添加条目。":"填写"+KIND_LABELS[kind]+"内容并选定实际原文位置后可添加。"}</span>}
                 </div>
+                <p className="boss-helper">加入条目后尚未保存，保存纪要草稿才会形成新版本。</p>
               </fieldset>
               {entries.some(entry=>entry.kind===kind)?entries.map((e,i)=>e.kind===kind&&<div key={i} className="boss-minutes-edit-row">
                 <EntryRow entry={e}/>
-                <button type="button" aria-label={"移除第"+(i+1)+"条内容"} onClick={()=>{
-                  setEntries(old=>old.filter((_,j)=>j!==i));setDirty(true);
-                }}><Trash2 size={16}/></button>
+                <button type="button" aria-label="移除" title="移除本条未保存内容" disabled={disabled} onClick={()=>removeEntry(i)}><Trash2 size={16}/></button>
               </div>):<Empty>当前分类还没有内容。请依据原文添加并核查。</Empty>}
+              {lastRemoved&&<div className="boss-actions"><span className="boss-helper">已移除 1 条未保存内容：{lastRemoved.entry.text.slice(0,40)||"内容为空"}</span><button type="button" className="boss-btn" disabled={disabled} onClick={undoRemove}>撤销移除</button></div>}
               <div className="boss-actions">
-                <button type="button" className="boss-btn" onClick={save} disabled={!entries.length||disabled}>
+                <button type="button" className="boss-btn" onClick={save} disabled={disabled||!dirty||!entries.length||Boolean(text.trim()||anchor)}>
                   保存纪要草稿</button>
                 <button type="button" className="boss-btn boss-btn-primary" onClick={confirmMinutes}
-                  disabled={!minute||minute.state!=="DRAFT_REVIEW"||edited||disabled}>
-                  <ShieldCheck size={15}/> 确认已保存的当前版本
+                  disabled={!minuteConfirmable||edited||disabled}>
+                  <ShieldCheck size={15}/> 核对并确认纪要
                 </button>
-                <button type="button" className="boss-btn" onClick={reload}>
-                  <RefreshCw size={15}/> 重读版本
-                </button>
-                <button type="button" className="boss-btn" disabled={loading||mutation.busy} onClick={restoreEditor}>恢复保存内容</button>
+                {minutesEdited&&<button type="button" className="boss-btn" disabled={loading||mutation.busy||!data} onClick={()=>setDiscardOpen(true)}>放弃本次修改</button>}
               </div>
+              <p className="boss-helper">待确认版本：{minute?("v"+minute.version+" · 原文 "+minute.source_id+" v"+minute.source_version):"尚无已保存纪要草稿"}；当前编辑{dirty?"尚未保存":"与已保存版本一致"}。</p>
+              {saveReason&&<p className="boss-helper">{saveReason}</p>}
+              {(!minuteConfirmable||edited||disabled)&&confirmReason&&<p className="boss-helper">{confirmReason}</p>}
               <Tip warning>确认纪要与发送交办是不同的本人决定。逐项创建只能在纪要已确认、来源仍有效且用户再次明确授权后执行。</Tip>
             </>:!loading&&<Empty>尚无可用会议资料。</Empty>}
           </Panel>
@@ -360,26 +382,25 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             contacts={minutes?.eligible_assignment_contacts||[]}
             businessClock={minutes?.business_clock||""}
             links={minutes?.linked_assignments||[]}
-            sourceCurrent={Boolean(source&&minute&&source.source_id===minute.source_id&&source.version===minute.source_version)}
+            sourceCurrent={sourceCurrent}
             editingUnsaved={edited||stale} onReload={reload}
             onTaskCreated={onTaskCreated} onNavigate={onNavigate}
             onDirtyChange={setAssignmentEdited}
           />
         </>:<>
           <Panel title="内容与配置" note="申请对象、金额、币种及附件版本">
-            <div className="boss-form-grid"><label>当前版本<input value={versionFilter} onChange={event=>setVersionFilter(event.target.value)}/></label><label>材料状态<select value={materialFilter} onChange={event=>setMaterialFilter(event.target.value)}><option value="">全部材料状态</option><option value="CURRENT">当前有效</option><option value="WITHDRAWN">已撤销</option><option value="MISSING_OR_CHANGED">缺少或已经变化</option></select></label></div>
             {approvals?.applications.length?<>
-              <label className="boss-label" htmlFor="boss-application-select">选择申请</label>
-              <select className="boss-single-input" id="boss-application-select"
+              <div className="boss-form-grid"><label>选择申请<select className="boss-single-input" id="boss-application-select"
                 value={selected} onChange={e=>{if(edited)setNextApplication(e.target.value);else selectApplication(e.target.value);}}>
                 <option value="">请选择当前申请</option>
-                {approvals.applications.filter(a=>a.application_id===selected||(!versionFilter||a.version===versionFilter)&&(!materialFilter||a.attachment_status===materialFilter)).map(a=><option value={a.application_id} key={a.application_id}>
+                {approvals.applications.filter(a=>a.application_id===selected||(!materialFilter||a.attachment_status===materialFilter)).map(a=><option value={a.application_id} key={a.application_id}>
                   {a.title} · {a.application_id}
                 </option>)}
-              </select>
-              {app&&<>
+              </select></label><label>材料状态<select value={materialFilter} onChange={event=>setMaterialFilter(event.target.value)}><option value="">全部材料状态</option><option value="CURRENT">当前有效</option><option value="WITHDRAWN">已撤销</option><option value="MISSING_OR_CHANGED">缺少或已经变化</option></select></label></div>
+              {app?<>
+                <VersionValue label="申请名称" value={app.title}/>
+                <VersionValue label="当前版本" value={app.version}/>
                 <VersionValue label="申请 ID" value={app.application_id}/>
-                <VersionValue label="申请版本" value={app.version}/>
                 <VersionValue label="金额与币种" value={(app.amount??"未知金额")+" "+(app.currency??"未知币种")}/>
                 <VersionValue label="当前状态" value={app.state}/>
                 <VersionValue label="附件状态" value={app.attachment_status}/>
@@ -388,11 +409,13 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
                 <h3>前后版本差异</h3>
                 {app.version_changes?.length?<div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>字段</th><th>原版本</th><th>当前版本</th></tr></thead><tbody>{app.version_changes.map(row=><tr key={row.field}><td>{row.field}</td><td>{row.previous??"尚未提供"}<small>v{row.previous_version}</small></td><td>{row.current??"尚未提供"}<small>v{row.current_version}</small></td></tr>)}</tbody></table></div>:<V7Empty title={app.version_changes?"当前没有已记录的版本差异":"服务尚未提供逐项版本差异"}/>}
                 <div className="boss-actions">
-                  <button type="button" className="boss-btn" onClick={()=>onViewSource(app.source_id)}
+                  <button type="button" className="boss-btn" onClick={()=>onViewSource(app.source_id,undefined,app.source_version)}
                     disabled={app.attachment_status!=="CURRENT"}>
-                    <FileSearch size={16}/> 打开附件原文 v{app.source_version}
+                    <FileSearch size={16}/> 查看附件
                   </button>
+                  <span className="boss-helper">附件：{app.source_id} · v{app.source_version}</span>
                 </div>
+                {app.attachment_status!=="CURRENT"&&<p className="boss-helper">附件当前状态为{app.attachment_status}，不能打开当前版本；请请求补充材料后重新核查。</p>}
                 <div className="boss-approval-decisions" role="group" aria-label="本人决定">
                   {([
                     ["APPROVE","同意"],["REJECT","拒绝"],["REQUEST_MORE","请求补充"],
@@ -406,22 +429,27 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
                     <span>{label}</span>
                   </label>)}
                 </div>
+                {decisionReason&&<p className="boss-helper">{decisionReason}</p>}
+                {decision==="REQUEST_MORE"&&<div className="boss-status boss-status-warn"><AlertCircle size={16}/><span>请求补充的材料：{app.missing_items?.length?app.missing_items.join("；"):"服务尚未提供具体缺少材料，请在本人意见中写明需要补充的内容。"}</span></div>}
                 <label className="boss-label" htmlFor="boss-approval-comment">本人意见（必填）</label>
                 <textarea rows={3} id="boss-approval-comment" value={comment}
                   onChange={e=>setComment(e.target.value)}
                   placeholder="说明对当前版本申请的批准范围、拒绝原因或必须补充的材料。"/>
-              </>}
+              </>:<p className="boss-helper">选择申请后显示当前版本摘要、附件与本人决定；未选择申请时不显示决定操作。</p>}
             </>:!loading&&<Empty>尚未录入获准的模拟审批申请。</Empty>}
             <Tip warning>本界面只保存申请版本对应的模拟审批记录。没有资金交易、专业放行或真实外部消息发送。</Tip>
           </Panel>
           <Panel title="关联内容与处理边界" note="当前申请的本人决定与原版本">
-            {(approvals?.decisions||[]).some(x=>x.application_id===selected)?(approvals?.decisions||[]).filter(x=>x.application_id===selected).map(x=><div
+            {applicationDecisions.length?applicationDecisions.map(x=><div
               className="boss-minutes-row" key={x.decision_id}>
               <span className="boss-tag boss-tag-green">{x.action}</span>
               <p>{x.comment}</p>
               <small>申请：{x.application_id} · v{x.application_version} ·
                 金额：{x.amount} {x.currency} · {time(x.recorded_at)}</small>
+              <VersionValue label="本次授权编号" value={x.authorization_id}/>
             </div>):<Empty>当前没有已保存的老板审批决定。</Empty>}
+            <div className="boss-actions">{latestDecision?<button type="button" className="boss-btn" onClick={()=>onNavigate("N10")}>查看本次授权</button>:<button type="button" className="boss-btn" onClick={()=>onNavigate("N10")}>全部授权</button>}</div>
+            <p className="boss-helper">{latestDecision?"按授权编号在当前授权记录中查看本次决定绑定的范围；没有关联时只保留全部授权入口。":"当前申请没有已记录的本人决定，全部授权作为次级入口保留。"}</p>
           </Panel>
         </>}
       </div>
@@ -435,7 +463,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             {source?.content?<details><summary>阅读当前原文</summary><blockquote className="boss-source">{source.content}</blockquote></details>
               :<Tip warning>资料已撤销、未获取或当前身份无权读取，不能确认纪要。</Tip>}
             {source&&<div className="boss-actions"><button className="boss-btn" type="button"
-              onClick={()=>onViewSource(source.source_id)}>查看完整原文 <ArrowRight size={15}/></button></div>}
+              onClick={()=>onViewSource(source.source_id,{version:source.version,start:0,end:source.content.length},source.version)}>查看完整原文 <ArrowRight size={15}/></button></div>}
             {(minutes?.revisions||[]).length>0&&<div className="boss-minutes-history">
               <h3>历史纪要版本</h3>
               {minutes?.revisions.map(x=><p key={x.version}>v{x.version} · {x.state} · {time(x.updated_at)}</p>)}
@@ -448,9 +476,11 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             <VersionValue label="是否自动创建交办" value="否"/>
             <VersionValue label="是否自动发送" value="否"/>
             <div className="boss-actions">
-              <button className="boss-btn boss-btn-primary" type="button"
-                onClick={()=>onNavigate("F06")}><ClipboardCheck size={15}/> 进入 F06 交办详情</button>
+              {linkedAssignments.length?linkedAssignments.map(item=><button key={item.task_id} className={"boss-btn"+(linkedAssignments.length===1?" boss-btn-primary":"")} type="button"
+                onClick={()=>{onTaskCreated(item.task_id);onNavigate("F06");}}><ClipboardCheck size={15}/> {linkedAssignments.length===1?"打开交办":"打开交办："+item.task_id}</button>)
+                :<button className="boss-btn" type="button" disabled><ClipboardCheck size={15}/> 准备交办</button>}
             </div>
+            <p className="boss-helper">{linkedAssignments.length?"按已创建任务编号打开该交办；任务编号与纪要版本见下方“逐项创建、发送及补充核查”。":"当前纪要没有已创建的任务；纪要确认后在下方逐项交办草稿中按条目准备交办，不会跳到其他任务。"}</p>
           </Panel>
         </>:<>
           <Panel title="来源与依据" note="仅当前申请版本">
@@ -471,9 +501,6 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             <div className="boss-actions">
               <button className="boss-btn" type="button" onClick={()=>onNavigate("N04")}>
                 <ArrowLeft size={15}/> 会议与资料
-              </button>
-              <button className="boss-btn" type="button" onClick={()=>onNavigate("N10")}>
-                本人授权记录
               </button>
             </div>
           </Panel>
@@ -499,9 +526,15 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
       <V7Panel title="与当前事项联动"><div className="boss-actions"><button className="boss-btn" onClick={()=>onNavigate("N04")}>会议与资料</button><button className="boss-btn" onClick={()=>onNavigate("N05")}>任务与承诺</button><button className="boss-btn" onClick={()=>onNavigate("N11")}>历史决定</button></div></V7Panel>
       </div>
     </div>}
-    {pageId==="F07"&&<footer className="boss-owner-actions"><button type="button" className="boss-btn boss-btn-primary" onClick={submitDecision} disabled={disabled||!app||!decision||!comment.trim()||!["PENDING_DECISION","WAITING_MATERIAL"].includes(app.state)}><ShieldCheck size={15}/>提交当前版本决定</button><button type="button" className="boss-btn" onClick={restoreEditor} disabled={loading||mutation.busy}>取消未执行操作</button><button type="button" className="boss-btn" onClick={reload} disabled={loading||mutation.busy}><RefreshCw size={15}/>重读正式状态</button></footer>}
+    {pageId==="F07"&&<footer className="boss-owner-actions">{app?<>{decision?<>
+      <button type="button" className="boss-btn boss-btn-primary" onClick={submitDecision} disabled={disabled||!comment.trim()||!["PENDING_DECISION","WAITING_MATERIAL"].includes(app.state)}><ShieldCheck size={15}/>{submitLabel}</button>
+      {(!comment.trim()||disabled||!["PENDING_DECISION","WAITING_MATERIAL"].includes(app.state))&&<p className="boss-helper">{!comment.trim()?"请填写本人意见后提交。":disabled?"当前正在核对或版本已经变化，请稍后提交。":"当前申请状态不再接受新的决定。"}</p>}
+    </>:<p className="boss-helper">请先选择同意、拒绝或请求补充，再提交本人决定；未选择决定时不显示提交按钮。</p>}
+      {opinionEdited&&<button type="button" className="boss-btn" disabled={loading||mutation.busy} onClick={()=>setDiscardOpen(true)}>放弃本次意见</button>}
+    </>:<p className="boss-helper">尚未选择申请；选择申请后显示当前版本的决定操作。</p>}</footer>}
     {mutation.dialog}
-    <Dialog.Root open={nextApplication!==null} onOpenChange={open=>{if(!open)setNextApplication(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>当前申请存在未提交意见</Dialog.Title><Dialog.Description>切换申请前可以继续编辑，或者放弃当前尚未提交的意见。已经保存的本人决定继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn">继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{if(nextApplication!==null)selectApplication(nextApplication);}}>放弃编辑并切换申请</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
+    <Dialog.Root open={discardOpen} onOpenChange={setDiscardOpen}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>放弃本次修改</Dialog.Title><Dialog.Description>{pageId==="F05"?"放弃本次修改将恢复到已保存的纪要版本"+(minute?"v"+minute.version:"")+"，尚未保存的条目、正文与原文位置会被清除。":"放弃本次意见将清空尚未提交的决定选择与本人意见，已经保存的决定继续保留。"}</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn" autoFocus>继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{restoreEditor();setDiscardOpen(false);}}>确认放弃</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
+    <Dialog.Root open={nextApplication!==null} onOpenChange={open=>{if(!open)setNextApplication(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>当前申请存在未提交意见</Dialog.Title><Dialog.Description>切换申请前可以继续编辑，或者放弃当前尚未提交的意见。已经保存的本人决定继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn" autoFocus>继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{if(nextApplication!==null)selectApplication(nextApplication);}}>放弃编辑并切换申请</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;
 }
 

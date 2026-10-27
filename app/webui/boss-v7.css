@@ -762,6 +762,7 @@ table.boss-v7-table{width:100%;min-width:580px;border-collapse:collapse;text-ali
 @media(max-width:700px){.boss-research-columns,.boss-research-editor{grid-template-columns:minmax(0,1fr)}.boss-research-scope{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .boss-v7-table tr[aria-selected="true"]{background:#edf5ff}
 .boss-private-calendar{display:flex;flex-direction:column;gap:12px;min-width:0}
+.boss-private-calendar .boss-btn-danger{color:#ad3737;background:#fff6f6;border-color:#f2d4d4}
 .boss-supply-quality,.boss-supply-workspace{display:flex;flex-direction:column;gap:12px;min-width:0}
 .boss-supply-filters fieldset{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;border:0;padding:0;margin:0;align-items:end}
 .boss-supply-filters label{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:13px}

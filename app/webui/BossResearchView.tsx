@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AlertCircle, BookOpen, FileSearch, Loader2, RefreshCw, Search, Send } from "lucide-react";
+import { AlertCircle, BookOpen, FileSearch, Search, Send } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 import { useTransaction } from "./BossAssignmentFlow";
 
@@ -44,7 +44,7 @@ function ResearchView({onNavigate,onViewSource,onStartChat,onDirtyChange,refresh
   const [loading,setLoading]=useState(true),[error,setError]=useState("");
   const [form,setForm]=useState<Scope>(EMPTY),[basis,setBasis]=useState("");
   const [dirty,setDirty]=useState(false),dirtyRef=useRef(false);
-  const [recipient,setRecipient]=useState(""),[selectedSource,setSelectedSource]=useState("");
+  const [recipient,setRecipient]=useState("");
   const [chatBusy,setChatBusy]=useState(false),[draftId,setDraftId]=useState("");
   const active=useRef(true),operation=useRef<"research"|"message"|null>(null);
   dirtyRef.current=dirty;
@@ -77,8 +77,6 @@ function ResearchView({onNavigate,onViewSource,onStartChat,onDirtyChange,refresh
   const stale=Boolean(current&&basis&&basis!==signature(current));
   const disabled=blocked||!current||!basis||stale;
   const sources=[...(report?.matched_sources??[]),...(report?.conflicted_sources??[])];
-  const source=sources.find(value=>quoteKey(value)===selectedSource);
-  const sourceReadable=Boolean(source&&(source.validity_state==="VALID"||source.validity_state==="CONFLICTED"));
   function edit(change:Partial<Scope>){setForm(value=>({...value,...change}));dirtyRef.current=true;setDirty(true);setError("");}
   function restore(){if(!current||blocked)return;setForm(current.report?.scope??EMPTY);setBasis(signature(current));dirtyRef.current=false;setDirty(false);setError("");}
   function begin(){
@@ -117,10 +115,10 @@ function ResearchView({onNavigate,onViewSource,onStartChat,onDirtyChange,refresh
     catch(reason){if(active.current)setError(reason instanceof Error?reason.message:String(reason));}
     finally{if(active.current)setChatBusy(false);}
   }
-  function referenceButtons(refs:SourceRef[]){return refs.map((ref,index)=>{const match=sources.find(value=>quoteKey(value)===quoteKey(ref));return <button key={quoteKey(ref)+index} type="button" className="boss-btn" disabled={!match||Boolean(current?.source_changed)} onClick={()=>setSelectedSource(quoteKey(ref))}><FileSearch size={14}/>{ref.source_id} · v{ref.version}{!match?" · 引用待核查":""}</button>;});}
+  function referenceButtons(refs:SourceRef[]){return refs.map((ref,index)=>{const match=sources.find(value=>quoteKey(value)===quoteKey(ref));const readable=Boolean(match&&(match.validity_state==="VALID"||match.validity_state==="CONFLICTED")&&!current?.source_changed);return <button key={quoteKey(ref)+index} type="button" className="boss-btn" disabled={!readable} title={!match?"当前引用缺少可读取的来源":current?.source_changed?"研究来源已经变化，需要重新核查":undefined} onClick={()=>{if(match&&readable)onViewSource(ref.source_id,{version:ref.version,start:ref.quote_start,end:ref.quote_end});}}><FileSearch size={14}/>查看依据</button>;});}
   function claims(title:string,rows:Claim[],empty:string){return <section className="boss-research-layer"><h3>{title}<span className="boss-tag">{report?rows.length:"待研究"}</span></h3>{rows.length?rows.map(row=><article key={row.claim_id} className="boss-workspace-item"><p>{row.text}</p>{row.author_contact_id&&<Fact label="作者" value={row.author_contact_id}/>} {row.run_id&&<Fact label="推断运行" value={row.run_id}/>}<div className="boss-actions">{referenceButtons(row.source_refs)}</div>{!row.source_refs.length&&<p className="boss-helper">缺少可定位的支持引用，当前内容仍需核查。</p>}{row.limitations?.map(item=><p key={item} className="boss-helper">{item}</p>)}</article>):<p className="boss-helper">{loading?"正在读取研究内容…":empty}</p>}</section>;}
   return <div className="boss-research-view">
-    <div className="boss-workspace-toolbar"><span className="boss-tag boss-tag-amber">SIMULATED</span><button className="boss-btn" type="button" disabled={loading||blocked} onClick={reload}>{loading?<Loader2 size={15} className="boss-spin"/>:<RefreshCw size={15}/>}重读当前版本</button></div>
+    <div className="boss-workspace-toolbar"><span className="boss-tag boss-tag-amber">SIMULATED</span><span className="boss-workspace-note">页面标题“刷新”只读取当前研究版本与产物，不重新执行研究。</span></div>
     {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
     {transaction.notice&&<div role="status" className="boss-status boss-status-ok">{transaction.notice}</div>}
     {stale&&<div role="alert" className="boss-status boss-status-warn">研究或来源版本已经变化。输入内容已保留，请核查当前版本并明确恢复保存内容后继续。</div>}
@@ -141,13 +139,12 @@ function ResearchView({onNavigate,onViewSource,onStartChat,onDirtyChange,refresh
         <fieldset className="boss-research-editor" disabled={blocked||!current||!basis}><label>资料截止日期<input type="date" value={form.cutoff_date} onChange={event=>edit({cutoff_date:event.target.value})}/></label><div><span className="boss-label">获准资料</span>{current?.source_selection_available?<div className="boss-research-source-options">{current.available_sources?.filter(value=>value.reference_state==="CURRENT").map(value=><label key={JSON.stringify([value.source_id,value.version])}><input type="checkbox" checked={Boolean(form.source_refs?.some(ref=>ref.source_id===value.source_id&&ref.version===value.version))} onChange={event=>edit({source_refs:event.target.checked?[...(form.source_refs??[]),{source_id:value.source_id,version:value.version}]:(form.source_refs??[]).filter(ref=>ref.source_id!==value.source_id||ref.version!==value.version)})}/>{value.title} · v{value.version}</label>)}{!current.available_sources?.some(value=>value.reference_state==="CURRENT")&&<p className="boss-helper">当前没有有效的获准资料。</p>}</div>:<p className="boss-helper">资料选择目录尚未提供。当前研究覆盖由获准来源服务返回。</p>}</div></fieldset>
         <Fact label="已保存研究问题" value={report?.scope.question}/><Fact label="采用研究版本" value={report?.version}/>
         <p className="boss-helper">事实、作者意见与模型推断分别核查。具体业务影响需要匹配业务关系与期间，资料中的指令不改变操作权限。</p>
-        <div className="boss-actions"><button type="button" className="boss-btn" disabled={!current||blocked||(!dirty&&!stale)} onClick={restore}>恢复当前保存内容</button>{dirty&&<span className="boss-helper">查询条件尚未保存</span>}</div>
+        <div className="boss-actions"><button type="button" className="boss-btn" disabled={!current||blocked||(!dirty&&!stale)} onClick={restore}>放弃本次修改</button>{dirty&&<span className="boss-helper">查询条件尚未保存</span>}</div>
         <details><summary>研究版本记录（{current?.revisions.length??"未知"}）</summary>{current?.revisions.map(item=><div className="boss-workspace-item" key={item.version}><strong>v{item.version} · {item.state}</strong><p>{time(item.prepared_at)}</p></div>)}{current&&!current.revisions.length&&<p className="boss-helper">尚无历史研究版本。</p>}</details>
       </Block>
     </div><aside className="boss-column">
       <Block title="来源与依据">
-        <label className="boss-label" htmlFor="boss-research-source">选择引用</label><select className="boss-single-input" id="boss-research-source" value={source?selectedSource:""} disabled={!sources.length} onChange={event=>setSelectedSource(event.target.value)}><option value="">请选择原文引用</option>{sources.map((value,index)=><option key={quoteKey(value)} value={quoteKey(value)}>{index+1}. {value.source_id} · v{value.version}</option>)}</select>
-        {source?<><p className="boss-research-quote">{source.quote}</p><Fact label="来源属性" value={source.source_type}/><Fact label="作者" value={source.author_contact_id}/><Fact label="发布日期" value={time(source.published_at)}/><Fact label="来源版本" value={source.version}/><Fact label="原文位置" value={source.quote_start+" — "+source.quote_end}/><Fact label="有效范围" value={source.valid_scope}/><Fact label="引用状态" value={source.validity_state}/><Fact label="可作为当前依据" value={source.eligible_as_current_evidence?"可以引用，断言仍需核查":"仅供核查"}/><p className="boss-helper">当前摘录为材料原文，分类结论由左侧研究内容分别提供。</p></>:<p className="boss-helper">{loading?"正在读取来源…":"选择引用后查看作者、日期、版本与原文位置。"}</p>}
+        <p className="boss-helper">每条结论旁提供“查看依据”，直接打开该结论的固定版本与原文位置；资料失效时显示原因。</p>
         {current?.source_changed&&<div className="boss-status boss-status-warn">引用已变化，当前研究需要重新核查有效来源。</div>}
         {current?.conflicts?.map(item=><div className="boss-workspace-item" key={item.conflict_id}><strong>来源冲突</strong><p>{item.description}</p><div className="boss-actions">{referenceButtons(item.source_refs)}</div></div>)}
         {report?.source_issues.map(item=><div className="boss-workspace-item" key={JSON.stringify([item.source_id,item.version])}><strong>{item.source_id} · v{item.version}</strong><Fact label="有效状态" value={item.validity_state}/>{item.adoption_state&&<Fact label="采用状态" value={item.adoption_state}/>}<Fact label="有效起始" value={item.valid_from}/><Fact label="有效截至" value={item.valid_until}/><p className="boss-helper">当前不能作为确定依据。</p></div>)}
@@ -155,12 +152,12 @@ function ResearchView({onNavigate,onViewSource,onStartChat,onDirtyChange,refresh
       </Block>
       <Block title="状态与核查">
         <Fact label="研究状态" value={report?.state}/><Fact label="当前依据" value={current?.current_reference_state}/><Fact label="获准来源数" value={report?.coverage.current_approved_sources}/><Fact label="匹配来源数" value={report?.coverage.matched_source_count}/><Fact label="公开网页检索" value={report?report.coverage.public_web_search_performed?"已执行":"未执行":null}/><Fact label="语义检索" value={report?report.coverage.semantic_retrieval_performed?"已执行":"未执行":null}/>
-        <label className="boss-label" htmlFor="boss-research-contact">核查请求收件人</label><select id="boss-research-contact" className="boss-single-input" value={recipient} disabled={!current||blocked} onChange={event=>setRecipient(event.target.value)}><option value="">请选择获准联系人</option>{current?.contacts.map(person=><option key={person.contact_id} value={person.contact_id}>{person.name} · {person.organization}</option>)}</select><p className="boss-helper">核查请求保存为消息草稿，发送需要本人另行审核。</p>
-        {draftId&&<p className="boss-helper">已保存消息草稿：{draftId}</p>}<button type="button" className="boss-btn" onClick={()=>onNavigate("F08")}>查看消息草稿</button>
+        <label className="boss-label" htmlFor="boss-research-contact">起草核查消息的收件人</label><select id="boss-research-contact" className="boss-single-input" value={recipient} disabled={!current||blocked} onChange={event=>setRecipient(event.target.value)}><option value="">请选择获准联系人</option>{current?.contacts.map(person=><option key={person.contact_id} value={person.contact_id}>{person.name} · {person.organization}</option>)}</select><p className="boss-helper">核查消息保存为消息草稿，发送需要本人另行审核。</p>
+        {draftId&&<p className="boss-helper">已保存消息草稿：{draftId}</p>}<button type="button" className="boss-btn" onClick={()=>onNavigate("F08")}>打开草稿</button>
         {transaction.recovery}
       </Block>
     </aside></div>
-    <footer className="boss-research-footer boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={begin}><Search size={15}/>开始研究</button><button type="button" className="boss-btn" disabled={!sourceReadable||blocked} onClick={()=>{if(source&&sourceReadable)onViewSource(source.source_id,{version:source.version,start:source.quote_start,end:source.quote_end});}}><FileSearch size={15}/>打开引用</button><button type="button" className="boss-btn" disabled={!report||blocked||dirty||Boolean(current?.source_changed)} onClick={()=>void continueQuestion()}><BookOpen size={15}/>继续追问</button><button type="button" className="boss-btn" disabled={disabled||!report?.missing_items.length||dirty||Boolean(current?.source_changed)} onClick={createRequest}><Send size={15}/>准备核查请求</button></footer>
+    <footer className="boss-research-footer boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={begin}><Search size={15}/>开始研究</button><button type="button" className="boss-btn" disabled={!report||blocked||dirty||Boolean(current?.source_changed)} onClick={()=>void continueQuestion()}><BookOpen size={15}/>继续追问</button><button type="button" className="boss-btn" disabled={disabled||!report?.missing_items.length||dirty||Boolean(current?.source_changed)} onClick={createRequest}><Send size={15}/>起草核查消息</button></footer>
     {transaction.dialog}
   </div>;
 }
