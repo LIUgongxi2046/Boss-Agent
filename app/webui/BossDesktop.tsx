@@ -660,7 +660,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   {role==="BOSS"&&!conversationReturn.current&&page!=="F01"&&previousPage==="F01"&&<button className="boss-btn" type="button" onClick={()=>navigate("F01")}><ArrowLeft size={15}/>返回今日工作</button>}
                   {role==="BOSS"&&!conversationReturn.current&&page==="F04"&&<button className="boss-btn" type="button" onClick={()=>navigate("N04")}><ArrowLeft size={15}/>返回会议与资料</button>}
                   {role==="BOSS"&&fromOverview&&<button className="boss-btn" type="button" onClick={returnOverview}><ArrowLeft size={15}/>返回经营关注</button>}
-                  {role==="BOSS"&&!(currentEntry?.state==="AUTHENTICATION"||["A13","A14","A15","F30"].includes(page))&&<button type="button" onClick={refresh} disabled={loading} aria-label="刷新当前页面的业务数据" aria-busy={loading}>
+                  {role==="BOSS"&&!(currentEntry?.state==="AUTHENTICATION"||["A13","A14","A15","F30","N10","N11","F28","D02","D09"].includes(page))&&<button type="button" onClick={refresh} disabled={loading} aria-label="刷新当前页面的业务数据" aria-busy={loading}>
                     <RefreshCw size={15} className={loading ? "boss-spin" : ""}/> {loading ? "刷新中…" : currentRefreshLabel}
                   </button>}
                 </div>

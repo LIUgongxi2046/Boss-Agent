@@ -91,7 +91,7 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
     <button className="boss-btn boss-btn-primary" type="submit" disabled={api.loading}>{isList?"筛选授权":isDecisions?"筛选历史决定":"查询"}</button>
   </form>;
   const selector=<div className="boss-owner-filters">
-    <label>{isHistory?"获准历史记录":"目标事项与当前版本"}<select value={selected} onChange={event=>select(event.target.value)}>
+    <label>{isHistory?"历史通知":"目标事项与当前版本"}<select value={selected} onChange={event=>select(event.target.value)}>
       <option value="">请选择记录</option>{api.data?.records.map(row=><option key={row.id} value={row.id}>{row.title} · {row.target_id??row.id} · v{row.version}{row.historical?" · 历史只读":""}</option>)}
     </select></label>
     {isHistory?<><V7Fact label="原数据集">{record?.dataset_id??"尚未选择"}</V7Fact><V7Fact label="原执行空间">{record?.namespace??"尚未选择"}</V7Fact><V7Fact label="历史版本">{record?.version??"尚未选择"}</V7Fact></>:<><V7Fact label="当前身份">老板本人</V7Fact><V7Fact label="内容版本">{record?.version??"尚未选择"}</V7Fact></>}
@@ -103,7 +103,7 @@ export function BossOwnerRecords({pageId,onNavigate,onOpenTask,onViewSource}:{pa
     <V7Fact label="读取时间">{api.data?.read_at??"尚未读取"}</V7Fact>
     <V7Fact label="业务时钟">{api.data?.business_clock??"尚未读取"}</V7Fact>
     {record?.historical&&<p className="boss-v7-note">原执行空间已归档，仅供本人查询历史内容。</p>}
-    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>刷新正式状态</button>
+    <button className="boss-btn" disabled={api.loading} onClick={api.reload}>{isHistory?"刷新当前事项状态":"刷新正式状态"}</button>
   </V7Panel>;
   const sources=<V7Panel title="来源与依据">
     {record?<><OwnerRecordIdentity record={record}/><OwnerConditions record={record}/><OwnerSources record={record} onViewSource={onViewSource}/></>:<V7Empty title="尚未选择记录">选择记录后查看当时版本与来源状态。</V7Empty>}

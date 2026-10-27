@@ -2825,7 +2825,7 @@
       ],
       "code_wired_write_actions": [
         "boss.sop.save", "boss.sop.validate", "boss.sop.activate", "boss.sop.enable",
-        "boss.sop.disable", "boss.sop.restore", "boss.sop.recover", "boss.sop.cancel", "skill.update"
+        "boss.sop.disable", "boss.sop.restore", "boss.sop.recover", "boss.sop.cancel"
       ],
       "other_integration_points": [
         "Same Runtime SkillsLoader, ToolRegistry and native disabled_skills configuration; method changes do not grant business permissions",
@@ -2870,8 +2870,8 @@
       "actual_webui_navigation": "?bossPage=A07",
       "webui_navigation_is_server_access_control": false,
       "render_status": "PARTIAL_VERSIONED_SIMULATED_KNOWLEDGE_CAS_FTS",
-      "component_file": "app/webui/MaintainerKnowledgeEditor.tsx",
-      "component_name": "MaintainerKnowledgeEditor",
+      "component_file": "app/webui/MaintainerKnowledgeWorkspace.tsx",
+      "component_name": "MaintainerKnowledgeWorkspace",
       "verified_http_read_routes": [
         "GET /api/boss/ui/workspace/source-index",
         "GET /api/boss/ui/operation-status"

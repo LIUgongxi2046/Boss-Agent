@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import { useClient } from "@/providers/ClientProvider";
 
 type Method = {
@@ -17,16 +17,10 @@ type Projection = {
 export function MaintainerSkills() {
   const {client, getToken, token} = useClient();
   const [data, setData] = useState<Projection | null>(null);
-  const [pending, setPending] = useState<Method | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const active = useRef<AbortController | null>(null);
-  const surface = useRef<HTMLDivElement | null>(null);
   const epoch = useRef(0);
-  const locked = useRef(false);
   const read = useCallback(async () => {
     active.current?.abort();
     const abort = new AbortController(); active.current = abort;
@@ -46,78 +40,56 @@ export function MaintainerSkills() {
       setData(result); setLoading(false);
     }).then(undefined, failure => {
       if (abort.signal.aborted || epoch.current !== identity) return;
-      setData(null); setLoading(false); setPending(null); setConfirmed(false);
+      setData(null); setLoading(false);
       setError(failure instanceof Error ? failure.message : String(failure));
     });
   }, [getToken]);
   useEffect(() => {
-    epoch.current += 1; locked.current = false;
-    setData(null); setPending(null); setConfirmed(false); setBusy(false); setNotice(""); setError("");
+    epoch.current += 1;
+    setData(null); setError("");
     void read();
     return () => {epoch.current += 1; active.current?.abort();};
   }, [client, token, read]);
-
-  async function update() {
-    if (!pending || !confirmed || locked.current) return;
-    const identity = epoch.current;
-    locked.current = true; setBusy(true); setError(""); setNotice("");
-    try {
-      const result = await client.requestMutation<{name: string; enabled: boolean; content_sha256: string}>("skill.update", {
-        name: pending.name, enabled: !pending.enabled, expected_content_sha256: pending.content_sha256,
-      });
-      if (identity !== epoch.current) return;
-      if (result.name !== pending.name || result.enabled !== !pending.enabled || result.content_sha256 !== pending.content_sha256)
-        throw Error("方法状态回执与本次操作不一致");
-      setPending(null); setConfirmed(false);
-      setNotice("原生方法状态已保存，后续上下文按当前状态读取。");
-      await read();
-    } catch (failure) {
-      if (identity !== epoch.current) return;
-      setPending(null); setConfirmed(false);
-      setError((failure instanceof Error ? failure.message : String(failure)) + "。请读取当前状态核查结果。");
-      setData(null);
-    } finally {
-      if (identity === epoch.current) {locked.current = false; setBusy(false);}
-    }
+  function unavailableReasons(item: Method) {
+    const reasons: string[] = [];
+    if (data?.pending_activations.length) reasons.push("存在待恢复的方法启用操作，当前全部新上下文暂停采用。");
+    if (item.missing_tools.length) reasons.push("缺少尚未注册的工具：" + item.missing_tools.join("、"));
+    if (item.missing_projections.length) reasons.push("缺少尚未获准的工作投影：" + item.missing_projections.join("、"));
+    if (!item.native_available) reasons.push("当前原生方法文件不可用。");
+    return reasons;
   }
-  return <div ref={surface}>
+  return <div>
     <section className="boss-panel" aria-label="秘书方法技术维护">
-      <div className="boss-panel-head"><h2>SOP 与 Skills</h2><small>A06 · 原生方法文件与配置</small></div>
-      <p>十三项方法读取当前文件、版本和实际工具目录。启停使用同一原生配置，不授予老板业务权限。</p>
-      <button type="button" className="boss-btn" disabled={loading || busy} onClick={() => {void read();}}>读取当前方法状态</button>
+      <div className="boss-panel-head"><h2>方法技术状态</h2><small>A06 · 十三项原生方法的只读状态</small></div>
+      <p>读取当前方法文件、版本、工具引用与工作投影。启用、停用和草稿操作在方法版本区完成，本区域只显示实际状态与缺少条件。</p>
+      <button type="button" className="boss-btn" disabled={loading} onClick={() => {void read();}}>
+        {loading ? <Loader2 size={15} className="boss-spin"/> : <RefreshCw size={15}/>} {loading ? "刷新中…" : "刷新方法技术状态"}
+      </button>
       <div className="boss-kv"><span>当前 Runtime 可接收任务</span><strong>{data ? data.runtime_admission_ready ? "可以接收" : "需要检查当前运行配置" : "尚未读取"}</strong></div>
-      <p>方法正文编辑、草稿及历史恢复继续由版本管理功能负责。当前状态读取和本地上下文检查没有验证模型质量。</p>
-      {!!data?.pending_activations.length && <p role="status">存在待恢复的方法启用操作，请在方法版本页面明确继续或取消。</p>}
+      {data && !data.runtime_admission_ready && <p className="boss-helper">Runtime 当前不能接收任务：服务未返回具体原因，需要到运行状态页核查运行配置。</p>}
+      <p>方法正文编辑、草稿及历史恢复由方法版本区负责。当前状态读取和本地上下文检查没有验证模型质量。</p>
+      {!!data?.pending_activations.length && <p role="status" className="boss-helper">存在待恢复的方法启用操作，请在方法版本区明确继续或取消。</p>}
     </section>
     {loading && <div role="status" className="boss-status">正在读取当前方法</div>}
-    {error && <div role="alert" className="boss-status boss-status-error">{error}</div>}
-    {notice && <div role="status" className="boss-status">{notice}</div>}
+    {error && <div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}
     {data && <div className="boss-columns"><div className="boss-column">
-      {data.items.map(item => <section key={item.sop_id} className="boss-panel" aria-label={"方法 " + item.sop_id}>
-        <div className="boss-panel-head"><h2>{item.sop_id} · {item.name}</h2><small>{item.requirement_id} · v{item.version}</small></div>
-        <div className="boss-kv"><span>当前状态</span><strong>{item.enabled ? "已经启用" : "已经停用"}</strong></div>
-        <div className="boss-kv"><span>后续上下文采用条件</span><strong>{item.context_eligible ? "符合当前条件" : "当前不能采用"}</strong></div>
-        <div className="boss-kv"><span>内容 SHA256</span><strong>{item.content_sha256}</strong></div>
-        <div className="boss-kv"><span>读取工具</span><strong>{item.read_operations.join("、") || "没有读取工具"}</strong></div>
-        <div className="boss-kv"><span>动作工具</span><strong>{item.command_operations.join("、") || "没有动作工具"}</strong></div>
-        <div className="boss-kv"><span>需要本人独立确认</span><strong>{item.human_only_operations.join("、") || "根据对应业务动作核查"}</strong></div>
-        <div className="boss-kv"><span>尚未注册的工具</span><strong>{item.missing_tools.join("、") || "当前引用已经注册"}</strong></div>
-        <div className="boss-kv"><span>尚未获准的工作投影</span><strong>{item.missing_projections.join("、") || "当前投影引用完整"}</strong></div>
-        <button type="button" className="boss-btn" disabled={busy || data.pending_activations.length > 0 || (!item.enabled && (item.missing_tools.length > 0||item.missing_projections.length>0))}
-          aria-label={(item.enabled ? "停用方法 " : "启用方法 ") + item.sop_id}
-          onClick={() => {setPending(item); setConfirmed(false); setError("");}}>{item.enabled ? "停用方法" : "启用方法"}</button>
-      </section>)}
+      {data.items.map(item => {
+        const reasons = unavailableReasons(item);
+        return <section key={item.sop_id} className="boss-panel" aria-label={"方法 " + item.sop_id}>
+          <div className="boss-panel-head"><h2>{item.sop_id} · {item.name}</h2><small>{item.requirement_id} · v{item.version}</small></div>
+          <div className="boss-kv"><span>当前状态</span><strong>{item.enabled ? "已经启用" : "已经停用"}</strong></div>
+          <div className="boss-kv"><span>后续上下文采用条件</span><strong>{item.context_eligible ? "符合当前条件" : "当前不能采用"}</strong></div>
+          <div className="boss-kv"><span>当前缺少条件</span><strong>{reasons.length ? reasons.join("；") : "没有缺少条件"}</strong></div>
+          <div className="boss-kv"><span>内容 SHA256</span><strong>{item.content_sha256}</strong></div>
+          <div className="boss-kv"><span>读取工具</span><strong>{item.read_operations.join("、") || "没有读取工具"}</strong></div>
+          <div className="boss-kv"><span>动作工具</span><strong>{item.command_operations.join("、") || "没有动作工具"}</strong></div>
+          <div className="boss-kv"><span>需要本人独立确认</span><strong>{item.human_only_operations.join("、") || "根据对应业务动作核查"}</strong></div>
+          <div className="boss-kv"><span>尚未注册的工具</span><strong>{item.missing_tools.join("、") || "当前引用已经注册"}</strong></div>
+          <div className="boss-kv"><span>尚未获准的工作投影</span><strong>{item.missing_projections.join("、") || "当前投影引用完整"}</strong></div>
+          {!item.enabled && reasons.length > 0 && <p className="boss-helper">当前停用且存在缺少条件：需要先在方法版本区补齐依赖，才能启用此方法版本。</p>}
+          {item.enabled && <p className="boss-helper">当前已启用；如需变更版本或停用，请到方法版本区操作。</p>}
+        </section>;
+      })}
     </div></div>}
-    <DialogPrimitive.Root open={pending !== null} onOpenChange={open => {if (!open && !busy) {setPending(null); setConfirmed(false);}}}>
-      <DialogPrimitive.Portal container={surface.current}><DialogPrimitive.Overlay className="boss-confirm-backdrop"/>
-        <DialogPrimitive.Content className="boss-confirm boss-navigation-confirm">
-          <DialogPrimitive.Title asChild><h3>{pending?.enabled ? "确认停用方法" : "确认启用方法"}</h3></DialogPrimitive.Title>
-          <DialogPrimitive.Description asChild><p>{pending?.sop_id} · v{pending?.version}。本次只修改后续上下文的方法采用状态，业务授权继续独立核查。</p></DialogPrimitive.Description>
-          <label className="boss-confirm-check"><input type="checkbox" checked={confirmed} disabled={busy} onChange={event => setConfirmed(event.target.checked)}/>我确认本次方法状态变更。</label>
-          <div className="boss-actions"><button type="button" className="boss-btn" disabled={busy} onClick={() => setPending(null)}>取消变更</button>
-            <button type="button" className="boss-btn boss-btn-primary" disabled={!confirmed || busy} onClick={() => {void update();}}>确认变更</button></div>
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
   </div>;
 }
