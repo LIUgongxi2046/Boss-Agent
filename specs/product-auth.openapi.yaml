@@ -47,12 +47,20 @@ components:
       oneOf:
         - type: object
           additionalProperties: false
-          required: [role, owner_id]
-          properties: {role: {const: BOSS}, owner_id: {const: boss-1}}
+          required: [role, owner_id, execution_scope, execution_namespace]
+          properties:
+            role: {const: BOSS}
+            owner_id: {const: boss-1}
+            execution_scope: {type: [string, 'null']}
+            execution_namespace: {type: string, minLength: 1}
         - type: object
           additionalProperties: false
-          required: [role, owner_id]
-          properties: {role: {const: MAINTAINER}, owner_id: {type: 'null'}}
+          required: [role, owner_id, execution_scope, execution_namespace]
+          properties:
+            role: {const: MAINTAINER}
+            owner_id: {type: 'null'}
+            execution_scope: {type: [string, 'null']}
+            execution_namespace: {type: string, minLength: 1}
     Bootstrap:
       type: object
       additionalProperties: false

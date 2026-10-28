@@ -7,7 +7,7 @@ export type BusinessEntry={source_type:"RUNTIME_RECORD";store_reference:string;p
 export type BusinessContext={source_type:"RUNTIME_RECORD";session_id:string;chat_id:string;binding_state:"BOUND"|"UNBOUND";entry:BusinessEntry|null;overview:Overview|null;references:{kind:"document";id:string;version:string}[];current_use_verified:boolean;current_selection_active?:boolean;business_authorization_granted:false;business_mutation_performed:false};
 type Receipt={source_type:"RUNTIME_RECORD";client_request_id:string;outcome:"RECORDED"|"NOT_FOUND_IN_CURRENT_STORE";entry:BusinessEntry|null;business_authorization_granted:false;business_mutation_performed:false};
 type Pointer={requestId:string;chatId:string|null};
-type Props={role:"BOSS"|"MAINTAINER"|null;getToken:()=>string;onCreateChat:()=>Promise<string>;onOpenChat:(chatId:string)=>void;onBeforeStart:(start:()=>void)=>void};
+type Props={role:"BOSS"|"MAINTAINER"|null;getToken:()=>string;onCreateChat:()=>Promise<string>;onOpenChat:(chatId:string,question?:string)=>void;onBeforeStart:(start:()=>void)=>void};
 const scopeKeys=["legal_entity_id","region_id","period_start","period_end","timezone","attention"] as const;
 function pointerFromUrl():Pointer|null{const query=new URLSearchParams(window.location.search),requestId=query.get("businessConversationRequest");if(!requestId)return null;if(!/^[A-Za-z0-9_.-]{8,128}$/.test(requestId))throw new Error("经营会话原请求编号无效");return {requestId,chatId:query.get("businessConversationChat")};}
 function savePointer(pointer:Pointer|null){const address=new URL(window.location.href);for(const key of ["businessConversationRequest","businessConversationChat"])address.searchParams.delete(key);if(pointer){address.searchParams.set("businessConversationRequest",pointer.requestId);if(pointer.chatId)address.searchParams.set("businessConversationChat",pointer.chatId);}window.history.replaceState(window.history.state,"",address);}
@@ -40,7 +40,7 @@ export function useBusinessConversationEntry({role,getToken,onCreateChat,onOpenC
     if(role==="BOSS"&&saved)void readReceipt(saved,abort.signal).then(result=>{if(epoch.current===current){setEntry(result.entry);setLookedUp(true);setBusy(false);}},_reason=>{if(epoch.current===current&&!abort.signal.aborted){setBusy(false);setError("原经营会话尚未取得回执，请核查连接后读取原编号。");}});
     return()=>{++epoch.current;abort.abort();};
   },[client,token,role,getToken]);
-  async function openPrepared(original:BusinessEntry,value:Pointer,current:()=>boolean){
+  async function openPrepared(original:BusinessEntry,value:Pointer,current:()=>boolean,question?:string){
     verifyBusinessEntry(original,value.requestId);
     const checked=await client.requestMutation<BusinessEntry>("boss.conversation.business.prepare",{client_request_id:value.requestId,applied_scope:original.applied_scope,snapshot_sha256:original.snapshot_sha256,topic_reference:original.topic_reference});
     if(!current())return;verifyBusinessEntry(checked,value.requestId);
@@ -58,13 +58,13 @@ export function useBusinessConversationEntry({role,getToken,onCreateChat,onOpenC
     const context=await client.requestMutation<BusinessContext>("boss.conversation.business.read",{chat_id:chatId,adopt_selection:true});
     if(!current())return;verifyBusinessContext(context,chatId);
     if(context.entry?.preparation_id!==original.preparation_id||context.entry.preparation_sha256!==original.preparation_sha256)throw new Error("当前经营会话与原准备记录不符");
-    preserve(null);setEntry(null);setLookedUp(false);latest.current.onOpenChat(chatId);
+    preserve(null);setEntry(null);setLookedUp(false);latest.current.onOpenChat(chatId,question);
   }
   async function startNow(selection:OverviewSelection){
     if(latest.current.role!=="BOSS"||pointerRef.current||busy)throw new Error("当前经营会话原请求尚未核查");
     const current=begin(),value={requestId:crypto.randomUUID(),chatId:null};preserve(value);setLookedUp(false);
     const prepared=client.requestMutation<BusinessEntry>("boss.conversation.business.prepare",{client_request_id:value.requestId,applied_scope:selection.scope,snapshot_sha256:selection.snapshot_sha256,topic_reference:selection.page_id?{page_id:selection.page_id,use:selection.use}:null});
-    await prepared.then(async result=>{if(!current())return;verifyBusinessEntry(result,value.requestId);setEntry(result);await openPrepared(result,value,current);}).then(()=>{if(current())setBusy(false);},_reason=>{if(current()){setBusy(false);setError("本次经营会话尚未确认，请读取原请求记录。系统不会自动重试或提交问题。");}});
+    await prepared.then(async result=>{if(!current())return;verifyBusinessEntry(result,value.requestId);setEntry(result);await openPrepared(result,value,current,"请分析当前绑定的经营范围与选定专题，说明主要问题、当前数值与变化、资料依据、可能影响及建议行动。仅进行资料读取与分析。");}).then(()=>{if(current())setBusy(false);},_reason=>{if(current()){setBusy(false);setError("本次经营会话尚未确认，请读取原请求记录。系统不会自动重试或提交问题。");}});
   }
   async function start(selection:OverviewSelection){
     if(pointerRef.current){setError("已有原经营会话请求等待核查，请读取原记录或明确结束本次入口操作。");return;}

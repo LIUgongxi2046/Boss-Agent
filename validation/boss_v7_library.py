@@ -50,8 +50,8 @@ def _document_state(document, clock):
     return source_validity(document, clock)
 
 
-def _meeting(db, data, clock):
-    initial = data["meeting"]
+def _meeting(db, data, clock, selected=None):
+    initial = selected or data["meeting"]
     meeting = _get(db, "meeting", initial["meeting_id"]) or initial
     timezone = meeting.get("timezone", "Asia/Shanghai")
     material_ids = [item for item in meeting.get("material_ids", [])
@@ -75,7 +75,7 @@ def _meeting(db, data, clock):
                     if contact["contact_id"] in meeting.get("participant_ids", [])]
     material_state = "READY" if sources and not gaps else "PARTIAL" if sources else "MATERIALS_MISSING"
     actions = [
-        _action("prepare", "准备会议", "F04", True, ""),
+        _action("prepare", "准备会议", "F04", meeting["meeting_id"] == data["meeting"]["meeting_id"], "请通过当前会议安排处理准备资料"),
         _action("source", "阅读原文", "D01", bool(sources), "当前会议没有已获准的材料原文",
                 sources[0]["source_id"] if sources else None),
         _action("minutes", "打开纪要", "F05", minute is not None, "当前会议尚无已保存纪要"),
@@ -224,6 +224,8 @@ def read_meeting_library(store, db, snapshot):
     from boss_insights import meeting_insights
     clock = store.get(db, NS, "clock", "current")["at"]
     records = [_meeting(db, snapshot, clock)]
+    records.extend(_meeting(db, snapshot, clock, meeting) for meeting in _list(db, "meeting")
+                   if meeting["meeting_id"] != snapshot["meeting"]["meeting_id"] and meeting.get("owner_id") == snapshot["owner_id"])
     records.extend(_documents(db, snapshot, clock))
     records.extend(_applications(db, snapshot, clock))
     records.extend(_people(db, snapshot, clock))

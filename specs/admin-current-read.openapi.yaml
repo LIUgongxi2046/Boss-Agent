@@ -1,0 +1,185 @@
+openapi: 3.1.0
+info:
+  title: 管理员当前配置与业务资料只读接口
+  version: 1.0.0
+security:
+  - bearerAuth: []
+paths:
+  /api/boss/ui/admin/technical/datasets/current-records:
+    get:
+      operationId: readCurrentBusinessRecords
+      description: MAINTAINER读取Boss当前业务空间的公开业务元数据，禁止返回私人正文；不生成、载入或重置数据。
+      parameters:
+        - {name: kind, in: query, required: true, schema: {type: string, enum: [financial_detail, initial_contact, document_metadata, meeting_summary, application_summary, task_summary, feedback_summary, event_summary]}}
+        - {name: offset, in: query, required: true, schema: {type: integer, minimum: 0, maximum: 99999999}}
+        - {name: snapshot_sha256, in: query, required: true, schema: {type: string}}
+      responses:
+        '200':
+          description: 当前资料与所选摘要一致，每页最多25项。
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CurrentRecords'}
+        '400': {description: 字段、类别或位置无效}
+        '401': {description: 尚未认证}
+        '403': {description: 非MAINTAINER或超出技术读取权限}
+        '409': {description: 当前业务资料或版本已经变化，需要刷新摘要}
+  /api/boss/ui/admin/technical/datasets:
+    get:
+      operationId: readDatasetsWithCurrentSnapshot
+      description: 在原有候选数据集目录之外，提供同一事务读取的current_snapshot；候选生成记录保持其原有含义。
+      responses:
+        '200':
+          description: 当前业务资料摘要和既有数据集目录。
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [current_snapshot, datasets, current]
+                properties:
+                  current_snapshot: {$ref: '#/components/schemas/CurrentSnapshot'}
+                  datasets: {type: array, items: {type: object}}
+                  current: {type: object}
+  /api/boss/ui/workspace/prompt-versions:
+    get:
+      operationId: readPromptsWithEffectiveRuntime
+      description: effective_runtime来自当前configuration对象；自定义Prompt草稿、启用与历史保持原有含义。
+      responses:
+        '200':
+          description: 当前实际运行配置及已有Prompt版本。
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [effective_runtime, drafts, active, revisions]
+                properties:
+                  effective_runtime: {$ref: '#/components/schemas/EffectiveRuntime'}
+                  drafts: {type: array, items: {type: object}}
+                  active: {type: array, items: {type: object}}
+                  revisions: {type: array, items: {type: object}}
+  /api/boss/ui/admin/technical/simulation-events:
+    get:
+      operationId: readSimulationWithCurrentBusiness
+      description: business_records读取现有交办、反馈与事件；records只保存真实执行的模拟操作记录。
+      responses:
+        '200':
+          description: 当前业务对象及已有模拟操作。
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [business_records, records]
+                properties:
+                  business_records: {type: array, items: {$ref: '#/components/schemas/BusinessRecord'}}
+                  records: {type: array, items: {type: object}}
+  /api/boss/ui/workspace/scheduler:
+    get:
+      operationId: readSchedulerWithCurrentEvents
+      description: current_events读取当前事件与期限；不启用、暂停、恢复或执行调度。
+      responses:
+        '200':
+          description: 当前配置、已有派发记录与业务事件。
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [current_events, recent_dispatches, schedule]
+                properties:
+                  current_events: {type: array, items: {$ref: '#/components/schemas/BusinessRecord'}}
+                  recent_dispatches: {type: array, items: {type: object}}
+                  schedule: {type: object}
+  /api/boss/ui/admin/technical/evaluation:
+    get:
+      operationId: readEvaluationWithObservedRuns
+      description: observed_runs采用当前空间最近50项真实运行记录；不将运行成功登记为正式评测通过。
+      responses:
+        '200':
+          description: 现有评测与实际运行。
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [observed_runs, attempts, evidence]
+                properties:
+                  observed_runs: {type: array, items: {$ref: '#/components/schemas/ObservedRun'}}
+                  attempts: {type: array, items: {type: object}}
+                  evidence: {type: array, items: {type: object}}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer}
+  schemas:
+    CurrentSnapshot:
+      type: object
+      required: [dataset_id, dataset_version, namespace, business_at, source_type, snapshot_sha256, counts, totals, business_mutation_performed, private_body_available_here]
+      properties:
+        dataset_id: {type: string}
+        dataset_version: {type: string}
+        namespace: {type: string}
+        business_at: {type: string, format: date-time}
+        source_type: {const: SIMULATED}
+        snapshot_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        counts: {type: object, additionalProperties: {type: integer, minimum: 0}}
+        totals: {type: object, additionalProperties: {type: object, additionalProperties: {type: string}}}
+        business_mutation_performed: {const: false}
+        private_body_available_here: {const: false}
+    CurrentRecords:
+      type: object
+      required: [dataset_id, version, source_type, kind, facts_sha256, offset, limit, total, records, private_body_available_here, business_mutation_performed, read_at]
+      properties:
+        dataset_id: {type: string}
+        version: {type: string}
+        source_type: {const: SIMULATED}
+        kind: {type: string}
+        facts_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        offset: {type: integer, minimum: 0}
+        limit: {const: 25}
+        total: {type: integer, minimum: 0}
+        records: {type: array, items: {type: object}}
+        private_body_available_here: {const: false}
+        business_mutation_performed: {const: false}
+        read_at: {type: string, format: date-time}
+    EffectiveRuntime:
+      type: object
+      required: [configuration_version, provider, model_id, api_type, enabled, max_tool_rounds, max_output_tokens, timeout, workspace_read_mode, tool_scope, workspace_projections, custom_prompt_count, configuration_mutated]
+      properties:
+        configuration_version: {type: string}
+        provider: {type: [string, 'null']}
+        model_id: {type: [string, 'null']}
+        api_type: {type: [string, 'null']}
+        enabled: {type: [boolean, 'null']}
+        max_tool_rounds: {type: [integer, 'null']}
+        max_output_tokens: {type: [integer, 'null']}
+        timeout: {type: [number, 'null']}
+        workspace_read_mode: {type: [string, 'null']}
+        tool_scope: {type: array, items: {type: string}}
+        workspace_projections: {type: array, items: {type: string}}
+        custom_prompt_count: {type: integer, minimum: 0}
+        configuration_mutated: {const: false}
+    BusinessRecord:
+      type: object
+      required: [kind, id, version, title, state, at, author_name, related_object_id, source_refs]
+      properties:
+        kind: {enum: [task, feedback, event]}
+        id: {type: string}
+        version: {type: string}
+        title: {type: [string, 'null']}
+        state: {type: string}
+        at: {type: string}
+        author_name: {type: [string, 'null']}
+        related_object_id: {type: [string, 'null']}
+        source_refs: {type: array, items: {type: object, required: [source_id, version], properties: {source_id: {type: string}, version: {type: string}}}}
+    ObservedRun:
+      type: object
+      required: [run_id, state, started_at, finished_at, model_id, configuration_version, dataset_id, dataset_version, model_requests, tool_results, external_model_invoked, formal_evaluation_passed]
+      properties:
+        run_id: {type: string}
+        state: {type: string}
+        started_at: {type: string}
+        finished_at: {type: [string, 'null']}
+        model_id: {type: string}
+        configuration_version: {type: string}
+        dataset_id: {type: [string, 'null']}
+        dataset_version: {type: [string, 'null']}
+        model_requests: {type: integer, minimum: 0}
+        tool_results: {type: integer, minimum: 0}
+        external_model_invoked: {type: boolean}
+        formal_evaluation_passed: {type: boolean}

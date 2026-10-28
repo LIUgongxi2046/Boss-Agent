@@ -1,5 +1,7 @@
 # Boss-Agent 前端设计
 
+2026-10-28核查：doc_id=DOC-LLD-FRONTEND，维护责任为当前主执行者。当前页面采用Desktop v7与用户最新标注，老板五个主要工作入口、个人设置账号菜单、经营分析绑定和会议资料讨论见[操作手册](操作手册.md)、[集成指南](开发者集成指南.md)及[用户标注任务](development/USER-REVIEW-20261027.md)。源码为`9cd9888490521242def326f475c93823a68ec95b`及未提交修改。以下设计及各日期接收记录保留原范围，未完整复验的页面、状态、字段与视觉要求保持NEEDS_REVIEW，任务状态采用唯一正式来源。
+
 版本：0.4.8；日期：2026-10-23；T08/A08；状态：IN_REVIEW。已接收T05/T06 1.7.0，T07现有设计为0.6.4-draft；公共Runtime扩展0.2.0、方法扩展0.3.0及本机账号扩展0.1.0等待正式接收，源码版本`8292824`及W3公共接入。本文件记录已核查工程与设计要求；完整字段、全部页面及状态审查和T03视觉仍未完成，A08保持NOT_RUN。
 
 ## 1. 资产与工程映射
@@ -14,7 +16,7 @@ N01/D08采用T27的账号密码表单及专用CSS，默认本人，下方提供�
 
 ## 2. 身份、数据与副作用
 
-`RoleChannel`从bootstrap秘密建立API与WebSocket token对应角色；`/api/boss/identity`返回当前服务端角色。渲染入口只能使用该结果。联系人identifier、payload.role、owner_id及URL不能替代认证。维护请求业务正文和本人确认动作必须被服务端拒绝。
+产品模式由`AccountRoleChannel`核验本机账号或已有API token，再由`RoleChannel`建立API与WebSocket token对应角色；`/api/boss/identity`返回当前服务端角色、owner及执行空间。渲染入口使用该结果。联系人identifier、payload.role、owner_id及URL不能替代认证。维护请求业务正文和本人确认动作必须被服务端拒绝。
 
 领域状态只由SQLite事务维护。读取采用当前认证token、`cache:no-store`和AbortController；组件显示服务器返回的source_type、对象ID、版本与日期。写入通过上游`client.requestMutation`、稳定`client_request_id`及服务端CAS。保存、校验、启用和下一任务采用分别显示。未知结果先查询原回执，不自动生成新动作。
 
@@ -26,7 +28,7 @@ A06方法目录和版本读取同时提供实际缺少工具与缺少工作投�
 
 ## 3. Token与可访问性
 
-权威值为`Boss-Agent-Desktop-Complete-v6/design-tokens.json`，公共映射为`app/webui/boss-v6.css`。全部领域组件继承相同字体、颜色、间距与焦点规则。
+权威值为`Boss-Agent-Desktop-Complete-v7/design-tokens.json`，公共映射为`app/webui/boss-v6.css`及当前页面样式。全部领域组件继承相同字体、颜色、间距与焦点规则，并采用用户最新明确的界面要求。
 
 | Token | 值 | 使用位置 |
 |---|---|---|
@@ -40,7 +42,7 @@ A06方法目录和版本读取同时提供实际缺少工具与缺少工作投�
 | radii | 14px卡片、9px输入框 | 卡片与表单 |
 | accessibility | 44px操作目标、2px焦点 | 键盘和指针 |
 
-字体使用Noto Sans CJK SC / PingFang SC。遵循prefers-reduced-motion。需要在1024×768、1280×800、1440×1024和200%缩放验证内容、长文本、表单错误、弹窗与滚动区域。没有批准的独立深色设计，完整界面遵循v6设计参数。视觉结果NOT_RUN。
+字体使用Noto Sans CJK SC / PingFang SC。遵循prefers-reduced-motion。需要在1024×768、1280×800、1440×1024和200%缩放验证内容、长文本、表单错误、弹窗与滚动区域。没有批准的独立深色设计，完整界面遵循v7设计参数及用户最新明确要求。视觉结果NOT_RUN。
 
 ## 4. 类型与状态所有权
 
@@ -179,11 +181,11 @@ BossBusinessAlerts显示当前事实、比较期间、参与条件、来源版�
 
 ## 全部菜单导航与UI01登录
 
-CURRENT，2026-10-25。delivered-navigation.ts依据原始v6的72项页面配置与角色范围提供全部合法菜单；BossPrimaryNavigation保持本人六组、维护四组，BossMenuDirectory按相同分组显示全部页面、搜索结果及实现状态。本人目录包含52项入口，维护目录包含26项入口，保留既有MVP及Settings入口；F19三项变体分别显示用途。导航、页面目录、搜索、移动目录、通知、快捷操作和直接入口共用同一角色范围；未知及跨角色页面进入UNAVAILABLE，服务端身份及业务权限继续核查。
+CURRENT，2026-10-28。delivered-navigation.ts依据Desktop v7的72项页面配置与角色范围保留合法路由，目录显示独立采用`directory`字段。BossPrimaryNavigation保持本人五组、维护四组，BossMenuDirectory与侧栏采用同一可见目录；本人显示五项入口，维护显示20项入口。管理员隐藏列表采用`specs/menu-plan.json`的`administrator_hidden_pages`，包括N01、D08、D06、D07、F30、F31。关联页面继续通过角色检查；F30从A15所选运行进入，评测统一从A16进入。未知及跨角色页面进入UNAVAILABLE，服务端身份及业务权限继续核查。
 
-F01/N02与既有开发交付入口显示待用户验收，N03显示开发中，其余页面显示当前部分实现及待完整验收，F27显示语音暂停并且不挂载录音组件。N01/D08在已认证页面中只显示当前认证状态，由本人明确退出后进入现有登录表单；认证失效继续由BossLogin处理。D06/D07保留当前身份公共状态。目录显示不改变开发或验收结论，MENU-N03继续0/26；本项记录见docs/development/SHOW-ALL-MENUS.md。
+页面实现状态与用户验收分别记录，F27保持语音暂停并且不挂载录音组件。认证失效继续由BossLogin处理，未保存编辑由离开页面和关闭窗口的保护流程处理，D07保留权限提示用途。隐藏目录入口不改变服务端权限，不改变原页面能力或完整设计要求；当前用途与验证见`docs/development/ADMIN-MENU-20261028.md`，正式状态采用唯一来源。
 
-展开侧栏直接显示各分组全部页面和当前实现状态。boss-route.ts统一页面及返回编号读取，菜单跳转清除共享来源的返回标识；本人NATIVE沿用N02原生会话。boss-history.ts保存页面历史位置，未保存内容确认后沿原后退或前进继续；业务查询参数更新保留history.state。原生App采用相同History函数及replace视图选择，接收位置记录于nanobot-all-menus-routing.patch。组件点击与History检查使用独立静态页面，产品认证后的完整逐页行为及独立启动仍需各自验证。
+展开侧栏显示该分组可见页面，单页分组直接进入工作页面。boss-route.ts统一页面及返回编号读取，菜单跳转清除共享来源的返回标识；本人NATIVE沿用N02原生会话。boss-history.ts保存页面历史位置，未保存内容确认后沿原后退或前进继续；业务查询参数更新保留history.state。原生App采用相同History函数及replace视图选择，接收位置记录于nanobot-all-menus-routing.patch。准备脚本完整复制当前页面模块，并将正式菜单配置复制到独立构建目录；隐藏策略与正式源码使用同一文件。
 
 登录采用原Token及Logo/大鹏，CSS增加蓝绿白层次；两个触发按钮共用同一尺寸样式，帮助正文独立。明确授权的run_ui01.command本机演示模式才能显示测试账号注入，Electron主进程同时核查窗口/主frame/来源/模式/角色及受控文件范围、所有者和权限。仅填充表单，密码仍经原服务认证；入口变化清空输入，异步返回核查代次。普通模式拒绝该能力，凭据不进入静态制品、日志、URL或浏览器持久存储。必要DOM/实际认证/权限与资料保持证据见UI01交付记录，视觉与用户验收单独登记。
 

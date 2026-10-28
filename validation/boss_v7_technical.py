@@ -40,6 +40,13 @@ class TechnicalWorkspaceAPI:
         domain = parts[0]
         require(domain in DOMAINS, "没有对应的技术页面接口", web.HTTPNotFound)
         authorize_technical(self.store, domain, "READ")
+        if parts == ["datasets", "current-records"]:
+            from boss_admin_current import read_current_records
+            with self.store.connect() as db:
+                db.execute("BEGIN")
+                self.store.active(db, NAMESPACE)
+                snapshot = self.store.get(db, NAMESPACE, "initial", "snapshot")
+                return read_current_records(self.store, db, snapshot, query)
         if len(parts) == 3 and domain == "datasets" and parts[1] == "history":
             with self.store.connect() as db:
                 db.execute("BEGIN")

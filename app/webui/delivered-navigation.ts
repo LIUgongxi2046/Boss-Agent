@@ -1,4 +1,5 @@
 import designPages from "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json";
+import menuPlan from "../../specs/menu-plan.json";
 import {brandMessages} from "./boss-branding";
 
 export type Role="BOSS"|"MAINTAINER";
@@ -44,6 +45,7 @@ const PRIMARY_NAVIGATION:Record<Role,PrimaryEntry[]>={
 const PUBLIC_GROUP="公共状态与登录";
 const SHARED_PAGES=new Set(["D06","D07"]);
 const AUTHENTICATION_PAGES=new Set(["N01","D08"]);
+const ADMINISTRATOR_HIDDEN_PAGES=new Set(menuPlan.administrator_hidden_pages.map(page=>page.id));
 const VARIANTS:Record<string,string>={"V19-EGG":"蛋禽","V19-MILK":"奶畜","V19-BEEF":"肉用牛羊"};
 const STATE_LABELS:Record<NavigationEntry["state"],string>={DEVELOPED:"已开发，待用户验收",IN_PROGRESS:"开发中，完整菜单待验收",PARTIAL:"已有实现，完整功能待验收",PAUSED:"语音暂停",AUTHENTICATION:"认证状态入口"};
 
@@ -63,6 +65,12 @@ DELIVERED_NAVIGATION.BOSS.N06={...DELIVERED_NAVIGATION.BOSS.N06,title:"任务通
 const BOSS_DIRECTORY=new Set(["F01","N02","N03","N04","N05"]);
 for(const [id,entry] of Object.entries(DELIVERED_NAVIGATION.BOSS))entry.directory=BOSS_DIRECTORY.has(id);
 DELIVERED_NAVIGATION.MAINTAINER.NATIVE={id:"NATIVE",title:"应用设置",group:"Agent配置",feature:"UI02",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
+// 提示状态及关联详情继续支持原有流程，仅隐藏常驻入口。
+for(const id of ADMINISTRATOR_HIDDEN_PAGES){
+  const entry=DELIVERED_NAVIGATION.MAINTAINER[id];
+  if(!entry)throw new Error("管理员隐藏页面缺少实际路由："+id);
+  entry.directory=false;
+}
 
 export function deliveredPage(page:string,role:Role,_mvp=false):NavigationEntry|undefined{
   if(role!=="BOSS"&&role!=="MAINTAINER")return undefined;

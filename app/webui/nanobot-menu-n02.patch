@@ -272,7 +272,7 @@
 @@
          onNewConversation={onNewChat}
 +        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
-+        onOpenTaskConversation={chatId=>onSelectChat("websocket:"+chatId)}
++        onOpenTaskConversation={(chatId,question)=>{onSelectChat("websocket:"+chatId);if(question)setPendingAutomationMessage({id:crypto.randomUUID(),chatId,content:question});}}
 *** Update File: webui/src/components/thread/ThreadViewport.tsx
 @@
 -export interface ThreadViewportHandle {

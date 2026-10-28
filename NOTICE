@@ -1,0 +1,20 @@
+Boss Agent
+Copyright (C) 2026 Boss Agent contributors
+
+本项目有权授权的原创代码与文档采用 GNU Affero General Public License，
+仅限第3版（AGPL-3.0-only）。完整协议见 LICENSE。
+
+本软件不提供保证；免责声明与责任限制采用 LICENSE 第15至17条。
+独立商业授权的申请说明见 COMMERCIAL_LICENSE.md。
+
+本项目基于 nanobot v0.3.5，采用源码提交
+1bb712d3488915ca4ed9ccc1a93067ff722f5ab9，并添加业务服务、界面与集成修改。
+这些项目修改截至2026-10-28包含在本仓库中。
+nanobot 的原有代码继续适用 MIT License，版权属于
+Xubin Ren and the nanobot contributors，原有版权与许可声明必须保留。
+
+第三方软件、图标、字体、图片、资料及模型服务继续适用各自的许可与条款。
+来源、许可和分发要求见 THIRD_PARTY_NOTICES.md。
+
+Boss Agent、Boss-Agent、“大鹏”名称及相关 Logo 的品牌使用规则见 TRADEMARKS.md。
+软件许可不授予以品牌名义声称官方认可、认证或合作关系的权利。

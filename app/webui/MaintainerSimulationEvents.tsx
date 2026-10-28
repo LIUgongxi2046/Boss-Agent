@@ -2,6 +2,7 @@ import {useEffect,useRef,useState,type ReactNode} from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {V7Empty,V7Fact,V7Panel,V7Pagination,V7ReadState} from "./BossV7UI";
 import {useTechnicalWorkspace} from "./useTechnicalWorkspace";
+import {CurrentBusinessRecords,type CurrentBusinessRecord} from "./MaintainerCurrentFacts";
 
 type Action="inject"|"reply"|"advance-clock";
 type Versioned={id:string;title:string;version:string};
@@ -11,6 +12,7 @@ type Outcome={state:string;ids:string[];error:string|null};
 type EventRecord={id:string;action:Action;event_type:string;namespace:string;request_id:string;created_at:string;target_id:string|null;
   source_id:string|null;source_version:string|null;saved:Outcome;tasks:Outcome;notifications:Outcome;simulation:Outcome;agent:Outcome;run_ids:string[]};
 type Projection={projection:"simulation-events";private_body_available_here:false;source_type:"SIMULATED";namespace:string;dataset_id:string;dataset_version:string;
+  business_records:CurrentBusinessRecord[];
   business_clock:{at:string;version:string};event_types:{id:string;title:string;actions:Action[];target_kinds:string[]}[];
   targets:Target[];authors:Versioned[];sources:Source[];records:EventRecord[];allowed_actions:Action[];read_at:string};
 type Draft={eventType:string;targetId:string;targetVersion:string;authorId:string;authorVersion:string;sourceId:string;sourceVersion:string;eventAt:string;content:string};
@@ -67,6 +69,7 @@ export function MaintainerSimulationEvents({onNavigate,onOpenRun,onDirtyChange,c
   const controls=<><button className="boss-btn boss-btn-primary" disabled={busy||!data?.allowed_actions.includes("inject")||!definition?.actions.includes("inject")} onClick={()=>propose("inject")}>注入事件</button><button className="boss-btn" disabled={busy||!data?.allowed_actions.includes("reply")||!definition?.actions.includes("reply")} onClick={()=>propose("reply")}>提供模拟回复</button></>;
   const outcomes:readonly [string,Outcome|undefined][]=[["事件保存结果",record?.saved],["触发任务",record?.tasks],["系统通知",record?.notifications],["模拟执行结果",record?.simulation],["Agent 处理结果",record?.agent]];
   return <div className="boss-simulation-events">
+    {data&&<CurrentBusinessRecords records={data.business_records}/>}
     <V7ReadState loading={api.loading} error={api.error} onReload={api.reload}/>
     {api.pending&&<p role="status" className="boss-status boss-status-warn">原请求 {api.pending.request_id} 尚需核查。<button className="boss-btn" disabled={api.busy} onClick={()=>void api.reconcile()}>查询原请求</button></p>}
     {api.receipt&&<p className="boss-status">操作已经记录：{api.receipt.request_id}。任务、通知及Agent处理结果以各自记录为准。</p>}

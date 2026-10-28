@@ -8,6 +8,7 @@ import {useTechnicalWorkspace} from "./useTechnicalWorkspace";
 type Dataset={id:string;version:string;seed:number;scale:string;period_start:string;period_end:string;generator_version:string;relationship_version:string;state:string;created_at:string;counts:Record<string,number>;checks:{name:string;state:string;message:string}[];facts_sha256:string;validated_at:string;totals:Record<string,Record<string,string>>};
 type Transition={request_id:string;action:string;state:string;namespace:string;previous_namespace:string;dataset_id:string;dataset_version:string;requested_at:string;activated_at:string|null;runtime_adopted_at:string|null;error:string|null};
 type Projection={projection:"datasets";private_body_available_here:false;current:{dataset_id:string;version:string;namespace:string;business_clock:string};
+  current_snapshot:{dataset_id:string;dataset_version:string;namespace:string;business_at:string;snapshot_sha256:string;counts:Record<string,number>;totals:Record<string,Record<string,string>>};
   datasets:Dataset[];generator_versions:string[];relationship_versions:string[];scales:{id:string;label:string}[];
   reset_impact:{version:string;namespace:string;sessions:number;memories:number;tasks:number;plans:number;outbox:number;active_runs:number;schedule_configurations:number;model_validation_jobs:number;checked_at:string;state:"CURRENT"|"STALE"}|null;
   history:{namespace:string;dataset_id:string;version:string;state:string;created_at:string|null;history_available:boolean}[];transitions:Transition[];inspection_available:boolean;transition_available:boolean;transition_reason:string|null;read_at:string};
@@ -15,6 +16,7 @@ type Projection={projection:"datasets";private_body_available_here:false;current
 type GeneratedRecords={dataset_id:string;version:string;source_type:"SIMULATED";kind:string;facts_sha256:string;offset:number;limit:number;total:number;records:unknown[]};
 type Confirmation={action:"load"|"reset";datasetId:string;datasetVersion:string;factsSha256:string;namespace:string;impactVersion:string};
 const EMPTY_GENERATOR={seed:"",scale:"",period_start:"",period_end:"",generator_version:"",relationship_version:""};
+const CURRENT_RECORD_LABELS:Record<string,string>={financial_detail:"经营明细",initial_contact:"联系人",document_metadata:"来源目录",meeting_summary:"会议",application_summary:"申请",task_summary:"交办",feedback_summary:"业务反馈",event_summary:"业务事件"};
 export type {Dataset,Projection as DatasetProjection};
 type HistoryRecords={namespace:string;state:"READ_ONLY";dataset_id:string;dataset_version:string;archived_at:string;private_body_available_here:false;current_evidence_eligible:false;counts:Record<string,number>;runtime:{runs:{run_id:string;status:string;started_at:string;finished_at:string|null;runtime:{provider:string;model_id:string};tool_results:unknown[]}[];matched_count:number;next_cursor:{cursor_started_at:string;cursor_run_id:string}|null}};
 function DatasetHistory({namespace}:{namespace:string}){
@@ -40,7 +42,7 @@ function DatasetHistory({namespace}:{namespace:string}){
   return <><V7ReadState loading={loading} error={error} onReload={()=>setRefresh(value=>value+1)}/>{data&&<><p className="boss-status">历史资料保持只读，不能作为当前空间的业务依据。私人正文仅在本人入口提供。</p><V7Fact label="归档时间">{data.archived_at}</V7Fact><div className="boss-form-grid">{Object.entries(data.counts).map(([key,value])=><V7Fact key={key} label={labels[key]??key}>{value}</V7Fact>)}</div><p>实际运行 · 共{data.runtime.matched_count}项</p>{data.runtime.runs.map(run=><article className="boss-workspace-item" key={run.run_id}><strong>{run.status} · {run.run_id}</strong><p>{run.runtime.provider} / {run.runtime.model_id}</p><V7Fact label="开始 / 结束">{run.started_at} / {run.finished_at??"尚无结束记录"}</V7Fact><V7Fact label="工具结果">{run.tool_results.length}项</V7Fact></article>)}<div className="boss-actions"><button className="boss-btn" disabled={!query} onClick={()=>setQuery("")}>返回首页</button><button className="boss-btn" disabled={!data.runtime.next_cursor} onClick={()=>{if(data.runtime.next_cursor)setQuery(new URLSearchParams(data.runtime.next_cursor).toString());}}>读取下一页</button></div></>}</>;
 }
 
-function DatasetRecords({dataset}:{dataset:Dataset}){
+function DatasetRecords({dataset,currentSnapshot=false}:{dataset:Pick<Dataset,"id"|"version"|"facts_sha256"|"counts">;currentSnapshot?:boolean}){
   const {getToken,token}=useClient();
   const [kind,setKind]=useState("financial_detail");
   const [offset,setOffset]=useState(0);
@@ -53,7 +55,9 @@ function DatasetRecords({dataset}:{dataset:Dataset}){
   useEffect(()=>{
     const abort=new AbortController();setRecords(null);setError("");setLoading(true);
     const query=new URLSearchParams({kind,offset:String(offset)});
-    void fetch("/api/boss/ui/admin/technical/datasets/"+encodeURIComponent(dataset.id)+"/records?"+query.toString(),{headers:{Authorization:"Bearer "+getToken()},signal:abort.signal,cache:"no-store"}).then(async response=>{
+    if(currentSnapshot)query.set("snapshot_sha256",dataset.facts_sha256);
+    const route=currentSnapshot?"/api/boss/ui/admin/technical/datasets/current-records":"/api/boss/ui/admin/technical/datasets/"+encodeURIComponent(dataset.id)+"/records";
+    void fetch(route+"?"+query.toString(),{headers:{Authorization:"Bearer "+getToken()},signal:abort.signal,cache:"no-store"}).then(async response=>{
       if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
       if(!response.ok)throw new Error("生成明细读取失败（HTTP "+response.status+"）");
       const value=await response.json() as GeneratedRecords;
@@ -61,8 +65,8 @@ function DatasetRecords({dataset}:{dataset:Dataset}){
       if(!abort.signal.aborted){setRecords(value);setLoadedToken(token);setLoading(false);}
     }).then(undefined,reason=>{if(!abort.signal.aborted){setError(reason.message);setLoading(false);}});
     return()=>abort.abort();
-  },[dataset.id,dataset.version,dataset.facts_sha256,kind,offset,getToken,token,refresh]);
-  return <div><div className="boss-v7-filter-bar"><label>资料类别<select value={kind} onChange={event=>{setKind(event.target.value);setOffset(0);}}>{Object.keys(dataset.counts).map(name=><option key={name}>{name}</option>)}</select></label></div>
+  },[dataset.id,dataset.version,dataset.facts_sha256,currentSnapshot,kind,offset,getToken,token,refresh]);
+  return <div><div className="boss-v7-filter-bar"><label>资料类别<select value={kind} onChange={event=>{setKind(event.target.value);setOffset(0);}}>{Object.keys(dataset.counts).map(name=><option key={name} value={name}>{currentSnapshot?CURRENT_RECORD_LABELS[name]:name}</option>)}</select></label></div>
     <V7ReadState loading={loading} error={error} onReload={()=>setRefresh(value=>value+1)}/>
     {records&&<><p>SIMULATED · {records.total}项记录 · 当前第{offset+1}至{Math.min(offset+records.limit,records.total)}项</p>{records.records.map((record,index)=><pre className="boss-v7-code" key={offset+index}>{JSON.stringify(record,null,2)}</pre>)}<div className="boss-actions"><button className="boss-btn" disabled={offset===0} onClick={()=>setOffset(value=>Math.max(0,value-records.limit))}>上一页</button><button className="boss-btn" disabled={offset+records.limit>=records.total} onClick={()=>setOffset(value=>value+records.limit)}>下一页</button></div></>}
   </div>;
@@ -114,6 +118,7 @@ export function MaintainerDatasets({onNavigate,onDirtyChange}:{onNavigate:(page:
   const currentPage=Math.min(page,Math.max(1,Math.ceil(rows.length/10)));
   return <div className="boss-maintainer-records boss-dataset-workspace">
     <V7ReadState loading={api.loading} error={api.error||error} onReload={api.reload}/>
+    {api.data&&<V7Panel title="Boss端当前使用的资料" description="当前业务空间的只读资料；查看不会生成、载入或重置数据集。"><div className="boss-form-grid"><V7Fact label="数据集 / 版本">{api.data.current_snapshot.dataset_id} / {api.data.current_snapshot.dataset_version}</V7Fact><V7Fact label="执行空间">{api.data.current_snapshot.namespace}</V7Fact><V7Fact label="业务时钟">{api.data.current_snapshot.business_at}</V7Fact>{Object.entries(api.data.current_snapshot.counts).map(([kind,count])=><V7Fact key={kind} label={CURRENT_RECORD_LABELS[kind]}>{count}</V7Fact>)}</div><details><summary>查看当前业务明细</summary><DatasetRecords currentSnapshot dataset={{id:api.data.current_snapshot.dataset_id,version:api.data.current_snapshot.dataset_version,facts_sha256:api.data.current_snapshot.snapshot_sha256,counts:api.data.current_snapshot.counts}}/></details></V7Panel>}
     {api.pending&&<p className="boss-status boss-status-warn">原请求 {api.pending.request_id} 等待核查。<button className="boss-btn" disabled={api.busy} onClick={()=>void api.reconcile()}>查询原请求</button></p>}
     {api.receipt&&<p role="status" className="boss-status boss-status-ok">数据操作已记录 · {api.receipt.request_id}</p>}
     <div className="boss-maintainer-columns"><div className="boss-column">

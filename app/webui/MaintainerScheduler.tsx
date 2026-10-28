@@ -7,6 +7,7 @@ import { useClient } from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
 import {BossBusinessAlertAdministration} from "./BossBusinessAlerts";
 import {deliveredPage} from "./delivered-navigation";
+import {CurrentBusinessRecords,type CurrentBusinessRecord} from "./MaintainerCurrentFacts";
 
 type Schedule = {
   schedule_id:string;version:string;schedule_version:string;timezone:string;
@@ -28,6 +29,7 @@ type Runtime = {
   schedule_version?:string;started_at?:string|null;
 };
 type Scheduler = {
+  current_events:CurrentBusinessRecord[];
   source_type:"SIMULATED";projection:"scheduler";schedule:Schedule;
   draft:Draft|null;rules:Rules|null;simulated_business_time:string;
   recent_dispatches:{event_id:string;event_version:string;state:string;
@@ -245,6 +247,7 @@ export function MaintainerScheduler({onNavigate,onDirtyChange}:{onNavigate:(page
       :data.draft.validation_state!=="DRAFT"?`当前草稿状态为 ${data.draft.validation_state}，不能重复验证`
         :"";
   return <div className="boss-scheduler-workspace">
+    {data&&<CurrentBusinessRecords records={data.current_events} title="当前业务事件与期限"/>}
     <div className="boss-workspace-toolbar">
       <div className="boss-workspace-note"><span className="boss-tag boss-tag-amber">SIMULATED · TECH ONLY</span>
         A13 · 版本化调度草稿与运行开关

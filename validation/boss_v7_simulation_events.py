@@ -90,6 +90,7 @@ def _records(db):
 
 
 def read_simulation_events(store, db, snapshot, query):
+    from boss_admin_current import business_records
     require(not query, "事件读取不接受查询参数", web.HTTPBadRequest)
     clock = _clock(db)
     sources = _sources(db, snapshot, clock["at"])
@@ -104,6 +105,7 @@ def read_simulation_events(store, db, snapshot, query):
         "authors": _authors(snapshot),
         "sources": sources,
         "records": _records(db),
+        "business_records": business_records(store, db, snapshot),
         "allowed_actions": ["inject", "reply", "advance-clock"],
         "read_at": now(),
     }

@@ -2,9 +2,29 @@
 
 每次接手完整读取 [开发接手与执行规范](开发接手与执行规范.md)。当前执行状态唯一来自 [feature-delivery.json](../specs/feature-delivery.json)，队列来自 [menu-plan.json](../specs/menu-plan.json)；索引中的日期和阶段状态仅代表对应文档核查范围。
 
+## 当前实现与使用文档
+
+适用源码为 `9cd9888490521242def326f475c93823a68ec95b`及当前未提交修改，核查日期为2026-10-28。当前活动工单通过唯一正式状态读取；本次文档更新保留全部完整产品需求与未完成验收。
+
+| doc_id | 受众与关键词 | 文件与来源 | 文档有效性 | last_verified |
+|---|---|---|---|---|
+| DOC-INTEGRATION-CURRENT | 开发者；认证、HTTP、WebSocket、经营范围、会话绑定、错误与恢复 | [集成指南](开发者集成指南.md)、[经营接口](../specs/product-business-overview.openapi.yaml)、[账号接口](../specs/product-auth.openapi.yaml) | CURRENT；代码与Schema核查 | 2026-10-28 |
+| DOC-DATA-CURRENT | 开发者；SQLite、FTS5、来源、经营绑定与公开基准 | [当前数据字典](当前数据字典.md)、`business.Store`、`BusinessOverviewEntry` | CURRENT；物理定义及相关实体 | 2026-10-28 |
+| DOC-RUNTIME-ENV | 开发与维护；依赖、启动矩阵、目录、端口、制品、配置及影响 | [运行环境](运行环境.md)、当前启动与准备脚本 | CURRENT；源码及本机文件核查 | 2026-10-28 |
+| DOC-OPS-CURRENT | 老板与维护；连续操作、Prompt、SOP、故障与原编号恢复 | [操作手册](操作手册.md)、当前界面及领域入口 | CURRENT；使用条件与限制 | 2026-10-28 |
+| DOC-RELEASE-CURRENT | 产品与维护；候选行为、证据范围、兼容与未完成项 | [发布说明](发布说明.md)、[仿真主记录](development/SIMULATION-20261028.md) | CURRENT；本机研发候选 | 2026-10-28 |
+| DOC-AGENT-SIX-COMPONENTS | 产品与开发；业务场景、六类Agent组件及实际采用 | [Agent说明](Agent六要素设计与实现说明.md)、文内源码与验证记录 | 按原文核查范围使用 | 2026-10-28 |
+| DOC-SYNC-20261028 | 接手者；文档范围、来源版本、检查、依赖与完整剩余项 | [文档任务主记录](development/DOC-SYNC-20261028.md) | CURRENT；仅文档任务 | 2026-10-28 |
+
+以上文档由当前主执行者维护；关联业务任务为 `V7-FRONTEND`、`V7-BACKEND`、`USER-REVIEW-20261027`、`SIMULATION-20261028`。详细任务通过[开发索引](development/index.md)检索。
+
+## 设计基线与原任务资料
+
+下表按原核查日期检索设计和任务。各项验收状态具有原版本范围，当前代码及运行方式采用前述2026-10-28文档；未完整复核的设计章节保持 NEEDS_REVIEW，不据旧表中的“当前”表述切换任务。
+
 | doc_id | 内容与关键词 | 当前文件 | 维护责任 | 状态 | last_verified |
 |---|---|---|---|---|---|
-| DOC-HANDOVER | 每次必读、依据关系、工程入口、开源复用、接手检查与完整交付 | [开发接手与执行规范](开发接手与执行规范.md) | 当前接手负责人 | CURRENT；仅规范与来源核查 | 2026-10-25 |
+| DOC-HANDOVER | 每次必读、依据关系、工程入口、开源复用、接手检查与完整交付 | [开发接手与执行规范](开发接手与执行规范.md) | 当前接手负责人 | CURRENT；仅规范与来源核查 | 2026-10-28 |
 | DOC-REQ | 电脑桌面应用、老板秘书、农业经营、模拟服务、模型与验收 | [需求输入](Boss-Agent需求输入.md) | S002 | CURRENT | 2026-10-22 |
 | DOC-PLAN | S001—S012、老板范围、R01—R32、依赖、工单；第 8 节桌面任务与验收，第 11—12 节战略设计与 A00 审查 | [项目计划](Boss-Agent项目计划.md) | S000/S007；S001 维护战略章节 | CURRENT | 2026-10-22 |
 | DOC-DEC | 授权、候选、模型、预算、语音、资源及 D17 桌面产品决定 | [决策记录](项目决策记录.md) | S000 | CURRENT | 2026-10-22 |

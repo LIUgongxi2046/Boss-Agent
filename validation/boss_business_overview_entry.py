@@ -55,7 +55,7 @@ class BusinessOverviewEntry:
         require(view["snapshot_sha256"] == snapshot_sha256, "已应用经营范围或来源快照已经变化", web.HTTPConflict)
         topic = None
         if topic_reference is not None:
-            topic = next(row for row in view["topics"] if row["page_id"] == topic_reference["page_id"])
+            topic = self.overview.topic_in_transaction(db, view, topic_reference)
             require(topic_reference["use"] is None or topic_reference["use"] in topic["uses"], "当前专题不支持所选用途", web.HTTPBadRequest)
         return view, {"scope_sha256": checksum(view["applied_scope"]), "topic_sha256": checksum(topic) if topic is not None else None,
             "business_at": view["business_at"], "source_references": [{"kind": "document", "id": row["source_id"],

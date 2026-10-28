@@ -1,8 +1,16 @@
 {
   "schema_version": 1,
   "decision_id": "D-MENU-DELIVERY-20261024",
-  "navigation_visibility_decision_id": "D-ALL-MENUS-MAIN-20261025",
-  "navigation_visibility_policy": "按本人/维护身份分别显示全部菜单；合法访问、实际能力、暂停与完整开发状态分别保持，不因可见增加完成数量",
+  "navigation_visibility_decision_id": "D-ADMIN-MENU-PURPOSE-20261028",
+  "navigation_visibility_policy": "Boss端保持当前五项主菜单；管理端隐藏提示状态、重复评测及运行详情入口，关联页面与权限校验保留；可见性不增加完成数量",
+  "administrator_hidden_pages": [
+    {"id": "N01", "reason": "登录状态由身份认证流程显示"},
+    {"id": "D08", "reason": "认证状态由身份认证流程显示"},
+    {"id": "D06", "reason": "未保存提示由离开页面及关闭窗口时显示"},
+    {"id": "D07", "reason": "访问限制在权限不足时显示"},
+    {"id": "F30", "reason": "运行详情由A15所选运行进入"},
+    {"id": "F31", "reason": "同一评测能力统一从A16进入"}
+  ],
   "git_delivery_target": "origin/main",
   "design_fidelity_decision_id": "D-UI-FIDELITY-20261024",
   "design_fidelity_requirements": "docs/menu-delivery/高保真还原执行要求.md",

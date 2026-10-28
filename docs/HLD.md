@@ -3,16 +3,31 @@
 > **版本**：1.0.0 · **基准日期**：2026-10-22 · **任务**：T04 / A04 · **性质**：最终版架构设计基线（非代码或功能验收）  
 > **优先级**：已确认项目决定 > PRD V1.2.0 的业务/验收语义 > 本 HLD 的技术决策 > 72 页映射的页面责任 > 后续 T05—T08 的专业 LLD。任何冲突回溯原始需求与决策，不默默扩大权限或开发范围。
 
+## 当前实现核查：2026-10-28
+
+doc_id：DOC-HLD；当前实现核查采用 `9cd9888490521242def326f475c93823a68ec95b`及未提交修改。维护责任为当前主执行者。本文保留完整架构设计，设计基线日期为2026-10-22；本次核查入口、模块职责和实际调用，未完整复验的设计与NFR保持 NEEDS_REVIEW。
+
+| 架构部分 | 当前实现与验证边界 |
+|---|---|
+| 页面与交互 | Desktop v7，72个设计主视图；老板使用五个主要工作入口，个人设置从账号菜单进入；结构、业务、视觉与用户验收分别记录 |
+| 本机宿主 | 通用 Electron 桌面与独立浏览器候选共用 Python 产品服务；当前仿真候选入口及制品见[运行环境](运行环境.md) |
+| 公共接口 | `AccountRoleChannel`、`RoleChannel`、`BossPageAPI`、`BossCommandAPI`，复用原生认证、ClientProvider及WebSocket |
+| Agent | 单一 nanobot AgentLoop；FeatureProvider采用当前启用的外部模型或显式模拟Provider，已有DeepSeek限定运行证据 |
+| 状态与知识 | ControlStore/Store维护SQLite业务对象、来源、权限、CAS与回执；知识采用FTS5，原生会话采用MemorySessionManager |
+| 交付 | 当前源码包含未提交内容，完整产品、正式安装分发、视觉及用户验收均继续保留未完成要求 |
+
+字段和当前业务调用见[集成指南](开发者集成指南.md)、[数据字典](当前数据字典.md)与[Agent说明](Agent六要素设计与实现说明.md)。任务状态仅采用[唯一正式状态](../specs/feature-delivery.json)。
+
 ## 0. 结论与交接
 
-Boss-Agent 是运行于**本机桌面**、只服务**一个老板业务主体**的 Agent 软件。一个 nanobot Runtime 执行模型、工具、会话；老板使用桌面内的六类工作入口，技术维护者使用同一桌面宿主内的独立授权维护入口。部门人员只作为联系人、资料作者、反馈对象，不获得登录身份，不新增部门 Agent。模型唯一选择 DeepSeek，不设置自动回退模型。当前业务输入是有显著标识的模拟资料，真实模型调用与模拟业务执行分别记录。
+Boss-Agent 是运行于**本机桌面**、只服务**一个老板业务主体**的 Agent 软件。一个 nanobot Runtime 执行模型、工具、会话；老板使用今日工作、聊天交办、经营关注、会议与资料、任务与承诺，个人设置采用账号菜单。技术维护者使用独立授权维护入口。部门人员只作为联系人、资料作者、反馈对象，不获得登录身份，不新增部门 Agent。当前真实模型记录采用 DeepSeek，模型配置与实际请求分别核查。业务输入采用明确模拟资料与具有公开出处的经营基准，真实模型调用与模拟业务执行分别记录。
 
 固定采用：**HKUDS/nanobot v0.3.5**（commit 1bb712d3488915ca4ed9ccc1a93067ff722f5ab9）、上游 React 18/TypeScript/Vite/Tailwind 3/shadcn/ui 用户 WebUI 与 Settings、**Electron 45.0.0**、**Python 3.12**、**SQLite + FTS5**、nanobot CronService、DeepSeek 的 deepseek-flash Chat Completions。其可行性已有 T02 实证，但尚无覆盖 72 个页面的正式业务产品或正式安装交付。只有 T02 的选型可行性状态可引用 ACCEPTED；T18/T19/T20/T24/T25 的产品验收仍为未执行。
 
 **页面实现冻结物**：
 - [72 页人类可读实现映射](HLD-72页面实现映射.md)（72/72 页面、每页设计源、逻辑路由、拟实现 React 组件、真实上游复用锚点、语义读写、角色及任务责任）。
 - [72 页结构化架构契约](../specs/hld-72-page-map.json)（T04 设计阶段唯一机器可读映射；不是 T06 OpenAPI 或 T08 page-service-map 的替代品）。
-- [设计与交互预览](../Boss-Agent-Desktop-Complete-v6/index.html)；[设计 Token](../Boss-Agent-Desktop-Complete-v6/design-tokens.json)。
+- [设计与交互预览](../Boss-Agent-Desktop-Complete-v7/index.html)；[设计 Token](../Boss-Agent-Desktop-Complete-v7/design-tokens.json)。
 - 权威业务语义、权限、FR-01—FR-32、AD01—AD16、状态与验收仍由 [PRD](PRD.md)、[交互与页面规范](交互与页面规范.md) 管理。
 
 **实施授权更新（D21）**：HLD 最初冻结时 D19 暂停开发；2026-10-22 用户后续明确批准基于固定开源基础开始实施。D19 保留为历史决策，当前实际开发权限按 D21 执行。完整 PRD 和视觉验收不因授权变化视为通过。
@@ -23,9 +38,9 @@ Boss-Agent 是运行于**本机桌面**、只服务**一个老板业务主体**�
 |---|---|---|
 | 主要用户 | 一个老板主体（BOSS），支持多个会话、任务、个人计划 | 其他部门独立 Agent、员工业务工作台、客户账号、真实协作门户 |
 | 技术维护 | 一个独立维护身份（MAINTAINER），承担配置、模拟资料、可观测与评测 | 不可代老板批准、完成、发送、修改私人记忆，不可默认访问私人正文 |
-| 入口 | 老板六类 U01—U06 与维护 AD01—AD16；桌面含登录、详情/弹窗、异常页 | 手机专属端、平板专属端、独立部署给外部用户的 Web 产品 |
+| 入口 | 老板五个主要工作入口及个人设置，维护AD01—AD16；全部原业务能力、登录、详情/弹窗与异常要求保留 | 手机专属端、平板专属端、独立部署给外部用户的 Web 产品 |
 | 需求 | FR-01—FR-32；13 秘书任务、10 农业专题及共通能力 | 增加新业务角色/新产业执行系统需要新的明确决策 |
-| 设计 | Desktop v6.0 共 72 HTML、72 1x/2x 页面图片、561 条 F/A/V 状态关联、大鹏素材与六种动效 | 设计态不是业务已成功、动作已发送、授权已有效或产品测试已通过 |
+| 设计 | Desktop v7共72主视图、561条状态关联、大鹏素材与六种动效；用户最新交互要求共同适用 | 设计资源存在不能证明业务、视觉和用户验收通过 |
 | 数据 | SIMULATED 的农业经营、联系人、会议、任务与材料；真实模型/工具运行记录 | 未授权接入企业 ERP/OA、真实外部联系人发送、线上客户生产数据 |
 | 网络 | 本机 UI 与业务状态可运行；DeepSeek、语音和外部来源依赖获准网络服务 | 不宣称模型、转写或外部检索离线可用 |
 | 验证设备 | T02 已核验的 macOS 13.7.8 / Intel x86_64 | Apple Silicon、Windows、Linux 与最低兼容系统版本未通过验证 |
@@ -36,11 +51,11 @@ Boss-Agent 是运行于**本机桌面**、只服务**一个老板业务主体**�
 
 | 分层 | 上游 / 当前验证入口 | 正式产品维护方式 |
 |---|---|---|
-| WebUI 与维护 Settings | nanobot 0.3.5：webui/src/ 下的 Sidebar、ThreadShell/Composer/Messages、GenericToolRun、SettingsPage/SettingsView、ModelsSettings、AppsSettings、SkillsCatalogSettings、AutomationsSettings 等 | **扩展同一 WebUI 源码体系**；从 v6 转换为 React 业务视图和公共组件，不用 72 个 iframe/静态 HTML 组成正式 UI |
+| WebUI 与维护 Settings | nanobot 0.3.5：webui/src/ 下的 Sidebar、ThreadShell/Composer/Messages、GenericToolRun、SettingsPage/SettingsView、ModelsSettings、AppsSettings、SkillsCatalogSettings、AutomationsSettings 等 | 扩展同一WebUI源码体系；Desktop v7由React业务视图和公共组件承载，HTML作为设计来源 |
 | 会话、流与恢复 | nanobot/agent/loop.py；nanobot/session/manager.py、webui_turns.py、recovery.py；session/thread 正式 API 与 WebSocket | 保留上游会话事件/持久投影，增加老板业务结果关联；不重新造第二套 SDK 会话 |
 | 模型 | OpenAICompatProvider、nanobot SDK；当前 DeepSeek deepseek-flash/Chat Completions，thinking disabled | 仅 DeepSeek 受控调用，凭据在服务端；型号、协议或内部适配器升级必须复验 |
 | Tools | ToolRegistry + 业务 Tool 扩展；T02 已验证 query_metrics、read_evidence、create_assignment、send_assignment、read_assignment | 业务 Tool 只接受白名单参数；owner、执行空间、授权、幂等与资料版本由服务端注入/校验 |
-| 业务服务 | validation/business.py、controls.py、service.py、application.py 为本次可运行**验证实现** | T05/T06/T11 将可复用逻辑重构为正式业务 API 与状态服务；验证代码**不是正式生产组件** |
+| 业务服务 | validation/application.py、business.py、controls.py、service.py及product_*/boss_*为当前产品入口与领域实现 | 通过实际调用核查权限、版本和持久化；目录名称不表示内容仅供测试，完整生产交付仍需正式验收 |
 | 本地存储 | SQLite、FTS5、事务、原始精度 Decimal；T02 的业务与控制 Store | 明确域对象、源版本、执行空间与迁移方案；数据字典由 T05 固定 |
 | 调度 | nanobot CronService、应用级 FileLock、业务事件及规则 | 同一进程只有一个实际调度执行者；Cron 承载调度机制，不创建第二套自主业务计划 |
 | 桌面宿主 | validation/desktop/main.cjs、preload.cjs、Electron BrowserWindow | T11/T25 产品化为安装目录、资源路径、Python 打包、数据目录、权限和正式安装器；不得依赖开发者绝对路径 |

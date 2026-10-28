@@ -151,8 +151,13 @@ def copy_overlay() -> None:
     original_meta_import = "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json"
     if navigation_source.count(original_meta_import) != 1:
         raise RuntimeError("经营导航源码与已审核的72页设计引用不匹配，拒绝自动改写")
+    original_menu_import = "../../specs/menu-plan.json"
+    if navigation_source.count(original_menu_import) != 1:
+        raise RuntimeError("管理员导航源码缺少正式菜单配置引用")
+    # 独立构建采用同一正式菜单配置，保留管理员隐藏入口的用户决定。
+    shutil.copy2(ROOT / "specs/menu-plan.json", BOSS_DIR / "menu-plan.json")
     navigation.write_text(
-        navigation_source.replace(original_meta_import, "./page-meta.json", 1),
+        navigation_source.replace(original_meta_import, "./page-meta.json", 1).replace(original_menu_import, "./menu-plan.json", 1),
         encoding="utf-8",
     )
     shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")

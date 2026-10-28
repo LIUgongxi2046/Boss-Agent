@@ -7,6 +7,7 @@ import { useClient } from "@/providers/ClientProvider";
 import {diffLines} from "diff";
 import * as Dialog from "@radix-ui/react-dialog";
 import {V7Empty,V7Panel,V7Tabs} from "./BossV7UI";
+import {CurrentRuntimeConfiguration,type EffectiveRuntime} from "./MaintainerCurrentFacts";
 
 type Kind = "SECRETARY_ROLE" | "EXPRESSION" | "TASK_HINTS";
 const KINDS: {id:Kind;label:string}[] = [
@@ -29,6 +30,7 @@ type Active = {
   actual_model_evaluation_passed:false;
 };
 type Data = {
+  effective_runtime:EffectiveRuntime;
   source_type:"SIMULATED";projection:"prompt-versions";data_version:string;
   kinds:Kind[];drafts:Prompt[];revisions:Prompt[];active:Active[];adoptable_current_ids:string[];
   model_evaluation_completed:false;full_security_evaluation_completed:false;
@@ -401,6 +403,7 @@ export function MaintainerPromptVersion({onNavigate,onDirtyChange}:Props) {
     {loading&&<div className="boss-status" role="status"><Loader2 className="boss-spin" size={16}/> 正在获取已授权技术配置…</div>}
     {dirty&&stale&&<p role="alert" className="boss-status boss-status-warn">当前编辑版本与已读取版本不同，请放弃本次编辑后重新选择。</p>}
     {!data&&!loading&&!error&&<V7Empty title="尚未读取Prompt版本">点击“刷新版本列表”读取已保存版本与采用状态。</V7Empty>}
+    {data&&<CurrentRuntimeConfiguration value={data.effective_runtime}/>}
     {data&&<div className="boss-prompt-columns">
       <aside className="boss-column"><V7Panel title="内容目录"><nav className="boss-prompt-directory" aria-label="Prompt内容目录">{KINDS.map(row=>{const count=versionCount(row.id);const current=data?.active.find(item=>item.kind===row.id);return <button type="button" key={row.id} className="boss-btn" aria-current={row.id===kind?"page":undefined} disabled={busy||lookupBusy||!!pending} onClick={()=>changeKind(row.id)}><span>{row.label}</span><small>{count?`${count} 个已保存版本`:"尚无已保存版本 · 新增"}{current?.enabled?` · 有效 v${current.prompt_version}`:" · 未启用"}</small></button>;})}</nav><p className="boss-v7-note">数量表示已保存版本；草稿、启用版本与实际采用记录分别显示。</p><Detail label="当前类别" value={kindLabel}/><Detail label="当前草稿" value={dirty?"存在未保存修改":prompt?`v${prompt.version} · ${validationLabel(prompt.validation_status)}`:"尚未保存"}/><button type="button" className="boss-btn" onClick={showAdoption}>查看实际采用</button></V7Panel></aside>
       <div className="boss-column">

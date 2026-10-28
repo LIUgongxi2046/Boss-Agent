@@ -13,6 +13,46 @@ from runtime_page_read_tools import BossEvidenceReadTool
 FORMAL_TOOLS = frozenset({"todayRead", "morningListRead", "morningDetailRead", "morningSourceRead"})
 
 
+def compact_morning_messages(messages):
+    known = set()
+    compacted = []
+    calls = {call["id"] for message in messages if message.get("role") == "assistant"
+             for call in message.get("tool_calls", []) if call["function"]["name"] in FORMAL_TOOLS}
+    for message in messages:
+        if message.get("role") != "tool" or message.get("tool_call_id") not in calls:
+            compacted.append(message)
+            continue
+        sources = {}
+
+        def reference(value):
+            if isinstance(value, dict):
+                identity = None
+                if "source_id" in value and "version" in value and ("content" in value or len(value) > 4):
+                    identity = {"source_id": value["source_id"], "version": value["version"]}
+                elif "item_id" in value and "source_refs" in value:
+                    identity = {"item_id": value["item_id"]}
+                elif "contact_id" in value and "name" in value:
+                    identity = {"contact_id": value["contact_id"]}
+                elif set(value) == {"reference", "data"}:
+                    identity = {"reference": value["reference"]}
+                if identity is not None:
+                    digest = checksum(value)
+                    if digest not in known:
+                        known.add(digest)
+                        sources[digest] = value
+                    return {**identity, "representation_sha256": digest}
+                return {key: reference(item) for key, item in value.items()}
+            if isinstance(value, list):
+                return [reference(item) for item in value]
+            return value
+
+        output = reference(json.loads(message["content"]))
+        require(isinstance(output, dict) and "source_representations" not in output, "晨间工具结果格式无效")
+        output["source_representations"] = sources
+        compacted.append({**message, "content": encode(output)})
+    return compacted
+
+
 class FormalMorningTool(Fc03TodayTool):
     def __init__(self, store, context_provider, name):
         require(name in FORMAL_TOOLS, "工具超出晨间批准范围", web.HTTPForbidden)
@@ -102,5 +142,10 @@ class FormalMorningTool(Fc03TodayTool):
                 output = {"document": document, "knowledge_selection": {key: selection[key] for key in ("binding_id", "context_version")}}
             else:
                 output = self.api.source(context.role, params["list_id"], params["source_id"])
+        with self.store.connect() as db:
+            db.execute("BEGIN")
+            initial = self.store.get(db, context.namespace, "initial", "snapshot")
+            output = {**output, "contact_directory": initial["contacts"],
+                      "owner_reference": {"owner_id": context.owner_id, "display_name": "本人"}}
         require(self.context() == context, "晨间读取期间认证范围已经变化", web.HTTPConflict)
         return encode(output)

@@ -77,6 +77,7 @@ class DatasetWorkspace:
         return {**saved, "state": "CURRENT" if current["version"] == saved["version"] else "STALE"}
 
     def read(self, db, initial):
+        from boss_admin_current import current_snapshot
         from boss_execution_transition import transition_status
         controller = self.runtime_control.execution_transition if self.runtime_control is not None else None
         transition_available = controller is not None and controller.available
@@ -94,7 +95,7 @@ class DatasetWorkspace:
                 history.append({"namespace": namespace, "dataset_id": previous["dataset_id"], "version": previous["dataset_version"],
                                 "state": "READ_ONLY", "created_at": manifest["created_at"] if manifest else None,
                                 "history_available": archive is not None})
-        return {"datasets": [_public(item, checksum(item["facts"]) == item["facts_sha256"]
+        return {"current_snapshot": current_snapshot(self.store, db, initial), "datasets": [_public(item, checksum(item["facts"]) == item["facts_sha256"]
                                     and _content_hash(db, item["candidate_namespace"]) == item["candidate_sha256"])
                              for item in sorted(definitions, key=lambda item: item["created_at"], reverse=True)],
                 "current": {"dataset_id": initial["dataset_id"], "version": initial["dataset_version"], "namespace": NAMESPACE,

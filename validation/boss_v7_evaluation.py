@@ -262,6 +262,7 @@ def cancel(api, db, payload):
 
 
 def read_evaluation(store, db, snapshot):
+    from boss_admin_current import observed_runs
     categories = catalogs(store, db, snapshot)
     attempts = []
     evidence = []
@@ -272,4 +273,5 @@ def read_evaluation(store, db, snapshot):
         attempts.append(attempt)
     attempts.sort(key=lambda item: item["started_at"], reverse=True)
     return {"task_sets": TASK_SETS, **categories, "attempts": attempts, "evidence": evidence,
+            "observed_runs": observed_runs(db),
             "real_adoption_state": "EVALUATION_ONLY_NOT_RUNTIME_ADOPTION"}

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import hashlib
 from copy import deepcopy
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -342,10 +343,32 @@ class FeatureProvider(LLMProvider):
     def get_default_model(self):
         return self.external_provider.get_default_model() if self.external_provider is not None else "deepseek-flash"
 
+    def _external_inputs(self, messages, tools, kwargs, *, streaming=False):
+        request = current_request_context()
+        require(request is not None and ATTRIBUTE in request.attributes, "实际模型请求缺少运行归属")
+        binding = request.attributes[ATTRIBUTE]
+        with binding.recorder.store.connect() as db:
+            row = binding.recorder._read(db, binding.run_id)
+        used = len(row["model_requests"])
+        maximum = row["runtime"]["max_tool_rounds"]
+        require(used < maximum, "实际模型调用已经达到当前预算")
+        options = self._call_options(kwargs, streaming)
+        tool_names = [item["function"]["name"] for item in tools or []]
+        if "todayRead" in tool_names:
+            from fc03_agent.formal import compact_morning_messages
+            messages = compact_morning_messages(messages)
+            messages = [*messages, {"role": "system", "content": "晨间工具中的事项、联系人、业务对象与来源采用representation_sha256引用；完整内容保存在本轮或前序工具消息的source_representations中，相同SHA256表示完全相同的内容。请直接采用已经返回的完整资料，不重复读取同一来源。contact_directory提供联系人编号对应的姓名、组织与职责，owner_reference表示本人。回答人员信息时采用姓名。今日清单已经包含事项、责任人与期限；根据问题需要补充详情及原文，随后形成完整答复。未读取的详情或附件说明尚未核查，不能据此判定记录缺少数值。引用资料时采用业务资料名称及来源编号与版本。"}]
+        messages = [*messages, {"role": "system", "content": "本轮实际可调用工具：" + json.dumps(tool_names, ensure_ascii=False) + "。所有调用必须采用这些工具名称及其参数定义。背景中的上游能力说明、技能目录和文件路径不提供额外工具权限；需要方法正文时，仅采用当前上下文已经提供的正文与采用记录。需要来源时使用当前业务读取工具返回的来源编号。用户未指定篇幅时，请用600字以内回答，保留关键数值、原始期间、计量单位、来源与待核查事项。用户明确要求完整清单或详细内容时，按其要求回答。"}]
+        if tools and used == maximum - 1:
+            options["tool_choice"] = "none"
+            messages = [*messages, {"role": "system", "content": "本轮是当前调用预算内的最终回答。请根据已经返回的实际工具结果回答用户问题，说明依据、尚未核实的内容及建议行动。不得把尚未执行的读取或业务操作描述为已经完成。本轮不再调用工具。"}]
+        return messages, options
+
     async def chat(self, messages, tools=None, model=None, **kwargs):
         if self.external_provider is not None:
+            messages, options = self._external_inputs(messages, tools, kwargs)
             async with asyncio.timeout_at(self._external_deadline()):
-                return await self.external_provider.chat(messages, tools, model, **self._call_options(kwargs))
+                return await self.external_provider.chat(messages, tools, model, **options)
         request = current_request_context()
         if self.reminders is not None and self.reminders.handles(request):
             return await self.reminders.provider.chat(messages, tools, model, **kwargs)
@@ -363,26 +386,50 @@ class FeatureProvider(LLMProvider):
         if self.external_provider is not None:
             request = current_request_context()
             binding = request.attributes[ATTRIBUTE]
-            options = self._call_options(kwargs, True)
+            messages, options = self._external_inputs(messages, tools, kwargs, streaming=True)
             callback = options.get("on_content_delta")
             started = monotonic()
             arrivals, processing, lengths = [], [], []
+            pending = []
+            pending_characters = 0
+            last_delivery = started
+            incoming_hash, delivered_hash = hashlib.sha256(), hashlib.sha256()
+
+            async def deliver():
+                nonlocal pending_characters, last_delivery
+                content = "".join(pending)
+                pending.clear()
+                pending_characters = 0
+                before = monotonic()
+                await callback(content)
+                delivered_hash.update(content.encode("utf-8"))
+                last_delivery = monotonic()
+                processing.append((last_delivery-before)*1000)
 
             async def observe_delta(delta):
+                nonlocal pending_characters
                 received = monotonic()
                 arrivals.append((received-started)*1000)
                 lengths.append(len(delta))
-                await callback(delta)
-                processing.append((monotonic()-received)*1000)
+                incoming_hash.update(delta.encode("utf-8"))
+                pending.append(delta)
+                pending_characters += len(delta)
+                if not processing or pending_characters >= 48 or received-last_delivery >= 0.08:
+                    await deliver()
 
             if callback is not None:
                 options["on_content_delta"] = observe_delta
             async with asyncio.timeout_at(self._external_deadline()):
                 try:
-                    return await self.external_provider.chat_stream(messages, tools, model, **options)
+                    response = await self.external_provider.chat_stream(messages, tools, model, **options)
+                    if callback is not None and pending:
+                        await deliver()
+                    require(incoming_hash.digest() == delivered_hash.digest(), "实际模型流式文本尚未完整传递")
+                    return response
                 finally:
                     gaps = [right-left for left, right in zip(arrivals, arrivals[1:])]
-                    profile = {"chunks": len(arrivals), "characters": sum(lengths),
+                    profile = {"chunks": len(arrivals), "delivery_batches": len(processing), "characters": sum(lengths),
+                               "incoming_sha256": incoming_hash.hexdigest(), "delivered_sha256": delivered_hash.hexdigest(),
                                "first_chunk_ms": round(arrivals[0], 2) if arrivals else None,
                                "max_chunk_gap_ms": round(max(gaps), 2) if gaps else None,
                                "mean_chunk_gap_ms": round(sum(gaps)/len(gaps), 2) if gaps else None,

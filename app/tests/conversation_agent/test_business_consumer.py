@@ -323,10 +323,11 @@ def test_actual_business_model_sees_only_scoped_tools_and_rejects_unplanned_para
         names = {tool["function"]["name"] for tool in tools}
         assert names == {"businessOverviewRead", "query_metrics", "bossEvidenceRead"}
         tool = agent.registry.get("businessOverviewRead")
-        with pytest.raises(web.HTTPForbidden):
+        assert tool.parameters["properties"]["projection"]["enum"] == ["current"]
+        with pytest.raises(web.HTTPBadRequest):
             await tool.execute(projection="topic")
         with pytest.raises(web.HTTPBadRequest):
-            await tool.execute(projection="overview", owner_id="unapproved")
+            await tool.execute(projection="current", owner_id="unapproved")
         observed.append(names)
         return await original(messages, tools)
     agent.provider.event_producer = inspected

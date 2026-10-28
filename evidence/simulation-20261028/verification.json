@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "source_baseline": "9cd9888490521242def326f475c93823a68ec95b",
+  "task_records": [
+    "docs/development/SIMULATION-20261028.md",
+    "docs/development/ADMIN-MENU-20261028.md",
+    "docs/development/SEED-RELEASE-20261028.md"
+  ],
+  "public_baseline": {
+    "path": "specs/public-business-baseline.json",
+    "sha256": "4b04704aebfb110a57eac7a9ecde0760daca0ae2523af603bc48cb7e660e06f5",
+    "source_pdf_sha256": "42da166bd4e2a4062f4c7652c18c85f3c7e2186a59a8fb3ef10fedb728aa8ab4",
+    "amounts_verified": 24,
+    "volumes_verified": 8,
+    "verification_script": "scripts/verify_public_business_baseline.py"
+  },
+  "simulation_initialization": {
+    "script": "scripts/prepare_comprehensive_simulation.py",
+    "test_files": ["app/tests/test_simulation_initializer.py", "app/tests/test_comprehensive_simulation.py", "app/tests/test_admin_current_projection.py"],
+    "checks_passed": 19,
+    "nonempty_interfaces": 14,
+    "accounts": "RANDOM_LOCAL_PASSWORDS_BCRYPT_HASHED",
+    "repeat_preserves_owner_actions": true,
+    "repeat_preserves_accounts": true,
+    "external_requests_sent": false
+  },
+  "administrator_readonly_validation": {
+    "domain_checks_passed": 57,
+    "navigation_and_history_checks_passed": 12,
+    "authenticated_dom_checks_passed": 32,
+    "visible_administrator_entries": 20,
+    "hidden_administrator_entries": ["N01", "D08", "D06", "D07", "F30", "F31"],
+    "matched_boss_tasks": 12,
+    "business_objects_before_and_after_sha256": "39cca01f76203ebb37cd88ac49f03be04654c92bfad9b9d463060bcec2c108b6",
+    "boss_configuration_changed": false,
+    "private_body_exposed": false
+  },
+  "prior_real_model_validation": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "business_scenarios_passed": 27,
+    "browser_question_paths_passed": 13,
+    "saved_answers_verified": 40,
+    "stream_text_sha256_checks_passed": 13,
+    "raw_records": "RETAINED_ONLY_IN_PRIVATE_LOCAL_INSTANCE",
+    "rerun_during_initialization_release": false
+  },
+  "frontend": {
+    "typescript": "PASSED",
+    "vite_build": "PASSED",
+    "index_sha256": "acc1f0018b16132edbe9757253e284eb49e79d3abdfd8f5f9027f5ba6c65bcc8"
+  },
+  "visual": "NOT_RUN",
+  "user_acceptance": "PENDING",
+  "full_product_delivery": false
+}

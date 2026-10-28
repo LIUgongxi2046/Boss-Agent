@@ -291,8 +291,8 @@ def application_seed(api, db, data, payload):
         "client_request_id", "application_id", "applicant_contact_id",
         "amount_cny", "title", "description", "attachment_text",
     })
-    require(payload["application_id"] == "application-1",
-            "当前获准模拟数据集只允许 application-1", web.HTTPBadRequest)
+    require(payload["application_id"] in {"application-1", *data.get("simulation_application_ids", [])},
+            "申请编号不在当前获准模拟资料中", web.HTTPBadRequest)
     require(payload["applicant_contact_id"] in {
         c["contact_id"] for c in data["contacts"] if c["contact_id"] != "contact-2"
     }, "申请联系人须来自当前内部模拟资料", web.HTTPBadRequest)

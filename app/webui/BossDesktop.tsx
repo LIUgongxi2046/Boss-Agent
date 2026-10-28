@@ -153,7 +153,7 @@ type Props = {
   onOpenMorning:(chatId:string)=>void;
   onNewConversation:()=>void;
   onCreateTaskConversation:()=>Promise<string>;
-  onOpenTaskConversation:(chatId:string)=>void;
+  onOpenTaskConversation:(chatId:string,question?:string)=>void;
   children: (role: Role, visible: boolean, actions:ConversationActions) => ReactNode;
   onOpenNative: (role: Role) => void;
   onBeforeLeaveNative: (leave: () => void) => void;
@@ -433,7 +433,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     }else leave();
   },[page,assignmentDirty,sourceReviewDirty,settingsDirty,workDirty,overviewDirty,queryDirty,supplyDirty,importDirty,onBeforeLeaveNative]);
   const businessConversation=useBusinessConversationEntry({role,getToken,onCreateChat:onCreateTaskConversation,
-    onOpenChat:chatId=>{onOpenTaskConversation(chatId);navigate("N02","N03",true);},onBeforeStart:guardLeave});
+    onOpenChat:(chatId,question)=>{onOpenTaskConversation(chatId,question);navigate("N02","N03",true);},onBeforeStart:guardLeave});
   const requestLogout=useCallback(()=>guardLeave(onLogout),[guardLeave,onLogout]);
   const historyCallbacks=useRef({guardLeave,page});
   historyCallbacks.current={guardLeave,page};
@@ -719,7 +719,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onCreateTask={()=>guardLeave(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);selectTask("",true);})}
                   onNavigate={id=>navigate(id)} onReload={refresh} onDirtyChange={setWorkDirty}
                 /> :
-                page === "N04" ? <BossMeetingLibrary refreshVersion={requestVersion} onViewSource={goSource} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
+                page === "N04" ? <BossMeetingLibrary refreshVersion={requestVersion} onViewSource={goSource} onDiscuss={onStartChat} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
                 page==="D03" ? <BossExecutionRecovery taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)}/> :
                 page==="F29" ? <BossTaskExceptions taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)} onViewSource={goSource} refreshVersion={requestVersion}/> :
                 page==="F13" ? <BossPersonalMemory onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}/> :

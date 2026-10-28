@@ -49,7 +49,7 @@
       "period_start":{"type":"string","format":"date"},"period_end":{"type":"string","format":"date"},"timezone":{"$ref":"#/$defs/Id"},
       "attention":{"enum":["ALL","OWNER_INVOLVEMENT","SOURCE_REVIEW"]}}},
     "Detail":{"type":"object","additionalProperties":false,"required":["scope","page_id","snapshot_sha256"],"properties":{
-      "scope":{"$ref":"#/$defs/Scope"},"page_id":{"enum":["F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"]},"snapshot_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}},
+      "scope":{"$ref":"#/$defs/Scope"},"page_id":{"enum":["F14","F15","F16","F17","F18","F19","F20","F21","F22","F23"]},"use":{"enum":[null,"BROILER","EGG","MILK","BEEF"]},"snapshot_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}},
     "Record":{"type":"object","additionalProperties":false,"required":["kind","id","version","state","adoption_state","source_refs","facts"],"properties":{
       "kind":{"$ref":"#/$defs/Id"},"id":{"$ref":"#/$defs/Id"},"version":{"type":["string","null"]},"state":{"type":["string","null"]},
       "adoption_state":{"enum":["CURRENT","NEEDS_REVIEW"]},"source_refs":{"type":"array","items":{"type":"object"}},"facts":{"type":["object","null"]}}},

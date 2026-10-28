@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import {FileSearch,Play,Square} from "lucide-react";
 import {V7Empty,V7Fact,V7Metric,V7Pagination,V7Panel,V7ReadState,V7Tabs} from "./BossV7UI";
 import {useTechnicalWorkspace} from "./useTechnicalWorkspace";
+import {ObservedAgentRuns,type ObservedRun} from "./MaintainerCurrentFacts";
 
 type Choice={id:string;title:string;version:string};
 type Assertion={id:string;title:string;state:string;expected:unknown;observed:unknown;evidence_ids:string[];requirement_refs:string[]};
@@ -12,6 +13,7 @@ type Attempt={id:string;task_set_id:string;task_set_version:string;variant:strin
 type TaskSet=Choice&{input_summary:string;authorization_requirements:string[];assertion_definitions:{id:string;title:string;requirement_refs:string[]}[];
   pairing_conditions:string[];variant:string;scoring_access:string};
 type Projection={projection:"evaluation";private_body_available_here:false;task_sets:TaskSet[];snapshots:Choice[];models:Choice[];prompts:Choice[];sops:Choice[];attempts:Attempt[];
+  observed_runs:ObservedRun[];
   evidence:{id:string;attempt_id:string;kind:string;content:unknown}[];namespace:string;read_at:string;real_adoption_state:string};
 type Selection={task_set_id:string;dataset_snapshot_id:string;model_version:string;prompt_version:string;sop_version:string};
 type RecordFilter="all"|"failed"|"active";
@@ -77,6 +79,7 @@ export function MaintainerEvaluation({pageId,onNavigate,onDirtyChange,onOpenRun}
   function execute(){if(!confirmation||!confirmationCurrent||busy)return;const request=confirmation;setConfirmation(null);void api.execute(request.action,request.payload).then(recorded=>{if(recorded&&request.action!=="cancel"){setDirty(false);setConfirmedContext(null);}});}
   function apply(){setApplied({...selection});setAppliedVariant(variant);setPage(1);}
   return <div className="boss-maintainer-records boss-evaluation-workspace">
+    {api.data&&<ObservedAgentRuns records={api.data.observed_runs} onOpenRun={onOpenRun}/>}
     <V7ReadState loading={api.loading} error={api.error} onReload={api.reload}/>
     {api.pending&&<div className="boss-status boss-status-warn">原请求 {api.pending.request_id} 需要核查。<button className="boss-btn" disabled={api.busy} onClick={()=>void api.reconcile()}>核查回执</button></div>}
     {api.receipt&&<p className="boss-status" role="status">操作已记录 · {api.receipt.request_id}</p>}

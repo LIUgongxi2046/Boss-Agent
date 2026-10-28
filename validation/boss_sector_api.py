@@ -12,7 +12,7 @@ from urllib.parse import parse_qs
 
 from aiohttp import web
 
-from business import checksum, now
+from business import checksum, now, require
 from boss_execution_scope import NAMESPACE
 
 CATALOGUE_PATH = Path(__file__).resolve().parents[1] / "Boss-Agent-Desktop-Complete-v7/meta/页面配置.json"
@@ -145,7 +145,7 @@ class BossSectorAPI:
         facts = pack.get("sector_facts") if pack else None
         pack_source = ({"source_id": pack["source_id"], "version": pack["version"], "source_type": "SIMULATED",
                         "published_at": pack.get("published_at"), "related_scope": f"{page} 模拟指标",
-                        "validity_state": "VALID", "author_display_name": "李文"} if pack else None)
+                        "validity_state": "VALID", "author_display_name": next(contact["name"] for contact in base["contacts"] if contact["contact_id"] == pack["author_contact_id"])} if pack else None)
         sources = ([pack_source] if pack_source else []) + [
             {"source_id": doc["source_id"], "version": doc["version"], "source_type": "SIMULATED",
              "published_at": doc.get("published_at"), "related_scope": doc["related_scope"],
@@ -156,12 +156,23 @@ class BossSectorAPI:
                      "state": "SIMULATED" if facts else "SOURCE_NOT_AVAILABLE"}
                     for label in (design.get("right") or [])]
         if facts:
-            missing = ["明细与指标来自模拟资料包；后续动作尚未提供"]
+            missing = [] if followup_rows else ["尚未保存本专题后续安排"]
         else:
             missing = ["当前专题的正式模拟明细尚未生成", "指标计算、来源核对与后续动作待接入"]
             if matching:
                 missing.insert(0, "已有相关外销资料，但不足以计算本页指标")
         followup_actions = []
+        if any(row.get("task_id") for row in followup_rows):
+            from boss_page_api import BossPageAPI
+            status, tasks_view = BossPageAPI(self.store, namespace=self.namespace).serve(role, "/api/boss/ui/tasks")
+            require(status == 200, "专题关联任务读取失败", web.HTTPConflict)
+            tasks = {row["task_id"]: row for row in tasks_view["tasks"]}
+            for row in followup_rows:
+                if row.get("task_id"):
+                    require(row["task_id"] in tasks, "专题关联任务不在当前获准范围", web.HTTPConflict)
+                    task = tasks[row["task_id"]]
+                    row.update(task_status=task["status"], task_version=task["version"],
+                               feedback=[item for item in tasks_view["feedback"] if item["task_id"] == task["task_id"]])
         for label in (design.get("actions") or []):
             kind = ACTION_KINDS.get(label)
             if kind is None:

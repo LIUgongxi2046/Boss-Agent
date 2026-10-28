@@ -524,6 +524,7 @@ class BossWorkspaceAPI:
                 "external_channel_invoked": False,
             }
         if key == "prompt-versions":
+            from boss_admin_current import effective_runtime
             drafts = _object_list(db, self.namespace, "prompt_draft")
             revisions = _object_list(db, self.namespace, "prompt_revision")
             context_records = _object_list(db, self.namespace, "prompt_context_use")
@@ -561,6 +562,7 @@ class BossWorkspaceAPI:
             }
             return {
                 "kinds": list(KINDS),
+                "effective_runtime": effective_runtime(self.store, db, self.namespace),
                 "drafts": [{
                     k: entry[k] for k in (
                         "prompt_id", "kind", "title", "instruction_text", "version",
@@ -615,6 +617,7 @@ class BossWorkspaceAPI:
             "business_clock": self.store.get(db, self.namespace, "clock", "current")["at"],
             "owner_body_access": False}
         if key == "scheduler":
+            from boss_admin_current import business_records
             from boss_scheduler_config import SCOPES, RESTART_POLICIES, plan_fields
             schedule = self.store.get(db, self.namespace, "schedule", "current")
             clock = self.store.get(db, self.namespace, "clock", "current")
@@ -639,6 +642,7 @@ class BossWorkspaceAPI:
             if executor is not None and runtime["schedule_version"] != schedule["version"]:
                 runtime = {**runtime, "state": "CONFIGURATION_PENDING", "next_run_time": None}
             return {
+                "current_events": [row for row in business_records(self.store, db, data, self.namespace) if row["kind"] == "event"],
                 "schedule": {**{k: schedule.get(k) for k in (
                     "schedule_id", "version", "schedule_version", "timezone",
                     "trigger", "enabled", "canceled", "active_draft_version",

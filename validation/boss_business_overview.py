@@ -55,6 +55,27 @@ class BusinessOverviewAPI:
         from boss_business_overview_preparation import BusinessOverviewPreparation
         return BusinessOverviewPreparation(self)
 
+    def topic_in_transaction(self, db, view, reference):
+        topic = next(row for row in view["topics"] if row["page_id"] == reference["page_id"])
+        uses = {"EGG": "V19-EGG", "MILK": "V19-MILK", "BEEF": "V19-BEEF"}
+        use = reference["use"]
+        if reference["page_id"] != "F19" or use not in uses:
+            return topic
+        page = uses[use]
+        source_id = "sector-" + page.lower() + "-a"
+        evidence = next(row for row in view["sources"] if row["source_id"] == source_id)
+        if evidence["status"] != "VALID" or view["applied_scope"]["attention"] != "ALL":
+            return {**topic, "title": SECTORS[page][0], "metrics": [], "records": [], "availability": "NEEDS_REVIEW" if evidence["status"] != "VALID" else "FILTER_EMPTY"}
+        context = _context(db)
+        document = self.store.get(db, context["namespace"], "document", source_id)
+        require(checksum(document) == evidence["sha256"], "专题用途来源已经变化，请重新读取经营范围")
+        values = sector_metrics(document, view["applied_scope"])
+        records = [{"kind": "sector_summary", "id": source_id, "version": document["version"], "state": "CURRENT", "adoption_state": "CURRENT",
+                    "source_refs": [{"source_id": source_id, "version": document["version"]}],
+                    "facts": {item["label"]: item["value"] + " " + item["unit"] for item in values}}] if values else []
+        return {**topic, "title": SECTORS[page][0], "metrics": values, "records": records,
+                "availability": "PARTIAL" if records else "SOURCE_NOT_AVAILABLE", "related_sales_source_refs": []}
+
     def dimensions(self, role):
         owner(role)
         with self.store.connect() as db:
@@ -245,7 +266,11 @@ class BusinessOverviewAPI:
             "business_at": context["clock"], "read_at": now(), "coverage_state": "PARTIAL",
             "business_authorization_granted": False, "business_mutation_performed": False}
         result["insights"] = business_insights(topics)
-        result["snapshot_sha256"] = checksum({"context": context, "initial": data, "result": {key: value for key, value in result.items() if key != "read_at"}})
+        for document in sector_documents:
+            if document["sector_page"] in {"V19-EGG", "V19-MILK", "V19-BEEF"}:
+                source(document["source_id"])
+        result["sources"] = list(sources.values())
+        result["snapshot_sha256"] = checksum({"context": context, "initial": data, "sector_documents": sector_documents, "result": {key: value for key, value in result.items() if key != "read_at"}})
         return validate("View", result)
 
     def detail(self, role, payload):
@@ -253,7 +278,10 @@ class BusinessOverviewAPI:
         validate("Detail", payload)
         result = self.read(role, payload["scope"])
         require(result["snapshot_sha256"] == payload["snapshot_sha256"], "经营范围或来源版本已经变化", web.HTTPConflict)
+        require(payload.get("use") is None or payload["page_id"] == "F19", "当前专题不支持禽畜用途", web.HTTPBadRequest)
+        with self.store.connect() as db:
+            topic = self.topic_in_transaction(db, result, {"page_id": payload["page_id"], "use": payload.get("use")})
         return {"source_type": "SIMULATED", "applied_scope": result["applied_scope"], "snapshot_sha256": result["snapshot_sha256"],
-            "topic": next(row for row in result["topics"] if row["page_id"] == payload["page_id"]),
+            "topic": topic,
             "sources": result["sources"], "business_at": result["business_at"], "read_at": result["read_at"],
             "business_authorization_granted": False, "business_mutation_performed": False}

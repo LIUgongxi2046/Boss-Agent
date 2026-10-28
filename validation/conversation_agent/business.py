@@ -5,6 +5,7 @@ from jsonschema import Draft202012Validator
 
 from business import encode, require
 from boss_page_api import BossPageAPI
+from boss_business_overview import BusinessOverviewAPI
 from runtime_page_read_tools import _BossPageReadTool
 from conversation_agent.domain import ConversationPlan
 from conversation_agent.queries import ConversationQueries, METRICS, mentioned
@@ -38,7 +39,7 @@ class BusinessOverviewReadTool(_BossPageReadTool):
     @property
     def parameters(self):
         return {"type": "object", "additionalProperties": False, "required": ["projection"],
-            "properties": {"projection": {"enum": ["overview", "topic"]}}}
+            "properties": {"projection": {"const": "current", "enum": ["current"], "description": "由服务端采用当前会话绑定的总览、专题与用途"}}}
 
     async def execute(self, **params):
         require(not list(Draft202012Validator(self.parameters).iter_errors(params)), "经营读取参数无效", web.HTTPBadRequest)
@@ -46,13 +47,14 @@ class BusinessOverviewReadTool(_BossPageReadTool):
         view = self.entry.read("BOSS", {"session_id": context.session_id, "chat_id": context.chat_id})
         require(entry_pin(view) is not None, "经营读取需要正式绑定", web.HTTPForbidden)
         entry = view["entry"]
-        if params["projection"] == "overview":
-            require(entry["topic_reference"] is None, "当前会话已经选定具体专题", web.HTTPForbidden)
+        if entry["topic_reference"] is None:
             result = view["overview"]
         else:
-            require(entry["topic_reference"] is not None, "当前会话没有选定专题", web.HTTPForbidden)
-            result = self.entry.overview.detail("BOSS", {"scope": entry["applied_scope"],
-                "page_id": entry["topic_reference"]["page_id"], "snapshot_sha256": entry["snapshot_sha256"]})
+            with self._api.store.connect() as db:
+                topic = self.entry.overview.topic_in_transaction(db, view["overview"], entry["topic_reference"])
+            result = {"source_type": "SIMULATED", "applied_scope": entry["applied_scope"], "snapshot_sha256": entry["snapshot_sha256"],
+                      "topic": topic, "sources": view["overview"]["sources"], "business_at": view["overview"]["business_at"],
+                      "read_at": view["overview"]["read_at"], "business_authorization_granted": False, "business_mutation_performed": False}
             result["topic_reference"] = entry["topic_reference"]
         return encode(result)
 
@@ -60,10 +62,11 @@ class BusinessOverviewReadTool(_BossPageReadTool):
 def plan_business(store, conversation, text, query, view, pending_scope=None):
     entry, overview = view["entry"], view["overview"]
     topic = entry["topic_reference"]
-    calls = [(BUSINESS_READ, encode({"projection": "topic" if topic else "overview"}))]
+    calls = [(BUSINESS_READ, encode({"projection": "current"}))]
     references = [tuple(ref[field] for field in ("kind", "id", "version")) for ref in view["references"]]
     required, bindings, checks, pending = [], (), (), None
-    selected_topic = next(row for row in overview["topics"] if topic and row["page_id"] == topic["page_id"]) if topic else None
+    with store.connect() as db:
+        selected_topic = BusinessOverviewAPI(store).topic_in_transaction(db, overview, topic) if topic else None
     if selected_topic is not None:
         if selected_topic["availability"] != "PARTIAL":
             required.extend(selected_topic["missing_fields"])

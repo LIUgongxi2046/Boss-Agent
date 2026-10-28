@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "company_display_name": "丰泽农牧集团",
+  "source_title": "农牧行业上市企业2025年度公开报告",
+  "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-28/1225203635.PDF",
+  "published_on": "2026-04-28",
+  "financial_page": 199,
+  "volume_page": 16,
+  "currency": "CNY",
+  "amount_unit": "元",
+  "simulation_policy": "PUBLIC_BASELINE_WITH_SEPARATE_SIMULATED_OPERATIONS",
+  "consolidated": {
+    "2024": {"revenue_cny": "114601056662.29", "cost_cny": "101639577488.17"},
+    "2025": {"revenue_cny": "128468230914.96", "cost_cny": "115193343614.54"}
+  },
+  "products": [
+    {"id": "feed", "name": "饲料", "2024": {"revenue_cny": "91202471546.02", "cost_cny": "82315983104.74"}, "2025": {"revenue_cny": "105257615986.92", "cost_cny": "95075398107.81"}},
+    {"id": "animal-health", "name": "动保产品", "2024": {"revenue_cny": "845785008.00", "cost_cny": "368047297.51"}, "2025": {"revenue_cny": "891050510.76", "cost_cny": "485883904.63"}},
+    {"id": "agriculture", "name": "农产品", "2024": {"revenue_cny": "18826479018.92", "cost_cny": "15384621981.11"}, "2025": {"revenue_cny": "17958922847.61", "cost_cny": "15506477221.90"}},
+    {"id": "trade", "name": "贸易业务", "2024": {"revenue_cny": "3435411501.16", "cost_cny": "3413103070.42"}, "2025": {"revenue_cny": "4124515406.60", "cost_cny": "4016901743.07"}},
+    {"id": "other", "name": "其他业务", "2024": {"revenue_cny": "290909588.19", "cost_cny": "157822034.39"}, "2025": {"revenue_cny": "236126163.07", "cost_cny": "108682637.13"}}
+  ],
+  "feed_sales_2025": {"unit": "万吨", "total": "3208", "internal": "222", "external": "2986", "poultry": "1470", "pig": "770", "aquatic": "696", "ruminant_and_other": "50", "overseas_external": "346"},
+  "scope_note": "产品分项采用合并后对外收入，禁止将含内部交易的区域收入直接相加。公开年度数据仅作为历史基准；月度、客户、批次、人物、任务与事件均为模拟业务。"
+}

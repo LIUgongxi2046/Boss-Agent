@@ -54,7 +54,7 @@ class BusinessOverviewPreparation:
         topic = None
         if payload["topic_reference"] is not None:
             selected = payload["topic_reference"]
-            topic = next(row for row in view["topics"] if row["page_id"] == selected["page_id"])
+            topic = self.overview.topic_in_transaction(db, view, selected)
             require(selected["use"] is None or selected["use"] in topic["uses"], "专题不支持所选用途", web.HTTPBadRequest)
         records = topic["records"] if topic is not None else []
         topic_sources = {ref["source_id"] for row in records for ref in row["source_refs"]}

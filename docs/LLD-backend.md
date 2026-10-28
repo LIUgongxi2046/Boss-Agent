@@ -2,6 +2,8 @@
 
 版本1.6.0；T06/A06；2026-10-23；引用LLD-data1.6.0、PRD V1.2.0和HLD1.0.0。字段、operationId、角色、输入/结果、错误与事件作为W2/W3确定接收版本；A06保持NOT_RUN，完整边界、独立语义与公开集成仍需验证。
 
+2026-10-28核查：doc_id=DOC-LLD-BACKEND，维护责任为当前主执行者。当前公共入口、账号、经营查询、会话绑定和错误处理采用[集成指南](开发者集成指南.md)及[经营接口扩展](../specs/product-business-overview.openapi.yaml)，来源为`9cd9888490521242def326f475c93823a68ec95b`及未提交修改。十四项模拟接口已有当前仿真资料，实际覆盖见[仿真任务](development/SIMULATION-20261028.md)。本文保留完整后端设计，2026-10-23接收说明只适用于其版本；全部动作Schema及完整业务集成仍为NEEDS_REVIEW，不通过文档同步改变A06。
+
 ## 服务、身份与事务
 
 FC07公共扩展采用specs/product-assignment.openapi.yaml。BossCommandAPI对boss.assignment.extension.decide完成角色检查后延迟导入AssignmentExtensionAPI，在同一正式领域事务完成独立本人授权、CAS、决定和原回执。BossPageAPI严格读取assignment-extensions，operation-status委派原动作和编号，读取不执行决定。任务投影增加source_versions、结果证据重新提交标记、反馈证据版本/状态与historical_only、本人承诺的当前来源及期限/修订历史；模拟消息正文和授权编号仅提供给BOSS。

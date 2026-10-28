@@ -2,6 +2,8 @@
 
 版本 `1.6.0`；2026-10-23；T05/A05；依据PRD V1.2.0、HLD1.0.0、共同代码63e6295。字段清单为specs/data-dictionary.json，状态FROZEN_FOR_IMPLEMENTATION，供W2/W3引用。本文件为DESIGN，A05尚未通过；字段版本固定与正式业务验收分别管理，新增行为以T12/T13/T14/T17/T18检查为依据。
 
+2026-10-28核查：doc_id=DOC-LLD-DATA，维护责任为当前主执行者。当前机器字典版本为1.8.0；物理存储、FTS5、经营绑定与仿真资料采用[当前数据字典](当前数据字典.md)，源码为`9cd9888490521242def326f475c93823a68ec95b`及未提交修改。本文其余实体设计完整保留，未逐项核查的字段和迁移要求保持NEEDS_REVIEW，A05状态继续引用正式任务。
+
 ## 数据归属与物理存储
 
 同一老板的正式业务状态由 `business.Store` / `controls.ControlStore` 维护。nanobot SessionManager 维护会话，不修改任务终态。运行身份由 RoleChannel 验证，联系人没有认证字段。
@@ -13,6 +15,7 @@
 | idempotency | `(namespace, operation, key)`；digest TEXT；result TEXT | 相同请求与相同内容读取原结果；不同内容拒绝 |
 | audit | id INTEGER PRIMARY KEY；namespace、operation、input、output、created_at TEXT | 技术元信息；禁止私人正文、凭据和内部推理 |
 | knowledge | FTS5(namespace UNINDEXED, source_id UNINDEXED, content) | 按空间检索获准原文；撤销同事务删除对应索引 |
+| knowledge_text | FTS5(namespace UNINDEXED, source_id UNINDEXED, content)，trigram tokenizer | 当前中文片段索引；document触发器维护插入、更新和删除 |
 
 `objects` 复合主键支持当前按空间/类别/ID读取；新增查询索引须取得实际查询计划和容量依据。没有既有证据时不设置吞吐、恢复时间或留存达标结论。数据库连接超时10秒，启用 WAL 和 foreign_keys；JSON 关系仍需领域服务明确校验。
 

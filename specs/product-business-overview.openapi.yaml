@@ -1,0 +1,216 @@
+openapi: 3.1.0
+info:
+  title: Boss Agent 当前经营读取与会话入口
+  version: 0.1.0
+  description: 依据当前源码核查；HTTP、WebSocket及模型工具分别描述，完整产品验收采用feature-delivery.json。
+x-documentation:
+  source_commit: 9cd9888490521242def326f475c93823a68ec95b
+  includes_uncommitted_source: true
+  last_verified: '2026-10-28'
+  record: docs/development/DOC-SYNC-20261028.md
+  status: SOURCE_REVIEWED
+security:
+  - ApiToken: []
+paths:
+  /api/boss/ui/business-overview/dimensions:
+    get:
+      operationId: currentBusinessOverviewDimensions
+      description: 仅限BOSS，不接受查询参数；实际范围从当前资料读取。
+      responses:
+        '200':
+          description: 当前合法范围与期间目录
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Dimensions'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /api/boss/ui/conversation/business-entry:
+    get:
+      operationId: currentBusinessConversationReceipt
+      description: 仅限BOSS；查询参数必须恰好包含一个非空client_request_id。回执不确认当前采用资格。
+      parameters:
+        - name: client_request_id
+          in: query
+          required: true
+          schema: {$ref: './business-overview.schema.json#/$defs/EntryRequestId'}
+      responses:
+        '200':
+          description: 当前存储中的原请求结果
+          content:
+            application/json:
+              schema: {$ref: './business-overview.schema.json#/$defs/EntryReceipt'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '503': {description: 原生会话服务尚未就绪}
+components:
+  securitySchemes:
+    ApiToken: {type: http, scheme: bearer}
+  responses:
+    BadRequest: {description: 字段、类型或范围无效}
+    Unauthorized: {description: 当前本人认证无效}
+    Forbidden: {description: 角色、主体、来源或会话订阅权限不足}
+    Conflict: {description: 当前执行空间、资料、对象版本或快照发生变化}
+  schemas:
+    Dimensions:
+      type: object
+      required: [source_type, legal_entity_ids, region_ids, periods, timezones, attention_values, region_null_meaning, dimension_coverage]
+      properties:
+        source_type: {const: SIMULATED}
+        legal_entity_ids: {type: array, items: {type: string}}
+        region_ids: {type: array, items: {type: string}}
+        periods:
+          type: array
+          items:
+            type: object
+            required: [id, period_start, period_end]
+            properties:
+              id: {type: string}
+              period_start: {type: string, format: date}
+              period_end: {type: string, format: date}
+        timezones: {type: array, items: {type: string}}
+        attention_values: {type: array, items: {enum: [ALL, OWNER_INVOLVEMENT, SOURCE_REVIEW]}}
+        region_null_meaning: {const: NO_REGION_RESTRICTION}
+        dimension_coverage: {type: string}
+    Empty:
+      type: object
+      additionalProperties: false
+    PreparationVerify:
+      type: object
+      additionalProperties: false
+      required: [input, context_sha256]
+      properties:
+        input: {$ref: './business-overview-preparation.schema.json#/$defs/Input'}
+        context_sha256: {$ref: './business-overview-preparation.schema.json#/$defs/Sha256'}
+    BusinessRead:
+      type: object
+      additionalProperties: false
+      required: [chat_id]
+      properties:
+        chat_id: {type: string, minLength: 1, description: 必须为合法且当前连接已订阅的原生会话编号}
+        adopt_selection: {type: boolean}
+    SelectionCleared:
+      type: object
+      required: [source_type, current_selection_cleared, business_authorization_granted, business_mutation_performed]
+      properties:
+        source_type: {const: RUNTIME_RECORD}
+        current_selection_cleared: {const: true}
+        business_authorization_granted: {const: false}
+        business_mutation_performed: {const: false}
+    TopicView:
+      type: object
+      required: [source_type, applied_scope, snapshot_sha256, topic, sources, business_at, read_at, business_authorization_granted, business_mutation_performed]
+      properties:
+        source_type: {const: SIMULATED}
+        applied_scope: {$ref: './business-overview.schema.json#/$defs/Scope'}
+        snapshot_sha256: {$ref: './business-overview.schema.json#/$defs/Sha256'}
+        topic: {$ref: './business-overview.schema.json#/$defs/Topic'}
+        sources:
+          type: array
+          items: {type: object}
+        business_at: {type: string}
+        read_at: {type: string}
+        business_authorization_granted: {const: false}
+        business_mutation_performed: {const: false}
+    EntryContextResponse:
+      type: object
+      additionalProperties: false
+      required: [source_type, session_id, chat_id, binding_state, entry, overview, references, current_use_verified, current_selection_active, business_authorization_granted, business_mutation_performed]
+      properties:
+        source_type: {const: RUNTIME_RECORD}
+        session_id: {$ref: './business-overview.schema.json#/$defs/Id'}
+        chat_id: {$ref: './business-overview.schema.json#/$defs/Id'}
+        binding_state: {enum: [BOUND, UNBOUND]}
+        entry:
+          anyOf:
+            - {$ref: './business-overview.schema.json#/$defs/EntryPreparation'}
+            - {type: 'null'}
+        overview:
+          anyOf:
+            - {$ref: './business-overview.schema.json#/$defs/View'}
+            - {type: 'null'}
+        references:
+          type: array
+          items: {$ref: './business-overview.schema.json#/$defs/EntryReference'}
+        current_use_verified: {type: boolean}
+        current_selection_active: {type: boolean}
+        business_authorization_granted: {const: false}
+        business_mutation_performed: {const: false}
+    CurrentProjection:
+      type: object
+      additionalProperties: false
+      required: [projection]
+      properties:
+        projection: {const: current}
+x-websocket-transport:
+  request: 'type=webui_request; request_id; action; payload'
+  response: 'event=webui_response; request_id; ok; result|error'
+  authentication: 当前RoleChannel连接中的BOSS身份
+  current_selection_active: RoleChannel为经营read结果增加当前连接的选择状态
+  business_authorization_granted: false
+x-websocket-operations:
+  - operationId: currentBusinessDimensions
+    action: boss.business_overview.dimensions
+    role: BOSS
+    input: '#/components/schemas/Empty'
+    output: '#/components/schemas/Dimensions'
+  - operationId: currentBusinessOverview
+    action: boss.business_overview.read
+    role: BOSS
+    input: './business-overview.schema.json#/$defs/Scope'
+    output: './business-overview.schema.json#/$defs/View'
+  - operationId: currentBusinessTopic
+    action: boss.business_overview.detail
+    role: BOSS
+    input: './business-overview.schema.json#/$defs/Detail'
+    output: '#/components/schemas/TopicView'
+  - operationId: currentBusinessPreparation
+    action: boss.business_overview.preparation
+    role: BOSS
+    input: './business-overview-preparation.schema.json#/$defs/Input'
+    output: './business-overview-preparation.schema.json#/$defs/View'
+  - operationId: currentBusinessPreparationVerify
+    action: boss.business_overview.preparation.verify
+    role: BOSS
+    input: '#/components/schemas/PreparationVerify'
+    output: './business-overview-preparation.schema.json#/$defs/View'
+  - operationId: currentBusinessMeetingPreparation
+    action: boss.business.meeting.prepare
+    role: BOSS
+    input: './business-overview-preparation.schema.json#/$defs/MeetingInput'
+    output: './business-overview-preparation.schema.json#/$defs/MeetingResult'
+  - operationId: currentBusinessEntryPrepare
+    action: boss.conversation.business.prepare
+    role: BOSS
+    input: './business-overview.schema.json#/$defs/EntryPrepare'
+    output: './business-overview.schema.json#/$defs/EntryPreparation'
+  - operationId: currentBusinessEntryBind
+    action: boss.conversation.business.bind
+    role: BOSS
+    input: './business-overview.schema.json#/$defs/EntryBind'
+    output: './business-overview.schema.json#/$defs/EntryPreparation'
+  - operationId: currentBusinessEntryRead
+    action: boss.conversation.business.read
+    role: BOSS
+    input: '#/components/schemas/BusinessRead'
+    output: '#/components/schemas/EntryContextResponse'
+  - operationId: currentBusinessEntryReceipt
+    action: boss.conversation.business.receipt
+    role: BOSS
+    input: './business-overview.schema.json#/$defs/EntryReceiptInput'
+    output: './business-overview.schema.json#/$defs/EntryReceipt'
+  - operationId: currentBusinessEntryClear
+    action: boss.conversation.business.clear
+    role: BOSS
+    input: '#/components/schemas/Empty'
+    output: '#/components/schemas/SelectionCleared'
+x-tool-operations:
+  - name: businessOverviewRead
+    role: BOSS
+    input: '#/components/schemas/CurrentProjection'
+    implementation: conversation_agent.business.BusinessOverviewReadTool.execute
+    output: 当前正式绑定的总览或专题及来源；采用对应Scope、Topic与版本引用
+    business_authorization_granted: false

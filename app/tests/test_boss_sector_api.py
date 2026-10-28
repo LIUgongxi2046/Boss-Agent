@@ -22,7 +22,7 @@ def api(tmp_path):
 
 
 @pytest.mark.parametrize("page", list(SECTORS))
-def test_sector_page_matches_approved_v6_and_returns_null_unknown_metrics(api,page):
+def test_sector_page_matches_approved_v7_and_returns_null_unknown_metrics(api,page):
     status,result=api.serve("BOSS","/api/boss/ui/sector","page="+page)
     assert status==200
     assert result["page_id"]==page
@@ -33,9 +33,9 @@ def test_sector_page_matches_approved_v6_and_returns_null_unknown_metrics(api,pa
     assert all(x["value"] is None and x["unit"] is None for x in result["metrics"])
     assert result["sector_kpi_calculations_supported"] is False
     assert result["sector_specific_dataset_available"] is False
-    from_disk=json.loads((ROOT/"Boss-Agent-Desktop-Complete-v6/meta/页面配置.json").read_text())
+    from_disk=json.loads((ROOT/"Boss-Agent-Desktop-Complete-v7/meta/页面配置.json").read_text())
     assert result["title"].startswith(from_disk[page]["title"])
-    expected_html=(ROOT/"Boss-Agent-Desktop-Complete-v6/pages"/
+    expected_html=(ROOT/"Boss-Agent-Desktop-Complete-v7/pages"/
                    (page+"-"+from_disk[page]["title"]+".html")).read_text()
     for field in result["design_filters"]:
         assert "class=\"filteritem\">"+field+"<strong>" in expected_html

@@ -6,8 +6,15 @@
 
 共同要求：[菜单开发总计划](../菜单开发总计划.md)、[高保真还原执行要求](../menu-delivery/高保真还原执行要求.md)。任务主记录与证据按其明确版本和限定范围采用，当前源码通过实际调用核查。完整产品Txx任务使用`delivery-ledger.json`追溯，不与菜单进度相加；2026-10-23交接文件按日期参考。
 
+产品 Agent 设计：[Boss-Agent 产品 Agent 设计说明](../Agent六要素设计与实现说明.md)；文档任务 `DOC-AGENT-20261028`，包含经营查询流程、业务场景与示例、六类组件、业务控制、验证结果及实现位置；关键词为 Prompt 版本、SOP 采用、知识检索、Provider、工具权限及评测，产品状态继续采用唯一正式来源。
+
 | 任务 | 记录 | 当前状态 |
 |---|---|---|
+| DOC-LICENSE-20261028 | [开源许可文档](LICENSE-20261028.md) | AGPL-3.0-only、独立商业授权、品牌规则、CLA 与第三方声明；文档验证独立于发布及产品验收 |
+| DOC-SYNC-20261028 | [当前实现文档同步](DOC-SYNC-20261028.md) | S012；集成、认证Schema、数据字典、操作手册、运行环境、发布说明及设计来源；文档检查独立于产品验收 |
+| SIMULATION-20261028 | [全功能仿真资料与真实 Agent 验证](SIMULATION-20261028.md) | 公开经营基准、匿名企业、关联人物及业务日期、十四项模拟接口、全部问题入口；状态采用 feature-delivery.json |
+| ADMIN-MENU-20261028 | [管理员菜单用途核查](ADMIN-MENU-20261028.md) | 当前页面实际用途、管理员入口隐藏、Boss行为保持及合并桌面制品；状态采用feature-delivery.json |
+| SEED-RELEASE-20261028 | [仿真初始化与main提交](SEED-RELEASE-20261028.md) | 初始化脚本、随机账号、重复执行保留、公开经营基准及main提交推送；状态采用feature-delivery.json |
 | V7-FRONTEND | [全部电脑端界面](V7-FRONTEND.md) | 全部72个Desktop v7主视图、公共框架、页面交互与适用状态；前端完成后接续后端和Agent；状态采用feature-delivery.json |
 | V7-BACKEND | [后端与页面服务](V7-BACKEND.md) | 全部新增页面读写、权限、版本、持久化、原请求查询与实际消费者；状态采用feature-delivery.json |
 | SHOW-ALL-MENUS | [全部菜单显示](SHOW-ALL-MENUS.md) | 本人六组、维护四组及72项设计页面按角色显示；侧栏全部页面、目录、搜索、直接入口及History；10项检查含实际React点击与Chromium前进后退、严格TypeScript通过，产品认证UI与独立启动尚未验证 |

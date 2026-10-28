@@ -1,146 +1,102 @@
-# Boss-Agent · 老板专用 Agent
+# Boss Agent
 
-**每次必读**：[开发接手与执行规范](docs/开发接手与执行规范.md)。适用于任务开始、聊天恢复及交接；项目规则见 [AGENTS.md](AGENTS.md)。当前活动工单、候选、启动入口和验收状态统一读取 [feature-delivery.json](specs/feature-delivery.json)，菜单队列读取 [menu-plan.json](specs/menu-plan.json)。
+面向企业老板的个人 AI 助理，将日常事项、经营资料、会议准备和交办跟进集中在同一个电脑桌面应用中。通过自然语言提问、业务工具查询和来源核查，帮助老板了解经营变化、准备决策材料，并持续查看交办与本人承诺的进展。
 
-页面服务映射用于定位实现，`delivery-ledger.json`用于完整产品任务追溯。[2026-10-23交接文件](docs/Boss-Agent开发交接文档-2026-10-23-v2.md)仅按其日期和版本参考。下文分批开发说明保留对应范围；运行与重建条件须按接手规范核查，不能据其推断当前桌面已经采用最新源码。
+项目以农牧企业为业务场景，围绕成本、订单、回款、交付及农业专题组织资料。界面采用 Boss-Agent Desktop v7 设计，使用蓝绿白配色与“大鹏”品牌形象。当前实现核查日期为2026-10-28，源码版本采用当前Git提交，提交及验证范围见[发布记录](docs/development/SEED-RELEASE-20261028.md)；完整产品验收尚未完成。
 
-基于 **HKUDS/nanobot v0.3.5 + Electron 45.0.0 + DeepSeek** 改造，使用已确认的 **Boss-Agent Desktop v6.0** 蓝绿白高保真设计与“大鹏”IP。业务主体只有一位老板，技术维护身份独立，其他人员仅为模拟联系人或资料来源。
+## 开源许可与商业授权
 
-## 当前状态
+Boss Agent 社区版本采用 [GNU Affero General Public License v3.0 only](LICENSE)（`AGPL-3.0-only`）。个人和机构可以依据协议使用、修改、部署、分发和商用。分发源码或桌面应用时，需要履行适用的声明与对应源码提供义务；修改版本通过网络与用户交互时，需要依据 AGPL 第13条向这些用户显著提供免费获取该版本对应源码的方式。
 
-- **架构**：T04 / A04 静态设计通过；`docs/HLD.md` 与 `specs/hld-72-page-map.json` 固定 72 页架构映射。
-- **第一批前端与数据接入**：`app/webui/BossDesktop.tsx`、`app/webui/boss-v6.css`、`validation/boss_page_api.py` 已入库；实际业务指标由原有 Tool/SQLite 返回；提供身份受控的 72 页导航。当前 70 页已有不同程度的代码接入、2 页由上游身份认证承接；但 72 页的正式端到端与像素级验收均无通过记录，不能将部分接入当作功能完成。
-- **开源源码不复制入库**：`scripts/prepare_boss_webui.py` 固定拉取上游 commit 并在本地私有目录叠加增量代码，保证上游可追溯且复用原生会话/设置功能。
-- **开发和验收**：T11 正在进行，T05—T10 与 T18—T26 的完整专业设计/功能开发和产品验收仍有待办。没有声称已经在目标 Mac 安装/运行或通过视觉像素验收。
+需要在闭源产品中分发、运营闭源修改版本网络服务或协商企业条款的机构，可以申请[独立商业授权](COMMERCIAL_LICENSE.md)。商业授权需要另行签署书面协议，不减少已经依据 AGPL 获得的权利；第三方组件继续适用各自的许可。
 
-## 本机 DeepSeek 凭据配置（已支持用户提供的文件）
+- [版权与许可声明](NOTICE)
+- [第三方组件、素材与资料声明](THIRD_PARTY_NOTICES.md)
+- [品牌与 Logo 使用规则](TRADEMARKS.md)
+- [贡献指南](CONTRIBUTING.md)与[贡献者许可协议](CLA.md)
 
-**不要把 API Key 写进终端命令、代码、截图或 GitHub。** 本次上传的凭据仅核验了格式；本机的软件通过服务端文件引用读取，不在 GitHub Actions 中使用真实 Key。
+开源许可和商业授权均不保证模型回答、经营分析或专业执行结果，也不构成生产部署批准。部署方负责核查资料授权、隐私保护、业务权限和适用法规；业务资料、凭据及模型服务的使用权需要分别取得。
 
-请将已提供的 `boss agent.md` 保留在本机项目根目录（如果原先就在这个位置，无须重复复制）。首次在本机运行：
+## 产品能力
+
+| 入口 | 面向的使用场景 |
+|---|---|
+| 今日工作 | 查看待决定、待协调和需要知晓的事项，结合会议、任务、承诺与时间冲突安排当天工作。 |
+| 聊天交办 | 使用自然语言查询和分析资料，查看工具返回、依据与结果，准备需要本人确认的后续操作。 |
+| 经营关注 | 查看成本、订单、回款和交付指标，比较期间变化，进入专题阅读原始明细、关联任务与反馈。 |
+| 会议与资料 | 管理会议及相关资料，准备会前材料，核查历史承诺，整理纪要与交办草稿。 |
+| 任务与承诺 | 跟进负责人、期限、反馈和结果依据，处理催办、延期、取消及本人确认完成。 |
+
+个人设置管理本人目标、关注主题、阅读要求、通知和授权。技术维护入口管理模型连接、知识资料、工具、模拟业务接口、调度及运行记录。
+
+## 典型使用场景
+
+- **安排当天工作**：查看今日事项及优先级，阅读具体依据与可能影响，进入关联会议或任务继续处理。
+- **了解经营变化**：提出“采购成本变化主要来自哪些因素”，通过工具读取当前获准资料，核查期间、指标单位、来源与待确认原因。
+- **准备经营会议**：选择会议，汇集议题、经营资料、历史承诺和待决定事项，查看材料缺口，准备会前简报。
+- **持续跟进交办**：核对负责人、内容、期限和依据，确认交办后查看反馈及结果材料，由本人决定完成、延期或取消。
+
+农业专题覆盖原料、水产、苗种、技服、生猪、畜禽、养殖、食品、海外和研发；畜禽专题进一步区分蛋禽、奶畜、肉用牛羊等用途，保留各自的业务范围与计量单位。
+
+## 资料与操作规则
+
+- **来源可核查**：查询与分析保留资料来源、期间、版本和适用范围，公开资料与模拟业务记录分别标明；事实、意见、推断和未知内容分别表达。
+- **本人控制业务决定**：模型通过受限工具查询和准备操作，服务端检查身份、权限、对象版本及有效授权。需要本人决定的事项由老板确认。
+- **状态持续保存**：业务记录、反馈、授权与请求回执保存在本地 SQLite 中。收到反馈与确认完成分别记录；执行结果未知时，通过原请求编号查询状态。
+- **身份分别授权**：业务使用者为一位老板，技术维护身份负责配置和获准资料维护。联系人与负责人属于资料对象，维护身份不能代替老板作出业务决定。
+- **专业执行范围明确**：产品处理经营信息与协调事务；采购成交、配方发布、用药、设备控制、质量放行及资金交易由相应专业系统或人员负责。
+
+## 技术组成
+
+| 部分 | 使用的技术与职责 |
+|---|---|
+| 桌面应用 | Electron 承载产品窗口与本地服务。 |
+| 用户界面 | React、TypeScript、Vite 与 Radix UI，复用 nanobot 原生会话、设置和 ClientProvider。 |
+| Agent Runtime | 基于 nanobot v0.3.5，复用 AgentLoop、SessionManager、CronService 和 WebSocket 传输。 |
+| 模型与工具 | 通过服务端配置接入 DeepSeek，由模型理解问题并调用业务工具，领域服务负责权限、计算与状态变更。 |
+| 数据与资料 | Python 领域服务、SQLite、版本化来源及个人记忆，共同支撑查询、保存与重新读取。 |
+
+上游源码固定到 commit `1bb712d3488915ca4ed9ccc1a93067ff722f5ab9`，由准备脚本获取并应用项目扩展。产品源码保存在仓库中，凭据、用户资料和本地生成内容使用独立目录。产品服务入口和领域服务位于 `validation/`；目录名称不表示内容仅用于测试。当前知识检索使用 SQLite FTS5。
+
+## 本地运行
+
+本地环境使用 macOS、Git、Node.js 24、Python 3.12 和 uv。以下命令用于准备通用研发环境：
 
 ```bash
-python3 scripts/configure_local_deepseek.py
-# 文件保存在其他本机目录时可用 --source 指定文件路径，不要传 Key 本身
-# 使用项目锁定的本机环境
-cd validation && uv sync --locked && cd ..
-```
-
-`scripts/configure_local_deepseek.py` 只创建 Git 忽略、权限0600的本地密钥文件和无密钥的连接引用。当前全部外部API依赖按项目计划13.18使用显式SIMULATED资料，当前开发与本地验收不安排新增真实外部请求。既有真实模型证据保留其适用版本，完整真实接入继续独立验证。
-
-## 本地开发（macOS Intel）
-
-前提：Git、Node.js 24、Python 3.12、uv、可用的网络及本机授权的 DeepSeek 密钥。首次克隆项目后：
-
-```bash
-python3 scripts/prepare_boss_webui.py --build
-cd validation && uv sync --locked && cd ..
+cd validation
+uv sync --locked
+cd ..
+validation/.venv/bin/python scripts/prepare_boss_webui.py --build
 npm --prefix validation/desktop ci
-validation/.venv/bin/python scripts/provision_boss_accounts.py
-bash scripts/run_boss_local.sh
 ```
 
-首次初始化创建真实本机`boss`和`maintainer`账号，分别属于BOSS与MAINTAINER；随机密码位于受保护的`validation/.work/application/accounts/credentials.json`，账号数据库只保存bcrypt摘要。重复初始化拒绝覆盖，已有账号直接使用。登录后由nanobot发放会话令牌，退出撤销当前身份令牌。内部`access.json`仅供服务端使用；产品登录入口使用账号密码。模型密钥通过服务端引用配置，密码和密钥不进入源码、前端存储或命令参数。
+通用桌面启动入口为 `bash scripts/run_boss_local.sh`，启动前需要完成本机模型凭据配置与账号初始化。模型配置使用 `scripts/configure_local_deepseek.py`，账号初始化使用 `scripts/provision_boss_accounts.py`；凭据仅保存在本机受保护目录，已有账号无需重复初始化。
+
+仿真数据随源码提供[初始化脚本与完整说明](docs/仿真数据初始化.md)，无需复制本机数据库。首次生成业务资料及随机账号：
 
 ```bash
-python -m pytest -q app/tests/test_boss_page_api.py
+validation/.venv/bin/python scripts/prepare_comprehensive_simulation.py \
+  --directory validation/.work/comprehensive-simulation-20261028 \
+  --business-at 2026-10-28T09:00:00+08:00 \
+  --create --initialize-accounts
 ```
 
-实际构建、单测状态看 [GitHub Actions](https://github.com/LIUgongxi2046/Boss-Agent/actions)。桌面宿主目前仍引用开发态 Python 工程，**不是正式的已签名可分发应用**。详细范围、问题和后续任务见 [首批开发记录](docs/development/T11.md)。
+当前仿真候选使用 `bash scripts/run_comprehensive_simulation_local.sh --desktop`启动桌面，省略`--desktop`启动本机WebUI，采用同一资料及前端制品。启动入口不创建资料、账号或构建制品；构建位置、模型配置和重复执行说明采用初始化文档。具体端口及版本见[运行环境](docs/运行环境.md)和[仿真任务记录](docs/development/SIMULATION-20261028.md)。凭据、密码、数据库和生成回答均保留在本机忽略目录。
 
-## 文档
+## 使用范围
 
-[产品 PRD](docs/PRD.md) · [最终 HLD](docs/HLD.md) · [72 页实施映射](docs/HLD-72页面实现映射.md) · [高保真 v6 预览](Boss-Agent-Desktop-Complete-v6/index.html)
+项目处于持续开发与验证阶段。业务演练使用明确标注的模拟资料和外部接口，公开经营基准保留原始年度及单位。已启用外部模型连接的实例通过 FeatureProvider 调用真实模型，当前已有27项 DeepSeek 场景记录；显式模拟模式继续单独标识。真实模型调用、真实外部投递及专业执行分别核查。模型连接配置成功不代表已经发生模型调用，模拟发送记录不代表外部联系人收到消息。语音能力当前暂停，视觉及用户验收继续独立登记。
 
+## 项目文档
 
-## 第二批交办闭环（开发中）
+- [产品需求](docs/PRD.md)
+- [完整业务需求](docs/PRD完整产品后续需求.md)
+- [系统架构](docs/HLD.md)
+- [开发者集成指南](docs/开发者集成指南.md)
+- [当前数据字典](docs/当前数据字典.md)
+- [操作手册与故障处理](docs/操作手册.md)
+- [发布说明与验证范围](docs/发布说明.md)
+- [Desktop v7 设计预览](Boss-Agent-Desktop-Complete-v7/index.html)
+- [文档索引](docs/README.md)
 
-F06 采用服务端事务完成“创建交办→模拟发送→维护端模拟反馈→老板确认完成/批准延期/取消”链路；由 nanobot 已认证 WebSocket `requestMutation` 转到 `RoleChannel`，在同一个 SQLite 事务写授权、对象状态、幂等回执及最小审计。MAINTAINER 只有模拟反馈能力，无法代老板决定。T18/T19 整体功能仍未完成，详见 [老板端开发记录](docs/development/T18.md)、[维护端开发记录](docs/development/T19.md) 和 [72 页当前实现状态](specs/page-service-map.json)。
-
-本机 Desktop v6 UI 截图与原图差异核查：
-
-```bash
-cd validation/desktop && npx playwright install chromium && cd ../..
-node scripts/visual_qa.cjs --role BOSS --pages F01,F06,N02,N05
-python3 scripts/visual_diff.py --role boss
-```
-
-这些命令要求本地研发版服务已运行；Pillow 仅在差异分析阶段额外安装。截图存于忽略的 `.work/visual-qa/`，绝不表示目前已经完成 72 页像素验收。
-
-
-## 第三批：真实模型运行可观测（待 Mac 联调）
-
-F24 老板运行详情与 A15 维护记录可读取本机 DeepSeek 实际响应 ID、请求次数、Tool 事件、Token 用量及未覆盖费用范围，模型没响应过就明确展示“未观察到”，不会将配置状态冒充实际运行。真实模型测试、真实 Electron 交互和最终 v6 像素比对仍待目标 Mac 运行。
-
-[DeepSeek 接入开发记录](docs/development/T16.md) · [72 页现有组件与 API 接入状态](specs/page-service-map.json) · [GitHub Actions](https://github.com/LIUgongxi2046/Boss-Agent/actions)
-
-
-## 第四批：会议纪要与模拟审批
-
-F05 采用意见、建议、明确决定和交办草稿四类分类，真实保存纪要与来源/版本，老板明确确认后才记录已确认纪要；不会自动给联系人发交办。F07 先在 A03 明确录入模拟申请及附件，老板才能按当前版本和 CNY 金额/附件逐项决定同意、拒绝或请求补充。请求补充后由维护端按版本更新材料，旧审批对新金额失效；无资金交易或专业放行。
-
-本轮 Desktop v6 还校正 1440×1024 主视口的 204px 侧栏、64px 顶栏、146px 主 Hero / 122px 紧凑 Hero、20px 圆角及 278px 右侧信息栏，并在 1024px 下切换 60px 图标侧栏。请参考 [F05/F07 开发记录](docs/development/T18-meeting-approval.md)。视觉截图检查脚本已支持源尺寸比较，但**目标 Mac 的真实截图和最终像素级验收仍未完成**。
-
-## 第五批：F08 消息与 F12 私人安排
-
-F08 实现版本化草稿、本人单独确认模拟发送、模拟发件箱和署名模拟回复，关联已独立发送的交办时更新真实进展但不自动标记完成。FR12 私人日程支持 BOSS-only 编辑、删除和仅 busy/起止时间/时区的模拟分享及撤销，技术维护端无法读取私人正文。真实外部发送、实际日历共享与彻底擦除备份不在已完成功能范围。
-
-[业务实现与测试记录](docs/development/T18-message-calendar.md) · [72页实施映射](specs/page-service-map.json)。界面沿用固定 Desktop v6 品牌与交互规格，但尚未通过目标 Mac 的逐页截图像素对照。
-
-
-### 功能先于数据：当前交易与失败恢复
-
-针对 F05/F06/F07/F08/F12 和记忆/提醒动作，已增加受本人或维护角色约束的**原始幂等请求回执重查**，并补了 F08 任务发送边界、联系人有效期、附件去重、F12 工作会议冲突的服务端预检与失效 busy 分享预览。不会把模型超时直接当成“没有执行”，也不会在没有真实外部通道时宣称送达。
-
-具体覆盖、接口和剩余未通过项见 [F08/FR12 迭代记录](docs/development/T18-message-calendar.md) 与 [逐页映射](specs/page-service-map.json)；本次未扩充农业样本或模拟指标数据。
-
-
-## 第六批：F04 会前材料功能闭环
-
-按照 PRD FR04 和原始 Desktop v6 F04 页面，新增真实的会前材料准备业务：从目前已获准的会议、参会人 ID、历史承诺、已发送和待办任务、有效文档来源及固定现有经营明细形成**可核查的材料状态**；保存时使用 BOSS-only、CAS版本校验和 SQLite 幂等事务，后续撤销资料或新增关联交办会触发 NEEDS_REVIEW，不静默重写历史。
-
-UI 恢复原稿 4 项筛选与“议题/历史承诺/待决定/材料缺口”四页签，继续沿用既定 Logo、大鹏素材、卡片与左右栏结构。缺口索取由本人明确确认后只保存 F08 DRAFT，**不自动发送、不标记会议举行**。尚缺真实企业会议、会议信息改期、准备期限来源和真实外部资料发送等能力；高保真截图/目标 macOS Intel/DeepSeek 联调仍需完成，不能将本次部分实现写成完整 PRD 验收通过。
-
-[完整开发记录](docs/development/T18-meeting-brief.md) · [逐页实施映射](specs/page-service-map.json)。
-
-## 第七批：F05 确认纪要逐项交办到 F06
-
-按 PRD FR05/FR06 新增一次性、版本化的纪要条目关联交办：只有已确认纪要的 ASSIGNMENT_DRAFT 才能在本人逐项核对负责人、期限、证据并单独授权后创建 OPEN 任务；独立 F06 再确认才可模拟发送。F05/F06 能相互回查纪要版本、条目ID、来源与当前任务状态；并发重复提交只有一个任务，重新确认的新纪要版本可以另行授权，不覆盖旧任务。失效来源的历史引用仅保留类型和元信息，不返回撤销前的正文。
-
-该功能仍是获准模拟业务，不包括真实收件投递和 macOS 实机像素验收。[业务实现和安全记录](docs/development/T18-minute-task-chain.md) · [72页映射](specs/page-service-map.json)。
-
-
-## 第七批：A05 Prompt版本生命周期
-
-A05 现有独立的技术配置页面，可保存/校验/启用/停用 Prompt 版本、对照上一历史修订，并通过真实 nanobot RuntimeContextBlock 的调用记录查看已启用配置是否被运行时加载。草稿、静态校验、启用指针与运行采纳**分别持久化且状态不同**；没有观察到实际加载时不会显示成功。本功能不会修改老板业务授权或 API Key。
-
-详见 [A05 Prompt开发记录](docs/development/T19-prompt-lifecycle.md)。实际 DeepSeek 接口完成、模型质量评估及目标 Mac UI 像素级比对仍待完成。
-
-
-## 第八批：F06 独立催办与 A13 技术调度
-
-新增由老板单独授权的 F06 模拟催办，在任务已发送且处于等待或进行中时，严格校验稳定收件人、来源版本和模拟时间，24 小时内重复催办由服务端拒绝。F06/N05 查询同一条实际 SQLite 模拟催办记录，送达、回复与完成仍分别核查。
-
-A13 技术维护端已支持调度草稿保存、规则校验、启用、暂停、恢复、取消，以及在已启用的模拟技术计划下对**一个指定事件版本**执行手动模拟调度。手动动作与原 CronService 复用相同的到期、静默和去重逻辑。模拟数据库里的 DELIVERED 并不证明真实系统通知或外部收件人已收到。被取消的原计划不可自动恢复。所有调度配置与老板业务授权分开。
-
-[调度与催办开发记录](docs/development/T17.md) · [逐页实现映射](specs/page-service-map.json)。本次仅新增功能代码和测试，目标 Mac 休眠唤醒、系统通知权限、真实调度恢复和 v6 逐页像素对照仍未验收。
-
-
-## 第九批：F10 人员会面与 F11 行程安排（功能优先）
-
-按原始 v6 页面和 PRD FR-10/11，F10 已实现稳定联系人 ID/当前职责核查、工作任务与反馈关联、可追溯来源版本、本人准备材料，以及把议题**明确关联/解除**已获准模拟会议。F11 实现版本化行程预检、会议信息/私人日程/任务/其他行程冲突识别、时区与夏令时校验、本人确认及取消。F04 已读取两者实际版本，并对影响现有会前材料的变化标记需复核。
-
-这些动作只对 BOSS 开放并写入现有 SQLite 事务；无真实交通预订、天气查询、外部会议邀请或日历改期。没有为页面填造农业指标。原 Desktop v6 Logo、配色、大鹏资源和 React Shell 不降级；目标 Mac、真实 DeepSeek 联调及 72 页像素截图验收仍待执行。
-
-[开发与剩余问题记录](docs/development/T18-people-travel.md) · [页面及接口实装状态](specs/page-service-map.json) · [本轮完整成功 CI](https://github.com/LIUgongxi2046/Boss-Agent/actions/runs/39887407709)。
-
-
-## 第十批：N07/N08/F26 本人设置与 N10 授权撤销
-
-在冻结的 Desktop v6 Shell、蓝绿白色系和“大鹏”素材下，N07 新增本人目标、关注主题和阅读要求的版本化草稿与独立本人确认；已确认且在有效期内的设置按范围被 F01/F04 和 nanobot RuntimeContextBlock 读取。新聊天仅注入适用于完整工作区的目标；运行时提供器调用有独立采用记录，**不把上下文加载当成模型遵从或任务完成**。
-
-N08 新增本人通知暂停、免打扰、重要事件升级选择和阅读格式；真正参与原 CronService 采用的 SQLite `dispatch_due_in_transaction`，对技术调度只施加更严格的本人限制，不会绕过 A13 去重、技术暂停或原事件版本。F02/N06 可追查模拟派发和抑制原因；F26 汇总本人设置入口与当前有效版本，并复用原生退出登录。N07/N08 离开未保存编辑时显示 D06 确认。
-
-N10 支持老板本人按当前授权 ID 和版本撤销未到期授权，事务同时保存最小审计和幂等回执。**撤销仅阻止授权未来使用，不逆转已经执行的交办、发件或审批**。维护身份无权读取或代操作本人授权正文。
-
-以上仍属于代码与模拟 SQLite 业务切片，尚未完成目标 Mac 的真实 DeepSeek、Cron 恢复、72 页真实交互和像素级验收。没有增加农业演示业务明细或虚构结果。详情见 [本轮开发记录](docs/development/T18-owner-preferences.md)、[72 页实现状态](specs/page-service-map.json) 和 [CI 检查](https://github.com/LIUgongxi2046/Boss-Agent/actions)。
+参与开发前完整阅读[开发接手与执行规范](docs/开发接手与执行规范.md)与 [AGENTS.md](AGENTS.md)。开发任务、交付入口和验收状态统一由 [feature-delivery.json](specs/feature-delivery.json) 管理。
