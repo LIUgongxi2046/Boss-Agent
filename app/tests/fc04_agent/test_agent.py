@@ -14,6 +14,7 @@ from nanobot.agent.loop import AgentLoop
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.config.schema import Config
 from nanobot.providers.base import LLMResponse, ToolCallRequest
+from nanobot.session.manager import SessionManager
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "validation"))
@@ -99,7 +100,9 @@ def run(scope, tmp_path, producer):
     recorder = Fc04RuntimeRecorder(store, "ui-check", tools, lambda: snapshot, lambda: current[0])
     provider = Fc04SimulatedProvider(producer)
     provider.generation = config.resolve_preset().to_generation_settings()
-    loop = AgentLoop.from_config(config, tool_registry=tools, provider=provider, hook_factories=[recorder.hook_factory])
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    loop = AgentLoop.from_config(config, tool_registry=tools, provider=provider,
+                                 session_manager=sessions, hook_factories=[recorder.hook_factory])
     for name in list(tools.tool_names):
         tools.unregister(name)
     names = register_fc04_tools(tools, store, lambda: current[0])

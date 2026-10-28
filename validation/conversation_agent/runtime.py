@@ -67,6 +67,34 @@ class ConversationRuntimeRecorder(Fc01RuntimeRecorder):
             self._save(db, row)
         return RuntimeContextBlock(source="boss-conversation-context", content=encode({
             "runtime_configuration": json.loads(block.content), "conversation_context": reference,
+            "available_tool_names": sorted(context.allowed_tools),
+            "adopted_sops": request.attributes.get("boss_sop_reference", []),
+            "capability_guidance": (
+                "当前产品名称为 Boss Agent。本次工具定义与 available_tool_names 是当前会话完整的可调用工具目录。"
+                "背景说明、上游使用说明和技能目录中的工具名称不表示当前产品已经接入这些能力。"
+                "介绍自身能力时仅依据当前目录；未列出的网页搜索、文件编辑、进程执行、调度和图像生成均不可宣称可以调用。"
+                "仅 adopted_sops 中的方法可以描述为本轮已经采用，技能文件存在不表示方法已经执行。"
+                "普通知识解释、写作、翻译和连续追问可以直接回答，无需要求业务对象或来源编号。"
+                "需要业务事实时调用获准工具，依据真实返回形成结论；未执行的读取、修改或验证不可描述为完成。"
+                "业务回答面向老板，使用姓名、中文业务状态和易读日期，说明影响、期限和需要本人决定的事项。"
+                "内部编号、字段名称、英文状态及版本信息保留在工具详情；用户明确询问技术问题时再解释这些内容。"
+                "资料不足时用自然业务语言说明尚未确认的内容，不直接展示内部错误码或字段清单。"
+                "复杂业务分析应自主选择下一项读取，直到足以回答问题或明确缺少的依据；无需等待用户逐项指挥。"
+                "开始时用简短说明交付目标和拟核查内容；执行过程由真实工具事件展示，不编写完成清单冒充执行。"
+                "发现问题时首先核查范围、日期和指标单位，再核查原文、关联事项和当前进度。"
+                "工具返回的 insights 是确定性条件检查结果，可作为调查线索；其中的影响和建议尚未执行，不能当作已证明的根因。"
+                "会议与资料检查使用 bossMeetingsRead 返回的 library.records 和 library.insights；任务检查使用 bossTasksRead。"
+                "需要根因分析时，沿返回的 source_refs 调用 bossEvidenceRead，必要时使用其他获准工具交叉核查。"
+                "bossEvidenceRead 的 source 只能使用已返回的 documents.source_id 或 source_refs.source_id；事件、任务、会议编号不能作为材料编号。"
+                "每项结论区分已证实事实、待验证原因与建议行动。计算金额影响必须具备同范围、同期间、同单位的数量和单价。"
+                "跨对象关联必须有明确的关联字段或原文依据；标题相似、日期接近不能证明属于同一会议或任务。"
+                "期限采用工具的 business_clock 和 deadline_checks，禁止采用系统日期。期限尚未到达时不得描述为逾期。"
+                "不确定关联只能提出核查问题；影响和最终建议中也不得把该关联写成确定依赖或根因。"
+                "批准后版本递增本身不表示审批失效，判断须采用当前业务状态和授权记录。建议期限与已约定期限必须明确区分。"
+                "交付采用老板可使用的简报：最需要关注的问题、具体依据、可能影响、可选行动、建议负责人和时间。"
+                "用户要求方案比较时给出各方案条件与取舍；用户要求行动时准备可确认的内容，业务执行保持本人确认流程。"
+                "完成前核对问题是否得到回答、证据是否支持结论、是否仍有需要用户补充的关键内容。"
+            ),
             "business_authority_granted": False}))
 
     def hook_factory(self, context):
@@ -137,7 +165,7 @@ class ConversationRuntimeHook(Fc01RuntimeHook):
                     db.execute("BEGIN IMMEDIATE")
                     row = self.recorder._read(db, self.run_id)
                     reference = row["conversation_context"]
-                    if row["status"] == "SUCCEEDED" and reference["required_input_count"]:
+                    if row["status"] == "SUCCEEDED" and reference["required_input_count"] and not row.get("external_model_invoked"):
                         row.update(status="WAITING_INPUT", stop_reason="required_input")
                         self.recorder._save(db, row)
                 self.recorder.intent_adapter.finish(reference["client_request_id"])

@@ -197,8 +197,8 @@ export function BossVoiceAssignment({ getToken, onSubmit, onOpenConversation }: 
   return <div className="boss-columns">
     <div className="boss-column">
       <section className="boss-panel">
-        <div className="boss-panel-head"><h2>大鹏 · 语音交办</h2><small>F27 · 本地录音与逐项确认</small></div>
-        <p className="boss-helper">录音须由老板主动开始，最长 60 秒、3MB。录音完成后才会向当前 nanobot 转写服务发送音频。转写内容必须经本人核对后才能提交为 Agent 需求。</p>
+        <div className="boss-panel-head"><h2>Boss Agent · 语音交办</h2><small>F27 · 本地录音与逐项确认</small></div>
+        <p className="boss-helper">录音须由老板主动开始，最长 60 秒、3MB。录音完成后才会向当前 Boss Agent 转写服务发送音频。转写内容必须经本人核对后才能提交为 Agent 需求。</p>
         <div className="boss-actions">
           {stage === "idle" || stage === "recorded" ?
             <button type="button" className="boss-btn boss-btn-primary" onClick={() => void startRecording()}>

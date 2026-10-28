@@ -14,6 +14,8 @@ from boss_source_policy import source_validity
 from boss_supply_quality import external_adoption
 from boss_business_alerts import BusinessAlertsAPI
 from boss_v7_metrics import apply_configurations, display_rounding
+from boss_overview_metrics import periods as sector_periods, metrics as sector_metrics
+from boss_insights import business_insights
 
 
 SCHEMA = json.loads((Path(__file__).resolve().parents[1] / "specs/business-overview.schema.json").read_text())
@@ -59,12 +61,19 @@ class BusinessOverviewAPI:
             db.execute("BEGIN")
             context = _context(db)
             data = self.store.get(db, context["namespace"], "initial", "snapshot")
-            return self._dimensions(data, self._external(db, context))
+            return self._dimensions(data, self._external(db, context), self._sector_documents(db, context))
 
     @staticmethod
-    def _dimensions(data, records):
+    def _sector_documents(db, context):
+        return [json.loads(row[0]) for row in db.execute(
+            "SELECT body FROM objects WHERE namespace=? AND kind='document' AND json_extract(body,'$.access_scope')=? AND json_extract(body,'$.sector_facts') IS NOT NULL",
+            (context["namespace"], context["owner_id"])).fetchall()]
+
+    @staticmethod
+    def _dimensions(data, records, documents=()):
         bodies = [row["data"]["data"] for row in records]
         periods = [{"id": key, "period_start": value[0], "period_end": value[1]} for key, value in data["periods"].items()]
+        periods += [period for period in sector_periods(documents) if not any(row["period_start"] == period["period_start"] and row["period_end"] == period["period_end"] for row in periods)]
         for body in bodies:
             if body.get("period_start") and body.get("period_end"):
                 dates = {key: datetime.fromisoformat(body[key]).astimezone(ZoneInfo(data["boss_profile"]["timezone"])).date().isoformat() for key in ("period_start", "period_end")}
@@ -98,7 +107,8 @@ class BusinessOverviewAPI:
         ns = context["namespace"]
         data = self.store.get(db, ns, "initial", "snapshot")
         records = self._external(db, context)
-        dimensions = self._dimensions(data, records)
+        sector_documents = self._sector_documents(db, context)
+        dimensions = self._dimensions(data, records, sector_documents)
         require(scope["legal_entity_id"] in dimensions["legal_entity_ids"] and (scope["region_id"] is None or scope["region_id"] in dimensions["region_ids"]), "法人或区域不在当前获准范围", web.HTTPBadRequest)
         require(scope["timezone"] in dimensions["timezones"] and any([scope["period_start"], scope["period_end"]] == [row["period_start"],row["period_end"]] for row in dimensions["periods"]), "期间或时区不属于当前接口已验证范围", web.HTTPBadRequest)
         sources = {}
@@ -164,14 +174,28 @@ class BusinessOverviewAPI:
         for page in TOPICS:
             title, filters, labels = SECTORS[page]
             related = [row for row in scoped if row["kind"] in KINDS.get(page, set())]
+            business_metrics = []
+            for document in sector_documents:
+                if document["sector_page"] != page:
+                    continue
+                evidence = source(document["source_id"])
+                if evidence["status"] != "VALID":
+                    continue
+                business_metrics = sector_metrics(document, scope)
+                if business_metrics:
+                    related.append({"kind": "sector_summary", "id": document["source_id"], "version": document["version"],
+                        "state": "CURRENT", "adoption_state": "CURRENT", "source_refs": [{"source_id": document["source_id"], "version": document["version"]}],
+                        "facts": {metric["label"]: metric["value"] + " " + metric["unit"] for metric in business_metrics}})
             had_records = bool(related)
             if scope["attention"] == "SOURCE_REVIEW":
                 related = [row for row in related if row["adoption_state"] != "CURRENT"]
+                business_metrics = []
             if scope["attention"] == "OWNER_INVOLVEMENT":
                 related = []
+                business_metrics = []
             topic_sources = sorted({ref["source_id"] for row in related for ref in row["source_refs"]})
             timestamps = [sources[sid]["metadata"].get("observed_at") for sid in topic_sources if sources[sid]["metadata"]]
-            topics.append({"page_id": page, "title": title, "purpose": {"filters": filters, "indicators": labels},
+            topics.append({"page_id": page, "title": title, "purpose": {"filters": filters, "indicators": labels}, "metrics": business_metrics,
                 "availability": "PARTIAL" if any(row["adoption_state"] == "CURRENT" for row in related) else "NEEDS_REVIEW" if related else "FILTER_EMPTY" if had_records else "SOURCE_NOT_AVAILABLE",
                 "data_as_of": latest(timestamps), "latest_source_published_at": latest([sources[sid]["metadata"].get("published_at") for sid in topic_sources if sources[sid]["metadata"]]), "records": related, "missing_fields": GAPS[page],
                 "scope_application": "CURRENT_SNAPSHOT_AT_BUSINESS_CLOCK; PERIOD_IS_NOT_A_FLOW_AGGREGATION",
@@ -220,6 +244,7 @@ class BusinessOverviewAPI:
             "unclassified_records": [{"record": row, "reason": "TOPIC_APPLICABILITY_NOT_PROVEN"} for row in scoped if row["kind"] not in set().union(*KINDS.values())],
             "business_at": context["clock"], "read_at": now(), "coverage_state": "PARTIAL",
             "business_authorization_granted": False, "business_mutation_performed": False}
+        result["insights"] = business_insights(topics)
         result["snapshot_sha256"] = checksum({"context": context, "initial": data, "result": {key: value for key, value in result.items() if key != "read_at"}})
         return validate("View", result)
 

@@ -4,6 +4,7 @@ from copy import deepcopy
 from contextvars import ContextVar
 from dataclasses import dataclass
 from uuid import uuid4
+from time import monotonic
 
 import yaml
 from aiohttp import web
@@ -360,8 +361,38 @@ class FeatureProvider(LLMProvider):
 
     async def chat_stream_with_retry(self, messages, tools=None, model=None, **kwargs):
         if self.external_provider is not None:
+            request = current_request_context()
+            binding = request.attributes[ATTRIBUTE]
+            options = self._call_options(kwargs, True)
+            callback = options.get("on_content_delta")
+            started = monotonic()
+            arrivals, processing, lengths = [], [], []
+
+            async def observe_delta(delta):
+                received = monotonic()
+                arrivals.append((received-started)*1000)
+                lengths.append(len(delta))
+                await callback(delta)
+                processing.append((monotonic()-received)*1000)
+
+            if callback is not None:
+                options["on_content_delta"] = observe_delta
             async with asyncio.timeout_at(self._external_deadline()):
-                return await self.external_provider.chat_stream(messages, tools, model, **self._call_options(kwargs, True))
+                try:
+                    return await self.external_provider.chat_stream(messages, tools, model, **options)
+                finally:
+                    gaps = [right-left for left, right in zip(arrivals, arrivals[1:])]
+                    profile = {"chunks": len(arrivals), "characters": sum(lengths),
+                               "first_chunk_ms": round(arrivals[0], 2) if arrivals else None,
+                               "max_chunk_gap_ms": round(max(gaps), 2) if gaps else None,
+                               "mean_chunk_gap_ms": round(sum(gaps)/len(gaps), 2) if gaps else None,
+                               "max_processing_ms": round(max(processing), 2) if processing else None,
+                               "mean_processing_ms": round(sum(processing)/len(processing), 2) if processing else None}
+                    with binding.recorder.store.connect() as db:
+                        db.execute("BEGIN IMMEDIATE")
+                        row = binding.recorder._read(db, binding.run_id)
+                        row.setdefault("stream_observations", []).append(profile)
+                        binding.recorder._save(db, row)
         result = await self.chat(messages, tools, model, **kwargs)
         if kwargs.get("on_content_delta") is not None and result.content:
             await kwargs["on_content_delta"](result.content)

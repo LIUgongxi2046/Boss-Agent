@@ -1,0 +1,95 @@
+*** Begin Patch
+*** Update File: webui/src/components/thread/activity/generic-tool-model.ts
+@@
+ export interface GenericToolRunItem {
+   trace: GenericToolTrace;
+   status: GenericToolStatus;
+   error?: string;
++  observedStatus?: GenericToolStatus;
++  active?: boolean;
++  result?: unknown;
+ }
+*** Update File: webui/src/components/thread/AgentActivityCluster.tsx
+@@
+ import { useTranslation } from "react-i18next";
++import { BossToolEvents, canRenderBossToolEvents } from "@/boss-agent/BossToolActivity";
+@@
+   mcpPresetsByName: Map<string, McpPresetInfo>;
+ }) {
+   const lines = traceLines(message);
++  if (canRenderBossToolEvents(message.toolEvents ?? [])) {
++    return <BossToolEvents events={message.toolEvents ?? []} active={active}/>;
++  }
+@@
+         error: explicitState?.error,
++        observedStatus: explicitState?.status,
++        active,
++        result: explicitState?.result,
+@@
+-    : isTurnStreaming || completionHoldOpen || (wasTurnStreaming && !isTurnStreaming);
++    : isTurnStreaming || completionHoldOpen || (wasTurnStreaming && !isTurnStreaming)
++      || activityMessages.some(message => (message.toolEvents ?? []).length > 0);
+*** Update File: webui/src/components/thread/activity/GenericToolRun.tsx
+@@
+ import { useMemo } from "react";
++import { BossToolActivity, isBossToolActivity } from "@/boss-agent/BossToolActivity";
+@@
+   const label = model.aside ? `${action} · ${model.aside}` : action;
++  if (items.length > 0 && items.every(item => isBossToolActivity(item.trace.name))) {
++    return <BossToolActivity items={items} />;
++  }
+*** Update File: webui/src/components/thread/ThreadComposer.tsx
+@@
+ import { MarkdownText, preloadMarkdownText } from "@/components/MarkdownText";
++import { BossConversationSuggestions } from "@/boss-agent/BossConversationSuggestions";
+@@
+           <div className="ml-auto">{usageControl}</div>
+         </div>
+       ) : null}
++      {isHero && !hasDraft && !interactionDisabled && !isStreaming ? (
++        <BossConversationSuggestions onSelect={prompt => {
++          replaceMentionInput(prompt, prompt.length);
++          setInlineError(null);
++          resizeTextarea();
++        }}/>
++      ) : null}
+     </form>
+*** Update File: webui/src/components/thread/ThreadViewport.tsx
+@@
+     threadMotionRef.current?.takeUserControl();
++    setAtBottom(false);
+   }, []);
+@@
+-        && (event.target === el || isThreadDisclosureTarget(event.target))
++        && isThreadDisclosureTarget(event.target)
+*** Update File: webui/src/hooks/useNanobotStream.ts
+@@
+-const VISIBLE_STREAM_FLUSH_INTERVAL_MS = 50;
++const VISIBLE_STREAM_FLUSH_INTERVAL_MS = 16;
+*** Update File: webui/src/components/thread/thread-camera.ts
+@@
+-   * Automatic follow is a layout constraint, not navigation. Resolve it in
+-   * the geometry frame so streamed content and viewport resizing cannot build
+-   * up hidden travel below the visible tail.
++   * 自动跟随使用短时动画连接内容高度变化，并保留用户接管与减少动态效果设置。
+@@
+   followTo(top: number): ThreadCameraFollowResult | null {
+     const viewport = this.getViewport();
+     if (!viewport) return null;
+-    this.cancel();
+-    this.target = Math.max(0, top);
+-    this.write(viewport, this.target);
+-    return "settled";
++    if (this.prefersReducedMotion()) {
++      this.jumpTo(top);
++      return "settled";
++    }
++    return this.moveTo(top, 80);
+@@
+-  private moveTo(top: number): ThreadCameraFollowResult | null {
++  private moveTo(top: number, duration = NAVIGATION_DURATION_MS): ThreadCameraFollowResult | null {
+@@
+       ? REDUCED_NAVIGATION_DURATION_MS
+-      : NAVIGATION_DURATION_MS);
++      : duration);
+*** End Patch

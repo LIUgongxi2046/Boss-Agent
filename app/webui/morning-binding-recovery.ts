@@ -47,7 +47,8 @@ export function validateMorningBindingReceipt(value:unknown,requestId:string):Mo
         ||!/^[0-9a-f]{64}$/.test(bound.snapshot_sha256)
         ||["list_id","item_id","last_request_id"].some(field=>
           bound[field]!==null&&(typeof bound[field]!=="string"||!bound[field]))
-        ||Boolean(bound.item_id)!==Boolean(bound.list_id)) {
+        ||(bound.item_id!==null&&bound.list_id===null)
+        ||(bound.item_id===null&&bound.list_id!==null&&bound.last_request_id===null)) {
       throw new Error("晨间原会话绑定与当前真实会话、事项或快照不一致");
     }
   }

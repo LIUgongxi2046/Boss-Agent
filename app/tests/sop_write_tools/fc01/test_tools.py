@@ -13,6 +13,7 @@ from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
 from nanobot.config.schema import Config
 from nanobot.providers.base import LLMResponse, ToolCallRequest
+from nanobot.session.manager import SessionManager
 from loguru import logger
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -168,8 +169,9 @@ def run_runtime(scope, tmp_path, producer, *, session="fc01-session"):
     recorder = Fc01RuntimeRecorder(store, "ui-check", registry, lambda: effective)
     provider = Fc01SimulatedProvider(producer)
     provider.generation = config.resolve_preset().to_generation_settings()
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
     loop = AgentLoop.from_config(config, tool_registry=registry, provider=provider,
-                                 hook_factories=[recorder.hook_factory])
+                                 session_manager=sessions, hook_factories=[recorder.hook_factory])
     for name in list(registry.tool_names):
         registry.unregister(name)
     register_fc01_tools(registry, store, lambda: current[0], allowed_tools=current[0].allowed_tools)

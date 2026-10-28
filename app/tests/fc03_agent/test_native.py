@@ -3,6 +3,7 @@ from dataclasses import replace
 import inspect
 import json
 import os
+import subprocess
 from pathlib import Path
 import sys
 
@@ -115,12 +116,16 @@ def test_actual_native_sdk_keeps_two_inputs_one_session_and_one_list(native):
     bind(native)
     questions = ["今天有哪些事情需要本人处理", "继续讨论当前清单，说明需要处理的事项"]
     results, admitted = run_turns(native, questions)
-    assert all(not result.error and "SIMULATED" in result.content for result in results)
+    assert all(not result.error and "当前模拟资料" in result.content for result in results)
     runs = rows(native, "runtime_run")
     assert len(runs) == 2 and {row["session_id"] for row in runs} == {"websocket:" + CHAT}
     assert len({row["run_id"] for row in runs}) == 2
     assert {row["feature_id"] for row in runs} == {"FC03"}
     assert len(rows(native, "morning_list")) == 1
+    receipt = native[2].binding_receipt("BOSS", "native-binding-original", active=lambda: True)
+    assert receipt["result"]["list_id"] is not None and receipt["result"]["item_id"] is None
+    subprocess.run(["node", str(ROOT / "app/tests/helpers/validate_morning_binding.mjs")],
+                   input=json.dumps(receipt), text=True, check=True, capture_output=True)
     assert [len(row["tool_results"]) for row in runs] == [4, 3]
     session = native[3].sessions.get_or_create("websocket:" + CHAT)
     text = json.dumps(session.messages, ensure_ascii=False)
@@ -157,7 +162,9 @@ def test_native_morning_reads_selected_knowledge_and_records_versions(native):
     bind(native)
     refs = select_knowledge(native)
     results, _ = run_turns(native, ["结合选择的知识资料讨论今天的事项"])
-    assert all(ref["source_id"] in results[0].content for ref in refs)
+    assert "相关材料" in results[0].content
+    with native[0].connect() as db:
+        assert all(native[0].get(db, "ui-check", "document", ref["source_id"])["content"] in results[0].content for ref in refs)
     row = rows(native, "runtime_run")[0]
     assert row["status"] == "SUCCEEDED" and row["morning_context"]["source_selection"]["source_refs"] == refs
     documents = [step["document_ref"] for step in row["tool_results"] if "document_ref" in step]
@@ -207,6 +214,20 @@ def test_selected_native_sdk_consumes_exact_item(native):
     assert row["morning_context"]["selected_item_ref"]["item_id"] == item["item_id"]
     assert {reference["list_id"] for reference in row["tool_results"]} == {view["list_id"]}
     assert len(rows(native, "morning_list")) == 1
+
+
+def test_selected_todo_titles_limit_discussion_and_offer_processing_actions(native):
+    view = native[1].api.query("BOSS", {**DAY, "client_request_id": "batch-selection-current", "session_id": "owner-selection"})
+    chosen = view["items"][:1]
+    assert len(chosen) == 1 and len(view["items"]) > 1
+    bind(native)
+    question = "请协助处理以下事项，说明当前问题、建议和需要我确认的操作：\n" + "\n".join(item["title"] + "：" + item["reason"] for item in chosen)
+    results, _ = run_turns(native, [question])
+    answer = results[0].content
+    assert not results[0].error and all("### " + item["title"] in answer for item in chosen)
+    assert all("### " + item["title"] not in answer for item in view["items"][1:])
+    assert "确认具体处理操作" in answer and "SIMULATED" not in answer
+    assert rows(native, "runtime_run")[0]["status"] == "SUCCEEDED"
 
 
 @pytest.mark.parametrize("fields", [{"owner_id": "other"}, {"session_id": "sdk:forged"}, {"confirmed": True},

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import uuid
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from urllib.parse import parse_qs
 from aiohttp import web
@@ -14,6 +16,8 @@ from boss_owner_preferences import owner_profile
 from boss_admin_config import memory_technical_status, prompt_technical_status
 from boss_owner_plans import OwnerPlansAPI
 from boss_today import TodayAPI
+from boss_morning_projection import project as morning_project
+from boss_simulation_api import _context
 from boss_meetings import MeetingAPI, meeting_materials
 from boss_source_access import require_current_business_source
 from boss_source_policy import source_validity
@@ -69,18 +73,24 @@ class BossPageAPI:
             return meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
 
     def _dashboard(self):
+        from boss_insights import task_insights
         with self.store.connect() as db:
             self.store.active(db, self.namespace)
             data = meeting_materials(db, self.store.get(db, self.namespace, "initial", "snapshot"))
             clock = self.store.get(db, self.namespace, "clock", "current")
             tasks = self._items(db, self.namespace, "task")
             notifications = self._items(db, self.namespace, "notification")
+            zone = data["boss_profile"]["timezone"]
+            day = {"date": datetime.fromisoformat(clock["at"]).astimezone(ZoneInfo(zone)).date().isoformat(), "timezone": zone}
+            today, _ = morning_project(self.store, db, _context(db), day)
             return {
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
                 "dataset_id": data["dataset_id"],
                 "dataset_version": data["dataset_version"],
                 "business_clock": clock["at"],
+                "today": today,
+                "insights": task_insights(tasks, clock["at"], data.get("contacts", []), self._items(db, self.namespace, "self_commitment")),
                 "refreshed_at": now(),
                 "profile": owner_profile(db, data),
                 "source_coverage": {
@@ -91,7 +101,7 @@ class BossPageAPI:
                 },
                 "tasks": [self._public_task(task) for task in tasks],
                 "historical_commitment": data.get("historical_task"),
-                "meeting": data.get("meeting"),
+                "meeting": self._meeting_reference(data),
                 "event": {"event_id": data["event"]["event_id"],
                           "status": data["event"]["status"]},
                 "assignment_source_ids": [
@@ -123,6 +133,7 @@ class BossPageAPI:
         return {key: item[key] for key in keys if key in item}
 
     def _tasks(self):
+        from boss_insights import task_insights
         with self.store.connect() as db:
             db.execute("BEGIN")
             self.store.active(db, self.namespace)
@@ -233,6 +244,7 @@ class BossPageAPI:
                 "source_type": "SIMULATED",
                 "namespace": self.namespace,
                 "tasks": tasks,
+                "insights": task_insights(tasks, business_at, data.get("contacts", []), self._items(db, self.namespace, "self_commitment")),
                 "linked_messages": linked_messages,
                 "task_due_events": task_due_events,
                 "feedback": [
@@ -277,11 +289,21 @@ class BossPageAPI:
                 "read_at": now(),
             }
 
+    @staticmethod
+    def _meeting_reference(data):
+        meeting = data.get("meeting")
+        if meeting is None:
+            return None
+        event_id = data["event"]["event_id"]
+        materials = meeting.get("material_ids", [])
+        return {**meeting, "material_ids": [identifier for identifier in materials if identifier != event_id],
+                "related_event_ids": [event_id] if event_id in materials else []}
+
     def _meetings(self):
         data = self._snapshot()
         return {
             "source_type": "SIMULATED",
-            "meeting": data.get("meeting"),
+            "meeting": self._meeting_reference(data),
             "documents": [
                 {"source_id": d["source_id"], "version": d["version"],
                  "source_type": d["source_type"], "author_contact_id": d["author_contact_id"],

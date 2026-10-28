@@ -1,4 +1,5 @@
 import designPages from "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json";
+import {brandMessages} from "./boss-branding";
 
 export type Role="BOSS"|"MAINTAINER";
 type FeatureReference={title:string;feature:string;directory:boolean};
@@ -37,7 +38,7 @@ const FEATURE_REFERENCES:Record<Role,Record<string,FeatureReference>>={
   },
 };
 const PRIMARY_NAVIGATION:Record<Role,PrimaryEntry[]>={
-  BOSS:[{id:"F01",title:"今日工作"},{id:"N02",title:"聊天交办"},{id:"N03",title:"经营关注"},{id:"N04",title:"会议与资料"},{id:"N05",title:"任务与承诺"},{id:"N06",title:"通知与设置"}],
+  BOSS:[{id:"F01",title:"今日工作"},{id:"N02",title:"聊天交办"},{id:"N03",title:"经营关注"},{id:"N04",title:"会议与资料"},{id:"N05",title:"任务与承诺"}],
   MAINTAINER:[{id:"A01",title:"档案与访问"},{id:"F25",title:"模拟中心"},{id:"A08",title:"Agent配置"},{id:"A15",title:"运行与评测"}],
 };
 const PUBLIC_GROUP="公共状态与登录";
@@ -53,12 +54,13 @@ for(const role of ["BOSS","MAINTAINER"] as const){
     if(!authentication&&!SHARED_PAGES.has(id)&&(metadata.technical?"MAINTAINER":"BOSS")!==role)continue;
     const group=PRIMARY_NAVIGATION[role].some(item=>item.title===metadata.module)?metadata.module:PUBLIC_GROUP;
     const state:NavigationEntry["state"]=authentication?"AUTHENTICATION":id==="F27"?"PAUSED":["F01","N02"].includes(id)?"DEVELOPED":id==="N03"?"IN_PROGRESS":"PARTIAL";
-    DELIVERED_NAVIGATION[role][id]={id,title:metadata.title,group,feature:FEATURE_REFERENCES[role][id]?.feature??"PARTIAL_PAGE_BINDING",directory:true,state,stateLabel:STATE_LABELS[state],accepted:false,variantLabel:VARIANTS[id]??null};
+    DELIVERED_NAVIGATION[role][id]={id,title:brandMessages(metadata.title),group,feature:FEATURE_REFERENCES[role][id]?.feature??"PARTIAL_PAGE_BINDING",directory:true,state,stateLabel:STATE_LABELS[state],accepted:false,variantLabel:VARIANTS[id]??null};
   }
 }
 DELIVERED_NAVIGATION.BOSS.MVP01={id:"MVP01",title:"采购成本协调",group:"今日工作",feature:"MVP01",directory:false,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 DELIVERED_NAVIGATION.BOSS.NATIVE={...DELIVERED_NAVIGATION.BOSS.N02,id:"NATIVE",directory:false};
-const BOSS_DIRECTORY=new Set(["F01","N02","N03","F02","F03","F14","F21","N04","N05","N06","N08","N09"]);
+DELIVERED_NAVIGATION.BOSS.N06={...DELIVERED_NAVIGATION.BOSS.N06,title:"任务通知",group:"任务与承诺"};
+const BOSS_DIRECTORY=new Set(["F01","N02","N03","N04","N05"]);
 for(const [id,entry] of Object.entries(DELIVERED_NAVIGATION.BOSS))entry.directory=BOSS_DIRECTORY.has(id);
 DELIVERED_NAVIGATION.MAINTAINER.NATIVE={id:"NATIVE",title:"应用设置",group:"Agent配置",feature:"UI02",directory:true,state:"DEVELOPED",stateLabel:STATE_LABELS.DEVELOPED,accepted:false,variantLabel:null};
 

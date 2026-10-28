@@ -23,6 +23,8 @@ PATCHES = (
     "nanobot-menu-n02.patch",
     "nanobot-all-menus-routing.patch",
     "nanobot-menu-n03.patch",
+    "nanobot-branding.patch",
+    "nanobot-agent-experience.patch",
 )
 
 
@@ -109,10 +111,6 @@ def normalize_native_threads(content: str) -> str:
         indent = re.match(r"^\s*", lines[anchor]).group()
         props = [
             "persistQueuedPrompts={false}",
-            'composerInputLabel={role==="BOSS"?"本次消息":undefined}',
-            'composerSubmitLabel={role==="BOSS"?"提交需求":undefined}',
-            'composerAttachmentLabel={role==="BOSS"?"添加附件":undefined}',
-            'composerPlaceholder={role==="BOSS"?"输入问题、补充信息或待执行任务":undefined}',
             f"onDraftController={{controller=>registerNativeDraft({key},controller)}}",
             f"onReadingController={{controller=>registerNativeReading({key},controller)}}",
         ]

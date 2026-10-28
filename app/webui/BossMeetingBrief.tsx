@@ -136,7 +136,7 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
       <Fact label="当前会议版本" value={b?.meeting.version}/><Fact label="会议状态" value={b?.meeting.state}/><Fact label="已保存材料版本" value={saved?.version}/><Fact label="已保存材料状态" value={saved?.state}/><Fact label="当前资料状态" value={current?.current_status}/><Fact label="准备期限" value={time(b?.meeting.preparation_due_at,b?.meeting.timezone)}/><Fact label="有效材料" value={b?.sources.filter(value=>value.status==="CURRENT").length}/><Fact label="待补项目" value={b?.missing_items.length}/><Fact label="会议已举行" value={current?current.meeting_occurred?"本人已经确认":"尚未确认":null}/><Fact label="来源版本变化" value={current?.source_changed===undefined?null:current.source_changed?"需要复核":"未观察到"}/><Fact label="参会人变化" value={current?.participant_changed===undefined?null:current.participant_changed?"需要复核":"未观察到"}/><Fact label="关联业务变化" value={current?.business_changed===undefined?null:current.business_changed?"需要复核":"未观察到"}/>{current?.needs_review&&<p className="boss-status boss-status-warn">当前材料需要复核，旧版本继续按原依据保留。</p>}
       {transaction.recovery}
     </Panel></aside></div>
-    <footer className="boss-brief-footer boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={prepare}><ShieldCheck size={15}/>让大鹏准备会前材料</button>{disabled&&reason&&<p className="boss-helper">{reason}</p>}</footer>
+    <footer className="boss-brief-footer boss-actions"><button type="button" className="boss-btn boss-btn-primary" disabled={disabled} onClick={prepare}><ShieldCheck size={15}/>让 Boss Agent 准备会前材料</button>{disabled&&reason&&<p className="boss-helper">{reason}</p>}</footer>
     {transaction.dialog}
   </div>;
 }

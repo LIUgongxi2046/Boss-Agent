@@ -13,6 +13,7 @@ from nanobot import Nanobot
 from nanobot.agent.loop import AgentLoop
 from nanobot.config.loader import load_config, save_config
 from nanobot.config.schema import Config
+from nanobot.session.manager import SessionManager
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
 
@@ -60,7 +61,9 @@ def mvp(tmp_path):
     service, bi = ProductMVP(store), ProductBI(store)
     registry, provider = FeatureToolRegistry(), FeatureProvider(service, bi)
     recorder = FeatureRecorder(store, registry, lambda: runtime.snapshot(), bi)
-    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry, hook_factories=[recorder.hook_factory])
+    sessions = SessionManager(tmp_path / "workspace", sessions_root=tmp_path / "sessions")
+    loop = AgentLoop.from_config(config, provider=provider, tool_registry=registry,
+                                 session_manager=sessions, hook_factories=[recorder.hook_factory])
     tools = [FeatureBusinessTool(store, service, bi, name) if name in BI_TOOLS else Fc01Tool(store, service.context_provider, name) for name in sorted(TOOLS)]
     runtime = ProductRuntime(store, path, loop, registry, tools, provider)
     service.runtime = bi.runtime = runtime

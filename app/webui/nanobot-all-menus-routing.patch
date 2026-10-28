@@ -27,7 +27,8 @@
          onOpenNative={role => {
 -          if (role === "BOSS" && view !== "chat") onBackToChat();
 -          if (role === "MAINTAINER" && view === "chat") onOpenSettings(settingsInitialSection);
-+          if(role === "BOSS" && view !== "chat")navigate({view:"chat",activeKey,settingsSection:"overview"},{replace:true});
-+          if(role === "MAINTAINER" && view === "chat")navigate({view:shellViewForSettingsSection(settingsInitialSection),activeKey,settingsSection:settingsInitialSection},{replace:true});
++          const currentRoute=readShellRoute();
++          if(role === "BOSS" && currentRoute.view !== "chat")navigate({...currentRoute,view:"chat",settingsSection:"overview"},{replace:true});
++          if(role === "MAINTAINER" && currentRoute.view === "chat")navigate({...currentRoute,view:shellViewForSettingsSection(settingsInitialSection),settingsSection:settingsInitialSection},{replace:true});
          }}
 *** End Patch

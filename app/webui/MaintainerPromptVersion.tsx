@@ -476,7 +476,7 @@ export function MaintainerPromptVersion({onNavigate,onDirtyChange}:Props) {
           <div className="boss-actions"><button type="button" className="boss-btn" disabled={!canCompare} onClick={openCompare}>查看版本差异</button><button type="button" className="boss-btn" onClick={()=>onNavigate("A15")}>查看采用本版本的运行</button></div>
           {!canCompare&&<p className="boss-helper">当前类别少于两个保存版本，暂时不能比较差异。</p>}
           <div className="boss-status"><Clock3 size={16}/>
-            载入次数来自nanobot上下文Provider的实际记录。当前服务未返回最近运行ID，运行关联需在A15按实际run_id核对；模型响应和业务结果也在对应运行中核查。
+            载入次数来自 Boss Agent 上下文 Provider 的实际记录。当前服务未返回最近运行 ID，运行关联需在 A15 按实际 run_id 核对；模型响应和业务结果也在对应运行中核查。
           </div>
           <details className="boss-sop-history"><summary>当前生效版本的更多操作</summary><p className="boss-helper">停用后，{kindLabel}类新会话不再采用已启用版本；已有运行继续记录原采用版本，历史草稿保留。</p>{active?.enabled?<button type="button" className="boss-btn" disabled={unavailable||dirty} onClick={deactivate}><Square size={15}/> 停用当前类别</button>:<p className="boss-helper">当前类别没有已启用版本，无需停用。</p>}{dirty&&<p className="boss-helper">存在未保存修改，先保存或放弃本次编辑。</p>}</details>
         </section>

@@ -2,7 +2,8 @@ import {useEffect,useRef,useState} from "react";
 import {CalendarDays,FileText,Search} from "lucide-react";
 import {useOwnerWorkspace} from "./useTechnicalWorkspace";
 import {replaceBossHistory} from "./boss-history";
-import {V7Panel,V7Empty,V7Fact,V7Pagination,V7ReadState,V7Tabs} from "./BossV7UI";
+import {V7Panel,V7Empty,V7Pagination,V7ReadState,V7Tabs} from "./BossV7UI";
+import {BossInsightList,type BossInsight} from "./BossInsightList";
 
 const TABS=[{id:"meeting",title:"会议"},{id:"document",title:"资料"},{id:"approval",title:"待决定申请"},{id:"research",title:"研究材料"},{id:"people",title:"人员会面"}] as const;
 type Kind=typeof TABS[number]["id"];
@@ -12,9 +13,12 @@ export type LibraryReference={id:string;kind:Kind;version:string;namespace:strin
 type LibraryRecord={id:string;kind:Kind;title:string;version:string;at:string|null;local_date:string|null;timezone:string|null;source_type:string;
   summary:string;material_state:string;material_gaps:string[];meeting_state:string|null;preparation_state:string|null;minute_state:string|null;assignment_state:string|null;
   source_refs:{source_id:string;version:string;location:string|null}[];related_objects:{id:string;title:string;kind:string}[];actions:LibraryAction[]};
-type Projection={projection:"meeting-library";namespace:string;source_type:string;read_at:string;records:LibraryRecord[];coverage:{kind:Kind;state:string;reason:string|null}[]};
+export type LibraryProjection={projection:"meeting-library";namespace:string;source_type:string;read_at:string;insights:BossInsight[];records:LibraryRecord[];coverage:{kind:Kind;state:string;reason:string|null}[]};
 type Props={onOpen:(action:LibraryAction,reference:LibraryReference)=>void;onViewSource:(id:string)=>void;refreshVersion?:number};
 const MATERIAL_STATE_TABS:Kind[]=["meeting","document","research"];
+const STATES:Record<string,string>={READY:"材料齐备",PARTIAL:"待补充材料",MATERIALS_MISSING:"等待材料",VALID:"可以阅读",CURRENT:"当前有效",DRAFT:"正在准备",PREPARED:"已准备",PENDING_DECISION:"待我决定",WAITING_MATERIAL:"待补充材料",APPROVED_RECORDED:"已同意",REJECTED_RECORDED:"已驳回",CONFIRMED:"已确认",HELD:"已举行",CANCELED:"已取消",WITHDRAWN:"已撤回",EXPIRED:"已到期",COMPLETED:"已完成"};
+function stateLabel(value:string){return STATES[value]??"待核查";}
+function displayTime(record:LibraryRecord){return record.at?new Intl.DateTimeFormat("zh-CN",{timeZone:record.timezone??"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(record.at)):"时间待安排";}
 function initial(){const parameters=new URLSearchParams(window.location.search);const raw=parameters.get("libraryTab");return {tab:TABS.some(item=>item.id===raw)?raw as Kind:"meeting" as Kind,query:parameters.get("libraryQuery")??"",from:parameters.get("libraryDateFrom")??"",to:parameters.get("libraryDateTo")??"",state:parameters.get("libraryState")??"",selected:parameters.get("librarySelected")??""};}
 function inRange(record:LibraryRecord,from:string,to:string){
   if(!from&&!to)return true;
@@ -27,7 +31,7 @@ function DetailAction({action,label,loading,onOpen}:{action:LibraryAction;label:
 }
 
 export function BossMeetingLibrary({onOpen,onViewSource,refreshVersion}:Props){
-  const api=useOwnerWorkspace<Projection>("meeting-library");
+  const api=useOwnerWorkspace<LibraryProjection>("meeting-library");
   const [view,setView]=useState(initial),[query,setQuery]=useState(view.query),[from,setFrom]=useState(view.from),[to,setTo]=useState(view.to),[state,setState]=useState(view.state),[page,setPage]=useState(1);
   const previousRefresh=useRef(refreshVersion);
   useEffect(()=>{if(previousRefresh.current===refreshVersion)return;previousRefresh.current=refreshVersion;api.reload();},[refreshVersion,api.reload]);
@@ -61,23 +65,25 @@ export function BossMeetingLibrary({onOpen,onViewSource,refreshVersion}:Props){
   const sourceAction=findAction("source"),minutes=findAction("minutes"),history=findAction("history"),discuss=findAction("discuss");
   const primary=prepare??openAction;
   const primaryLabel=prepare?"准备会前材料":openAction?.title??"";
-  const discussLabel=selected?.kind==="meeting"?"讨论这场会议":selected?.kind==="document"?"让大鹏整理这份资料":discuss?.title??"继续讨论";
+  const discussLabel=selected?.kind==="meeting"?"讨论这场会议":selected?.kind==="document"?"让 Boss Agent 整理这份资料":discuss?.title??"继续讨论";
   return <div className="boss-meeting-library">
     <V7ReadState loading={api.loading} error={api.error} onReload={api.reload}/>
     <div className="boss-library-columns"><div className="boss-column"><V7Panel title="对象与记录">
       <V7Tabs label="会议资料分类" value={view.tab} onChange={changeTab} items={TABS.map(item=>({...item,count:api.data?records.filter(record=>record.kind===item.id).length:undefined}))}/>
       <form className="boss-v7-filter-bar boss-library-filters" onSubmit={event=>{event.preventDefault();update({...view,query:query.trim(),from,to,state,selected:""});}}>
-        <label>起始日期<input type="date" value={from} onChange={event=>setFrom(event.target.value)}/></label><label>结束日期<input type="date" value={to} onChange={event=>setTo(event.target.value)}/></label><label>关联对象<input value={query} onChange={event=>setQuery(event.target.value)} placeholder="按名称搜索当前分类"/></label>{stateFilter&&<label>材料状态<select value={state} onChange={event=>setState(event.target.value)}><option value="">全部已读取状态</option>{[...new Set(directory.map(record=>record.material_state))].map(value=><option key={value}>{value}</option>)}</select></label>}<button className="boss-btn boss-btn-primary" type="submit" disabled={api.loading}><Search size={16}/>筛选</button><button className="boss-btn" type="button" disabled={api.loading} onClick={clearFilters}>清除筛选</button>
+        <label>起始日期<input type="date" value={from} onChange={event=>setFrom(event.target.value)}/></label><label>结束日期<input type="date" value={to} onChange={event=>setTo(event.target.value)}/></label><label>关联对象<input value={query} onChange={event=>setQuery(event.target.value)} placeholder="按名称搜索当前分类"/></label>{stateFilter&&<label>材料状态<select value={state} onChange={event=>setState(event.target.value)}><option value="">全部状态</option>{[...new Set(directory.map(record=>record.material_state))].map(value=><option key={value} value={value}>{stateLabel(value)}</option>)}</select></label>}<button className="boss-btn boss-btn-primary" type="submit" disabled={api.loading}><Search size={16}/>筛选</button><button className="boss-btn" type="button" disabled={api.loading} onClick={clearFilters}>清除筛选</button>
       </form>
-      {coverage&&coverage.state!=="COMPLETE"&&<p className="boss-status boss-status-warn">{coverage.state} · {coverage.reason??"当前类别资料覆盖尚不完整"}</p>}
-      <div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>标题</th><th>时间与时区</th><th>来源版本</th><th>准备或核查状态</th><th>材料缺口</th><th>关联事项</th></tr></thead><tbody>{filtered.slice((currentPage-1)*10,currentPage*10).map(record=><tr key={record.kind+record.id} aria-selected={record.id===selected?.id}><td><button className="boss-v7-text-button" aria-label={record.title+"，"+(record.at??"时间尚未提供")} onClick={()=>update({...view,selected:record.id},false)}>{record.kind==="meeting"?<CalendarDays size={17}/>:<FileText size={17}/>}<span>{record.title}</span></button></td><td>{record.at??"尚未提供"}<small>{record.timezone??"时区尚未提供"}</small></td><td>{record.version}<small>{record.source_type}</small></td><td>{record.material_state}</td><td>{record.material_gaps.length?record.material_gaps.join("；"):"当前记录未列出材料缺口"}</td><td>{record.related_objects.map(item=>item.title+"（"+item.id+"）").join("；")||"没有已读取关联"}</td></tr>)}</tbody></table></div>
+      {coverage&&coverage.state!=="COMPLETE"&&<p className="boss-status boss-status-warn">{coverage.reason??"当前类别还有材料需要补充。"}</p>}
+      <div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>标题</th><th>时间</th><th>状态</th><th>相关人员与事项</th></tr></thead><tbody>{filtered.slice((currentPage-1)*10,currentPage*10).map(record=><tr key={record.kind+record.id} aria-selected={record.id===selected?.id}><td><button className="boss-v7-text-button" aria-label={record.title+"，"+displayTime(record)} onClick={()=>update({...view,selected:record.id},false)}>{record.kind==="meeting"?<CalendarDays size={17}/>:<FileText size={17}/>}<span>{record.title}</span></button></td><td>{displayTime(record)}</td><td>{stateLabel(record.material_state)}</td><td>{record.related_objects.map(item=>item.title).join("；")||"暂无关联事项"}</td></tr>)}</tbody></table></div>
       {!filtered.length&&<V7Empty title={api.loading?"正在读取当前目录":api.error?"目录读取失败":api.data?"当前条件下没有已读取记录":"目录待读取"}>按当前本人权限查询，缺少资料时保留明确状态。</V7Empty>}{api.data&&<V7Pagination page={currentPage} total={filtered.length} pageSize={10} onChange={setPage}/>}
-    </V7Panel></div><aside className="boss-column"><V7Panel title="选中记录">{selected?<><h3>{selected.title}</h3><p>{selected.summary}</p><V7Fact label="对象与版本">{selected.id} · v{selected.version}</V7Fact><V7Fact label="时间与时区">{selected.at??"尚未提供"} · {selected.timezone??"未知"}</V7Fact><V7Fact label="材料缺口">{selected.material_gaps.join("；")||"当前记录未列出缺口"}</V7Fact><V7Fact label="来源属性">{selected.source_type}</V7Fact>{selected.source_refs.length?selected.source_refs.map(source=><article className="boss-workspace-item" key={source.source_id+source.version}><strong>{source.source_id} · v{source.version}</strong><p>{source.location??"原文位置待核查"}</p>{sourceAction?.enabled&&<button className="boss-btn" onClick={()=>onViewSource(source.source_id)}>阅读原文</button>}</article>):<p className="boss-v7-note">当前记录尚未产生原文依据。</p>}{sourceAction&&!sourceAction.enabled&&<p className="boss-v7-note">阅读原文：{actionReason(sourceAction)}</p>}
+    </V7Panel>{selected&&<V7Panel title={selected.title}><p>{selected.summary}</p><p>{displayTime(selected)} · {stateLabel(selected.material_state)}</p>{selected.source_refs.map((source,index)=><button key={source.source_id} className="boss-btn" disabled={!sourceAction?.enabled} onClick={()=>onViewSource(source.source_id)}>阅读材料 {index+1}</button>)}
         {minutes&&<DetailAction action={minutes} label="打开纪要" loading={api.loading} onOpen={open}/>}
         {history&&<DetailAction action={history} label="查看历史决定" loading={api.loading} onOpen={open}/>}
         {discuss&&<DetailAction action={discuss} label={discussLabel} loading={api.loading} onOpen={open}/>}
-      </>:missingSelected?<V7Empty title="上次选中的记录已不在当前目录">该记录可能已被撤销或移出目录，详情已经清理；请重新选择当前目录记录。</V7Empty>:<V7Empty title="尚未选择记录">选择当前目录记录，查看摘要和关联操作。</V7Empty>}</V7Panel>
-      <V7Panel title="状态与核查"><V7Fact label="会议举行">{selected?.meeting_state??"尚未取得对应记录"}</V7Fact><V7Fact label="材料准备">{selected?.preparation_state??"尚未取得对应记录"}</V7Fact><V7Fact label="纪要确认">{selected?.minute_state??"尚未取得对应记录"}</V7Fact><V7Fact label="交办状态">{selected?.assignment_state??"尚未取得对应记录"}</V7Fact><V7Fact label="目录读取时间">{api.data?.read_at??"尚未读取"}</V7Fact></V7Panel>
+      </V7Panel>}{missingSelected&&<p role="status">上次选中的记录已经更新，请重新选择。</p>}</div><aside className="boss-column"><V7Panel title="Boss Agent 建议">
+        {api.data&&<BossInsightList items={api.data.insights.filter(item=>item.target_kind===view.tab&&(!selected||item.target_id===selected.id))} disabled={api.loading} label="查看依据与继续分析" onOpen={item=>{const record=records.find(row=>row.id===item.target_id&&row.kind===item.target_kind);if(!record||!api.data)throw new Error("提醒关联资料已经变化");const action=record.actions.find(row=>row.id==="discuss"&&row.enabled);if(action)onOpen(action,{id:record.id,kind:record.kind,version:record.version,namespace:api.data.namespace});else update({...view,selected:record.id},false);}}/>}
+        {selected&&discuss&&<DetailAction action={discuss} label="与 Boss Agent 讨论" loading={api.loading} onOpen={open}/>}
+      </V7Panel>
     </aside></div>
     {(!selected||primary)&&<footer className="boss-owner-actions">{selected&&primary?<><button className={"boss-btn boss-btn-primary"} disabled={!primary.enabled||api.loading} title={primary.disabled_reason??undefined} onClick={()=>open(primary)}>{primaryLabel}</button>{!primary.enabled&&<p className="boss-v7-note">{primaryLabel}：{actionReason(primary)}</p>}</>:<p className="boss-v7-note">请先选择目录记录，再执行准备会前材料或打开当前对象。</p>}</footer>}
   </div>;

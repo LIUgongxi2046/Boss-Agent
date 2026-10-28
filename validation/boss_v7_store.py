@@ -81,7 +81,7 @@ def execute_transaction(api, role, expected_role, command, payload, mutate):
         db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (receipt_namespace, command, key, digest, encode(receipt)))
         audit_input = {"client_request_id": key, "action": command, "role": role}
         audit_output = {field: result[field] for field in (
-            "object_id", "memory_id", "authorization_id", "run_id", "task_id", "source_id", "version", "state", "status",
+            "object_id", "memory_id", "authorization_id", "run_id", "task_id", "message_id", "source_id", "version", "state", "status",
         ) if field in result}
         db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)",
                    (NAMESPACE, command, encode(audit_input), encode(audit_output), now()))

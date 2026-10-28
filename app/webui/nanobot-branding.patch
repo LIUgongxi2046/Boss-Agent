@@ -1,0 +1,32 @@
+*** Begin Patch
+*** Update File: webui/src/i18n/index.ts
+@@
+ import { initReactI18next } from "react-i18next";
++import {brandMessages} from "@/boss-agent/boss-branding";
+@@
+-      const resource: LocaleResource = { common: common.default, ...channels };
++      const resource: LocaleResource = brandMessages({ common: common.default, ...channels });
+*** Update File: webui/index.html
+@@
+-    <title>nanobot</title>
++    <title>Boss Agent</title>
+@@
+-    <meta name="apple-mobile-web-app-title" content="nanobot" />
++    <meta name="apple-mobile-web-app-title" content="Boss Agent" />
+@@
+-          <span data-boot-copy>Loading nanobot…</span>
++          <span data-boot-copy>正在加载 Boss Agent…</span>
+@@
+-            boot: "正在加载 nanobot…",
+-            description: "nanobot Web UI —— 与你的 nanobot 工作区对话。"
++            boot: "正在加载 Boss Agent…",
++            description: "Boss Agent 工作区"
+@@
+-            boot: "Loading nanobot…",
+-            description: "nanobot web UI — chat with your nanobot workspace."
++            boot: "Loading Boss Agent…",
++            description: "Boss Agent workspace"
+@@
+-          var localized = copy[locale] || copy.en;
++          var localized = {boot: copy[locale].boot.replaceAll("nanobot", "Boss Agent"), description: copy[locale].description.replaceAll("nanobot", "Boss Agent")};
+*** End Patch

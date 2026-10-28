@@ -54,11 +54,12 @@ def test_bound_current_task_consumes_exact_formal_selection_and_original_hash(na
     other = create_task(native, "n02-consumer-other-task")
     entry, bound = bind_task(native, selected)
     original_tasks, original_authorizations = read(native, "task"), read(native, "authorization")
+    selected_record = next(row for row in original_tasks if row["task_id"] == selected["task_id"])
     async def check():
         async with session(native) as (bot, _):
             return [await bot.run(text, **arguments(CHAT)) for text in ("查看当前任务", "查看这个事项")]
     results = asyncio.run(check())
-    assert all(not result.error and selected["task_id"] in result.content for result in results)
+    assert all(not result.error and selected_record["purpose"] in result.content and "2026-10-24 17:00" in result.content for result in results)
     assert all(other["task_id"] not in result.content for result in results)
     for run in read(native, "runtime_run"):
         context = run["conversation_context"]
@@ -84,7 +85,7 @@ def test_task_discussion_reads_selected_knowledge_without_changing_task(native):
         async with session(native) as (bot, _):
             return await bot.run("查看当前任务", **arguments(CHAT))
     result = asyncio.run(check())
-    assert task["task_id"] in result.content and "meeting-minutes" in result.content
+    assert next(row for row in tasks if row["task_id"] == task["task_id"])["purpose"] in result.content and "meeting-minutes" in result.content
     run = read(native, "runtime_run")[0]
     assert run["conversation_context"]["task_entry"] == pinned(bound)
     assert run["conversation_context"]["source_selection"]["source_refs"] == request["source_refs"]

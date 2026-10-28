@@ -74,14 +74,14 @@ class BossMeetingsReadTool(_BossPageReadTool):
 
     @property
     def description(self):
-        return "读取本人当前会议及会议视图列出的来源元信息；该投影不包含独立会议草稿，来源原文与当前版本需通过bossEvidenceRead核查。读取不确认会议或发送邀请。"
+        return "读取本人当前会议、完整资料目录library.records和关注提醒library.insights。来源原文使用documents中的source_id或library.records.source_refs调用bossEvidenceRead；related_event_ids属于业务事件，不能作为来源读取。读取不确认会议或发送邀请。"
 
     @property
     def parameters(self):
         return {"type":"object","properties":{},"additionalProperties":False}
 
     async def execute(self):
-        return encode(self._read("/api/boss/ui/meetings"))
+        return encode({**self._read("/api/boss/ui/meetings"), "library": self._read("/api/boss/ui/owner/meeting-library")})
 
 
 class BossEvidenceReadTool(_BossPageReadTool):

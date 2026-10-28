@@ -44,6 +44,7 @@ export interface TaskDueEvent {
   external_delivery_verified: false;
 }
 export interface TaskListResponse {
+  insights: import("./BossInsightList").BossInsight[];
   tasks: AssignmentTask[];
   business_clock?:string;source_type?:string;namespace?:string;data_version?:string;
   feedback?: TaskFeedback[];

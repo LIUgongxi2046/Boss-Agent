@@ -258,6 +258,9 @@ async def serve():
         assignment.runtime = runtime_control
         reminders.runtime = runtime_control
         audit.runtime_snapshot = runtime_control.snapshot
+        if os.environ.get("BOSS_REVIEW_RUNTIME_SETUP") == "1":
+            from product_review_runtime import configure_review_runtime
+            configure_review_runtime(runtime_control)
         skills = ProductSkills(runtime_control)
     cron = CronService(NATIVE_ROOT / "cron/jobs.json")
     from boss_scheduler_runtime import BossSchedulerRuntime, CONTROL_ID, TIME_ID
@@ -294,7 +297,8 @@ async def serve():
         original.gateway.http.skill_state_action = apply_skill_state
     if product_mode:
         channels.channels["websocket"] = account_channel_class(RoleChannel)(original, roles, output / "access.jsonl", store,
-            runtime_control, skills, account_store=account_store)
+            runtime_control, skills, account_store=account_store,
+            demo_account_prefill=os.environ.get("BOSS_DEMO_ACCOUNT_INJECTION") == "1")
     else:
         channels.channels["websocket"] = RoleChannel(original, roles, output / "access.jsonl", store, runtime_control, skills)
     if fc01 is not None:

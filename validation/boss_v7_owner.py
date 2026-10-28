@@ -10,12 +10,14 @@ from boss_v7_runs import read_runs, cancel_run
 from boss_v7_library import read_meeting_library
 from boss_v7_store import NAMESPACE, execute_transaction, read_receipt, role_required
 from boss_session_history import session_history
+from boss_morning_actions import read_actions, act
 
 PREFIX = "boss.owner_workspace."
 ACTIONS = {PREFIX + domain + "." + action: "BOSS" for domain, actions in {
     "personal-memory": ("confirm", "delete", "reconcile"), "authorizations": ("revoke",), "runs": ("cancel",),
+    "morning-actions": ("approve", "reject", "delegate"),
 }.items() for action in actions}
-DOMAINS = {"personal-memory", "authorizations", "decisions", "notification-history", "runs", "session-history", "meeting-library"}
+DOMAINS = {"morning-actions", "personal-memory", "authorizations", "decisions", "notification-history", "runs", "session-history", "meeting-library"}
 
 
 class OwnerWorkspaceAPI:
@@ -35,7 +37,9 @@ class OwnerWorkspaceAPI:
             db.execute("BEGIN")
             self.store.active(db, NAMESPACE)
             snapshot = self.store.get(db, NAMESPACE, "initial", "snapshot")
-            if domain == "session-history":
+            if domain == "morning-actions":
+                data = read_actions(self.store, db, snapshot)
+            elif domain == "session-history":
                 data = session_history(db, snapshot, query)
             elif domain == "meeting-library":
                 data = read_meeting_library(self.store, db, snapshot)
@@ -57,6 +61,8 @@ class OwnerWorkspaceAPI:
         domain, action = command.removeprefix(PREFIX).split(".")
 
         def mutate(db, snapshot):
+            if domain == "morning-actions":
+                return act(api, db, snapshot, action, payload)
             if domain == "personal-memory":
                 return mutate_memory(api, db, snapshot, action, payload)
             if domain == "runs":

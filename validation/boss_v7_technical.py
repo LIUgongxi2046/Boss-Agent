@@ -12,18 +12,19 @@ from boss_v7_datasets import DatasetWorkspace
 from boss_v7_evaluation import cancel as evaluation_cancel, read_evaluation, start as evaluation_start
 from boss_v7_simulation_events import advance_clock, read_simulation_events, record as record_simulation_event
 from boss_v7_relationships import read_relationships, save_contact
+from boss_secretary import read_secretary, save_secretary
 from boss_v7_store import NAMESPACE, execute_transaction, read_receipt, role_required
 
 PREFIX = "boss.technical."
 ACTIONS = {PREFIX + name: "MAINTAINER" for name in (
-    "relationships.save", "knowledge.ingest", "knowledge.revise", "knowledge.withdraw",
+    "relationships.save", "secretary.save", "knowledge.ingest", "knowledge.revise", "knowledge.withdraw",
 )}
 ACTIONS.update({PREFIX + domain + "." + action: "MAINTAINER" for domain in CONFIG_DOMAINS for action in ("save", "validate", "activate")})
 ACTIONS.update({PREFIX + "models." + action: "MAINTAINER" for action in ("save", "validate", "activate", "cancel")})
 ACTIONS.update({PREFIX + "datasets." + action: "MAINTAINER" for action in ("generate", "validate", "load", "reset", "inspect-reset")})
 ACTIONS.update({PREFIX + "evaluation." + action: "MAINTAINER" for action in ("start", "reset", "cancel")})
 ACTIONS.update({PREFIX + "simulation-events." + action: "MAINTAINER" for action in ("inject", "reply", "advance-clock")})
-DOMAINS = {"relationships", "audit", "knowledge", "local-system", "models", "datasets", "evaluation", "simulation-events"} | CONFIG_DOMAINS
+DOMAINS = {"secretary", "relationships", "audit", "knowledge", "local-system", "models", "datasets", "evaluation", "simulation-events"} | CONFIG_DOMAINS
 
 
 class TechnicalWorkspaceAPI:
@@ -62,7 +63,9 @@ class TechnicalWorkspaceAPI:
             db.execute("BEGIN")
             self.store.active(db, NAMESPACE)
             snapshot = self.store.get(db, NAMESPACE, "initial", "snapshot")
-            if domain == "datasets":
+            if domain == "secretary":
+                data = read_secretary(self.store, db, snapshot)
+            elif domain == "datasets":
                 data = self.datasets.read(db, snapshot)
             elif domain == "models":
                 data = self.models.read(db)
@@ -88,6 +91,8 @@ class TechnicalWorkspaceAPI:
         domain, action = command.removeprefix(PREFIX).split(".")
         authorize_technical(self.store, domain, "WRITE")
         def mutate(db, snapshot):
+            if domain == "secretary":
+                return save_secretary(api, db, snapshot, payload)
             if domain == "datasets":
                 return self.datasets.mutate(db, action, payload)
             if domain == "models":

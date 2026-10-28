@@ -44,6 +44,13 @@ export function MaintainerSimulationCenter({onNavigate,onOpenRun}:{onNavigate:(p
   const controls=<><button className="boss-btn boss-btn-primary" onClick={()=>open("A03","generate")}>管理数据集</button><button className="boss-btn" disabled={!current||busy} onClick={()=>setManualOpen(true)}>检查接口</button><button className="boss-btn" onClick={()=>open("A04","event")}>注入事件</button><button className="boss-btn" onClick={()=>open("A04","clock")}>推进业务时间</button><button className="boss-btn" disabled={!current||busy} onClick={()=>open("A03","reset")}>重置当前模拟空间</button></>;
   return <div className="boss-maintainer-records boss-simulation-center">
     <V7ReadState loading={datasets.loading} error={datasets.error} onReload={datasets.reload}/>
+    <V7Panel title="老板工作区管理"><div className="boss-simulation-regions">
+      <article><h3>今日工作与秘书交办</h3><p>维护事项资料、秘书接收人和渠道，提供交办后的模拟回复。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>open("A11")}>联系人与秘书配置</button><button className="boss-btn" onClick={()=>open("A04","feedback")}>事项与回复</button></div></article>
+      <article><h3>经营关注</h3><p>管理经营资料、统计期间、经营事件和提醒规则。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>open("A03")}>经营资料</button><button className="boss-btn" onClick={()=>open("A13")}>提醒规则</button></div></article>
+      <article><h3>会议与资料</h3><p>管理会议相关联系人与知识资料，核查资料关系和读取权限。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>open("A07")}>知识资料</button><button className="boss-btn" onClick={()=>open("A11")}>会议与联系人</button></div></article>
+      <article><h3>任务、承诺与通知</h3><p>提供负责人反馈、模拟事件和通知条件，核查保存记录。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>open("A04","feedback")}>模拟反馈</button><button className="boss-btn" onClick={()=>open("A14")}>操作记录</button></div></article>
+      <article><h3>聊天与 Boss Agent</h3><p>管理模型、工具、提示词、技能及运行记录。</p><div className="boss-actions"><button className="boss-btn" onClick={()=>open("A08")}>Agent 配置</button><button className="boss-btn" onClick={()=>open("A15")}>运行记录</button></div></article>
+    </div></V7Panel>
     <div className="boss-simulation-summary"><V7Fact label="数据集与版本">{current?`${current.dataset_id} · v${current.version}`:"尚未读取"}</V7Fact><V7Fact label="seed（随机种子）">{loaded?.seed??"当前数据集没有生成器记录"}</V7Fact><V7Fact label="业务时钟">{current?.business_clock??"尚未读取"}</V7Fact><V7Fact label="execution_namespace">{current?.namespace??"尚未读取"}</V7Fact></div>
     <p className="boss-status"><span className="boss-tag boss-tag-amber">SIMULATED</span> 当前资料采用独立执行空间。历史空间保持原归属，不能作为当前业务依据。<button className="boss-btn" onClick={()=>open("A03","history")}>查看历史空间</button></p>
     <div className="boss-maintainer-columns"><div className="boss-column">

@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from business import require
 from boss_source_policy import source_validity
+from boss_research import project as project_research
 
 from boss_execution_scope import NAMESPACE as NS
 
@@ -113,11 +114,11 @@ def _documents(db, data, clock):
         accessible = state == "VALID"
         records.append({
             "id": document["source_id"], "kind": "document",
-            "title": document.get("title") or "资料 · " + document["source_id"],
+            "title": document.get("title") or {"finance-note": "经营财务资料", "meeting-material": "经营会议材料", "meeting-minutes": "经营会议纪要", "event-evidence": "经营问题说明"}.get(document["source_id"], "业务资料"),
             "version": str(document.get("version")), "at": document.get("published_at"),
             "local_date": _local(document.get("published_at"), timezone), "timezone": timezone,
             "source_type": document.get("source_type", "SIMULATED"),
-            "summary": (document.get("content") or "")[:160],
+            "summary": (document.get("content") or "")[:160] if accessible else "资料当前无法阅读，请核查可用材料。",
             "material_state": state, "material_gaps": [],
             "meeting_state": None, "preparation_state": None, "minute_state": None,
             "assignment_state": None,
@@ -201,19 +202,36 @@ def _people(db, data, clock):
     return records
 
 
+def _research(db, data):
+    current = project_research(db, data)
+    report = current["report"]
+    if report is None:
+        return []
+    timezone = data["boss_profile"]["timezone"]
+    available = current["current_reference_state"] == "CURRENT_SOURCE_EXCERPTS"
+    sources = [{"source_id": item["source_id"], "version": item["version"], "location": None} for item in report["matched_sources"]]
+    return [{"id": report["research_id"], "kind": "research", "title": report["scope"]["question"],
+             "version": report["version"], "at": report["prepared_at"], "local_date": _local(report["prepared_at"], timezone),
+             "timezone": timezone, "source_type": "SIMULATED", "summary": "已整理 " + str(len(sources)) + " 项相关资料，可继续核查并讨论。",
+             "material_state": "READY" if available else "PARTIAL", "material_gaps": [] if available else ["相关材料需要重新核查"],
+             "meeting_state": None, "preparation_state": None, "minute_state": None, "assignment_state": None,
+             "source_refs": sources, "related_objects": [], "actions": [
+                 _action("open", "查看研究材料", "F09", True, ""),
+                 _action("source", "阅读原文", "D01", bool(sources), "当前没有可阅读材料", sources[0]["source_id"] if sources else None)]}]
+
+
 def read_meeting_library(store, db, snapshot):
+    from boss_insights import meeting_insights
     clock = store.get(db, NS, "clock", "current")["at"]
     records = [_meeting(db, snapshot, clock)]
     records.extend(_documents(db, snapshot, clock))
     records.extend(_applications(db, snapshot, clock))
     records.extend(_people(db, snapshot, clock))
+    records.extend(_research(db, snapshot))
     coverage = []
     for kind in ("meeting", "document", "approval", "research", "people"):
         count = len([row for row in records if row["kind"] == kind])
-        if kind == "research":
-            coverage.append({"kind": kind, "state": "NOT_PROVIDED",
-                             "reason": "当前没有已保存的研究材料"})
-        elif count:
+        if count:
             coverage.append({"kind": kind, "state": "COMPLETE", "reason": None})
         else:
             coverage.append({"kind": kind, "state": "NOT_PROVIDED",
@@ -223,4 +241,5 @@ def read_meeting_library(store, db, snapshot):
     require(all(row["kind"] in {"meeting", "document", "approval", "research", "people"}
                 for row in records), "目录记录类别无效")
     return {"source_type": "SIMULATED", "records": records, "coverage": coverage,
+            "business_clock": clock, "insights": meeting_insights(records, clock),
             "namespace": NS}

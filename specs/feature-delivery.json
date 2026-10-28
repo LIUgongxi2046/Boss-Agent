@@ -1316,21 +1316,56 @@
     "status": "PAUSED_WITH_SOURCE_AND_EVIDENCE_PRESERVED"
   },
   "plan": "docs/菜单开发总计划.md",
-  "active_feature_id": "V7-BACKEND",
-  "active_ticket": "docs/development/V7-BACKEND.md",
-  "current_stage": "CONNECT_BACKEND_TO_DESKTOP_V7_FRONTEND",
+  "active_feature_id": "USER-REVIEW-20261027",
+  "active_ticket": "docs/development/USER-REVIEW-20261027.md",
+  "current_stage": "DEEPSEEK_LIVE_STREAMING_CONVERSATION_AND_TOOL_EVENTS_VERIFIED",
   "candidate_commit": null,
-  "implementation_commit": "d1436abc614dbfeb842421b5b1bdefe53d9d5df9",
-  "baseline_commit": "7527537830f6c011c328dc3bb6b7567ff262c20b",
-  "development_record": "docs/development/V7-BACKEND.md",
+  "implementation_commit": null,
+  "baseline_commit": "7a2be73a864232ec1dfb866ab2246101e4eaf063",
+  "development_record": "docs/development/USER-REVIEW-20261027.md",
   "delivery_record": null,
-  "experience_instructions": null,
-  "experience_launcher": null,
-  "experience_origin": null,
-  "frontend_directory": null,
-  "credential_file": null,
+  "experience_instructions": "docs/development/USER-REVIEW-20261027.md",
+  "experience_launcher": "scripts/run_user_review_local.sh",
+  "experience_origin": "http://127.0.0.1:9072/",
+  "frontend_directory": ".work/user-review-20261027/dist-testing-final",
+  "credential_file": "validation/.work/user-review-20261027-r2/accounts/credentials.json",
   "manifest_sha256": null,
-  "index_sha256": null,
+  "index_sha256": "fccffacb5568972450ae04cc5a6642d5becef087e5f224f9b2c1d46a3fe38025",
+  "insight_agent_review": {
+    "status": "BUILD_DOM_AND_LIMITED_LIVE_MODEL_VERIFIED",
+    "date": "2026-10-28",
+    "pages": ["N03", "N04", "N05"],
+    "agent_run_id": "run-6f7d16a5-4633-45ff-b81f-43f751bb9d0e",
+    "stream_run_id": "run-85401d92-148a-4708-9faf-5c108487275b",
+    "directed_tests": 42,
+    "record": "docs/development/USER-REVIEW-20261027.md",
+    "visual": "NOT_RUN",
+    "full_agent_quality": "PENDING_BROADER_EVALUATION",
+    "user_acceptance": "PENDING"
+  },
+  "stream_scroll_review": {
+    "status": "LIVE_MODEL_BROWSER_VERIFIED",
+    "chat_id": "f6357f42-1d55-4638-9757-220ec4c4ba6e",
+    "checks": ["BLANK_CLICK_CONTINUES_FOLLOW", "MANUAL_SCROLL_PRESERVES_READING", "LATEST_BUTTON_RESUMES_FOLLOW", "COMPOSER_POSITION_STABLE", "COMPLETION_AT_BOTTOM"],
+    "record": "docs/development/USER-REVIEW-20261027.md"
+  },
+  "chat_surface_review": {
+    "status": "BUILD_AND_CURRENT_VIEWPORT_DOM_VERIFIED",
+    "background": "TRANSPARENT_WITH_DISTINCT_COMPOSER",
+    "workbuddy_reference": "docs/development/BOSS-AGENT-问题清单与设计.md",
+    "visual": "NOT_RUN",
+    "user_acceptance": "PENDING"
+  },
+  "native_comparison": {
+    "origin": "http://127.0.0.1:9172/",
+    "upstream_commit": "1bb712d3488915ca4ed9ccc1a93067ff722f5ab9",
+    "source_directory": ".work/user-review-20261027/native-upstream",
+    "instance_directory": ".work/user-review-20261027/native-instance",
+    "launcher": "scripts/run_native_comparison.sh",
+    "source_verified_files": 1471,
+    "model_status": "GPT_6_ASTRA_PRESET_SELECTED_NOT_AGENT_VERIFIED",
+    "browser_status": "CONNECTED_WORKBENCH_OPEN"
+  },
   "inventory": null,
   "inventory_sha256": null,
   "directed_review": {
@@ -1340,7 +1375,16 @@
     "independent_product_run": false,
     "visual": "NOT_RUN"
   },
-  "candidate_scope": "全部Desktop v7页面组件与表单进入后端接入，采用V7-FRONTEND的33项服务接收要求；72页完整DOM、连续操作、高保真及用户验收保持待完成，已有业务证据按原版本和范围保留",
+  "candidate_scope": "采用2026-10-28最新用户要求；9072使用DeepSeek deepseek-flash。经营页面提供老板指标、业务方向颜色和当前资料提醒，会议及任务提供依据、影响、建议与对应操作。真实模型自主跨资料读取、长回答流式增量、阅读位置保持与恢复跟随完成限定验证；当前任务期限由服务端依据业务日期计算。完整指标规划、经营归因、自动SOP采用、通用网页及文件进程工具、其他窗口尺寸、视觉和用户验收仍未完成。全部业务及模型质量未登记通过",
+  "live_model_validation": {
+    "provider": "deepseek",
+    "model_id": "deepseek-flash",
+    "connection_id": "model-494035d7-b7cf-47aa-b400-bbe42d1fb023",
+    "connection_version": "1",
+    "validation_id": "model-validation-980548a9-0572-4764-8e5d-971dacbfd889",
+    "status": "PASSED_LIMITED_BROWSER_AND_RUNTIME_VALIDATION",
+    "record": "docs/development/USER-REVIEW-20261027.md"
+  },
   "menu_completed_development_ids": [
     "MENU-F01",
     "MENU-N02"

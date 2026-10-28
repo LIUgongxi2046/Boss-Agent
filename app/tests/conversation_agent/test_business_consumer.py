@@ -125,7 +125,7 @@ def test_missing_topic_does_not_query_unrelated_sales(native):
         async with session(native) as (bot, _):
             return await bot.run("查询收入并查看当前专题", **arguments(CHAT))
     result = asyncio.run(check())
-    assert "待补充" in result.content and "F19" in result.content and "EGG" in result.content
+    assert "待补充" in result.content and "禽类与反刍" in result.content and "蛋禽" in result.content
     assert not read(native, "query")
     run = run_for(native, CHAT)
     assert run["status"] == "WAITING_INPUT" and len(run["tool_results"]) == 1

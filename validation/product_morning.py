@@ -18,6 +18,7 @@ from fc03_agent.formal import FORMAL_TOOLS
 from fc03_agent.runtime import Fc03RuntimeRecorder, Fc03SimulatedProvider
 from fc03_agent.native import NativeMorningAdapter
 from product_bi import FEATURE_SCOPE, PREPARING_REQUEST
+from conversation_agent.presentation import morning_brief
 
 MORNING_REQUEST = "product_morning_request"
 REQUEST_SCHEMA = {"type": "object", "additionalProperties": False, "$defs": SCHEMA["$defs"],
@@ -118,12 +119,15 @@ class ProductMorning:
             return call("morningListRead", {"list_id": grant.list_id}) if grant.list_id else call("todayRead", {"date": grant.date, "timezone": grant.timezone})
         view = outputs[0].get("result", outputs[0])
         require(view["source_type"] == "SIMULATED" and bool(view["list_id"]), "晨间工具未产生正式清单", web.HTTPConflict)
+        question = messages[current]["content"]
+        mentioned = [item for item in view["items"] if item["title"] in question]
+        discussed = [item for item in view["items"] if item["item_id"] == grant.item_id] if grant.item_id else mentioned or view["items"]
         if not any("adoption_state" in output for output in outputs):
             return call("morningListRead", {"list_id": view["list_id"]})
-        if view["items"] and not any("item" in output for output in outputs):
-            return call("morningDetailRead", {"list_id": view["list_id"], "item_id": grant.item_id or view["items"][0]["item_id"]})
+        if discussed and not any("item" in output for output in outputs):
+            return call("morningDetailRead", {"list_id": view["list_id"], "item_id": discussed[0]["item_id"]})
         detail = next((output for output in outputs if "item" in output), None)
-        source_ids = {ref["id"] for ref in detail["item"]["source_refs"] if ref["kind"] == "document"} if grant.item_id and detail else None
+        source_ids = {ref["id"] for item in discussed for ref in item["source_refs"] if ref["kind"] == "document"} if grant.item_id or mentioned else None
         sources = [source for source in view["source_statuses"] if source["status"] == "VALID" and (source_ids is None or source["source_id"] in source_ids)]
         if sources and not any("document" in output for output in outputs):
             return call("morningSourceRead", {"list_id": view["list_id"], "source_id": sources[0]["source_id"]})
@@ -133,12 +137,10 @@ class ProductMorning:
             for source in selected_sources:
                 if (source["source_id"], source["version"]) not in documents_read:
                     return call("morningSourceRead", {"list_id": view["list_id"], "source_id": source["source_id"]})
-        content = "SIMULATED · 晨间清单 " + view["list_id"] + " · 版本 " + view["list_version"]
-        discussed = [detail["item"]] if grant.item_id and detail else view["items"]
-        content += "\n" + "\n".join(item["title"] + "：" + item["reason"] for item in discussed)
+        content = "当前模拟资料：\n\n" + "\n\n".join(morning_brief({**view, "items": discussed}))
         documents = [output["document"] for output in outputs if "document" in output]
-        content += "\n" + ("\n".join(document["source_id"] + " · v" + document["version"] + "：" + document["content"] for document in documents) if documents else "当前事项没有已读取的原文依据。")
-        content += "\n覆盖 " + view["coverage_state"] + "；缺少资料 " + "、".join(view["missing_sources"])
+        content += "\n\n### 相关材料\n" + ("\n\n".join(document["content"] for document in documents) if documents else "当前事项尚无可读取的材料，请补充后核查。")
+        content += "\n\n可以返回今日工作，勾选事项后确认具体处理操作。"
         return LLMResponse(content=content, usage=None)
 
     def _request(self, role, payload, active):

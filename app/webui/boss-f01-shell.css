@@ -69,3 +69,14 @@
  .boss-v6[data-page="F01"] .boss-hero-copy p{font-size:12px}
  .boss-v6[data-page="F01"] .boss-stage .boss-hero-mascot{opacity:.25}
 }
+.boss-morning-select-row{display:flex;align-items:center;gap:12px}
+.boss-morning-select-row>.boss-f01-item{flex:1;min-width:0}
+.boss-morning-select-row>input,.boss-morning-select-all>input{width:18px;height:18px;accent-color:var(--boss-primary,#0766ed);flex:none}
+.boss-morning-select-all{display:flex;align-items:center;gap:10px;margin:16px 0}
+.boss-f01-entry-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:14px}
+.boss-dialog-overlay{position:fixed;inset:0;background:rgba(18,40,71,.35);z-index:1000}
+.boss-dialog-content{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1001;width:min(620px,calc(100vw - 32px));max-height:85vh;overflow:auto;background:#fff;color:#17375d;border-radius:18px;padding:28px;box-shadow:0 20px 70px rgba(18,40,71,.2)}
+.boss-dialog-content .boss-field{display:grid;gap:8px;margin:18px 0}
+.boss-dialog-content textarea{min-height:120px;padding:12px;border:1px solid #cfdded;border-radius:10px;font:inherit}
+.boss-dialog-content .boss-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}
+.boss-f01>.boss-f01-datebar {margin-bottom:14px}

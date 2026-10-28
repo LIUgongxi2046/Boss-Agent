@@ -88,12 +88,16 @@ def account_channel_class(role_channel_class):
     from websockets.http11 import Request
 
     class AccountRoleChannel(role_channel_class):
-        def __init__(self, *args, account_store, **kwargs):
+        def __init__(self, *args, account_store, demo_account_prefill=False, **kwargs):
             super().__init__(*args, **kwargs)
             self.account_store = account_store
+            self.demo_account_prefill = demo_account_prefill
 
         async def _dispatch_http(self, connection, request):
             address = urlsplit(request.path)
+            if address.path == "/webui/demo-account":
+                from boss_demo_accounts import prefill_response
+                return prefill_response(self.account_store, connection, request, self.demo_account_prefill)
             if address.path != "/webui/bootstrap":
                 return await super()._dispatch_http(connection, request)
             origin = request.headers.get("Origin")

@@ -9,7 +9,7 @@ from boss_v7_store import NAMESPACE, optional, rows, text
 from boss_v7_metrics import METRICS, builtin_metric, effective_configuration, options as metric_options, recompute, validate_values as validate_metric_values
 
 CONFIG_DOMAINS = {"access", "tools", "metrics"}
-TECHNICAL_SCOPES = ("relationships", "audit", "knowledge", "models", "datasets", "evaluation", "simulation-events", "local-system", "tools", "metrics", "scheduler", "prompts", "skills", "simulation", "memory-status")
+TECHNICAL_SCOPES = ("secretary", "relationships", "audit", "knowledge", "models", "datasets", "evaluation", "simulation-events", "local-system", "tools", "metrics", "scheduler", "prompts", "skills", "simulation", "memory-status")
 SIDE_EFFECTS = {"query_metrics": "QUERY_RECORD", "read_evidence": "AUDIT_ONLY", "read_assignment": "AUDIT_ONLY",
                 "create_assignment": "TASK_WRITE", "send_assignment": "OUTBOX_WRITE"}
 PERMISSIONS = {name: "BOSS_CURRENT_AUTHORIZATION" if name in {"create_assignment", "send_assignment"} else "BOSS_CURRENT_SCOPE" for name in OPERATIONS}

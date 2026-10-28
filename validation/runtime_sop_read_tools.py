@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from urllib.parse import urlencode
 
 from aiohttp import web
@@ -39,7 +40,25 @@ class BossTasksReadTool(_StrictSopReadTool):
         return {"type":"object","properties":{},"additionalProperties":False}
 
     async def execute(self):
-        return encode(self._read("/api/boss/ui/tasks"))
+        result = self._read("/api/boss/ui/tasks")
+        now = datetime.fromisoformat(result["business_clock"])
+        deadline_checks = []
+        items = result["tasks"] + result["self_commitments"]
+        if result.get("historical_commitment"):
+            items = items + [result["historical_commitment"]]
+        for item in items:
+            if item.get("due_at"):
+                remaining = (datetime.fromisoformat(item["due_at"]) - now).total_seconds()
+                deadline_checks.append({"purpose": item.get("purpose", item.get("title")),
+                    "due_at": item["due_at"], "overdue": remaining < 0,
+                    "hours_until_due": round(remaining / 3600, 2)})
+        result["deadline_checks"] = deadline_checks
+        result["interpretation"] = {
+            "time": "所有期限判断仅采用 business_clock 与 deadline_checks，禁止使用系统日期推断逾期。hours_until_due 为正数表示尚未到期。",
+            "meeting_dependencies": "只有任务中明确保存的关联会议才能用于检查会前依赖。本人承诺当前没有关联会议字段；不得将本人承诺的期限与列表中的某次会议比较并认定冲突。标题相似或引用同一资料均不能证明关联。",
+            "completion": "尚无完成证据仅说明当前记录未确认完成，不能断言工作尚未开展。",
+        }
+        return encode(result)
 
 
 class BossCalendarConflictReadTool(_StrictSopReadTool):

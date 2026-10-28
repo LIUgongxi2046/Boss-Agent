@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from business import now
 from boss_sector_api import CATALOGUE, SECTORS
 
-PACK_VERSION = "5"
+PACK_VERSION = "6"
 DEFINITION = "SECTOR-PACK-1"
 UNIT_MAP = {
     "F14": ["CNY/吨", "CNY/吨", "CNY/吨", "CNY/吨"],
@@ -145,6 +145,8 @@ def _document(page, snapshot):
         "access_scope": snapshot["owner_id"], "published_at": published,
         "valid_from": valid_from, "valid_until": None, "validity_state": "VALID",
         "original_locator": "sector-pack:" + page, "sector_page": page,
+        "sector_scope": {"legal_entity_ids": sorted({row["legal_entity_id"] for row in snapshot["details"]}),
+                         "region_ids": sorted({row["region_id"] for row in snapshot["details"]})},
         "sector_facts": facts, "simulation_definition": DEFINITION,
         "content": "专题 " + page + " 模拟资料：按固定种子生成 " + str(len(facts["metrics"])) + " 项指标，覆盖 2026-08 至 2026-10；不是真实企业经营结果。",
     }

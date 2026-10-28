@@ -30,7 +30,7 @@ type Props = {
   category?:TodayItem["category"]|"ALL";
   selectedItemId?:string;
 };
-export function morningState(state:string){const labels:Record<string,string>={OPEN:"待处理",DRAFT:"草稿",ACTIVE:"当前启用",IN_PROGRESS:"处理中",RESULT_SUBMITTED:"结果已提交",PENDING_DECISION:"等待本人决定",WAITING_MATERIAL:"等待材料",CONFIRMED:"已经确认",CANCELED:"已经取消",HELD:"已经举行",CLOSED:"已经关闭",APPROVED:"已经批准",REJECTED:"已经拒绝",COMPLETED_CONFIRMED:"本人已确认完成"};return labels[state]??state;}
+export function morningState(state:string){const labels:Record<string,string>={OPEN:"待处理",DRAFT:"草稿",ACTIVE:"进行中",IN_PROGRESS:"处理中",WAITING_FEEDBACK:"等待反馈",RESULT_SUBMITTED:"结果已提交",PENDING_DECISION:"等待本人决定",WAITING_MATERIAL:"等待材料",CONFIRMED:"已经确认",CANCELED:"已经取消",HELD:"已经举行",CLOSED:"已经关闭",APPROVED:"已经批准",REJECTED:"已经拒绝",COMPLETED_CONFIRMED:"本人已确认完成"};return labels[state]??state;}
 export function morningReason(reason:string){
   const labels:Record<string,string>={"CATEGORY:DECIDE":"按照待本人决定事项分类","CATEGORY:COORDINATE":"按照待本人协调事项分类","CATEGORY:INFORM":"按照需要知晓事项分类",
     MATCHES_CONFIRMED_OWNER_GOAL:"符合当前本人确认目标",OVERDUE_AT_SELECTED_DAY:"在所选业务日之前已经到期",FUTURE_DEADLINE_BACKLOG:"期限位于后续日期，当前仍需跟进",
@@ -159,7 +159,7 @@ export function BossToday({data,loading,error,onReload,onNavigate,onReorder,onRe
         <button type="button" className="boss-btn" disabled={!orderEnabled||selectedPosition.index<0||selectedPosition.index===selectedPosition.total-1||busy||Boolean(pending)} onClick={()=>move(selectedIndex,1)}>下移 ↓</button>
         <button type="button" className="boss-btn boss-btn-primary" disabled={!orderEnabled||!dirty||busy||loading||Boolean(pending)} onClick={()=>void save()}>{busy?"正在保存排序":"保存排序"}</button>
         <button type="button" className="boss-btn" disabled={busy||Boolean(pending)} onClick={cancelOrder}>取消排序</button></>}
-        {onDiscuss&&<button id="morning-discuss" type="button" className="boss-btn boss-btn-primary" disabled={!discussEnabled||busy||Boolean(pending)} onClick={onDiscuss}>让大鹏处理这件事</button>}</div>
+        {onDiscuss&&<button id="morning-discuss" type="button" className="boss-btn boss-btn-primary" disabled={!discussEnabled||busy||Boolean(pending)} onClick={onDiscuss}>让 Boss Agent 处理这件事</button>}</div>
       {orderMode&&<p role="status">{selectedPosition.index<0?"选择一个事项后可调整它在本分类中的位置。":"当前分类中第 "+(selectedPosition.index+1)+" / "+selectedPosition.total+" 项。"}</p>}
       {dirty&&<p role="status">{stale?"当前清单或次序版本已经变化，未保存次序继续保留。请明确放弃未保存次序并核查新版本后调整。":"当前次序尚未保存。选中事项支持 Alt+方向键调整。"}</p>}
       {pending&&<div role="status"><p>排序结果尚未确认，原请求 {original} · 回执 {receipt?.outcome??"尚未取得"}</p><button type="button" className="boss-btn" disabled={busy} onClick={()=>void recover()}>读取排序原请求结果</button>

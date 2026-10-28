@@ -182,7 +182,7 @@ def test_unoccupied_morning_two_actual_sdk_turns_preserve_existing_flow(native):
                 for remove in reversed(removes):
                     remove()
     results = asyncio.run(check())
-    assert all(not result.error and "SIMULATED" in result.content for result in results)
+    assert all(not result.error and "当前模拟资料" in result.content for result in results)
     runs = read(native, "runtime_run")
     assert len(runs) == 2 and {row["session_id"] for row in runs} == {"websocket:" + CHAT}
     assert {row["feature_id"] for row in runs} == {"FC03"} and [len(row["tool_results"]) for row in runs] == [4, 3]

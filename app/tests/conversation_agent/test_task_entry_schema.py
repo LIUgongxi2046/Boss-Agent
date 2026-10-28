@@ -27,10 +27,13 @@ def current_validator():
 def bound_runtime(native):
     task = create_task(native, "n02-schema-actual-task")
     _, bound = bind_task(native, task, key="n02-schema-actual-entry")
+    with native[0].connect() as db:
+        selected = native[0].get(db, "ui-check", "task", task["task_id"])
     async def check():
         async with session(native) as (bot, _):
             result = await bot.run("查看当前任务", **arguments(CHAT))
-            assert not result.error and task["task_id"] in result.content
+            assert not result.error and selected["purpose"] in result.content
+            assert task["task_id"] not in result.content
     asyncio.run(check())
     run = run_for(native, CHAT)
     assert run["status"] == "SUCCEEDED" and run["conversation_context"]["task_entry"] == pinned(bound)
@@ -108,7 +111,7 @@ def test_actual_unbound_runtime_keeps_optional_task_entry_absent(native):
     current_validator().validate(run)
 
 
-def test_runtime_schema_preserves_exact_product_113_baseline():
+def test_runtime_schema_preserves_product_113_with_declared_extensions():
     base = json.loads(subprocess.run(["git", "show", "72f0a7f5af190eadded4f93e385abfa4d067be2a:specs/runtime-records.schema.json"],
         cwd=ROOT, check=True, capture_output=True, text=True).stdout)
     assert base["$id"] == "urn:boss-agent:runtime-records:1.13.0"
@@ -116,6 +119,16 @@ def test_runtime_schema_preserves_exact_product_113_baseline():
     assert schema["$id"] == "urn:boss-agent:runtime-records:1.14.0"
     schema["$id"] = base["$id"]
     del schema["$defs"]["ConversationContext"]["properties"]["business_entry"]
+    selection = schema["$defs"]["ConversationContext"]["properties"].pop("source_selection")
+    assert selection["additionalProperties"] is False
+    assert set(selection["required"]) == {"binding_id", "context_version", "source_refs", "source_pins", "native_session_created_at"}
+    morning = schema["$defs"]["MorningContext"]["properties"].pop("source_selection")
+    assert morning == {"$ref": "#/$defs/ConversationContext/properties/source_selection"}
+    runtime = schema["$defs"]["RuntimeRun"]["properties"]
+    connection = runtime.pop("model_connection")
+    assert connection["additionalProperties"] is False and connection["required"] == ["id", "version"]
+    assert runtime["external_model_invoked"] == {"type": "boolean"}
+    runtime["external_model_invoked"] = base["$defs"]["RuntimeRun"]["properties"]["external_model_invoked"]
     for name in ("BusinessScope", "BusinessTopic", "BusinessEntry"):
         del schema["$defs"][name]
     assert schema == base

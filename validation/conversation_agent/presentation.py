@@ -1,9 +1,53 @@
 from business import require
 from conversation_agent.queries import METRICS
+from decimal import Decimal
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 METRIC_NAMES = {value: key for key, value in reversed(list(METRICS.items()))}
 PERIOD_NAMES = {"CURRENT": "查询期间", "BASE": "比较期间", "CHANGE": "期间变化"}
+
+
+def morning_brief(view, contacts=()):
+    names = {item["contact_id"]: item["name"] for item in contacts}
+    names["boss-1"] = "本人"
+    clock = datetime.fromisoformat(view["business_clock"])
+    zone = ZoneInfo(view["timezone"])
+    categories = {"DECIDE": "需要决定", "COORDINATE": "需要协调", "INFORM": "需要知晓"}
+    suggestions = {"DECIDE": "核对申请和依据，选择同意、驳回或交给秘书核查。",
+                   "COORDINATE": "明确下一步、负责人和反馈时间；需要时交给秘书跟进。",
+                   "INFORM": "了解相关情况，如需采取行动，请明确负责人和期限。"}
+
+    def deadline(item):
+        value = item["due_at"] or item["starts_at"]
+        return datetime.fromisoformat(value) if value else None
+
+    def priority(item):
+        due = deadline(item)
+        return (0 if due and due < clock else 1 if item["important"] else 2,
+                due.timestamp() if due else float("inf"), item["item_id"])
+
+    items = sorted(view["items"], key=priority)
+    counts = {key: sum(item["category"] == key for item in items) for key in categories}
+    lines = ["按 " + view["date"] + " 的当前资料，" + "、".join(categories[key] + " " + str(counts[key]) + " 项" for key in categories) + "。",
+             "处理顺序依据已过期限、重要标记和最近期限；当前资料未确认的业务影响不作推断。"]
+    if not items:
+        return lines + ["当前没有需要处理的事项。"]
+    for item in items:
+        due = deadline(item)
+        local_due = due.astimezone(zone) if due else None
+        timing = "尚未约定期限" if local_due is None else f"{local_due.month:02d}月{local_due.day:02d}日 {local_due.hour:02d}:{local_due.minute:02d}"
+        urgency = "已过期限，请优先核查进展" if due and due < clock else "已标记重要，请优先关注" if item["important"] else "按最近约定期限安排" if due else "先确认处理期限"
+        coordinator = item["coordinator_id"]
+        owner = names.get(coordinator, "当前负责人") if coordinator else "负责人待确认"
+        action = "由本人完成承诺，并确认相关结果。" if item["kind"] == "self_commitment" else suggestions[item["category"]]
+        lines.extend(["### " + item["title"],
+                      "**" + categories[item["category"]] + "** · " + owner + " · " + timing,
+                      "关注原因：" + item["reason"] + "。" + urgency + "。",
+                      "建议处理：" + action])
+    lines.append("以上处理建议尚未执行。可以在今日工作中选择事项，确认同意、驳回、交给秘书或让 Boss Agent 继续分析。")
+    return lines
 
 
 def excerpt(value):
@@ -47,31 +91,45 @@ def object_text(kind, data):
         lines.extend(sources(data.get("attachment_refs", [])))
         return lines
     if kind == "task":
-        return ["任务编号：" + data["task_id"] + "；版本 " + data["version"] + "；状态 " + data["status"]]
+        states = {"OPEN": "待决定", "WAITING_FEEDBACK": "等待反馈", "IN_PROGRESS": "执行中", "WAITING_MATERIAL": "等待材料", "RESULT_SUBMITTED": "待验收", "COMPLETED_CONFIRMED": "已完成", "CANCELED": "已取消"}
+        advice = {"OPEN": "核对交办内容，确认后发送给负责人。", "WAITING_FEEDBACK": "请负责人反馈当前进展和预计完成时间。", "IN_PROGRESS": "关注约定期限，请负责人提交阶段进展。", "WAITING_MATERIAL": "请负责人补充所需材料后继续处理。", "RESULT_SUBMITTED": "查看提交结果和相关材料，再确认完成情况。", "COMPLETED_CONFIRMED": "任务已经确认完成，可以查看相关结果。", "CANCELED": "任务已经取消，已有记录继续保留。"}
+        due = datetime.fromisoformat(data["due_at"]).astimezone(ZoneInfo(data["timezone"]))
+        return ["### " + data["purpose"], "当前进展：" + states[data["status"]],
+            "约定期限：" + due.strftime("%Y-%m-%d %H:%M"),
+            "已收到反馈：" + str(len(data["feedback_ids"])) + " 条。",
+            "建议：" + advice[data["status"]], "可以返回交办页面核对材料并确认具体处理操作。"]
     require(kind == "morning_list", "当前产物种类没有正式文字呈现方式")
     return ["晨间清单当前顺序版本：" + data["current_order"]["version"],
         "事项编号：" + "、".join(data["current_order"]["item_ids"])]
 
 
 def result_text(name, data):
+    if name == "bossDashboardRead":
+        return morning_brief(data["today"], data["contacts"])
+    if name == "bossTasksRead":
+        lines = ["当前任务 " + str(len(data["tasks"])) + " 项。"]
+        for task in sorted(data["tasks"], key=lambda row: row["due_at"]):
+            lines.extend(object_text("task", task))
+        return lines
     if name == "businessOverviewRead":
         scope = data["applied_scope"]
-        lines = ["经营范围：法人 " + scope["legal_entity_id"] + "；区域 " + (scope["region_id"] or "不限制区域")
-            + "；期间 " + scope["period_start"] + " 至 " + scope["period_end"] + "；关注条件 " + scope["attention"],
-            "业务截至：" + data["business_at"] + "；读取时间：" + data["read_at"]]
+        lines = ["查询期间：" + scope["period_start"] + " 至 " + scope["period_end"]]
         topics = [data["topic"]] if "topic" in data else data["topics"]
-        if "topic_reference" in data:
-            lines.append("当前用途：" + (data["topic_reference"]["use"] or "未选择具体用途"))
+        if "topic_reference" in data and data["topic_reference"]["use"]:
+            lines.append("业务类型：" + {"BROILER": "肉禽", "EGG": "蛋禽", "MILK": "奶畜", "BEEF": "肉用牛羊"}[data["topic_reference"]["use"]])
         for topic in topics:
-            lines.append(topic["page_id"] + " · " + topic["title"] + "；可读状态 " + topic["availability"])
-            lines.extend("资料缺口：" + value for value in topic["missing_fields"])
-            lines.extend("正式对象：" + row["kind"] + " / " + row["id"] + "；版本 " + str(row["version"])
-                + "；状态 " + str(row["state"]) + "；采用状态 " + row["adoption_state"] for row in topic["records"])
+            lines.append("### " + topic["title"])
+            for metric in topic["metrics"]:
+                change = metric["change_percent"]
+                comparison = "；尚无上月比较数据" if change is None else "；较上月" + ("增加 " if Decimal(change) >= 0 else "减少 ") + str(abs(Decimal(change))) + "%"
+                lines.append(metric["label"] + "：" + metric["value"] + " " + metric["unit"] + comparison)
+            if topic["metrics"]:
+                lines.append("建议核查变化较大的指标，结合采购、销售或生产记录确认原因，再确定负责人和处理期限。当前数值可以说明变化，原因仍需相关材料支持。")
+            else:
+                lines.append("当前期间没有可用的专题指标，请补充相应业务材料后继续分析。")
         if "metrics" in data:
-            lines.append("指标采用范围：" + data["metric_scope"])
+            lines.append("### 水产饲料外销")
             lines.extend(METRIC_NAMES[row["metric_id"]] + "：" + (row["value"] + " " + row["unit"] if row["value"] is not None else "当前资料无法确定") for row in data["metrics"])
-            lines.append("本人参与提醒：" + str(len(data["alerts"])) + " 项；关联事项：" + str(len(data["associations"])) + " 项")
-        lines.extend("已应用范围的来源：" + row["source_id"] + "；版本 " + str(row["version"]) + "；状态 " + row["status"] for row in data["sources"])
         return lines
     if name == "query_metrics":
         return query_text(data)
@@ -129,7 +187,7 @@ def result_text(name, data):
 
 
 def render_conversation(calls, outputs, required_inputs):
-    lines = ["数据类型：SIMULATED；运行与附件元信息来自当前正式记录。"]
+    lines = ["以下内容依据当前保存的模拟资料。"]
     for (name, _), output in zip(calls, outputs, strict=True):
         lines.extend(result_text(name, output))
     lines.extend("待补充：" + value for value in required_inputs)

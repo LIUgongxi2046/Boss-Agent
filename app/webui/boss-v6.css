@@ -49,10 +49,10 @@
   color-scheme: light;
 }
 .boss-v6, .boss-v6 * {box-sizing:border-box}
-.boss-v6 button, .boss-v6 input, .boss-v6 textarea,.boss-v6 select {font:inherit}
+.boss-v6 :is(button,input,textarea,select):not(.boss-n02-thread *) {font:inherit}
 .boss-v6 button {cursor:pointer}
 .boss-v6 button:disabled {opacity:.53;cursor:not-allowed}
-.boss-v6 :focus-visible,
+.boss-v6 :focus-visible:not(.boss-n02-thread *),
 .boss-native-view :focus-visible {
   outline: 2px solid #0A64E8 !important;
   outline-offset: 3px !important;
@@ -74,7 +74,7 @@
 .boss-brand {display:flex;align-items:center;gap:9px;padding:7px 7px 3px;white-space:nowrap}
 .boss-brand img{display:block;width:34px;height:34px;object-fit:contain;flex-shrink:0}
 .boss-brand strong{font-size:19px;line-height:1.2;font-weight:800;letter-spacing:-.02em;color:#063f73}
-.boss-brand-caption{font-size:11px;line-height:1.55;color:#6682a0;margin:1px 7px 22px;white-space:nowrap}
+.boss-brand-caption{font-size:11px;line-height:1.55;color:#6682a0;margin:1px 7px 22px 50px;white-space:normal}
 .boss-sidebar-label{font-size:11px;color:#7692ae;font-weight:750;letter-spacing:.08em;margin:12px 8px 8px}
 .boss-sidebar-nav{display:flex;flex-direction:column;gap:5px}
 .boss-nav-group>.boss-nav-item{width:100%}
@@ -352,11 +352,7 @@
 .boss-native-toolbar label {display:flex;align-items:center;gap:8px;min-width:0;flex:1;max-width:680px}
 .boss-native-toolbar select {min-width:0;max-width:100%;flex:1;min-height:44px;padding:8px 12px;border:1px solid var(--boss-border);border-radius:9px;background:#fff;color:var(--boss-text)}
 .boss-native-surface > .relative {flex:1;min-height:0}
-.boss-native-surface :is(p,textarea,input,select,[role="status"],[role="alert"],.markdown-content) {font-size:16px;line-height:24px}
-.boss-native-surface :is(button,[role="button"]) {min-height:44px;min-width:44px}
-.boss-native-surface button[role="switch"][aria-checked="true"] {background:var(--boss-action)}
 .boss-native-surface .settings-feature-header {display:none}
-.boss-native-surface [data-testid="hero-greeting"] {display:none}
 .boss-native-surface .settings-grid {padding:18px 24px;max-width:1100px}
 .boss-native-surface pre {overflow-x:auto;max-width:100%}
 .boss-native-surface :is(p,li,td) {overflow-wrap:anywhere}
@@ -680,7 +676,8 @@
   border:1px solid #e0ebf7;border-radius:15px;
   background:#fff;
 }
-.boss-v6 .boss-search{max-width:450px}
+.boss-v6[data-design="v7"][data-page] .boss-topbar .boss-search{display:flex;flex:1 1 0;width:auto;max-width:none;min-width:44px;min-height:44px}
+.boss-v6[data-design="v7"][data-page] .boss-topbar .boss-topright{flex:0 0 auto}
 .boss-v6 .boss-sidebar{
   background:linear-gradient(155deg,#fff,#f8fbff 68%,#f0f8ff);
 }

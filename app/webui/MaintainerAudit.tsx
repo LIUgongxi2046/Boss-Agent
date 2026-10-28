@@ -22,6 +22,7 @@ const RESOURCES:Record<string,string>={"assignment":"交办","assignment.extensi
   "minutes.assignment":"纪要交办","knowledge.source":"资料","prompt":"Prompt","approval":"审批","message":"消息",
   "calendar":"日程","travel":"行程","people":"人员","owner.goals":"本人目标","owner.notice":"本人通知","owner.plan":"本人计划",
   "owner_workspace.personal-memory":"本人记忆","owner_workspace.authorizations":"本人授权","owner_workspace.runs":"运行取消",
+  "owner_workspace.morning-actions":"今日事项","technical.secretary":"秘书接收方式",
   "authorization":"授权","today":"今日安排","sector":"经营板块","runtime":"模型运行配置","scheduler":"调度计划",
   "scheduler.draft":"调度草稿","scheduler.restart":"调度组件重启","simulation":"模拟环境","simulation.clock":"模拟业务时钟","simulation.event":"模拟事件",
   "simulation.application":"模拟应用资料","simulation.message":"模拟消息回复","simulation.feedback":"模拟回复",
@@ -31,6 +32,7 @@ const RESOURCES:Record<string,string>={"assignment":"交办","assignment.extensi
   "alert.meeting":"提醒关联会议","alert.assignment":"提醒转交办","bi":"经营查询",
   "morning":"晨间视图","mvp":"MVP视图","conversation":"会话记录"};
 const VERBS:Record<string,string>={"save":"保存","create":"新建","confirm":"确认","send":"发送","prepare":"准备",
+  "approve":"同意","reject":"驳回","delegate":"交给秘书处理",
   "nudge":"催办","complete":"完成","extend":"延期","decide":"决定","cancel":"取消","withdraw":"撤回","revise":"修改",
   "activate":"启用","deactivate":"停用","validate":"验证","pause":"暂停","resume":"恢复","ack":"知悉","snooze":"延后",
   "close":"关闭","attach":"关联","detach":"解除关联","release":"发布","revoke":"撤销","reorder":"排序",

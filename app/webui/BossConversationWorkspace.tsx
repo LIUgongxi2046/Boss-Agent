@@ -195,10 +195,10 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
             <div className="boss-n02-heading"><h3>会话与任务</h3></div>
             <button className="boss-chat-search" onClick={onSearch}><Search size={16}/><span>搜索历史会话</span></button>
             {role==="BOSS"&&visible&&<BossArchivedSessions/>}
-            {sessions.length?<ul>{sessions.map(value=><li key={value.key}><button aria-current={value.key===activeKey?"page":undefined} onClick={()=>onSelectChat(value.key)}><MessageCircle size={16}/><span>{value.title}<small>{value.updatedAt}</small></span></button></li>)}</ul>:<p className="boss-n02-empty">尚无可用会话</p>}
-            <div className="boss-chat-history-note"><p>会话与对象分别保存</p><span>返回会话时恢复原消息位置；资料版本与已确认决定沿用对应业务记录。</span></div>
+            {sessions.length?<ul>{sessions.map(value=><li key={value.key}><button aria-current={value.key===activeKey?"page":undefined} onClick={()=>onSelectChat(value.key)}><MessageCircle size={16}/><span>{value.title}<small><time dateTime={value.updatedAt}>{new Intl.DateTimeFormat("zh-CN",{month:"long",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(value.updatedAt))}</time></small></span></button></li>)}</ul>:<p className="boss-n02-empty">尚无可用会话</p>}
+            <div className="boss-chat-history-note"><p>继续之前的对话</p><span>选择会话，查看相关问题与处理记录。</span></div>
           </aside>
-          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"和 Boss Agent 聊天"}</h2><p>直接说你想处理的事</p></div><div className="boss-chat-toolbar"><button className="boss-btn" type="button" onClick={onNewChat}><Plus size={16}/>新对话</button><button className="boss-btn" type="button" aria-expanded={historyOpen} onClick={()=>setHistoryOpen(value=>!value)}><History size={16}/>{historyOpen?"收起历史":"历史对话"}</button>{conversationReturn()&&<button className="boss-btn" type="button" onClick={actions.onReturn}><ArrowLeft size={16}/>{conversationReturn()?.label}</button>}<span className="boss-n02-chip">{connectionStatus==="open"?"已连接":"连接中"}</span></div></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><AgentProcess run={latest} runs={view?.runs??[]} onSelect={setSelectedRunId}/><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
+          <div className="boss-n02-message-column"><header className="boss-chat-thread-heading"><div><h2>{session?.title??"和 Boss Agent 聊天"}</h2><p>直接说你想处理的事</p></div><div className="boss-chat-toolbar"><button className="boss-btn" type="button" onClick={onNewChat}><Plus size={16}/>新对话</button><button className="boss-btn" type="button" aria-expanded={historyOpen} onClick={()=>setHistoryOpen(value=>!value)}><History size={16}/>{historyOpen?"收起历史":"历史对话"}</button>{conversationReturn()&&<button className="boss-btn" type="button" onClick={actions.onReturn}><ArrowLeft size={16}/>{conversationReturn()?.label}</button>}<span className="boss-n02-chip">{connectionStatus==="open"?"已连接":"连接中"}</span></div></header><div className="boss-n02-thread" aria-label="交办消息">{children}</div><BossConversationKnowledge chatId={chatId} active={isActiveN02Scope(latestScope.current)} onSource={(id,version)=>openBusiness(()=>actions.onOpenSource(id,version))}/></div>
         </div>
         {error&&<div className="boss-n02-note error" role="alert">{error}<button className="boss-btn" onClick={()=>setRevision(value=>value+1)}>刷新结果</button></div>}
       </section>
@@ -265,26 +265,4 @@ function QueryDetails({data}:{data:Record<string,unknown>}){
   const query=data as {context_snapshot:Record<string,unknown>;values:{metric_id:string;period_scope:string;scope_description:string;value:string|null;unit:string;formula:string;definition_version:string;display_rounding:string}[];comparison:{state:string;reasons:string[]};missing_fields:string[];unexplained_causes:string[];detail_refs:string[]};
   const fields:Record<string,string>={period_start:"查询开始",period_end:"查询结束",comparison_start:"比较开始",comparison_end:"比较结束",region_id:"区域",region_ids:"全部区域",product_ids:"产品",metric_ids:"指标",legal_entity_id:"法人主体",currency:"币种",quantity_unit:"数量单位",trade_scope:"交易范围",definition_version:"指标定义版本",business_basis:"业务口径",settlement_state:"结算状态",parent_query_id:"父查询",scenario_id:"经营资料范围"};
   return <section aria-label="查询完整结果"><h3>查询条件与结果</h3>{Object.entries(fields).filter(([field])=>query.context_snapshot[field]!==undefined).map(([field,name])=><Row key={field} name={name} value={Array.isArray(query.context_snapshot[field])?(query.context_snapshot[field] as string[]).join("、"):String(query.context_snapshot[field])}/>)}<div className="boss-n02-query-table"><table><thead><tr>{["指标","期间","范围","数值","单位","公式","定义版本","显示规则"].map(name=><th key={name}>{name}</th>)}</tr></thead><tbody>{query.values.map((value,index)=><tr key={index}><th>{value.metric_id}</th><td>{value.period_scope}</td><td>{value.scope_description}</td><td>{value.value??"当前无法确定"}</td><td>{value.unit}</td><td>{value.formula}</td><td>{value.definition_version}</td><td>{value.display_rounding}</td></tr>)}</tbody></table></div><Row name="比较状态" value={query.comparison.state}/>{query.comparison.reasons.map(reason=><p key={reason}>{reason}</p>)}<Row name="资料缺口" value={query.missing_fields.join("、")||"没有已记录缺口"}/>{query.unexplained_causes.map(value=><p key={value}>{value}</p>)}<details><summary>查看结果明细编号</summary>{query.detail_refs.map(id=><p key={id}>{id}</p>)}</details></section>;
-}
-
-const toolNames:Record<string,string>={query_metrics:"查询经营数据",read_evidence:"读取资料原文",bossSectorRead:"读取专题数据",bossTasksRead:"读取任务与承诺",bossMeetingsRead:"读取会议资料",bossEvidenceRead:"读取来源原文",bossWorkspaceRead:"读取工作资料",conversationRead:"读取会话记录",create_assignment:"创建交办",send_assignment:"发送交办",read_assignment:"读取交办状态",morningListRead:"读取晨间清单",morningDetailRead:"读取事项详情",morningSourceRead:"读取事项来源",todayRead:"读取今日工作",ownerPlansRead:"读取本人计划",assignmentSourcesRead:"读取交办来源",businessOverviewRead:"读取经营概览"};
-
-const runNames:Record<string,string>={RUNNING:"正在处理",QUEUED:"等待中",SUCCEEDED:"已完成",FAILED:"未完成",CANCELED:"已取消",WAITING_INPUT:"等待补充",TIMED_OUT:"超时",INTERRUPTED:"已中断",UNKNOWN:"待确认"};
-function AgentProcess({run,runs,onSelect}:{run:Run|undefined;runs:Run[];onSelect:(id:string)=>void}){
-  if(!runs.length)return null;
-  const steps=run?.tool_steps??[];
-  const running=run?.status==="RUNNING"||run?.status==="QUEUED";
-  const state=run?.status?(runNames[run.status]??"已完成"):"等待中";
-  const stepState=(status:string)=>status==="SUCCEEDED"?"已完成":runNames[status]??"已完成";
-  return <section className="boss-n02-agent" aria-label="处理过程" aria-live="polite">
-    <header className="boss-n02-agent-head"><h3>处理过程</h3>
-      {runs.length>1&&<select aria-label="选择运行" value={run?.run_id??""} onChange={event=>onSelect(event.target.value)}>{runs.map(item=><option key={item.run_id} value={item.run_id}>{item.started_at} · {runNames[item.status]??"已完成"}</option>)}</select>}
-      <span className={"boss-n02-chip"+(running?" boss-n02-chip-active":"")}>{state}</span>
-    </header>
-    <ol className="boss-n02-agent-steps">
-      {steps.map((step,index)=><li key={step.tool_call_id+index} data-state={step.status}><span className="boss-n02-agent-index">{String(index+1).padStart(2,"0")}</span><div><strong>{toolNames[step.tool_id]??step.tool_id}</strong><small>{step.status?stepState(step.status):"已完成"}</small></div></li>)}
-      {!steps.length&&run&&<li data-state={run.status}><span className="boss-n02-agent-index">··</span><div><strong>{running?"正在理解需求":"本次未调用工具"}</strong><small>{state}</small></div></li>}
-    </ol>
-    {run?.tool_errors.length?<div className="boss-n02-agent-errors">{run.tool_errors.map((error,index)=><p key={error.tool_id+index}>{(toolNames[error.tool_id]??error.tool_id)+"未完成"} · {error.error_type}</p>)}</div>:null}
-  </section>;
 }

@@ -516,7 +516,7 @@ def test_current_complete_query_and_scoped_followup_change_actual_parameters(nat
     assert set(second["overridden_fields"]) == {"product_ids", "metric_ids"}
     for query, result, row in zip(queries, results, read(native, "runtime_run")):
         assert query["query_id"] in result.content and "来源" in result.content
-        assert "{\"" not in result.content and "SIMULATED" in result.content
+        assert "{\"" not in result.content and "当前保存的模拟资料" in result.content
         assert row["tool_results"][0]["query_id"] == query["query_id"]
         assert row["tool_results"][0]["parameters_sha256"] == checksum({key: value for key, value in query["context_snapshot"].items() if key != "envelope"})
         artifact = ConversationAPI(native[0]).artifact("BOSS", {"session_id": "websocket:" + CHAT, "chat_id": CHAT,

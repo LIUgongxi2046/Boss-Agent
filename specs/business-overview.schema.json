@@ -54,7 +54,7 @@
       "kind":{"$ref":"#/$defs/Id"},"id":{"$ref":"#/$defs/Id"},"version":{"type":["string","null"]},"state":{"type":["string","null"]},
       "adoption_state":{"enum":["CURRENT","NEEDS_REVIEW"]},"source_refs":{"type":"array","items":{"type":"object"}},"facts":{"type":["object","null"]}}},
     "Topic":{"type":"object","additionalProperties":false,"required":["page_id","title","purpose","availability","data_as_of","latest_source_published_at","records","missing_fields","scope_application","related_sales_source_refs","uses"],"properties":{
-      "page_id":{"$ref":"#/$defs/Id"},"title":{"type":"string"},"purpose":{"type":"object"},
+      "page_id":{"$ref":"#/$defs/Id"},"title":{"type":"string"},"purpose":{"type":"object"},"metrics":{"type":"array","items":{"type":"object","required":["label","value","unit","period","previous_value","change_percent","source_refs"]}},
       "availability":{"enum":["PARTIAL","NEEDS_REVIEW","SOURCE_NOT_AVAILABLE","FILTER_EMPTY"]},
       "data_as_of":{"type":["string","null"]},"latest_source_published_at":{"type":["string","null"]},"records":{"type":"array","items":{"$ref":"#/$defs/Record"}},
       "missing_fields":{"type":"array","items":{"type":"string"}},"scope_application":{"type":"string"},"related_sales_source_refs":{"type":"array","items":{"type":"object"}},"uses":{"type":"array","items":{"type":"string"}}}},
@@ -63,6 +63,7 @@
       "metrics":{"type":"array","items":{"type":"object","required":["metric_id","value","unit","formula","definition_version","precision","business_as_of","source_refs"],"properties":{"value":{"type":["string","null"]}}}},
       "metric_missing_fields":{"type":"array","items":{"type":"string"}},"metric_scope":{"const":"WATER_FEED_EXTERNAL_SALES_ONLY"},"metric_coverage":{"type":"object","required":["state","missing_region_ids","record_refs"]},"query_handoff":{"type":["object","null"]},"query_handoff_unavailable_reason":{"type":["string","null"]},
       "topics":{"type":"array","minItems":10,"maxItems":10,"items":{"$ref":"#/$defs/Topic"}},"alerts":{"type":"array","items":{"type":"object"}},
+      "insights":{"type":"array","items":{"type":"object","required":["id","target_id","title","finding","impact","action","evidence","priority","basis","action_executed"],"properties":{"basis":{"const":"CURRENT_RECORD_RULE"},"action_executed":{"const":false},"priority":{"enum":["urgent","attention"]},"evidence":{"type":"array","items":{"type":"string"}}}}},
       "associations":{"type":"array","items":{"type":"object"}},"sources":{"type":"array","items":{"type":"object"}},"excluded_records":{"type":"array","items":{"type":"object"}},"unclassified_records":{"type":"array","items":{"type":"object"}},"alert_scope_exclusions":{"type":"object","required":["scope","attention"],"additionalProperties":{"type":"integer","minimum":0}},
       "business_at":{"type":"string"},"read_at":{"type":"string"},"coverage_state":{"const":"PARTIAL"},"snapshot_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
       "business_authorization_granted":{"const":false},"business_mutation_performed":{"const":false}}}

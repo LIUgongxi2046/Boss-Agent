@@ -131,7 +131,7 @@ export function BossMVPView({contacts,onDirtyChange,refreshVersion,onOpenTask}:{
     <section className="boss-panel"><header className="boss-panel-head"><h2>查询记录与原编号恢复</h2></header><p>原采购查询 {queryKey||"尚未提交"}</p><p>查询状态 {receipt?.request_state??(busy?"执行中":uncertain?"结果尚未确认":"尚未提交")} · 来源采用 {receipt?.adoption_state??"尚未读取"}</p>
       {uncertain&&<p role="status">执行结果尚未确定，仅查询同一原编号。</p>}<button className="boss-btn" disabled={!queryKey||dirty||denied} onClick={()=>void recover()}>读取原采购查询结果</button>
       <ul>{history.map(value=><li key={value.client_request_id}><button className="boss-btn" disabled={blocked||dirty} onClick={()=>{setCoordinateKey("");setSaved(null);setTaskId("");remember({mvpCoordinate:null,mvpTask:null});void recover(value.client_request_id);}}>{titles[value.cost_type]} · {value.read_at}</button></li>)}</ul></section>
-    <section className="boss-panel"><div className="boss-mascot-work"><img src={busy?"/boss-brand/03-思考分析.webp":"/boss-brand/01-待机悬浮.webp"} alt=""/><div><h2>大鹏 · 采购成本协调</h2><p>{busy?"正在读取实际资料":"等候本人核查与决定"}</p></div></div></section>
+    <section className="boss-panel"><div className="boss-mascot-work"><img src={busy?"/boss-brand/03-思考分析.webp":"/boss-brand/01-待机悬浮.webp"} alt=""/><div><h2>Boss Agent · 采购成本协调</h2><p>{busy?"正在读取实际资料":"等候本人核查与决定"}</p></div></div></section>
     </div></div>
   </div>;
 }
