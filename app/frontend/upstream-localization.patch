@@ -1,0 +1,29 @@
+--- a/webui/src/i18n/config.ts
++++ b/webui/src/i18n/config.ts
+@@ -15,7 +15,7 @@ export const supportedLocales = [
+ 
+ export type SupportedLocale = (typeof supportedLocales)[number]["code"];
+ 
+-export const defaultLocale: SupportedLocale = "en";
++export const defaultLocale: SupportedLocale = "zh-CN";
+ export const fallbackLocale: SupportedLocale = "en";
+ 
+ export function normalizeLocale(
+--- a/webui/src/i18n/index.ts
++++ b/webui/src/i18n/index.ts
+@@ -1,5 +1,6 @@
+ import i18n, { type InitOptions } from "i18next";
+ import { initReactI18next } from "react-i18next";
++import {brandMessages} from "@/boss-agent/boss-branding";
+ 
+ import {
+   channelLocaleNamespaces,
+@@ -57,7 +58,7 @@ async function loadLocaleResources(
+ 
+   const pending = Promise.all([loader(), channelLocaleResources(locale)])
+     .then(([common, channels]) => {
+-      const resource: LocaleResource = { common: common.default, ...channels };
++      const resource: LocaleResource = brandMessages({ common: common.default, ...channels });
+       resources[locale] = resource;
+       if (i18n.isInitialized) {
+         for (const [namespace, messages] of Object.entries(resource)) {

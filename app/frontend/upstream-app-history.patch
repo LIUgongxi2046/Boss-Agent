@@ -1,0 +1,23 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -322,18 +323,10 @@ function writeShellRoute(route: ShellRoute, replace = false): void {
+   const nextHash = shellRouteHash(route);
+   if (window.location.hash === nextHash) return;
+   if (replace) {
+-    window.history.replaceState(
+-      null,
+-      "",
+-      `${window.location.pathname}${window.location.search}${nextHash}`,
+-    );
++    replaceBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+     return;
+   }
+-  window.history.pushState(
+-    null,
+-    "",
+-    `${window.location.pathname}${window.location.search}${nextHash}`,
+-  );
++  pushBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+ }
+ 
+ function bootstrapTokenExpiresAt(expiresInSeconds: number): number {

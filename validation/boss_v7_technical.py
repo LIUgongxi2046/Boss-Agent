@@ -117,7 +117,25 @@ class TechnicalWorkspaceAPI:
             if command == PREFIX + "relationships.save":
                 return save_contact(api, db, snapshot, payload)
             return mutate_knowledge(api, db, snapshot, payload, action)
-        receipt = execute_transaction(api, role, "MAINTAINER", command, payload, mutate)
+        pending = False
+        if domain == "knowledge" and action == "withdraw":
+            api._exact(payload, {"client_request_id", "source_id", "expected_version", "values", "upload", "text", "confirmation"})
+            require(payload["confirmation"] is True, "需要确认来源操作", web.HTTPBadRequest)
+            from boss_knowledge_ingestion import _validate_source
+            _validate_source(None, payload["source_id"])
+            from hermes_source_invalidation import begin_source_cleanup
+            pending = begin_source_cleanup(self.store, NAMESPACE, payload["source_id"], payload["expected_version"], operation=command, request_id=payload["client_request_id"], maintainer_source=True)
+        completed = False
+        try:
+            receipt = execute_transaction(api, role, "MAINTAINER", command, payload, mutate)
+            completed = True
+            if domain == "knowledge" and action == "withdraw":
+                from hermes_source_invalidation import complete_source_session_cleanup
+                complete_source_session_cleanup(self.store, NAMESPACE, payload["source_id"])
+        finally:
+            if pending and not completed:
+                from hermes_source_invalidation import fail_source_cleanup
+                fail_source_cleanup(self.store, NAMESPACE, payload["source_id"])
         if domain == "models":
             self.models.enqueue(receipt)
         if domain == "datasets" and action in {"load", "reset"} and self.runtime_control is not None:

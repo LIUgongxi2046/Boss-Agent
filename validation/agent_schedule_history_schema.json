@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_id", "plan_version", "event_id", "event_version", "receipts"],
+  "properties": {
+    "plan_id": {"type": "string", "minLength": 1},
+    "plan_version": {"type": "string", "minLength": 1},
+    "event_id": {"type": "string", "minLength": 1},
+    "event_version": {"type": "string", "minLength": 1},
+    "receipts": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["plan_id", "plan_version", "event_id", "event_version", "occurrence_id", "run_id", "dispatch_id", "status", "reason", "business_at", "rule_version", "schedule_version", "source_type", "occurrence_binding"],
+      "properties": {
+        "plan_id": {"type": "string"}, "plan_version": {"type": "string"}, "event_id": {"type": "string"}, "event_version": {"type": "string"},
+        "occurrence_id": {"type": ["string", "null"]}, "run_id": {"type": ["string", "null"]}, "dispatch_id": {"type": "string"},
+        "status": {"const": "SUPPRESSED"}, "reason": {"type": "string", "minLength": 1}, "business_at": {"type": ["string", "null"]},
+        "rule_version": {"type": ["string", "null"]}, "schedule_version": {"type": ["string", "null"]}, "source_type": {"const": "SIMULATED"},
+        "occurrence_binding": {"enum": ["VERIFIED", "UNVERIFIED"]}
+      }
+    }}
+  }
+}

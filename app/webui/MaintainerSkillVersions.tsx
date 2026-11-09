@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, FileSearch, History, Loader2, RefreshCw, Save, ShieldCheck, Square } from "lucide-react";
 import {V7Empty,V7Fact,V7Panel} from "./BossV7UI";
+import {SkillCandidateReview} from "./SkillCandidateReview";
 
 type HistoryVersion={history_id:string;method_version:string;content_sha256:string;recorded_at:string;origin:string};
 type Draft={draft_version:string;method_version:string;description:string;body:string;content_sha256:string;
@@ -233,6 +234,7 @@ export function MaintainerSkillVersions({getToken,identityKey,mutate,onNavigate,
   const validateBlocker=disabled?"正在读取方法或等待回执，操作暂不可用。":!draft?"尚未保存方法草稿。":dirty?"存在未保存修改，先保存新草稿版本。":"";
   const sectionText=(label:string)=>data?.sections.filter(section=>section.heading.includes(label)).map(section=>section.body).join("\n\n")||"当前方法尚未提供此字段";
   return <div className="boss-maintainer-records boss-sop-workspace">
+    <SkillCandidateReview role="MAINTAINER" getToken={getToken} identityKey={identityKey}/>
     <div className="boss-workspace-toolbar"><div className="boss-workspace-note"><span className="boss-tag">MAINTAINER · A06</span>
       <span>SOP 与 Skills · 技术配置不授予本人业务权限</span></div>
       {loading&&<div className="boss-actions"><button className="boss-btn" type="button" onClick={cancelRead}>取消本次读取</button></div>}</div>

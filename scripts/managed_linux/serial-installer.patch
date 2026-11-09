@@ -1,0 +1,22 @@
+--- a/boot/grub/grub.cfg
++++ b/boot/grub/grub.cfg
+@@ -1,3 +1,8 @@
++set timeout=0
++menuentry 'Debian serial installer' {
++    linux /install.amd/vmlinuz console=hvc0 DEBIAN_FRONTEND=text
++    initrd /install.amd/initrd.gz
++}
+ if [ x$feature_default_font_path = xy ] ; then
+    font=unicode
+ else
+--- a/EFI/debian/grub.cfg
++++ b/EFI/debian/grub.cfg
+@@ -1,3 +1,3 @@
+-search --file --set=root /.disk/id/19d5b690-0f60-4b5d-9755-2b7afd177e7e
++search --file --set=root /.boss-boot
+ set prefix=($root)/boot/grub
+ source $prefix/${grub_cpu}-efi/grub.cfg
+--- /dev/null
++++ b/.boss-boot
+@@ -0,0 +1 @@
++Debian serial installer

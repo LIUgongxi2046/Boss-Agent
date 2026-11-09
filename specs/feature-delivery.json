@@ -664,14 +664,30 @@
       "check_log": ".work/takeover/sector-scope-tests.log",
       "authenticated_ui": "F15_F22_SCOPE_RESPONSE_COVERAGE_AND_MISSING_RENDERED",
       "ui_log": ".work/takeover/sector-scope-ui.log",
-      "remaining": ["SECTOR_MEETING_SERVICE_INTEGRATION"],
+      "remaining": [
+        "SECTOR_MEETING_SERVICE_INTEGRATION"
+      ],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_pack_validation": {
       "task_id": "V7-BACKEND",
       "status": "SIMULATED_METRICS_RECORDS_SECTIONS_RELATIONS_WORKFLOW_COORDINATION_AND_DECISIONS_AVAILABLE",
       "definition": "SECTOR-PACK-1",
-      "pages": ["F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "V19-BEEF", "V19-EGG", "V19-MILK"],
+      "pages": [
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "V19-BEEF",
+        "V19-EGG",
+        "V19-MILK"
+      ],
       "checks": "6_PASSED",
       "check_log": ".work/takeover/sector-metrics-tests.log",
       "authenticated_http": "F15_METRICS_DERIVED_FROM_FILTERED_ROWS",
@@ -682,7 +698,9 @@
       "filter_validation": "UNKNOWN_KEYS_REJECTED_WITH_400",
       "filter_validation_log": ".work/takeover/sector-filter-validation-tests.log",
       "metric_calculation": "DERIVED_FROM_FILTERED_DETAIL_ROWS_SUM_OR_AVERAGE",
-      "remaining": ["SECTOR_MEETING_SERVICE_INTEGRATION"],
+      "remaining": [
+        "SECTOR_MEETING_SERVICE_INTEGRATION"
+      ],
       "full_product": "NOT_VERIFIED"
     },
     "backend_sector_review_validation": {
@@ -1315,18 +1333,116 @@
     "pause_date": "2026-10-25",
     "status": "PAUSED_WITH_SOURCE_AND_EVIDENCE_PRESERVED"
   },
-  "plan": "docs/菜单开发总计划.md",
-  "active_feature_id": "SEED-RELEASE-20261028",
-  "active_ticket": "docs/development/SEED-RELEASE-20261028.md",
-  "current_stage": "SIMULATION_INITIALIZER_VERIFIED_AND_MAIN_PUSH_CONFIRMED",
+  "plan": "docs/升级2.0执行与验收计划.md",
+  "active_feature_id": "UPGRADE-2-EXECUTION",
+  "active_ticket": "docs/development/UPGRADE-2-EXECUTION.md",
+  "current_stage": "UPGRADE_2_FORMAL_RUN_VERIFIED",
+  "active_task_type": "IMPLEMENTATION",
+  "upgrade_design": {
+    "version": "2.0.0",
+    "date": "2026-10-30",
+    "source_commit": "72d9ed63937ffca5adc525a694d0d27a13297c2c",
+    "record": "docs/development/UPGRADE-2-DESIGN.md",
+    "prd": "docs/PRD2.0.md",
+    "hld": "docs/HLD2.0.md",
+    "lld": "docs/升级2.0详细设计.md",
+    "plan": "docs/升级2.0执行与验收计划.md",
+    "documentation_status": "COMPLETE",
+    "design_status": "IN_REVIEW",
+    "target_engine": "hermes",
+    "engine_decision_status": "INFERRED_PROPOSED",
+    "current_engine": "nanobot",
+    "business_data_mode": "SIMULATED",
+    "implementation_status": "CORE_FORMAL_RUN_VERIFIED_REMAINING_TASKS_IN_PROGRESS",
+    "runtime_validation": "FORMAL_HERMES_RUN_SUCCEEDED",
+    "product_preview_validation": "PARTIAL_UNAUTHENTICATED_ISOLATED_PREVIEW",
+    "product_preview_candidate": {
+      "id": "014",
+      "wheel_sha256": "d502411dc011aee67c3b673edbfdd90adc7ca8384c639e742d01291542c58be7",
+      "frontend_index_sha256": "e5fe9325dbee01fc3900f52de29e6fc54711dedd167e7da5dfb463e76d8507f6",
+      "launcher": ".work/upgrade2/u2-03/candidate-014-preview.sh",
+      "evidence": "evidence/upgrade2-supervision-20261101/candidate-014/preview-tool-output.md",
+      "scope": "ISOLATED_SIMULATION_HOME_AND_UNAUTHENTICATED_REQUESTS_ONLY",
+      "service_status": "STOPPED_PORTS_RELEASED_AT_CHECK",
+      "authenticated_business_flow": "NOT_VERIFIED",
+      "formal_hermes_isolation": "NOT_VERIFIED",
+      "full_product_delivery": "NOT_COMPLETE"
+    },
+    "package_012_validation": "BUILD_EVIDENCE_RECORDED_CURRENT_SOURCE_CHANGED_INSTALL_METHOD_NONCOMPLIANT",
+    "managed_linux_isolation": "FORMAL_LINUX_ISOLATION_EVIDENCE_VERIFIED",
+    "managed_linux_source": "scripts/managed_linux/README.md",
+    "simulation_artifact_backup": "PENDING_ARTIFACT_GATE_VERIFIED_RESTORE_BLOCKED",
+    "visual_validation": "NOT_VERIFIED",
+    "user_acceptance": "PENDING_USER_ACCEPTANCE",
+    "full_product_delivery": "NOT_COMPLETE",
+    "verification": {
+      "scope": "DOCUMENTATION_ONLY",
+      "status": "PASS",
+      "documents_checked": 24,
+      "new_local_link_occurrences_checked": 77,
+      "prd_sections": 13,
+      "hld_sections": 8,
+      "functional_requirements": 12,
+      "acceptance_ids_matched": 24,
+      "implementation_tasks": 10,
+      "candidate_and_existing_delivery_preserved": true,
+      "diff_check": "PASS",
+      "record": "docs/development/UPGRADE-2-DESIGN.md"
+    },
+    "formal_run": {
+      "run_id": "e877cd04-6615-4ff9-ad40-ee9415af4f2b",
+      "status": "SUCCEEDED",
+      "completion_state": "PASS",
+      "revision": 12,
+      "model_requests": 5,
+      "tools": [
+        "read_product_memory",
+        "query_metrics",
+        "read_evidence"
+      ],
+      "usage_events": 1,
+      "descendants": "VERIFIED_EXITED",
+      "run_log_sha256": "9f1b1699438026f43c0b0f2488413e3ce32897f2beda31eb15f0b3f3a3c20ec1",
+      "database_sha256": "1330d1c33ab7f724b5fafdd3cb8a7e3a8715e2f85fbc20aacfd15b5167bfe79b",
+      "adapter_version": "0.1.21",
+      "adapter_wheel_sha256": "8e341ac96245d36fb377b664312858a298db800a2c8aa9e0c30fa9fbb92fc906",
+      "product_wheel_sha256": "71fd41fa81bb87fbb6fda15f4be44cc6b04912faed5766bfbd565fc68ec02799",
+      "record": "docs/development/U2-03.md",
+      "scope": "ISOLATED_SIMULATED_RUN_WITH_REAL_DEEPSEEK_MODEL_AND_LINUX_VM_ISOLATION",
+      "limits": [
+        "NO_AUTHENTICATED_BROWSER_FLOW",
+        "VISUAL_NOT_VERIFIED",
+        "NO_ARTIFACT_GENERATION_IN_THIS_RUN",
+        "NO_SCHEDULING_OR_RECOVERY_IN_THIS_RUN"
+      ],
+      "product_sdist_sha256": "64b36c40d969489e8441371446f822b8d3872316cb51898834211364936691e8",
+      "regression": "DISPATCHER_21_PASSED_TRANSPORT_30_PASSED_1_SKIPPED"
+    }
+  },
+  "preserved_product_candidate": {
+    "task_id": "SEED-RELEASE-20261028",
+    "record": "docs/development/SEED-RELEASE-20261028.md",
+    "stage": "SIMULATION_INITIALIZER_VERIFIED_AND_MAIN_PUSH_CONFIRMED",
+    "feature_status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
+    "development_status": "DEVELOPED",
+    "development_covered_checkpoints": 4,
+    "verified_checkpoints": 4,
+    "total_checkpoints": 4,
+    "acceptance_baseline_id": "simulation-initializer-and-main-release-20261028-v1",
+    "acceptance_status": "PENDING_USER_ACCEPTANCE",
+    "candidate_commit": "636ba070a0111adfccc587e225a972ae8e5d0a05",
+    "scope_note": "根字段candidate_commit、implementation_commit、baseline_commit与体验入口继续描述本候选；升级候选014及局部预览范围记录在upgrade_design。原execution_model和current_delivery继续记录既有产品任务范围。"
+  },
   "candidate_commit": "636ba070a0111adfccc587e225a972ae8e5d0a05",
   "implementation_commit": "636ba070a0111adfccc587e225a972ae8e5d0a05",
   "baseline_commit": "7a2be73a864232ec1dfb866ab2246101e4eaf063",
-  "development_record": "docs/development/SEED-RELEASE-20261028.md",
+  "development_record": "docs/development/UPGRADE-2-EXECUTION.md",
   "delivery_record": null,
   "experience_instructions": "docs/development/SIMULATION-20261028.md",
   "experience_launcher": "scripts/run_comprehensive_simulation_local.sh",
-  "experience_launcher_arguments": ["--desktop"],
+  "experience_launcher_arguments": [
+    "--desktop"
+  ],
   "experience_origin": "http://127.0.0.1:9082/",
   "frontend_directory": ".work/simulation-20261028/admin-dist",
   "credential_file": "validation/.work/comprehensive-simulation-20261028/accounts/credentials.json",
@@ -1378,8 +1494,21 @@
     "source_commit": "9cd9888490521242def326f475c93823a68ec95b",
     "uncommitted_changes": true,
     "visible_administrator_entries": 20,
-    "hidden_administrator_entries": ["N01", "D08", "D06", "D07", "F30", "F31"],
-    "boss_primary_entries": ["F01", "N02", "N03", "N04", "N05"],
+    "hidden_administrator_entries": [
+      "N01",
+      "D08",
+      "D06",
+      "D07",
+      "F30",
+      "F31"
+    ],
+    "boss_primary_entries": [
+      "F01",
+      "N02",
+      "N03",
+      "N04",
+      "N05"
+    ],
     "navigation_and_history_checks_passed": 12,
     "authenticated_dom_checks_passed": 32,
     "desktop_http_checks": ".work/simulation-20261028/admin-desktop-http-evidence.json",
@@ -1416,7 +1545,11 @@
   "insight_agent_review": {
     "status": "BUILD_DOM_AND_LIMITED_LIVE_MODEL_VERIFIED",
     "date": "2026-10-28",
-    "pages": ["N03", "N04", "N05"],
+    "pages": [
+      "N03",
+      "N04",
+      "N05"
+    ],
     "agent_run_id": "run-6f7d16a5-4633-45ff-b81f-43f751bb9d0e",
     "stream_run_id": "run-85401d92-148a-4708-9faf-5c108487275b",
     "directed_tests": 42,
@@ -1428,7 +1561,13 @@
   "stream_scroll_review": {
     "status": "LIVE_MODEL_BROWSER_VERIFIED",
     "chat_id": "f6357f42-1d55-4638-9757-220ec4c4ba6e",
-    "checks": ["BLANK_CLICK_CONTINUES_FOLLOW", "MANUAL_SCROLL_PRESERVES_READING", "LATEST_BUTTON_RESUMES_FOLLOW", "COMPOSER_POSITION_STABLE", "COMPLETION_AT_BOTTOM"],
+    "checks": [
+      "BLANK_CLICK_CONTINUES_FOLLOW",
+      "MANUAL_SCROLL_PRESERVES_READING",
+      "LATEST_BUTTON_RESUMES_FOLLOW",
+      "COMPOSER_POSITION_STABLE",
+      "COMPLETION_AT_BOTTOM"
+    ],
     "record": "docs/development/USER-REVIEW-20261027.md"
   },
   "chat_surface_review": {
@@ -1465,7 +1604,20 @@
     "connection_version": "1",
     "validation_id": "model-validation-980548a9-0572-4764-8e5d-971dacbfd889",
     "status": "PASSED_LIMITED_BROWSER_AND_RUNTIME_VALIDATION",
-    "record": "docs/development/USER-REVIEW-20261027.md"
+    "record": "docs/development/USER-REVIEW-20261027.md",
+    "hermes_formal_run": {
+      "run_id": "e877cd04-6615-4ff9-ad40-ee9415af4f2b",
+      "status": "SUCCEEDED",
+      "model_requests": 5,
+      "tools": [
+        "read_product_memory",
+        "query_metrics",
+        "read_evidence"
+      ],
+      "usage_events": 1,
+      "completion_state": "PASS",
+      "record": "docs/development/U2-03.md"
+    }
   },
   "menu_completed_development_ids": [
     "MENU-F01",
@@ -1948,12 +2100,12 @@
     "remaining_full_scope": "DEFERRED",
     "current_n4_run": "READ_ONLY_NO_INTERRUPTION"
   },
-  "feature_status": "DEVELOPED_PENDING_USER_ACCEPTANCE",
-  "development_covered_checkpoints": 4,
-  "verified_checkpoints": 4,
-  "total_checkpoints": 4,
-  "acceptance_baseline_id": "simulation-initializer-and-main-release-20261028-v1",
-  "development_status": "DEVELOPED",
+  "feature_status": "UPGRADE_IN_PROGRESS",
+  "development_covered_checkpoints": 0,
+  "verified_checkpoints": 0,
+  "total_checkpoints": 8,
+  "acceptance_baseline_id": "upgrade-2-core-flow-20261030-v1",
+  "development_status": "IN_PROGRESS",
   "acceptance_owner": "USER_AND_SUPERVISOR",
   "acceptance_status": "PENDING_USER_ACCEPTANCE",
   "routine_independent_full_acceptance_gate": false,

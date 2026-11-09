@@ -1,0 +1,38 @@
+set timeout 90
+set vmExecutable [lindex $argv 0]
+set vmDirectory [lindex $argv 1]
+set shareDirectory [lindex $argv 2]
+set account [lindex $argv 3]
+stty -echo
+puts "TECHNICAL_PASSWORD_INPUT"
+flush stdout
+set password [gets stdin]
+log_user 0
+if {[llength $argv] == 5 && [lindex $argv 4] eq "install-python"} {
+    spawn $vmExecutable $vmDirectory $shareDirectory install-python
+} elseif {[llength $argv] == 7 && [lindex $argv 4] in {guest-setup guest-workspace-setup}} {
+    spawn $vmExecutable $vmDirectory $shareDirectory [lindex $argv 4] [lindex $argv 5] [lindex $argv 6]
+} else {
+    spawn $vmExecutable $vmDirectory $shareDirectory
+}
+expect {
+    -re {login: $} {}
+    timeout { puts "VM_LOGIN_PROMPT_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_BEFORE_LOGIN"; exit 1 }
+}
+send -- "$account\r"
+expect {
+    -re {Password: $} {}
+    timeout { puts "VM_PASSWORD_PROMPT_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_BEFORE_PASSWORD"; exit 1 }
+}
+send -- "$password\r"
+unset password
+expect {
+    -re {Login incorrect} { puts "VM_AUTHENTICATION_FAILED"; exit 1 }
+    -re {[$#] $} { puts "VM_AUTHENTICATED" }
+    timeout { puts "VM_AUTHENTICATION_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_DURING_LOGIN"; exit 1 }
+}
+log_user 1
+interact

@@ -3,7 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import {useClient} from "@/providers/ClientProvider";
 import {V7Empty,V7Fact,V7Panel,V7ReadState} from "./BossV7UI";
 import {BIRecordContent} from "./BIRecordContent";
-import pageMeta from "./page-meta.json";
+import pageMeta from "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json";
 
 export type SourceAnchor={source_id:string;version:string;start:number;end:number};
 type Source={source_id:string;source_type:string;version:string;content?:string|null;title?:string;published_at?:string;observed_at?:string;received_at?:string;read_at?:string;
@@ -12,7 +12,7 @@ type Source={source_id:string;source_type:string;version:string;content?:string|
   available_versions?:{version:string;readable:boolean;reason?:string}[];
   origin_context?:{kind:string;id:string;version:string;title?:string;scope?:Record<string,unknown>};
   assertions?:{claim_id:string;text:string;kind:"FACT"|"OPINION"|"INFERENCE";support_state:string;source_version:string;start?:number;end?:number;limitation?:string}[]};
-type Props={sourceId:string;anchor:SourceAnchor|null;originPage:string;refreshVersion:number;onReturn:()=>void};
+type Props={sourceId:string;anchor:SourceAnchor|null;citation?:{source_id:string;version:string;locator:string}|null;originPage:string;refreshVersion:number;onReturn:()=>void};
 export function savedSourceAnchor(sourceId:string):SourceAnchor|null{
   const query=new URLSearchParams(window.location.search),version=query.get("bossSourceVersion"),start=query.get("bossSourceStart"),end=query.get("bossSourceEnd");
   if(version===null&&start===null&&end===null)return null;
@@ -20,11 +20,11 @@ export function savedSourceAnchor(sourceId:string):SourceAnchor|null{
   return {source_id:sourceId,version,start:Number(start),end:Number(end)};
 }
 export function BossSourceView(props:Props){const {token}=useClient();return <SourceView key={token+":"+props.sourceId} {...props}/>;}
-function SourceView({sourceId,anchor:providedAnchor,originPage,refreshVersion,onReturn}:Props){
+function SourceView({sourceId,anchor:providedAnchor,citation,originPage,refreshVersion,onReturn}:Props){
   const {getToken}=useClient();
   const [anchor]=useState(()=>providedAnchor??savedSourceAnchor(sourceId));
-  const [referenceVersion]=useState(()=>providedAnchor?.version??new URLSearchParams(window.location.search).get("bossSourceReferenceVersion")??anchor?.version??null);
-  const [version,setVersion]=useState(""),[revision,setRevision]=useState(0),[data,setData]=useState<Source|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState("");
+  const [referenceVersion]=useState(()=>citation?.version??providedAnchor?.version??new URLSearchParams(window.location.search).get("bossSourceReferenceVersion")??anchor?.version??null);
+  const [version,setVersion]=useState(()=>citation?.version??""),[revision,setRevision]=useState(0),[data,setData]=useState<Source|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState("");
   const [fullOpen,setFullOpen]=useState(false),[versions,setVersions]=useState<NonNullable<Source["available_versions"]>>([]);
   const supportRef=useRef<HTMLElement|null>(null);
   const query=new URLSearchParams(window.location.search);
@@ -35,9 +35,10 @@ function SourceView({sourceId,anchor:providedAnchor,originPage,refreshVersion,on
     void fetch("/api/boss/ui/evidence?"+params,{headers:{Authorization:"Bearer "+getToken()},cache:"no-store",signal:abort.signal}).then(async response=>{
       if(abort.signal.aborted)return null;
       if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
-      if(!response.ok)throw new Error(response.status===403?"当前身份无法读取这项来源，正文不可用。":response.status===404?"当前来源或所选版本不存在。":response.status===409||response.status===410?"当前来源已变化、到期或撤销，请返回原事项核查。":"来源读取失败，HTTP "+response.status);
+      if(!response.ok)throw new Error(response.status===403?"当前身份无法读取这项来源，正文不可用。":response.status===404?"当前来源或所选版本不存在，无法定位原文。":response.status===409||response.status===410?"当前来源已变化、到期或撤销，请返回原事项核查。":"来源读取失败，HTTP "+response.status);
       const result=await response.json() as Source;
-      if(result.source_id!==sourceId||!result.version||version&&result.version!==version)throw new Error("来源返回的编号或版本与本次请求不符。");
+      if(result.source_id!==sourceId||!result.version)throw new Error("来源返回的编号或版本与本次请求不符。");
+      if(version&&result.version!==version)throw new Error("来源服务没有返回所引用的版本，无法定位原文。");
       if(!["SIMULATED","PUBLIC_SOURCE","RUNTIME_RECORD"].includes(result.source_type))throw new Error("来源属性尚未通过核查。");
       return result;
     }).then(result=>{if(abort.signal.aborted||!result)return;setData(result);if(result.available_versions)setVersions(result.available_versions);setLoading(false);}).catch(failure=>{if(abort.signal.aborted)return;setData(null);setLoading(false);setError(failure instanceof Error?failure.message:String(failure));});
@@ -47,6 +48,7 @@ function SourceView({sourceId,anchor:providedAnchor,originPage,refreshVersion,on
   const content=restricted?null:data?.content;
   const matching=Boolean(anchor&&data&&anchor.source_id===data.source_id&&anchor.version===data.version&&typeof content==="string"&&anchor.start>=0&&anchor.end<=content.length&&anchor.start<anchor.end);
   const text=typeof content==="string"?matching&&anchor?<>{content.slice(0,anchor.start)}<mark id="boss-source-citation" className="boss-source-highlight">{content.slice(anchor.start,anchor.end)}</mark>{content.slice(anchor.end)}</>:content:null;
+  useEffect(()=>{if(matching)document.getElementById("boss-source-citation")?.scrollIntoView({block:"center"});},[matching,anchor,data]);
   return <div className="boss-source-workspace"><V7ReadState loading={loading} error={error} onReload={()=>setRevision(value=>value+1)}/>
     <div className="boss-source-columns"><div className="boss-column"><V7Panel title="当前经营查询上下文"><V7Fact label="返回页面">{(pageMeta as Record<string,{title:string}>)[originPage]?.title??"原工作页面"}</V7Fact><V7Fact label="所引用来源">{sourceId}</V7Fact><V7Fact label="引用版本">{referenceVersion??"原入口未提供固定引用版本"}</V7Fact>{originRefs.map(([label,value])=><V7Fact key={label} label={label}>{value}</V7Fact>)}{data?.origin_context&&<><V7Fact label="原对象">{data.origin_context.title??data.origin_context.id} · {data.origin_context.kind} · 版本 {data.origin_context.version}</V7Fact>{data.origin_context.scope&&<BIRecordContent value={data.origin_context.scope}/>}</>}
       {!data?.origin_context&&<p className="boss-helper">完整查询条件与断言正文尚未由来源服务提供。返回原页面可继续核查原查询。</p>}
@@ -57,6 +59,7 @@ function SourceView({sourceId,anchor:providedAnchor,originPage,refreshVersion,on
       {data?.coverage!==undefined&&<div><h3>适用范围</h3><BIRecordContent value={data.coverage}/></div>}{data?.original_locator!==undefined&&<div><h3>原文位置</h3><BIRecordContent value={data.original_locator}/></div>}
       {restricted&&<p className="boss-status boss-status-warn" role="status">来源状态 {data?.validity_state}，当前不显示正文。</p>}
       {data?.validity_state==="EXPIRED"&&<p className="boss-status boss-status-warn" role="status">来源已经到期。当前获准历史内容仅用于核查，不能直接作为当前结论依据。</p>}
+      {citation&&data&&<><V7Fact label="结果中的位置说明">{citation.locator||"未提供"}</V7Fact><p className="boss-status boss-status-warn" role="status">{data.version!==citation.version?"当前版本与引用版本不同，无法定位原引用。":typeof content!=="string"?"来源正文不可读，无法定位原文。":citation.locator?"结果提供了文字位置说明，服务尚未提供可核查的原文区间，无法自动定位。":"结果未提供原文位置，无法自动定位。"}</p></>}
       {anchor&&data&&!matching&&<p className="boss-status boss-status-warn" role="status">当前原文的版本或位置与原引用不同。原引用保持独立，可查询当时版本；新内容不会自动替代原证据。</p>}
       {!anchor&&referenceVersion&&data&&data.version!==referenceVersion&&<p className="boss-status boss-status-warn" role="status">当前版本与会话引用版本 {referenceVersion} 不同，可以查询当时版本核查原依据。</p>}
       {text!==null?<blockquote className="boss-source-text">{text}</blockquote>:<V7Empty title="原文尚不可读">来源未提供、读取失败或权限受限时，正文保持不可用。</V7Empty>}

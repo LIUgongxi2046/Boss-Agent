@@ -93,7 +93,7 @@ def mutate_knowledge(api, db, snapshot, payload, action):
     api._exact(payload, {"client_request_id", "source_id", "expected_version", "values", "upload", "text", "confirmation"})
     require(payload["confirmation"] is True, "需要确认来源操作", web.HTTPBadRequest)
     if action == "withdraw":
-        return withdraw(api, db, snapshot, {key: payload[key] for key in ("client_request_id", "source_id", "expected_version")})
+        return withdraw(api, db, snapshot, {key: payload[key] for key in ("client_request_id", "source_id", "expected_version")}, operation="boss.technical.knowledge.withdraw")
     values = payload["values"]
     require(isinstance(values, dict), "来源字段无效", web.HTTPBadRequest)
     api._exact(values, {"source_id", "title", "author_id", "observed_at", "published_at", "valid_until", "visibility", "change_note"})

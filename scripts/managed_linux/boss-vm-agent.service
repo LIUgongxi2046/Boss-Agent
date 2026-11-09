@@ -1,0 +1,14 @@
+[Unit]
+Description=Boss Agent virtual machine control
+After=local-fs.target
+
+[Service]
+Type=notify
+NotifyAccess=all
+EnvironmentFile=/etc/boss-vm/identity
+EnvironmentFile=/etc/boss-vm/workspace
+ExecStart=/bin/bash /usr/local/lib/boss-vm/guest-vm-agent-start.sh ${BOSS_VM_ID} ${BOSS_WORKSPACE_UUID}
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

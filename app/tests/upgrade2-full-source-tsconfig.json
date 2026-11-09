@@ -1,0 +1,8 @@
+{
+  "extends": "./upgrade2-n02-tsconfig.json",
+  "files": [
+    "../../.work/product/nanobot/webui/node_modules/vite/client.d.ts",
+    "../webui/BossDesktop.tsx",
+    "../webui/BossConversationWorkspace.tsx"
+  ]
+}

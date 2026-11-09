@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:boss-agent:agent-intents:1",
+  "$defs": {
+    "identifier": {"type": "string", "minLength": 1, "maxLength": 160},
+    "request_key": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{8,128}$"},
+    "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "version": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,8})$"},
+    "source_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "version", "source_sha256"],
+      "properties": {"source_id": {"$ref": "#/$defs/identifier"}, "version": {"$ref": "#/$defs/version"}, "source_sha256": {"$ref": "#/$defs/digest"}}
+    },
+    "coordinate_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["interface_id", "origin_entity_type", "origin_record_id", "origin_version", "review_sha256", "purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements"],
+      "properties": {
+        "interface_id": {"enum": ["SI09", "SI10"]},
+        "origin_entity_type": {"$ref": "#/$defs/identifier"}, "origin_record_id": {"$ref": "#/$defs/identifier"},
+        "origin_version": {"$ref": "#/$defs/version"}, "review_sha256": {"$ref": "#/$defs/digest"},
+        "purpose": {"type": "string", "minLength": 1, "maxLength": 2000}, "coordinator_id": {"$ref": "#/$defs/identifier"},
+        "due_at": {"type": "string", "format": "date-time"}, "timezone": {"type": "string", "minLength": 1, "maxLength": 160},
+        "evidence_requirements": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 160}}
+      }
+    },
+    "coordinate_preview_content": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_type", "preparation_sha256", "coordinate_input", "source_refs", "owner_decision_required", "business_authority_granted", "external_service_invoked", "next_operation", "owner_page"],
+      "properties": {
+        "source_type": {"const": "SIMULATED"}, "preparation_sha256": {"$ref": "#/$defs/digest"},
+        "coordinate_input": {"$ref": "#/$defs/coordinate_input"}, "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_ref"}},
+        "owner_decision_required": {"const": true}, "business_authority_granted": {"const": false}, "external_service_invoked": {"const": false},
+        "next_operation": {"const": "boss.supply_quality.coordinate"}, "owner_page": {"enum": ["F14", "F21"]}
+      }
+    },
+    "domain_preview_content": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "params", "object_id", "object_revision", "goal_revision", "source_refs", "context_digest", "impact", "details", "owner_decision_required", "business_authority_granted", "plan_digest", "budget_digest"],
+      "properties": {
+        "action": {"enum": ["boss.meeting.confirm", "boss.meeting.cancel", "boss.meeting.held", "boss.minutes.confirm", "boss.minutes.assignment.create", "boss.assignment.create"]},
+        "params": {"type": "object"}, "object_id": {"$ref": "#/$defs/identifier"}, "object_revision": {"$ref": "#/$defs/version"},
+        "goal_revision": {"type": "integer", "minimum": 1}, "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_ref"}},
+        "context_digest": {"$ref": "#/$defs/digest"}, "impact": {"type": ["object", "null"]}, "details": {"type": "object"},
+        "owner_decision_required": {"const": true}, "business_authority_granted": {"const": false},
+        "plan_digest": {"$ref": "#/$defs/digest"}, "budget_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "preview_content": {"oneOf": [{"$ref": "#/$defs/coordinate_preview_content"}, {"$ref": "#/$defs/domain_preview_content"}]},
+    "preview": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "intent_id", "run_id", "status", "revision", "payload_digest", "preview", "allowed_actions"],
+      "properties": {
+        "schema_version": {"const": 1}, "intent_id": {"$ref": "#/$defs/identifier"}, "run_id": {"$ref": "#/$defs/identifier"},
+        "status": {"const": "WAITING_CONFIRMATION"}, "revision": {"type": "integer", "minimum": 0}, "payload_digest": {"$ref": "#/$defs/digest"},
+        "preview": {"$ref": "#/$defs/preview_content"}, "allowed_actions": {"type": "array", "uniqueItems": true, "items": {"enum": ["CONFIRM", "REJECT"]}}
+      }
+    },
+    "decision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["decision", "expected_revision", "payload_digest", "request_key"],
+      "properties": {"decision": {"enum": ["CONFIRM", "REJECT"]}, "expected_revision": {"type": "integer", "minimum": 0}, "payload_digest": {"$ref": "#/$defs/digest"}, "request_key": {"$ref": "#/$defs/request_key"}, "acknowledge_conflict": {"type": "boolean"}}
+    },
+    "decision_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intent_id", "status", "revision"],
+      "properties": {
+        "intent_id": {"$ref": "#/$defs/identifier"}, "status": {"enum": ["REJECTED", "SUCCEEDED"]}, "revision": {"type": "integer", "minimum": 1},
+        "authorization_id": {"$ref": "#/$defs/identifier"}, "result_ref": {"$ref": "#/$defs/identifier"}, "task_id": {"$ref": "#/$defs/identifier"},
+        "action": {"type": "string"}, "goal_revision": {"type": "integer", "minimum": 1}, "business_object_id": {"$ref": "#/$defs/identifier"}, "business_object_version": {"$ref": "#/$defs/version"}, "source_refs": {"type": "array", "items": {"$ref": "#/$defs/source_ref"}}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "SUCCEEDED"}}}, "then": {"required": ["authorization_id", "result_ref"], "oneOf": [{"required": ["task_id"], "not": {"required": ["action"]}}, {"required": ["action", "goal_revision", "business_object_id", "business_object_version", "source_refs"]}]}},
+        {"if": {"properties": {"status": {"const": "REJECTED"}}}, "then": {"not": {"anyOf": [{"required": ["authorization_id"]}, {"required": ["result_ref"]}, {"required": ["task_id"]}]}}}
+      ]
+    },
+    "decision_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "request_key", "receipt"],
+      "properties": {"schema_version": {"const": 1}, "request_key": {"$ref": "#/$defs/request_key"}, "receipt": {"$ref": "#/$defs/decision_result"}}
+    }
+  }
+}

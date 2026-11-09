@@ -5,8 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
 
-from business import now
+from business import checksum, now
 from boss_sector_api import CATALOGUE, SECTORS
 
 PACK_VERSION = "6"
@@ -153,14 +154,56 @@ def _document(page, snapshot):
 
 
 def ensure_sector_pack(store, db, snapshot):
+    main = db.execute("PRAGMA database_list").fetchone()
+    if not db.in_transaction or main is None or main[1] != "main" or Path(main[2]).resolve() != store.path.resolve():
+        raise ValueError("专题资料更新需要同一数据库事务")
+    store.active(db, "ui-check")
+    initial = store.get(db, "ui-check", "initial", "snapshot")
+    if any(snapshot[key] != initial[key] for key in ("owner_id", "dataset_version")):
+        raise ValueError("专题资料不属于当前执行范围")
     existing = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='sector_pack' AND id='current'",
                           ("ui-check",)).fetchone()
+    marker = None
     if existing is not None:
         marker = json.loads(existing[0])
         if marker.get("version") == PACK_VERSION and marker.get("dataset_version") == snapshot["dataset_version"]:
             return marker
     documents = [_document(page, snapshot) for page in SECTORS]
+    updates = []
     for document in documents:
+        source_id = document["source_id"]
+        row = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='document' AND id=?", ("ui-check", source_id)).fetchone()
+        cleanup = db.execute("SELECT 1 FROM objects WHERE namespace=? AND kind='hermes_source_cleanup' AND id=?", ("ui-check", source_id)).fetchone()
+        if cleanup is not None:
+            raise ValueError("专题来源撤销或清理已经开始")
+        if row is None:
+            if marker is not None and source_id in marker.get("document_ids", []):
+                raise ValueError("专题来源正文不存在")
+            updates.append((document, None))
+            continue
+        current = json.loads(row[0])
+        version = current.get("version")
+        if (current.get("source_id") != source_id or current.get("source_type") != "SIMULATED"
+                or current.get("access_scope") != initial["owner_id"] or current.get("simulation_definition") != DEFINITION
+                or current.get("withdrawn") is True or current.get("validity_state") != "VALID"):
+            raise ValueError("专题来源当前不可更新")
+        if not isinstance(version, str) or not version.isascii() or not version.isdecimal() or str(int(version)) != version or int(version) < 1:
+            raise ValueError("专题来源版本无效")
+        document["version"] = version
+        if document == current:
+            continue
+        from agent_memory_deletion_log import require_memory_deletion_propagation_in_transaction
+        require_memory_deletion_propagation_in_transaction(store, db, "ui-check")
+        saved = db.execute("SELECT body FROM objects WHERE namespace=? AND ((kind='document_revision' AND id=?) OR (kind='document_history' AND id=?))", ("ui-check", source_id + ":v" + version, source_id + ":" + version)).fetchall()
+        if any(checksum(json.loads(item[0])) != checksum(current) for item in saved):
+            raise ValueError("专题来源已有历史版本内容不一致")
+        document["version"] = str(int(version) + 1)
+        if db.execute("SELECT 1 FROM objects WHERE namespace=? AND ((kind='document_revision' AND id=?) OR (kind='document_history' AND id=?))", ("ui-check", source_id + ":v" + document["version"], source_id + ":" + document["version"])).fetchone() is not None:
+            raise ValueError("专题来源下一版本已经存在")
+        updates.append((document, current))
+    for document, current in updates:
+        if current is not None:
+            store.put(db, "ui-check", "document_revision", document["source_id"] + ":v" + current["version"], current)
         store.put(db, "ui-check", "document", document["source_id"], document)
     marker = {"version": PACK_VERSION, "definition": DEFINITION,
               "dataset_version": snapshot["dataset_version"],

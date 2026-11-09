@@ -4,6 +4,7 @@ import json
 import re
 from contextlib import contextmanager
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -17,6 +18,7 @@ from nanobot.webui.skills_api import set_webui_skill_enabled
 from packaging.version import VERSION_PATTERN, Version
 
 from boss_native_skills import HUMAN_ONLY_OPERATIONS, _require_role
+from boss_simulation_api import _context
 from business import checksum, now
 from boss_execution_scope import NAMESPACE
 from boss_knowledge_ingestion import POTENTIAL_SECRET
@@ -243,6 +245,46 @@ class BossSkillDrafts:
             raise web.HTTPConflict(text="草稿版本或内容摘要已经变化")
         return draft
 
+    def require_candidate_authorization(self, db, candidate, authorization_id, target):
+        authorization = self._get(db, "authorization", authorization_id)
+        decision = self._get(db, "hermes_skill_decision", authorization_id)
+        if authorization is None or decision is None:
+            raise web.HTTPForbidden(text="方法候选缺少本人授权")
+        expected = {"candidate_id": candidate["candidate_id"], "sop_id": candidate["sop_id"],
+                    "content_sha256": candidate["content_sha256"], "base_sha256": candidate["base_method"]["content_sha256"],
+                    "tool_config_sha256": candidate.get("tool_config_sha256"), "decision": "APPROVE"}
+        context = _context(db)
+        if (decision != {**expected, "authorization_id": authorization_id}
+                or authorization.get("authorization_id") != authorization_id
+                or authorization.get("action") != "hermes.skill.decision"
+                or authorization.get("target_id") != candidate["candidate_id"]
+                or authorization.get("content_version") != candidate["content_sha256"]
+                or authorization.get("payload") != expected
+                or authorization.get("scope") != self.namespace
+                or context["namespace"] != self.namespace
+                or authorization.get("owner_id") != context["owner_id"]
+                or authorization.get("issuer_identity") != "BOSS"
+                or authorization.get("issuer") != context["owner_id"]
+                or authorization.get("revoked") is not False
+                or checksum(candidate["content"]) != candidate["content_sha256"]
+                or target != candidate["content"]
+                or candidate.get("state") != "DRAFT" or candidate.get("enabled") is not False
+                or candidate.get("validation_status") != "VALIDATED_STATIC_ONLY"
+                or candidate.get("errors") or candidate.get("missing_tools")
+                or candidate.get("tool_config_sha256") != checksum(self.catalog.registry.get_definitions())):
+            raise web.HTTPForbidden(text="本人授权与当前候选不符")
+        start = datetime.fromisoformat(authorization["valid_from"])
+        end = datetime.fromisoformat(authorization["valid_until"])
+        if start.tzinfo is None or end.tzinfo is None or not start <= datetime.now(timezone.utc) < end:
+            raise web.HTTPForbidden(text="本人授权尚未生效或已经到期")
+        rows = db.execute("SELECT body FROM objects WHERE namespace=? AND kind='hermes_skill_decision'", (self.namespace,)).fetchall()
+        for row in rows:
+            other = json.loads(row[0])
+            if other["candidate_id"] == candidate["candidate_id"] and other["authorization_id"] != authorization_id:
+                other_auth = self._get(db, "authorization", other["authorization_id"])
+                if other_auth is None or other_auth["valid_from"] >= authorization["valid_from"]:
+                    raise web.HTTPForbidden(text="本人决定已经更新")
+
     def _prepare(self, db, payload):
         draft = self._draft(db, payload)
         _, active, metadata, binding = self._method(payload["sop_id"])
@@ -257,6 +299,12 @@ class BossSkillDrafts:
                    "state": "PREPARED", "prepared_at": now(), "payload": payload,
                    "before_markdown": active, "target_markdown": draft["raw_markdown"],
                    "was_enabled": metadata["name"] not in set(load_config(self.config_path).agents.defaults.disabled_skills)}
+        if "hermes_candidate_id" in draft:
+            candidate = self._get(db, "hermes_skill_candidate", draft["hermes_candidate_id"])
+            if candidate is None or candidate.get("sop_id") != payload["sop_id"] or candidate.get("base_method", {}).get("content_sha256") != digest(active):
+                raise web.HTTPForbidden(text="方法候选不存在")
+            self.require_candidate_authorization(db, candidate, draft["hermes_authorization_id"], draft["raw_markdown"])
+            journal.update(hermes_candidate_id=draft["hermes_candidate_id"], hermes_authorization_id=draft["hermes_authorization_id"])
         self._put(db, "sop_activation", payload["client_request_id"], journal)
         return journal
 
@@ -267,12 +315,21 @@ class BossSkillDrafts:
             self.store.active(db, self.namespace)
             self._configuration()
             current = self._get(db, "sop_activation", journal["client_request_id"])
-            if current["state"] != "PREPARED":
+            if current is None or current != journal or current["state"] != "PREPARED":
                 raise web.HTTPConflict(text="启用操作状态已经变化")
             path, active, metadata, binding = self._method(journal["sop_id"])
             if digest(active) not in {digest(journal["before_markdown"]), digest(journal["target_markdown"])}:
                 raise web.HTTPConflict(text="当前方法已被其他操作修改，需要人工核查")
             target = journal["before_markdown"] if cancel else journal["target_markdown"]
+            if not cancel and "hermes_candidate_id" in current:
+                candidate = self._get(db, "hermes_skill_candidate", current["hermes_candidate_id"])
+                draft = self._get(db, "sop_draft", current["sop_id"])
+                if candidate is None or draft is None or candidate.get("sop_id") != current["sop_id"] or candidate.get("base_method", {}).get("content_sha256") != digest(current["before_markdown"]) or draft.get("draft_version") != current["draft_version"] or draft.get("content_sha256") != digest(target) or draft.get("raw_markdown") != target or draft.get("hermes_candidate_id") != current["hermes_candidate_id"] or draft.get("hermes_authorization_id") != current["hermes_authorization_id"]:
+                    raise web.HTTPConflict(text="候选草稿或准备记录已经变化")
+                self.require_candidate_authorization(db, candidate, current["hermes_authorization_id"], target)
+                workspace_reader = self.catalog.registry.get("bossWorkspaceRead")
+                if set(binding.get("workspace_projections", [])) - set(getattr(workspace_reader, "allowed_projections", ())):
+                    raise web.HTTPConflict(text="当前方法投影依赖不可用")
             assessment = self._assessment(target, binding)
             if not cancel and (assessment["errors"] or assessment["missing_tools"]):
                 raise web.HTTPConflict(text="当前方法依赖已经变化，不能继续启用")
@@ -280,8 +337,12 @@ class BossSkillDrafts:
             disabled = self.catalog.loader.disabled_skills
             set_webui_skill_enabled(self.catalog.loader.workspace, metadata["name"], enabled=False, disabled_skills=disabled, config_path=self.config_path)
             _write_text_atomic(path, target)
+            if not cancel and "hermes_candidate_id" in current:
+                self.require_candidate_authorization(db, candidate, current["hermes_authorization_id"], target)
             set_webui_skill_enabled(self.catalog.loader.workspace, metadata["name"], enabled=journal["was_enabled"] if cancel else True,
                                     disabled_skills=disabled, config_path=self.config_path)
+            if not cancel and "hermes_candidate_id" in current:
+                self.require_candidate_authorization(db, candidate, current["hermes_authorization_id"], target)
             self._historical(db, journal["sop_id"], journal["before_markdown"], "NATIVE_CURRENT")
             if not cancel:
                 self._historical(db, journal["sop_id"], target, "ACTIVATED_DRAFT")
@@ -289,6 +350,9 @@ class BossSkillDrafts:
             if not cancel:
                 draft["state"] = "ACTIVE"
                 self._put(db, "sop_draft", journal["sop_id"], draft)
+                if "hermes_candidate_id" in current:
+                    candidate.update(state="ACTIVE", enabled=True, activated_at=now(), activation_request_id=journal["client_request_id"])
+                    self._put(db, "hermes_skill_candidate", candidate["candidate_id"], candidate)
             journal = {**journal, "state": "CANCELED" if cancel else "COMPLETED", "finished_at": now()}
             self._put(db, "sop_activation", journal["client_request_id"], journal)
             result = {"sop_id": journal["sop_id"], "draft_version": journal["draft_version"], "state": "CANCELED" if cancel else "ACTIVE",

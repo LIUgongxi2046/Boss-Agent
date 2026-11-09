@@ -39,4 +39,7 @@ menu-f01-n3-dist/
 menu-n02-n3-dist/
 menu-f01-rework-n3-dist/
 menu-n03-n3-dist/
+packaging/product/build/
+packaging/product/*.egg-info/
+packaging/product/dist/
 validation/connection.json

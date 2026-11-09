@@ -1,0 +1,104 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -76,6 +78,7 @@ import type {
+ } from "@/lib/types";
+ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
++import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+ import { Disclosure } from "@/components/ui/disclosure";
+ import {
+   fetchPairingRequests,
+@@ -1726,6 +1729,7 @@ function Shell({
+   }, [forkChat, navigate, sessions, sidebarState.title_overrides, t]);
+ 
+   const onNewChat = useCallback(() => {
++    writeConversationPosition(null);
+     navigate(defaultShellRoute());
+     setTemporaryChatEnabled(false);
+     setDraftWorkspaceScope(null);
+@@ -1765,6 +1769,7 @@ function Shell({
+ 
+   const onSelectChat = useCallback(
+     (key: string) => {
++      writeConversationPosition(null);
+       const selectedTemporary = temporarySessionsRef.current[key];
+       const selected = selectedTemporary
+         ?? sessions.find((session) => session.key === key);
+@@ -2073,6 +2078,7 @@ function Shell({
+     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+       const action = matchSidebarShortcut(event);
+       if (!action) return;
++      if (new URLSearchParams(window.location.search).get("bossPage") !== "NATIVE" || action === "search") return;
+       event.preventDefault();
+       actions[action]();
+     };
+@@ -2082,11 +2088,13 @@ function Shell({
+ 
+   const onSettingsSectionChange = useCallback(
+     (section: SettingsSectionKey) => {
+-      navigate({
++      const leave = () => navigate({
+         view: shellViewForSettingsSection(section),
+         activeKey,
+         settingsSection: section,
+       });
++      if (settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++      else leave();
+     },
+     [activeKey, navigate],
+   );
+@@ -2657,7 +2665,44 @@ function Shell({
+ 
+   return (
+     <ThemeProvider theme={theme}>
+-      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat}>
++      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onRegisterCloseGuard={registerWindowCloseGuard}
++        onNewConversation={onNewChat}
++        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
++        onOpenTaskConversation={(chatId,question)=>{onSelectChat("websocket:"+chatId);if(question)setPendingAutomationMessage({id:crypto.randomUUID(),chatId,content:question});}}
++        onOpenMorning={chatId=>onSelectChat("websocket:"+chatId)}
++        onOpenNative={role => {
++          const currentRoute=readShellRoute();
++          if(role === "BOSS" && currentRoute.view !== "chat")navigate({...currentRoute,view:"chat",settingsSection:"overview"},{replace:true});
++          if(role === "MAINTAINER" && currentRoute.view === "chat")navigate({...currentRoute,view:shellViewForSettingsSection(settingsInitialSection),settingsSection:settingsInitialSection},{replace:true});
++        }}
++        onBeforeLeaveNative={leave => {
++          const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++          if(view==="chat"&&draft?.hasDraft)setPendingNativeNavigation(()=>()=>{draft.discard();leave();});
++          else if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++          else leave();
++        }}>
++      {(role,nativeVisible,conversationActions) => <>
++      {role === "MAINTAINER" && <div className="boss-native-toolbar" aria-label="设置分类">
++        <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
++          {SETTINGS_SECTION_KEYS.filter(section => section !== "voice").map(section => <option key={section} value={section}>{t(`settings.nav.${section}`)}</option>)}
++        </select></label>
++      </div>}
++      <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        captureReadingPosition={()=>nativeReading.current.get(activeKey??"new-conversation")?.captureReadingPosition()??null}
++        restoreReadingPosition={(position,signal)=>{
++          const reader=nativeReading.current.get(position.conversationKey);
++          if(!reader)return Promise.reject(new Error("当前原生会话阅读服务尚未就绪"));
++          return reader.restoreReadingPosition(position,signal);
++        }}
++        sessions={topicSessions.map(session=>({key:session.key,chatId:session.chatId,title:displayTitle(session,sidebarState.title_overrides,t("chat.newChat")),updatedAt:session.updatedAt??"更新时间未知"}))}
++        onNewChat={onNewChat} onSelectChat={onSelectChat} onSearch={onOpenSessionSearch} actions={conversationActions}>
++      <Dialog open={pendingNativeNavigation !== null} onOpenChange={open => {if (!open) setPendingNativeNavigation(null);}}>
++        <DialogContent className="boss-native-dialog">
++          <DialogTitle>未保存会话输入</DialogTitle><DialogDescription>当前输入尚未发送。请选择继续编辑，或者明确放弃当前输入。</DialogDescription>
++          <DialogFooter><Button variant="outline" onClick={() => setPendingNativeNavigation(null)}>返回继续编辑</Button><Button onClick={() => {const leave=pendingNativeNavigation;setPendingNativeNavigation(null);leave?.();}}>放弃输入并离开</Button></DialogFooter>
++        </DialogContent>
++      </Dialog>
+       <div
+         className={cn(
+           "relative h-full w-full overflow-hidden",
+@@ -3014,6 +3059,8 @@ function Shell({
+           onDismiss={onDismissPairingRequest}
+         />
+       </div>
++      </BossConversationWorkspace>
++      </>}
+       </BossDesktop>
+     </ThemeProvider>
+   );

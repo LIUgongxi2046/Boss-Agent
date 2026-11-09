@@ -1,0 +1,48 @@
+--- a/webui/src/lib/nanobot-client.ts
++++ b/webui/src/lib/nanobot-client.ts
+@@ -118,6 +118,7 @@ interface PendingRequest<T> {
+ }
+ 
+ interface PendingWebUIRequest extends PendingRequest<unknown> {
++  action: string;
+   serializedFrame: string;
+ }
+ 
+@@ -919,6 +920,7 @@ export class NanobotClient {
+         );
+       }, timeoutMs);
+       this.pendingWebUIRequests.set(requestId, {
++        action,
+         resolve: (value) => resolve(value as T),
+         reject,
+         timer,
+@@ -1070,7 +1072,28 @@ export class NanobotClient {
+     for (const chatId of this.knownChats) {
+       this.rawSend({ type: "attach", chat_id: chatId });
+     }
+-    for (const pending of this.pendingWebUIRequests.values()) {
++    for (const [requestId, pending] of this.pendingWebUIRequests) {
++      // 场景载入在连接中断后仅允许读取原回执。
++      if (pending.action === "boss.simulation.bi_scenario.load") {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "连接已经中断，请读取原载入回执"));
++        continue;
++      }
++      // 经营范围准备与绑定在连接中断后仅查询原编号。
++      if (["boss.conversation.business.prepare", "boss.conversation.business.bind", "boss.conversation.business.read", "boss.conversation.business.clear", "boss.business_overview.assignment.prepare"].includes(pending.action)) {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "经营会话连接已中断，请读取原请求回执"));
++        continue;
++      }
++      // 晨间请求与本人排序在连接中断后只读取原请求结果。
++      if (["boss.conversation.task.prepare", "boss.conversation.task.bind", "boss.today.reorder", "boss.morning.query", "boss.morning.bind", "boss.simulation.morning_coverage.load", "boss.mvp.query", "boss.fc01.coordinate", "boss.simulation.feedback", "boss.simulation.message.reply"].includes(pending.action) || pending.action.startsWith("boss.message.") || pending.action.startsWith("boss.assignment.") || pending.action.startsWith("boss.commitment.") || pending.action.startsWith("boss.reminder.") || pending.action.startsWith("boss.owner.notice.") || pending.action.startsWith("boss.owner.plan.") || pending.action.startsWith("boss.scheduler.") || pending.action.startsWith("boss.alert.") || pending.action.startsWith("boss.simulation.alert.")) {
++        clearTimeout(pending.timer);
++        this.pendingWebUIRequests.delete(requestId);
++        pending.reject(new WebUIMutationError(503, "连接已经中断，请读取当前动作的原请求结果"));
++        continue;
++      }
+       this.rawSendSerialized(pending.serializedFrame);
+     }
+     // Flush anything queued during reconnect.

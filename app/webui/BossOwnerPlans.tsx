@@ -1,6 +1,8 @@
 import {useEffect,useRef,useState} from "react";
 import {useTransaction} from "./BossAssignmentFlow";
 import {V7Panel,V7Empty,V7Fact,V7Pagination,V7ReadState} from "./BossV7UI";
+import {OwnerPlanExecutionScope} from "./OwnerPlanExecutionScope";
+import {OwnerPlanSuppressedHistory,suppressedReason} from "./OwnerPlanSuppressedHistory";
 
 export type OwnerPlan={plan_id:string;version:string;state:string;purpose:string;event_ids:string[];timezone:string;not_before:string;authorization_id:string;plan_type?:string;next_run_at?:string|null;rule_version?:string};
 export type OwnerPlanProjection={
@@ -12,12 +14,14 @@ export type OwnerPlanProjection={
 type Props={data:OwnerPlanProjection|null;loading:boolean;error:string;onReload:()=>void;onDirtyChange:(dirty:boolean)=>void};
 function localTime(value:string){return new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(value)).replace(" ","T");}
 function planStateLabel(state:string){return state==="ACTIVE"?"启用":state==="PAUSED"?"暂停":state==="CANCELED"?"已取消":state;}
+export function dispatchStateLabel(state:string){return state==="SUPPRESSED"?"已抑制":state==="DELIVERED"?"已生成通知":state;}
 
 export function BossOwnerPlans({data,loading,error,onReload,onDirtyChange}:Props){
   const [selected,setSelected]=useState<OwnerPlan|null>(null);
   const [purpose,setPurpose]=useState(""),[at,setAt]=useState(""),[events,setEvents]=useState<string[]>([]);
   const [filter,setFilter]=useState({state:"",type:"",timezone:""}),[applied,setApplied]=useState(filter),[page,setPage]=useState(1);
   const [dirty,setDirty]=useState(false),[failure,setFailure]=useState(""),[eventSearch,setEventSearch]=useState("");
+  const [scopeDirty,setScopeDirty]=useState(false);
   const resultsRef=useRef<HTMLElement|null>(null);
   const transaction=useTransaction(()=>{select(null);onReload();},undefined,undefined,"plan");
   const busy=transaction.busy;
@@ -36,16 +40,16 @@ export function BossOwnerPlans({data,loading,error,onReload,onDirtyChange}:Props
   if(!at)missing.push("执行时间");
   if(!events.length)missing.push("至少一个关联事项");
   if(selected?.state==="CANCELED")missing.push("该计划已取消，不能修改");
-  useEffect(()=>{onDirtyChange(dirty||busy);},[dirty,busy,onDirtyChange]);
+  useEffect(()=>{onDirtyChange(dirty||scopeDirty||busy);},[dirty,scopeDirty,busy,onDirtyChange]);
   function select(plan:OwnerPlan|null){
     setSelected(plan);setPurpose(plan?.purpose??"");setAt(plan?localTime(plan.not_before):"");
     setEvents(plan?.event_ids??[]);setDirty(false);setFailure("");setEventSearch("");onDirtyChange(false);
   }
   function changed(){setDirty(true);onDirtyChange(true);}
-  function choose(plan:OwnerPlan|null){if(dirty){setFailure("当前计划存在未保存编辑，请保存或明确放弃后选择其他计划。");return;}select(plan);}
+  function choose(plan:OwnerPlan|null){if(dirty||scopeDirty){setFailure("当前计划存在未保存编辑，请保存或明确放弃后选择其他计划。");return;}select(plan);}
   function focusHistory(){resultsRef.current?.scrollIntoView({block:"start",behavior:"smooth"});resultsRef.current?.focus({preventScroll:true});}
   function submit(action:"save"|"pause"|"resume"|"cancel"){
-    if(disabled)return;
+    if(disabled||scopeDirty)return;
     const payload={plan_id:selected?.plan_id??"",expected_version:selected?.version??"0",
       ...(action==="save"?{purpose,event_ids:events,timezone:"Asia/Shanghai",not_before:at+":00+08:00"}:{}),
     };
@@ -87,13 +91,15 @@ export function BossOwnerPlans({data,loading,error,onReload,onDirtyChange}:Props
         {dirty&&selected&&<p className="boss-v7-note">当前计划有未保存编辑，请先保存或放弃后再暂停、恢复或取消。</p>}
         {selected?.state==="CANCELED"&&<p className="boss-v7-note">该计划已经取消，不再触发，也不能恢复或修改。历史执行记录仍可查看。</p>}
       </V7Panel>
+      {selected&&selected.state==="ACTIVE"&&<OwnerPlanExecutionScope key={selected.plan_id+":"+selected.version} plan={selected} disabled={disabled||dirty} onDirtyChange={setScopeDirty} onReload={onReload}/>}
       <section ref={resultsRef} tabIndex={-1}><V7Panel title="执行历史">
         {selected?<>
           <V7Fact label="本次查看范围">{selected.purpose}</V7Fact>
           <p>暂停和取消会停止后续计划采用；历史通知、已经保存的任务与发件记录继续保留。</p>
           <p>执行需要同时满足事项期限、有效授权、技术规则、免打扰和冷却条件。</p>
-          <div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>计划与事项</th><th>执行状态</th><th>处理原因</th><th>业务时间</th></tr></thead><tbody>{dispatches.map((row,index)=><tr key={row.owner_plan_id+row.event_id+row.business_at+index}><td>{row.owner_plan_id}<small>{row.event_id}</small></td><td>{row.state}</td><td>{row.reason??"未提供"}</td><td>{row.business_at}</td></tr>)}</tbody></table></div>
+          <div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>计划与事项</th><th>执行状态</th><th>处理原因</th><th>业务时间</th></tr></thead><tbody>{dispatches.map((row,index)=><tr key={row.owner_plan_id+row.event_id+row.business_at+index}><td>{row.owner_plan_id}<small>{row.event_id}</small></td><td>{dispatchStateLabel(row.state)}</td><td>{row.reason?suppressedReason(row.reason):"未提供"}</td><td>{row.business_at}</td></tr>)}</tbody></table></div>
           {!dispatches.length&&<V7Empty title={data?"该计划尚未触发":"执行记录待读取"}>执行结果采用服务保存的正式记录。</V7Empty>}
+          {selected.event_ids.map(eventId=><OwnerPlanSuppressedHistory key={selected.plan_id+":"+selected.version+":"+eventId} planId={selected.plan_id} version={selected.version} eventId={eventId}/>)}
           <details><summary>已保存内部通知（{data?results.length:"尚未读取"}）</summary>{results.map((row,index)=><article className="boss-workspace-item" key={row.owner_plan_id+row.event_id+row.business_at+index}><strong>{row.event_id} · {row.state}</strong><p>{row.business_at}</p><small>{row.owner_plan_id}</small></article>)}</details>
         </>:<V7Empty title="先选择本人计划">执行历史按当前计划编号读取，选择计划后显示该计划的执行记录。</V7Empty>}
       </V7Panel></section>
@@ -102,10 +108,10 @@ export function BossOwnerPlans({data,loading,error,onReload,onDirtyChange}:Props
       <V7Panel title="状态与核查"><V7Fact label="本人计划状态">{current?planStateLabel(current.state):(selected?"当前记录不可用":"尚未选择")}</V7Fact><V7Fact label="下一次执行时间">{current?.next_run_at??"尚未提供"}</V7Fact><V7Fact label="技术执行责任">{data?.execution_owner??"尚未读取"}</V7Fact><V7Fact label="当前技术规则">{data?.technical_schedule.version??"尚未读取"}</V7Fact><V7Fact label="技术调度状态">{data?(data.technical_schedule.canceled?"已经取消":data.technical_schedule.enabled?"启用":"暂停"):"尚未读取"}</V7Fact></V7Panel>
     </aside></div>
     <footer className="boss-owner-actions">
-      <button className="boss-btn boss-btn-primary" disabled={disabled||missing.length>0} onClick={()=>submit("save")}>{selected?"修改本人范围":"核对并创建计划"}</button>
-      {selected?.state==="ACTIVE"&&<button className="boss-btn" disabled={disabled||dirty} onClick={()=>submit("pause")}>暂停计划</button>}
-      {selected?.state==="PAUSED"&&<button className="boss-btn" disabled={disabled||dirty} onClick={()=>submit("resume")}>恢复计划</button>}
-      {selected&&selected.state!=="CANCELED"&&<details><summary>更多操作</summary><div className="boss-actions"><button className="boss-btn" disabled={disabled||dirty} onClick={()=>submit("cancel")}>取消计划</button></div><p className="boss-v7-note">取消后该计划不再触发；已经保存的事项、通知和发件记录继续保留。</p></details>}
+      <button className="boss-btn boss-btn-primary" disabled={disabled||scopeDirty||missing.length>0} onClick={()=>submit("save")}>{selected?"修改本人范围":"核对并创建计划"}</button>
+      {selected?.state==="ACTIVE"&&<button className="boss-btn" disabled={disabled||dirty||scopeDirty} onClick={()=>submit("pause")}>暂停计划</button>}
+      {selected?.state==="PAUSED"&&<button className="boss-btn" disabled={disabled||dirty||scopeDirty} onClick={()=>submit("resume")}>恢复计划</button>}
+      {selected&&selected.state!=="CANCELED"&&<details><summary>更多操作</summary><div className="boss-actions"><button className="boss-btn" disabled={disabled||dirty||scopeDirty} onClick={()=>submit("cancel")}>取消计划</button></div><p className="boss-v7-note">取消后该计划不再触发；已经保存的事项、通知和发件记录继续保留。</p></details>}
       {selected&&<button className="boss-btn" onClick={focusHistory}>执行历史</button>}
     </footer>
     {transaction.notice&&<p className="boss-status boss-status-ok" role="status">{transaction.notice}</p>}{transaction.dialog}{transaction.recovery}

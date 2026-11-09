@@ -8,6 +8,8 @@ import { useClient } from "@/providers/ClientProvider";
 import type { AssignmentDraft } from "./BossAssignmentPicker";
 import {BossAssignmentDetails} from "./BossAssignmentDetails";
 import {BossOriginalReceipt} from "./BossOriginalReceipt";
+import {assignmentReceiptStatus} from "./assignment-receipt-reference";
+import {replaceBossHistory} from "./boss-history";
 
 export interface AssignmentTask {
   task_id: string; status: string; version?: string; purpose?: string;
@@ -350,6 +352,9 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   const [extensionHistory,setExtensionHistory]=useState<{task_id:string;task_version:string;due_at:string;decisions:{decision_id:string;feedback_id:string;decision:"APPROVE"|"REJECT";old_due_at:string;new_due_at:string;reason:string|null;request_reason:string;decided_at:string;previous_task_version:string;task_version:string}[]}|null>(null);
   const rows=loading?[]:tasks?.tasks||[];
   const current=rows.find(t=>t.task_id===selectedTaskId);
+  const [receiptReference,setReceiptReference]=useState(()=>{const params=new URLSearchParams(window.location.search);return {id:params.get("bossTaskReceiptId"),version:params.get("bossTaskReceiptVersion")};});
+  const receiptStatus=assignmentReceiptStatus(receiptReference,current??null,loading);
+  useEffect(()=>{if(receiptReference.id&&receiptReference.id!==selectedTaskId)setReceiptReference({id:null,version:null});},[receiptReference.id,selectedTaskId]);
   const contactName=(id?:string)=>{
     if(!id)return "尚未选择";
     const contact=context?.contacts.find(item=>item.contact_id===id);
@@ -364,7 +369,7 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
   ),[current,tasks]);
   const currentBasis=current?JSON.stringify([tasks?.namespace,tasks?.data_version,current,feedback]):context?JSON.stringify([context.namespace,context.dataset_version,context.meeting,context.event,context.contacts,context.assignment_source_ids,morningReference,morningContext]):"";
   const stale=Boolean(draft.basis&&currentBasis&&draft.basis!==currentBasis);
-  const editable=!loading&&!busy&&!stale;
+  const editable=!loading&&!busy&&!stale&&(receiptStatus==="NONE"||receiptStatus==="CURRENT");
   const sourceIds=morningReference?morningContext?.source_ids??[]:(draft.sourceIds?draft.sourceIds.split("\n").map(item=>item.trim()).filter(Boolean):context?.assignment_source_ids??[]);
   const meetingId=morningReference?morningContext?.meeting_id??null:draft.meetingId||context?.meeting?.meeting_id||null;
   const eventIds=morningReference?morningContext?.event_ids??[]:draft.eventIds?draft.eventIds.split("\n").map(item=>item.trim()).filter(Boolean):context?.event?[context.event.event_id]:[];
@@ -511,10 +516,11 @@ export function BossAssignmentFlow({ tasks, selectedTaskId, onSelectTask, onRelo
     ]);
   });
   return <div className="boss-assignment-scope">
+    {receiptStatus!=="NONE"&&<div role={receiptStatus==="CHANGED"?"alert":"status"} className="boss-status">关联交办 {receiptReference.id??"待核查"} · 关联版本 {receiptReference.version??"待核查"} · {receiptStatus==="WAITING"?"正在核查当前交办":receiptStatus==="CURRENT"?"当前交办版本与关联版本一致":"当前交办与关联版本不一致或无法读取，请核查当前版本。"}{receiptStatus==="CHANGED"&&current&&<button type="button" className="boss-btn" onClick={()=>{const address=new URL(window.location.href);address.searchParams.delete("bossTaskReceiptId");address.searchParams.delete("bossTaskReceiptVersion");replaceBossHistory(address);setReceiptReference({id:null,version:null});}}>采用当前交办版本</button>}</div>}
     <BossAssignmentDetails rows={rows} selectedTaskId={selectedTaskId} current={current} context={context} draft={draft} feedback={feedback} messages={linkedMessages} taskDue={taskDue}
       extensions={currentExtensions} extension={extension} completed={completed} clock={clock} overdue={overdue} sourceIds={sourceIds} meetingId={meetingId} eventIds={eventIds}
       editable={editable} loading={loading} stale={stale} busy={busy} morningBlocked={Boolean(morningReference&&!morningReady)} messagesEnabled={messagesEnabled}
-      sourceReview={sourceReview} conversation={conversation} edit={edit} onSelect={onSelectTask} onSource={onViewSource} onNavigate={onNavigate} onNew={onNew}
+      sourceReview={receiptStatus==="CHANGED"||receiptStatus==="WAITING"?undefined:sourceReview} conversation={receiptStatus==="CHANGED"||receiptStatus==="WAITING"?undefined:conversation} edit={edit} onSelect={onSelectTask} onSource={onViewSource} onNavigate={onNavigate} onNew={onNew}
       onDiscard={onDiscard} onCoordinator={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenCoordinatorPicker();}} onDue={()=>{if(!draft.basis)edit("basis",currentBasis);onOpenDuePicker();}}
       onMessages={onViewMessages} onCreate={prepareCreate} onSend={prepareSend} onNudge={prepareNudge} onFollowup={prepareFollowup} onComplete={prepareComplete} onExtend={prepareExtend} onCancel={prepareCancel}/>
     {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}

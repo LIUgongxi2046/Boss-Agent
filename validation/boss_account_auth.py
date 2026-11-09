@@ -19,7 +19,17 @@ def private_file(path):
         raise PermissionError("账号文件需要当前用户持有且权限为0600")
 
 
-def provision_accounts(directory):
+def validate_account_passwords(passwords):
+    if not isinstance(passwords, dict) or set(passwords) != ROLES:
+        raise ValueError("需要分别提供老板和维护身份密码")
+    if any(not isinstance(value, str) or not value.isascii() or not 1 <= len(value) <= 72
+           for value in passwords.values()):
+        raise ValueError("密码必须由1至72个ASCII字符组成")
+
+
+def provision_accounts(directory, *, passwords=None):
+    if passwords is not None:
+        validate_account_passwords(passwords)
     directory = Path(directory)
     if ".work" not in directory.absolute().parts:
         raise ValueError("账号目录必须位于本机忽略的.work目录")
@@ -31,7 +41,7 @@ def provision_accounts(directory):
     credentials = directory / "credentials.json"
     if database.exists() or credentials.exists():
         raise FileExistsError("账号已初始化；重置需单独授权的本机操作")
-    accounts = [{"username": username, "password": secrets.token_urlsafe(24), "role": role}
+    accounts = [{"username": username, "password": secrets.token_urlsafe(24) if passwords is None else passwords[role], "role": role}
                 for username, role in (("boss", "BOSS"), ("maintainer", "MAINTAINER"))]
     fd = os.open(database, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     os.close(fd)
@@ -40,8 +50,9 @@ def provision_accounts(directory):
         db.executemany("INSERT INTO accounts VALUES (?,?,?)", [
             (account["username"], bcrypt.hashpw(account["password"].encode(), bcrypt.gensalt(rounds=12)), account["role"])
             for account in accounts])
-    with os.fdopen(os.open(credentials, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), "w") as output:
-        json.dump(accounts, output, ensure_ascii=False)
+    if passwords is None:
+        with os.fdopen(os.open(credentials, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), "w") as output:
+            json.dump(accounts, output, ensure_ascii=False)
     return database
 
 

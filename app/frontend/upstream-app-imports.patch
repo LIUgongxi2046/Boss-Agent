@@ -1,0 +1,13 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -50,6 +50,10 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
+ import type { SendAttachment, SendOptions } from "@/hooks/useNanobotStream";
+ import { ThemeProvider, useTheme } from "@/hooks/useTheme";
+ import { BossDesktop } from "./boss-agent/BossDesktop";
++import {bossHistorySuppressed,pushBossHistory,replaceBossHistory} from "./boss-agent/boss-history";
++import {BossConversationWorkspace} from "./boss-agent/BossConversationWorkspace";
++import {writeConversationPosition} from "./boss-agent/BossConversationPosition";
++import type {MorningConversationRequest,MorningBindingReceipt} from "./boss-agent/BossMorningView";
+ import { BossLogin, bossFetchBootstrap as fetchBootstrap, bossClearSavedSecret as clearSavedSecret } from "./boss-agent/BossLogin";
+ import { logoFallbackUrls } from "@/lib/provider-brand";
+ import { cn } from "@/lib/utils";

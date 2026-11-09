@@ -1,0 +1,54 @@
+--- a/webui/index.html
++++ b/webui/index.html
+@@ -21,7 +21,7 @@
+     <meta name="mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+-    <meta name="apple-mobile-web-app-title" content="nanobot" />
++    <meta name="apple-mobile-web-app-title" content="Boss Agent" />
+     <link rel="icon" type="image/svg+xml" href="/brand/nanobot_mark.svg" />
+     <link rel="alternate icon" type="image/png" sizes="32x32" href="/brand/nanobot_favicon_32.png" />
+     <link rel="apple-touch-icon" sizes="180x180" href="/brand/nanobot_apple_touch.png" />
+@@ -120,14 +120,14 @@
+         } catch {}
+       })();
+     </script>
+-    <title>nanobot</title>
++    <title>Boss Agent</title>
+   </head>
+   <body class="bg-background text-foreground antialiased">
+     <div id="root">
+       <div class="boot-splash">
+         <div class="boot-splash-inner">
+           <span class="boot-dot" aria-hidden="true"></span>
+-          <span data-boot-copy>Loading nanobot…</span>
++          <span data-boot-copy>正在加载 Boss Agent…</span>
+         </div>
+       </div>
+     </div>
+@@ -136,12 +136,12 @@
+         var localeKey = "nanobot.locale";
+         var copy = {
+           en: {
+-            boot: "Loading nanobot…",
+-            description: "nanobot web UI — chat with your nanobot workspace."
++            boot: "Loading Boss Agent…",
++            description: "Boss Agent workspace"
+           },
+           "zh-CN": {
+-            boot: "正在加载 nanobot…",
+-            description: "nanobot Web UI —— 与你的 nanobot 工作区对话。"
++            boot: "正在加载 Boss Agent…",
++            description: "Boss Agent 工作区"
+           },
+           "zh-TW": {
+             boot: "正在載入 nanobot…",
+@@ -209,7 +209,7 @@
+             navigator.language ||
+             "en";
+           var locale = normalizeLocale(detected);
+-          var localized = copy[locale] || copy.en;
++          var localized = {boot: copy[locale].boot.replaceAll("nanobot", "Boss Agent"), description: copy[locale].description.replaceAll("nanobot", "Boss Agent")};
+           document.documentElement.lang = locale;
+           var description = document.querySelector('[data-i18n-meta=\"description\"]');
+           if (description) description.setAttribute("content", localized.description);

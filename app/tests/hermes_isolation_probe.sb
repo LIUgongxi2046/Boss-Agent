@@ -1,0 +1,8 @@
+(version 1)
+(allow default)
+(deny file-read* file-write* (subpath (param "PROTECTED")))
+(allow file-read* file-write* (subpath (param "WORK")))
+(deny network-outbound)
+(allow network-outbound (remote ip (param "ENDPOINT")))
+(deny mach-lookup (global-name "com.apple.dnssd.service"))
+(deny mach-lookup (global-name "com.apple.SystemConfiguration.configd"))

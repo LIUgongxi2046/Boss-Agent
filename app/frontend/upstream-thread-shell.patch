@@ -1,0 +1,156 @@
+--- a/webui/src/components/thread/ThreadShell.tsx
++++ b/webui/src/components/thread/ThreadShell.tsx
+@@ -9,7 +9,7 @@ import { SessionHandleLabel } from "@/components/SessionHandleLabel";
+ import { PromptNavigator } from "@/components/thread/PromptNavigator";
+ import { RecoveryNotice } from "@/components/thread/RecoveryNotice";
+ import { SessionInfoPopover } from "@/components/thread/SessionInfoPopover";
+-import { ThreadComposer } from "@/components/thread/ThreadComposer";
++import { ThreadComposer,type ComposerDraftController } from "@/components/thread/ThreadComposer";
+ import type {
+   ComposerContextUsage,
+   ComposerRoundUsage,
+@@ -20,7 +20,7 @@ import {
+ } from "@/components/thread/model-preset";
+ import { ThreadHeader } from "@/components/thread/ThreadHeader";
+ import { StreamErrorNotice } from "@/components/thread/StreamErrorNotice";
+-import { ThreadViewport, type ThreadViewportHandle } from "@/components/thread/ThreadViewport";
++import { ThreadViewport, type ThreadViewportHandle,type ThreadReadingController } from "@/components/thread/ThreadViewport";
+ import { useNanobotStream, type SendAttachment, type SendOptions } from "@/hooks/useNanobotStream";
+ import { useSessionHistory } from "@/hooks/useSessions";
+ import {
+@@ -414,12 +414,20 @@ interface ThreadShellProps {
+   hideHeaderTitle?: boolean;
+   inlineHandle?: boolean;
+   hideHeader?: boolean;
++  transcriptionEnabled?: boolean;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
++  onReadingController?: (controller:ThreadReadingController|null)=>void;
+   headerActions?: ReactNode;
+   headerPortalTarget?: HTMLElement | null;
+   headerActive?: boolean;
+   composerPortalTarget?: HTMLElement | null;
+   composerActive?: boolean;
+   composerInputAriaLabel?: string;
++  composerInputLabel?: string;
++  composerSubmitLabel?: string;
++  composerAttachmentLabel?: string;
++  composerPlaceholder?: string;
+   emptyComposerVariant?: "hero" | "thread";
+   workspaceScope?: WorkspaceScopePayload | null;
+   workspaceDefaultScope?: WorkspaceScopePayload | null;
+@@ -622,12 +630,20 @@ export function ThreadShell({
+   hideHeaderTitle = false,
+   inlineHandle = false,
+   hideHeader = false,
++  transcriptionEnabled = true,
++  persistQueuedPrompts = true,
++  onDraftController,
++  onReadingController,
+   headerActions,
+   headerPortalTarget,
+   headerActive = true,
+   composerPortalTarget,
+   composerActive = true,
+   composerInputAriaLabel,
++  composerInputLabel,
++  composerSubmitLabel,
++  composerAttachmentLabel,
++  composerPlaceholder,
+   emptyComposerVariant = "hero",
+   workspaceScope = null,
+   workspaceDefaultScope = null,
+@@ -705,6 +721,16 @@ export function ThreadShell({
+   const [pendingFirstTargetChatId, setPendingFirstTargetChatId] = useState<string | null>(null);
+   const consumedPendingFirstMessageIdRef = useRef<string | null>(null);
+   const viewportRef = useRef<ThreadViewportHandle | null>(null);
++  useEffect(()=>{
++    onReadingController?.({
++      captureReadingPosition:()=>viewportRef.current?.captureReadingPosition()??null,
++      restoreReadingPosition:(position,signal)=>{
++        if(!viewportRef.current)return Promise.reject(new Error("当前原生阅读视图尚未就绪"));
++        return viewportRef.current.restoreReadingPosition(position,signal);
++      },
++    });
++    return()=>onReadingController?.(null);
++  },[historyKey,onReadingController]);
+   const activeViewportTurnByChatIdRef = useRef<Map<string, string>>(new Map());
+   const knownTemporaryChatIdsRef = useRef(new Set<string>());
+   const messageCacheRef = useRef(new ThreadMessageCache(
+@@ -860,6 +886,8 @@ export function ThreadShell({
+   }, []);
+ 
+   const displayMessages = useMemo(() => projectWebuiThreadMessages(messages), [messages]);
++  const readingMessageIds=useMemo(()=>new Set(displayMessages.map(message=>message.id)),[displayMessages]);
++  const readingHistoryPending=loading||loadingOlder||historical.some(message=>message.role==="user"&&!readingMessageIds.has(message.id));
+   const composerContextUsage = useMemo(
+     () => latestComposerContextUsage(displayMessages),
+     [displayMessages],
+@@ -1554,13 +1582,18 @@ export function ThreadShell({
+       {session ? (
+         <ThreadComposer
+           onSend={handleThreadSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+           disabled={!chatId}
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+           isStreaming={turnActive}
+           placeholder={
+-            composerVariant === "hero"
++            composerPlaceholder??(composerVariant === "hero"
+               ? t("thread.composer.placeholderHero")
+-              : t("thread.composer.placeholderThread")
++              : t("thread.composer.placeholderThread"))
+           }
+           modelLabel={modelBadgeLabel}
+           modelDetail={modelBadge.model}
+@@ -1582,7 +1615,7 @@ export function ThreadShell({
+           sessions={mentionSessions}
+           skills={skills}
+           onStop={stop}
+-          onTranscribeAudio={transcribeAudio}
++          onTranscribeAudio={transcriptionEnabled ? transcribeAudio : undefined}
+           goalState={currentGoalState}
+           workspaceScope={workspaceScope}
+           workspaceControlsHidden={temporary}
+@@ -1604,13 +1637,18 @@ export function ThreadShell({
+       ) : (
+         <ThreadComposer
+           onSend={handleWelcomeSend}
++          persistQueuedPrompts={persistQueuedPrompts}
++          onDraftController={onDraftController}
+           disabled={booting}
+           inputAriaLabel={composerInputAriaLabel}
++          inputLabel={composerInputLabel}
++          submitLabel={composerSubmitLabel}
++          attachmentLabel={composerAttachmentLabel}
+           isStreaming={turnActive}
+           placeholder={
+             booting
+               ? t("thread.composer.placeholderOpening")
+-              : t("thread.composer.placeholderHero")
++              : composerPlaceholder??t("thread.composer.placeholderHero")
+           }
+           modelLabel={modelBadgeLabel}
+           modelDetail={modelBadge.model}
+@@ -1632,7 +1670,7 @@ export function ThreadShell({
+           sessions={mentionSessions}
+           skills={skills}
+           surfaceRef={composerSurfaceRef}
+-          onTranscribeAudio={transcribeAudio}
++          onTranscribeAudio={transcriptionEnabled ? transcribeAudio : undefined}
+           goalState={currentGoalState}
+           workspaceScope={workspaceScope}
+           workspaceControlsHidden={temporary}
+@@ -1738,6 +1776,8 @@ export function ThreadShell({
+             loadingOlder={loadingOlder}
+             userMessageOffset={userMessageOffset}
+             onLoadOlder={loadOlder}
++            readingHistoryPending={readingHistoryPending}
++            readingHistoryError={historyError}
+             traceDetailScope={historyKey}
+             onLoadTraceDetails={messagesReady ? loadTraceDetails : undefined}
+             onOpenFilePreview={historyKey ? handleOpenFilePreview : undefined}

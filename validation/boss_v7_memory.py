@@ -2,6 +2,7 @@ from aiohttp import web
 from uuid import uuid4
 
 from business import checksum, now, require
+from agent_memory_deletion_log import append_memory_deletion
 from boss_memory import confirmed_memory, current_memory
 from boss_owner_history import owner_spaces
 from boss_v7_store import NAMESPACE, aware_time, optional, rows, text
@@ -89,6 +90,7 @@ def delete_memory_records(store, db, current, authorization):
         "requested_at": now(), "version": updated["version"], "failure_reason": None,
         "loaded_sessions": "REQUIRES_CONTEXT_REFRESH", "backups": "NOT_VERIFIED",
     })
+    append_memory_deletion(store, db, NAMESPACE, current, updated, authorization)
     return updated
 
 

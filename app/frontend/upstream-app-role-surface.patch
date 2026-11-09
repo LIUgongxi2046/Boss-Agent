@@ -1,0 +1,80 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -2767,7 +2767,8 @@ function Shell({
+               />
+             </Suspense>
+           ) : null}
+-        <main
++        {role === "BOSS" && view !== "chat" && <div role="status" className="boss-status boss-status-warn">当前身份没有应用维护权限，请返回当前会话。</div>}
++        <div
+           className={cn(
+             "relative flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-background",
+           )}
+@@ -2775,10 +2776,10 @@ function Shell({
+             <div
+               className={cn(
+                 "absolute inset-0 flex flex-col",
+-                view !== "chat" && "hidden",
++                (view !== "chat" || role !== "BOSS") && "hidden",
+               )}
+             >
+-              <ThreadVisibilityContext.Provider value={view === "chat"}>
++              {role === "BOSS" && <ThreadVisibilityContext.Provider value={nativeVisible && view === "chat"}>
+                 <Suspense fallback={<SurfaceLoadingFallback label={t("chat.loading")} />}>
+                   <PaneWorkbench
+                     panes={renderedWorkbenchPanes}
+@@ -2838,7 +2839,11 @@ function Shell({
+                             theme={theme}
+                             onToggleTheme={toggle}
+                             hideSidebarToggleForHostChrome
+-                            hideHeader={false}
++                            hideHeader
++                            transcriptionEnabled={false}
++                            persistQueuedPrompts={false}
++                            onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
++                            onReadingController={controller=>registerNativeReading(activeKey??"new-conversation",controller)}
+                             workspaceScope={activeWorkspaceScope}
+                             workspaceDefaultScope={workspaces?.default_scope ?? null}
+                             workspaceControls={workspaces?.controls ?? null}
+@@ -2879,6 +2884,11 @@ function Shell({
+                           hideSidebarToggleForHostChrome={context.active}
+                           hideThemeButton={!context.active}
+                           hideHeaderTitle
++                          hideHeader
++                          transcriptionEnabled={false}
++                          persistQueuedPrompts={false}
++                          onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
++                          onReadingController={controller=>registerNativeReading(paneSession.key,controller)}
+                           inlineHandle={!mobileWorkbench && workbenchPaneSessions.length > 1}
+                           headerActions={context.headerActions}
+                           headerPortalTarget={context.headerPortalTarget}
+@@ -2912,9 +2922,9 @@ function Shell({
+                     }}
+                   />
+                 </Suspense>
+-              </ThreadVisibilityContext.Provider>
++              </ThreadVisibilityContext.Provider>}
+             </div>
+-            {view !== "chat" && (
++            {role === "MAINTAINER" && (
+               <div className="absolute inset-0 flex flex-col">
+                 <Suspense fallback={<SurfaceLoadingFallback />}>
+                   <SettingsView
+@@ -2922,7 +2932,7 @@ function Shell({
+                     theme={theme}
+                     initialSection={settingsInitialSection}
+                     initialSettings={settingsSnapshot}
+-                    showSidebar={view === "settings"}
++                    showSidebar={false}
+                     mainNavigationExpanded={showMainSidebar && hostSidebarOpen}
+                     onToggleTheme={toggle}
+                     onBackToChat={onBackToChat}
+@@ -2941,7 +2951,7 @@ function Shell({
+                 </Suspense>
+               </div>
+             )}
+-          </main>
++          </div>
+         </div>
+ 
+         {pendingDelete ? (

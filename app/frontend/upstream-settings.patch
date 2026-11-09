@@ -1,0 +1,55 @@
+--- a/webui/src/components/settings/SettingsPage.tsx
++++ b/webui/src/components/settings/SettingsPage.tsx
+@@ -82,6 +82,7 @@ export function SettingsPage({
+ }: SettingsPageProps) {
+   const [dialogLayoutAnchor, setDialogLayoutAnchor] = useState<HTMLDivElement | null>(null);
+   const [pendingExit, setPendingExit] = useState<(() => void) | null>(null);
++  const [pendingUnsavedExit, setPendingUnsavedExit] = useState<(() => void) | null>(null);
+   const [automationDetailReturn, setAutomationDetailReturn] =
+     useState<SessionAutomationJob | null>(null);
+   const {
+@@ -238,10 +239,19 @@ export function SettingsPage({
+   } = controller;
+ 
+   const restartInProgress = isRestarting || hostEngineApplying;
++  const unsaved = modelDirty || imageGenerationDirty || transcriptionDirty || networkSafetyDirty ||
++    RUNTIME_CONFIG_FIELDS.some(controller.runtimeConfigState.dirty) || controller.runtimeConfigState.saving !== null;
++  useEffect(() => {
++    if (!unsaved) return;
++    const protect = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return () => window.removeEventListener("beforeunload",protect);
++  }, [unsaved]);
+   const requestExit = useCallback<SettingsExitGuard>((leave) => {
+-    if (settings?.requires_restart && !restartInProgress) setPendingExit(() => leave);
++    if (unsaved) setPendingUnsavedExit(() => leave);
++    else if (settings?.requires_restart && !restartInProgress) setPendingExit(() => leave);
+     else leave();
+-  }, [settings?.requires_restart, restartInProgress]);
++  }, [settings?.requires_restart, restartInProgress, unsaved]);
+   useEffect(() => {
+     registerExitGuard?.(requestExit);
+     return () => registerExitGuard?.(null);
+@@ -630,6 +640,9 @@ export function SettingsPage({
+   return (
+     <DialogLayoutContext.Provider value={dialogLayoutAnchor}>
+     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-settings-canvas lg:flex-row">
++      <Dialog open={pendingUnsavedExit !== null} onOpenChange={open => {if (!open) setPendingUnsavedExit(null);}}>
++        <DialogContent className="boss-native-dialog"><DialogHeader><DialogTitle>未保存应用设置</DialogTitle><DialogDescription>当前设置仍有编辑或保存过程。请选择继续编辑，或者保留编辑并离开。已提交的保存请求保持原处理规则。</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => setPendingUnsavedExit(null)}>返回继续编辑</Button><Button onClick={() => {const leave=pendingUnsavedExit;setPendingUnsavedExit(null);leave?.();}}>保留编辑并离开</Button></DialogFooter></DialogContent>
++      </Dialog>
+       <Dialog open={pendingExit !== null} onOpenChange={(open) => { if (!open) setPendingExit(null); }}>
+         <DialogContent showCloseButton={false}>
+           <DialogHeader>
+--- a/webui/src/components/settings/useSettingsController.ts
++++ b/webui/src/components/settings/useSettingsController.ts
+@@ -138,8 +138,8 @@ export function useSettingsController({
+ 
+   const selectSection = useCallback(
+     (section: SettingsSectionKey) => {
+-      setActiveSection(section);
+-      onSectionChange?.(section);
++      if (onSectionChange) onSectionChange(section);
++      else setActiveSection(section);
+     },
+     [onSectionChange],
+   );

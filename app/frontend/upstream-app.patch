@@ -1,0 +1,162 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -49,14 +49,14 @@
+ import { useMediaQuery } from "@/hooks/useMediaQuery";
+ import type { SendAttachment, SendOptions } from "@/hooks/useNanobotStream";
+ import { ThemeProvider, useTheme } from "@/hooks/useTheme";
++import { BossDesktop } from "./boss-agent/BossDesktop";
++import { BossLogin, bossFetchBootstrap as fetchBootstrap, bossClearSavedSecret as clearSavedSecret } from "./boss-agent/BossLogin";
+ import { logoFallbackUrls } from "@/lib/provider-brand";
+ import { cn } from "@/lib/utils";
+ import {
+   BootstrapAuthRequiredError,
+-  clearSavedSecret,
+   consumeUrlBootstrapSecret,
+   deriveWsUrl,
+-  fetchBootstrap,
+   loadSavedSecret,
+   saveSecret,
+ } from "@/lib/bootstrap";
+@@ -97,7 +97,7 @@
+ type BootState =
+   | { status: "loading" }
+   | { status: "error"; message: string }
+-  | { status: "auth"; failed?: boolean }
++  | { status: "auth"; failed?: boolean; expired?: boolean }
+   | {
+       status: "ready";
+       client: NanobotClient;
+@@ -349,7 +349,7 @@
+   return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, remaining - margin);
+ }
+ 
+-function AuthForm({
++export function NativeAuthForm({
+   failed,
+   onSecret,
+ }: {
+@@ -875,9 +875,19 @@
+ }
+ 
+ export default function App() {
+-  const { t } = useTranslation();
+   const [state, setState] = useState<BootState>({ status: "loading" });
+   const bootstrapSecretRef = useRef("");
++  useEffect(() => {
++    if (state.status !== "ready") return;
++    const expire = () => {
++      state.client.close();
++      bootstrapSecretRef.current = "";
++      clearSavedSecret();
++      setState({ status: "auth", expired: true });
++    };
++    window.addEventListener("boss-auth-expired", expire);
++    return () => window.removeEventListener("boss-auth-expired", expire);
++  }, [state]);
+ 
+   const refreshReadyClient = useCallback(
+     async (client: NanobotClient, fallbackSurface: RuntimeSurface) => {
+@@ -932,6 +942,9 @@
+                 const refreshed = await refreshReadyClient(client, runtimeSurface);
+                 return refreshed.url;
+               } catch {
++                client.close();
++                clearSavedSecret();
++                setState({ status: "auth", expired: true });
+                 return null;
+               }
+             },
+@@ -976,7 +989,10 @@
+         await refreshReadyClient(client, state.runtimeSurface);
+       } catch (e) {
+         if (isBootstrapAuthRequired(e)) {
+-          setState({ status: "auth", failed: !!bootstrapSecretRef.current });
++          client.close();
++          clearSavedSecret();
++          bootstrapSecretRef.current = "";
++          setState({ status: "auth", expired: true });
+         }
+       }
+     }, tokenRefreshDelayMs(state.tokenExpiresAt));
+@@ -989,40 +1005,18 @@
+   }, [bootstrapWithSecret]);
+ 
+   if (state.status === "loading") {
+-    return (
+-      <div className="flex h-full w-full items-center justify-center">
+-        <div className="flex flex-col items-center gap-3 animate-in fade-in-0 duration-300">
+-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+-            <span className="relative flex h-2 w-2">
+-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground/40" />
+-              <span className="relative inline-flex h-2 w-2 rounded-full bg-foreground/60" />
+-            </span>
+-            {t("app.loading.connecting")}
+-          </div>
+-        </div>
+-      </div>
+-    );
++    return <BossLogin mode="loading" onSecret={(s) => bootstrapWithSecret(s)} />;
+   }
+   if (state.status === "auth") {
+     return (
+-      <AuthForm
+-        failed={!!state.failed}
++      <BossLogin
++        failed={!!state.failed} expired={!!state.expired}
+         onSecret={(s) => bootstrapWithSecret(s)}
+       />
+     );
+   }
+   if (state.status === "error") {
+-    return (
+-      <div className="flex h-full w-full items-center justify-center px-4 text-center">
+-        <div className="flex max-w-md flex-col items-center gap-3">
+-          <p className="text-lg font-semibold">{t("app.error.title")}</p>
+-          <p className="text-sm text-muted-foreground">{state.message}</p>
+-          <p className="text-xs text-muted-foreground">
+-            {t("app.error.gatewayHint")}
+-          </p>
+-        </div>
+-      </div>
+-    );
++    return <BossLogin mode="error" message={state.message} onSecret={(s) => bootstrapWithSecret(s)} />;
+   }
+ 
+   const handleModelNameChange = (modelName: string | null) => {
+@@ -1031,12 +1025,16 @@
+     );
+   };
+ 
+-  const handleLogout = () => {
+-    if (state.status === "ready") {
++  const handleLogout = async () => {
++    if (state.status !== "ready") return;
++    try {
++      await state.client.requestMutation("boss.auth.logout", {});
++    } finally {
+       state.client.close();
++      bootstrapSecretRef.current = "";
++      clearSavedSecret();
++      setState({ status: "auth" });
+     }
+-    clearSavedSecret();
+-    setState({ status: "auth" });
+   };
+ 
+   const handleNativeEngineRestart = async (): Promise<string> => {
+@@ -2659,6 +2657,7 @@
+ 
+   return (
+     <ThemeProvider theme={theme}>
++      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat}>
+       <div
+         className={cn(
+           "relative h-full w-full overflow-hidden",
+@@ -3015,6 +3014,7 @@
+           onDismiss={onDismissPairingRequest}
+         />
+       </div>
++      </BossDesktop>
+     </ThemeProvider>
+   );
+ }

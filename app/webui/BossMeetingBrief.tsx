@@ -4,6 +4,7 @@ import {useClient} from "@/providers/ClientProvider";
 import {useTransaction} from "./BossAssignmentFlow";
 import {BossMeetingArrangement,type MeetingArrangementProjection} from "./BossMeetingArrangement";
 import {readLibraryContext} from "./library-context";
+import {meetingReceiptStatus} from "./meeting-receipt-reference";
 
 type Source={source_id:string;version:string|null;status:string;published_at?:string;valid_from?:string|null;valid_until?:string|null;author_contact_id?:string;excerpt:string|null};
 type Commitment={task_id:string;status:string;due_at:string;is_historical:boolean;evidence_requirements:string[]};
@@ -37,6 +38,8 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
   const [data,setData]=useState<Briefing|null>(null),[revision,setRevision]=useState(0),[loading,setLoading]=useState(true),[error,setError]=useState("");
   const [selectedContact,setSelectedContact]=useState(""),[tab,setTab]=useState<Tab>(initialTab),[arrangementDirty,setArrangementDirty]=useState(false);
   const [gapPick,setGapPick]=useState<{key:string;ids:string[]}>({key:"",ids:[]}),[draftId,setDraftId]=useState("");
+  const [receiptReference]=useState(()=>{const query=new URLSearchParams(window.location.search);return {id:query.get("bossMeetingReceiptId"),version:query.get("bossMeetingReceiptVersion")};});
+  const [libraryReference]=useState(readLibraryContext);
   const reload=()=>{setRevision(value=>value+1);onReloadArrangement();};
   const transaction=useTransaction(()=>{setSelectedContact("");reload();},undefined,id=>{setDraftId(id);onMessageDraftCreated(id);},"meetingBrief");
   useEffect(()=>{onDirtyChange(arrangementDirty||transaction.busy);return()=>onDirtyChange(false);},[arrangementDirty,transaction.busy,onDirtyChange]);
@@ -53,11 +56,13 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
   },[revision,refreshVersion,getToken]);
   const current=!loading?data:null,b=current?.current,saved=current?.saved_brief;
   const arrangementCurrent=!arrangementLoading&&!arrangementError?arrangement:null;
+  const receiptStatus=meetingReceiptStatus(receiptReference,b?.meeting??null);
+  const libraryMismatch=Boolean(b&&libraryReference?.kind==="meeting"&&(libraryReference.id!==b.meeting.meeting_id||libraryReference.version!==b.meeting.version||Boolean(current?.execution_namespace&&libraryReference.namespace!==current.execution_namespace)));
   const versionMismatch=Boolean(b&&arrangementCurrent&&(b.meeting.meeting_id!==arrangementCurrent.meeting.meeting_id||b.meeting.version!==arrangementCurrent.meeting.version||current?.execution_namespace&&arrangementCurrent.execution_namespace&&current.execution_namespace!==arrangementCurrent.execution_namespace));
-  const disabled=transaction.busy||arrangementDirty||!b||!arrangementCurrent||versionMismatch;
+  const disabled=transaction.busy||arrangementDirty||!b||!arrangementCurrent||versionMismatch||libraryMismatch||receiptStatus==="CHANGED"||receiptStatus==="WAITING";
   const gapKey=(b?.missing_items??[]).join("|");
   const gaps=gapPick.key===gapKey?gapPick.ids:(b?.missing_items??[]);
-  const reason=!b?"尚未读取当前会议的会前材料，请先确认当前会议。":!arrangementCurrent?"会议安排尚未读取"+(arrangementError?"："+arrangementError:"，请等待读取完成"):versionMismatch?"会议安排与会前材料采用的版本不同，请刷新会议材料后核查。":arrangementDirty?"会议安排存在未保存修改，请先保存或放弃本次修改。":transaction.busy?"正在核对并提交上一项操作。":"";
+  const reason=receiptStatus==="CHANGED"?"当前会议与本人决定回执的对象或版本不同，请返回原会话核查。":libraryMismatch?"当前会议与目录引用的对象、版本或执行空间不同，请返回会议目录核查。":!b?"尚未读取当前会议的会前材料，请先确认当前会议。":!arrangementCurrent?"会议安排尚未读取"+(arrangementError?"："+arrangementError:"，请等待读取完成"):versionMismatch?"会议安排与会前材料采用的版本不同，请刷新会议材料后核查。":arrangementDirty?"会议安排存在未保存修改，请先保存或放弃本次修改。":transaction.busy?"正在核对并提交上一项操作。":"";
   const gapCount=b?(b.missing_items.length||!current?.needs_review?b.missing_items.length:"待整理"):"待整理";
   const counts:Record<Tab,string|number>={"议题":b?.topics?.length??"待整理","历史承诺":b?.commitments.length??"待整理","待决定":b?.pending_decisions?.length??"待整理","材料缺口":gapCount};
   function changeTab(value:Tab){setTab(value);window.history.replaceState({...window.history.state,bossBriefTab:value},"",window.location.href);}
@@ -95,6 +100,7 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
   const draftNote=!b?"尚未读取当前会议材料":!b.missing_items.length?"当前会议没有返回缺少资料，起草入口保持不可用。":!gaps.length?"请选择至少一项缺少材料。":!selectedContact?"请选择当前有效的资料请求联系人。":disabled?reason||"当前无法保存新的消息草稿。":"选择收件人和缺少项后保存为消息草稿；发送在消息编辑中由本人另行确认。";
   return <div className="boss-brief-view">
     <div className="boss-workspace-toolbar"><button className="boss-btn" type="button" onClick={()=>onNavigate("N04")}><ArrowLeft size={15}/>返回会议与资料</button><span className="boss-tag boss-tag-amber">SIMULATED</span></div>
+    {receiptStatus!=="NONE"&&<div role={receiptStatus==="CHANGED"?"alert":"status"} className="boss-status boss-status-warn">本人决定回执：会议 {receiptReference.id??"编号缺失"} · 版本 {receiptReference.version??"版本缺失"}。{receiptStatus==="CURRENT"?"当前会议版本已经核查。":receiptStatus==="WAITING"?"正在读取当前会议。":"当前会议与回执不同，相关操作不可用。"}</div>}{libraryMismatch&&<div role="alert" className="boss-status boss-status-warn">当前会议与目录引用不同，相关操作不可用。</div>}
     {error&&<div role="alert" className="boss-status boss-status-error"><AlertCircle size={16}/>{error}</div>}{transaction.notice&&<div role="status" className="boss-status boss-status-ok">{transaction.notice}</div>}{versionMismatch&&<div role="alert" className="boss-status boss-status-warn">会议安排与材料采用的版本不同，请重新读取后核查。</div>}
     <div className="boss-brief-filters"><div className="boss-kv"><span>会议对象</span><strong>{b?.meeting.meeting_id??"尚未读取"}</strong></div><div className="boss-kv"><span>日期时间</span><strong>{time(b?.meeting.starts_at,b?.meeting.timezone)}</strong></div><div className="boss-kv"><span>IANA时区</span><strong>{b?.meeting.timezone??"尚未提供"}</strong></div><div className="boss-kv"><span>参会联系人</span><strong>{b?.participants.map(value=>value.name??value.contact_id).join("、")||"尚未提供"}</strong></div></div>
     <div className="boss-brief-columns"><main className="boss-column"><Panel title="内容与配置">
@@ -123,7 +129,7 @@ function MeetingBrief({onNavigate,onViewSource,onOpenTask,onMessageDraftCreated,
         <div className="boss-actions"><button type="button" className="boss-btn" disabled={disabled||!b?.missing_items.length||!gaps.length||!selectedContact} onClick={requestMaterials}><Send size={15}/>起草补材料消息</button>{draftId&&<button type="button" className="boss-btn" onClick={()=>onNavigate("F08")}><FileSearch size={15}/>打开草稿</button>}</div>
         <p className="boss-helper">{draftNote}</p>{draftId&&<p className="boss-helper">已保存草稿编号：{draftId}</p>}
       </section>}
-      <BossMeetingArrangement data={arrangement} loading={arrangementLoading} error={arrangementError} onReload={onReloadArrangement} onDirtyChange={setArrangementDirty} otherBusy={transaction.busy}/>
+      <BossMeetingArrangement data={arrangement} loading={arrangementLoading} error={arrangementError} onReload={onReloadArrangement} onDirtyChange={setArrangementDirty} otherBusy={transaction.busy||versionMismatch||libraryMismatch||receiptStatus==="CHANGED"||receiptStatus==="WAITING"}/>
     </Panel><Panel title="关联内容与处理边界">
       <section className="boss-brief-section"><h3>本人目标</h3><Fact label="本人目标采用状态" value={b?.owner_goal_reference?.status}/><Fact label="本人确认的目标版本" value={b?.owner_goal_reference?.active_version}/><Fact label="目标适用范围" value={b?.owner_goal_reference?.scope}/><Fact label="目标数量" value={b?.owner_goal_reference?.goal_count}/><div className="boss-actions"><button type="button" className="boss-btn" onClick={()=>onNavigate("N07")}>核查本人目标</button></div>{!b?.owner_goal_reference?.status&&<p className="boss-helper">当前未返回本人目标采用状态；可从本人目标核查并建立本次会议适用目标。</p>}</section>
       <section className="boss-brief-section"><h3>关联事件</h3><Fact label="关联事件" value={b?.event.event_id}/><Fact label="事件状态" value={b?.event.status}/><Fact label="事件来源" value={b?.event.origin}/></section>

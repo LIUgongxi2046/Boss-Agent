@@ -1,0 +1,9 @@
+validation/desktop/package.json
+validation/desktop/package-lock.json
+validation/desktop/package.mjs
+validation/desktop/package-output.cjs
+validation/desktop/main.cjs
+validation/desktop/preload.cjs
+validation/desktop/branding.cjs
+validation/desktop/branding/boss-agent.png
+validation/desktop/branding/boss-agent.icns

@@ -35,9 +35,26 @@ class ControlStore(Store):
         properties, required = FIELDS[action]
         errors = list(Draft202012Validator({"type": "object", "properties": properties, "required": required, "additionalProperties": False}, format_checker=FormatChecker()).iter_errors(p))
         require(not errors, "控制参数不符合 Schema", web.HTTPBadRequest)
+        if action != "withdraw":
+            return self._control_in_transaction(ns, action, p)
+        from hermes_source_invalidation import begin_source_cleanup, fail_source_cleanup
+        pending = begin_source_cleanup(self, ns, p["source_id"], p["version"])
+        completed = False
+        try:
+            result = self._control_in_transaction(ns, action, p)
+            completed = True
+            from hermes_source_invalidation import complete_source_session_cleanup
+            complete_source_session_cleanup(self, ns, p["source_id"])
+            return result
+        finally:
+            if pending and not completed:
+                fail_source_cleanup(self, ns, p["source_id"])
+
+    def _control_in_transaction(self, ns, action, p):
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             self.active(db, ns)
+            previously_withdrawn = action == "withdraw" and self.get(db, ns, "document", p["source_id"]).get("withdrawn") is True
             result = getattr(self, "control_" + action)(db, ns, p)
             audit_result = {"calendar_id": result["calendar_id"], "visibility": result["visibility"]} if action == "private_calendar" else result
             audit_input = p
@@ -52,7 +69,13 @@ class ControlStore(Store):
             elif action == "decide":
                 audit_input = {key: p[key] for key in ("authorization_id", "task_id", "task_version", "feedback_id", "due_at") if key in p}
                 audit_result = {key: result[key] for key in ("task_id", "version", "status", "due_at")}
-            db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
+            audit = db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (ns, action, encode(audit_input), encode(audit_result), now()))
+            if action == "withdraw" and not previously_withdrawn:
+                from hermes_source_invalidation import append_source_withdrawal_in_transaction
+                append_source_withdrawal_in_transaction(self, db, ns, p["source_id"], p["version"], action, str(audit.lastrowid), "audit")
+            if action == "withdraw":
+                from agent_artifact_withdrawal import propagate_domain_source_withdrawal_in_transaction
+                propagate_domain_source_withdrawal_in_transaction(self, db, p["source_id"])
             return result
 
     def control_feedback(self, db, ns, p):
@@ -178,9 +201,13 @@ class ControlStore(Store):
     def control_withdraw(self, db, ns, p):
         document = self.get(db, ns, "document", p["source_id"])
         require(document["version"] == p["version"], "资料版本冲突")
-        document.update(withdrawn=True, withdrawn_at=now())
+        if document.get("withdrawn") is not True:
+            document.update(withdrawn=True, withdrawn_at=now())
         self.put(db, ns, "document", p["source_id"], document)
         db.execute("DELETE FROM knowledge WHERE namespace=? AND source_id=?", (ns, p["source_id"]))
+        from hermes_source_invalidation import finish_source_cleanup_in_transaction, invalidate_document_results_in_transaction
+        invalidate_document_results_in_transaction(db, ns, p["source_id"])
+        finish_source_cleanup_in_transaction(self, db, ns, p["source_id"])
         return {"source_id": p["source_id"], "withdrawn": True, "derived_summaries": []}
 
     def control_search(self, db, ns, p):

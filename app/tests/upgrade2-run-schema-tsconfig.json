@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": "../../.work/upgrade2-u2-07/dependencies",
+    "types": [],
+    "paths": {
+      "react": ["node_modules/@types/react/index.d.ts"],
+      "react/*": ["node_modules/@types/react/*"],
+      "*": ["node_modules/*"]
+    }
+  },
+  "files": ["../webui/upgrade2-run-client.ts", "../webui/useUpgrade2Run.ts", "../webui/Upgrade2RunPanel.tsx"]
+}

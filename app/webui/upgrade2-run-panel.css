@@ -1,0 +1,36 @@
+.upgrade2-run-panel { color: #172b4d; font: 16px/24px "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+.upgrade2-run-panel *, .upgrade2-run-panel *::before, .upgrade2-run-panel *::after { box-sizing: border-box; }
+.upgrade2-run-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border: 1px solid #d5e6f8; border-radius: 14px; padding: 18px; background: linear-gradient(105deg, #f3f9ff, #f5fff9); }
+.upgrade2-run-panel h2, .upgrade2-run-panel h3, .upgrade2-run-panel p { margin: 0; }
+.upgrade2-run-panel h2 { font-size: 18px; line-height: 26px; }
+.upgrade2-run-panel h3 { font-size: 16px; line-height: 24px; }
+.upgrade2-run-header p { margin-top: 4px; overflow-wrap: anywhere; }
+.upgrade2-run-header strong { flex: none; color: #005bac; }
+.upgrade2-run-result-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 12px 0; }
+.upgrade2-run-columns { display: grid; grid-template-columns: minmax(0, 1fr) 272px; gap: 12px; align-items: start; margin-top: 12px; }
+.upgrade2-run-main, .upgrade2-run-side { display: grid; gap: 12px; min-width: 0; }
+.upgrade2-run-card, .upgrade2-run-compose { min-width: 0; padding: 18px; border: 1px solid #dce4ed; border-radius: 14px; background: #fff; }
+.upgrade2-run-card h3 { margin-bottom: 12px; }
+.upgrade2-run-card ol, .upgrade2-run-card ul { margin: 0; padding-left: 20px; }
+.upgrade2-run-card li { overflow-wrap: anywhere; }
+.upgrade2-run-card ol li { padding: 8px 0; border-bottom: 1px solid #eaf0f6; }
+.upgrade2-run-card ol li strong, .upgrade2-run-card ol li time, .upgrade2-run-card ol li span { display: block; }
+.upgrade2-run-card ol li time, .upgrade2-run-card ol li span { color: #52647a; font-size: 14px; line-height: 22px; }
+.upgrade2-run-compose label { display: block; font-weight: 600; margin-bottom: 8px; }
+.upgrade2-run-compose textarea { display: block; width: 100%; min-height: 106px; padding: 12px; resize: vertical; color: inherit; font: inherit; border: 1px solid #c9ddf3; border-radius: 9px; }
+.upgrade2-run-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.upgrade2-run-panel button { min-height: 44px; max-width: 100%; padding: 8px 12px; font: inherit; color: #005bac; background: #fff; border: 1px solid #dce4ed; border-radius: 9px; overflow-wrap: anywhere; cursor: pointer; }
+.upgrade2-run-panel button:disabled { color: #52647a; background: #f5f7fa; cursor: not-allowed; }
+.upgrade2-run-panel button:focus-visible, .upgrade2-run-panel textarea:focus-visible { outline: 2px solid #0a64e8; outline-offset: 2px; }
+.upgrade2-run-facts { margin: 0; }
+.upgrade2-run-facts div { padding: 8px 0; border-bottom: 1px solid #edf2f8; }
+.upgrade2-run-facts dt { color: #52647a; font-size: 14px; }
+.upgrade2-run-facts dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.upgrade2-run-card .upgrade2-run-sources, .upgrade2-run-card .upgrade2-run-artifacts { padding: 0; list-style: none; }
+.upgrade2-run-artifacts > li { padding: 12px 0; border-bottom: 1px solid #edf2f8; }
+.upgrade2-run-artifacts p, .upgrade2-run-sources { font-size: 14px; line-height: 22px; color: #52647a; }
+.upgrade2-run-sources button { text-align: left; width: 100%; }
+.upgrade2-run-notice, .upgrade2-run-error { padding: 12px 18px; margin-top: 12px !important; border-radius: 9px; background: #fff8e8; color: #9b5a05; }
+.upgrade2-run-error { background: #fef3f2; color: #b42318; }
+@media (max-width: 1080px) { .upgrade2-run-columns { grid-template-columns: 1fr; } .upgrade2-run-side { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .upgrade2-run-side { grid-template-columns: 1fr; } .upgrade2-run-header { flex-wrap: wrap; } }

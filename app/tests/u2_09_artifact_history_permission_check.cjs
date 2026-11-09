@@ -1,0 +1,38 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const Module=require("node:module");
+const {spawn}=require("node:child_process");
+const {once}=require("node:events");
+const root=path.resolve(__dirname,"../..");
+const dependencies=path.join(root,".work/upgrade2-u2-07/dependencies/node_modules");
+const React=require(path.join(dependencies,"react"));
+const {Window}=require(path.join(dependencies,"happy-dom/cjs/index.cjs"));
+const {buildSync}=require(path.join(dependencies,"esbuild"));
+const reference=JSON.parse(fs.readFileSync(0,"utf8"));
+const output=buildSync({entryPoints:[path.join(root,"app/webui/Upgrade2ArtifactSourceHistory.tsx")],bundle:true,write:false,platform:"node",format:"cjs",jsx:"automatic",nodePaths:[dependencies],external:["react","react/jsx-runtime"]});
+const moduleView=new Module(path.join(root,"app/tests/artifact-history-permission.cjs"));moduleView.filename=path.join(root,"app/tests/artifact-history-permission.cjs");moduleView.paths=[dependencies];moduleView._compile(output.outputFiles[0].text,moduleView.filename);
+const {Upgrade2ArtifactSourceHistory}=moduleView.exports;
+async function main(){
+  const server=spawn(path.join(root,".work/upgrade2-u2-04/locked-env/bin/python"),[path.join(root,"app/tests/upgrade2-run-client-server.py")],{cwd:root,env:{...process.env,PYTHONDONTWRITEBYTECODE:"1"},stdio:["ignore","pipe","pipe"]});
+  let stderr="";server.stderr.on("data",value=>{stderr+=value;});
+  const data=await Promise.race([once(server.stdout,"data").then(([value])=>value),once(server,"exit").then(([code])=>{throw new Error("服务启动失败 "+code+": "+stderr);})]);
+  const port=Number(String(data).trim());assert.ok(Number.isInteger(port)&&port>0);
+  const window=new Window({url:"http://127.0.0.1:"+port+"/"});
+  global.window=window;global.document=window.document;global.navigator=window.navigator;global.fetch=window.fetch.bind(window);global.IS_REACT_ACT_ENVIRONMENT=true;
+  const {createRoot}=require(path.join(dependencies,"react-dom/client"));
+  const getToken=()=>"",denied=[];let expired=0;window.addEventListener("boss-auth-expired",()=>expired++);
+  const container=document.createElement("div");document.body.appendChild(container);const view=createRoot(container);
+  await React.act(async()=>view.render(React.createElement(Upgrade2ArtifactSourceHistory,{reference,token:"",getToken,onClose:()=>{},onInvalidated:status=>denied.push(status)})));
+  for(let index=0;index<100&&denied.length===0;index++)await React.act(async()=>{await new Promise(resolve=>setTimeout(resolve,20));});
+  assert.deepEqual(denied,[401]);assert.equal(expired,1);assert.equal(container.querySelector("blockquote"),null);
+  await React.act(async()=>view.unmount());
+  const view2=createRoot(container);
+  await React.act(async()=>view2.render(React.createElement(Upgrade2ArtifactSourceHistory,{reference,token:"",getToken,onClose:()=>{},onInvalidated:status=>denied.push(status)})));
+  await React.act(async()=>view2.unmount());
+  await React.act(async()=>{await new Promise(resolve=>setTimeout(resolve,150));});
+  assert.deepEqual(denied,[401]);assert.equal(expired,1);
+  await window.happyDOM.close();server.kill();await once(server,"exit");
+  process.stdout.write(JSON.stringify({status:denied[0],expired}));
+}
+void main();

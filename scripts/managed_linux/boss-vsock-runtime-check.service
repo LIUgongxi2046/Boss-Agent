@@ -1,0 +1,14 @@
+[Unit]
+Description=Boss Agent virtual machine runtime transport check
+Requires=boss-vm-agent.service
+After=boss-vm-agent.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/boss-vm/identity
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONPATH=/run/boss-dependencies
+ExecStart=/opt/boss/python-3.14.9/bin/python3.14 /usr/local/lib/boss-vm/guest-vsock-runtime-check.py ${BOSS_VM_ID}
+
+[Install]
+WantedBy=multi-user.target

@@ -20,6 +20,21 @@ def test_independent_build_preserves_default_frontend(tmp_path):
     assert (default / "index.html").read_text() == "default"
 
 
+def test_installed_runtime_uses_packaged_frontend(tmp_path):
+    root = tmp_path / "site-packages" / "boss_agent_runtime"
+    webui = root / "webui"
+    webui.mkdir(parents=True)
+    (webui / "index.html").write_text("packaged")
+    assert application_frontend_directory(root) == webui
+
+
+def test_installed_runtime_rejects_missing_frontend(tmp_path):
+    root = tmp_path / "site-packages" / "boss_agent_runtime"
+    root.mkdir(parents=True)
+    with pytest.raises(FileNotFoundError):
+        application_frontend_directory(root)
+
+
 def test_frontend_directory_rejects_missing_or_external_build(tmp_path):
     root = tmp_path / "project" / "validation"
     with pytest.raises(ValueError):

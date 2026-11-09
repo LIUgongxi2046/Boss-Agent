@@ -4,6 +4,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const { once } = require('node:events');
+const { createHash } = require('node:crypto');
 
 const root = process.env.BOSS_VALIDATION_ROOT;
 if (!root || !path.isAbsolute(root)) throw new Error('缺少验证工程绝对路径');
@@ -98,10 +99,89 @@ if (!app.requestSingleInstanceLock()) {
     requireMainFrame(event);
     if (typeof token !== 'string' || token.length > 200) throw new Error('IPC 身份凭据无效');
     const response = await fetch(origin + '/api/boss/identity', { headers: { Authorization: 'Bearer ' + token } });
-    if (!response.ok) throw new Error('IPC 未认证');
+    if (!response.ok) throw new Error('IPC 身份核查失败，HTTP ' + response.status);
     const identity = await response.json();
     if (identity.role !== 'BOSS') throw new Error('IPC 需要老板身份');
   }
+
+  ipcMain.handle('boss-desktop:export-artifact', async (event, request) => {
+    requireMainFrame(event);
+    if (!request || typeof request !== 'object' || Array.isArray(request) ||
+        Object.keys(request).sort().join(',') !== 'artifact_id,run_id,token,version' ||
+        typeof request.artifact_id !== 'string' || typeof request.run_id !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(request.artifact_id) ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(request.run_id) ||
+        typeof request.token !== 'string' || !request.token || request.token.length > 200 ||
+        !Number.isSafeInteger(request.version) || request.version < 1) throw new Error('成果导出参数无效');
+    await authorize(event, request.token);
+    requireMainFrame(event);
+    const headers = { Authorization: 'Bearer ' + request.token };
+    const base = origin + '/api/v2/artifacts/' + request.artifact_id;
+    const query = '?version=' + request.version;
+    const formats = {
+      'text/markdown': 'md',
+      'application/pdf': 'pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    };
+    async function readMetadata() {
+      const response = await fetch(base + query, { headers, cache: 'no-store', redirect: 'error' });
+      if (!response.ok) throw new Error('成果信息请求失败，HTTP ' + response.status + '：' + (await response.text()).slice(0, 2000));
+      const metadata = await response.json();
+      if (!metadata || metadata.artifact_id !== request.artifact_id || metadata.run_id !== request.run_id ||
+          metadata.version !== request.version || metadata.status !== 'PUBLISHED' || metadata.verification_status !== 'VERIFIED' ||
+          !Object.hasOwn(formats, metadata.media_type) || !Number.isSafeInteger(metadata.size_bytes) || metadata.size_bytes < 1 ||
+          typeof metadata.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(metadata.sha256) ||
+          !Array.isArray(metadata.source_refs) || metadata.source_refs.length === 0) throw new Error('成果信息无法核查');
+      return metadata;
+    }
+    const metadata = await readMetadata();
+    requireMainFrame(event);
+    const selected = await dialog.showSaveDialog(window, {
+      title: '选择成果保存位置',
+      defaultPath: '成果-' + request.artifact_id + '.' + formats[metadata.media_type],
+      filters: [{ name: '成果文件', extensions: [formats[metadata.media_type]] }],
+    });
+    if (selected.canceled) return { canceled: true };
+    if (typeof selected.filePath !== 'string' || !path.isAbsolute(selected.filePath)) throw new Error('保存位置无效');
+    requireMainFrame(event);
+    await authorize(event, request.token);
+    const current = await readMetadata();
+    if (JSON.stringify(current) !== JSON.stringify(metadata)) throw new Error('成果信息已经变化');
+    const response = await fetch(base + '/file' + query, { headers, cache: 'no-store', redirect: 'error' });
+    if (!response.ok) throw new Error('成果文件请求失败，HTTP ' + response.status + '：' + (await response.text()).slice(0, 2000));
+    if (response.headers.get('etag') !== '"' + metadata.sha256 + '"' ||
+        response.headers.get('content-type')?.split(';', 1)[0].trim() !== metadata.media_type || !response.body) throw new Error('成果文件响应无法核查');
+    const reader = response.body.getReader();
+    const chunks = [];
+    let length = 0;
+    const hash = createHash('sha256');
+    while (true) {
+      const part = await reader.read();
+      if (part.done) break;
+      length += part.value.byteLength;
+      if (length > metadata.size_bytes) { await reader.cancel(); throw new Error('成果文件大小不符'); }
+      hash.update(part.value);
+      chunks.push(Buffer.from(part.value));
+    }
+    if (length !== metadata.size_bytes || hash.digest('hex') !== metadata.sha256) throw new Error('成果文件摘要或大小不符');
+    await authorize(event, request.token);
+    if (JSON.stringify(await readMetadata()) !== JSON.stringify(metadata)) throw new Error('成果信息已经变化');
+    requireMainFrame(event);
+    const directory = await fs.promises.realpath(path.dirname(selected.filePath));
+    if (directory === '/tmp' || directory.startsWith('/tmp/') || directory === '/private/tmp' || directory.startsWith('/private/tmp/')) throw new Error('保存位置不受支持');
+    const target = path.join(directory, path.basename(selected.filePath));
+    const temporaryDirectory = await fs.promises.mkdtemp(path.join(directory, '.boss-agent-export-'));
+    const temporaryFile = path.join(temporaryDirectory, 'artifact');
+    try {
+      await fs.promises.writeFile(temporaryFile, Buffer.concat(chunks, length), { flag: 'wx', mode: 0o600 });
+      await fs.promises.link(temporaryFile, target);
+    } finally {
+      await fs.promises.rm(temporaryDirectory, { recursive: true, force: true });
+    }
+    return { canceled: false };
+  });
 
   ipcMain.handle('boss-desktop:capability', async (event, request) => {
     if (!request || typeof request !== 'object' || Object.keys(request).some(key => !['action', 'token', 'url', 'event_id', 'event_version', 'role'].includes(key))) throw new Error('IPC 参数无效');

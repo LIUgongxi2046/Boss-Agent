@@ -1,0 +1,46 @@
+set timeout 180
+set secret [open [lindex $argv 6] r]
+set password [string trim [read $secret]]
+close $secret
+log_user 1
+spawn {*}[lrange $argv 0 5]
+expect {
+    -re {login:} {}
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+send -- "root\r"
+expect {
+    -re {Password:} {}
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+log_user 0
+send -- "$password\r"
+unset password
+expect {
+    -re {# $} {}
+    -re {Login incorrect} { exit 1 }
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+log_user 1
+puts "RECOVERY_LOGIN_OK"
+send -- "mkdir -p /run/boss-deps /run/boss-extras /run/boss-checks /run/pip-work && mount -t virtiofs -o ro boss-probe /run/boss-deps && mount -t virtiofs -o ro boss-guest-runtime /run/boss-extras && mount -t virtiofs -o ro boss-checks /run/boss-checks; echo MOUNT_STATUS=\$?\r"
+expect -re {MOUNT_STATUS=([0-9]+)}
+if {$expect_out(1,string) ne "0"} { send -- "poweroff\r"; expect eof; exit 1 }
+expect -re {# $}
+send -- "TMPDIR=/run/pip-work PYTHONPATH=/run/boss-deps/linux-target /opt/boss/python-3.14.9/bin/python3.14 -m pip install --no-index --find-links=/run/boss-extras --upgrade /run/boss-extras/boss_agent_guest_runtime-0.2.23-py3-none-any.whl; echo INSTALL_STATUS=\$?\r"
+expect -re {INSTALL_STATUS=([0-9]+)}
+if {$expect_out(1,string) ne "0"} { send -- "poweroff\r"; expect eof; exit 1 }
+expect -re {# $}
+send -- "timeout 90 systemd-run --unit=boss-restart-controller --wait --property=Type=exec --setenv=PYTHONPATH=/run/boss-deps/linux-target --setenv=PYTHONDONTWRITEBYTECODE=1 /opt/boss/python-3.14.9/bin/python3.14 /run/boss-checks/guest-restart-control-check.py; result=\$?; systemctl stop boss-restart-controller; journalctl -b -u boss-restart-controller -u boss-test-control --no-pager; echo TEST_STATUS=\$result\r"
+expect {
+    -re {\r\nTEST_STATUS=([0-9]+)\r} { set result $expect_out(1,string) }
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+expect -re {# $}
+send -- "poweroff\r"
+expect eof
+exit $result

@@ -38,7 +38,9 @@ class ConversationQueries:
     def __init__(self, store, conversation):
         self.store, self.conversation, self.api = store, conversation, BIQueryAPI(store)
 
-    def plan(self, text, query, pending_scope=None, *, applied_parameters=None):
+    def plan(self, text, query, pending_scope=None, *, applied_parameters=None, use_implicit_previous=True):
+        if type(use_implicit_previous) is not bool:
+            raise ValueError("历史查询选择参数无效")
         followup = any(word in text for word in ("继续", "改为", "调整", "只看", "仅看", "补充", "沿用"))
         metric_words = sorted([*METRICS, *METRICS.values()], key=len, reverse=True)
         metrics = re.findall("|".join(r"(?<![A-Za-z0-9_])" + re.escape(word) + r"(?![A-Za-z0-9_])"
@@ -50,7 +52,7 @@ class ConversationQueries:
         view = self.conversation.read("BOSS", query)
         choices = [(run["run_id"], ref) for run in view["runs"] for ref in run["artifacts"] if ref["kind"] == "query"]
         explicit = [(run_id, ref) for run_id, ref in choices if mentioned(text, ref["id"])]
-        selected = explicit[-1] if explicit else choices[-1] if followup and choices and "重新" not in text else None
+        selected = explicit[-1] if explicit else choices[-1] if use_implicit_previous and followup and choices and "重新" not in text else None
         parent = self.conversation.artifact("BOSS", {**query, "run_id": selected[0], "kind": "query", "id": selected[1]["id"]}) if selected else None
         base = {key: value for key, value in parent["data"]["context_snapshot"].items()
             if key not in {"envelope", "question", "parent_query_id", "query_mode"}} if parent else json.loads(pending_scope) if pending_scope and "重新" not in text else {}

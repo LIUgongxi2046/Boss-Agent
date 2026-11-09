@@ -7,13 +7,15 @@ import {useConversationReturn} from "./BossConversationPosition";
 import {BossArchivedSessions} from "./BossArchivedSessions";
 import {BossConversationMetrics} from "./BossConversationMetrics";
 import {BossConversationKnowledge} from "./BossConversationKnowledge";
+import {Upgrade2ConversationEntry,Upgrade2ConversationRun,type Upgrade2ConversationBinding} from "./Upgrade2ConversationRun";
+import {SkillCandidateReview} from "./SkillCandidateReview";
 import {verifyBusinessContext,type BusinessContext} from "./BusinessConversationEntry";
 import {isActiveN02Scope,mayDisplayCurrentTaskReference,sameActiveN02Scope,shouldCancelN02PositionOnInteraction,type N02Scope} from "./n02-context-guard";
 import {shouldRefreshN02Attachments,validateN02AttachmentRead,type N02Attachment,type N02AttachmentReadMarker} from "./n02-attachments";
 import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
 import "./boss-n02.css";
 
-export type ConversationActions={onOpenTask:(id:string)=>void;onOpenSource:(id:string,version?:string)=>void;onOpenMessages:()=>void;onOpenPage:(page:"F24"|"F29"|"F28"|"F03"|"N10",runId?:string)=>void;onReturn:()=>void};
+export type ConversationActions={onOpenTask:(id:string)=>void;onOpenTaskReceipt:(id:string,version:string)=>void;onOpenMeeting:(id:string,version:string)=>void;onOpenMinutes:(id:string,version:string)=>void;onOpenSource:(id:string,version?:string,locator?:string)=>void;onOpenMessages:()=>void;onOpenPage:(page:"F24"|"F29"|"F28"|"F03"|"N10",runId?:string)=>void;onReturn:()=>void};
 type Session={key:string;chatId:string;title:string;updatedAt:string};
 type Reference={kind:"query"|"task"|"morning_list"|"message"|"message_draft";id:string;recorded_version:string|null};
 type ContextReference={kind:string;id:string;recorded_version:string|null;current_version:string|null;reference_state:string;adoption_state:string;current_validity:string|null;current_object_state:string|null;source_metadata:Record<string,string|null>|null;source_refs:{source_id:string;version:string|null;current_version:string|null;status:string}[];support:{origin:string;tool_id:string|null;tool_call_id:string|null}[]};
@@ -22,7 +24,7 @@ type View={session_id:string;chat_id:string;runs:Run[];business_authorization_gr
 type RequestReceipt={client_request_id:string;outcome:"RECORDED";request_state:string;run_id:string|null;chat_id:string;session_id:string;turn_id:string;write_performed_by_lookup:false;business_authority_granted:false};
 type Attachment=N02Attachment;
 type Artifact={run_id:string;chat_id:string;session_id:string;business_authorization_granted:false;business_mutation_performed:false;kind:Reference["kind"];id:string;data:Record<string,unknown>;evidence:{sources:{source_id:string;version:string;published_at?:string;author_contact_id?:string}[]}|null};
-type Props=ThreadReadingController&{role:"BOSS"|"MAINTAINER";visible:boolean;activeKey:string|null;sessions:Session[];onNewChat:()=>void;onSelectChat:(key:string)=>void;onSearch:()=>void;actions:ConversationActions;children:ReactNode};
+type Props=ThreadReadingController&{role:"BOSS"|"MAINTAINER";visible:boolean;activeKey:string|null;sessions:Session[];onNewChat:()=>void;onSelectChat:(key:string)=>void;onSearch:()=>void;actions:ConversationActions;children:ReactNode;upgrade2Binding?:Upgrade2ConversationBinding|null};
 const stateLabel:Record<string,string>={RUNNING:"正在执行",QUEUED:"正在排队",SUCCEEDED:"运行完成",WAITING_INPUT:"等待补充条件",FAILED:"运行失败",CANCELED:"已经取消",TIMED_OUT:"执行超时",UNKNOWN:"结果待核查",INTERRUPTED:"执行中断",CURRENT:"当前可以读取",NEEDS_REVIEW:"需要重新核查",UNAVAILABLE:"当前无法采用",VERSION_CHANGED:"当前版本已经变化",VERSION_UNRECORDED:"原版本未记录",INACTIVE:"当前已经停用",MISSING_OR_FORBIDDEN:"当前无法访问",UNSUPPORTED_KIND:"当前种类无法读取"};
 const kindLabel:Record<Reference["kind"],string>={query:"查询结果",task:"交办任务",morning_list:"晨间清单",message:"已保存消息",message_draft:"消息草稿"};
 const label=(value:string)=>stateLabel[value]??value;
@@ -30,7 +32,7 @@ const returnNames:Record<string,string>={F01:"返回今日工作",N03:"返回经
 function conversationReturn(){const page=new URLSearchParams(window.location.search).get("bossReturn");return page?{page,label:returnNames[page]??"返回业务页面"}:null;}
 const fileState={STORED:"已经保存",MISSING:"文件缺少",CHANGED:"内容已经变化，需要重新核查",REFERENCE_UNAVAILABLE:"文件引用无法确认"};
 function Row({name,value}:{name:string;value:ReactNode}){return <div className="boss-n02-kv"><span>{name}</span><strong>{value}</strong></div>;}
-export function BossConversationWorkspace({role,visible,activeKey,sessions,onNewChat,onSelectChat,onSearch,actions,children,captureReadingPosition,restoreReadingPosition}:Props){
+export function BossConversationWorkspace({role,visible,activeKey,sessions,onNewChat,onSelectChat,onSearch,actions,children,captureReadingPosition,restoreReadingPosition,upgrade2Binding}:Props){
   const {client,token}=useClient();
   const [connectionStatus,setConnectionStatus]=useState(client.status);
   const session=sessions.find(value=>value.key===activeKey),chatId=session?.chatId??(activeKey?.startsWith("websocket:")?activeKey.slice(10):null);
@@ -222,6 +224,13 @@ export function BossConversationWorkspace({role,visible,activeKey,sessions,onNew
       </section>
     </aside>
     <div className="boss-chat-below">
+    {role==="BOSS"&&visible&&token&&<SkillCandidateReview key={token} role="BOSS" getToken={()=>token} identityKey={token}/>}
+    <section className="boss-n02-panel" aria-label="持续任务"><h2>持续任务</h2>
+      {role==="BOSS"&&visible&&chatId&&token&&upgrade2Binding&&upgrade2Binding.authToken===token&&upgrade2Binding.chatId===chatId&&upgrade2Binding.runId.trim()&&upgrade2Binding.conversationId.trim()&&upgrade2Binding.identityKey.trim()&&upgrade2Binding.pendingScopeKey.trim()
+        ? <Upgrade2ConversationRun key={JSON.stringify([upgrade2Binding.identityKey,upgrade2Binding.pendingScopeKey,upgrade2Binding.chatId,upgrade2Binding.conversationId,upgrade2Binding.runId,token])} binding={upgrade2Binding} connected={connectionStatus==="open"} onOpenTask={id=>openBusiness(()=>actions.onOpenTask(id))} onOpenTaskReceipt={(id,version)=>openBusiness(()=>actions.onOpenTaskReceipt(id,version))} onOpenMeeting={(id,version)=>openBusiness(()=>actions.onOpenMeeting(id,version))} onOpenMinutes={(id,version)=>openBusiness(()=>actions.onOpenMinutes(id,version))} onOpenSource={(id,version,locator)=>openBusiness(()=>actions.onOpenSource(id,version,locator))}/>
+        : role==="BOSS"&&visible&&chatId&&token&&connectionStatus==="open" ? <Upgrade2ConversationEntry key={JSON.stringify([token,chatId])} chatId={chatId} token={token} connected={true} onOpenTask={id=>openBusiness(()=>actions.onOpenTask(id))} onOpenTaskReceipt={(id,version)=>openBusiness(()=>actions.onOpenTaskReceipt(id,version))} onOpenMeeting={(id,version)=>openBusiness(()=>actions.onOpenMeeting(id,version))} onOpenMinutes={(id,version)=>openBusiness(()=>actions.onOpenMinutes(id,version))} onOpenSource={(id,version,locator)=>openBusiness(()=>actions.onOpenSource(id,version,locator))}/>
+        : <p>当前会话尚未取得可用的持续任务运行。</p>}
+    </section>
     <section className="boss-n02-panel boss-chat-deliverables" aria-labelledby="boss-chat-deliverables-title">
       <header className="boss-n02-heading"><h2 id="boss-chat-deliverables-title">关联资料与产物</h2><span className="boss-n02-chip">当前运行</span></header>
       <p>从已保存的执行记录打开业务结果，核查当前对象和来源。</p>

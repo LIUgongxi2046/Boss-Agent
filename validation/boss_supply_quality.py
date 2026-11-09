@@ -165,6 +165,39 @@ class SupplyQualityAPI:
         require(role == expected, "当前身份不能执行此业务操作", web.HTTPForbidden)
 
     def execute(self, role, action, payload):
+        if action != WITHDRAW_ACTION:
+            return self._execute(role, action, payload)
+        self._role(role, "MAINTAINER")
+        validator = Draft202012Validator({**SCHEMA, "$ref": "#/$defs/" + ACTION_INPUTS[action][1]}, format_checker=FormatChecker())
+        require(not list(validator.iter_errors(payload)), "模拟业务输入不符合Schema", web.HTTPBadRequest)
+        size = len(encode(payload).encode("utf-8"))
+        if size > 1048576:
+            raise web.HTTPRequestEntityTooLarge(max_size=1048576, actual_size=size)
+        from boss_simulation_api import _context
+        from hermes_source_invalidation import begin_source_cleanup, fail_source_cleanup
+        with self.store.connect() as db:
+            db.execute("BEGIN")
+            context = _context(db)
+            namespace = context["namespace"]
+            record = self.store.get(db, namespace, payload["entity_type"], payload["record_id"])
+            document = self.store.get(db, namespace, "document", record["source_id"])
+            previous = db.execute("SELECT 1 FROM idempotency WHERE namespace=? AND operation=? AND key=?", (namespace, action, payload["client_request_id"])).fetchone()
+            if previous is None:
+                require(record.get("simulation_definition") == DEFINITION and record.get("owner_id") == context["owner_id"], "当前记录不属于模拟外部资料范围", web.HTTPForbidden)
+                require(record.get("version") == payload["expected_version"] and record.get("record_state") == "ACTIVE", "记录版本已经变化或已经撤销")
+        pending = begin_source_cleanup(self.store, namespace, record["source_id"], document["version"], operation=action, request_id=payload["client_request_id"])
+        completed = False
+        try:
+            result = self._execute(role, action, payload)
+            completed = True
+            from hermes_source_invalidation import complete_source_session_cleanup
+            complete_source_session_cleanup(self.store, namespace, record["source_id"])
+            return result
+        finally:
+            if pending and not completed:
+                fail_source_cleanup(self.store, namespace, record["source_id"])
+
+    def _execute(self, role, action, payload):
         require(action in ACTION_INPUTS, "未知模拟业务动作", web.HTTPNotFound)
         expected, name = ACTION_INPUTS[action]
         self._role(role, expected)
@@ -432,6 +465,13 @@ class SupplyQualityAPI:
         withdrawn = {**document, "version": updated["version"], "withdrawn": True, "withdrawn_at": now(), "withdrawal_reason_sha256": checksum(payload["reason"])}
         self.store.put(db, namespace, kind, identifier, updated)
         self.store.put(db, namespace, "document", record["source_id"], withdrawn)
+        from hermes_source_invalidation import finish_source_cleanup_in_transaction, invalidate_document_results_in_transaction
+        invalidate_document_results_in_transaction(db, namespace, record["source_id"])
+        finish_source_cleanup_in_transaction(self.store, db, namespace, record["source_id"])
+        from hermes_source_invalidation import append_source_withdrawal_in_transaction
+        append_source_withdrawal_in_transaction(self.store, db, namespace, record["source_id"], document["version"], WITHDRAW_ACTION, payload["client_request_id"], "idempotency")
+        from agent_artifact_withdrawal import propagate_domain_source_withdrawal_in_transaction
+        propagate_domain_source_withdrawal_in_transaction(self.store, db, record["source_id"])
         previous_binding = self.store.get(db, namespace, "external_record_binding", binding_id(kind, identifier))
         references = [{"source_id": reference["source_id"], "version": withdrawn["version"], "source_sha256": checksum(withdrawn)} if reference["source_id"] == withdrawn["source_id"] else reference for reference in previous_binding["sources"]]
         self.store.put(db, namespace, "external_record_binding", binding_id(kind, identifier), {**previous_binding, "version": updated["version"], "sources": references})

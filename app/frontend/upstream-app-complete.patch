@@ -1,0 +1,502 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -19,6 +19,8 @@ import type { SidebarDeleteItem } from "@/components/ChatList";
+ import type { SettingsSectionKey } from "@/components/settings/SettingsView";
+ import { ThreadVisibilityContext } from "@/hooks/useThreadVisibility";
+ import type { SettingsExitGuard } from "@/components/settings/contracts";
++import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
++import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
+ import { PaneWorkbench } from "@/components/workbench/PaneWorkbench";
+ import {
+   MAX_WORKBENCH_PANES,
+@@ -49,20 +51,25 @@ import { usePageVisibility } from "@/hooks/usePageVisibility";
+ import { useMediaQuery } from "@/hooks/useMediaQuery";
+ import type { SendAttachment, SendOptions } from "@/hooks/useNanobotStream";
+ import { ThemeProvider, useTheme } from "@/hooks/useTheme";
++import { BossDesktop } from "@/boss-agent/BossDesktop";
++import {bossHistorySuppressed,pushBossHistory,replaceBossHistory} from "@/boss-agent/boss-history";
++import {BossConversationWorkspace} from "@/boss-agent/BossConversationWorkspace";
++import {writeConversationPosition} from "@/boss-agent/BossConversationPosition";
++import type {MorningConversationRequest,MorningBindingReceipt} from "@/boss-agent/BossMorningView";
++import { BossLogin, bossFetchBootstrap as fetchBootstrap, bossClearSavedSecret as clearSavedSecret } from "@/boss-agent/BossLogin";
+ import { logoFallbackUrls } from "@/lib/provider-brand";
+ import { cn } from "@/lib/utils";
+ import {
+   BootstrapAuthRequiredError,
+-  clearSavedSecret,
+   consumeUrlBootstrapSecret,
+   deriveWsUrl,
+-  fetchBootstrap,
+   loadSavedSecret,
+   saveSecret,
+ } from "@/lib/bootstrap";
+ import { displayTitle, sortSessions } from "@/lib/chat-groups";
+ import { deriveTitle } from "@/lib/format";
+ import { NanobotClient } from "@/lib/nanobot-client";
++import { webuiThreadCache } from "@/lib/webui-thread-cache";
+ import { ClientProvider, useClient } from "@/providers/ClientProvider";
+ import type {
+   BootstrapResponse,
+@@ -76,6 +83,7 @@ import type {
+ } from "@/lib/types";
+ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
++import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+ import { Disclosure } from "@/components/ui/disclosure";
+ import {
+   fetchPairingRequests,
+@@ -97,7 +105,7 @@ import {
+ type BootState =
+   | { status: "loading" }
+   | { status: "error"; message: string }
+-  | { status: "auth"; failed?: boolean }
++  | { status: "auth"; failed?: boolean; expired?: boolean }
+   | {
+       status: "ready";
+       client: NanobotClient;
+@@ -322,18 +330,10 @@ function writeShellRoute(route: ShellRoute, replace = false): void {
+   const nextHash = shellRouteHash(route);
+   if (window.location.hash === nextHash) return;
+   if (replace) {
+-    window.history.replaceState(
+-      null,
+-      "",
+-      `${window.location.pathname}${window.location.search}${nextHash}`,
+-    );
++    replaceBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+     return;
+   }
+-  window.history.pushState(
+-    null,
+-    "",
+-    `${window.location.pathname}${window.location.search}${nextHash}`,
+-  );
++  pushBossHistory(`${window.location.pathname}${window.location.search}${nextHash}`);
+ }
+ 
+ function bootstrapTokenExpiresAt(expiresInSeconds: number): number {
+@@ -349,7 +349,7 @@ function tokenRefreshDelayMs(expiresAt: number): number {
+   return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, remaining - margin);
+ }
+ 
+-function AuthForm({
++export function NativeAuthForm({
+   failed,
+   onSecret,
+ }: {
+@@ -874,10 +874,29 @@ function resolveRuntimeSurface(
+   return surface ? toRuntimeSurface(surface) : fallback;
+ }
+ 
++function clearPrivateNativeState(): void {
++  webuiThreadCache.clear();
++  for (const key of Object.keys(window.localStorage)) {
++    if (key.startsWith("nanobot.webui.composerQueuedGuidance.v1:")) window.localStorage.removeItem(key);
++  }
++}
++
+ export default function App() {
+-  const { t } = useTranslation();
+   const [state, setState] = useState<BootState>({ status: "loading" });
++  useEffect(() => {if (state.status === "auth") clearPrivateNativeState();}, [state.status]);
+   const bootstrapSecretRef = useRef("");
++  useEffect(() => {
++    if (state.status !== "ready") return;
++    const expire = () => {
++      state.client.close();
++      clearPrivateNativeState();
++      bootstrapSecretRef.current = "";
++      clearSavedSecret();
++      setState({ status: "auth", expired: true });
++    };
++    window.addEventListener("boss-auth-expired", expire);
++    return () => window.removeEventListener("boss-auth-expired", expire);
++  }, [state]);
+ 
+   const refreshReadyClient = useCallback(
+     async (client: NanobotClient, fallbackSurface: RuntimeSurface) => {
+@@ -932,6 +951,9 @@ export default function App() {
+                 const refreshed = await refreshReadyClient(client, runtimeSurface);
+                 return refreshed.url;
+               } catch {
++                client.close();
++                clearSavedSecret();
++                setState({ status: "auth", expired: true });
+                 return null;
+               }
+             },
+@@ -976,7 +998,10 @@ export default function App() {
+         await refreshReadyClient(client, state.runtimeSurface);
+       } catch (e) {
+         if (isBootstrapAuthRequired(e)) {
+-          setState({ status: "auth", failed: !!bootstrapSecretRef.current });
++          client.close();
++          clearSavedSecret();
++          bootstrapSecretRef.current = "";
++          setState({ status: "auth", expired: true });
+         }
+       }
+     }, tokenRefreshDelayMs(state.tokenExpiresAt));
+@@ -990,38 +1015,20 @@ export default function App() {
+ 
+   if (state.status === "loading") {
+     return (
+-      <div className="flex h-full w-full items-center justify-center">
+-        <div className="flex flex-col items-center gap-3 animate-in fade-in-0 duration-300">
+-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+-            <span className="relative flex h-2 w-2">
+-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground/40" />
+-              <span className="relative inline-flex h-2 w-2 rounded-full bg-foreground/60" />
+-            </span>
+-            {t("app.loading.connecting")}
+-          </div>
+-        </div>
+-      </div>
++      <BossLogin mode="loading" onSecret={(s) => bootstrapWithSecret(s)} />
+     );
+   }
+   if (state.status === "auth") {
+     return (
+-      <AuthForm
+-        failed={!!state.failed}
++      <BossLogin
++        failed={!!state.failed} expired={!!state.expired}
+         onSecret={(s) => bootstrapWithSecret(s)}
+       />
+     );
+   }
+   if (state.status === "error") {
+     return (
+-      <div className="flex h-full w-full items-center justify-center px-4 text-center">
+-        <div className="flex max-w-md flex-col items-center gap-3">
+-          <p className="text-lg font-semibold">{t("app.error.title")}</p>
+-          <p className="text-sm text-muted-foreground">{state.message}</p>
+-          <p className="text-xs text-muted-foreground">
+-            {t("app.error.gatewayHint")}
+-          </p>
+-        </div>
+-      </div>
++      <BossLogin mode="error" message={state.message} onSecret={(s) => bootstrapWithSecret(s)} />
+     );
+   }
+ 
+@@ -1031,12 +1038,17 @@ export default function App() {
+     );
+   };
+ 
+-  const handleLogout = () => {
+-    if (state.status === "ready") {
++  const handleLogout = async () => {
++    if (state.status !== "ready") return;
++    try {
++      await state.client.requestMutation("boss.auth.logout", {});
++    } finally {
+       state.client.close();
++      clearPrivateNativeState();
++      bootstrapSecretRef.current = "";
++      clearSavedSecret();
++      setState({ status: "auth" });
+     }
+-    clearSavedSecret();
+-    setState({ status: "auth" });
+   };
+ 
+   const handleNativeEngineRestart = async (): Promise<string> => {
+@@ -1082,7 +1094,6 @@ export default function App() {
+ }
+ 
+ function Shell({
+-  runtimeSurface,
+   onModelNameChange,
+   onLogout,
+   onNativeEngineRestart,
+@@ -1193,10 +1204,29 @@ function Shell({
+   const activeChatIdRef = useRef<string | null>(null);
+   const pendingCreatedSessionKeyRef = useRef<string | null>(null);
+   const temporarySessionsRef = useRef<Record<string, ChatSummary>>({});
+-  const effectiveRuntimeSurface =
+-    settingsSnapshot?.surface ?? settingsSnapshot?.runtime_surface ?? runtimeSurface;
+-  const showHostChrome = isNativeRuntime(effectiveRuntimeSurface);
+-  const showMainSidebar = view !== "settings";
++  const showHostChrome = false;
++  const showMainSidebar = false;
++  const [pendingNativeNavigation, setPendingNativeNavigation] = useState<(() => void) | null>(null);
++  const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const nativeReading=useRef(new Map<string,ThreadReadingController>());
++  const registerNativeReading=useCallback((key:string,controller:ThreadReadingController|null)=>{
++    if(controller)nativeReading.current.set(key,controller);else nativeReading.current.delete(key);
++  },[]);
++  const windowCloseGuard=useRef<((close:()=>void)=>void)|null>(null);
++  const registerWindowCloseGuard=useCallback((guard:((close:()=>void)=>void)|null)=>{windowCloseGuard.current=guard;},[]);
++  useEffect(()=>{
++    const bridge=(window as Window&{bossDesktop?:{onCloseRequested?:(listener:()=>void)=>()=>void;confirmClose?:()=>Promise<unknown>}}).bossDesktop;
++    if(!bridge?.onCloseRequested||!bridge.confirmClose)return;
++    const confirm=bridge.confirmClose;
++    return bridge.onCloseRequested(()=>{
++      const close=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{void confirm();}));
++      const guard=windowCloseGuard.current;
++      if(guard)guard(close);else close();
++    });
++  },[]);
++  const registerNativeDraft=useCallback((key:string,controller:ComposerDraftController|null)=>{
++    if(controller)nativeDrafts.current.set(key,controller);else nativeDrafts.current.delete(key);
++  },[]);
+   const activeTemporarySession = activeKey ? temporarySessions[activeKey] ?? null : null;
+   const temporaryChatId = activeTemporarySession?.chatId ?? null;
+   const temporaryChatActive = view === "chat" && temporaryChatId !== null;
+@@ -1213,14 +1243,18 @@ function Shell({
+   );
+ 
+   const navigate = useCallback(
+-    (route: ShellRoute, options?: { replace?: boolean }) => {
++    (route: ShellRoute, options?: { replace?: boolean; sending?: boolean }) => {
+       const leave = () => {
+         setActiveKey(route.activeKey);
+         setView(route.view);
+         setSettingsInitialSection(route.settingsSection);
+         writeShellRoute(route, options?.replace);
+       };
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++      if (!options?.sending && currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        setPendingNativeNavigation(() => ()=>{draft.discard();leave();});
++      } else if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
+         settingsExitGuardRef.current(leave);
+       } else leave();
+     },
+@@ -1229,8 +1263,21 @@ function Shell({
+ 
+   useEffect(() => {
+     const applyRoute = () => {
++      if(bossHistorySuppressed())return;
+       const route = readShellRoute();
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++      if (currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        writeShellRoute(currentShellRouteRef.current, true);
++        setPendingNativeNavigation(() => () => {
++          draft.discard();
++          setActiveKey(route.activeKey);setView(route.view);setSettingsInitialSection(route.settingsSection);
++          writeShellRoute(route,true);
++        });
++        return;
++      }
++      if (currentShellRouteRef.current.view === "settings" &&
++          (route.view !== "settings" || route.settingsSection !== currentShellRouteRef.current.settingsSection) && settingsExitGuardRef.current) {
+         writeShellRoute(currentShellRouteRef.current, true);
+         settingsExitGuardRef.current(() => {
+           setActiveKey(route.activeKey);
+@@ -1615,7 +1662,7 @@ function Shell({
+         view: "chat",
+         activeKey: key,
+         settingsSection: "overview",
+-      });
++      }, {sending: Boolean(_initialMessage?.trim())});
+       setMobileSidebarOpen(false);
+       if (scope) {
+         setWorkspaceOverrides((current) => ({
+@@ -1659,6 +1706,30 @@ function Shell({
+     setPendingAutomationMessage((current) => current?.id === id ? null : current);
+   }, []);
+ 
++  const onStartMorningChat=useCallback(async(value:MorningConversationRequest,signal:AbortSignal):Promise<MorningBindingReceipt>=>{
++    if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
++    let binding:MorningBindingReceipt;
++    if(value.binding_id){
++      const response=await fetch("/api/boss/ui/morning/binding?"+new URLSearchParams({client_request_id:value.binding_id}),{headers:{Authorization:"Bearer "+getToken()},cache:"no-store"});
++      if(!response.ok)throw new Error("晨间原生绑定读取失败，HTTP "+response.status);
++      binding=await response.json();
++      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.date!==value.date||binding.result.timezone!==value.timezone||binding.result.item_id!==(value.item_id??null))throw new Error("当前问题与原生绑定不符");
++    }else{
++      const chatId=await onCreateChat(undefined,value.question);
++      if(signal.aborted)throw Object.assign(new Error("会话交接已取消"),{handoffNotSubmitted:true});
++      if(!chatId)throw new Error("原生会话尚未创建，问题保留在今日工作。");
++      const {question:submittedQuestion,binding_id:existingBinding,...scope}=value;
++      void submittedQuestion;void existingBinding;
++      binding=await client.requestMutation<MorningBindingReceipt>("boss.morning.bind",{...scope,chat_id:chatId});
++      if(binding.outcome!=="RECORDED"||!binding.result||binding.result.chat_id!==chatId)throw new Error("原生晨间绑定尚未取得有效回执");
++    }
++    if(!signal.aborted){
++      if(value.binding_id)navigate({view:"chat",activeKey:binding.result.session_id,settingsSection:"overview"},{sending:true});
++      setPendingAutomationMessage({id:crypto.randomUUID(),chatId:binding.result.chat_id,content:value.question});
++    }
++    return binding;
++  },[client,getToken,navigate,onCreateChat]);
++
+   const onCreateTemporaryChat = useCallback(
+     async (
+       workspaceScope?: WorkspaceScopePayload | null,
+@@ -1728,6 +1799,7 @@ function Shell({
+   }, [forkChat, navigate, sessions, sidebarState.title_overrides, t]);
+ 
+   const onNewChat = useCallback(() => {
++    writeConversationPosition(null);
+     navigate(defaultShellRoute());
+     setTemporaryChatEnabled(false);
+     setDraftWorkspaceScope(null);
+@@ -1767,6 +1839,7 @@ function Shell({
+ 
+   const onSelectChat = useCallback(
+     (key: string) => {
++      writeConversationPosition(null);
+       const selectedTemporary = temporarySessionsRef.current[key];
+       const selected = selectedTemporary
+         ?? sessions.find((session) => session.key === key);
+@@ -2075,6 +2148,7 @@ function Shell({
+     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+       const action = matchSidebarShortcut(event);
+       if (!action) return;
++      if (new URLSearchParams(window.location.search).get("bossPage") !== "NATIVE" || action === "search") return;
+       event.preventDefault();
+       actions[action]();
+     };
+@@ -2084,11 +2158,13 @@ function Shell({
+ 
+   const onSettingsSectionChange = useCallback(
+     (section: SettingsSectionKey) => {
+-      navigate({
++      const leave = () => navigate({
+         view: shellViewForSettingsSection(section),
+         activeKey,
+         settingsSection: section,
+       });
++      if (settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++      else leave();
+     },
+     [activeKey, navigate],
+   );
+@@ -2659,6 +2735,44 @@ function Shell({
+ 
+   return (
+     <ThemeProvider theme={theme}>
++      <BossDesktop getToken={getToken} onLogout={onLogout} onStartChat={onStartAutomationChat} onStartMorning={onStartMorningChat}
++        onRegisterCloseGuard={registerWindowCloseGuard}
++        onNewConversation={onNewChat}
++        onCreateTaskConversation={()=>createChat(activeWorkspaceScope)}
++        onOpenTaskConversation={(chatId,question)=>{onSelectChat("websocket:"+chatId);if(question)setPendingAutomationMessage({id:crypto.randomUUID(),chatId,content:question});}}
++        onOpenMorning={chatId=>onSelectChat("websocket:"+chatId)}
++        onOpenNative={role => {
++          const currentRoute=readShellRoute();
++          if(role === "BOSS" && currentRoute.view !== "chat")navigate({...currentRoute,view:"chat",settingsSection:"overview"},{replace:true});
++          if(role === "MAINTAINER" && currentRoute.view === "chat")navigate({...currentRoute,view:shellViewForSettingsSection(settingsInitialSection),settingsSection:settingsInitialSection},{replace:true});
++        }}
++        onBeforeLeaveNative={leave => {
++          const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++          if(view==="chat"&&draft?.hasDraft)setPendingNativeNavigation(()=>()=>{draft.discard();leave();});
++          else if (view !== "chat" && settingsExitGuardRef.current) settingsExitGuardRef.current(leave);
++          else leave();
++        }}>
++      {(role,nativeVisible,conversationActions) => <>
++      {role === "MAINTAINER" && <div className="boss-native-toolbar" aria-label="设置分类">
++        <label>设置分类<select aria-label="设置分类" value={settingsInitialSection} onChange={event => onSettingsSectionChange(event.target.value as SettingsSectionKey)}>
++          {SETTINGS_SECTION_KEYS.filter(section => section !== "voice").map(section => <option key={section} value={section}>{t(`settings.nav.${section}`)}</option>)}
++        </select></label>
++      </div>}
++      <BossConversationWorkspace role={role} visible={nativeVisible} activeKey={activeKey}
++        captureReadingPosition={()=>nativeReading.current.get(activeKey??"new-conversation")?.captureReadingPosition()??null}
++        restoreReadingPosition={(position,signal)=>{
++          const reader=nativeReading.current.get(position.conversationKey);
++          if(!reader)return Promise.reject(new Error("当前原生会话阅读服务尚未就绪"));
++          return reader.restoreReadingPosition(position,signal);
++        }}
++        sessions={topicSessions.map(session=>({key:session.key,chatId:session.chatId,title:displayTitle(session,sidebarState.title_overrides,t("chat.newChat")),updatedAt:session.updatedAt??"更新时间未知"}))}
++        onNewChat={onNewChat} onSelectChat={onSelectChat} onSearch={onOpenSessionSearch} actions={conversationActions}>
++      <Dialog open={pendingNativeNavigation !== null} onOpenChange={open => {if (!open) setPendingNativeNavigation(null);}}>
++        <DialogContent className="boss-native-dialog">
++          <DialogTitle>未保存会话输入</DialogTitle><DialogDescription>当前输入尚未发送。请选择继续编辑，或者明确放弃当前输入。</DialogDescription>
++          <DialogFooter><Button variant="outline" onClick={() => setPendingNativeNavigation(null)}>返回继续编辑</Button><Button onClick={() => {const leave=pendingNativeNavigation;setPendingNativeNavigation(null);leave?.();}}>放弃输入并离开</Button></DialogFooter>
++        </DialogContent>
++      </Dialog>
+       <div
+         className={cn(
+           "relative h-full w-full overflow-hidden",
+@@ -2768,7 +2882,8 @@ function Shell({
+               />
+             </Suspense>
+           ) : null}
+-        <main
++        {role === "BOSS" && view !== "chat" && <div role="status" className="boss-status boss-status-warn">当前身份没有应用维护权限，请返回当前会话。</div>}
++        <div
+           className={cn(
+             "relative flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-background",
+           )}
+@@ -2776,10 +2891,10 @@ function Shell({
+             <div
+               className={cn(
+                 "absolute inset-0 flex flex-col",
+-                view !== "chat" && "hidden",
++                (view !== "chat" || role !== "BOSS") && "hidden",
+               )}
+             >
+-              <ThreadVisibilityContext.Provider value={view === "chat"}>
++              {role === "BOSS" && <ThreadVisibilityContext.Provider value={nativeVisible && view === "chat"}>
+                 <Suspense fallback={<SurfaceLoadingFallback label={t("chat.loading")} />}>
+                   <PaneWorkbench
+                     panes={renderedWorkbenchPanes}
+@@ -2839,7 +2954,11 @@ function Shell({
+                             theme={theme}
+                             onToggleTheme={toggle}
+                             hideSidebarToggleForHostChrome
+-                            hideHeader={false}
++                            hideHeader
++                            transcriptionEnabled={false}
++                            persistQueuedPrompts={false}
++                            onDraftController={controller=>registerNativeDraft(activeKey??"new-conversation",controller)}
++                            onReadingController={controller=>registerNativeReading(activeKey??"new-conversation",controller)}
+                             workspaceScope={activeWorkspaceScope}
+                             workspaceDefaultScope={workspaces?.default_scope ?? null}
+                             workspaceControls={workspaces?.controls ?? null}
+@@ -2880,6 +2999,11 @@ function Shell({
+                           hideSidebarToggleForHostChrome={context.active}
+                           hideThemeButton={!context.active}
+                           hideHeaderTitle
++                          hideHeader
++                          transcriptionEnabled={false}
++                          persistQueuedPrompts={false}
++                          onDraftController={controller=>registerNativeDraft(paneSession.key,controller)}
++                          onReadingController={controller=>registerNativeReading(paneSession.key,controller)}
+                           inlineHandle={!mobileWorkbench && workbenchPaneSessions.length > 1}
+                           headerActions={context.headerActions}
+                           headerPortalTarget={context.headerPortalTarget}
+@@ -2913,9 +3037,9 @@ function Shell({
+                     }}
+                   />
+                 </Suspense>
+-              </ThreadVisibilityContext.Provider>
++              </ThreadVisibilityContext.Provider>}
+             </div>
+-            {view !== "chat" && (
++            {role === "MAINTAINER" && (
+               <div className="absolute inset-0 flex flex-col">
+                 <Suspense fallback={<SurfaceLoadingFallback />}>
+                   <SettingsView
+@@ -2923,7 +3047,7 @@ function Shell({
+                     theme={theme}
+                     initialSection={settingsInitialSection}
+                     initialSettings={settingsSnapshot}
+-                    showSidebar={view === "settings"}
++                    showSidebar={false}
+                     mainNavigationExpanded={showMainSidebar && hostSidebarOpen}
+                     onToggleTheme={toggle}
+                     onBackToChat={onBackToChat}
+@@ -2942,7 +3066,7 @@ function Shell({
+                 </Suspense>
+               </div>
+             )}
+-          </main>
++          </div>
+         </div>
+ 
+         {pendingDelete ? (
+@@ -3015,6 +3139,9 @@ function Shell({
+           onDismiss={onDismissPairingRequest}
+         />
+       </div>
++      </BossConversationWorkspace>
++      </>}
++      </BossDesktop>
+     </ThemeProvider>
+   );
+ }

@@ -1,0 +1,25 @@
+{
+  "extends": "../../.work/product/nanobot/webui/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../../.work/product/nanobot/webui",
+    "typeRoots": ["../../.work/product/nanobot/webui/node_modules/@types"],
+    "types": [],
+    "paths": {
+      "@/*": ["src/*"],
+      "ajv": ["../../../upgrade2-u2-07/dependencies/node_modules/ajv"],
+      "ajv/*": ["../../../upgrade2-u2-07/dependencies/node_modules/ajv/*"],
+      "ajv-formats": ["../../../upgrade2-u2-07/dependencies/node_modules/ajv-formats"],
+      "yaml": ["../../../upgrade2-u2-07/yaml-dependency/node_modules/yaml"],
+      "react": ["node_modules/@types/react/index.d.ts"],
+      "react/*": ["node_modules/@types/react/*"],
+      "react-dom": ["node_modules/@types/react-dom/index.d.ts"],
+      "react-dom/*": ["node_modules/@types/react-dom/*"],
+      "react-syntax-highlighter": ["node_modules/@types/react-syntax-highlighter/index.d.ts"],
+      "react-syntax-highlighter/*": ["node_modules/@types/react-syntax-highlighter/*"],
+      "luxon": ["node_modules/@types/luxon/index.d.ts"],
+      "*": ["node_modules/*"]
+    }
+  },
+  "files": ["../../.work/product/nanobot/webui/node_modules/vite/client.d.ts", "../webui/BossConversationWorkspace.tsx"],
+  "include": []
+}

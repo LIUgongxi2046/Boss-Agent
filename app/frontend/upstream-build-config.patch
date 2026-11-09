@@ -1,0 +1,21 @@
+--- a/webui/tsconfig.json
++++ b/webui/tsconfig.json
+@@ -27,6 +27,7 @@
+     "paths": {
+       "@/*": ["./src/*"],
+       "lucide-react": ["./node_modules/lucide-react"],
++      "@radix-ui/react-dialog": ["./node_modules/@radix-ui/react-dialog"],
+       "react": ["./node_modules/@types/react/index.d.ts"],
+       "react/*": ["./node_modules/@types/react/*"],
+       "react-i18next": ["./node_modules/react-i18next"]
+--- a/webui/vite.config.ts
++++ b/webui/vite.config.ts
+@@ -126,7 +126,7 @@ export default defineConfig(({ mode }) => {
+       },
+       // Channel-owned UI lives beside the Python package, outside webui/.
+       // Resolve its shared frontend dependencies from this app's root.
+-      dedupe: ["react", "react-dom", "lucide-react", "react-i18next", "qrcode"],
++      dedupe: ["react", "react-dom", "lucide-react", "react-i18next", "qrcode", "@radix-ui/react-dialog"],
+     },
+     optimizeDeps: {
+       // Pre-bundle Dialog up front, including lazy settings/sheets. Excluding

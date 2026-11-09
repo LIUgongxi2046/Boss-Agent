@@ -7,28 +7,41 @@ function initial(){const params=new URLSearchParams(window.location.search);for(
 
 export function BossExecutionRecovery({taskId,onOpenTask,onNavigate}:{taskId?:string;onOpenTask:(id:string)=>void;onNavigate:(page:string)=>void}){
   const {getToken}=useClient();
+  return <BossExecutionRecoveryContent taskId={taskId} onOpenTask={onOpenTask} onNavigate={onNavigate} getToken={getToken}/>;
+}
+
+export function BossExecutionRecoveryContent({taskId,onOpenTask,onNavigate,getToken}:{taskId?:string;onOpenTask:(id:string)=>void;onNavigate:(page:string)=>void;getToken:()=>string}){
   const [values,setValues]=useState(initial);
-  const [receipt,setReceipt]=useState<Receipt|null>(null);
+  const [savedReceipt,setReceipt]=useState<Receipt|null>(null);
   const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
+  const [savedError,setError]=useState("");
   const controller=useRef<AbortController|null>(null);
-  useEffect(()=>()=>controller.current?.abort(),[]);
+  const latest=useRef({taskId,getToken});latest.current={taskId,getToken};
+  const currentToken=getToken();
+  const responseScope=useRef<{taskId:string|undefined;token:string}|null>(null);
+  const visible=responseScope.current?.taskId===taskId&&responseScope.current?.token===currentToken;
+  const receipt=visible?savedReceipt:null;
+  const error=visible?savedError:"";
+  useEffect(()=>{controller.current?.abort();setReceipt(null);setLoading(false);setError("");return()=>controller.current?.abort();},[taskId,getToken,currentToken]);
+  function clearRequest(){controller.current?.abort();controller.current=null;setLoading(false);setReceipt(null);setError("");}
   function read(){
-    if(!values.action.trim()||!values.request.trim()){setError("请提供原动作与原请求编号");return;}
+    if(!values.action.trim()||!values.request.trim()){responseScope.current={taskId,token:getToken()};setError("请提供原动作与原请求编号");return;}
     controller.current?.abort();const abort=new AbortController();controller.current=abort;setLoading(true);setError("");setReceipt(null);
-    const request=values.request.trim(),action=values.action.trim();
+    const request=values.request.trim(),action=values.action.trim(),token=getToken(),startedTask=taskId;
+    responseScope.current={taskId:startedTask,token};
+    const active=()=>!abort.signal.aborted&&latest.current.taskId===startedTask&&latest.current.getToken()===token;
     const url=new URL(window.location.href);url.searchParams.set("bossRecoveryRequest",request);url.searchParams.set("bossRecoveryAction",action);window.history.replaceState(window.history.state,"",url);
-    void fetch("/api/boss/ui/operation-status?"+new URLSearchParams({action,client_request_id:request}),{headers:{Authorization:"Bearer "+getToken()},signal:abort.signal,cache:"no-store"}).then(async response=>{
-      if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));
+    void fetch("/api/boss/ui/operation-status?"+new URLSearchParams({action,client_request_id:request}),{headers:{Authorization:"Bearer "+token},signal:abort.signal,cache:"no-store"}).then(async response=>{
+      if(response.status===401&&active())window.dispatchEvent(new Event("boss-auth-expired"));
       if(!response.ok)throw new Error("执行结果查询失败（HTTP "+response.status+"）");
       const next=await response.json() as Receipt;
       if(next.action!==action||next.client_request_id!==request||!["RECORDED","NOT_FOUND_IN_CURRENT_STORE"].includes(next.outcome))throw new Error("回执与原请求不一致");
-      if(abort.signal.aborted)return;setReceipt(next);setLoading(false);
-    }).then(undefined,reason=>{if(!abort.signal.aborted){setLoading(false);setError(reason.message);}});
+      if(!active())return;setReceipt(next);setLoading(false);
+    }).then(undefined,reason=>{if(active()){setLoading(false);setError(reason instanceof Error?reason.message:String(reason));}});
   }
   const resultTask=typeof receipt?.result?.task_id==="string"?receipt.result.task_id:taskId;
   return <><V7ReadState loading={loading} error={error}/><div className="boss-columns"><div className="boss-column">
-    <V7Panel title="执行结果核查" description="通过原请求编号读取服务端回执，不会再次执行原业务动作。"><details><summary>按编号查询</summary><form onSubmit={event=>{event.preventDefault();read();}}><div className="boss-form-grid"><label>原动作<input required value={values.action} onChange={event=>{setValues(current=>({...current,action:event.target.value}));setReceipt(null);}} placeholder="原请求中的 action"/></label><label>原请求编号<input required value={values.request} onChange={event=>{setValues(current=>({...current,request:event.target.value}));setReceipt(null);}} placeholder="client_request_id"/></label></div></form></details><div className="boss-actions"><button className="boss-btn boss-btn-primary" disabled={loading||!values.action.trim()||!values.request.trim()} onClick={read}>查询原请求结果</button><button className="boss-btn" type="button" disabled={!loading} onClick={()=>{controller.current?.abort();setLoading(false);}}>{loading?"停止本次查询":"取消本次查询"}</button></div></V7Panel>
+    <V7Panel title="执行结果核查" description="通过原请求编号读取服务端回执，不会再次执行原业务动作。"><details><summary>按编号查询</summary><form onSubmit={event=>{event.preventDefault();read();}}><div className="boss-form-grid"><label>原动作<input required value={values.action} onChange={event=>{const action=event.target.value;clearRequest();setValues(current=>({...current,action}));}} placeholder="原请求中的 action"/></label><label>原请求编号<input required value={values.request} onChange={event=>{const request=event.target.value;clearRequest();setValues(current=>({...current,request}));}} placeholder="client_request_id"/></label></div></form></details><div className="boss-actions"><button className="boss-btn boss-btn-primary" disabled={loading||!values.action.trim()||!values.request.trim()} onClick={read}>查询原请求结果</button><button className="boss-btn" type="button" disabled={!loading} onClick={clearRequest}>{loading?"停止本次查询":"取消本次查询"}</button></div></V7Panel>
     <V7Panel title="当前正式状态">{receipt?<><V7Fact label="查询结论">{receipt.outcome==="RECORDED"?"已找到执行回执":"执行结果仍未确定"}</V7Fact><V7Fact label="原请求编号">{receipt.client_request_id}</V7Fact><V7Fact label="动作">{receipt.action}</V7Fact>{receipt.result?<pre className="boss-v7-code">{JSON.stringify(receipt.result,null,2)}</pre>:<p>当前没有找到该请求记录。继续使用原编号核查，读取业务对象的当前状态。</p>}</>:<V7Empty title="尚未查询原执行结果">网络中断、超时或页面关闭后，使用原请求信息继续核查。</V7Empty>}</V7Panel>
   </div><aside className="boss-column"><V7Panel title="恢复步骤"><V7Steps steps={[
     {title:"定位原请求",description:values.request?values.request:"提供原请求编号",state:values.request?"complete":"current"},

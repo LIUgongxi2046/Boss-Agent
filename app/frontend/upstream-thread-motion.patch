@@ -1,0 +1,54 @@
+--- a/webui/src/components/thread/thread-camera.ts
++++ b/webui/src/components/thread/thread-camera.ts
+@@ -66,24 +66,23 @@ export class ThreadCameraController {
+   }
+ 
+   /**
+-   * Automatic follow is a layout constraint, not navigation. Resolve it in
+-   * the geometry frame so streamed content and viewport resizing cannot build
+-   * up hidden travel below the visible tail.
++   * 自动跟随使用短时动画连接内容高度变化，并保留用户接管与减少动态效果设置。
+    */
+   followTo(top: number): ThreadCameraFollowResult | null {
+     const viewport = this.getViewport();
+     if (!viewport) return null;
+-    this.cancel();
+-    this.target = Math.max(0, top);
+-    this.write(viewport, this.target);
+-    return "settled";
++    if (this.prefersReducedMotion()) {
++      this.jumpTo(top);
++      return "settled";
++    }
++    return this.moveTo(top, 80);
+   }
+ 
+   navigateTo(top: number): ThreadCameraFollowResult | null {
+     return this.moveTo(top);
+   }
+ 
+-  private moveTo(top: number): ThreadCameraFollowResult | null {
++  private moveTo(top: number, duration = NAVIGATION_DURATION_MS): ThreadCameraFollowResult | null {
+     const viewport = this.getViewport();
+     if (!viewport) return null;
+     const current = viewport.scrollTop;
+@@ -101,7 +100,7 @@ export class ThreadCameraController {
+     this.lastTimestamp = this.scheduler.now();
+     this.deadline = this.lastTimestamp + (this.prefersReducedMotion()
+       ? REDUCED_NAVIGATION_DURATION_MS
+-      : NAVIGATION_DURATION_MS);
++      : duration);
+     this.frameId = this.scheduler.request(this.advance);
+     return "started";
+   }
+--- a/webui/src/hooks/useNanobotStream.ts
++++ b/webui/src/hooks/useNanobotStream.ts
+@@ -64,7 +64,7 @@ type PendingStreamEvent =
+ 
+ const BACKGROUND_STREAM_FLUSH_INTERVAL_MS = 1_000;
+ // Markdown and layout work must leave room for input between visible updates.
+-const VISIBLE_STREAM_FLUSH_INTERVAL_MS = 50;
++const VISIBLE_STREAM_FLUSH_INTERVAL_MS = 16;
+ 
+ /**
+  * Append a reasoning chunk to the last open reasoning stream in ``prev``.

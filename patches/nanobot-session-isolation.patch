@@ -1,0 +1,45 @@
+diff --git a/nanobot/session/manager.py b/nanobot/session/manager.py
+--- a/nanobot/session/manager.py
++++ b/nanobot/session/manager.py
+@@ -548,7 +548,13 @@ class SessionStore(Protocol):
+ class JsonlSessionStore:
+     """JSONL implementation of session persistence."""
+ 
+-    def __init__(self, workspace: Path, *, sessions_root: Path | None = None):
++    def __init__(
++        self,
++        workspace: Path,
++        *,
++        sessions_root: Path | None = None,
++        legacy_sessions_root: Path | None = None,
++    ):
+         canonical_workspace = Path(workspace).expanduser().resolve(strict=False)
+         ensure_dir(canonical_workspace)
+         root = (
+@@ -577,7 +583,11 @@ class JsonlSessionStore:
+                 workspace_id,
+             )
+             self.sessions_dir = ensure_dir(root / workspace_id)
+-            self.legacy_sessions_dir = get_legacy_sessions_dir()
++            self.legacy_sessions_dir = (
++                Path(legacy_sessions_root).expanduser().resolve(strict=False)
++                if legacy_sessions_root is not None
++                else get_legacy_sessions_dir()
++            )
+             self._session_files_lock = FileLock(
+                 str(self.sessions_dir / _SESSION_FILES_LOCK_FILENAME)
+             )
+@@ -1650,9 +1659,12 @@ class SessionManager:
+         *,
+         store: SessionStore | None = None,
+         sessions_root: Path | None = None,
++        legacy_sessions_root: Path | None = None,
+     ):
+         self.workspace = workspace
+-        self._jsonl_store = JsonlSessionStore(workspace, sessions_root=sessions_root)
++        self._jsonl_store = JsonlSessionStore(
++            workspace, sessions_root=sessions_root, legacy_sessions_root=legacy_sessions_root
++        )
+         self._store: SessionStore = store if store is not None else self._jsonl_store
+         self.sessions_dir = self._jsonl_store.sessions_dir
+         self.legacy_sessions_dir = self._jsonl_store.legacy_sessions_dir

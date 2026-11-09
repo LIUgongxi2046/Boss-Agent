@@ -1,0 +1,72 @@
+--- a/webui/src/components/thread/AgentActivityCluster.tsx
++++ b/webui/src/components/thread/AgentActivityCluster.tsx
+@@ -20,6 +20,7 @@ import {
+   type LucideIcon,
+ } from "lucide-react";
+ import { useTranslation } from "react-i18next";
++import { BossToolEvents, canRenderBossToolEvents } from "@/boss-agent/BossToolActivity";
+ 
+ import { MarkdownText } from "@/components/MarkdownText";
+ import { cliAppInitials, mcpPresetInitials } from "@/components/CliAppMentionText";
+@@ -285,7 +286,8 @@ function FoldedAgentActivity({
+   /** Live work stays open; completed work briefly shows the done state, then tucks away. */
+   const outerExpanded = userToggledOuter
+     ? outerOpenLocal
+-    : isTurnStreaming || completionHoldOpen || (wasTurnStreaming && !isTurnStreaming);
++    : isTurnStreaming || completionHoldOpen || (wasTurnStreaming && !isTurnStreaming)
++      || activityMessages.some(message => (message.toolEvents ?? []).length > 0);
+   const deferredTraceRefs = useMemo(
+     () => Array.from(new Set(
+       messages
+@@ -693,6 +695,9 @@ function ActivityTraceList({
+         trace,
+         status: explicitState?.status === "running" && !active ? "done" : explicitState?.status ?? fallbackStatus,
+         error: explicitState?.error,
++        observedStatus: explicitState?.status,
++        active,
++        result: explicitState?.result,
+       };
+       const previous = genericItems[genericItems.length - 1];
+       if (previous && !canGroupGenericToolRuns(previous, item)) flushGenericItems(String(index));
+@@ -731,6 +736,9 @@ function ActivityTraceTimeline({
+   mcpPresetsByName: Map<string, McpPresetInfo>;
+ }) {
+   const lines = traceLines(message);
++  if (canRenderBossToolEvents(message.toolEvents ?? [])) {
++    return <BossToolEvents events={message.toolEvents ?? []} active={active}/>;
++  }
+   const cliRunsByLine = cliRunMapByTraceLine(message);
+   const mcpRunsByLine = mcpRunMapByTraceLine(message);
+   const webSearchRunsByLine = webSearchRunsByTraceLine(message.toolEvents ?? []);
+--- a/webui/src/components/thread/activity/GenericToolRun.tsx
++++ b/webui/src/components/thread/activity/GenericToolRun.tsx
+@@ -8,6 +8,7 @@ import {
+   type LucideIcon,
+ } from "lucide-react";
+ import { useMemo } from "react";
++import { BossToolActivity, isBossToolActivity } from "@/boss-agent/BossToolActivity";
+ 
+ import { ActivityStep } from "@/components/thread/activity/ActivityStep";
+ import {
+@@ -29,6 +30,9 @@ export function GenericToolRun({ items }: { items: GenericToolRunItem[] }) {
+   const model = useMemo(() => buildModel(items), [items]);
+   const action = [model.label, model.detail].filter(Boolean).join(" ");
+   const label = model.aside ? `${action} · ${model.aside}` : action;
++  if (items.length > 0 && items.every(item => isBossToolActivity(item.trace.name))) {
++    return <BossToolActivity items={items} />;
++  }
+ 
+   return (
+     <ActivityStep
+--- a/webui/src/components/thread/activity/generic-tool-model.ts
++++ b/webui/src/components/thread/activity/generic-tool-model.ts
+@@ -34,6 +34,9 @@ export interface GenericToolRunItem {
+   trace: GenericToolTrace;
+   status: GenericToolStatus;
+   error?: string;
++  observedStatus?: GenericToolStatus;
++  active?: boolean;
++  result?: unknown;
+ }
+ 
+ export interface GenericToolPresentation {

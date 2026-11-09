@@ -1,0 +1,75 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -19,6 +19,8 @@ import type { SidebarDeleteItem } from "@/components/ChatList";
+ import type { SettingsSectionKey } from "@/components/settings/SettingsView";
+ import { ThreadVisibilityContext } from "@/hooks/useThreadVisibility";
+ import type { SettingsExitGuard } from "@/components/settings/contracts";
++import type {ComposerDraftController} from "@/components/thread/ThreadComposer";
++import type {ThreadReadingController} from "@/components/thread/ThreadViewport";
+ import { PaneWorkbench } from "@/components/workbench/PaneWorkbench";
+ import {
+   MAX_WORKBENCH_PANES,
+@@ -1191,10 +1193,29 @@ function Shell({
+   const activeChatIdRef = useRef<string | null>(null);
+   const pendingCreatedSessionKeyRef = useRef<string | null>(null);
+   const temporarySessionsRef = useRef<Record<string, ChatSummary>>({});
+-  const effectiveRuntimeSurface =
+-    settingsSnapshot?.surface ?? settingsSnapshot?.runtime_surface ?? runtimeSurface;
+-  const showHostChrome = isNativeRuntime(effectiveRuntimeSurface);
+-  const showMainSidebar = view !== "settings";
++  const showHostChrome = false;
++  const showMainSidebar = false;
++  const [pendingNativeNavigation, setPendingNativeNavigation] = useState<(() => void) | null>(null);
++  const nativeDrafts=useRef(new Map<string,ComposerDraftController>());
++  const nativeReading=useRef(new Map<string,ThreadReadingController>());
++  const registerNativeReading=useCallback((key:string,controller:ThreadReadingController|null)=>{
++    if(controller)nativeReading.current.set(key,controller);else nativeReading.current.delete(key);
++  },[]);
++  const windowCloseGuard=useRef<((close:()=>void)=>void)|null>(null);
++  const registerWindowCloseGuard=useCallback((guard:((close:()=>void)=>void)|null)=>{windowCloseGuard.current=guard;},[]);
++  useEffect(()=>{
++    const bridge=(window as Window&{bossDesktop?:{onCloseRequested?:(listener:()=>void)=>()=>void;confirmClose?:()=>Promise<unknown>}}).bossDesktop;
++    if(!bridge?.onCloseRequested||!bridge.confirmClose)return;
++    const confirm=bridge.confirmClose;
++    return bridge.onCloseRequested(()=>{
++      const close=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{void confirm();}));
++      const guard=windowCloseGuard.current;
++      if(guard)guard(close);else close();
++    });
++  },[]);
++  const registerNativeDraft=useCallback((key:string,controller:ComposerDraftController|null)=>{
++    if(controller)nativeDrafts.current.set(key,controller);else nativeDrafts.current.delete(key);
++  },[]);
+   const activeTemporarySession = activeKey ? temporarySessions[activeKey] ?? null : null;
+   const temporaryChatId = activeTemporarySession?.chatId ?? null;
+   const temporaryChatActive = view === "chat" && temporaryChatId !== null;
+@@ -1211,14 +1232,18 @@ function Shell({
+   );
+ 
+   const navigate = useCallback(
+-    (route: ShellRoute, options?: { replace?: boolean }) => {
++    (route: ShellRoute, options?: { replace?: boolean; sending?: boolean }) => {
+       const leave = () => {
+         setActiveKey(route.activeKey);
+         setView(route.view);
+         setSettingsInitialSection(route.settingsSection);
+         writeShellRoute(route, options?.replace);
+       };
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++      if (!options?.sending && currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        setPendingNativeNavigation(() => ()=>{draft.discard();leave();});
++      } else if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
+         settingsExitGuardRef.current(leave);
+       } else leave();
+     },
+@@ -1613,7 +1638,7 @@ function Shell({
+         view: "chat",
+         activeKey: key,
+         settingsSection: "overview",
+-      });
++      }, {sending: Boolean(_initialMessage?.trim())});
+       setMobileSidebarOpen(false);
+       if (scope) {
+         setWorkspaceOverrides((current) => ({

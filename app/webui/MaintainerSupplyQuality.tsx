@@ -1,10 +1,13 @@
 import {useState} from "react";
 import {useClient} from "@/providers/ClientProvider";
-import definition from "./supply-quality-v1.json";
+import {parse} from "yaml";
+import source from "../../data/simulation/supply-quality-v1.yaml?raw";
 import type {SupplyQualityReceipt} from "./BossSupplyQualityPanel";
 
 const IMPORT="boss.simulation.supply_quality.import";
 const WITHDRAW="boss.simulation.supply_quality.withdraw";
+const definition=parse(source,{merge:true}) as {purpose:string;definition_id:string;version:string;
+  initial_request:Record<string,unknown>;empty_request:Record<string,unknown>;failed_request:Record<string,unknown>;timeout_request:Record<string,unknown>};
 type Choice="initial_request"|"empty_request"|"failed_request"|"timeout_request"|"withdraw";
 export type SupplyImportEditor={choice:Choice;text:string;approvedText:string|null;pending:{action:string;payload:Record<string,unknown>}|null};
 export const EMPTY_IMPORT_EDITOR:SupplyImportEditor={choice:"initial_request",text:"",approvedText:null,pending:null};

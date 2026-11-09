@@ -1,0 +1,180 @@
+--- a/webui/src/components/thread/ThreadComposer.tsx
++++ b/webui/src/components/thread/ThreadComposer.tsx
+@@ -1,6 +1,7 @@
+ import {
+   useCallback,
+   useEffect,
++  useId,
+   useLayoutEffect,
+   useMemo,
+   useRef,
+@@ -11,6 +12,7 @@ import {
+ } from "react";
+ 
+ import { MarkdownText, preloadMarkdownText } from "@/components/MarkdownText";
++import { BossConversationSuggestions } from "@/boss-agent/BossConversationSuggestions";
+ import {
+   CapabilityMentionToken,
+   cliAppInitials,
+@@ -186,6 +188,8 @@ function getVoiceShortcutLabel(): string {
+   }
+ }
+ 
++export type ComposerDraftController={hasDraft:boolean;discard:()=>void};
++
+ interface ThreadComposerProps {
+   onSend: (
+     content: string,
+@@ -195,6 +199,9 @@ interface ThreadComposerProps {
+   disabled?: boolean;
+   placeholder?: string;
+   inputAriaLabel?: string;
++  inputLabel?: string;
++  submitLabel?: string;
++  attachmentLabel?: string;
+   compactWhenIdle?: boolean;
+   isStreaming?: boolean;
+   modelLabel?: string | null;
+@@ -230,6 +237,8 @@ interface ThreadComposerProps {
+   onPickWorkspaceFolder?: () => Promise<string | null>;
+   onWorkspaceScopeChange?: (scope: WorkspaceScopePayload) => void;
+   pendingQueueKey?: string | null;
++  persistQueuedPrompts?: boolean;
++  onDraftController?: (controller:ComposerDraftController|null)=>void;
+   transcriptionProvider?: string | null;
+   ingressLimits?: WebUIIngressLimits | null;
+   quotedContext?: string | null;
+@@ -897,6 +906,9 @@ export function ThreadComposer({
+   disabled,
+   placeholder,
+   inputAriaLabel,
++  inputLabel,
++  submitLabel,
++  attachmentLabel,
+   compactWhenIdle = false,
+   isStreaming = false,
+   modelLabel = null,
+@@ -931,6 +943,8 @@ export function ThreadComposer({
+   onPickWorkspaceFolder,
+   onWorkspaceScopeChange,
+   pendingQueueKey = null,
++  persistQueuedPrompts = true,
++  onDraftController,
+   transcriptionProvider = null,
+   ingressLimits = null,
+   quotedContext = null,
+@@ -938,7 +952,9 @@ export function ThreadComposer({
+   onQuotedContextChange,
+ }: ThreadComposerProps) {
+   const { t } = useTranslation();
++  const inputId=useId();
+   const [value, setValue] = useState("");
++
+   const [composerFocused, setComposerFocused] = useState(false);
+   const blurFrame = useRef<number | null>(null);
+   const [selectedSessionMentions, setSelectedSessionMentions] = useState<SessionMention[]>([]);
+@@ -1004,8 +1020,8 @@ export function ThreadComposer({
+   const isHero = variant === "hero";
+   const voiceShortcutLabel = useMemo(getVoiceShortcutLabel, []);
+   const queuedPromptStorageKey = useMemo(
+-    () => queuedPromptsStorageKey(pendingQueueKey),
+-    [pendingQueueKey],
++    () => persistQueuedPrompts ? queuedPromptsStorageKey(pendingQueueKey) : null,
++    [pendingQueueKey,persistQueuedPrompts],
+   );
+   const projectPickerAvailable =
+     isHero
+@@ -1809,6 +1825,18 @@ export function ThreadComposer({
+     resizeTextarea(restoreFocus);
+   }, [resizeTextarea]);
+ 
++  const hasDraft=Boolean(value.trim()||images.length||queuedPrompts.length||normalizedQuotedContext);
++  useEffect(()=>{
++    onDraftController?.({hasDraft,discard:()=>{clear();clearComposerText(false);setQueuedPrompts([]);onQuotedContextChange?.(null);}});
++    return()=>onDraftController?.(null);
++  },[hasDraft,onDraftController,clear,clearComposerText,onQuotedContextChange]);
++  useEffect(()=>{
++    if(!hasDraft)return;
++    const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};
++    window.addEventListener("beforeunload",protect);
++    return()=>window.removeEventListener("beforeunload",protect);
++  },[hasDraft]);
++
+   const queueGuidancePrompt = useCallback(() => {
+     const text = value.trim();
+     if (!canQueueGuidance || (!text && readyImages.length === 0)) return;
+@@ -2405,7 +2433,7 @@ export function ThreadComposer({
+         {images.length > 0 ? (
+           <div
+             className="flex flex-wrap gap-2 px-3 pt-3"
+-            aria-label={t("thread.composer.attachImage")}
++            aria-label={attachmentLabel??t("thread.composer.attachImage")}
+           >
+             {images.map((img) => (
+               <AttachmentChip
+@@ -2453,6 +2481,7 @@ export function ThreadComposer({
+           </div>
+         ) : null}
+         <GoalStateStrip goalState={goalState} />
++        {inputLabel&&<label className="boss-n02-composer-label" htmlFor={inputId}>{inputLabel}</label>}
+         <div className="thread-composer-input relative min-w-0">
+           {hasMentionDecorations ? (
+             <ComposerCliMentionOverlay
+@@ -2467,6 +2496,7 @@ export function ThreadComposer({
+             />
+           ) : null}
+           <textarea
++            id={inputId}
+             ref={textareaRef}
+             value={mentionInput.value}
+             onFocus={() => {
+@@ -2492,7 +2522,7 @@ export function ThreadComposer({
+             rows={1}
+             placeholder={sessionDragPreview ? "" : resolvedPlaceholder}
+             disabled={interactionDisabled}
+-            aria-label={inputAriaLabel ?? t("thread.composer.inputAria")}
++            aria-label={inputLabel?(inputAriaLabel?inputLabel+" · "+inputAriaLabel:inputLabel):inputAriaLabel??t("thread.composer.inputAria")}
+             className={cn(
+               inputTextClasses,
+               "relative z-10 block caret-foreground placeholder:text-muted-foreground/70",
+@@ -2544,10 +2574,10 @@ export function ThreadComposer({
+               size="icon"
+               variant="ghost"
+               disabled={attachButtonDisabled}
+-              aria-label={t("thread.composer.attachImage")}
++              aria-label={attachmentLabel??t("thread.composer.attachImage")}
+               onClick={() => fileInputRef.current?.click()}
+               className={cn(
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
++                "thread-composer-action thread-composer-attachment-action thread-composer-round-action touch-target rounded-full text-muted-foreground hover:text-foreground",
+                 isHero
+                   ? "h-8 w-8 border border-border/55 bg-card shadow-[0_2px_8px_rgba(15,23,42,0.05)] hover:bg-card"
+                   : "h-9 w-9 border border-border/55 bg-card shadow-[0_2px_8px_rgba(15,23,42,0.05)] hover:bg-card",
+@@ -2629,11 +2659,11 @@ export function ThreadComposer({
+                   ? t("thread.composer.stop")
+                   : modelNeedsSetup
+                     ? t("thread.composer.configureModel", { defaultValue: "Configure model" })
+-                    : t("thread.composer.send")
++                    : submitLabel??t("thread.composer.send")
+               }
+               onClick={showStopButton ? handleStop : modelNeedsSetup ? onModelBadgeClick : undefined}
+               className={cn(
+-                "thread-composer-action thread-composer-round-action touch-target rounded-full transition-transform",
++                "thread-composer-action thread-composer-submit-action thread-composer-round-action touch-target rounded-full transition-transform",
+                 showStopButton
+                   ? "border border-border/70 bg-card text-foreground/85 shadow-[0_3px_10px_rgba(15,23,42,0.08)] hover:bg-muted/65 hover:text-foreground disabled:text-muted-foreground/50"
+                   : isHero
+@@ -2683,6 +2713,13 @@ export function ThreadComposer({
+           <div className="ml-auto">{usageControl}</div>
+         </div>
+       ) : null}
++      {isHero && !hasDraft && !interactionDisabled && !isStreaming ? (
++        <BossConversationSuggestions onSelect={prompt => {
++          replaceMentionInput(prompt, prompt.length);
++          setInlineError(null);
++          resizeTextarea();
++        }}/>
++      ) : null}
+     </form>
+   );
+ }

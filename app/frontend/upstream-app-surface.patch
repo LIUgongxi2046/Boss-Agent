@@ -1,0 +1,10 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -1080,7 +1080,6 @@ export default function App() {
+ }
+ 
+ function Shell({
+-  runtimeSurface,
+   onModelNameChange,
+   onLogout,
+   onNativeEngineRestart,

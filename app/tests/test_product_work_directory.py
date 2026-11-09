@@ -9,6 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "validation"))
 from application_paths import application_work_directory, application_ports
 
 
+def test_source_default_work_directory_allows_missing_work(tmp_path):
+    assert application_work_directory(tmp_path) == tmp_path / ".work" / "application"
+
+
 def test_default_and_explicit_application_directories_are_isolated(tmp_path):
     parent = tmp_path / ".work"
     parent.mkdir()
@@ -18,6 +22,28 @@ def test_default_and_explicit_application_directories_are_isolated(tmp_path):
     selected.mkdir()
     (selected / "state.txt").write_text("独立检查目录")
     assert not (parent / "application").exists()
+
+
+def test_installed_runtime_requires_private_data_root(tmp_path):
+    root = tmp_path / "site-packages" / "boss_agent_runtime"
+    root.mkdir(parents=True)
+    with pytest.raises(ValueError):
+        application_work_directory(root)
+    data_root = tmp_path / "private"
+    data_root.mkdir()
+    data_root.chmod(0o700)
+    selected = data_root / "application"
+    assert application_work_directory(root, data_root=str(data_root)) == selected
+
+
+def test_installed_runtime_rejects_shared_data_root(tmp_path):
+    root = tmp_path / "site-packages" / "boss_agent_runtime"
+    root.mkdir(parents=True)
+    data_root = tmp_path / "shared"
+    data_root.mkdir()
+    data_root.chmod(0o755)
+    with pytest.raises(ValueError):
+        application_work_directory(root, data_root=str(data_root))
 
 
 @pytest.mark.parametrize("candidate", ["relative", "/", "outside"])

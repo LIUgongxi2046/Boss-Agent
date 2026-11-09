@@ -1,0 +1,38 @@
+set timeout 90
+set vmExecutable [lindex $argv 0]
+set vmDirectory [lindex $argv 1]
+set account [lindex $argv 2]
+stty -echo
+puts "TECHNICAL_PASSWORD_INPUT"
+flush stdout
+set password [gets stdin]
+set vmArgument installed
+if {[llength $argv] > 3} {
+    set vmArgument [lindex $argv 3]
+    puts "PROBE_TOKEN_INPUT"
+    flush stdout
+    set env(BOSS_VSOCK_PROBE_TOKEN) [gets stdin]
+}
+log_user 0
+spawn $vmExecutable $vmDirectory $vmArgument
+expect {
+    -re {login: $} {}
+    timeout { puts "VM_LOGIN_PROMPT_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_BEFORE_LOGIN"; exit 1 }
+}
+send -- "$account\r"
+expect {
+    -re {Password: $} {}
+    timeout { puts "VM_PASSWORD_PROMPT_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_BEFORE_PASSWORD"; exit 1 }
+}
+send -- "$password\r"
+unset password
+expect {
+    -re {Login incorrect} { puts "VM_AUTHENTICATION_FAILED"; exit 1 }
+    -re {[$#] $} { puts "VM_AUTHENTICATED" }
+    timeout { puts "VM_AUTHENTICATION_TIMEOUT"; exit 1 }
+    eof { puts "VM_EXITED_DURING_LOGIN"; exit 1 }
+}
+log_user 1
+interact

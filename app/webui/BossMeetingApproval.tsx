@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3,
@@ -11,12 +11,17 @@ import {useTransaction} from "./BossAssignmentFlow";
 import type {DraftLeaveRegistration} from "./draft-leave";
 import {V7Panel, V7Empty, V7Steps, V7Tabs} from "./BossV7UI";
 import {readLibraryContext} from "./library-context";
+import {minutesLibraryMismatch,minutesReceiptStatus} from "./minutes-reference";
+import {MinutesReferenceNotice} from "./MinutesReferenceNotice";
+import {MinutesEditGuard,minutesEditAvailable} from "./MinutesEditGuard";
+import {OpenLinkedAssignment} from "./OpenLinkedAssignment";
+import {useTokenChangeDraftNotice} from "./draft-token-notice";
 import "./boss-v6.css";
 
 type Kind = "OPINION" | "SUGGESTION" | "DECISION" | "ASSIGNMENT_DRAFT";
 type Entry = { kind: Kind; text: string; source_anchor: string };
 type MinutesResponse = {
-  source_type: "SIMULATED"; projection: "minutes"; data_version: string;
+  source_type: "SIMULATED"; projection: "minutes"; data_version: string; namespace:string;
   meeting: { meeting_id: string; version: string; starts_at: string;
     timezone: string; participant_ids: string[] };
   minute: {
@@ -112,6 +117,7 @@ type ViewProps={
   onViewSource:(sourceId:string,anchor?:{version:string;start:number;end:number},referenceVersion?:string)=>void;
   onNavigate:(pageId:string)=>void;
   onTaskCreated:(taskId:string)=>void;
+  onOpenTask:(taskId:string,version:string)=>void;
   onDirtyChange:(dirty:boolean)=>void;
   refreshVersion?:number;
   onDraftLeaveChange?:DraftLeaveRegistration;
@@ -119,15 +125,23 @@ type ViewProps={
 export function BossMeetingApprovalView(props:ViewProps){
   const {token}=useClient(),identity=useRef({token,sequence:0});
   if(identity.current.token!==token)identity.current={token,sequence:identity.current.sequence+1};
-  return <MeetingApprovalView key={props.pageId+identity.current.sequence} {...props}/>;
+  const [dirty,setDirty]=useState(false);
+  const tokenNotice=useTokenChangeDraftNotice(token,dirty);
+  const onDirtyChange=useCallback((value:boolean)=>{setDirty(value);props.onDirtyChange(value);},[props.onDirtyChange]);
+  return <>
+    {tokenNotice.notice&&<div role="alert" className="boss-status boss-status-warn"><AlertCircle size={16}/><span>{tokenNotice.notice}</span><button type="button" className="boss-btn" onClick={tokenNotice.dismiss}>关闭提示</button></div>}
+    <MeetingApprovalView key={props.pageId+identity.current.sequence} {...props} onDirtyChange={onDirtyChange}/>
+  </>;
 }
-function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDirtyChange,refreshVersion,onDraftLeaveChange}:ViewProps) {
+function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onOpenTask,onDirtyChange,refreshVersion,onDraftLeaveChange}:ViewProps) {
   const {getToken}=useClient();
   const [data,setData]=useState<MinutesResponse|Decisions|null>(null);
   const [source,setSource]=useState<Evidence|null>(null);
   const [revision,setRevision]=useState(0);
   const [error,setError]=useState("");
   const [loading,setLoading]=useState(true);
+  const [libraryReference]=useState(readLibraryContext);
+  const [receiptReference]=useState(()=>{const params=new URLSearchParams(window.location.search);return {id:params.get("bossMinutesReceiptId"),version:params.get("bossMinutesReceiptVersion")};});
   const [dirty,setDirty]=useState(false);
   const [assignmentEdited,setAssignmentEdited]=useState(false);
   const [entries,setEntries]=useState<Entry[]>([]);
@@ -144,7 +158,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
   const edited=dirty||Boolean(text.trim()||anchor||decision||comment.trim());
   const minutesEdited=dirty||Boolean(text.trim()||anchor),opinionEdited=Boolean(decision||comment.trim());
   const dirtyRef=useRef(edited);dirtyRef.current=edited;
-  const reload=()=>setRevision(x=>x+1);
+  const reload=()=>{setSource(null);setData(null);setLoading(true);setRevision(x=>x+1);};
   const savedLeave=useRef<(()=>void)|null>(null);
   const mutation=useConfirmedMutation(action=>{dirtyRef.current=false;setDirty(false);setText("");setAnchor("");setDecision("");setComment("");setBasis("");setLastRemoved(null);setDiscardOpen(false);reload();if(action==="boss.minutes.save"){const finish=savedLeave.current;savedLeave.current=null;finish?.();}});
   useEffect(()=>{if(!mutation.dialog&&!mutation.busy)savedLeave.current=null;},[mutation.dialog,mutation.busy]);
@@ -175,9 +189,6 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
           if(target){setSelectedApplication(target.application_id);setBasis(approvalSignature(target));setDecision("");setComment("");}
           else setError("原申请不在当前目录，请重新选择。");
         }
-        if(pageId==="F05"&&context?.kind==="meeting"&&context.id!==((result as MinutesResponse).meeting?.meeting_id)){
-          setError("原会议不在当前目录，请返回会议资料重新选择。");
-        }
       }
       if(pageId==="F05"){
         const minutes=result as MinutesResponse;
@@ -194,7 +205,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
         if(response.ok){
           const value=await response.json() as Evidence;
           if(!abort.signal.aborted&&value.source_type==="SIMULATED"){setSource(value);if(!dirtyRef.current)setBasis(minuteSignature(minutes,value));}
-        }
+        }else{if(response.status===401)window.dispatchEvent(new Event("boss-auth-expired"));throw Error("纪要原文读取失败，HTTP "+response.status);}
       }
     }).catch(e=>{
       if(abort.signal.aborted)return;
@@ -216,9 +227,14 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
   const latestDecision=applicationDecisions.length?applicationDecisions[applicationDecisions.length-1]:null;
   const linkedAssignments=minutes?.linked_assignments??[];
   const minute=minutes?.minute;
+  const receiptStatus=pageId==="F05"?minutesReceiptStatus(receiptReference,minute??null,loading):"NONE";
+  const libraryMismatch=pageId==="F05"&&minutesLibraryMismatch(libraryReference,minutes);
+  const referenceBlocked=libraryMismatch||receiptStatus==="WAITING"||receiptStatus==="CHANGED";
   const stale=Boolean(basis&&(pageId==="F05"?minutes&&source&&basis!==minuteSignature(minutes,source):app&&basis!==approvalSignature(app)));
-  const disabled=loading||mutation.busy||!data||!basis||stale;
   const sourceCurrent=Boolean(minute&&source&&source.source_id===minute.source_id&&source.version===minute.source_version&&minute.source_reference_state==="CURRENT");
+  const minutesAvailable=minutesEditAvailable({minute:minute??null,source,loading,stale,referenceBlocked,basis});
+  const visibleLinkedAssignments=minutesAvailable?linkedAssignments:[];
+  const disabled=loading||mutation.busy||!data||!basis||stale||referenceBlocked||(pageId==="F05"&&!minutesAvailable);
   const minuteConfirmable=Boolean(minute&&minute.state==="DRAFT_REVIEW"&&sourceCurrent);
   const confirmReason=!minutes?"纪要尚未读取":!minute?"当前没有已保存的纪要草稿":minute.state!=="DRAFT_REVIEW"?"当前纪要已经确认，不能再确认纪要":!source?"原始纪要未能读取，不能确认纪要":!sourceCurrent?"原始资料版本已经变化或需要复核，请刷新版本后重新核查":stale?"来源或纪要版本已经变化，请放弃本次修改后重新核查":edited?"存在未保存编辑，请先保存本次版本":mutation.busy?"正在核对并提交上一项操作，请稍后确认":"";
   const saveReason=!minutes?"纪要尚未读取":!source?"当前未能读取原始纪要，不能保存":!entries.length?"当前没有纪要条目，先添加条目":text.trim()||anchor?"请先把当前输入加入分类条目":stale?"来源或纪要版本已经变化，请放弃本次修改后重新核查":!dirty?"当前没有待保存的修改":mutation.busy?"正在核对并提交上一项操作":"";
@@ -320,6 +336,8 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
 
   return <div className={pageId==="F05"?"boss-minutes-view":"boss-approval-view"}>
     {loading&&<Tip>正在读取获准的原始材料、申请版本与已有决定…</Tip>}
+    {pageId==="F05"&&<MinutesReferenceNotice reference={receiptReference} minute={minute??null} loading={loading}/>}
+    {libraryMismatch&&<div role="alert" className="boss-status boss-status-warn">当前会议与目录引用的对象、版本或执行空间不同，请返回会议资料重新选择。</div>}
     {error&&<div className="boss-status boss-status-error" role="alert"><AlertCircle size={16}/>{error}</div>}
     {mutation.notice&&<div className="boss-status boss-status-ok" role="status">
       <CheckCircle2 size={16}/>{mutation.notice}</div>}
@@ -337,7 +355,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             <VersionValue label="当前纪要版本" value={minute?.version}/>
           </Panel>
           <Panel title="会议纪要 · 四类内容" note="意见 / 建议 / 明确决定 / 交办草稿">
-            {minutes?<>
+            {minutes?<MinutesEditGuard available={minutesAvailable} edited={minutesEdited} onReload={reload}>
               <V7Tabs label="纪要内容分类" value={kind} onChange={setKind} items={TABS.map(k=>({id:k,title:KIND_LABELS[k],count:entries.filter(e=>e.kind===k).length}))}/>
               <fieldset className="boss-minutes-editor" disabled={disabled||!source}>
                 <label className="boss-label" htmlFor="boss-minutes-text">{KIND_LABELS[kind]}的具体内容</label>
@@ -375,7 +393,8 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
               {saveReason&&<p className="boss-helper">{saveReason}</p>}
               {(!minuteConfirmable||edited||disabled)&&confirmReason&&<p className="boss-helper">{confirmReason}</p>}
               <Tip warning>确认纪要与发送交办是不同的本人决定。逐项创建只能在纪要已确认、来源仍有效且用户再次明确授权后执行。</Tip>
-            </>:!loading&&<Empty>尚无可用会议资料。</Empty>}
+            </MinutesEditGuard>:!loading&&<Empty>{minutesEdited?"当前纪要不可读取，未保存内容仍保留在当前页面。":"尚无可用会议资料。"}</Empty>}
+            {minutesEdited&&!minutesAvailable&&<button type="button" className="boss-btn" disabled={loading||mutation.busy||!data} onClick={()=>setDiscardOpen(true)}>放弃本次修改</button>}
           </Panel>
           <BossMinutesAssignmentActions
             minute={minute||null} participants={minutes?.meeting.participant_ids||[]}
@@ -383,8 +402,9 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             businessClock={minutes?.business_clock||""}
             links={minutes?.linked_assignments||[]}
             sourceCurrent={sourceCurrent}
-            editingUnsaved={edited||stale} onReload={reload}
-            onTaskCreated={onTaskCreated} onNavigate={onNavigate}
+            available={minutesAvailable}
+            editingUnsaved={edited||stale||referenceBlocked} onReload={reload}
+            onTaskCreated={onTaskCreated} onOpenTask={onOpenTask} referenceBlocked={referenceBlocked}
             onDirtyChange={setAssignmentEdited}
           />
         </>:<>
@@ -463,24 +483,23 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
             {source?.content?<details><summary>阅读当前原文</summary><blockquote className="boss-source">{source.content}</blockquote></details>
               :<Tip warning>资料已撤销、未获取或当前身份无权读取，不能确认纪要。</Tip>}
             {source&&<div className="boss-actions"><button className="boss-btn" type="button"
-              onClick={()=>onViewSource(source.source_id,{version:source.version,start:0,end:source.content.length},source.version)}>查看完整原文 <ArrowRight size={15}/></button></div>}
+              disabled={referenceBlocked} onClick={()=>onViewSource(source.source_id,{version:source.version,start:0,end:source.content.length},source.version)}>查看完整原文 <ArrowRight size={15}/></button></div>}
             {(minutes?.revisions||[]).length>0&&<div className="boss-minutes-history">
               <h3>历史纪要版本</h3>
               {minutes?.revisions.map(x=><p key={x.version}>v{x.version} · {x.state} · {time(x.updated_at)}</p>)}
             </div>}
           </Panel>
           <Panel title="关联">
-            <VersionValue label="人工逐项创建的任务" value={minutes?.linked_assignments.length}/>
+            <VersionValue label="人工逐项创建的任务" value={minutesAvailable?visibleLinkedAssignments.length:undefined}/>
             <VersionValue label="已经模拟发送的关联交办" value={
-              minutes?.linked_assignments.filter(x=>x.send_status==="SENT_SIMULATED").length}/>
+              minutesAvailable?visibleLinkedAssignments.filter(x=>x.send_status==="SENT_SIMULATED").length:undefined}/>
             <VersionValue label="是否自动创建交办" value="否"/>
             <VersionValue label="是否自动发送" value="否"/>
             <div className="boss-actions">
-              {linkedAssignments.length?linkedAssignments.map(item=><button key={item.task_id} className={"boss-btn"+(linkedAssignments.length===1?" boss-btn-primary":"")} type="button"
-                onClick={()=>{onTaskCreated(item.task_id);onNavigate("F06");}}><ClipboardCheck size={15}/> {linkedAssignments.length===1?"打开交办":"打开交办："+item.task_id}</button>)
+              {visibleLinkedAssignments.length?visibleLinkedAssignments.map(item=><OpenLinkedAssignment key={item.task_id} className={"boss-btn"+(visibleLinkedAssignments.length===1?" boss-btn-primary":"")} taskId={item.task_id} version={item.task_version} disabled={referenceBlocked} onOpenTask={onOpenTask}><ClipboardCheck size={15}/> {visibleLinkedAssignments.length===1?"打开交办":"打开交办："+item.task_id}</OpenLinkedAssignment>)
                 :<button className="boss-btn" type="button" disabled><ClipboardCheck size={15}/> 准备交办</button>}
             </div>
-            <p className="boss-helper">{linkedAssignments.length?"按已创建任务编号打开该交办；任务编号与纪要版本见下方“逐项创建、发送及补充核查”。":"当前纪要没有已创建的任务；纪要确认后在下方逐项交办草稿中按条目准备交办，不会跳到其他任务。"}</p>
+            <p className="boss-helper">{!minutesAvailable?"纪要来源或读取权限尚未核查，关联交办暂不可显示。":visibleLinkedAssignments.length?"按已创建任务编号打开该交办；任务编号与纪要版本见下方“逐项创建、发送及补充核查”。":"当前纪要没有已创建的任务；纪要确认后在下方逐项交办草稿中按条目准备交办，不会跳到其他任务。"}</p>
           </Panel>
         </>:<>
           <Panel title="来源与依据" note="仅当前申请版本">
@@ -507,11 +526,11 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
         </>}
       </div>
     </div>
-    {pageId==="F05"&&<div className="boss-v7-addendum">
+    {pageId==="F05"&&minutesAvailable&&<div className="boss-v7-addendum">
       <V7Panel title="逐项创建、发送及补充核查" description="每条交办分别关联纪要版本、任务和本人授权。">
         {minute?.entries.some(entry=>entry.kind==="ASSIGNMENT_DRAFT")?<div className="boss-v7-table-scroll"><table className="boss-v7-table"><thead><tr><th>纪要条目</th><th>来源版本</th><th>创建任务</th><th>发送状态</th><th>授权引用</th></tr></thead><tbody>{minute.entries.filter(entry=>entry.kind==="ASSIGNMENT_DRAFT").map(entry=>{
           const linked=minutes?.linked_assignments.find(item=>item.entry_id===entry.entry_id&&item.minute_version===minute.version);
-          return <tr key={entry.entry_id}><td>{entry.text||"来源需要复核"}<small>{entry.entry_id}</small></td><td>v{minute.source_version}<small>{minute.source_reference_state}</small></td><td>{linked?<button className="boss-btn" onClick={()=>{onTaskCreated(linked.task_id);onNavigate("F06");}}>{linked.task_id}</button>:"尚未创建"}</td><td>{linked?.send_status==="SENT_SIMULATED"?"已模拟发送":"尚未发送"}</td><td>{linked?.authorization_id||"尚无当前动作授权"}</td></tr>;
+          return <tr key={entry.entry_id}><td>{entry.text||"来源需要复核"}<small>{entry.entry_id}</small></td><td>v{minute.source_version}<small>{minute.source_reference_state}</small></td><td>{linked?<OpenLinkedAssignment taskId={linked.task_id} version={linked.task_version} disabled={referenceBlocked} onOpenTask={onOpenTask}>{linked.task_id}</OpenLinkedAssignment>:"尚未创建"}</td><td>{linked?.send_status==="SENT_SIMULATED"?"已模拟发送":"尚未发送"}</td><td>{linked?.authorization_id||"尚无当前动作授权"}</td></tr>;
         })}</tbody></table></div>:<V7Empty title="尚无交办草稿">在交办草稿分类中整理具体事项，确认纪要后逐项创建。</V7Empty>}
       </V7Panel>
       <div className="boss-v7-equal-columns">
@@ -532,7 +551,7 @@ function MeetingApprovalView({pageId,onViewSource,onNavigate,onTaskCreated,onDir
     </>:<p className="boss-helper">请先选择同意、拒绝或请求补充，再提交本人决定；未选择决定时不显示提交按钮。</p>}
       {opinionEdited&&<button type="button" className="boss-btn" disabled={loading||mutation.busy} onClick={()=>setDiscardOpen(true)}>放弃本次意见</button>}
     </>:<p className="boss-helper">尚未选择申请；选择申请后显示当前版本的决定操作。</p>}</footer>}
-    {mutation.dialog}
+    {(pageId!=="F05"||minutesAvailable)&&mutation.dialog}
     <Dialog.Root open={discardOpen} onOpenChange={setDiscardOpen}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>放弃本次修改</Dialog.Title><Dialog.Description>{pageId==="F05"?"放弃本次修改将恢复到已保存的纪要版本"+(minute?"v"+minute.version:"")+"，尚未保存的条目、正文与原文位置会被清除。":"放弃本次意见将清空尚未提交的决定选择与本人意见，已经保存的决定继续保留。"}</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn" autoFocus>继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{restoreEditor();setDiscardOpen(false);}}>确认放弃</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
     <Dialog.Root open={nextApplication!==null} onOpenChange={open=>{if(!open)setNextApplication(null);}}><Dialog.Portal><Dialog.Overlay className="boss-v7-dialog-overlay"/><Dialog.Content className="boss-v7-dialog"><Dialog.Title>当前申请存在未提交意见</Dialog.Title><Dialog.Description>切换申请前可以继续编辑，或者放弃当前尚未提交的意见。已经保存的本人决定继续保留。</Dialog.Description><div className="boss-actions"><Dialog.Close asChild><button className="boss-btn" autoFocus>继续编辑</button></Dialog.Close><button className="boss-btn" disabled={mutation.busy} onClick={()=>{if(nextApplication!==null)selectApplication(nextApplication);}}>放弃编辑并切换申请</button></div></Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;

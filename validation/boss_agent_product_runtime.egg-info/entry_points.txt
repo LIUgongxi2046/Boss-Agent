@@ -1,0 +1,2 @@
+[console_scripts]
+boss-agent-runtime = boss_agent_runtime.boss_agent_runtime_bootstrap:main

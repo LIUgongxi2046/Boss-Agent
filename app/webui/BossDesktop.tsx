@@ -10,7 +10,7 @@ import {
   Menu, MessageCircle, RefreshCw, Search, Settings,
   X,
 } from "lucide-react";
-import pageMeta from "./page-meta.json";
+import pageMeta from "../../Boss-Agent-Desktop-Complete-v7/meta/页面配置.json";
 import {brandMessages} from "./boss-branding";
 import {deliveredPage} from "./delivered-navigation";
 import {BossPrimaryNavigation,BossMenuDirectory} from "./BossMenuNavigation";
@@ -287,6 +287,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   const [sourceAnchor, setSourceAnchor] = useState<{
     source_id:string;version:string;start:number;end:number;
   }|null>(null);
+  const [sourceCitation,setSourceCitation]=useState<{source_id:string;version:string;locator:string;token:string}|null>(null);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [tasks, setTasks] = useState<Tasks | null>(null);
   const [maintenance, setMaintenance] = useState<Maintenance | null>(null);
@@ -405,7 +406,8 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
     if (id !== page) setWorkDirty(false);
     const url = menu?menuPageUrl(window.location.href,id,role):new URL(window.location.href);
     url.searchParams.set("bossPage", id);
-    if(menu){conversationReturn.current=false;setSourceAnchor(null);if(id==="D01")setSourceId(readBossLocation(url,role).sourceId);}
+    if(taskId!==undefined&&taskId!==url.searchParams.get("bossTaskReceiptId")){url.searchParams.delete("bossTaskReceiptId");url.searchParams.delete("bossTaskReceiptVersion");}
+    if(menu){conversationReturn.current=false;setSourceAnchor(null);setSourceCitation(null);if(id==="D01")setSourceId(readBossLocation(url,role).sourceId);}
     if(conversationReturn.current)url.searchParams.set("bossConversationReturn","N02");
     if (["NATIVE","N02"].includes(id)) url.searchParams.set("bossReturn", page);
     if(!menu&&(taskId ?? selectedTaskId))url.searchParams.set("bossTask",taskId ?? selectedTaskId);
@@ -457,7 +459,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       if(readBossLocation(url,role).page!==current.page)current.guardLeave(proceed);else proceed();
     },url=>{
       const location=readBossLocation(url,role);
-      setSelectedTaskId(location.taskId);setSourceId(location.sourceId);setSourceAnchor(null);
+      setSelectedTaskId(location.taskId);setSourceId(location.sourceId);setSourceAnchor(null);setSourceCitation(null);
       setPreviousPage(location.returnPage);
       conversationReturn.current=url.searchParams.get("bossConversationReturn")==="N02";
       if(["NATIVE","N02"].includes(location.page))businessPage.current=location.returnPage;
@@ -544,7 +546,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
   };
   const goSource = (id = "finance-note", anchor?:{
     version:string;start:number;end:number;
-  },referenceVersion?:string) => {
+  },referenceVersion?:string,locator?:string) => {
     guardLeave(()=>{
       setSourceId(id);
       const url=new URL(window.location.href);url.searchParams.set("bossSource",id);
@@ -553,6 +555,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
       if(referenceVersion)url.searchParams.set("bossSourceReferenceVersion",referenceVersion);
       replaceBossHistory(url);
       setSourceAnchor(anchor?{source_id:id,...anchor}:null);
+      setSourceCitation(referenceVersion&&locator!==undefined?{source_id:id,version:referenceVersion,locator,token}:null);
       navigate("D01", page,true);
     });
   };
@@ -627,7 +630,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
             </div>
             <section className="boss-native-surface" hidden={!isNative} aria-label={role === "BOSS" ? "聊天交办内容" : "应用设置内容"}>
               {role==="MAINTAINER"&&<div className="boss-native-context"><button className="boss-btn" type="button" onClick={() => navigate(businessPage.current??"A08")}><ArrowLeft size={16}/>返回业务页面</button><span>当前身份：技术维护</span></div>}
-              {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenSource:(id,version)=>{conversationReturn.current=true;goSource(id,undefined,version);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onOpenPage:(target,runId)=>guardLeave(()=>{
+              {children(role,isNative,{onOpenTask:id=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);if(!id){setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);}selectTask(id);},onOpenTaskReceipt:(id,version)=>guardLeave(()=>{conversationReturn.current=true;setMorningOrigin(null);setMorningContext(null);setMorningReady(false);setLoading(true);const address=new URL(window.location.href);address.searchParams.set("bossTaskReceiptId",id);address.searchParams.set("bossTaskReceiptVersion",version);replaceBossHistory(address);navigate("F06",page,true,id);}),onOpenMeeting:(id,version)=>guardLeave(()=>{conversationReturn.current=true;const address=new URL(window.location.href);address.searchParams.delete("bossLibraryContext");address.searchParams.delete("bossLibraryAction");address.searchParams.set("bossMeetingReceiptId",id);address.searchParams.set("bossMeetingReceiptVersion",version);replaceBossHistory(address);navigate("F04",page,true);}),onOpenMinutes:(id,version)=>guardLeave(()=>{conversationReturn.current=true;const address=new URL(window.location.href);address.searchParams.delete("bossLibraryContext");address.searchParams.delete("bossLibraryAction");address.searchParams.set("bossMinutesReceiptId",id);address.searchParams.set("bossMinutesReceiptVersion",version);replaceBossHistory(address);navigate("F05",page,true);}),onOpenSource:(id,version,locator)=>{conversationReturn.current=true;goSource(id,undefined,version,locator);},onOpenMessages:()=>{conversationReturn.current=true;navigate("F08",page);},onOpenPage:(target,runId)=>guardLeave(()=>{
                 conversationReturn.current=true;
                 const address=new URL(window.location.href);
                 if(runId)address.searchParams.set("bossRun",runId);else address.searchParams.delete("bossRun");
@@ -680,7 +683,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                 page === "F06" ? <>{morningOrigin&&<BossMorningPreparation reference={morningOrigin} onReady={setMorningReady} onContext={setMorningContext} onReturn={()=>navigate("F01")} refreshVersion={requestVersion}/>}<BossAssignmentFlow
                   morningReference={morningOrigin??undefined} morningReady={morningReady} morningContext={morningContext}
                   messagesEnabled={!priorityScope}
-                  tasks={tasks} selectedTaskId={selectedTaskId}
+                  tasks={error?null:tasks} selectedTaskId={selectedTaskId}
                   onSelectTask={selectTask} onReload={refresh}
                   onViewSource={id => goSource(id??"finance-note")} context={dashboard}
                   draft={assignmentDraft} onDraftChange={updateAssignmentDraft}
@@ -719,13 +722,13 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onCreateTask={()=>guardLeave(()=>{setAssignmentDraft({...DEFAULT_ASSIGNMENT_DRAFT});setAssignmentDirty(false);selectTask("",true);})}
                   onNavigate={id=>navigate(id)} onReload={refresh} onDirtyChange={setWorkDirty}
                 /> :
-                page === "N04" ? <BossMeetingLibrary refreshVersion={requestVersion} onViewSource={goSource} onDiscuss={onStartChat} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
+                page === "N04" ? <BossMeetingLibrary refreshVersion={requestVersion} onViewSource={goSource} onDiscuss={onStartChat} onOpen={(action,reference)=>{const url=new URL(window.location.href);url.searchParams.delete("bossMeetingReceiptId");url.searchParams.delete("bossMeetingReceiptVersion");url.searchParams.delete("bossMinutesReceiptId");url.searchParams.delete("bossMinutesReceiptVersion");url.searchParams.set("bossLibraryContext",JSON.stringify(reference));url.searchParams.set("bossLibraryAction",action.id);replaceBossHistory(url);navigate(action.page);}}/> :
                 page==="D03" ? <BossExecutionRecovery taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)}/> :
                 page==="F29" ? <BossTaskExceptions taskId={selectedTaskId} onOpenTask={selectTask} onNavigate={id=>navigate(id)} onViewSource={goSource} refreshVersion={requestVersion}/> :
                 page==="F13" ? <BossPersonalMemory onNavigate={id=>navigate(id)} onViewSource={goSource} onDirtyChange={setWorkDirty} refreshVersion={requestVersion}/> :
                 ["N10","N11","F28","D02","D09"].includes(page) ? <BossOwnerRecords key={page} pageId={page} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource}/> :
                 page==="F24" ? <BossRunDetails taskId={selectedTaskId} onNavigate={id=>navigate(id)} onOpenTask={selectTask} onViewSource={goSource} refreshVersion={requestVersion}/> :
-                page === "D01" ? <BossSourceView key={sourceId} sourceId={sourceId} anchor={sourceAnchor} originPage={previousPage} refreshVersion={requestVersion} onReturn={()=>navigate(allowed(previousPage,role,mvpScope,priorityScope)?previousPage:"F01")}/> :
+                page === "D01" ? <BossSourceView key={JSON.stringify([sourceId,sourceCitation?.version,sourceCitation?.locator,token])} sourceId={sourceId} anchor={sourceAnchor} citation={sourceCitation?.token===token?sourceCitation:null} originPage={previousPage} refreshVersion={requestVersion} onReturn={()=>navigate(allowed(previousPage,role,mvpScope,priorityScope)?previousPage:"F01")}/> :
                 (page==="F14"||page==="F21") ? <BossSupplyQualityView key={page} interfaceId={supplyInterface}
                   editor={supplyEditor} onEditorChange={changes=>updateSupplyEditor(supplyInterface,changes)}
                   refreshVersion={requestVersion} onDirtyChange={setWorkDirty}
@@ -773,6 +776,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   onViewSource={goSource}
                   onNavigate={id=>navigate(id)}
                   onTaskCreated={id=>{setSelectedTaskId(id);refresh();}}
+                  onOpenTask={(id,version)=>guardLeave(()=>{setMorningOrigin(null);setMorningContext(null);setMorningReady(false);setLoading(true);const address=new URL(window.location.href);address.searchParams.set("bossTaskReceiptId",id);address.searchParams.set("bossTaskReceiptVersion",version);replaceBossHistory(address);navigate("F06",page,true,id);})}
                   onDirtyChange={setWorkDirty} refreshVersion={requestVersion} onDraftLeaveChange={registerDraftLeave}
                 /> :
                 page === "N09" ? <BossOwnerPlans data={ownerPlans} loading={loading} error={error}
@@ -875,7 +879,7 @@ export function BossDesktop({ getToken, onLogout, onStartChat, onStartMorning,on
                   <MaintainerSupplyQuality editor={importEditor} onEditorChange={updateImportEditor}/>
                   {allowed("F10","BOSS")&&<MaintainerApplicationSeed/>}
                 </div>
-              </> : page==="A08" ? <MaintainerModelWorkspace onNavigate={id=>navigate(id)} getToken={getToken} onCommand={scopedCommand} onDirtyChange={setWorkDirty} onReload={refresh}/>
+              </> : page==="A08" ? <MaintainerModelWorkspace onNavigate={id=>navigate(id)} getToken={getToken} identityKey={token??""} onCommand={scopedCommand} onDirtyChange={setWorkDirty} onReload={refresh}/>
               : WORKSPACE_PAGE_ROUTES[page] ? <BossWorkspaceView
                 key={page} role={role} pageId={page}
                 onNavigate={id=>navigate(id)} onViewSource={goSource}

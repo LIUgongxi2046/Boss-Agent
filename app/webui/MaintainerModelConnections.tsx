@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import {V7Empty,V7Fact,V7Panel,V7ReadState,V7Tabs} from "./BossV7UI";
 import {useTechnicalWorkspace} from "./useTechnicalWorkspace";
 import {ProductRuntimeConfiguration} from "./ProductRuntimeConfiguration";
+import {MaintainerChatBudget} from "./MaintainerChatBudget";
 
 type ModelValues={provider:string;api_type:string;model_id:string;credential_reference:string;timeout_seconds:number;max_tool_rounds:number;pricing_version:string;capabilities:string[];change_note:string};
 type Validation={id:string;version:string;state:string;at:string;error:string|null;capabilities:string[];usage:string|null;cost:string|null;pricing_version:string|null};
@@ -15,10 +16,10 @@ type Projection={projection:"models";private_body_available_here:false;connectio
   active_run_count:number;read_at:string};
 const EMPTY:ModelValues={provider:"",api_type:"",model_id:"",credential_reference:"",timeout_seconds:120,max_tool_rounds:8,pricing_version:"",capabilities:[],change_note:""};
 
-export function MaintainerModelWorkspace({onNavigate,onDirtyChange,getToken,onCommand,onReload}:{onNavigate:(page:string)=>void;onDirtyChange:(dirty:boolean)=>void;getToken:()=>string;onCommand:(action:string,payload:Record<string,unknown>)=>Promise<void>;onReload:()=>void}){
-  const [connectionDirty,setConnectionDirty]=useState(false),[runtimeDirty,setRuntimeDirty]=useState(false);
-  useEffect(()=>onDirtyChange(connectionDirty||runtimeDirty),[connectionDirty,runtimeDirty,onDirtyChange]);
-  return <><MaintainerModelConnections onNavigate={onNavigate} onDirtyChange={setConnectionDirty}/><details className="boss-panel"><summary>工具与工作资料的 Runtime 范围</summary><ProductRuntimeConfiguration getToken={getToken} onCommand={onCommand} onReload={onReload} onDirtyChange={setRuntimeDirty}/></details></>;
+export function MaintainerModelWorkspace({onNavigate,onDirtyChange,getToken,identityKey,onCommand,onReload}:{onNavigate:(page:string)=>void;onDirtyChange:(dirty:boolean)=>void;getToken:()=>string;identityKey:string;onCommand:(action:string,payload:Record<string,unknown>)=>Promise<void>;onReload:()=>void}){
+  const [connectionDirty,setConnectionDirty]=useState(false),[runtimeDirty,setRuntimeDirty]=useState(false),[budgetDirty,setBudgetDirty]=useState(false);
+  useEffect(()=>onDirtyChange(connectionDirty||runtimeDirty||budgetDirty),[connectionDirty,runtimeDirty,budgetDirty,onDirtyChange]);
+  return <><MaintainerModelConnections onNavigate={onNavigate} onDirtyChange={setConnectionDirty}/><details className="boss-panel"><summary>工具与工作资料的 Runtime 范围</summary><ProductRuntimeConfiguration getToken={getToken} onCommand={onCommand} onReload={onReload} onDirtyChange={setRuntimeDirty}/></details><details className="boss-panel"><summary>聊天运行预算</summary><MaintainerChatBudget getToken={getToken} identityKey={identityKey} onDirtyChange={setBudgetDirty}/></details></>;
 }
 
 export function MaintainerModelConnections({onNavigate,onDirtyChange}:{onNavigate:(page:string)=>void;onDirtyChange:(dirty:boolean)=>void}){

@@ -10,6 +10,7 @@ from business import SPEC
 from controls import ControlStore
 from boss_runtime_records import runtime_records
 from fc02_agent import Fc02Tool, bind_query, bind_scoped_followup
+from hermes_bi_authority import continue_query_binding
 
 pytestmark = pytest.mark.skipif("scoped_query_input" not in SPEC["io_schema"]["$defs"],
                                 reason="需要N1正式SCOPED领域与Schema")
@@ -43,6 +44,21 @@ def test_scoped_followup_uses_formal_persistent_snapshot(scoped):
     assert result["overridden_fields"] == ["product_ids"]
     assert result["context_snapshot"]["legal_entity_id"] == "entity-1"
     assert len(result["detail_refs"]) < len(first["detail_refs"])
+
+
+def test_scoped_followup_keeps_parent_after_goal_supplement(scoped):
+    first = call(scoped, "query_metrics", scoped[2])
+    scoped[1][0] = replace(scoped[1][0], request_id="fc02-supplement-followup")
+    previous = bind_scoped_followup(scoped[0], scoped[1][0], first["query_id"], "继续按产品查询", {"product_ids": ["product-1"]})
+    parameters = json.loads(previous.parameters_json)
+    parameters.pop("parent_query_id")
+    parameters["question"] = "补充查询条件"
+    current = continue_query_binding(previous, bind_query(parameters))
+    scoped[1][0] = replace(scoped[1][0], query_bindings=(current,))
+    result = call(scoped, "query_metrics", json.loads(current.parameters_json))
+    assert result["parent_query_id"] == first["query_id"]
+    assert result["overridden_fields"] == ["product_ids"]
+    assert result["context_snapshot"]["product_ids"] == ["product-1"]
 
 
 def test_scoped_context_and_request_recover_after_runtime_timeout(scoped, tmp_path):

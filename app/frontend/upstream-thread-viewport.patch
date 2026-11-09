@@ -1,0 +1,148 @@
+--- a/webui/src/components/thread/ThreadViewport.tsx
++++ b/webui/src/components/thread/ThreadViewport.tsx
+@@ -28,7 +28,16 @@
+ import { cn } from "@/lib/utils";
+ import type { CliAppInfo, McpPresetInfo, RetryStatus, SlashCommand, UIMessage } from "@/lib/types";
+ 
+-export interface ThreadViewportHandle {
++export interface ThreadReadingPosition {conversationKey:string;promptId:string;offsetTop:number}
++export interface ThreadReadingController {
++  captureReadingPosition:()=>ThreadReadingPosition|null;
++  restoreReadingPosition:(position:ThreadReadingPosition,signal:AbortSignal)=>Promise<void>;
++}
++interface PendingReadingPosition {
++  position:ThreadReadingPosition;resolve:()=>void;reject:(error:Error)=>void;cleanup:()=>void;
++  loading:boolean;lastBoundary:string|null;
++}
++export interface ThreadViewportHandle extends ThreadReadingController {
+   jumpToUserPrompt: (promptId: string) => void;
+   cancelAutoScroll: () => void;
+ }
+@@ -56,6 +65,8 @@
+   loadingOlder?: boolean;
+   userMessageOffset?: number;
+   onLoadOlder?: () => Promise<void> | void;
++  readingHistoryPending?: boolean;
++  readingHistoryError?: string|null;
+   traceDetailScope?: string | null;
+   onLoadTraceDetails?: (refs: string[]) => void | Promise<void>;
+   onOpenFilePreview?: (path: string) => void;
+@@ -247,6 +258,8 @@
+   loadingOlder = false,
+   userMessageOffset = 0,
+   onLoadOlder,
++  readingHistoryPending = false,
++  readingHistoryError = null,
+   traceDetailScope = null,
+   onLoadTraceDetails,
+   onOpenFilePreview,
+@@ -270,6 +283,8 @@
+   const restoreScrollAfterPrependRef =
+     useRef<{ height: number; top: number } | null>(null);
+   const historyScrollAnchorRef = useRef<HistoryScrollAnchor | null>(null);
++  const pendingReadingPosition=useRef<PendingReadingPosition|null>(null);
++  const [readingRevision,setReadingRevision]=useState(0);
+   const composerInputScrollTopRef = useRef<number | null>(null);
+   const composerDockHeightRef = useRef(0);
+   const [atBottom, setAtBottom] = useState(true);
+@@ -355,7 +370,10 @@
+     keyboardInsetBottom > 0 ? { bottom: keyboardInsetBottom } : undefined;
+ 
+   const yieldCameraToUser = useCallback(() => {
++    const pending=pendingReadingPosition.current;
++    if(pending){pendingReadingPosition.current=null;pending.cleanup();pending.reject(new DOMException("本人已经调整阅读位置","AbortError"));}
+     threadMotionRef.current?.takeUserControl();
++    setAtBottom(false);
+   }, []);
+ 
+   const captureHistoryScrollAnchor = useCallback(() => {
+@@ -503,13 +521,44 @@
+     threadMotionRef.current?.takeUserControl();
+   }, []);
+ 
++  const captureReadingPosition=useCallback(()=>{
++    const scroller=scrollRef.current;
++    if(!conversationReady||!conversationKey||!scroller||!hasMessages)return null;
++    const prompts=Array.from(scroller.querySelectorAll<HTMLElement>("[data-user-prompt-id]"));
++    if(!prompts.length)return null;
++    const top=scroller.getBoundingClientRect().top;
++    const prompt=prompts.filter(element=>element.getBoundingClientRect().top<=top).at(-1)??prompts[0];
++    const promptId=prompt.dataset.userPromptId;
++    if(!promptId)throw new Error("原消息缺少稳定标识");
++    threadMotionRef.current?.takeUserControl();
++    return {conversationKey,promptId,offsetTop:prompt.getBoundingClientRect().top-top};
++  },[conversationKey,conversationReady,hasMessages]);
++  const finishReading=useCallback((pending:PendingReadingPosition,error?:Error)=>{
++    if(pendingReadingPosition.current!==pending)return;
++    pendingReadingPosition.current=null;pending.cleanup();
++    if(error)pending.reject(error);else pending.resolve();
++  },[]);
++  const restoreReadingPosition=useCallback((position:ThreadReadingPosition,signal:AbortSignal)=>{
++    if(position.conversationKey!==conversationKey||!position.promptId||!Number.isFinite(position.offsetTop))return Promise.reject(new Error("原阅读位置不属于当前会话"));
++    if(signal.aborted)return Promise.reject(new DOMException("阅读位置恢复已经取消","AbortError"));
++    const previous=pendingReadingPosition.current;
++    if(previous)finishReading(previous,new DOMException("阅读位置恢复已经替换","AbortError"));
++    return new Promise<void>((resolve,reject)=>{
++      const pending:PendingReadingPosition={position,resolve,reject,cleanup:()=>signal.removeEventListener("abort",abort),loading:false,lastBoundary:null};
++      const abort=()=>finishReading(pending,new DOMException("阅读位置恢复已经取消","AbortError"));
++      pendingReadingPosition.current=pending;signal.addEventListener("abort",abort,{once:true});setReadingRevision(value=>value+1);
++    });
++  },[conversationKey,finishReading]);
++
+   useImperativeHandle(
+     ref,
+     () => ({
+       jumpToUserPrompt,
+       cancelAutoScroll,
++      captureReadingPosition,
++      restoreReadingPosition,
+     }),
+-    [cancelAutoScroll, jumpToUserPrompt],
++    [cancelAutoScroll, jumpToUserPrompt,captureReadingPosition,restoreReadingPosition],
+   );
+ 
+   useLayoutEffect(() => {
+@@ -697,6 +746,34 @@
+     threadMotionRef.current?.invalidateGeometry();
+   }, [composer, hasMessages, visibleMessages.length]);
+ 
++  useLayoutEffect(()=>{
++    const pending=pendingReadingPosition.current;
++    if(!pending)return;
++    if(pending.position.conversationKey!==conversationKey){finishReading(pending,new DOMException("当前会话已经变化","AbortError"));return;}
++    if(!conversationReady)return;
++    const index=messages.findIndex(message=>message.role==="user"&&message.id===pending.position.promptId);
++    if(index<0){
++      if(readingHistoryError){finishReading(pending,new Error(readingHistoryError));return;}
++      if(readingHistoryPending||loadingOlder||pending.loading)return;
++      if(!hasMoreBefore||!onLoadOlder){finishReading(pending,new Error("原消息当前无法读取，请核查原会话历史"));return;}
++      const boundary=messages[0]?.id??"EMPTY";
++      if(pending.lastBoundary===boundary){finishReading(pending,new Error("原会话历史读取没有前进"));return;}
++      pending.lastBoundary=boundary;pending.loading=true;
++      void Promise.resolve(onLoadOlder()).then(()=>{if(pendingReadingPosition.current===pending){pending.loading=false;setReadingRevision(value=>value+1);}}).catch(error=>finishReading(pending,error instanceof Error?error:new Error(String(error))));
++      return;
++    }
++    const scroller=scrollRef.current,prompt=scroller?findPromptElement(scroller,pending.position.promptId):null;
++    if(!scroller||!prompt){setVisibleMessageCount(count=>Math.max(count,messages.length-index));return;}
++    const key=prompt.dataset.threadDisplayUnit;
++    if(!key){finishReading(pending,new Error("原消息缺少原生显示标识"));return;}
++    pendingConversationScrollRef.current=false;pendingPromptJumpRef.current=null;
++    threadMotionRef.current?.takeUserControl();setAtBottom(false);
++    historyScrollAnchorRef.current={key,offsetTop:pending.position.offsetTop};
++    if(!reconcileHistoryScrollAnchor()){finishReading(pending,new Error("原消息阅读位置未能恢复"));return;}
++    finishReading(pending);
++  },[conversationKey,conversationReady,messages,visibleMessages.length,hasMoreBefore,loadingOlder,onLoadOlder,readingHistoryPending,readingHistoryError,readingRevision,finishReading,reconcileHistoryScrollAnchor]);
++  useEffect(()=>()=>{const pending=pendingReadingPosition.current;if(pending)finishReading(pending,new DOMException("原生阅读视图已经退出","AbortError"));},[finishReading]);
++
+   useEffect(() => () => {
+     conversationHandoffAnimationRef.current?.cancel();
+     threadMotionRef.current?.dispose();
+@@ -777,7 +854,7 @@
+     const handlePointerDown = (event: PointerEvent) => {
+       if (
+         event.button === 0
+-        && (event.target === el || isThreadDisclosureTarget(event.target))
++        && isThreadDisclosureTarget(event.target)
+       ) {
+         yieldCameraToUser();
+       }

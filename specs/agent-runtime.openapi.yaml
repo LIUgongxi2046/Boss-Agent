@@ -1,0 +1,1581 @@
+openapi: 3.1.0
+info:
+  title: Boss-Agent 本地运行接口
+  version: 1.0.0
+  description: |
+    本规范覆盖同源运行、运行恢复、本人意图、成果读取、结果与成果的来源历史、本人计划执行、历史会话关联及方法候选路由。
+    产品入口需要显式配置端口及对应迁移；使用产品本人认证、会话订阅和来源范围检查。
+    当前运行创建及意图处理受引擎准备保护；成果读取受工作区隔离保护，相关成功路径未验证。
+    方法候选本人决定、维护发布及恢复的成功路径尚未验证。
+    不同入口可能返回 JSON 错误或文本错误，具体顺序受来源、身份与字段检查影响。
+security:
+  - ProductBearer: []
+paths:
+  /api/v2/owner-plans/{plan_id}/suppressed-history:
+    get:
+      summary: 读取本人计划事项的抑制历史
+      parameters:
+        - {name: plan_id, in: path, required: true, schema: {type: string}}
+        - {name: version, in: query, required: true, schema: {type: string}}
+        - {name: event_id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200':
+          description: 已核查的抑制回执列表
+          content:
+            application/json:
+              schema: {$ref: ../validation/agent_schedule_history_schema.json}
+        '401': {description: 本人认证无效}
+        '403': {description: 会话或来源范围无权读取}
+  /api/v2/runs/{run_id}/intent:
+    parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    get:
+      operationId: readCurrentIntent
+      description: 读取当前本人会话的待确认意图，核查运行租约、所选来源及当前版本；正式运行条件未通过时返回 503。
+      responses:
+        '200':
+          description: 版本化意图预览与当前允许动作
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-intents.schema.json#/$defs/preview
+        '400': {description: 请求格式无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 身份或请求来源无权访问}
+        '404': {description: 当前范围没有待确认意图}
+        '409': {description: 运行、租约或来源版本已经变化}
+        '503': {description: 正式运行条件尚未通过}
+  /api/v2/intents/{intent_id}/decision:
+    parameters:
+      - name: intent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    post:
+      operationId: decideIntent
+      description: 本人根据当前预览作出决定；请求需要同源 Origin，正式运行条件未通过时返回 503。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-intents.schema.json#/$defs/decision
+      responses:
+        '200':
+          description: 已保存的本人决定回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-intents.schema.json#/$defs/decision_receipt
+        '400': {description: 请求字段无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 身份或请求来源无权操作}
+        '404': {description: 当前范围没有对应意图}
+        '409': {description: 版本、来源或请求编号冲突}
+        '503': {description: 正式运行条件尚未通过}
+  /api/v2/intent-decisions/{request_key}:
+    parameters:
+      - name: request_key
+        in: path
+        required: true
+        schema:
+          $ref: ./agent-intents.schema.json#/$defs/request_key
+    get:
+      operationId: readIntentDecisionReceipt
+      description: 按原请求编号读取当前本人及会话范围内的决定回执；正式运行条件未通过时返回 503。
+      responses:
+        '200':
+          description: 版本化本人决定回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-intents.schema.json#/$defs/decision_receipt
+        '400': {description: 请求编号无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 身份或请求来源无权访问}
+        '404': {description: 当前范围没有原回执}
+        '409': {description: 会话或来源版本已经变化}
+        '503': {description: 正式运行条件尚未通过}
+  /api/v2/requests/{request_key}:
+    parameters:
+      - name: request_key
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 128
+    get:
+      operationId: readOriginalRequest
+      responses:
+        '200':
+          description: 当前身份及资料范围内已保存的原请求回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/request_receipt
+        '400': &errorResponse
+          description: 认证、范围、字段或版本错误；部分底层错误返回文本，具体状态及格式取决于处理入口。
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/error
+            text/plain:
+              schema: {type: string}
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/run-method-catalog:
+    post:
+      operationId: listCreateRunMethods
+      description: 需要本人身份、当前会话订阅及匹配来源；返回创建运行时可显式选择的方法。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [conversation_id, selected_refs]
+              properties:
+                conversation_id: {$ref: './agent-runs.schema.json#/$defs/key'}
+                selected_refs: {type: array, maxItems: 100, uniqueItems: true, items: {$ref: './agent-runs.schema.json#/$defs/key'}}
+      responses:
+        '200':
+          description: 当前会话和来源可使用的方法目录
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [conversation_id, selected_refs, methods]
+                properties:
+                  conversation_id: {type: string}
+                  selected_refs: {type: array, items: {type: string}}
+                  methods: {$ref: './agent-runs.schema.json#/$defs/method_catalog/properties/methods'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs:
+    post:
+      operationId: createRun
+      description: 产品创建需要本人明确选择方法，提交 method_selection；当前运行安全条件尚未通过，创建准入保持关闭。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-runs.schema.json#/$defs/create
+      responses:
+        '200':
+          description: 创建或读取原接收回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '413': *errorResponse
+        '503':
+          description: 创建事务前因运行安全条件拒绝时返回 CREATE_NOT_ADMITTED；其他依赖不可用错误不证明原请求结果，需保留请求编号并查询原回执。
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/error
+            text/plain:
+              schema: {type: string}
+  /api/v2/runs/{run_id}:
+    parameters: &runId
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: readRun
+      description: 读取当前运行快照；可选的 waiting_input 关联当前目标版本和 INPUT_REQUIRED 事件，可选的 method_selection 记录当前目标方法。
+      responses:
+        '200':
+          description: 当前运行投影
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/snapshot
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/dispatch:
+    parameters: *runId
+    post:
+      operationId: dispatchRun
+      description: 需要本人有效身份及当前会话订阅。服务端核查来源、预算、租约和隔离条件；执行工厂或安全条件未准备时拒绝。请求等待执行返回；连接中断后应查询原回执，404 不证明请求没有提交。自动派发及本人成功路径尚未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expected_revision, request_key]
+              properties:
+                expected_revision: {type: integer, minimum: 0}
+                request_key: {$ref: ./agent-runs.schema.json#/$defs/key}
+      responses:
+        '200':
+          description: 原派发请求回执
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [run_id, request_key, expected_revision, lease_epoch, state, result]
+                properties:
+                  run_id: {$ref: ./agent-runs.schema.json#/$defs/key}
+                  request_key: {$ref: ./agent-runs.schema.json#/$defs/key}
+                  expected_revision: {type: integer, minimum: 0}
+                  lease_epoch: {type: integer, minimum: 1}
+                  state: {enum: [ACCEPTED, COMPLETED, UNKNOWN]}
+                  result: {type: [object, 'null']}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/dispatch-requests/{request_key}:
+    parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string}}
+      - {name: request_key, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: readDispatchReceipt
+      description: 查询原派发请求；UNKNOWN 和在途请求需要核查运行租约与进程记录，不能自动重复派发。
+      responses:
+        '200':
+          description: 原派发请求回执
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [run_id, request_key, expected_revision, lease_epoch, state, result]
+                properties:
+                  run_id: {type: string}
+                  request_key: {type: string}
+                  expected_revision: {type: integer, minimum: 0}
+                  lease_epoch: {type: integer, minimum: 1}
+                  state: {enum: [ACCEPTED, COMPLETED, UNKNOWN]}
+                  result: {type: [object, 'null']}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/dispatch-requests/{request_key}/inspection:
+    parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string}}
+      - {name: request_key, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: inspectDispatchRecovery
+      description: 本人会话只读核查原派发回执、租约、并发预留及进程记录；不能据此自动重复派发。
+      responses:
+        '200':
+          description: 派发原请求的核查结果
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [run_id, request_key, receipt_state, run_status, lease_epoch, current_lease_epoch, lease_owner_matches, lease_expires_at, reservation_state, process_state, exit_code, exit_scope, automatic_retry]
+                properties:
+                  run_id: {type: string}
+                  request_key: {type: string}
+                  receipt_state: {enum: [ACCEPTED, COMPLETED, UNKNOWN]}
+                  run_status: {type: string}
+                  lease_epoch: {type: integer}
+                  current_lease_epoch: {type: integer}
+                  lease_owner_matches: {type: boolean}
+                  lease_expires_at: {type: [string, 'null']}
+                  reservation_state: {type: string}
+                  process_state: {type: string}
+                  exit_code: {type: [integer, 'null']}
+                  exit_scope: {type: [string, 'null']}
+                  automatic_retry: {const: false}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/inputs:
+    parameters: *runId
+    post:
+      operationId: addRunInput
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-runs.schema.json#/$defs/inputs
+      responses:
+        '200':
+          description: 输入回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/input_receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '413': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/object-scope:
+    parameters: *runId
+    post:
+      operationId: bindRunObjectScope
+      description: 本人在当前运行和目标版本明确选择对象；服务核查身份、会话、来源、记忆、对象版本和摘要。首次选择要求 QUEUED 或 WAITING_INPUT，运行中仅可核查相同原请求；服务未装配时返回 503。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-runs.schema.json#/$defs/object_scope_request
+      responses:
+        '200':
+          description: 当前目标的明确对象选择回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/object_scope_receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '413': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/object-scope/candidates:
+    parameters: *runId
+    get:
+      operationId: listRunObjectCandidates
+      description: 读取当前本人运行来源范围内可核查的五类对象及选择允许状态、不可用原因；需要有效本人会话和订阅。服务按对象来源筛选，查询参数不受支持。
+      responses:
+        '200':
+          description: 当前本人和运行来源范围内的业务对象候选
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/object_scope_candidates
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/object-scope/meeting-candidates/{meeting_id}:
+    parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: meeting_id
+        in: path
+        required: true
+        schema:
+          $ref: ./agent-runs.schema.json#/$defs/key
+    get:
+      operationId: readRunMeetingScopeCandidate
+      description: 按明确会议编号读取会议上下文候选及选择允许状态，核查会议、关联成员及来源；该候选仍需本人选择。查询参数不受支持。
+      responses:
+        '200':
+          description: 当前会议及关联成员的完整候选，等待本人明确选择
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/object_scope_candidates
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/object-scope/requests/{request_key}:
+    parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: request_key
+        in: path
+        required: true
+        schema:
+          $ref: ./agent-runs.schema.json#/$defs/key
+    get:
+      operationId: readRunObjectSelectionReceipt
+      description: 按原请求编号读取回执，并重新核查当前身份、会话、来源、记忆和对象版本。查询参数不受支持。
+      responses:
+        '200':
+          description: 重新核查后的对象选择回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/object_scope_receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/available-methods:
+    parameters: *runId
+    get:
+      operationId: listRunMethods
+      description: 本人会话、订阅、来源和记忆范围核查后读取当前方法目录；selection_allowed 表示当前运行是否允许选择，方法状态及缺少依赖分别列出。查询参数不受支持。
+      responses:
+        '200':
+          description: 当前运行可核查的方法目录
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/method_catalog
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/method-selection:
+    parameters: *runId
+    post:
+      operationId: reselectRunMethod
+      description: 本人为补充后的当前目标选择方法；核查目标版本、运行状态、初始方法、方法版本及依赖。请求编号和内容相同的已保存请求可返回原回执；结果未知时查询原回执。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-runs.schema.json#/$defs/method_reselection
+      responses:
+        '200':
+          description: 当前目标的方法选择回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/method_reselection_receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '413': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/method-selection/requests/{request_key}:
+    parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string}}
+      - {name: request_key, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: readRunMethodSelectionReceipt
+      description: 按原请求编号读取已保存的方法选择回执；核查当前本人会话、订阅、来源和记忆范围，查询参数不受支持。
+      responses:
+        '200':
+          description: 原方法选择回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/method_reselection_receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/cancel:
+    parameters: *runId
+    post:
+      operationId: cancelRun
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./agent-runs.schema.json#/$defs/cancel
+      responses:
+        '200':
+          description: 取消请求回执
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-runs.schema.json#/$defs/receipt
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '413': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/events:
+    parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: after_seq
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]{1,18}$'
+    get:
+      operationId: readRunEvents
+      responses:
+        '200':
+          description: 有序事件页面
+          content:
+            application/json:
+              schema:
+                $ref: ./agent-events.schema.json#/$defs/page
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/result:
+    parameters: *runId
+    get:
+      operationId: readRunResult
+      description: 读取当前目标版本的结果事件；空结果表示该版本尚无已保存结果。
+      responses:
+        '200':
+          description: 当前目标版本及结果事件
+          content:
+            application/json:
+              schema: {$ref: ./agent-events.schema.json#/$defs/result}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/usage:
+    parameters: *runId
+    get:
+      operationId: readRunUsage
+      description: 全运行关系授权和后代范围检查尚未验证，认证成功后返回 503，不开放用量查询。
+      responses:
+        '200':
+          description: 最新累计用量快照
+          content:
+            application/json:
+              schema: {$ref: ./agent-runs.schema.json#/$defs/usage_snapshot}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/completion-inspection:
+    parameters: *runId
+    get:
+      operationId: readRunCompletionInspection
+      description: 读取已保存的完成核查状态和阻断项；不创建核查、不改变运行状态。版本或目标已变化时返回 stale=true。
+      parameters:
+        - name: finish_event_id
+          in: query
+          required: false
+          schema: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200':
+          description: 已保存的完成核查投影
+          content:
+            application/json:
+              schema: {$ref: ./agent-runs.schema.json#/$defs/completion_inspection}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/recover-expired:
+    parameters: *runId
+    post:
+      operationId: recoverExpiredRun
+      description: 明确的本人恢复入口；当前身份、来源与写入事务竞争尚未验证，认证成功后返回 503，不执行恢复。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: false}
+      responses:
+        '200':
+          description: 恢复回执；当前未启用
+          content:
+            application/json:
+              schema: {$ref: ../validation/agent_run_recovery_schema.json#/$defs/receipt}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/completion-recheck:
+    parameters: *runId
+    post:
+      operationId: recheckTerminalCompletion
+      description: 本人认证后的终态重新核查入口；完整依赖服务尚未接入，认证成功后返回 503，不返回历史数据。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: ../validation/agent_run_recovery_schema.json#/$defs/recheck_request}
+      responses:
+        '200':
+          description: 终态重新核查回执；完成状态固定为 BLOCKED
+          content:
+            application/json:
+              schema: {$ref: ../validation/agent_run_recovery_schema.json#/$defs/recheck_receipt}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/resume-status:
+    parameters: &resumeRunId
+      - {name: run_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+    get:
+      operationId: inspectRunResume
+      description: 本人认证并订阅会话后读取恢复条件和原回执；当前 allowed_actions 为空。本人认证后的读取尚未验证。
+      responses:
+        '200':
+          description: 当前运行状态、等待原因及原回执
+          headers: &resumeHeaders
+            Cache-Control: {schema: {type: string, const: no-store}}
+            X-Content-Type-Options: {schema: {type: string, const: nosniff}}
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_run_resume_schema.json#/$defs/status'}
+        '400': {description: 运行编号或查询参数无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 请求来源、会话订阅或来源范围无权访问}
+        '404': {description: 当前范围没有对应运行}
+        '409': {description: 当前来源或运行范围已经变化}
+  /api/v2/runs/{run_id}/resume:
+    parameters: *resumeRunId
+    post:
+      operationId: resumeRun
+      description: 本人认证、会话订阅和来源范围核查后提交恢复请求；需要匹配的 Origin。已保存且内容相同的原请求可返回原回执；新请求核查运行及目标版本后，当前受服务准备保护并返回 503。本人恢复执行尚未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '../validation/agent_run_resume_schema.json#/$defs/request'}
+      responses:
+        '200':
+          description: 已保存的原恢复请求回执
+          headers: *resumeHeaders
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_run_resume_schema.json#/$defs/receipt'}
+        '400': {description: 请求格式、字段、运行编号或查询参数无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 请求来源、会话订阅或来源范围无权操作}
+        '404': {description: 当前范围没有对应运行}
+        '409': {description: 运行状态、版本或原请求内容冲突}
+        '413': {description: 请求超过大小限制}
+        '503': {description: 引擎准备及恢复条件尚未通过}
+  /api/v2/runs/{run_id}/resume-requests/{request_key}:
+    parameters:
+      - {name: run_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: request_key, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}}
+    get:
+      operationId: readRunResumeReceipt
+      description: 本人认证并订阅会话后按原请求编号查询已记录的恢复回执；本人成功读取尚未验证。
+      responses:
+        '200':
+          description: 已记录的原请求及恢复回执
+          headers: *resumeHeaders
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_run_resume_schema.json#/$defs/request_receipt'}
+        '400': {description: 运行编号、请求编号或查询参数无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 请求来源、会话订阅或来源范围无权访问}
+        '404': {description: 当前范围没有对应运行或原回执}
+        '409': {description: 当前来源或运行范围已经变化}
+  /api/v2/runs/{run_id}/source-history/{event_id}:
+    parameters:
+      - {name: run_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: event_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: source_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 160, pattern: '\S'}}
+      - {name: version, in: query, required: true, description: 规范 ASCII 十进制文本，最多 32 位, schema: {type: string, pattern: '^(0|[1-9][0-9]{0,31})$'}}
+    get:
+      operationId: readRunSourceHistory
+      description: 本人认证并订阅会话后读取结果所引用的来源版本；核查运行范围、来源状态和摘要。位置状态为 NOT_VERIFIED，本人成功读取尚未验证。Host 与 Origin 按同源规则检查。
+      responses:
+        '200':
+          description: 来源正文、版本、摘要及未经核查的引用位置
+          headers:
+            Cache-Control: {schema: {type: string, const: no-store}}
+            X-Content-Type-Options: {schema: {type: string, const: nosniff}}
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_source_history_schema.json'}
+        '400': {description: 编号或查询字段无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 请求来源、本人会话或来源范围无权访问}
+        '404': {description: 运行、结果、引用或历史正文不可读取}
+        '409': {description: 当前空间、来源版本、摘要或结果记录不可核查}
+        '410': {description: 来源撤销或清理已经开始}
+  /api/v2/runs/{run_id}/artifacts/{artifact_id}/source-history:
+    parameters:
+      - {name: run_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: artifact_id, in: path, required: true, description: 使用规范小写 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: source_id, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 160, pattern: '\S'}}
+      - {name: version, in: query, required: true, description: 规范 ASCII 十进制正整数文本，最多 16 位, schema: {type: string, pattern: '^[1-9][0-9]{0,15}$'}}
+      - {name: artifact_version, in: query, required: true, description: 规范 ASCII 十进制正整数文本，最多 16 位, schema: {type: string, pattern: '^[1-9][0-9]{0,15}$'}}
+    get:
+      operationId: readArtifactSourceHistory
+      description: 本人认证并订阅会话后读取成果所引用的来源版本；核查来源范围、成果版本和摘要。该路由使用业务数据库，成果文件读取仍受独立隔离保护；本人成功读取尚未验证。
+      responses:
+        '200':
+          description: 成果与来源版本、摘要、正文及未经核查的引用位置
+          headers:
+            Cache-Control: {schema: {type: string, const: no-store}}
+            X-Content-Type-Options: {schema: {type: string, const: nosniff}}
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_source_history_schema.json'}
+        '400': {description: 编号或查询字段无效}
+        '401': {description: 当前身份无效}
+        '403': {description: 请求来源、本人会话、来源或成果范围无权访问}
+        '404': {description: 运行、成果、引用或历史正文不可读取}
+        '409': {description: 当前空间、版本、摘要或成果记录不可核查}
+        '410': {description: 来源撤销或清理已经开始}
+  /api/v2/runs/{run_id}/artifacts:
+    parameters: *runId
+    get:
+      operationId: listRunArtifacts
+      description: 当前认证后受成果工作区隔离保护；成功读取路径未验证。
+      responses:
+        '200':
+          description: 已核查的运行成果列表
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_schema.json#/$defs/list'}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/artifact-pending-requests:
+    parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: listPendingArtifactRequests
+      description: 本人订阅的原运行中来源撤销后待核查请求；不返回来源正文、文件内容或路径，成果读取边界保持关闭。
+      responses:
+        '200':
+          description: 待核查请求列表
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_schema.json#/$defs/pending_requests'}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/artifact-requests/{request_key}:
+    parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string}}
+      - {name: request_key, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: readArtifactRequest
+      description: 原成果请求回执；来源撤销后仅在本人角色、原运行主体、执行空间及原生会话实例和订阅均通过核查时返回 RECONCILING，成果字段为 null，不读取来源正文或文件。当前读取边界关闭，本人成功路径未验证。
+      responses:
+        '200':
+          description: 原请求及成果状态
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_schema.json#/$defs/request_receipt'}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/artifacts/{artifact_id}:
+    parameters: &artifactParams
+      - {name: artifact_id, in: path, required: true, description: 使用小写标准 UUID 字符串, schema: {type: string, format: uuid}}
+      - {name: version, in: query, required: true, description: 十进制正整数文本，不接受前导零，最大值为 9007199254740991, schema: {type: string, pattern: '^[1-9][0-9]{0,15}$'}}
+    get:
+      operationId: readArtifactMetadata
+      description: 当前认证后受成果工作区隔离保护，参数校验和成功读取尚未在本人会话验证。
+      responses:
+        '200':
+          description: 成果元信息
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_schema.json#/$defs/metadata'}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/artifacts/{artifact_id}/versions:
+    parameters: *artifactParams
+    get:
+      operationId: readArtifactVersions
+      description: 当前认证后受成果工作区隔离保护，成功读取路径未验证。
+      responses:
+        '200':
+          description: 成果版本列表
+          content:
+            application/json:
+              schema: {$ref: '../validation/agent_artifact_schema.json#/$defs/version_list'}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/artifacts/{artifact_id}/file:
+    parameters: *artifactParams
+    get:
+      operationId: readArtifactFile
+      description: 当前认证后受成果工作区隔离保护，文件读取路径未验证。
+      responses:
+        '200':
+          description: 已核查的成果文件，媒体类型取决于成果格式
+          content:
+            text/markdown: {schema: {type: string, format: binary}}
+            application/pdf: {schema: {type: string, format: binary}}
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document: {schema: {type: string, format: binary}}
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: {schema: {type: string, format: binary}}
+            application/vnd.openxmlformats-officedocument.presentationml.presentation: {schema: {type: string, format: binary}}
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/owner-plans/execution-methods:
+    post:
+      operationId: listPlanExecutionMethods
+      description: 需要本人认证、当前会话订阅以及匹配的计划版本与来源。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlanMethodsInput'}
+      responses:
+        '200':
+          description: 当前计划可供选择的方法
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PlanMethods'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/owner-plans/execution-preview:
+    post:
+      operationId: previewPlanExecution
+      description: 需要本人认证、当前会话订阅和匹配来源；本人成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlanPreviewInput'}
+      responses:
+        '200':
+          description: 已保存的执行预览及内容摘要
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PlanPreview'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/owner-plans/execution-decision:
+    post:
+      operationId: decidePlanExecution
+      description: 本人决定需要有效预览、当前范围和同源 Origin；成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlanDecisionInput'}
+      responses:
+        '200':
+          description: 本人决定及授权编号
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PlanDecisionReceipt'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/owner-plans/execution-binding:
+    post:
+      operationId: bindPlanExecution
+      description: 绑定已确认的计划范围及本人授权；成功路径未验证，正式调度交接保持关闭。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlanBindingInput'}
+      responses:
+        '200':
+          description: 本人计划绑定回执
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PlanBindingReceipt'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/owner-plans/{plan_id}/execution-receipts/{operation}/{client_request_id}:
+    parameters:
+      - {name: plan_id, in: path, required: true, schema: {type: string, maxLength: 128}}
+      - {name: operation, in: path, required: true, schema: {type: string, enum: [decision, binding]}}
+      - {name: client_request_id, in: path, required: true, schema: {type: string, minLength: 8, maxLength: 128}}
+    get:
+      operationId: readPlanExecutionReceipt
+      description: 按原请求查询本人决定或绑定回执；本人成功路径未验证。
+      responses:
+        '200':
+          description: 当前本人范围内的原回执
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [plan_id, client_request_id, operation, receipt]
+                properties:
+                  plan_id: {type: string}
+                  client_request_id: {type: string}
+                  operation: {enum: [decision, binding]}
+                  receipt:
+                    oneOf:
+                      - {$ref: '#/components/schemas/PlanDecisionReceipt'}
+                      - {$ref: '#/components/schemas/PlanBindingReceipt'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/runs/{run_id}/legacy-link:
+    parameters: *runId
+    get:
+      operationId: readLegacyLink
+      description: 读取当前运行的历史会话关联；本人成功路径未验证。
+      responses:
+        '200':
+          description: 关联记录或空关联
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LegacyLinkResponse'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+    post:
+      operationId: linkLegacySession
+      description: 不接受请求体；需要匹配 Origin 和当前本人会话范围，成功路径未验证。
+      responses:
+        '200':
+          description: 历史关联结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LegacyLinkCreated'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates:
+    get:
+      operationId: listSkillCandidates
+      description: BOSS 或 MAINTAINER 可读取候选目录；需要已装配方法维护服务。
+      parameters:
+        - {name: after, in: query, required: false, schema: {type: string, maxLength: 128}}
+        - {name: limit, in: query, required: false, description: ASCII 数字文本，数值范围为 1 至 100, schema: {type: string, pattern: '^[0-9]{1,3}$', default: '50'}}
+      responses:
+        '200':
+          description: 当前空间中的候选及下一页游标
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillCandidatePage'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}:
+    parameters: &candidateId
+      - {name: candidate_id, in: path, required: true, schema: {type: string}}
+    get:
+      operationId: previewSkillCandidate
+      description: BOSS 读取候选与基础方法正文及决定记录；本人成功路径未验证。
+      responses:
+        '200':
+          description: 本人候选预览
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillCandidatePreview'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/decision:
+    parameters: *candidateId
+    post:
+      operationId: decideSkillCandidate
+      description: BOSS 基于静态校验、当前候选与基础摘要提交决定；要求匹配的 Origin。本人成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SkillDecisionInput'}
+      responses:
+        '200':
+          description: 本人决定与授权记录
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillDecision'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/decisions/{publication_id}:
+    parameters: &candidateOperationId
+      - {name: candidate_id, in: path, required: true, schema: {type: string}}
+      - {name: publication_id, in: path, required: true, description: 原 client_request_id, schema: {type: string, minLength: 1, maxLength: 128}}
+    get:
+      operationId: readSkillDecisionReceipt
+      description: BOSS 查询原决定；未找到时返回 NOT_FOUND，本人成功路径未验证。
+      responses:
+        '200':
+          description: 原决定状态和结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillDecisionStatus'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/maintenance:
+    parameters: *candidateId
+    get:
+      operationId: readSkillCandidateMaintenance
+      description: MAINTAINER 读取候选、当前方法、草稿及本人授权状态；成功路径未验证。
+      responses:
+        '200':
+          description: 方法候选维护详情
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillCandidateDetail'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/validation:
+    parameters: *candidateId
+    post:
+      operationId: validateSkillCandidate
+      description: MAINTAINER 对指定摘要执行静态校验；需要匹配的 Origin，成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expected_content_sha256]
+              properties:
+                expected_content_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      responses:
+        '200':
+          description: 静态校验结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillValidation'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/publish:
+    parameters: *candidateId
+    post:
+      operationId: publishSkillCandidate
+      description: MAINTAINER 发布候选，核查本人授权、摘要和方法依赖；需要匹配的 Origin，成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SkillPublicationInput'}
+      responses:
+        '200':
+          description: 方法启用结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillActivationResult'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skill-candidates/{candidate_id}/publications/{publication_id}:
+    parameters: *candidateOperationId
+    get:
+      operationId: readSkillPublicationStatus
+      description: MAINTAINER 以原 client_request_id 查询发布状态；成功路径未验证。
+      responses:
+        '200':
+          description: 原发布状态和结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillPublicationStatus'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skills/disable:
+    post:
+      operationId: disableSkill
+      description: MAINTAINER 停用指定方法；需要匹配的 Origin，成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SkillDisableInput'}
+      responses:
+        '200':
+          description: 方法停用结果
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sop_id, version, content_sha256, activation_policy, business_authorization_granted, model_adoption_verified]
+                properties:
+                  sop_id: {type: string}
+                  version: {type: string}
+                  content_sha256: {type: string}
+                  activation_policy: {const: NEXT_CONTEXT_LOAD}
+                  business_authorization_granted: {const: false}
+                  model_adoption_verified: {const: false}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '404': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skills/recover:
+    post:
+      operationId: recoverSkillActivation
+      description: MAINTAINER 处理 PREPARED 方法启用记录；需要匹配的 Origin，成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SkillActivationRecoveryInput'}
+      responses:
+        '200':
+          description: 方法启用结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillActivationResult'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+  /api/v2/skills/cancel:
+    post:
+      operationId: cancelSkillActivation
+      description: MAINTAINER 取消 PREPARED 方法启用记录；需要匹配的 Origin，成功路径未验证。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SkillActivationRecoveryInput'}
+      responses:
+        '200':
+          description: 方法取消结果
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SkillActivationResult'}
+        '400': *errorResponse
+        '401': *errorResponse
+        '403': *errorResponse
+        '409': *errorResponse
+        '503': *errorResponse
+components:
+  securitySchemes:
+    ProductBearer:
+      type: http
+      scheme: bearer
+      description: 当前产品认证凭据；本人运行还需要有效会话订阅和来源范围。
+  schemas:
+    PlanBudget:
+      type: object
+      additionalProperties: false
+      required: [model_requests, rounds, tools, seconds, concurrency, context_tokens, files, file_bytes, open_files, cpu_seconds]
+      properties:
+        model_requests: {type: integer, minimum: 1}
+        rounds: {type: integer, minimum: 1}
+        tools: {type: integer, minimum: 1}
+        seconds: {type: integer, minimum: 1}
+        concurrency: {type: integer, minimum: 1}
+        context_tokens: {type: integer, minimum: 1}
+        files: {type: integer, minimum: 1}
+        file_bytes: {type: integer, minimum: 1}
+        open_files: {type: integer, minimum: 16}
+        cpu_seconds: {type: integer, minimum: 1}
+    PlanStopConditions:
+      type: object
+      additionalProperties: false
+      required: [business_until]
+      properties:
+        business_until: {type: string, format: date-time, description: 需要包含时区的业务结束时间}
+    PlanMethodsInput:
+      type: object
+      additionalProperties: false
+      required: [plan_id, expected_version, conversation_id, source_refs]
+      properties:
+        plan_id: {type: string}
+        expected_version: {type: string}
+        conversation_id: {type: string}
+        source_refs: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1}}
+    PlanMethods:
+      type: object
+      additionalProperties: false
+      required: [plan_id, version, conversation_id, source_refs, methods]
+      properties:
+        plan_id: {type: string}
+        version: {type: string}
+        conversation_id: {type: string}
+        source_refs: {type: array, items: {type: string}}
+        methods: {$ref: './agent-runs.schema.json#/$defs/method_catalog/properties/methods'}
+    PlanPreviewInput:
+      type: object
+      additionalProperties: false
+      required: [plan_id, expected_version, conversation_id, source_refs, budget, stop_conditions, required_outputs, method_selection]
+      properties:
+        plan_id: {type: string}
+        expected_version: {type: string}
+        conversation_id: {type: string}
+        source_refs: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1, pattern: '\S'}}
+        budget: {$ref: '#/components/schemas/PlanBudget'}
+        stop_conditions: {$ref: '#/components/schemas/PlanStopConditions'}
+        required_outputs: {$ref: './agent-runs.schema.json#/$defs/required_outputs'}
+        method_selection: {$ref: './agent-runs.schema.json#/$defs/method_selection'}
+    PlanBindingInput:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, plan_id, expected_version, conversation_id, source_refs, budget, stop_conditions, authorization_id, required_outputs, method_selection]
+      properties:
+        client_request_id: {type: string}
+        plan_id: {type: string}
+        expected_version: {type: string}
+        conversation_id: {type: string}
+        source_refs: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1, pattern: '\S'}}
+        budget: {$ref: '#/components/schemas/PlanBudget'}
+        stop_conditions: {$ref: '#/components/schemas/PlanStopConditions'}
+        authorization_id: {type: string}
+        required_outputs: {$ref: './agent-runs.schema.json#/$defs/required_outputs'}
+        method_selection: {$ref: './agent-runs.schema.json#/$defs/method_selection'}
+    PlanDecisionInput:
+      type: object
+      additionalProperties: false
+      required: [preview_id, payload_sha256, decision, client_request_id]
+      properties:
+        preview_id: {type: string}
+        payload_sha256: {type: string}
+        decision: {enum: [CONFIRM, REJECT]}
+        client_request_id: {type: string, minLength: 8, maxLength: 128}
+    PlanPreview:
+      type: object
+      required: [preview_id, plan_id, expected_version, content_version, action, payload, payload_sha256]
+      properties:
+        preview_id: {type: string}
+        plan_id: {type: string}
+        expected_version: {type: string}
+        content_version: {type: string}
+        action: {const: owner_plan.save}
+        payload: {$ref: '#/components/schemas/PlanBoundPayload'}
+        payload_sha256: {type: string}
+    PlanBoundPayload:
+      type: object
+      required: [purpose, event_ids, timezone, not_before, event_versions, budget, stop_conditions, conversation_id, source_refs, scope_proof, required_outputs, method_selection]
+      properties:
+        purpose: {type: string}
+        event_ids: {type: array, items: {type: string}}
+        timezone: {type: string}
+        not_before: {type: string}
+        event_versions: {type: object, additionalProperties: {type: string}}
+        budget: {$ref: '#/components/schemas/PlanBudget'}
+        stop_conditions: {$ref: '#/components/schemas/PlanStopConditions'}
+        conversation_id: {type: string}
+        source_refs: {type: array, items: {type: string}}
+        required_outputs: {$ref: './agent-runs.schema.json#/$defs/required_outputs'}
+        method_selection: {$ref: './agent-runs.schema.json#/$defs/method_selection'}
+        scope_proof:
+          type: object
+          required: [namespace, owner_id, dataset_id, dataset_version, chat_id, session_id, native_session_created_at, binding_id, context_version, source_pins]
+          properties:
+            namespace: {type: string}
+            owner_id: {type: string}
+            dataset_id: {type: string}
+            dataset_version: {type: string}
+            chat_id: {type: string}
+            session_id: {type: string}
+            native_session_created_at: {type: string}
+            binding_id: {type: [string, 'null']}
+            context_version: {type: [string, 'null']}
+            source_pins:
+              type: array
+              items:
+                type: array
+                minItems: 3
+                maxItems: 3
+                items: {type: string}
+    PlanDecisionReceipt:
+      type: object
+      required: [preview_id, decision, authorization_id]
+      properties:
+        preview_id: {type: string}
+        decision: {enum: [CONFIRM, REJECT]}
+        authorization_id: {type: [string, 'null']}
+    PlanBindingReceipt:
+      type: object
+      required: [plan_id, version, authorization_id, state]
+      properties:
+        plan_id: {type: string}
+        version: {type: string}
+        authorization_id: {type: string}
+        state: {type: string}
+    LegacyLinkResponse:
+      type: object
+      required: [run_id, link]
+      properties:
+        run_id: {type: string}
+        link:
+          oneOf:
+            - {type: 'null'}
+            - type: object
+              required: [run_id, session_id, engine, source_digest]
+              properties:
+                run_id: {type: string}
+                session_id: {type: string}
+                engine: {const: nanobot}
+                source_digest: {type: string}
+    LegacyLinkCreated:
+      type: object
+      required: [run_id, session_id, engine, source_digest, created]
+      properties:
+        run_id: {type: string}
+        session_id: {type: string}
+        engine: {const: nanobot}
+        source_digest: {type: string}
+        created: {type: boolean}
+    SkillMethodReference:
+      type: object
+      required: [sop_id, name, version, content_sha256]
+      properties:
+        sop_id: {type: string}
+        name: {type: string}
+        version: {type: string}
+        content_sha256: {type: string}
+    SkillCandidate:
+      type: object
+      required: [candidate_id, run_id, sop_id, content_sha256, state, enabled, validation_status, created_at]
+      properties:
+        candidate_id: {type: string}
+        run_id: {type: string}
+        sop_id: {type: string}
+        content_sha256: {type: string}
+        state: {type: string}
+        enabled: {type: boolean}
+        validation_status: {type: string}
+        created_at: {type: string}
+    SkillCandidatePage:
+      type: object
+      required: [items, next_after]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/SkillCandidate'}}
+        next_after: {type: [string, 'null']}
+    SkillCandidatePreview:
+      type: object
+      required: [candidate_id, sop_id, content, content_sha256, base_content, base_method, validation_status, decision_receipts]
+      properties:
+        candidate_id: {type: string}
+        sop_id: {type: string}
+        content: {type: string}
+        content_sha256: {type: string}
+        base_content: {type: string}
+        base_method: {$ref: '#/components/schemas/SkillMethodReference'}
+        validation_status: {type: string}
+        decision_receipts:
+          type: array
+          items:
+            allOf:
+              - {$ref: '#/components/schemas/SkillDecision'}
+              - type: object
+                required: [client_request_id]
+                properties:
+                  client_request_id: {type: string}
+    SkillDecisionInput:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, expected_content_sha256, expected_base_sha256, decision]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 128}
+        expected_content_sha256: {type: string, minLength: 1, maxLength: 128}
+        expected_base_sha256: {type: string, minLength: 1, maxLength: 128}
+        decision: {enum: [APPROVE, REJECT]}
+    SkillDecision:
+      type: object
+      required: [candidate_id, sop_id, content_sha256, base_sha256, tool_config_sha256, decision, authorization_id]
+      properties:
+        candidate_id: {type: string}
+        sop_id: {type: string}
+        content_sha256: {type: string}
+        base_sha256: {type: string}
+        tool_config_sha256: {type: [string, 'null']}
+        decision: {enum: [APPROVE, REJECT]}
+        authorization_id: {type: string}
+    SkillDecisionStatus:
+      type: object
+      required: [candidate_id, client_request_id, state, result]
+      properties:
+        candidate_id: {type: string}
+        client_request_id: {type: string}
+        state: {enum: [NOT_FOUND, RECORDED]}
+        result:
+          oneOf:
+            - {type: 'null'}
+            - {$ref: '#/components/schemas/SkillDecision'}
+    SkillCandidateDetail:
+      allOf:
+        - {$ref: '#/components/schemas/SkillCandidate'}
+        - type: object
+          required: [base_method, errors, missing_tools, tool_config_sha256, current_active_sha256, draft_version, decisions]
+          properties:
+            base_method: {$ref: '#/components/schemas/SkillMethodReference'}
+            errors: {type: array, items: {type: object}}
+            missing_tools: {type: array, items: {type: string}}
+            tool_config_sha256: {type: [string, 'null']}
+            current_active_sha256: {type: string}
+            draft_version: {type: string}
+            decisions:
+              type: array
+              items:
+                type: object
+                required: [authorization_id, decision, valid_from, valid_until, revoked, expired, content_sha256, base_sha256, tool_config_sha256]
+                properties:
+                  authorization_id: {type: string}
+                  decision: {enum: [APPROVE, REJECT]}
+                  valid_from: {type: string}
+                  valid_until: {type: string}
+                  revoked: {type: boolean}
+                  expired: {type: boolean}
+                  content_sha256: {type: string}
+                  base_sha256: {type: string}
+                  tool_config_sha256: {type: [string, 'null']}
+    SkillValidation:
+      type: object
+      required: [candidate_id, content_sha256, method_version, state, enabled, validation_status, errors, missing_tools, tool_config_sha256, model_adoption_verified]
+      properties:
+        candidate_id: {type: string}
+        content_sha256: {type: string}
+        method_version: {type: string}
+        state: {const: DRAFT}
+        enabled: {const: false}
+        validation_status: {enum: [INVALID, VALIDATED_STATIC_ONLY]}
+        errors: {type: array, items: {type: object}}
+        missing_tools: {type: array, items: {type: string}}
+        tool_config_sha256: {type: string}
+        model_adoption_verified: {const: false}
+    SkillPublicationInput:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, expected_content_sha256, expected_base_sha256, expected_draft_version, authorization_id, change_note]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}
+        expected_content_sha256: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}
+        expected_base_sha256: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}
+        expected_draft_version: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}
+        authorization_id: {type: string, minLength: 1, maxLength: 128, pattern: '\S'}
+        change_note: {type: string, minLength: 1, maxLength: 360, pattern: '\S'}
+    SkillPublicationStatus:
+      type: object
+      required: [candidate_id, client_request_id, state]
+      properties:
+        candidate_id: {type: string}
+        client_request_id: {type: string}
+        state: {enum: [NOT_FOUND, PREPARED, COMPLETED, CANCELED]}
+        sop_id: {type: string}
+        result:
+          oneOf:
+            - {type: 'null'}
+            - {$ref: '#/components/schemas/SkillActivationResult'}
+    SkillDisableInput:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, expected_active_sha256]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 128}
+        sop_id: {type: string, minLength: 1, maxLength: 128}
+        expected_active_sha256: {type: string}
+    SkillActivationRecoveryInput:
+      type: object
+      additionalProperties: false
+      required: [client_request_id, sop_id, activation_request_id]
+      properties:
+        client_request_id: {type: string, minLength: 1, maxLength: 128}
+        sop_id: {type: string, minLength: 1, maxLength: 128}
+        activation_request_id: {type: string}
+    SkillActivationResult:
+      type: object
+      required: [sop_id, draft_version, state, method_version, content_sha256, model_adoption_verified, business_authorization_granted]
+      properties:
+        sop_id: {type: string}
+        draft_version: {type: string}
+        state: {enum: [ACTIVE, CANCELED]}
+        method_version: {type: string}
+        content_sha256: {type: string}
+        model_adoption_verified: {const: false}
+        business_authorization_granted: {const: false}

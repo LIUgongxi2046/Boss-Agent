@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from aiohttp import web
@@ -201,6 +202,52 @@ class BossCommandAPI:
         self.runtime_control = runtime_control
         self.skills = skills
 
+    def coordinate_in_transaction(self, db, payload, *, actor_id, space_id, scope_revision):
+        from boss_supply_quality import SCHEMA, COORDINATE_ACTION, bound_source_references, validate_result
+        from boss_supply_quality_views import read_projection
+
+        main = db.execute("PRAGMA database_list").fetchone()
+        require(db.in_transaction and main is not None and main[1] == "main" and Path(main[2]).resolve() == self.store.path.resolve(), "领域操作需要当前数据库事务")
+        validator = Draft202012Validator({**SCHEMA, "$ref": "#/$defs/CoordinateInput"}, format_checker=FormatChecker())
+        require(isinstance(payload, dict) and validator.is_valid(payload), "模拟业务输入不符合Schema", web.HTTPBadRequest)
+        context = _context(db)
+        require((context["owner_id"], context["namespace"]) == (actor_id, space_id), "当前主体或执行空间已经变化", web.HTTPForbidden)
+        action = COORDINATE_ACTION
+        key = payload["client_request_id"]
+        digest = checksum({"action": action, "payload": {field: value for field, value in payload.items() if field != "client_request_id"}})
+        previous = db.execute("SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?", (space_id, action, key)).fetchone()
+        require(previous is None, "原请求已有领域回执，请查询原决定")
+        require(db.execute("SELECT 1 FROM idempotency WHERE namespace<>? AND operation=? AND key=?", (space_id, action, key)).fetchone() is None, "原请求编号属于其他执行空间")
+        view = read_projection(self.store, db, context, payload["interface_id"])
+        origin = next((record for record in view["records"] if record["entity_type"] == payload["origin_entity_type"] and record["record_id"] == payload["origin_record_id"]), None)
+        require(origin is not None and origin["version"] == payload["origin_version"], "协调来源已经变化")
+        refs = bound_source_references(db, context, payload["origin_entity_type"], origin)
+        require(bool(refs) and checksum({"dataset_id": context["dataset_id"], "dataset_version": context["dataset_version"], "source_refs": refs}) == scope_revision, "当前来源范围已经变化")
+        result = SupplyQualityAPI(self.store)._coordinate(db, context, payload)
+        validate_result("CoordinateResult", result)
+        db.execute("INSERT INTO idempotency VALUES(?,?,?,?,?)", (space_id, action, key, digest, encode(result)))
+        safe_result = {field: result[field] for field in ("state", "record_count", "record_id", "version", "source_id", "task_id", "source_type", "external_service_invoked", "error_code") if field in result}
+        db.execute("INSERT INTO audit(namespace,operation,input,output,created_at) VALUES(?,?,?,?,?)", (space_id, action, encode({"role": "BOSS", "client_request_id": key, "payload_sha256": digest, "source_type": "SIMULATED"}), encode(safe_result), now()))
+        return result
+
+    def verify_coordinate_receipt_in_transaction(self, db, *, actor_id, space_id, payload, source_refs, authorization_id):
+        from boss_supply_quality import COORDINATE_ACTION
+
+        main = db.execute("PRAGMA database_list").fetchone()
+        require(db.in_transaction and main is not None and main[1] == "main" and Path(main[2]).resolve() == self.store.path.resolve(), "回执核查需要当前数据库事务")
+        key = payload["client_request_id"]
+        digest = checksum({"action": COORDINATE_ACTION, "payload": {field: value for field, value in payload.items() if field != "client_request_id"}})
+        row = db.execute("SELECT digest,result FROM idempotency WHERE namespace=? AND operation=? AND key=?", (space_id, COORDINATE_ACTION, key)).fetchone()
+        require(row is not None and row[0] == digest, "领域回执与原请求不符")
+        result = json.loads(row[1])
+        require(result.get("authorization_id") == authorization_id and isinstance(result.get("task_id"), str), "领域回执与本人授权不符")
+        auth = self.store.get(db, space_id, "authorization", authorization_id)
+        task = self.store.get(db, space_id, "task", result["task_id"])
+        content = {field: payload[field] for field in ("purpose", "coordinator_id", "due_at", "timezone", "evidence_requirements")}
+        content.update(content_version="1", related_meeting_id=None, related_event_ids=[], source_refs=[ref["source_id"] for ref in source_refs])
+        require(auth.get("owner_id") == actor_id and auth.get("issuer_identity") == "BOSS" and auth.get("issuer") == actor_id and auth.get("scope") == space_id and auth.get("action") == "create_assignment" and auth.get("payload") == content and task.get("authorization_id") == authorization_id and task.get("task_id") == result["task_id"], "本人授权或业务对象与原意图不符")
+        return result
+
     def execute(self, role, action, payload):
         if role not in ("BOSS", "MAINTAINER"):
             return 401, {"error": "UNAUTHENTICATED"}
@@ -262,6 +309,21 @@ class BossCommandAPI:
             elif action == "boss.today.reorder":
                 from boss_today import TodayAPI
                 result = TodayAPI(self.store).reorder(role, payload)
+            elif action == "boss.knowledge.source.withdraw":
+                self._exact(payload, {"client_request_id", "source_id", "expected_version"})
+                from boss_knowledge_ingestion import _validate_source
+                _validate_source(None, payload["source_id"])
+                from hermes_source_invalidation import begin_source_cleanup, fail_source_cleanup
+                pending = begin_source_cleanup(self.store, NAMESPACE, payload["source_id"], payload["expected_version"], operation=action, request_id=payload["client_request_id"], maintainer_source=True)
+                completed = False
+                try:
+                    result = self._transaction(action, payload)
+                    completed = True
+                    from hermes_source_invalidation import complete_source_session_cleanup
+                    complete_source_session_cleanup(self.store, NAMESPACE, payload["source_id"])
+                finally:
+                    if pending and not completed:
+                        fail_source_cleanup(self.store, NAMESPACE, payload["source_id"])
             else:
                 result = self._transaction(action, payload)
             if self.runtime_control is not None and action in {

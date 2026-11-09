@@ -3,6 +3,7 @@ import asyncio
 import hmac
 import json
 import os
+from pathlib import Path
 
 from aiohttp import web
 
@@ -10,8 +11,25 @@ from business import Store, require
 from controls import ControlStore
 
 
-def application(path, *, execution_namespace=None):
-    store = ControlStore(path)
+STORE_KEY = web.AppKey("control_store", ControlStore)
+
+
+def application(path, *, execution_namespace=None, business_store=None, session_manager=None, session_workspace=None, sessions_root=None):
+    if (session_workspace is None) != (sessions_root is None) or session_manager is not None and session_workspace is not None:
+        raise ValueError("会话服务配置不完整")
+    store = business_store if business_store is not None else ControlStore(path)
+    if not isinstance(store, ControlStore) or store.path.resolve() != Path(path).resolve():
+        raise ValueError("控制服务数据库不匹配")
+    if session_workspace is not None:
+        if not execution_namespace or not Path(session_workspace).is_dir() or not Path(sessions_root).is_dir():
+            raise ValueError("会话目录或执行空间无效")
+        from boss_memory_sessions import MemorySessionManager
+        session_manager = MemorySessionManager(Path(session_workspace), business_store=store, namespace=execution_namespace, sessions_root=Path(sessions_root))
+    if session_manager is not None:
+        from boss_memory_sessions import MemorySessionManager
+        if not isinstance(session_manager, MemorySessionManager) or session_manager.business_store is not store or session_manager.namespace != execution_namespace:
+            raise ValueError("控制服务会话管理器不匹配")
+        store.hermes_source_sessions = session_manager
     tokens = {"BOSS": os.environ["BOSS_PROBE_TOKEN"], "MAINTAINER": os.environ["MAINTAINER_PROBE_TOKEN"]}
     failure = os.environ.get("BOSS_PROBE_FAILURE", "NONE")
     require(failure in {"NONE", "UNAVAILABLE", "TIMEOUT"}, "模拟故障配置无效")
@@ -117,6 +135,12 @@ def application(path, *, execution_namespace=None):
         return web.json_response(store.control(request.match_info["ns"], action, await request.json()))
 
     app = web.Application(middlewares=[authenticate], client_max_size=1024*1024)
+    app[STORE_KEY] = store
+    if session_manager is not None:
+        async def recover_sources(application):
+            from hermes_source_invalidation import recover_source_session_cleanups
+            recover_source_session_cleanups(store, execution_namespace)
+        app.on_startup.append(recover_sources)
     app.add_routes([web.get("/health", health), web.post("/datasets", initialize), web.post("/authorizations", authorize), web.post("/operations/{operation}", invoke), web.get("/spaces/{ns}/context", context), web.put("/spaces/{ns}/{kind}", update), web.get("/spaces/{ns}/objects/{kind}", read_objects), web.post("/spaces/{ns}/events", trigger), web.post("/spaces/{ns}/reset", reset), web.post("/spaces/{ns}/controls/{action}", control)])
     return app
 
@@ -125,5 +149,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--database", required=True)
     parser.add_argument("--port", type=int, default=8871)
+    parser.add_argument("--namespace")
+    parser.add_argument("--session-workspace")
+    parser.add_argument("--sessions-root")
     args = parser.parse_args()
-    web.run_app(application(args.database), host="127.0.0.1", port=args.port, access_log=None)
+    web.run_app(application(args.database, execution_namespace=args.namespace, session_workspace=args.session_workspace, sessions_root=args.sessions_root), host="127.0.0.1", port=args.port, access_log=None)

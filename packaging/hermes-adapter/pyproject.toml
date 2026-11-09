@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools==83.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "boss-agent-hermes-adapter"
+version = "0.1.21"
+description = "Boss Agent Hermes process adapter"
+requires-python = ">=3.14,<3.15"
+dependencies = ["httpx==0.28.1"]
+
+[tool.setuptools]
+include-package-data = false

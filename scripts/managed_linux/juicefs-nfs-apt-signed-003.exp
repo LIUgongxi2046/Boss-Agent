@@ -1,0 +1,37 @@
+set timeout 240
+set secret [open [lindex $argv 6] r]
+set password [string trim [read $secret]]
+close $secret
+log_user 1
+spawn {*}[lrange $argv 0 5]
+expect {
+    -re {login:} {}
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+send -- "root\r"
+expect {
+    -re {Password:} {}
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+log_user 0
+send -- "$password\r"
+unset password
+expect {
+    -re {# $} {}
+    -re {Login incorrect} { exit 1 }
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+log_user 1
+send -- "mkdir -p /run/boss-checks /run/boss-repo && mount -t virtiofs -o ro boss-checks /run/boss-checks && mount -t virtiofs -o ro boss-guest-runtime /run/boss-repo && bash /run/boss-checks/guest-nfs-apt-signed-003.sh; echo CHECK_STATUS=\$?\r"
+expect {
+    -re {\r\nCHECK_STATUS=([0-9]+)\r} { set result $expect_out(1,string) }
+    timeout { exit 1 }
+    eof { exit 1 }
+}
+expect -re {# $}
+send -- "poweroff\r"
+expect eof
+exit $result

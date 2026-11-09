@@ -1,0 +1,13 @@
+hermes_guest_agent
+hermes_guest_control
+hermes_guest_cpu_guard
+hermes_guest_identity
+hermes_guest_proxy
+hermes_guest_slice
+hermes_guest_systemd
+hermes_guest_unit_reference
+hermes_guest_workspace_directory
+hermes_guest_workspace_guard
+hermes_guest_workspace_service
+hermes_vm_channel
+hermes_vm_credentials

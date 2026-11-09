@@ -31,6 +31,7 @@ class RoleChannel(WebSocketChannel):
         self.token_expirations = {}
         self.connection_expirations = {}
         self.connection_tokens = {}
+        self.run_token_pairs = {}
         self.fc01 = None
         self.bi = None
         self.morning = None
@@ -59,6 +60,37 @@ class RoleChannel(WebSocketChannel):
             from boss_execution_transition import pending_transition
             row = db.execute("SELECT active FROM spaces WHERE namespace=?", (NAMESPACE,)).fetchone()
             return row is not None and row[0] == 1 and pending_transition(db, NAMESPACE) is None
+
+    def require_run_api_role(self, request):
+        from agent_run_broker import fail
+        token = bearer_token(request.headers)
+        if not token or not self.gateway.tokens.check_api_token(request) or self.token_roles.get(token) not in {"BOSS", "MAINTAINER"} or time.monotonic() >= self.token_expirations.get(token, 0):
+            fail(web.HTTPUnauthorized, "UNAUTHENTICATED", "当前身份无效")
+        if self.token_roles[token] != "BOSS":
+            fail(web.HTTPForbidden, "FORBIDDEN", "当前身份无权操作运行")
+        if not self.execution_space_active():
+            fail(web.HTTPConflict, "EXECUTION_SPACE_CHANGED", "执行空间已经切换")
+        return "BOSS"
+
+    def require_run_subscription(self, request, chat_id):
+        from agent_run_broker import fail
+        from nanobot.webui.session_identity import is_valid_webui_chat_id
+        self.require_run_api_role(request)
+        if not is_valid_webui_chat_id(chat_id):
+            fail(web.HTTPBadRequest, "INVALID_INPUT", "会话编号无效")
+        api_token = bearer_token(request.headers)
+        ws_token = self.run_token_pairs.get(api_token)
+        now_mono = time.monotonic()
+        matching = [connection for connection, token in self.connection_tokens.items()
+                    if ws_token is not None and token == ws_token
+                    and self.connection_roles.get(connection) == "BOSS"
+                    and self.token_roles.get(token) == "BOSS"
+                    and connection.close_code is None
+                    and now_mono < self.connection_expirations.get(connection, 0)
+                    and chat_id in self.webui_connection_chats(connection)]
+        if not matching:
+            fail(web.HTTPForbidden, "FORBIDDEN", "当前认证连接未订阅该会话")
+        return "BOSS"
 
     async def _dispatch_http(self, connection, request):
         address = urlsplit(request.path)
@@ -90,6 +122,14 @@ class RoleChannel(WebSocketChannel):
                     if key in payload:
                         self.token_roles[payload[key]] = role
                         self.token_expirations[payload[key]] = time.monotonic() + payload["expires_in"]
+                if payload.get("token") and payload.get("api_token"):
+                    expired_pairs = [api for api, websocket in self.run_token_pairs.items()
+                                     if time.monotonic() >= self.token_expirations.get(api, 0)
+                                     or time.monotonic() >= self.token_expirations.get(websocket, 0)
+                                     or api not in self.token_roles or websocket not in self.token_roles]
+                    for api in expired_pairs:
+                        del self.run_token_pairs[api]
+                    self.run_token_pairs[payload["api_token"]] = payload["token"]
             self.record(role, "bootstrap", response.status_code)
             return response
         query = parse_qs(address.query)
@@ -332,6 +372,7 @@ class RoleChannel(WebSocketChannel):
                     self.gateway.tokens.issued_tokens.pop(token, None)
                     self.gateway.tokens.issued_token_audiences.pop(token, None)
                     self.token_roles.pop(token, None)
+                    self.run_token_pairs.pop(token, None)
             peers = [peer for peer, identity in self.connection_roles.items() if identity == role]
             for peer in peers:
                 self.connection_roles.pop(peer, None)

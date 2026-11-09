@@ -155,7 +155,7 @@ def revise(api, db, data, payload):
     return _change(api, db, data, payload, "revise")
 
 
-def withdraw(api, db, data, payload):
+def withdraw(api, db, data, payload, *, operation="boss.knowledge.source.withdraw"):
     api._exact(payload, {"client_request_id", "source_id", "expected_version"})
     sid = _validate_source(data, payload["source_id"])
     doc = _read(db, sid)
@@ -173,6 +173,13 @@ def withdraw(api, db, data, payload):
     doc["index_state"] = "WITHDRAWN"
     api.store.put(db, NS, "document", sid, doc)
     _reindex(db, sid, None)
+    from hermes_source_invalidation import finish_source_cleanup_in_transaction, invalidate_document_results_in_transaction
+    invalidate_document_results_in_transaction(db, NS, sid)
+    finish_source_cleanup_in_transaction(api.store, db, NS, sid)
+    from hermes_source_invalidation import append_source_withdrawal_in_transaction
+    append_source_withdrawal_in_transaction(api.store, db, NS, sid, payload["expected_version"], operation, payload["client_request_id"], "idempotency")
+    from agent_artifact_withdrawal import propagate_domain_source_withdrawal_in_transaction
+    propagate_domain_source_withdrawal_in_transaction(api.store, db, sid)
     return {
         "source_type": "SIMULATED", "source_id": sid,
         "version": doc["version"], "index_state": "WITHDRAWN",

@@ -2,6 +2,10 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('bossDesktop', Object.freeze({
   invoke: request => ipcRenderer.invoke('boss-desktop:capability', request),
+  exportArtifact: request => {
+    if (!navigator.userActivation.isActive) return Promise.reject(new Error('请由本人操作导出成果'));
+    return ipcRenderer.invoke('boss-desktop:export-artifact', request);
+  },
   confirmClose: () => ipcRenderer.invoke('boss-desktop:confirm-close'),
   onCloseRequested: listener => {
     if (typeof listener !== 'function') throw new Error('关闭监听器无效');

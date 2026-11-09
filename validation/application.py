@@ -108,7 +108,7 @@ def prepare():
                 "model": "deepseek-flash", "maxToolIterations": 12, "maxTokens": 4096,
                 "timezone": "Asia/Shanghai", "timezoneMode": "manual", "dream": {"enabled": False},
                 "idleCompactAfterMinutes": 0, "maxToolResultChars": 200000}},
-            "providers": {"deepseek": {"apiKey": "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com",
+            "providers": {"deepseek": {"apiKey": "" if os.environ.get("BOSS_PRODUCT_UI") == "1" else "${DEEPSEEK_API_KEY}", "apiBase": "https://api.deepseek.com",
                 "extraBody": {"thinking": {"type": "disabled"}}}},
             "gateway": {"host": "127.0.0.1", "port": PORTS["gateway"], "heartbeat": {"enabled": False}},
             "channels": {"websocket": {"enabled": True, "host": "127.0.0.1", "port": PORTS["webui"],
@@ -123,7 +123,7 @@ def prepare():
     return roles, config
 
 
-async def serve():
+async def serve(*, hermes_deployment=None, artifact_workspace=None):
     logger.remove()
     if os.environ.get("BOSS_PRODUCT_UI") == "1":
         logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False,
@@ -131,15 +131,25 @@ async def serve():
                    filter=product_log_filter)
     else:
         logger.add(sys.stderr, level="INFO", diagnose=False, backtrace=False)
-    connection = settings()
-    roles, config_path = prepare()
     product_mode = os.environ.get("BOSS_PRODUCT_UI") == "1"
+    if artifact_workspace is not None:
+        from agent_artifact_workspace import ArtifactWorkspace
+        if not isinstance(artifact_workspace, ArtifactWorkspace) or not product_mode or os.environ.get("BOSS_AGENT_RUN_PORT") is None:
+            raise ValueError("成果目录映射需要产品模式和运行接口")
+    from hermes_runtime_binding import require_application_deployment
+    hermes_deployment = require_application_deployment(hermes_deployment, product_mode=product_mode,
+                                                      run_port=os.environ.get("BOSS_AGENT_RUN_PORT"))
+    connection = None if product_mode else settings()
+    roles, config_path = prepare()
     if os.environ.get("BOSS_EXECUTION_SCOPE") not in (None, "BOSS-MVP-1", "BOSS-PRIORITY-ITERATION"):
         raise ValueError("当前执行范围配置无效")
     mvp_mode = product_mode and os.environ.get("BOSS_EXECUTION_SCOPE") in {"BOSS-MVP-1", "BOSS-PRIORITY-ITERATION"}
     account_store = AccountStore(WORK / "accounts/accounts.sqlite") if product_mode else None
     effective_config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
-    config = resolve_config_env_vars(load_config(config_path), config_path=config_path)
+    config = load_config(config_path)
+    if product_mode:
+        config.providers.deepseek.api_key = ""
+    config = resolve_config_env_vars(config, config_path=config_path)
     if NAMESPACE != "ui-check":
         require(config.workspace_path.resolve() == (NATIVE_ROOT / "workspace").resolve(),
                 "原生工作目录必须属于当前执行空间")
@@ -147,6 +157,15 @@ async def serve():
         raise ValueError("已保存配置与当前指定端口不一致")
     if hashlib.sha256(config_path.read_bytes()).hexdigest() != effective_config_sha256:
         raise ValueError("应用启动期间配置发生变化")
+    run_port = os.environ.get("BOSS_AGENT_RUN_PORT")
+    if run_port is not None:
+        if not product_mode or not run_port.isascii() or not run_port.isdecimal() or not 1024 <= int(run_port) <= 65535 or int(run_port) in PORTS.values():
+            raise ValueError("运行接口端口配置无效")
+        from nanobot.channels.websocket.runtime import WebSocketConfig
+        websocket_config = WebSocketConfig.model_validate(config.channels.websocket)
+        if websocket_config.host != "127.0.0.1" or websocket_config.unix_socket_path or websocket_config.public_ws_url or websocket_config.ssl_certfile or websocket_config.ssl_keyfile:
+            raise ValueError("同源运行服务需要本机 HTTP WebUI 配置")
+        config.channels.websocket["port"] = int(run_port)
     store = ControlStore(WORK / "business.sqlite")
     store.service_started_at = now()
     with store.connect() as db:
@@ -188,10 +207,18 @@ async def serve():
     audit = Audit(output / "events.json", records)
     audit.registry = registry
     bus = MessageBus()
-    session_options = {"sessions_root": NATIVE_ROOT / "sessions" if NAMESPACE != "ui-check" else None}
+    isolated_sessions = os.environ.get("BOSS_ISOLATED_SESSIONS")
+    if isolated_sessions not in (None, "1") or isolated_sessions == "1" and not product_mode:
+        raise ValueError("独立会话目录配置无效")
+    session_options = {"sessions_root": NATIVE_ROOT / "sessions" if NAMESPACE != "ui-check" or isolated_sessions == "1" else None}
+    if isolated_sessions == "1":
+        if (NATIVE_ROOT / "sessions").is_symlink() or (NATIVE_ROOT / "legacy-sessions").is_symlink():
+            raise ValueError("独立会话目录不能使用符号链接")
+        session_options["legacy_sessions_root"] = NATIVE_ROOT / "legacy-sessions"
     sessions = (MemorySessionManager(config.workspace_path, business_store=store, **session_options)
                 if product_mode else SessionManager(config.workspace_path, **session_options))
     if product_mode:
+        store.hermes_source_sessions = sessions
         sessions.reconcile_memory()
     if morning is not None:
         morning.native.bind_sessions(sessions)
@@ -309,9 +336,16 @@ async def serve():
         channels.channels["websocket"].assignment = assignment
         channels.channels["websocket"].reminders = reminders
         channels.channels["websocket"].native_conversation = conversation
-    server = web.AppRunner(business_application(WORK / "business.sqlite", execution_namespace=NAMESPACE))
+    server = web.AppRunner(business_application(WORK / "business.sqlite", execution_namespace=NAMESPACE, business_store=store, session_manager=sessions if product_mode else None))
     await server.setup()
     await web.TCPSite(server, "127.0.0.1", PORTS["business"]).start()
+    run_server = None
+    if run_port is not None:
+        from hermes_product import hermes_product_application
+        run_application = hermes_product_application(channels.channels["websocket"], store, sessions, NAMESPACE, public_port=PORTS["webui"], upstream_port=int(run_port), chat_budget_enabled=True, execution_deployment=hermes_deployment, artifact_workspace=artifact_workspace)
+        run_server = web.AppRunner(run_application)
+        await run_server.setup()
+        await web.TCPSite(run_server, "127.0.0.1", PORTS["webui"]).start()
     stop = asyncio.Event()
     external_stop = asyncio.Event()
     transition = ExecutionTransition(store, runtime_control, WORK, stop) if runtime_control is not None else None
@@ -408,6 +442,8 @@ async def serve():
             await runtime_control.stop_runs()
         await loop.aclose()
         await channels.stop_all()
+        if run_server is not None:
+            await run_server.cleanup()
         await server.cleanup()
         await asyncio.gather(channel_task, agent_task)
         if runtime_control is not None:

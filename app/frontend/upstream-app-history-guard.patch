@@ -1,0 +1,24 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -1229,7 +1229,20 @@ function Shell({
+   useEffect(() => {
+     const applyRoute = () => {
++      if(bossHistorySuppressed())return;
+       const route = readShellRoute();
+-      if (currentShellRouteRef.current.view === "settings" && route.view !== "settings" && settingsExitGuardRef.current) {
++      const draft=nativeDrafts.current.get(currentShellRouteRef.current.activeKey??"new-conversation");
++      if (currentShellRouteRef.current.view === "chat" &&
++          (route.activeKey !== currentShellRouteRef.current.activeKey || route.view !== "chat") && draft?.hasDraft) {
++        writeShellRoute(currentShellRouteRef.current, true);
++        setPendingNativeNavigation(() => () => {
++          draft.discard();
++          setActiveKey(route.activeKey);setView(route.view);setSettingsInitialSection(route.settingsSection);
++          writeShellRoute(route,true);
++        });
++        return;
++      }
++      if (currentShellRouteRef.current.view === "settings" &&
++          (route.view !== "settings" || route.settingsSection !== currentShellRouteRef.current.settingsSection) && settingsExitGuardRef.current) {
+         writeShellRoute(currentShellRouteRef.current, true);
+         settingsExitGuardRef.current(() => {
+           setActiveKey(route.activeKey);

@@ -183,12 +183,15 @@ dependencies = [
     { name = "jsonschema", extra = ["format"] },
     { name = "markdown-it-py" },
     { name = "nanobot-ai", extra = ["api"] },
+    { name = "openpyxl" },
     { name = "packaging" },
     { name = "playwright" },
     { name = "pypdf" },
     { name = "pytest" },
     { name = "python-docx" },
+    { name = "python-pptx" },
     { name = "pyyaml" },
+    { name = "reportlab" },
 ]
 
 [package.metadata]
@@ -200,12 +203,15 @@ requires-dist = [
     { name = "jsonschema", extras = ["format"], specifier = "==4.25.1" },
     { name = "markdown-it-py", specifier = "==4.2.0" },
     { name = "nanobot-ai", extras = ["api"], specifier = "==0.3.5" },
+    { name = "openpyxl", specifier = "==3.1.5" },
     { name = "packaging", specifier = "==26.3" },
     { name = "playwright", specifier = "==1.55.0" },
     { name = "pypdf", specifier = "==5.9.0" },
     { name = "pytest", specifier = "==8.4.2" },
     { name = "python-docx", specifier = "==1.2.0" },
+    { name = "python-pptx", specifier = "==1.0.2" },
     { name = "pyyaml", specifier = "==6.0.3" },
+    { name = "reportlab", specifier = "==4.4.4" },
 ]
 
 [[package]]
@@ -1433,6 +1439,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/05/2566c4ba849b68a8ab81a6bf428fa79d20aae7ddee83979103c0381df254/regex-2026.9.29-cp312-cp312-win32.whl", hash = "sha256:d0c3082bf79bcd6a614d55916590ad4b8f93200e10b97f463ea5d9d07c9b5f23", size = 269327, upload-time = "2026-09-29T00:47:01.135Z" },
     { url = "https://files.pythonhosted.org/packages/93/19/489bc8db91196381c935752df01ba3f607140daece33b78d88573f028e64/regex-2026.9.29-cp312-cp312-win_amd64.whl", hash = "sha256:fdd88ed5e20b1bcdd234421e454962c971aa44b653bdb7f1ea9ef683e90fb649", size = 280334, upload-time = "2026-09-29T00:47:04.436Z" },
     { url = "https://files.pythonhosted.org/packages/0b/47/fb88ba779d0e5e7d4b0ec1aceeb13845948a2cb876bd572a2d1dfdba090b/regex-2026.9.29-cp312-cp312-win_arm64.whl", hash = "sha256:4fe97894d1b306c919b4e50def1e6f6c522f4d03a7283811f4d108f1ce5d3ac2", size = 279614, upload-time = "2026-09-29T00:47:06.541Z" },
+]
+
+[[package]]
+name = "reportlab"
+version = "4.4.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "charset-normalizer" },
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f8/fa/ed71f3e750afb77497641eb0194aeda069e271ce6d6931140f8787e0e69a/reportlab-4.4.4.tar.gz", hash = "sha256:cb2f658b7f4a15be2cc68f7203aa67faef67213edd4f2d4bdd3eb20dab75a80d", size = 3711935, upload-time = "2025-09-19T10:43:36.502Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/57/66/e040586fe6f9ae7f3a6986186653791fb865947f0b745290ee4ab026b834/reportlab-4.4.4-py3-none-any.whl", hash = "sha256:299b3b0534e7202bb94ed2ddcd7179b818dcda7de9d8518a57c85a58a1ebaadb", size = 1954981, upload-time = "2025-09-19T10:43:33.589Z" },
 ]
 
 [[package]]

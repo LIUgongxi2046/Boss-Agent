@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "key": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "\\S"},
+    "revision": {"type": "integer", "minimum": 0},
+    "goal_revision": {"type": "integer", "minimum": 1},
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["expected_revision", "expected_goal_revision", "request_key"],
+      "properties": {"expected_revision": {"$ref": "#/$defs/revision"}, "expected_goal_revision": {"$ref": "#/$defs/goal_revision"}, "request_key": {"$ref": "#/$defs/key"}}
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["run_id", "status", "revision", "goal_revision"],
+      "properties": {"run_id": {"type": "string", "format": "uuid"}, "status": {"const": "QUEUED"}, "revision": {"$ref": "#/$defs/revision"}, "goal_revision": {"$ref": "#/$defs/goal_revision"}}
+    },
+    "status": {
+      "type": "object", "additionalProperties": false,
+      "required": ["run_id", "status", "revision", "goal_revision", "allowed_actions", "waiting_reasons", "original_receipt"],
+      "properties": {
+        "run_id": {"type": "string", "format": "uuid"},
+        "status": {"enum": ["QUEUED", "RUNNING", "WAITING_INPUT", "WAITING_CONFIRMATION", "CANCEL_REQUESTED", "RECONCILING", "SUCCEEDED", "FAILED", "CANCELED", "INTERRUPTED"]},
+        "revision": {"$ref": "#/$defs/revision"}, "goal_revision": {"$ref": "#/$defs/goal_revision"},
+        "allowed_actions": {"type": "array", "maxItems": 0},
+        "waiting_reasons": {"type": "array", "uniqueItems": true, "minItems": 1, "items": {"enum": ["ENGINE_BOUNDARY_UNVERIFIED", "PROCESS_RECOVERY_UNVERIFIED", "BUDGET_REVALIDATION_REQUIRED", "RUN_STATE_UNAVAILABLE", "REQUIRED_OUTPUTS_UNCONFIRMED", "ORIGINAL_LEASE_ACTIVE", "ADDITIONAL_INPUT_REQUIRED", "CHILD_RUN_RECOVERY_UNAVAILABLE", "PROCESS_RECORDS_UNAVAILABLE", "PROCESS_CAPACITY_UNRESOLVED", "PRIOR_PROCESS_SCOPE_UNVERIFIED"]}},
+        "original_receipt": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/receipt"}]}
+      }
+    },
+    "request_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["run_id", "request_key", "outcome", "receipt"],
+      "properties": {"run_id": {"type": "string", "format": "uuid"}, "request_key": {"$ref": "#/$defs/key"}, "outcome": {"const": "RECORDED"}, "receipt": {"$ref": "#/$defs/receipt"}}
+    }
+  }
+}

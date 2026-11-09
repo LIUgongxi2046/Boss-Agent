@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["run_id", "event_id", "source_id", "version", "sha256", "current_version", "historical", "title", "content", "citations"],
+  "properties": {
+    "run_id": {"type": "string", "format": "uuid"},
+    "event_id": {"type": "string", "format": "uuid"},
+    "source_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "current_version": {"type": "string", "minLength": 1},
+    "historical": {"type": "boolean"},
+    "title": {"type": "string", "minLength": 1},
+    "content": {"type": "string"},
+    "citations": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["locator", "locator_verification"], "properties": {"locator": {"type": "string", "minLength": 1}, "locator_verification": {"const": "NOT_VERIFIED"}}}}
+  }
+}

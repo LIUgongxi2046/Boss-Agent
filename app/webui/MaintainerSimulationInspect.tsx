@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useClient } from "@/providers/ClientProvider";
-import schema from "./simulation-query.schema.json";
+import schema from "../../specs/simulation-query.schema.json";
 import {V7Empty,V7Fact,V7Panel,V7Tabs} from "./BossV7UI";
 
 type Result = {

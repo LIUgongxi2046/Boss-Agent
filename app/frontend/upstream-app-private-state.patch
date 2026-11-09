@@ -1,0 +1,41 @@
+--- a/webui/src/App.tsx
++++ b/webui/src/App.tsx
+@@ -63,6 +63,7 @@ import {
+ import { displayTitle, sortSessions } from "@/lib/chat-groups";
+ import { deriveTitle } from "@/lib/format";
+ import { NanobotClient } from "@/lib/nanobot-client";
++import { webuiThreadCache } from "@/lib/webui-thread-cache";
+ import { ClientProvider, useClient } from "@/providers/ClientProvider";
+ import type {
+   BootstrapResponse,
+@@ -874,13 +875,22 @@ function resolveRuntimeSurface(
+   return surface ? toRuntimeSurface(surface) : fallback;
+ }
+ 
++function clearPrivateNativeState(): void {
++  webuiThreadCache.clear();
++  for (const key of Object.keys(window.localStorage)) {
++    if (key.startsWith("nanobot.webui.composerQueuedGuidance.v1:")) window.localStorage.removeItem(key);
++  }
++}
++
+ export default function App() {
+   const [state, setState] = useState<BootState>({ status: "loading" });
++  useEffect(() => {if (state.status === "auth") clearPrivateNativeState();}, [state.status]);
+   const bootstrapSecretRef = useRef("");
+   useEffect(() => {
+     if (state.status !== "ready") return;
+     const expire = () => {
+       state.client.close();
++      clearPrivateNativeState();
+       bootstrapSecretRef.current = "";
+       clearSavedSecret();
+       setState({ status: "auth", expired: true });
+@@ -1031,6 +1041,7 @@ export default function App() {
+       await state.client.requestMutation("boss.auth.logout", {});
+     } finally {
+       state.client.close();
++      clearPrivateNativeState();
+       bootstrapSecretRef.current = "";
+       clearSavedSecret();
+       setState({ status: "auth" });

@@ -67,10 +67,12 @@ class ProductRuntime:
 
     def _native(self, model_record=None):
         source_sha = self._native_sha()
-        config = resolve_config_env_vars(load_config(self.config.path), config_path=self.config.path)
         if model_record is None:
             with self.store.connect() as db:
                 model_record = optional(db, "model_connection_active", "current")
+        config = load_config(self.config.path)
+        config.providers.deepseek.api_key = ""
+        config = resolve_config_env_vars(config, config_path=self.config.path)
         if model_record is not None:
             values = model_record["values"]
             require(bool(os.environ.get(values["credential_reference"])), "服务端凭据尚未配置", web.HTTPServiceUnavailable)
@@ -92,8 +94,8 @@ class ProductRuntime:
         require(config.get_provider_name(preset.model, preset=preset) == "deepseek"
                 and preset.model == "deepseek-flash", "模型配置超出当前获准服务", web.HTTPForbidden)
         require(config.providers.deepseek.api_base == "https://api.deepseek.com"
-                and config.providers.deepseek.api_key == os.environ["DEEPSEEK_API_KEY"],
-                "模型连接与当前获准配置不一致", web.HTTPForbidden)
+                and not config.providers.deepseek.api_key,
+                "模拟模式不能启用模型连接凭据", web.HTTPForbidden)
         require(config.agents.defaults.dream.enabled is False, "当前产品不允许后台模型任务", web.HTTPForbidden)
         require(source_sha == self._native_sha(), "读取期间原生配置发生变化")
         return config

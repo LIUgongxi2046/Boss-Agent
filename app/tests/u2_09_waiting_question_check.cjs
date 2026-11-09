@@ -1,0 +1,26 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const Module=require("node:module");
+const root=path.resolve(__dirname,"../..");
+const dependencies=path.join(root,".work/upgrade2-u2-07/dependencies/node_modules");
+const React=require(path.join(dependencies,"react"));
+const {renderToStaticMarkup}=require(path.join(dependencies,"react-dom/server"));
+const {buildSync}=require(path.join(dependencies,"esbuild"));
+const data=JSON.parse(fs.readFileSync(0,"utf8"));
+const output=buildSync({entryPoints:[path.join(root,"app/webui/upgrade2-run-client.ts"),path.join(root,"app/webui/Upgrade2RunPanel.tsx")],bundle:true,write:false,outdir:path.join(root,"app/tests/waiting-question-build"),platform:"node",format:"cjs",jsx:"automatic",nodePaths:[dependencies],external:["react","react/jsx-runtime"],loader:{".css":"empty"}});
+function load(name){const file=output.outputFiles.find(item=>item.path.endsWith("/"+name+".js"));const module=new Module(path.join(root,"app/tests/"+name+".cjs"));module.filename=path.join(root,"app/tests/"+name+".cjs");module.paths=[dependencies];module._compile(file.text,module.filename);return module.exports;}
+const {snapshotWaitingInput,validateRunResponse,validateRunReadFence}=load("upgrade2-run-client");
+const {Upgrade2RunPanel}=load("Upgrade2RunPanel");
+validateRunResponse("snapshot",data.snapshot);
+const questions=snapshotWaitingInput(data.snapshot,data.events);
+validateRunReadFence(data.snapshot,data.snapshot,[...data.events,...data.events]);
+assert.deepEqual(snapshotWaitingInput(data.snapshot,[...data.events,...data.events]),questions);
+assert.deepEqual(questions,[data.snapshot.waiting_input.question]);
+const run={...data.snapshot,allowed_actions:data.snapshot.allowed_actions.includes("ADD_INPUT")?["SUPPLY_INPUT"]:[],waiting_inputs:questions,intent:null,artifacts:[]};
+const render=(connection,error=null)=>renderToStaticMarkup(React.createElement(Upgrade2RunPanel,{run,events:data.events,event_base_seq:0,connection,loading:false,busy:false,error,supplement:""}));
+assert.ok(render("CONNECTED").includes(questions[0]));
+assert.ok(!render("DISCONNECTED").includes(questions[0]));
+assert.ok(!render("CONNECTED","读取失败").includes(questions[0]));
+assert.throws(()=>snapshotWaitingInput({...data.snapshot,goal_revision:data.snapshot.goal_revision+1},data.events),/不一致/);
+process.stdout.write(JSON.stringify({checked:true}));

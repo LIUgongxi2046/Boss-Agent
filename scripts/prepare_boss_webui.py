@@ -6,7 +6,6 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
-import yaml
 from boss_auth_overlay import apply_auth_overlay
 from boss_native_overlay import apply_native_overlay
 
@@ -19,6 +18,10 @@ SOURCE_WEBUI = SOURCE / "webui"
 SRC = SOURCE_WEBUI / "src"
 BOSS_DIR = SRC / "boss-agent"
 ASSET_DIR = SOURCE_WEBUI / "public" / "boss-brand"
+OVERLAY_ROOT = ROOT
+MANIFEST_DIR = ROOT / ".work" / "product"
+NPM_CACHE = ROOT / ".work" / "npm-cache"
+OUTPUT_DIR = SOURCE / "nanobot" / "web" / "dist"
 ANIMATIONS = [
     "01-待机悬浮.webp", "02-语音倾听.webp",
     "03-思考分析.webp", "04-执行推进.webp",
@@ -28,6 +31,7 @@ ASSETS = [
     "boss-logo-from-reference.png", "dapeng-front.png",
     "dapeng-side.png", "dapeng-think.png", "dapeng-execute.png",
 ]
+RUN_SCHEMAS = ("agent-runs.schema.json", "agent-events.schema.json", "conversation-sources.schema.json", "agent-intents.schema.json", "simulation-query.schema.json")
 
 
 def run(*args: str, cwd: Path | None = None) -> str:
@@ -42,11 +46,62 @@ def one_replace(contents: str, source: str, replacement: str, label: str) -> str
     return contents.replace(source, replacement, 1)
 
 
-def ensure_source() -> None:
+def configure_work_dir(work_dir: Path | None) -> None:
+    global SOURCE, SOURCE_WEBUI, SRC, BOSS_DIR, ASSET_DIR, OVERLAY_ROOT, MANIFEST_DIR, NPM_CACHE, OUTPUT_DIR
+    if work_dir is None:
+        SOURCE = ROOT / ".work" / "product" / "nanobot"
+        OVERLAY_ROOT = ROOT
+        MANIFEST_DIR = ROOT / ".work" / "product"
+        NPM_CACHE = ROOT / ".work" / "npm-cache"
+        OUTPUT_DIR = SOURCE / "nanobot" / "web" / "dist"
+    else:
+        work_dir = work_dir.resolve()
+        work_root = (ROOT / ".work").resolve()
+        shared = (work_root / "product").resolve()
+        if work_dir == work_root or not work_dir.is_relative_to(work_root) or work_dir.is_relative_to(shared) or shared.is_relative_to(work_dir):
+            raise ValueError("独立工作目录必须位于项目工作目录内，并且不能包含共享产品目录")
+        SOURCE = work_dir / "nanobot"
+        OVERLAY_ROOT = work_dir / "overlay"
+        MANIFEST_DIR = OVERLAY_ROOT / ".work" / "product"
+        NPM_CACHE = work_dir / "npm-cache"
+        OUTPUT_DIR = work_dir / "dist"
+        for path in (SOURCE, OVERLAY_ROOT, NPM_CACHE, OUTPUT_DIR):
+            if path.is_symlink():
+                raise ValueError(f"独立工作目录中的路径不能是符号链接：{path}")
+    SOURCE_WEBUI = SOURCE / "webui"
+    SRC = SOURCE_WEBUI / "src"
+    BOSS_DIR = SRC / "boss-agent"
+    ASSET_DIR = SOURCE_WEBUI / "public" / "boss-brand"
+
+
+def prepare_overlay_root() -> None:
+    if OVERLAY_ROOT == ROOT:
+        return
+    OVERLAY_ROOT.mkdir(parents=True, exist_ok=True)
+    app = OVERLAY_ROOT / "app"
+    if app.is_symlink():
+        if app.resolve() != (ROOT / "app").resolve():
+            raise RuntimeError("补丁来源与当前源码目录不符")
+    elif app.exists():
+        raise RuntimeError("补丁来源目录已经存在，拒绝覆盖")
+    else:
+        app.symlink_to(ROOT / "app", target_is_directory=True)
+
+
+def ensure_source(source_repo: Path | None = None) -> None:
     if not SOURCE.exists():
         SOURCE.parent.mkdir(parents=True, exist_ok=True)
         print("正在获取固定 nanobot v0.3.5 源码…")
-        run("git", "clone", "--filter=blob:none", "--no-checkout", UPSTREAM_URL, str(SOURCE))
+        if source_repo is None:
+            run("git", "clone", "--filter=blob:none", "--no-checkout", UPSTREAM_URL, str(SOURCE))
+        else:
+            source_repo = source_repo.resolve(strict=True)
+            remote = run("git", "remote", "get-url", "origin", cwd=source_repo)
+            if not (remote.rstrip("/").endswith("HKUDS/nanobot.git") or remote.rstrip("/").endswith("HKUDS/nanobot")):
+                raise RuntimeError("来源仓库与已锁定的 HKUDS/nanobot 不符。")
+            run("git", "cat-file", "-e", UPSTREAM_REV + "^{commit}", cwd=source_repo)
+            run("git", "clone", "--no-hardlinks", "--no-checkout", str(source_repo), str(SOURCE))
+            run("git", "remote", "set-url", "origin", remote, cwd=SOURCE)
         run("git", "checkout", "--detach", UPSTREAM_REV, cwd=SOURCE)
     if not (SOURCE / ".git").exists():
         raise RuntimeError("目标路径存在，但不是 Git 仓库；已拒绝覆盖。")
@@ -86,6 +141,16 @@ def copy_overlay() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     for dependency_file in ("package.json", "package-lock.json"):
         shutil.copy2(ROOT / "app" / "frontend" / dependency_file, SOURCE_WEBUI / dependency_file)
+    schema_dir = SOURCE_WEBUI / "specs"
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    for name in RUN_SCHEMAS:
+        shutil.copy2(ROOT / "specs" / name, schema_dir / name)
+    design_meta_dir = SOURCE_WEBUI / "Boss-Agent-Desktop-Complete-v7" / "meta"
+    design_meta_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(meta_file, design_meta_dir / "页面配置.json")
+    artifact_schema_dir = SOURCE_WEBUI / "validation"
+    artifact_schema_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "validation" / "agent_artifact_schema.json", artifact_schema_dir / "agent_artifact_schema.json")
     for source_name, target_name in [
         ("BossDesktop.tsx", "BossDesktop.tsx"),
         ("BossMenuNavigation.tsx", "BossMenuNavigation.tsx"),
@@ -161,9 +226,9 @@ def copy_overlay() -> None:
         encoding="utf-8",
     )
     shutil.copy2(ROOT / "specs/simulation-query.schema.json", BOSS_DIR / "simulation-query.schema.json")
-    (BOSS_DIR / "supply-quality-v1.json").write_text(
-        json.dumps(yaml.safe_load((ROOT / "data/simulation/supply-quality-v1.yaml").read_text()), ensure_ascii=False) + "\n", encoding="utf-8",
-    )
+    simulation_dir = SOURCE_WEBUI / "data" / "simulation"
+    simulation_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "data/simulation/supply-quality-v1.yaml", simulation_dir / "supply-quality-v1.yaml")
     for filename in ASSETS:
         shutil.copy2(DESIGN / "assets" / filename, ASSET_DIR / filename)
     for filename in ANIMATIONS:
@@ -197,7 +262,8 @@ def copy_overlay() -> None:
         "closing Shell boundary",
     )
     patched = apply_auth_overlay(patched, one_replace)
-    native_manifest = apply_native_overlay(ROOT, SOURCE, patched, original)
+    prepare_overlay_root()
+    native_manifest = apply_native_overlay(OVERLAY_ROOT, SOURCE, patched, original)
 
     manifest = {
         "upstream": "HKUDS/nanobot",
@@ -211,13 +277,19 @@ def copy_overlay() -> None:
             name: hashlib.sha256((ROOT / "app" / "frontend" / name).read_bytes()).hexdigest()
             for name in ("package.json", "package-lock.json")
         },
+        "run_schemas_sha256": {
+            name: hashlib.sha256((ROOT / "specs" / name).read_bytes()).hexdigest()
+            for name in RUN_SCHEMAS
+        },
+        "artifact_schema_sha256": hashlib.sha256((ROOT / "validation" / "agent_artifact_schema.json").read_bytes()).hexdigest(),
+        "simulation_definition_sha256": hashlib.sha256((ROOT / "data/simulation/supply-quality-v1.yaml").read_bytes()).hexdigest(),
         "source_modified": "pinned native WebUI overlay (working tree only)",
         "native_patches_manifest_sha256": hashlib.sha256(
-            (ROOT / ".work" / "product" / "boss-native-patches.json").read_bytes()
+            (MANIFEST_DIR / "boss-native-patches.json").read_bytes()
         ).hexdigest(),
         "native_hunks_applied": native_manifest["hunks_applied"],
     }
-    manifest_path = ROOT / ".work" / "product" / "boss-build-manifest.json"
+    manifest_path = MANIFEST_DIR / "boss-build-manifest.json"
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("桌面 React overlay 已准备，72 页路由元数据和大鹏素材完整。")
 
@@ -225,14 +297,33 @@ def copy_overlay() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--build", action="store_true", help="执行 npm ci + npm run build，要求可联网安装上游依赖")
+    parser.add_argument("--work-dir", type=Path, help="项目 .work 内的独立构建目录")
+    parser.add_argument("--source-repo", type=Path, help="已获取固定 commit 的本机上游 Git 仓库")
+    parser.add_argument("--npm-cache", type=Path, help="用于安装锁定依赖的 npm 缓存目录")
+    parser.add_argument("--offline", action="store_true", help="仅使用 npm 缓存安装依赖")
     args = parser.parse_args()
-    ensure_source()
+    configure_work_dir(args.work_dir)
+    global NPM_CACHE
+    if args.npm_cache is not None:
+        NPM_CACHE = args.npm_cache.resolve(strict=True)
+        if not NPM_CACHE.is_dir():
+            raise ValueError("npm 缓存目录不存在")
+    if args.build and OVERLAY_ROOT != ROOT and OUTPUT_DIR.exists():
+        if not OUTPUT_DIR.is_dir() or any(OUTPUT_DIR.iterdir()):
+            raise RuntimeError("独立输出目录非空，拒绝覆盖")
+    ensure_source(args.source_repo)
     copy_overlay()
     if args.build:
         print("准备上游锁定前端依赖并编译…")
-        subprocess.run(["npm", "ci", "--no-audit", "--no-fund", "--cache", str(ROOT / ".work" / "npm-cache")], cwd=SOURCE_WEBUI, check=True)
-        subprocess.run(["npm", "run", "build"], cwd=SOURCE_WEBUI, check=True)
-        dist = SOURCE / "nanobot" / "web" / "dist" / "index.html"
+        install = ["npm", "ci", "--no-audit", "--no-fund", "--cache", str(NPM_CACHE)]
+        if args.offline:
+            install.append("--offline")
+        subprocess.run(install, cwd=SOURCE_WEBUI, check=True)
+        command = ["npm", "run", "build"]
+        if OVERLAY_ROOT != ROOT:
+            command += ["--", "--outDir", str(OUTPUT_DIR), "--emptyOutDir"]
+        subprocess.run(command, cwd=SOURCE_WEBUI, check=True)
+        dist = OUTPUT_DIR / "index.html"
         if not dist.exists():
             raise RuntimeError("上游构建成功但未发现正式 dist/index.html")
         # The previous overlay manifest identifies the first-party source, but
@@ -242,7 +333,7 @@ def main() -> None:
         files = sorted(path for path in dist_root.rglob("*") if path.is_file())
         if not files:
             raise RuntimeError("正式前端编译结果为空，拒绝建立可交付指针")
-        source_manifest = ROOT / ".work" / "product" / "boss-build-manifest.json"
+        source_manifest = MANIFEST_DIR / "boss-build-manifest.json"
         product = {
             "format": "BOSS_AGENT_DIST_SHA256_V1",
             "repo_commit": run("git", "rev-parse", "HEAD", cwd=ROOT),
@@ -256,7 +347,7 @@ def main() -> None:
             "result": "BUILT_NOT_MAC_GUI_ACCEPTED",
             "desktop_v7_verified": False,
         }
-        record = ROOT / ".work" / "product" / "boss-compiled-build.json"
+        record = MANIFEST_DIR / "boss-compiled-build.json"
         record.write_text(
             json.dumps(product, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )

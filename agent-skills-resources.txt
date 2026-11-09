@@ -1,0 +1,13 @@
+agent/skills/boss-sop01/SKILL.md
+agent/skills/boss-sop02/SKILL.md
+agent/skills/boss-sop03/SKILL.md
+agent/skills/boss-sop04/SKILL.md
+agent/skills/boss-sop05/SKILL.md
+agent/skills/boss-sop06/SKILL.md
+agent/skills/boss-sop07/SKILL.md
+agent/skills/boss-sop08/SKILL.md
+agent/skills/boss-sop09/SKILL.md
+agent/skills/boss-sop10/SKILL.md
+agent/skills/boss-sop11/SKILL.md
+agent/skills/boss-sop12/SKILL.md
+agent/skills/boss-sop13/SKILL.md
