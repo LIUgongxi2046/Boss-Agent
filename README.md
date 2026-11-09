@@ -1,10 +1,23 @@
 # Boss Agent
 
-升级2.0：[PRD2.0](docs/PRD2.0.md)、[HLD2.0](docs/HLD2.0.md)、[详细设计](docs/升级2.0详细设计.md)、[执行与验收计划](docs/升级2.0执行与验收计划.md)、[运行与接口说明](docs/升级2.0运行与接口说明.md)和[执行记录](docs/development/UPGRADE-2-EXECUTION.md)。升级实施正在进行，独立构建及部分服务检查已有证据；当前运行创建和成果读取受服务准备条件限制，本人认证、Hermes 产品运行、完整备份恢复和成果导出尚未验证。完整业务范围、页面和未完成验收继续保留。
+升级2.0：[PRD2.0](docs/PRD2.0.md)、[HLD2.0](docs/HLD2.0.md)、[详细设计](docs/升级2.0详细设计.md)、[执行与验收计划](docs/升级2.0执行与验收计划.md)、[运行与接口说明](docs/升级2.0运行与接口说明.md)和[执行记录](docs/development/UPGRADE-2-EXECUTION.md)。升级实施已完成正式部署门禁与真实模型端到端运行：运行 `e877cd04-6615-4ff9-ad40-ee9415af4f2b` 返回 `SUCCEEDED`、完成检查 `PASS`，5 次 DeepSeek 请求，工具为 `read_product_memory`、`query_metrics`、`read_evidence`，Linux 隔离证据与完整后代退出已核查。适配器 `0.1.21`，产品 `product-dist-071`。U2-04 五格式成果、U2-05 跨会话记忆、U2-06 唯一调度、U2-08 恢复与实例切换、U2-09 完整验收和 U2-10 发布文档仍在推进；认证后的页面流程、视觉核查和用户验收保持未完成。完整业务范围、页面和未完成验收继续保留。
 
 面向企业老板的个人 AI 助理，将日常事项、经营资料、会议准备和交办跟进集中在同一个电脑桌面应用中。通过自然语言提问、业务工具查询和来源核查，帮助老板了解经营变化、准备决策材料，并持续查看交办与本人承诺的进展。
 
 项目以农牧企业为业务场景，围绕成本、订单、回款、交付及农业专题组织资料。界面采用 Boss-Agent Desktop v7 设计，使用蓝绿白配色与“大鹏”品牌形象。当前实现核查日期为2026-10-28，源码版本采用当前Git提交，提交及验证范围见[发布记录](docs/development/SEED-RELEASE-20261028.md)；完整产品验收尚未完成。
+
+## 升级2.0当前状态
+
+| 项目 | 当前结果 |
+|---|---|
+| 正式运行 | `e877cd04-6615-4ff9-ad40-ee9415af4f2b`，`SUCCEEDED`，完成检查 `PASS` |
+| 模型与工具 | 5 次真实 DeepSeek 请求，工具 `read_product_memory`、`query_metrics`、`read_evidence` |
+| 隔离与退出 | Linux systemd 隔离证据通过，后代进程 `VERIFIED_EXITED`，租约清空 |
+| 制品 | 适配器 `0.1.21`，产品 `product-dist-071` |
+| 回归 | 派发测试 `21 passed`，transport `30 passed, 1 skipped` |
+| 仍待完成 | U2-04、U2-05、U2-06、U2-08、U2-09、U2-10 的正式验收；认证后页面流程、视觉核查与用户验收 |
+
+详细证据见 [U2-03](docs/development/U2-03.md)、[执行记录](docs/development/UPGRADE-2-EXECUTION.md) 和 [feature-delivery.json](specs/feature-delivery.json)。
 
 ## 开源许可与商业授权
 
@@ -83,7 +96,7 @@ validation/.venv/bin/python scripts/prepare_comprehensive_simulation.py \
   --create --initialize-accounts
 ```
 
-当前仿真候选使用 `bash scripts/run_comprehensive_simulation_local.sh --desktop`启动桌面，省略`--desktop`启动本机WebUI，采用同一资料及前端制品。启动入口不创建资料、账号或构建制品；构建位置、模型配置和重复执行说明采用初始化文档。具体端口及版本见[运行环境](docs/运行环境.md)和[仿真任务记录](docs/development/SIMULATION-20261028.md)。凭据、密码、数据库和生成回答均保留在本机忽略目录。
+当前仿真候选使用 `bash scripts/run_comprehensive_simulation_local.sh --desktop`启动桌面，省略`--desktop`启动本机WebUI，采用同一资料及前端制品。本机 WebUI 入口为 `http://127.0.0.1:9082/`，启动需要本机 `DEEPSEEK_API_KEY` 与 `NANOBOT_WEBUI_SECRET` 环境变量；模型请求前清除宿主 `HTTP_PROXY`、`HTTPS_PROXY`、`NO_PROXY` 等代理变量，避免 `InvalidURL`。启动入口不创建资料、账号或构建制品；构建位置、模型配置和重复执行说明采用初始化文档。具体端口及版本见[运行环境](docs/运行环境.md)和[仿真任务记录](docs/development/SIMULATION-20261028.md)。凭据、密码、数据库和生成回答均保留在本机忽略目录。
 
 ## 使用范围
 
